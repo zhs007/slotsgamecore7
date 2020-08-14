@@ -1,6 +1,11 @@
 package slotsgamecore7
 
-type lineInfo struct {
+import (
+	"encoding/json"
+	"io/ioutil"
+)
+
+type lineInfo5 struct {
 	R1   int `json:"R1"`
 	R2   int `json:"R2"`
 	R3   int `json:"R3"`
@@ -14,7 +19,28 @@ type LineData struct {
 	Lines [][]int
 }
 
-// LoadLineJSON - load json file
-func LoadLineJSON(fn string) (*LineData, error) {
-	return nil, nil
+// LoadLine5JSON - load json file
+func LoadLine5JSON(fn string) (*LineData, error) {
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	var li []lineInfo5
+	err = json.Unmarshal(data, &li)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(li) <= 0 {
+		return nil, nil
+	}
+
+	d := &LineData{}
+	for _, v := range li {
+		cl := []int{v.R1, v.R2, v.R3, v.R4, v.R5}
+		d.Lines = append(d.Lines, cl)
+	}
+
+	return d, nil
 }
