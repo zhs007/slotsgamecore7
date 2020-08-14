@@ -47,9 +47,9 @@ func Test_LoadPayTables5JSON(t *testing.T) {
 	}
 
 	pay0 := []int{0, 0, 50, 500, 2000}
-	pay1 := []int{1, 1, 1, 1, 1}
-	pay5 := []int{1, 1, 1, 1, 1}
-	pay11 := []int{1, 1, 1, 1, 1}
+	pay1 := []int{0, 0, 50, 200, 1000}
+	pay5 := []int{0, 0, 10, 30, 120}
+	pay11 := []int{0, 2, 5, 10, 100}
 
 	for i := 0; i < 5; i++ {
 		if ld.MapPay[0][i] != pay0[i] {
