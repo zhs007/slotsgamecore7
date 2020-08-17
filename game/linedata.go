@@ -1,4 +1,4 @@
-package slotsgamecore7
+package sgc7game
 
 import (
 	"encoding/json"

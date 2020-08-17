@@ -1,41 +1,41 @@
-package slotsgamecore7
+package sgc7game
 
 import (
 	"testing"
 )
 
 func Test_LoadLine5JSON(t *testing.T) {
-	ld, err := LoadLine5JSON("./unittestdata/linedata1.json")
+	ld, err := LoadLine5JSON("../unittestdata/linedata1.json")
 	if err == nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON non-file error %v",
 			err)
 	}
 
-	ld, err = LoadLine5JSON("./unittestdata/errjson.json")
+	ld, err = LoadLine5JSON("../unittestdata/errjson.json")
 	if err == nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON errjson error %v",
 			err)
 	}
 
-	ld, err = LoadLine5JSON("./unittestdata/empty.json")
+	ld, err = LoadLine5JSON("../unittestdata/empty.json")
 	if err == nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON empty error %v",
 			err)
 	}
 
-	ld, err = LoadLine5JSON("./unittestdata/paytables.json")
+	ld, err = LoadLine5JSON("../unittestdata/paytables.json")
 	if err != nil || ld != nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON format error %v",
 			err)
 	}
 
-	ld, err = LoadLine5JSON("./unittestdata/empty.linedata.json")
+	ld, err = LoadLine5JSON("../unittestdata/empty.linedata.json")
 	if err != nil || ld != nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON empty linedata error %v",
 			err)
 	}
 
-	ld, err = LoadLine5JSON("./unittestdata/linedata.json")
+	ld, err = LoadLine5JSON("../unittestdata/linedata.json")
 	if err != nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON error %v",
 			err)
