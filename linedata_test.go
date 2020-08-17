@@ -23,6 +23,12 @@ func Test_LoadLine5JSON(t *testing.T) {
 			err)
 	}
 
+	ld, err = LoadLine5JSON("./unittestdata/paytables.json")
+	if err != nil || ld != nil {
+		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON format error %v",
+			err)
+	}
+
 	ld, err = LoadLine5JSON("./unittestdata/empty.linedata.json")
 	if err != nil || ld != nil {
 		t.Fatalf("Test_LoadLine5JSON LoadLine5JSON empty linedata error %v",

@@ -19,6 +19,24 @@ type LineData struct {
 	Lines [][]int
 }
 
+// isValidLI5 - is it valid lineInfo5
+func isValidLI5(li5s []lineInfo5) bool {
+	if len(li5s) <= 0 {
+		return false
+	}
+
+	// alllinezero := true
+	for _, v := range li5s {
+		if v.Line > 0 {
+			// alllinezero = false
+
+			return true
+		}
+	}
+
+	return false
+}
+
 // LoadLine5JSON - load json file
 func LoadLine5JSON(fn string) (*LineData, error) {
 	data, err := ioutil.ReadFile(fn)
@@ -32,7 +50,7 @@ func LoadLine5JSON(fn string) (*LineData, error) {
 		return nil, err
 	}
 
-	if len(li) <= 0 {
+	if !isValidLI5(li) {
 		return nil, nil
 	}
 
