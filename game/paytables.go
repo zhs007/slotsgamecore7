@@ -17,7 +17,7 @@ type payInfo5 struct {
 
 // PayTables - pay tables
 type PayTables struct {
-	MapPay map[int][]int
+	MapPay map[int][]int `json:"paytables"`
 }
 
 // LoadPayTables5JSON - load json file

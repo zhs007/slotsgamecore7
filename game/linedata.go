@@ -16,7 +16,7 @@ type lineInfo5 struct {
 
 // LineData - line data
 type LineData struct {
-	Lines [][]int
+	Lines [][]int `json:"lines"`
 }
 
 // isValidLI5 - is it valid lineInfo5

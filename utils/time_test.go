@@ -31,9 +31,9 @@ func Test_FormatNow(t *testing.T) {
 	m.EXPECT().Now().Return(time.Unix(1597647832, 0))
 
 	strnow := FormatNow(m)
-	if strnow != "2020-08-17_15:03:52" {
+	if strnow != "2020-08-17_07:03:52" {
 		t.Fatalf("Test_FormatNow Now %s != %s",
-			strnow, "2020-08-17_15:03:52")
+			strnow, "2020-08-17_07:03:52")
 	}
 
 	t.Logf("Test_FormatNow OK")

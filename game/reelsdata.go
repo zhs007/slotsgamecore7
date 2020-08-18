@@ -16,7 +16,7 @@ type reelsInfo5 struct {
 
 // ReelsData - reels data
 type ReelsData struct {
-	Reels [][]int
+	Reels [][]int `json:"reels"`
 }
 
 // isValidRI5 - is it valid reelsInfo5
