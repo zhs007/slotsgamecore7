@@ -46,17 +46,3 @@ func (mr *MockTimeIMockRecorder) Now() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Now", reflect.TypeOf((*MockTimeI)(nil).Now))
 }
-
-// GetDefaultLocation mocks base method
-func (m *MockTimeI) GetDefaultLocation() *time.Location {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDefaultLocation")
-	ret0, _ := ret[0].(*time.Location)
-	return ret0
-}
-
-// GetDefaultLocation indicates an expected call of GetDefaultLocation
-func (mr *MockTimeIMockRecorder) GetDefaultLocation() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLocation", reflect.TypeOf((*MockTimeI)(nil).GetDefaultLocation))
-}
