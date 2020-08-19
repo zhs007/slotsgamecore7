@@ -4,5 +4,7 @@ go 1.14
 
 require (
 	github.com/golang/mock v1.4.3
+	github.com/json-iterator/go v1.1.10
+	github.com/valyala/fasthttp v1.16.0
 	go.uber.org/zap v1.15.0
 )
