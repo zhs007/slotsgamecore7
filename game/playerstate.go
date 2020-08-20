@@ -1,7 +1,9 @@
 package sgc7game
 
-// PlayerState - player state
-type PlayerState struct {
-	Public  string `json:"playerStatePublic"`
-	Private string `json:"playerStatePrivate"`
+// IPlayerState - player state
+type IPlayerState interface {
+	// SetPublic - set player public state
+	SetPublic(pub interface{})
+	// SetPrivate - set player private state
+	SetPrivate(pri interface{})
 }

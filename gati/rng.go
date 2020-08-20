@@ -9,6 +9,13 @@ import (
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
+// RngInfo - rng infomation
+type RngInfo struct {
+	Bits  int `json:"bits"`
+	Range int `json:"range"`
+	Value int `json:"value"`
+}
+
 // GetRngs - get rngs
 func GetRngs(rngURL string, gameID int, nums int) ([]int, error) {
 	client := &http.Client{}
