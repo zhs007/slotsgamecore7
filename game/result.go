@@ -18,5 +18,5 @@ type Result struct {
 	Mul       int
 	Win       int
 	RealWin   int
-	Data      string
+	Pos       []int
 }
