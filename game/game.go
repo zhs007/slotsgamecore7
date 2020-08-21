@@ -15,5 +15,5 @@ type IGame interface {
 	Initialize() IPlayerState
 
 	// AddGameMod - add a gamemod
-	AddGameMod(name string, gmod IGameMod) error
+	AddGameMod(gmod IGameMod) error
 }

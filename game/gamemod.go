@@ -7,4 +7,7 @@ type IGameMod interface {
 
 	// GetGameScene - get GameScene
 	GetGameScene() *GameScene
+
+	// OnPlay - on play
+	OnPlay(cmd string, params interface{}) error
 }

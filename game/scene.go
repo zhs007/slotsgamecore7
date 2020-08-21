@@ -6,10 +6,10 @@ type GameScene struct {
 }
 
 // NewGameScene - random with reels
-func NewGameScene(game IGame) *GameScene {
+func NewGameScene(width int, height int) *GameScene {
 	gs := &GameScene{}
 
-	gs.Init(game.GetConfig().Width, game.GetConfig().Height)
+	gs.Init(width, height)
 
 	return gs
 }

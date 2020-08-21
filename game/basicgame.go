@@ -33,13 +33,13 @@ func (game *BasicGame) Initialize() IPlayerState {
 }
 
 // AddGameMod - add a gamemod
-func (game *BasicGame) AddGameMod(name string, gmod IGameMod) error {
-	_, isok := game.MapGameMods[name]
+func (game *BasicGame) AddGameMod(gmod IGameMod) error {
+	_, isok := game.MapGameMods[gmod.GetName()]
 	if isok {
 		return ErrDuplicateGameMod
 	}
 
-	game.MapGameMods[name] = gmod
+	game.MapGameMods[gmod.GetName()] = gmod
 
 	return nil
 }

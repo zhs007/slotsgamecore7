@@ -52,7 +52,7 @@ func Test_NewGameScene(t *testing.T) {
 			err)
 	}
 
-	gs := NewGameScene(game)
+	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
 
 	if len(gs.Arr) != 5 {
 		t.Fatalf("Test_NewGameScene NewGameScene width err %d",
@@ -90,7 +90,7 @@ func Test_RandGameScene(t *testing.T) {
 			err)
 	}
 
-	gs := NewGameScene(game)
+	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
 
 	err = gs.RandReels(game, "bg")
 	if err != nil {
