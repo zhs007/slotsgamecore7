@@ -4,7 +4,7 @@ import sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 
 // BasicGame - basic game
 type BasicGame struct {
-	Cfg         Config
+	Cfg         *Config
 	MapGameMods map[string]IGameMod
 	Plugin      sgc7plugin.IPlugin
 }
@@ -12,13 +12,14 @@ type BasicGame struct {
 // NewBasicGame - new a BasicGame
 func NewBasicGame() BasicGame {
 	return BasicGame{
+		Cfg:         NewConfig(),
 		MapGameMods: make(map[string]IGameMod),
 	}
 }
 
 // GetConfig - get config
 func (game *BasicGame) GetConfig() *Config {
-	return &game.Cfg
+	return game.Cfg
 }
 
 // GetPlugin - get plugin
