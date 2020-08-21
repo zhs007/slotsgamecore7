@@ -6,60 +6,43 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zhs007/slotsgamecore7/gati"
-	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
 // testGame - game
 type testGame struct {
-	cfg    Config
-	plugin *gati.PluginGATI
+	BasicGame
 }
 
 func newtestGame() (*testGame, error) {
 	game := &testGame{
-		cfg: Config{
-			Width:  5,
-			Height: 3,
-		},
-		plugin: gati.NewPluginGATI(&gati.Config{
-			GameID:  936207324,
-			RNGURL:  "http://127.0.0.1:50000/numbers",
-			RngNums: 100,
-		}),
+		BasicGame: NewBasicGame(),
 	}
 
-	game.cfg.Reels = make(map[string]*ReelsData)
+	game.Cfg.Width = 5
+	game.Cfg.Height = 3
+	game.Cfg.Reels = make(map[string]*ReelsData)
+
+	game.Plugin = gati.NewPluginGATI(&gati.Config{
+		GameID:  936207324,
+		RNGURL:  "http://127.0.0.1:50000/numbers",
+		RngNums: 100,
+	})
 
 	r, err := LoadReels5JSON("../unittestdata/reels.json")
 	if err != nil {
 		return nil, err
 	}
 
-	game.cfg.Reels["bg"] = r
+	game.Cfg.Reels["bg"] = r
 
 	r, err = LoadReels5JSON("../unittestdata/reels2.json")
 	if err != nil {
 		return nil, err
 	}
 
-	game.cfg.Reels["fg1"] = r
+	game.Cfg.Reels["fg1"] = r
 
 	return game, nil
-}
-
-// GetPlugin - get plugin
-func (game *testGame) GetPlugin() sgc7plugin.IPlugin {
-	return game.plugin
-}
-
-// GetConfig - get config
-func (game *testGame) GetConfig() *Config {
-	return &game.cfg
-}
-
-// Initialize - initialize PlayerState
-func (game *testGame) Initialize() IPlayerState {
-	return nil
 }
 
 func Test_NewGameScene(t *testing.T) {

@@ -13,4 +13,7 @@ type IGame interface {
 	GetConfig() *Config
 	// Initialize - initialize PlayerState
 	Initialize() IPlayerState
+
+	// AddGameMod - add a gamemod
+	AddGameMod(name string, gmod IGameMod) error
 }
