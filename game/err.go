@@ -11,4 +11,7 @@ var (
 
 	// ErrDuplicateGameMod - duplicate gamemod
 	ErrDuplicateGameMod = errors.New("duplicate gamemod")
+
+	// ErrInvalidCommand - invalid command
+	ErrInvalidCommand = errors.New("invalid command")
 )

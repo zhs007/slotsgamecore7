@@ -26,5 +26,44 @@ func (mod *BasicGameMod) GetGameScene() *GameScene {
 
 // OnPlay - on play
 func (mod *BasicGameMod) OnPlay(cmd string, params interface{}) error {
+	if cmd == "SPIN" {
+		return mod.OnSpin(params)
+	}
+
+	return ErrInvalidCommand
+}
+
+// OnSpin - on spin
+func (mod *BasicGameMod) OnSpin(params interface{}) error {
+	err := mod.OnRandomScene(params)
+	if err != nil {
+		return err
+	}
+
+	err = mod.OnCalcScene(params)
+	if err != nil {
+		return err
+	}
+
+	err = mod.OnPayout(params)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// OnRandomScene - on random scene
+func (mod *BasicGameMod) OnRandomScene(params interface{}) error {
+	return nil
+}
+
+// OnCalcScene - on calc scene
+func (mod *BasicGameMod) OnCalcScene(params interface{}) error {
+	return nil
+}
+
+// OnPayout - on payout
+func (mod *BasicGameMod) OnPayout(params interface{}) error {
 	return nil
 }
