@@ -2,15 +2,17 @@ package sgc7game
 
 // BasicGameMod - basic gameMod
 type BasicGameMod struct {
-	Name  string
-	Scene *GameScene
+	Name   string
+	Width  int
+	Height int
 }
 
 // NewBasicGameMod - new a BasicGameMod
-func NewBasicGameMod(name string, width int, height int) BasicGameMod {
+func NewBasicGameMod(name string, w int, h int) BasicGameMod {
 	return BasicGameMod{
-		Name:  name,
-		Scene: NewGameScene(width, height),
+		Name:   name,
+		Width:  w,
+		Height: h,
 	}
 }
 
@@ -19,51 +21,59 @@ func (mod *BasicGameMod) GetName() string {
 	return mod.Name
 }
 
-// GetGameScene - get GameScene
-func (mod *BasicGameMod) GetGameScene() *GameScene {
-	return mod.Scene
-}
-
 // OnPlay - on play
-func (mod *BasicGameMod) OnPlay(cmd string, params interface{}) error {
+func (mod *BasicGameMod) OnPlay(game IGame, cmd string, param string, prs []*PlayResult) (*PlayResult, error) {
 	if cmd == "SPIN" {
-		return mod.OnSpin(params)
+		return mod.OnSpin(game, param, prs)
 	}
 
-	return ErrInvalidCommand
+	return nil, ErrInvalidCommand
 }
 
 // OnSpin - on spin
-func (mod *BasicGameMod) OnSpin(params interface{}) error {
-	err := mod.OnRandomScene(params)
+func (mod *BasicGameMod) OnSpin(game IGame, param string, prs []*PlayResult) (*PlayResult, error) {
+	pr := &PlayResult{}
+
+	err := mod.OnRandomScene(game, param, prs, pr, mod.Name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = mod.OnCalcScene(params)
+	err = mod.OnCalcScene(game, param, prs, pr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = mod.OnPayout(params)
+	err = mod.OnPayout(game, param, prs, pr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return pr, nil
 }
 
 // OnRandomScene - on random scene
-func (mod *BasicGameMod) OnRandomScene(params interface{}) error {
-	return nil
+func (mod *BasicGameMod) OnRandomScene(game IGame, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
+	if mod.Width > 0 && mod.Height > 0 {
+		pr.Scene = NewGameScene(mod.Width, mod.Height)
+
+		err := pr.Scene.RandReels(game, reelsName)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return ErrInvalidWHGameMod
 }
 
 // OnCalcScene - on calc scene
-func (mod *BasicGameMod) OnCalcScene(params interface{}) error {
+func (mod *BasicGameMod) OnCalcScene(game IGame, param string, prs []*PlayResult, pr *PlayResult) error {
 	return nil
 }
 
 // OnPayout - on payout
-func (mod *BasicGameMod) OnPayout(params interface{}) error {
+func (mod *BasicGameMod) OnPayout(game IGame, param string, prs []*PlayResult, pr *PlayResult) error {
 	return nil
 }

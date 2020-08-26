@@ -11,10 +11,10 @@ func Test_BasicGameMod(t *testing.T) {
 
 	assert.Equal(t, mod.GetName(), "bg", "Test_BasicGameMod GetName")
 
-	assert.NotNil(t, mod.GetGameScene(), "Test_BasicGameMod GetGameScene")
+	// assert.NotNil(t, mod.GetGameScene(), "Test_BasicGameMod GetGameScene")
 
-	assert.Equal(t, len(mod.GetGameScene().Arr), 5, "Test_BasicGameMod GetGameScene Width")
-	assert.Equal(t, len(mod.GetGameScene().Arr[0]), 3, "Test_BasicGameMod GetGameScene Height")
+	assert.Equal(t, mod.Width, 5, "Test_BasicGameMod GetGameScene Width")
+	assert.Equal(t, mod.Height, 3, "Test_BasicGameMod GetGameScene Height")
 
 	var gamemod IGameMod
 	gamemod = &mod

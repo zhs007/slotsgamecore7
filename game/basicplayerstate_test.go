@@ -17,5 +17,9 @@ func Test_BasicPlayerState(t *testing.T) {
 
 	ps.SetPrivate(&BasicPlayerPrivateState{})
 
+	var ips IPlayerState
+	ips = ps
+	assert.NotNil(t, ips, "Test_BasicPlayerState IPlayerState")
+
 	t.Logf("Test_BasicPlayerState OK")
 }

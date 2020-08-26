@@ -5,9 +5,6 @@ type IGameMod interface {
 	// GetName - get mode name
 	GetName() string
 
-	// GetGameScene - get GameScene
-	GetGameScene() *GameScene
-
 	// OnPlay - on play
-	OnPlay(cmd string, params interface{}) error
+	OnPlay(game IGame, cmd string, param string, prs []*PlayResult) (*PlayResult, error)
 }

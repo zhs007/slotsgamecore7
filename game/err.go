@@ -11,10 +11,16 @@ var (
 
 	// ErrDuplicateGameMod - duplicate gamemod
 	ErrDuplicateGameMod = errors.New("duplicate gamemod")
+	// ErrInvalidGameMod - invalid GameMod
+	ErrInvalidGameMod = errors.New("invalid GameMod")
+	// ErrInvalidWHGameMod - invalid Width or Height in GameMod
+	ErrInvalidWHGameMod = errors.New("invalid Width or Height in GameMod")
 
 	// ErrInvalidCommand - invalid command
 	ErrInvalidCommand = errors.New("invalid command")
 
+	// ErrInvalidBasicPlayerState - invalid BasicPlayerState
+	ErrInvalidBasicPlayerState = errors.New("invalid BasicPlayerState")
 	// ErrInvalidPlayerPublicState - invalid PlayerPublicState
 	ErrInvalidPlayerPublicState = errors.New("invalid PlayerPublicState")
 	// ErrInvalidPlayerPrivateState - invalid PlayerPrivateState
