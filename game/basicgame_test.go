@@ -13,7 +13,11 @@ func Test_BasicGame(t *testing.T) {
 
 	assert.Nil(t, game.GetPlugin(), "Test_BasicGame GetPlugin")
 
-	assert.Nil(t, game.Initialize(), "Test_BasicGame Initialize")
+	ps := game.Initialize()
+	assert.NotNil(t, ps, "Test_BasicGame Initialize")
+	bps, isok := ps.(*BasicPlayerState)
+	assert.Equal(t, isok, true, "Test_BasicGame BasicPlayerState")
+	assert.Equal(t, bps.Public.CurGameMod, "BG", "Test_BasicGame BasicPlayerPublicState CurGameMod")
 
 	bg := NewBasicGameMod("bg", 5, 3)
 	err := game.AddGameMod(&bg)

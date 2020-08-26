@@ -14,4 +14,9 @@ var (
 
 	// ErrInvalidCommand - invalid command
 	ErrInvalidCommand = errors.New("invalid command")
+
+	// ErrInvalidPlayerPublicState - invalid PlayerPublicState
+	ErrInvalidPlayerPublicState = errors.New("invalid PlayerPublicState")
+	// ErrInvalidPlayerPrivateState - invalid PlayerPrivateState
+	ErrInvalidPlayerPrivateState = errors.New("invalid PlayerPrivateState")
 )

@@ -14,6 +14,9 @@ type IGame interface {
 	// Initialize - initialize PlayerState
 	Initialize() IPlayerState
 
+	// Play - play
+	Play(cmd string, ps IPlayerState) error
+
 	// AddGameMod - add a gamemod
 	AddGameMod(gmod IGameMod) error
 }

@@ -29,7 +29,7 @@ func (game *BasicGame) GetPlugin() sgc7plugin.IPlugin {
 
 // Initialize - initialize PlayerState
 func (game *BasicGame) Initialize() IPlayerState {
-	return nil
+	return NewBasicPlayerState("BG")
 }
 
 // AddGameMod - add a gamemod
@@ -41,5 +41,10 @@ func (game *BasicGame) AddGameMod(gmod IGameMod) error {
 
 	game.MapGameMods[gmod.GetName()] = gmod
 
+	return nil
+}
+
+// Play - play
+func (game *BasicGame) Play(cmd string, ps IPlayerState) error {
 	return nil
 }
