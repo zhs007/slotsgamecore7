@@ -45,7 +45,7 @@ func (game *BasicGame) AddGameMod(gmod IGameMod) error {
 }
 
 // Play - play
-func (game *BasicGame) Play(cmd string, param string, ps IPlayerState, prs []*PlayResult) (*PlayResult, error) {
+func (game *BasicGame) Play(cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
 	bps, isok := ps.(*BasicPlayerState)
 	if !isok {
 		return nil, ErrInvalidBasicPlayerState
@@ -56,7 +56,7 @@ func (game *BasicGame) Play(cmd string, param string, ps IPlayerState, prs []*Pl
 		return nil, ErrInvalidGameMod
 	}
 
-	pr, err := curgamemod.OnPlay(game, cmd, param, prs)
+	pr, err := curgamemod.OnPlay(game, cmd, param, stake, prs)
 	if err != nil {
 		return nil, err
 	}

@@ -22,16 +22,16 @@ func (mod *BasicGameMod) GetName() string {
 }
 
 // OnPlay - on play
-func (mod *BasicGameMod) OnPlay(game IGame, cmd string, param string, prs []*PlayResult) (*PlayResult, error) {
+func (mod *BasicGameMod) OnPlay(game IGame, cmd string, param string, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
 	if cmd == "SPIN" {
-		return mod.OnSpin(game, param, prs)
+		return mod.OnSpin(game, param, stake, prs)
 	}
 
 	return nil, ErrInvalidCommand
 }
 
 // OnSpin - on spin
-func (mod *BasicGameMod) OnSpin(game IGame, param string, prs []*PlayResult) (*PlayResult, error) {
+func (mod *BasicGameMod) OnSpin(game IGame, param string, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
 	pr := &PlayResult{}
 
 	err := mod.OnRandomScene(game, param, prs, pr, mod.Name)

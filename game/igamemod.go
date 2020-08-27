@@ -6,5 +6,5 @@ type IGameMod interface {
 	GetName() string
 
 	// OnPlay - on play
-	OnPlay(game IGame, cmd string, param string, prs []*PlayResult) (*PlayResult, error)
+	OnPlay(game IGame, cmd string, param string, stake *Stake, prs []*PlayResult) (*PlayResult, error)
 }
