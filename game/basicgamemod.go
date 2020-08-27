@@ -39,7 +39,7 @@ func (mod *BasicGameMod) OnSpin(game IGame, param string, stake *Stake, prs []*P
 		return nil, err
 	}
 
-	err = mod.OnCalcScene(game, param, prs, pr)
+	err = mod.OnCalcScene(game, param, stake, prs, pr)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (mod *BasicGameMod) OnRandomScene(game IGame, param string, prs []*PlayResu
 }
 
 // OnCalcScene - on calc scene
-func (mod *BasicGameMod) OnCalcScene(game IGame, param string, prs []*PlayResult, pr *PlayResult) error {
+func (mod *BasicGameMod) OnCalcScene(game IGame, param string, stake *Stake, prs []*PlayResult, pr *PlayResult) error {
 	return ErrNonGameModCalcScene
 }
 

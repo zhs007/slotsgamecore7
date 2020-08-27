@@ -23,7 +23,7 @@ func Test_CalcScatter(t *testing.T) {
 			err)
 	}
 
-	result := CalcScatter(scene, pt, 11, func(s int, cs int) bool {
+	result := CalcScatter(scene, pt, 11, 1, func(s int, cs int) bool {
 		return cs == s
 	})
 
@@ -41,7 +41,7 @@ func Test_CalcScatter(t *testing.T) {
 		},
 	}
 
-	result = CalcScatter(scene, pt, 11, func(s int, cs int) bool {
+	result = CalcScatter(scene, pt, 11, 1, func(s int, cs int) bool {
 		return cs == s
 	})
 
@@ -59,7 +59,7 @@ func Test_CalcScatter(t *testing.T) {
 		},
 	}
 
-	result = CalcScatter(scene, pt, 11, func(s int, cs int) bool {
+	result = CalcScatter(scene, pt, 11, 1, func(s int, cs int) bool {
 		return cs == s
 	})
 
@@ -94,7 +94,7 @@ func Test_CalcLine(t *testing.T) {
 	}
 
 	// 0,1,1,1,9 => 1x4
-	result := CalcLine(scene, pt, ld.Lines[0],
+	result := CalcLine(scene, pt, ld.Lines[0], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -110,7 +110,7 @@ func Test_CalcLine(t *testing.T) {
 	assert.Equal(t, len(result.Pos), 8, "they should be equal")
 
 	// 1,1,1,1,0 => 1x5
-	result = CalcLine(scene, pt, ld.Lines[10],
+	result = CalcLine(scene, pt, ld.Lines[10], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -136,7 +136,7 @@ func Test_CalcLine(t *testing.T) {
 	}
 
 	// 0,0,0,0,1 => 0x4 | 1x5 => 1x5
-	result = CalcLine(scene, pt, ld.Lines[0],
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -152,7 +152,7 @@ func Test_CalcLine(t *testing.T) {
 	assert.Equal(t, len(result.Pos), 10, "they should be equal")
 
 	// 11,0,0,0,11 => nil
-	result = CalcLine(scene, pt, ld.Lines[10],
+	result = CalcLine(scene, pt, ld.Lines[10], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -166,7 +166,7 @@ func Test_CalcLine(t *testing.T) {
 	assert.Nil(t, result, "it should be nil")
 
 	// 11,11,11,11,11 => nil
-	result = CalcLine(scene, pt, ld.Lines[2],
+	result = CalcLine(scene, pt, ld.Lines[2], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -180,7 +180,7 @@ func Test_CalcLine(t *testing.T) {
 	assert.Nil(t, result, "it should be nil")
 
 	// 9,9,0,9,1 => 9x4
-	result = CalcLine(scene, pt, ld.Lines[1],
+	result = CalcLine(scene, pt, ld.Lines[1], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -206,7 +206,7 @@ func Test_CalcLine(t *testing.T) {
 	}
 
 	// 0,1,1,0,1 => 1x5
-	result = CalcLine(scene, pt, ld.Lines[0],
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -232,7 +232,7 @@ func Test_CalcLine(t *testing.T) {
 	}
 
 	// 0,1,2,2,0 => nil
-	result = CalcLine(scene, pt, ld.Lines[0],
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
 		func(cs int) bool {
 			return cs != 11
 		},
@@ -256,7 +256,7 @@ func Test_CalcLine(t *testing.T) {
 	}
 
 	// 0,1,1,2,0 => 1x3
-	result = CalcLine(scene, pt, ld.Lines[0],
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
 		func(cs int) bool {
 			return cs != 11
 		},

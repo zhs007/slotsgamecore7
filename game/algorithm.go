@@ -13,7 +13,7 @@ type FuncIsSameSymbol func(symbol int, cursymbol int) bool
 type FuncIsValidSymbol func(cursymbol int) bool
 
 // CalcScatter - calc scatter
-func CalcScatter(scene *GameScene, pt *PayTables, scatter int,
+func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int,
 	isScatter FuncIsScatter) *Result {
 
 	nums := 0
@@ -38,6 +38,7 @@ func CalcScatter(scene *GameScene, pt *PayTables, scatter int,
 			Type:      RTScatter,
 			LineIndex: -1,
 			Mul:       pt.MapPay[scatter][nums-1],
+			Win:       pt.MapPay[scatter][nums-1] * bet,
 			Pos:       pos,
 		}
 
@@ -48,7 +49,7 @@ func CalcScatter(scene *GameScene, pt *PayTables, scatter int,
 }
 
 // CalcLine - calc line
-func CalcLine(scene *GameScene, pt *PayTables, ld []int,
+func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	isValidSymbol FuncIsValidSymbol,
 	isWild FuncIsWild,
 	isSameSymbol FuncIsSameSymbol) *Result {
@@ -108,6 +109,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int,
 					Symbol: s0,
 					Type:   RTLine,
 					Mul:    pt.MapPay[s0][wnums-1],
+					Win:    pt.MapPay[s0][wnums-1] * bet,
 					Pos:    wpos,
 				}
 
@@ -129,6 +131,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int,
 				Symbol: s0,
 				Type:   RTLine,
 				Mul:    pt.MapPay[s0][wnums-1],
+				Win:    pt.MapPay[s0][wnums-1] * bet,
 				Pos:    wpos,
 			}
 
@@ -139,6 +142,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int,
 			Symbol: ws,
 			Type:   RTLine,
 			Mul:    pt.MapPay[ws][nums-1],
+			Win:    pt.MapPay[ws][nums-1] * bet,
 			Pos:    pos,
 		}
 
@@ -167,6 +171,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int,
 			Symbol: s0,
 			Type:   RTLine,
 			Mul:    pt.MapPay[s0][nums-1],
+			Win:    pt.MapPay[s0][nums-1] * bet,
 			Pos:    pos,
 		}
 
