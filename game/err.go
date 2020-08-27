@@ -25,4 +25,9 @@ var (
 	ErrInvalidPlayerPublicState = errors.New("invalid PlayerPublicState")
 	// ErrInvalidPlayerPrivateState - invalid PlayerPrivateState
 	ErrInvalidPlayerPrivateState = errors.New("invalid PlayerPrivateState")
+
+	// ErrNonGameModCalcScene - non CalcScene in GameMod
+	ErrNonGameModCalcScene = errors.New("non CalcScene in GameMod")
+	// ErrNonGameModPayout - non Payout in GameMod
+	ErrNonGameModPayout = errors.New("non Payout in GameMod")
 )

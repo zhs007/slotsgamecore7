@@ -70,10 +70,10 @@ func (mod *BasicGameMod) OnRandomScene(game IGame, param string, prs []*PlayResu
 
 // OnCalcScene - on calc scene
 func (mod *BasicGameMod) OnCalcScene(game IGame, param string, prs []*PlayResult, pr *PlayResult) error {
-	return nil
+	return ErrNonGameModCalcScene
 }
 
 // OnPayout - on payout
 func (mod *BasicGameMod) OnPayout(game IGame, param string, prs []*PlayResult, pr *PlayResult) error {
-	return nil
+	return ErrNonGameModPayout
 }
