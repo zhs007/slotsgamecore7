@@ -67,7 +67,7 @@ func (s *Serv) Start() error {
 		s.Stop()
 	}
 
-	ln, err := net.Listen("tcp4", "127.0.0.1:8080")
+	ln, err := net.Listen("tcp4", s.bindAddr)
 	if err != nil {
 		sgc7utils.Error("gatiserv.Serv.Start:Listen",
 			zap.Error(err))
