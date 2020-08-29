@@ -1,4 +1,4 @@
-package gatiserv
+package sgc7http
 
 import (
 	"encoding/json"
@@ -9,8 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
-
-	sgc7http "github.com/zhs007/slotsgamecore7/http"
 )
 
 func httpGet(url string) (int, []byte, error) {
@@ -35,13 +33,13 @@ func httpGet(url string) (int, []byte, error) {
 }
 
 func Test_Serv(t *testing.T) {
-	serv := NewServ("127.0.0.1:7891", true)
+	serv := NewServ("127.0.0.1:7890", true)
 
 	type response struct {
 		Result string `json:"result"`
 	}
 
-	serv.RegHandle("/index", func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+	serv.RegHandle("/index", func(ctx *fasthttp.RequestCtx, serv *Serv) {
 		serv.SetHTTPStatus(ctx, 400)
 
 		r := &response{
@@ -61,7 +59,7 @@ func Test_Serv(t *testing.T) {
 
 	time.Sleep(time.Second * 3)
 
-	sc, buff, err := httpGet("http://127.0.0.1:7891/index?a=123&b=hello")
+	sc, buff, err := httpGet("http://127.0.0.1:7890/index?a=123&b=hello")
 	if err != nil {
 		t.Fatalf("Test_Serv httpGet error %v",
 			err)
@@ -79,7 +77,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, rr.Result, "OK", "they should be equal")
 
-	sc, buff, err = httpGet("http://127.0.0.1:7891/abc?a=123&b=hello")
+	sc, buff, err = httpGet("http://127.0.0.1:7890/abc?a=123&b=hello")
 	if err != nil {
 		t.Fatalf("Test_Serv httpGet error %v",
 			err)
