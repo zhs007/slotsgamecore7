@@ -40,13 +40,15 @@ func Test_Serv(t *testing.T) {
 	}
 
 	serv.RegHandle("/index", func(ctx *fasthttp.RequestCtx, serv *Serv) {
-		serv.SetHTTPStatus(ctx, 400)
-
 		r := &response{
 			Result: "OK",
 		}
 
 		serv.SetResponse(ctx, r)
+	})
+
+	serv.RegHandle("/index2", func(ctx *fasthttp.RequestCtx, serv *Serv) {
+		serv.SetStringResponse(ctx, "{\"result\":\"123\"}")
 	})
 
 	go func() {
@@ -76,6 +78,24 @@ func Test_Serv(t *testing.T) {
 	}
 
 	assert.Equal(t, rr.Result, "OK", "they should be equal")
+
+	sc, buff, err = httpGet("http://127.0.0.1:7890/index2?a=123&b=hello")
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+	assert.Equal(t, string(buff), "{\"result\":\"123\"}", "they should be equal")
+
+	err = json.Unmarshal(buff, rr)
+	if err != nil {
+		t.Fatalf("Test_Serv Unmarshal error %v",
+			err)
+	}
+
+	assert.Equal(t, rr.Result, "123", "they should be equal")
 
 	sc, buff, err = httpGet("http://127.0.0.1:7890/abc?a=123&b=hello")
 	if err != nil {

@@ -21,8 +21,8 @@ type Serv struct {
 }
 
 // NewServ - new a serv
-func NewServ(bindAddr string, isDebugMode bool) Serv {
-	s := Serv{
+func NewServ(bindAddr string, isDebugMode bool) *Serv {
+	s := &Serv{
 		bindAddr:    bindAddr,
 		mapAPI:      make(map[string]APIHandle),
 		isDebugMode: isDebugMode,
@@ -96,6 +96,13 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 	ctx.SetContentType("application/json;charset=UTF-8")
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody(b)
+}
+
+// SetStringResponse - set a response with string
+func (s *Serv) SetStringResponse(ctx *fasthttp.RequestCtx, str string) {
+	ctx.SetContentType("application/json;charset=UTF-8")
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.SetBody([]byte(str))
 }
 
 // SetHTTPStatus - set a response with status

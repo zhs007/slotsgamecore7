@@ -8,9 +8,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/valyala/fasthttp"
-
-	sgc7http "github.com/zhs007/slotsgamecore7/http"
 )
 
 func httpGet(url string) (int, []byte, error) {
@@ -34,22 +31,22 @@ func httpGet(url string) (int, []byte, error) {
 	return resp.StatusCode, body, nil
 }
 
+type testService struct {
+	cfg *Config
+}
+
+// Config - get configuration
+func (sv *testService) Config() interface{} {
+	return sv.cfg
+}
+
 func Test_Serv(t *testing.T) {
-	serv := NewServ("127.0.0.1:7891", true)
-
-	type response struct {
-		Result string `json:"result"`
+	cfg := &Config{
+		GameID:      "1019",
+		BindAddr:    "127.0.0.1:7891",
+		IsDebugMode: true,
 	}
-
-	serv.RegHandle("/index", func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
-		serv.SetHTTPStatus(ctx, 400)
-
-		r := &response{
-			Result: "OK",
-		}
-
-		serv.SetResponse(ctx, r)
-	})
+	serv := NewServ(&testService{cfg}, cfg)
 
 	go func() {
 		err := serv.Start()
@@ -61,7 +58,7 @@ func Test_Serv(t *testing.T) {
 
 	time.Sleep(time.Second * 3)
 
-	sc, buff, err := httpGet("http://127.0.0.1:7891/index?a=123&b=hello")
+	sc, buff, err := httpGet("http://127.0.0.1:7891/v2/games/1019/config")
 	if err != nil {
 		t.Fatalf("Test_Serv httpGet error %v",
 			err)
@@ -70,23 +67,16 @@ func Test_Serv(t *testing.T) {
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
-	rr := &response{}
+	rr := &Config{}
 	err = json.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)
 	}
 
-	assert.Equal(t, rr.Result, "OK", "they should be equal")
-
-	sc, buff, err = httpGet("http://127.0.0.1:7891/abc?a=123&b=hello")
-	if err != nil {
-		t.Fatalf("Test_Serv httpGet error %v",
-			err)
-	}
-
-	assert.Equal(t, sc, 404, "they should be equal")
-	assert.NotNil(t, buff, "there is a valid buffer")
+	assert.Equal(t, rr.GameID, cfg.GameID, "they should be equal")
+	assert.Equal(t, rr.BindAddr, cfg.BindAddr, "they should be equal")
+	assert.Equal(t, rr.IsDebugMode, cfg.IsDebugMode, "they should be equal")
 
 	serv.Stop()
 
