@@ -27,9 +27,9 @@ func NewBasicPlayerState(curgamemod string) *BasicPlayerState {
 
 // SetPublic - set player public state
 func (ps *BasicPlayerState) SetPublic(pub interface{}) error {
-	bpub, isok := pub.(*BasicPlayerPublicState)
+	bpub, isok := pub.(BasicPlayerPublicState)
 	if isok {
-		ps.Public = *bpub
+		ps.Public = bpub
 
 		return nil
 	}
@@ -39,12 +39,22 @@ func (ps *BasicPlayerState) SetPublic(pub interface{}) error {
 
 // SetPrivate - set player private state
 func (ps *BasicPlayerState) SetPrivate(pri interface{}) error {
-	bpri, isok := pri.(*BasicPlayerPrivateState)
+	bpri, isok := pri.(BasicPlayerPrivateState)
 	if isok {
-		ps.Private = *bpri
+		ps.Private = bpri
 
 		return nil
 	}
 
 	return ErrInvalidPlayerPrivateState
+}
+
+// GetPublic - get player public state
+func (ps *BasicPlayerState) GetPublic() interface{} {
+	return ps.Public
+}
+
+// GetPrivate - get player private state
+func (ps *BasicPlayerState) GetPrivate() interface{} {
+	return ps.Private
 }

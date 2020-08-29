@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
 func httpGet(url string) (int, []byte, error) {
@@ -32,11 +34,11 @@ func httpGet(url string) (int, []byte, error) {
 }
 
 type testService struct {
-	cfg *Config
+	cfg *sgc7game.Config
 }
 
 // Config - get configuration
-func (sv *testService) Config() interface{} {
+func (sv *testService) Config() *sgc7game.Config {
 	return sv.cfg
 }
 
@@ -46,7 +48,12 @@ func Test_Serv(t *testing.T) {
 		BindAddr:    "127.0.0.1:7891",
 		IsDebugMode: true,
 	}
-	serv := NewServ(&testService{cfg}, cfg)
+	serv := NewServ(&testService{
+		&sgc7game.Config{
+			Width:  5,
+			Height: 3,
+		},
+	}, cfg)
 
 	go func() {
 		err := serv.Start()
@@ -67,16 +74,15 @@ func Test_Serv(t *testing.T) {
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
-	rr := &Config{}
+	rr := &sgc7game.Config{}
 	err = json.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)
 	}
 
-	assert.Equal(t, rr.GameID, cfg.GameID, "they should be equal")
-	assert.Equal(t, rr.BindAddr, cfg.BindAddr, "they should be equal")
-	assert.Equal(t, rr.IsDebugMode, cfg.IsDebugMode, "they should be equal")
+	assert.Equal(t, rr.Width, 5, "they should be equal")
+	assert.Equal(t, rr.Height, 3, "they should be equal")
 
 	serv.Stop()
 

@@ -6,4 +6,9 @@ type IPlayerState interface {
 	SetPublic(pub interface{}) error
 	// SetPrivate - set player private state
 	SetPrivate(pri interface{}) error
+
+	// GetPublic - get player public state
+	GetPublic() interface{}
+	// GetPrivate - get player private state
+	GetPrivate() interface{}
 }
