@@ -83,6 +83,7 @@ func (s *Serv) Start() error {
 // SetResponse - set a response
 func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	b, err := json.Marshal(jsonObj)
 	if err != nil {
 		sgc7utils.Warn("gatiserv.Serv.SetResponse",

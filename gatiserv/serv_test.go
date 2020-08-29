@@ -1,12 +1,12 @@
 package gatiserv
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -33,8 +33,40 @@ func httpGet(url string) (int, []byte, error) {
 	return resp.StatusCode, body, nil
 }
 
+//--------------------------------------------------------------------------------------
+// testPlayerState
+
+type testPlayerState struct {
+}
+
+// SetPublic - set player public state
+func (ps *testPlayerState) SetPublic(pub interface{}) error {
+	return nil
+}
+
+// SetPrivate - set player private state
+func (ps *testPlayerState) SetPrivate(pri interface{}) error {
+	return nil
+}
+
+// GetPublic - get player public state
+func (ps *testPlayerState) GetPublic() interface{} {
+	return sgc7game.BasicPlayerPublicState{
+		CurGameMod: "BG",
+	}
+}
+
+// GetPrivate - get player private state
+func (ps *testPlayerState) GetPrivate() interface{} {
+	return sgc7game.BasicPlayerPrivateState{}
+}
+
+//--------------------------------------------------------------------------------------
+// testService
+
 type testService struct {
-	cfg *sgc7game.Config
+	cfg      *sgc7game.Config
+	initmode int
 }
 
 // Config - get configuration
@@ -42,18 +74,33 @@ func (sv *testService) Config() *sgc7game.Config {
 	return sv.cfg
 }
 
+// Initialize - initialize a player
+func (sv *testService) Initialize() sgc7game.IPlayerState {
+	if sv.initmode == 0 {
+		return nil
+	}
+
+	return &testPlayerState{}
+}
+
 func Test_Serv(t *testing.T) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	cfg := &Config{
 		GameID:      "1019",
 		BindAddr:    "127.0.0.1:7891",
 		IsDebugMode: true,
 	}
-	serv := NewServ(&testService{
+
+	service := &testService{
 		&sgc7game.Config{
 			Width:  5,
 			Height: 3,
 		},
-	}, cfg)
+		0,
+	}
+
+	serv := NewServ(service, cfg)
 
 	go func() {
 		err := serv.Start()
@@ -83,6 +130,28 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, rr.Width, 5, "they should be equal")
 	assert.Equal(t, rr.Height, 3, "they should be equal")
+
+	sc, buff, err = httpGet("http://127.0.0.1:7891/v2/games/1019/initialize")
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}", "they should be equal")
+
+	service.initmode = 1
+
+	sc, buff, err = httpGet("http://127.0.0.1:7891/v2/games/1019/initialize")
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":{\"CurGameMod\":\"BG\"},\"playerStatePrivate\":{}}", "they should be equal")
 
 	serv.Stop()
 

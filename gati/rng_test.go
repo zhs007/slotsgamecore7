@@ -1,11 +1,11 @@
 package gati
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
+	jsoniter "github.com/json-iterator/go"
 )
 
 // func Test_GetRngs(t *testing.T) {
@@ -24,6 +24,8 @@ import (
 // }
 
 func Test_GetRngsMock(t *testing.T) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 

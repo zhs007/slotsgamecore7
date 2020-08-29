@@ -8,4 +8,6 @@ import (
 type IService interface {
 	// Config - get configuration
 	Config() *sgc7game.Config
+	// Initialize - initialize a player
+	Initialize() sgc7game.IPlayerState
 }

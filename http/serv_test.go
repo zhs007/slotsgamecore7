@@ -1,12 +1,12 @@
 package sgc7http
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 )
@@ -33,6 +33,8 @@ func httpGet(url string) (int, []byte, error) {
 }
 
 func Test_Serv(t *testing.T) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	serv := NewServ("127.0.0.1:7890", true)
 
 	type response struct {

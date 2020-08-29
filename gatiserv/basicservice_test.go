@@ -13,6 +13,8 @@ func Test_BasicService(t *testing.T) {
 
 	bs.Config()
 
+	bs.Initialize()
+
 	var iservice IService
 	iservice = bs
 	assert.NotNil(t, iservice, "Test_BasicService IService")

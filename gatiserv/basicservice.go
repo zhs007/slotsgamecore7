@@ -20,3 +20,8 @@ func NewBasicService(game sgc7game.IGame) *BasicService {
 func (sv *BasicService) Config() *sgc7game.Config {
 	return sv.Game.GetConfig()
 }
+
+// Initialize - initialize a player
+func (sv *BasicService) Initialize() sgc7game.IPlayerState {
+	return sv.Game.Initialize()
+}

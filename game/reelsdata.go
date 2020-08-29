@@ -1,8 +1,9 @@
 package sgc7game
 
 import (
-	"encoding/json"
 	"io/ioutil"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type reelsInfo5 struct {
@@ -39,6 +40,8 @@ func isValidRI5(ri5s []reelsInfo5) bool {
 
 // LoadReels5JSON - load json file
 func LoadReels5JSON(fn string) (*ReelsData, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	w := 5
 
 	data, err := ioutil.ReadFile(fn)

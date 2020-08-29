@@ -1,8 +1,9 @@
 package sgc7game
 
 import (
-	"encoding/json"
 	"io/ioutil"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type lineInfo5 struct {
@@ -39,6 +40,8 @@ func isValidLI5(li5s []lineInfo5) bool {
 
 // LoadLine5JSON - load json file
 func LoadLine5JSON(fn string) (*LineData, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	data, err := ioutil.ReadFile(fn)
 	if err != nil {
 		return nil, err

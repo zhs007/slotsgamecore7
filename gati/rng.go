@@ -1,11 +1,11 @@
 package gati
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
+	jsoniter "github.com/json-iterator/go"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
@@ -18,6 +18,8 @@ type RngInfo struct {
 
 // GetRngs - get rngs
 func GetRngs(rngURL string, gameID int, nums int) ([]int, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", sgc7utils.AppendString(rngURL, "?size=", strconv.Itoa(nums)), nil)

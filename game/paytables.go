@@ -1,8 +1,9 @@
 package sgc7game
 
 import (
-	"encoding/json"
 	"io/ioutil"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type payInfo5 struct {
@@ -22,6 +23,8 @@ type PayTables struct {
 
 // LoadPayTables5JSON - load json file
 func LoadPayTables5JSON(fn string) (*PayTables, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
 	data, err := ioutil.ReadFile(fn)
 	if err != nil {
 		return nil, err
