@@ -1,8 +1,6 @@
 package gatiserv
 
 import (
-	"io/ioutil"
-	"net/http"
 	"testing"
 	"time"
 
@@ -10,28 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7http "github.com/zhs007/slotsgamecore7/http"
 )
-
-func httpGet(url string) (int, []byte, error) {
-	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return -1, nil, err
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return -1, nil, err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return resp.StatusCode, nil, err
-	}
-
-	return resp.StatusCode, body, nil
-}
 
 //--------------------------------------------------------------------------------------
 // testPlayerState
@@ -88,6 +66,11 @@ func (sv *testService) Validate(params *ValidateParams) []ValidationError {
 	return nil
 }
 
+// Play - play game
+func (sv *testService) Play(params *PlayParams) *PlayResult {
+	return nil
+}
+
 func Test_Serv(t *testing.T) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
@@ -117,7 +100,7 @@ func Test_Serv(t *testing.T) {
 
 	time.Sleep(time.Second * 3)
 
-	sc, buff, err := httpGet("http://127.0.0.1:7891/v2/games/1019/config")
+	sc, buff, err := sgc7http.HTTPGet("http://127.0.0.1:7891/v2/games/1019/config", nil)
 	if err != nil {
 		t.Fatalf("Test_Serv httpGet error %v",
 			err)
@@ -136,7 +119,16 @@ func Test_Serv(t *testing.T) {
 	assert.Equal(t, rr.Width, 5, "they should be equal")
 	assert.Equal(t, rr.Height, 3, "they should be equal")
 
-	sc, buff, err = httpGet("http://127.0.0.1:7891/v2/games/1019/initialize")
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/config", nil, nil)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	sc, buff, err = sgc7http.HTTPGet("http://127.0.0.1:7891/v2/games/1019/initialize", nil)
 	if err != nil {
 		t.Fatalf("Test_Serv httpGet error %v",
 			err)
@@ -148,7 +140,7 @@ func Test_Serv(t *testing.T) {
 
 	service.initmode = 1
 
-	sc, buff, err = httpGet("http://127.0.0.1:7891/v2/games/1019/initialize")
+	sc, buff, err = sgc7http.HTTPGet("http://127.0.0.1:7891/v2/games/1019/initialize", nil)
 	if err != nil {
 		t.Fatalf("Test_Serv httpGet error %v",
 			err)
@@ -157,6 +149,71 @@ func Test_Serv(t *testing.T) {
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\"CurGameMod\":\"BG\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/initialize", nil, nil)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	sc, buff, err = sgc7http.HTTPGet("http://127.0.0.1:7891/v2/games/1019/validate", nil)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/validate", nil, nil)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	validateParams := &ValidateParams{}
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/validate", nil, validateParams)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	sc, buff, err = sgc7http.HTTPGet("http://127.0.0.1:7891/v2/games/1019/play", nil)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/play", nil, nil)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	playParams := &PlayParams{}
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/play", nil, playParams)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
 
 	serv.Stop()
 

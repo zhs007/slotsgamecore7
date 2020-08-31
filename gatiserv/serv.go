@@ -29,6 +29,12 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/config"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			if !ctx.Request.Header.IsGet() {
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
 			ret := s.Service.Config()
 			if ret == nil {
 				s.SetStringResponse(ctx, "{}")
@@ -39,6 +45,12 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/initialize"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			if !ctx.Request.Header.IsGet() {
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
 			ps := s.Service.Initialize()
 			str, err := s.BuildPlayerStateString(ps)
 			if err != nil {
@@ -55,6 +67,12 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/validate"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			if !ctx.Request.Header.IsPost() {
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
 			params := &ValidateParams{}
 			err := s.ParseBody(ctx, params)
 			if err != nil {
@@ -67,6 +85,29 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 
 			ret := s.Service.Validate(params)
+			s.SetResponse(ctx, ret)
+		})
+
+	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/play"),
+		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			if !ctx.Request.Header.IsPost() {
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
+			params := &PlayParams{}
+			err := s.ParseBody(ctx, params)
+			if err != nil {
+				sgc7utils.Warn("gatiserv.Serv.play:ParseBody",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
+			ret := s.Service.Play(params)
 			s.SetResponse(ctx, ret)
 		})
 
@@ -99,16 +140,4 @@ func (serv *Serv) BuildPlayerStateString(ps sgc7game.IPlayerState) (string, erro
 
 	return sgc7utils.AppendString(
 		"{\"playerStatePublic\":\"", string(psb), "\",\"playerStatePrivate\":\"", string(psp), "\"}"), nil
-}
-
-// ParseBody - parse body
-func (serv *Serv) ParseBody(ctx *fasthttp.RequestCtx, params interface{}) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	err := json.Unmarshal(ctx.PostBody(), params)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

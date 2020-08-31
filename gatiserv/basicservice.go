@@ -30,3 +30,8 @@ func (sv *BasicService) Initialize() sgc7game.IPlayerState {
 func (sv *BasicService) Validate(params *ValidateParams) []ValidationError {
 	return nil
 }
+
+// Play - play game
+func (sv *BasicService) Play(params *PlayParams) *PlayResult {
+	return nil
+}

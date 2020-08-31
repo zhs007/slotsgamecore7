@@ -12,4 +12,6 @@ type IService interface {
 	Initialize() sgc7game.IPlayerState
 	// Validate - validate game
 	Validate(params *ValidateParams) []ValidationError
+	// Play - play game
+	Play(params *PlayParams) *PlayResult
 }

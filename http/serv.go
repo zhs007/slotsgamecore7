@@ -82,6 +82,14 @@ func (s *Serv) Start() error {
 
 // SetResponse - set a response
 func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
+	if jsonObj == nil {
+		ctx.SetContentType("application/json;charset=UTF-8")
+		ctx.SetStatusCode(fasthttp.StatusOK)
+		ctx.SetBody([]byte(""))
+
+		return
+	}
+
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	b, err := json.Marshal(jsonObj)
@@ -141,4 +149,16 @@ func (s *Serv) outputDebugInfo(ctx *fasthttp.RequestCtx) {
 			zap.String("PostBody", string(ctx.PostBody())),
 		)
 	}
+}
+
+// ParseBody - parse body
+func (s *Serv) ParseBody(ctx *fasthttp.RequestCtx, params interface{}) error {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	err := json.Unmarshal(ctx.PostBody(), params)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

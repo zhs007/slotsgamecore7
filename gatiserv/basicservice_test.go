@@ -15,6 +15,10 @@ func Test_BasicService(t *testing.T) {
 
 	bs.Initialize()
 
+	bs.Validate(&ValidateParams{})
+
+	bs.Play(&PlayParams{})
+
 	var iservice IService
 	iservice = bs
 	assert.NotNil(t, iservice, "Test_BasicService IService")
