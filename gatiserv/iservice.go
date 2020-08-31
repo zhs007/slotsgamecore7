@@ -10,4 +10,6 @@ type IService interface {
 	Config() *sgc7game.Config
 	// Initialize - initialize a player
 	Initialize() sgc7game.IPlayerState
+	// Validate - validate game
+	Validate(params *ValidateParams) []ValidationError
 }

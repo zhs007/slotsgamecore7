@@ -53,6 +53,23 @@ func NewServ(service IService, cfg *Config) *Serv {
 			s.SetStringResponse(ctx, str)
 		})
 
+	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/validate"),
+		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			params := &ValidateParams{}
+			err := s.ParseBody(ctx, params)
+			if err != nil {
+				sgc7utils.Warn("gatiserv.Serv.validate:ParseBody",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
+			ret := s.Service.Validate(params)
+			s.SetResponse(ctx, ret)
+		})
+
 	return s
 }
 
@@ -61,7 +78,7 @@ func (serv *Serv) BuildPlayerStateString(ps sgc7game.IPlayerState) (string, erro
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	if ps == nil {
-		return "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}", nil
+		return "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}", nil
 	}
 
 	psb, err := json.Marshal(ps.GetPublic())
@@ -81,5 +98,17 @@ func (serv *Serv) BuildPlayerStateString(ps sgc7game.IPlayerState) (string, erro
 	}
 
 	return sgc7utils.AppendString(
-		"{\"playerStatePublic\":", string(psb), ",\"playerStatePrivate\":", string(psp), "}"), nil
+		"{\"playerStatePublic\":\"", string(psb), "\",\"playerStatePrivate\":\"", string(psp), "\"}"), nil
+}
+
+// ParseBody - parse body
+func (serv *Serv) ParseBody(ctx *fasthttp.RequestCtx, params interface{}) error {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	err := json.Unmarshal(ctx.PostBody(), params)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

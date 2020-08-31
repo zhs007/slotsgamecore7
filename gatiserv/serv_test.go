@@ -83,6 +83,11 @@ func (sv *testService) Initialize() sgc7game.IPlayerState {
 	return &testPlayerState{}
 }
 
+// Validate - validate game
+func (sv *testService) Validate(params *ValidateParams) []ValidationError {
+	return nil
+}
+
 func Test_Serv(t *testing.T) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
@@ -139,7 +144,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
 
 	service.initmode = 1
 
@@ -151,7 +156,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":{\"CurGameMod\":\"BG\"},\"playerStatePrivate\":{}}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\"CurGameMod\":\"BG\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
 
 	serv.Stop()
 

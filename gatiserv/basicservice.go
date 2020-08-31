@@ -25,3 +25,8 @@ func (sv *BasicService) Config() *sgc7game.Config {
 func (sv *BasicService) Initialize() sgc7game.IPlayerState {
 	return sv.Game.Initialize()
 }
+
+// Validate - validate game
+func (sv *BasicService) Validate(params *ValidateParams) []ValidationError {
+	return nil
+}
