@@ -2,10 +2,12 @@ package gati
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/stretchr/testify/assert"
 )
 
 // func Test_GetRngs(t *testing.T) {
@@ -34,9 +36,17 @@ func Test_GetRngsMock(t *testing.T) {
 
 	resbuff, err := json.Marshal(res)
 
+	// httpmock.RegisterResponder("GET",
+	// 	fmt.Sprintf("%s?size=%d", URL, 3),
+	// 	httpmock.NewStringResponder(200, string(resbuff)))
+
 	httpmock.RegisterResponder("GET",
 		fmt.Sprintf("%s?size=%d", URL, 3),
-		httpmock.NewStringResponder(200, string(resbuff)))
+		func(req *http.Request) (*http.Response, error) {
+			assert.Equal(t, req.Header.Get("X-Game-ID"), "936207324", "they should be equal")
+
+			return httpmock.NewStringResponder(200, string(resbuff))(req)
+		})
 
 	lst, err := GetRngs(URL, 936207324, 3)
 	if err != nil {
