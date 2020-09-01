@@ -22,6 +22,64 @@ func BuildIPlayerState(ips sgc7game.IPlayerState, ps PlayerState) error {
 	return nil
 }
 
+// BuildPlayerStateString - sgc7game.IPlayerState => string
+func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	if ps == nil {
+		return "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}", nil
+	}
+
+	psb, err := json.Marshal(ps.GetPublic())
+	if err != nil {
+		sgc7utils.Warn("gatiserv.BuildPlayerStateString:Marshal GetPublic",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	psp, err := json.Marshal(ps.GetPrivate())
+	if err != nil {
+		sgc7utils.Warn("gatiserv.BuildPlayerStateString:Marshal GetPrivate",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	return sgc7utils.AppendString(
+		"{\"playerStatePublic\":\"", string(psb), "\",\"playerStatePrivate\":\"", string(psp), "\"}"), nil
+}
+
+// BuildPlayerState - sgc7game.IPlayerState => PlayerState
+func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	if ips == nil {
+		return nil, nil
+	}
+
+	psb, err := json.Marshal(ips.GetPublic())
+	if err != nil {
+		sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPublic",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	psp, err := json.Marshal(ips.GetPrivate())
+	if err != nil {
+		sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPrivate",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return &PlayerState{
+		Public:  string(psb),
+		Private: string(psp),
+	}, nil
+}
+
 // BuildStake - PlayerState => sgc7game.IPlayerState
 func BuildStake(stake Stake) *sgc7game.Stake {
 	return &sgc7game.Stake{

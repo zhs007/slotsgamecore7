@@ -71,9 +71,31 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 		}
 	}
 
-	pr := &PlayResult{}
+	pr := &PlayResult{
+		RandomNumbers: sv.Game.GetPlugin().GetUsedRngs(),
+		// JackpotData   []string             `json:"jackpotData"`
+		// AnalyticsData AnalyticsData        `json:"analyticsData"`
+		// BoostData     string               `json:"boostData"`
+	}
 
-	AddPlayResult(pr, params.Stake, results)
+	ps, err := BuildPlayerState(ips)
+	if err != nil {
+		sgc7utils.Error("BasicService.Play:BuildPlayerState",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	pr.PlayerState = ps
+
+	if len(results) > 0 {
+		AddPlayResult(pr, params.Stake, results)
+
+		lastr := results[len(results)-1]
+
+		pr.Finished = lastr.IsFinish
+		pr.NextCommands = lastr.NextCmds
+	}
 
 	return pr, nil
 }

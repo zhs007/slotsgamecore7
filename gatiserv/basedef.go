@@ -77,7 +77,7 @@ type PlayParams struct {
 // PlayResult - play output parameters for the game
 type PlayResult struct {
 	RandomNumbers []*sgc7utils.RngInfo `json:"randomNumbers"`
-	PlayerState   PlayerState          `json:"playerState"`
+	PlayerState   *PlayerState         `json:"playerState"`
 	JackpotData   []string             `json:"jackpotData"`
 	Finished      bool                 `json:"finished"`
 	Results       []*Result            `json:"results"`
