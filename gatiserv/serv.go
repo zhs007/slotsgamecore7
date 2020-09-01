@@ -107,7 +107,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			ret := s.Service.Play(params)
+			ret, err := s.Service.Play(params)
 			s.SetResponse(ctx, ret)
 		})
 

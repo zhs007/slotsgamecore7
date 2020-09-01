@@ -9,13 +9,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// RngInfo - rng infomation
-type RngInfo struct {
-	Bits  int `json:"bits"`
-	Range int `json:"range"`
-	Value int `json:"value"`
-}
-
 // GetRngs - get rngs
 func GetRngs(rngURL string, gameID int, nums int) ([]int, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary

@@ -27,6 +27,16 @@ func (ps *testPlayerState) SetPrivate(pri interface{}) error {
 	return nil
 }
 
+// SetPublicString - set player public state
+func (ps *testPlayerState) SetPublicString(pub string) error {
+	return nil
+}
+
+// SetPrivateString - set player private state
+func (ps *testPlayerState) SetPrivateString(pri string) error {
+	return nil
+}
+
 // GetPublic - get player public state
 func (ps *testPlayerState) GetPublic() interface{} {
 	return sgc7game.BasicPlayerPublicState{
@@ -67,8 +77,8 @@ func (sv *testService) Validate(params *ValidateParams) []ValidationError {
 }
 
 // Play - play game
-func (sv *testService) Play(params *PlayParams) *PlayResult {
-	return nil
+func (sv *testService) Play(params *PlayParams) (*PlayResult, error) {
+	return nil, nil
 }
 
 func Test_Serv(t *testing.T) {
@@ -148,7 +158,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\"CurGameMod\":\"BG\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\"curgamemod\":\"BG\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
 
 	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/initialize", nil, nil)
 	if err != nil {

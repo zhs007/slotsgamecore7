@@ -2,11 +2,12 @@ package sgc7game
 
 // PlayResult - result for play
 type PlayResult struct {
-	Scene         *GameScene
-	Results       []*Result
-	NextCmd       string
-	NextCmdParam  string
-	NextCmdParams []string
-	TotalWin      int
-	RealWin       int
+	Scene         *GameScene `json:"scene"`
+	Results       []*Result  `json:"results"`
+	NextCmds      []string   `json:"-"`
+	NextCmdParams []string   `json:"-"`
+	CoinWin       int        `json:"-"`
+	CashWin       int64      `json:"-"`
+	IsFinish      bool       `json:"-"`
+	IsWait        bool       `json:"-"`
 }

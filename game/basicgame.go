@@ -27,6 +27,11 @@ func (game *BasicGame) GetPlugin() sgc7plugin.IPlugin {
 	return game.Plugin
 }
 
+// NewPlayerState - new playerstate
+func (game *BasicGame) NewPlayerState() IPlayerState {
+	return &BasicPlayerState{}
+}
+
 // Initialize - initialize PlayerState
 func (game *BasicGame) Initialize() IPlayerState {
 	return NewBasicPlayerState("BG")

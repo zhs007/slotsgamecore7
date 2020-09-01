@@ -13,5 +13,5 @@ type IService interface {
 	// Validate - validate game
 	Validate(params *ValidateParams) []ValidationError
 	// Play - play game
-	Play(params *PlayParams) *PlayResult
+	Play(params *PlayParams) (*PlayResult, error)
 }

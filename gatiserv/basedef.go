@@ -1,7 +1,7 @@
 package gatiserv
 
 import (
-	gati "github.com/zhs007/slotsgamecore7/gati"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // PlayerState - player state
@@ -76,12 +76,12 @@ type PlayParams struct {
 
 // PlayResult - play output parameters for the game
 type PlayResult struct {
-	RandomNumbers []gati.RngInfo `json:"randomNumbers"`
-	PlayerState   PlayerState    `json:"playerState"`
-	JackpotData   []string       `json:"jackpotData"`
-	Finished      bool           `json:"finished"`
-	Results       []Result       `json:"results"`
-	NextCommands  []string       `json:"nextCommands"`
-	AnalyticsData AnalyticsData  `json:"analyticsData"`
-	BoostData     string         `json:"boostData"`
+	RandomNumbers []*sgc7utils.RngInfo `json:"randomNumbers"`
+	PlayerState   PlayerState          `json:"playerState"`
+	JackpotData   []string             `json:"jackpotData"`
+	Finished      bool                 `json:"finished"`
+	Results       []*Result            `json:"results"`
+	NextCommands  []string             `json:"nextCommands"`
+	AnalyticsData AnalyticsData        `json:"analyticsData"`
+	BoostData     string               `json:"boostData"`
 }

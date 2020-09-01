@@ -1,10 +1,16 @@
 package gati
 
+import (
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+)
+
 // PluginGATI - plugin for GATI
 type PluginGATI struct {
-	Cfg     *Config
-	Rngs    []int
-	RngUsed []*RngInfo
+	sgc7plugin.BasicPlugin
+
+	Cfg  *Config
+	Rngs []int
 }
 
 // NewPluginGATI - new PluginGATI (IPlugin)
@@ -30,7 +36,7 @@ func (plugin *PluginGATI) Random(r int) (int, error) {
 
 	v := cv % r
 
-	plugin.RngUsed = append(plugin.RngUsed, &RngInfo{
+	plugin.AddRngUsed(&sgc7utils.RngInfo{
 		Bits:  cv,
 		Range: r,
 		Value: v,

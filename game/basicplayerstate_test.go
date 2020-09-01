@@ -17,27 +17,39 @@ func Test_BasicPlayerState(t *testing.T) {
 
 	ps.SetPrivate(BasicPlayerPrivateState{})
 
-	// ipspub := ps.GetPublic()
-	// bppub, isok := ipspub.(BasicPlayerPublicState)
-	// assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPublicState")
-	// assert.Equal(t, bppub.CurGameMod, "FG", "Test_BasicPlayerState BasicPlayerPublicState CurGameMod")
+	ipspub := ps.GetPublic()
+	bppub, isok := ipspub.(BasicPlayerPublicState)
+	assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPublicState")
+	assert.Equal(t, bppub.CurGameMod, "FG", "Test_BasicPlayerState BasicPlayerPublicState CurGameMod")
 
-	// ipspri := ps.GetPrivate()
-	// bppri, isok := ipspri.(BasicPlayerPrivateState)
-	// assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPrivateState")
-	// assert.NotNil(t, bppri, "Test_BasicPlayerState BasicPlayerPrivateState")
+	ipspri := ps.GetPrivate()
+	bppri, isok := ipspri.(BasicPlayerPrivateState)
+	assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPrivateState")
+	assert.NotNil(t, bppri, "Test_BasicPlayerState BasicPlayerPrivateState")
 
 	var ips IPlayerState
 	ips = ps
 	assert.NotNil(t, ips, "Test_BasicPlayerState IPlayerState")
 
-	ipspub := ips.GetPublic()
-	bppub, isok := ipspub.(BasicPlayerPublicState)
-	assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPublicState")
-	assert.Equal(t, bppub.CurGameMod, "FG", "Test_BasicPlayerState BasicPlayerPublicState CurGameMod")
+	err := ips.SetPublicString("")
+	assert.NotNil(t, err, "Test_BasicPlayerState SetPublicString")
 
-	ipspri := ips.GetPrivate()
-	bppri, isok := ipspri.(BasicPlayerPrivateState)
+	err = ips.SetPublicString("{\"curgamemod\":\"BONUS\"}")
+	assert.Nil(t, err, "Test_BasicPlayerState SetPublicString")
+
+	err = ips.SetPrivateString("")
+	assert.NotNil(t, err, "Test_BasicPlayerState SetPrivateString")
+
+	err = ips.SetPrivateString("{\"curgamemod\":\"BONUS\"}")
+	assert.Nil(t, err, "Test_BasicPlayerState SetPrivateString")
+
+	ipspub = ips.GetPublic()
+	bppub, isok = ipspub.(BasicPlayerPublicState)
+	assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPublicState")
+	assert.Equal(t, bppub.CurGameMod, "BONUS", "Test_BasicPlayerState BasicPlayerPublicState CurGameMod")
+
+	ipspri = ips.GetPrivate()
+	bppri, isok = ipspri.(BasicPlayerPrivateState)
 	assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPrivateState")
 	assert.NotNil(t, bppri, "Test_BasicPlayerState BasicPlayerPrivateState")
 

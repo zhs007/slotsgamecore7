@@ -8,6 +8,8 @@ import (
 type IGame interface {
 	// GetPlugin - get plugin
 	GetPlugin() sgc7plugin.IPlugin
+	// NewPlayerState - new playerstate
+	NewPlayerState() IPlayerState
 
 	// GetConfig - get config
 	GetConfig() *Config
