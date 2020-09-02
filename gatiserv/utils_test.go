@@ -7,6 +7,43 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
+//--------------------------------------------------------------------------------------
+// errPlayerState
+
+type errPlayerState struct {
+}
+
+// SetPublic - set player public state
+func (eps *errPlayerState) SetPublic(pub interface{}) error {
+	return nil
+
+}
+
+// SetPrivate - set player private state
+func (eps *errPlayerState) SetPrivate(pri interface{}) error {
+	return nil
+}
+
+// SetPublicString - set player public state
+func (eps *errPlayerState) SetPublicString(pub string) error {
+	return nil
+}
+
+// SetPrivateString - set player private state
+func (eps *errPlayerState) SetPrivateString(pri string) error {
+	return nil
+}
+
+// GetPublic - get player public state
+func (eps *errPlayerState) GetPublic() interface{} {
+	return nil
+}
+
+// GetPrivate - get player private state
+func (eps *errPlayerState) GetPrivate() interface{} {
+	return nil
+}
+
 func Test_BuildIPlayerState(t *testing.T) {
 	ips := &sgc7game.BasicPlayerState{}
 
@@ -51,6 +88,32 @@ func Test_BuildIPlayerState(t *testing.T) {
 	assert.NotNil(t, pps)
 
 	t.Logf("Test_BuildIPlayerState OK")
+}
+
+func Test_BuildPlayerStateString(t *testing.T) {
+	str, err := BuildPlayerStateString(nil)
+	assert.Nil(t, err)
+	assert.Equal(t, str, "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}")
+
+	ps, err := BuildPlayerStateWithString(str)
+	assert.Nil(t, err)
+	assert.NotNil(t, ps)
+
+	ips := sgc7game.NewBasicPlayerState("BG")
+	str, err = BuildPlayerStateString(ips)
+	assert.Nil(t, err)
+	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}")
+
+	ps, err = BuildPlayerStateWithString(str)
+	assert.Nil(t, err)
+	assert.NotNil(t, ps)
+
+	// eps := &errPlayerState{}
+	// str, err = BuildPlayerStateString(eps)
+	// assert.Nil(t, err)
+	// assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}")
+
+	t.Logf("Test_BuildPlayerStateString OK")
 }
 
 func Test_BuildStake(t *testing.T) {

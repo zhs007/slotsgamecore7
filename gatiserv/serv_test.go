@@ -9,6 +9,7 @@ import (
 
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 //--------------------------------------------------------------------------------------
@@ -82,6 +83,8 @@ func (sv *testService) Play(params *PlayParams) (*PlayResult, error) {
 }
 
 func Test_Serv(t *testing.T) {
+	sgc7utils.InitLogger("", "", "debug", true, "")
+
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	cfg := &Config{
@@ -99,6 +102,7 @@ func Test_Serv(t *testing.T) {
 	}
 
 	serv := NewServ(service, cfg)
+	client := NewClient("http://127.0.0.1:7891/v2/games/1019/")
 
 	go func() {
 		err := serv.Start()
@@ -158,7 +162,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\"curgamemod\":\"BG\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
 
 	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/initialize", nil, nil)
 	if err != nil {
@@ -224,6 +228,14 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
+
+	clientcfg, err := client.GetConfig()
+	assert.Nil(t, err)
+	assert.NotNil(t, clientcfg)
+
+	clientps, err := client.Initialize()
+	assert.Nil(t, err)
+	assert.NotNil(t, clientps)
 
 	serv.Stop()
 
