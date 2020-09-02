@@ -23,12 +23,14 @@ func Test_CalcScatter(t *testing.T) {
 			err)
 	}
 
-	result := CalcScatter(scene, pt, 11, 1, func(s int, cs int) bool {
+	result := CalcScatter(scene, pt, 11, 2, 10, func(s int, cs int) bool {
 		return cs == s
 	})
 
 	assert.Equal(t, result.Symbol, 11, "they should be equal")
 	assert.Equal(t, result.Mul, 5, "they should be equal")
+	assert.Equal(t, result.CoinWin, 50, "they should be equal")
+	assert.Equal(t, result.CashWin, 100, "they should be equal")
 	assert.Equal(t, len(result.Pos), 6, "they should be equal")
 
 	scene = &GameScene{
@@ -41,12 +43,14 @@ func Test_CalcScatter(t *testing.T) {
 		},
 	}
 
-	result = CalcScatter(scene, pt, 11, 1, func(s int, cs int) bool {
+	result = CalcScatter(scene, pt, 11, 2, 10, func(s int, cs int) bool {
 		return cs == s
 	})
 
 	assert.Equal(t, result.Symbol, 11, "they should be equal")
 	assert.Equal(t, result.Mul, 100, "they should be equal")
+	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
+	assert.Equal(t, result.CashWin, 2000, "they should be equal")
 	assert.Equal(t, len(result.Pos), 10, "they should be equal")
 
 	scene = &GameScene{
@@ -59,12 +63,14 @@ func Test_CalcScatter(t *testing.T) {
 		},
 	}
 
-	result = CalcScatter(scene, pt, 11, 1, func(s int, cs int) bool {
+	result = CalcScatter(scene, pt, 11, 2, 10, func(s int, cs int) bool {
 		return cs == s
 	})
 
 	assert.Equal(t, result.Symbol, 11, "they should be equal")
 	assert.Equal(t, result.Mul, 100, "they should be equal")
+	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
+	assert.Equal(t, result.CashWin, 2000, "they should be equal")
 	assert.Equal(t, len(result.Pos), 14, "they should be equal")
 
 	t.Logf("Test_CalcScatter OK")
@@ -107,6 +113,8 @@ func Test_CalcLine(t *testing.T) {
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
 	assert.Equal(t, result.Mul, 200, "they should be equal")
+	assert.Equal(t, result.CoinWin, 200, "they should be equal")
+	assert.Equal(t, result.CashWin, 200, "they should be equal")
 	assert.Equal(t, len(result.Pos), 8, "they should be equal")
 
 	// 1,1,1,1,0 => 1x5
@@ -123,6 +131,8 @@ func Test_CalcLine(t *testing.T) {
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
 	assert.Equal(t, result.Mul, 1000, "they should be equal")
+	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
+	assert.Equal(t, result.CashWin, 1000, "they should be equal")
 	assert.Equal(t, len(result.Pos), 10, "they should be equal")
 
 	scene = &GameScene{
@@ -149,6 +159,8 @@ func Test_CalcLine(t *testing.T) {
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
 	assert.Equal(t, result.Mul, 1000, "they should be equal")
+	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
+	assert.Equal(t, result.CashWin, 1000, "they should be equal")
 	assert.Equal(t, len(result.Pos), 10, "they should be equal")
 
 	// 11,0,0,0,11 => nil
@@ -193,6 +205,8 @@ func Test_CalcLine(t *testing.T) {
 
 	assert.Equal(t, result.Symbol, 9, "they should be equal")
 	assert.Equal(t, result.Mul, 15, "they should be equal")
+	assert.Equal(t, result.CoinWin, 15, "they should be equal")
+	assert.Equal(t, result.CashWin, 15, "they should be equal")
 	assert.Equal(t, len(result.Pos), 8, "they should be equal")
 
 	scene = &GameScene{
@@ -219,6 +233,8 @@ func Test_CalcLine(t *testing.T) {
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
 	assert.Equal(t, result.Mul, 1000, "they should be equal")
+	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
+	assert.Equal(t, result.CashWin, 1000, "they should be equal")
 	assert.Equal(t, len(result.Pos), 10, "they should be equal")
 
 	scene = &GameScene{
@@ -269,6 +285,8 @@ func Test_CalcLine(t *testing.T) {
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
 	assert.Equal(t, result.Mul, 50, "they should be equal")
+	assert.Equal(t, result.CoinWin, 50, "they should be equal")
+	assert.Equal(t, result.CashWin, 50, "they should be equal")
 	assert.Equal(t, len(result.Pos), 6, "they should be equal")
 
 	t.Logf("Test_CalcLine OK")

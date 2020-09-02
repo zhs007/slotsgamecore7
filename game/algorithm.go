@@ -13,7 +13,7 @@ type FuncIsSameSymbol func(symbol int, cursymbol int) bool
 type FuncIsValidSymbol func(cursymbol int) bool
 
 // CalcScatter - calc scatter
-func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int,
+func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins int,
 	isScatter FuncIsScatter) *Result {
 
 	nums := 0
@@ -38,7 +38,8 @@ func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int,
 			Type:      RTScatter,
 			LineIndex: -1,
 			Mul:       pt.MapPay[scatter][nums-1],
-			Win:       pt.MapPay[scatter][nums-1] * bet,
+			CoinWin:   pt.MapPay[scatter][nums-1] * coins,
+			CashWin:   pt.MapPay[scatter][nums-1] * coins * bet,
 			Pos:       pos,
 		}
 
@@ -106,11 +107,12 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 		if ws == -1 {
 			if pt.MapPay[s0][wnums-1] > 0 {
 				r := &Result{
-					Symbol: s0,
-					Type:   RTLine,
-					Mul:    pt.MapPay[s0][wnums-1],
-					Win:    pt.MapPay[s0][wnums-1] * bet,
-					Pos:    wpos,
+					Symbol:  s0,
+					Type:    RTLine,
+					Mul:     pt.MapPay[s0][wnums-1],
+					CoinWin: pt.MapPay[s0][wnums-1],
+					CashWin: pt.MapPay[s0][wnums-1] * bet,
+					Pos:     wpos,
 				}
 
 				return r
@@ -128,22 +130,24 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 		if wmul >= mul {
 			r := &Result{
-				Symbol: s0,
-				Type:   RTLine,
-				Mul:    pt.MapPay[s0][wnums-1],
-				Win:    pt.MapPay[s0][wnums-1] * bet,
-				Pos:    wpos,
+				Symbol:  s0,
+				Type:    RTLine,
+				Mul:     pt.MapPay[s0][wnums-1],
+				CoinWin: pt.MapPay[s0][wnums-1],
+				CashWin: pt.MapPay[s0][wnums-1] * bet,
+				Pos:     wpos,
 			}
 
 			return r
 		}
 
 		r := &Result{
-			Symbol: ws,
-			Type:   RTLine,
-			Mul:    pt.MapPay[ws][nums-1],
-			Win:    pt.MapPay[ws][nums-1] * bet,
-			Pos:    pos,
+			Symbol:  ws,
+			Type:    RTLine,
+			Mul:     pt.MapPay[ws][nums-1],
+			CoinWin: pt.MapPay[ws][nums-1],
+			CashWin: pt.MapPay[ws][nums-1] * bet,
+			Pos:     pos,
 		}
 
 		return r
@@ -168,11 +172,12 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 	if pt.MapPay[s0][nums-1] > 0 {
 		r := &Result{
-			Symbol: s0,
-			Type:   RTLine,
-			Mul:    pt.MapPay[s0][nums-1],
-			Win:    pt.MapPay[s0][nums-1] * bet,
-			Pos:    pos,
+			Symbol:  s0,
+			Type:    RTLine,
+			Mul:     pt.MapPay[s0][nums-1],
+			CoinWin: pt.MapPay[s0][nums-1],
+			CashWin: pt.MapPay[s0][nums-1] * bet,
+			Pos:     pos,
 		}
 
 		return r

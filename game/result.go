@@ -12,11 +12,11 @@ const (
 
 // Result - result for slots game
 type Result struct {
-	Type      ResultType
-	LineIndex int
-	Symbol    int
-	Mul       int
-	Win       int
-	RealWin   int
-	Pos       []int
+	Type      ResultType `json:"type"`
+	LineIndex int        `json:"lineindex"`
+	Symbol    int        `json:"symbol"`
+	Mul       int        `json:"mul"`
+	CoinWin   int        `json:"coinwin"`
+	CashWin   int        `json:"cachwin"`
+	Pos       []int      `json:"pos"`
 }
