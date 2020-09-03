@@ -79,14 +79,14 @@ func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
 	}, nil
 }
 
-// BuildPlayerStateWithString - json => PlayerState
-func BuildPlayerStateWithString(str string) (*PlayerState, error) {
+// ParsePlayerState - json => PlayerState
+func ParsePlayerState(str string) (*PlayerState, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	ps := &PlayerState{}
 	err := json.Unmarshal([]byte(str), ps)
 	if err != nil {
-		sgc7utils.Error("gatiserv.BuildPlayerStateWithString:JSON",
+		sgc7utils.Error("gatiserv.ParsePlayerState:JSON",
 			zap.String("str", str),
 			zap.Error(err))
 
@@ -135,4 +135,21 @@ func AddPlayResult(pr *PlayResult, stake Stake, results []*sgc7game.PlayResult) 
 	for _, v := range results {
 		AddWinResult(pr, stake, v)
 	}
+}
+
+// ParsePlayParams - string => *PlayParams
+func ParsePlayParams(str string) (*PlayParams, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	ps := &PlayParams{}
+	err := json.Unmarshal([]byte(str), ps)
+	if err != nil {
+		sgc7utils.Error("gatiserv.ParsePlayParams:JSON",
+			zap.String("str", str),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return ps, nil
 }

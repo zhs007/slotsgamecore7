@@ -1,6 +1,10 @@
 package sgc7game
 
-import sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+import (
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	"go.uber.org/zap"
+)
 
 // BasicGame - basic game
 type BasicGame struct {
@@ -58,6 +62,10 @@ func (game *BasicGame) Play(cmd string, param string, ps IPlayerState, stake *St
 
 	curgamemod, isok := game.MapGameMods[bps.Public.CurGameMod]
 	if !isok {
+		sgc7utils.Error("sgc7game.BasicGame.Play:MapGameMods[CurGameMod]", 
+			zap.String("CurGameMod", bps.Public.CurGameMod),
+			zap.Error(ErrInvalidGameMod))
+
 		return nil, ErrInvalidGameMod
 	}
 

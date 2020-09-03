@@ -53,6 +53,8 @@ func Test_BuildIPlayerState(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
+	assert.Equal(t, ips.Public.CurGameMod, "BG")
+
 	pbs, isok := ips.GetPublic().(sgc7game.BasicPlayerPublicState)
 	assert.Equal(t, isok, true)
 	assert.Equal(t, pbs.CurGameMod, "BG")
@@ -95,7 +97,7 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, str, "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}")
 
-	ps, err := BuildPlayerStateWithString(str)
+	ps, err := ParsePlayerState(str)
 	assert.Nil(t, err)
 	assert.NotNil(t, ps)
 
@@ -104,9 +106,13 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}")
 
-	ps, err = BuildPlayerStateWithString(str)
+	ps, err = ParsePlayerState(str)
 	assert.Nil(t, err)
 	assert.NotNil(t, ps)
+
+	ps, err = ParsePlayerState("")
+	assert.NotNil(t, err)
+	assert.Nil(t, ps)
 
 	// eps := &errPlayerState{}
 	// str, err = BuildPlayerStateString(eps)
@@ -138,4 +144,35 @@ func Test_BuildStake(t *testing.T) {
 	assert.Equal(t, bs.Currency, "USD")
 
 	t.Logf("Test_BuildStake OK")
+}
+
+func Test_ParsePlayParams(t *testing.T) {
+	pp, err := ParsePlayParams("{\"stakeValue\":{\"coinBet\":0.0500,\"cashBet\":1.00,\"currency\":\"EUR\"},\"playerState\":{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"},\"clientParams\":null,\"cheat\":\"\",\"command\":\"\",\"freespinsActive\":false,\"jackpotStakeValue\":null,\"jackpotValues\":null}")
+	assert.Nil(t, err)
+	assert.NotNil(t, pp)
+
+	assert.Equal(t, pp.Stake.CoinBet, 0.05)
+	assert.Equal(t, pp.Stake.CashBet, 1.0)
+	assert.Equal(t, pp.Stake.Currency, "EUR")
+
+	bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private)
+	assert.Equal(t, bps.Public.CurGameMod, "BG")
+
+	assert.Equal(t, pp.Params, "")
+
+	assert.Equal(t, pp.Cheat, "")
+
+	assert.Equal(t, pp.Cmd, "")
+
+	assert.Equal(t, pp.FreespinsActive, false)
+
+	assert.Equal(t, pp.JackpotStakeValue, float64(0))
+
+	assert.Nil(t, pp.JackpotValues)
+
+	pp, err = ParsePlayParams("")
+	assert.NotNil(t, err)
+	assert.Nil(t, pp)
+
+	t.Logf("Test_ParsePlayParams OK")
 }

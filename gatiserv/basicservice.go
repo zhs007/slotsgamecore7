@@ -52,6 +52,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 		pr, err := sv.Game.Play(params.Cmd, params.Params, ips, stake, results)
 		if err != nil {
 			sgc7utils.Error("BasicService.Play:Play",
+				zap.Int("results", len(results)),
 				zap.Error(err))
 
 			return nil, err

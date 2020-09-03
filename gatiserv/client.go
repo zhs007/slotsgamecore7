@@ -81,9 +81,9 @@ func (client *Client) Initialize() (*PlayerState, error) {
 		return nil, ErrNonStatusOK
 	}
 
-	ps, err := BuildPlayerStateWithString(string(buff))
+	ps, err := ParsePlayerState(string(buff))
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.Initialize:BuildPlayerStateWithString",
+		sgc7utils.Error("gatiserv.Client.Initialize:ParsePlayerState",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buff)),
 			zap.Error(err))
