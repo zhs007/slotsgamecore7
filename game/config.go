@@ -8,6 +8,8 @@ type Config struct {
 	Width        int                   `json:"width"`
 	Height       int                   `json:"height"`
 	DefaultScene *GameScene            `json:"defaultscene"`
+	Ver          string                `json:"ver"`
+	CoreVer      string                `json:"corever"`
 }
 
 // NewConfig - new a Config

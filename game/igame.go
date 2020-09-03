@@ -10,6 +10,8 @@ type IGame interface {
 	GetPlugin() sgc7plugin.IPlugin
 	// NewPlayerState - new playerstate
 	NewPlayerState() IPlayerState
+	// SetVer - set server version
+	SetVer(ver string)
 
 	// GetConfig - get config
 	GetConfig() *Config

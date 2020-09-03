@@ -17,7 +17,7 @@ func Test_BasicGame(t *testing.T) {
 	assert.NotNil(t, ps, "Test_BasicGame Initialize")
 	bps, isok := ps.(*BasicPlayerState)
 	assert.Equal(t, isok, true, "Test_BasicGame BasicPlayerState")
-	assert.Equal(t, bps.Public.CurGameMod, "BG", "Test_BasicGame BasicPlayerPublicState CurGameMod")
+	assert.Equal(t, bps.Public.CurGameMod, "bg", "Test_BasicGame BasicPlayerPublicState CurGameMod")
 
 	bg := NewBasicGameMod("bg", 5, 3)
 	err := game.AddGameMod(&bg)

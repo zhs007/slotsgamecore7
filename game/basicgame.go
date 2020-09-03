@@ -3,6 +3,7 @@ package sgc7game
 import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.uber.org/zap"
 )
 
@@ -31,6 +32,12 @@ func (game *BasicGame) GetPlugin() sgc7plugin.IPlugin {
 	return game.Plugin
 }
 
+// SetVer - set server version
+func (game *BasicGame) SetVer(ver string) {
+	game.Cfg.Ver = ver
+	game.Cfg.CoreVer = sgc7ver.Version
+}
+
 // NewPlayerState - new playerstate
 func (game *BasicGame) NewPlayerState() IPlayerState {
 	return &BasicPlayerState{}
@@ -38,7 +45,7 @@ func (game *BasicGame) NewPlayerState() IPlayerState {
 
 // Initialize - initialize PlayerState
 func (game *BasicGame) Initialize() IPlayerState {
-	return NewBasicPlayerState("BG")
+	return NewBasicPlayerState("bg")
 }
 
 // AddGameMod - add a gamemod
@@ -62,7 +69,7 @@ func (game *BasicGame) Play(cmd string, param string, ps IPlayerState, stake *St
 
 	curgamemod, isok := game.MapGameMods[bps.Public.CurGameMod]
 	if !isok {
-		sgc7utils.Error("sgc7game.BasicGame.Play:MapGameMods[CurGameMod]", 
+		sgc7utils.Error("sgc7game.BasicGame.Play:MapGameMods[CurGameMod]",
 			zap.String("CurGameMod", bps.Public.CurGameMod),
 			zap.Error(ErrInvalidGameMod))
 
