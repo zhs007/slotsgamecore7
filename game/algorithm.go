@@ -32,7 +32,7 @@ func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins in
 		nums = len(scene.Arr)
 	}
 
-	if pt.MapPay[scatter][nums-1] > 0 {
+	if nums > 0 && pt.MapPay[scatter][nums-1] > 0 {
 		r := &Result{
 			Symbol:    scatter,
 			Type:      RTScatter,
@@ -105,7 +105,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 		}
 
 		if ws == -1 {
-			if pt.MapPay[s0][wnums-1] > 0 {
+			if wnums > 0 && pt.MapPay[s0][wnums-1] > 0 {
 				r := &Result{
 					Symbol:  s0,
 					Type:    RTLine,
@@ -121,8 +121,16 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 			return nil
 		}
 
-		wmul := pt.MapPay[s0][wnums-1]
-		mul := pt.MapPay[ws][nums-1]
+		wmul := 0
+		mul := 0
+
+		if wnums > 0 {
+			wmul = pt.MapPay[s0][wnums-1]
+		}
+
+		if nums > 0 {
+			mul = pt.MapPay[ws][nums-1]
+		}
 
 		if wmul == 0 && mul == 0 {
 			return nil
@@ -170,7 +178,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 	}
 
-	if pt.MapPay[s0][nums-1] > 0 {
+	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
 		r := &Result{
 			Symbol:  s0,
 			Type:    RTLine,
