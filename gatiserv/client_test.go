@@ -125,3 +125,61 @@ func Test_ClientInitialize(t *testing.T) {
 
 	t.Logf("Test_ClientInitialize OK")
 }
+
+func Test_ClientPlayEx(t *testing.T) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	const URL = "http://127.0.0.1:7891/v2/games/1019/"
+	const configURL = URL + "play"
+
+	client := NewClient(URL)
+
+	httpmock.RegisterResponder("POST",
+		configURL,
+		func(req *http.Request) (*http.Response, error) {
+			return httpmock.NewStringResponder(404, "")(req)
+		})
+
+	pr, err := client.PlayEx("")
+	assert.Equal(t, err, ErrNonStatusOK, "Test_ClientPlayEx PlayEx")
+	assert.Nil(t, pr, "Test_ClientPlayEx PlayEx")
+
+	httpmock.RegisterResponder("POST",
+		configURL,
+		func(req *http.Request) (*http.Response, error) {
+			return nil, ErrNonStatusOK
+		})
+
+	pr, err = client.PlayEx("")
+	assert.NotNil(t, err, "Test_ClientPlayEx PlayEx")
+	assert.Nil(t, pr, "Test_ClientPlayEx PlayEx")
+
+	httpmock.RegisterResponder("POST",
+		configURL,
+		func(req *http.Request) (*http.Response, error) {
+			return httpmock.NewStringResponder(200, "")(req)
+		})
+
+	pr, err = client.PlayEx("")
+	assert.NotNil(t, err, "Test_ClientPlayEx PlayEx")
+	assert.Nil(t, pr, "Test_ClientPlayEx PlayEx")
+
+	httpmock.RegisterResponder("POST",
+		configURL,
+		func(req *http.Request) (*http.Response, error) {
+			pr := &PlayResult{}
+			resbuff, err := json.Marshal(pr)
+			assert.Nil(t, err, "Test_ClientPlayEx Marshal")
+
+			return httpmock.NewStringResponder(200, string(resbuff))(req)
+		})
+
+	pr, err = client.PlayEx("")
+	assert.Nil(t, err, "Test_ClientPlayEx PlayEx")
+	assert.NotNil(t, pr, "Test_ClientPlayEx PlayEx")
+
+	t.Logf("Test_ClientPlayEx OK")
+}

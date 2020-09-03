@@ -86,3 +86,42 @@ func HTTPPost(url string, header map[string]string, bodyObj interface{}) (int, [
 
 	return resp.StatusCode, body, nil
 }
+
+// HTTPPostEx - post
+func HTTPPostEx(url string, header map[string]string, body []byte) (int, []byte, error) {
+	var req *http.Request
+	var err error
+	client := &http.Client{}
+
+	if body != nil {
+		req, err = http.NewRequest("POST", url, bytes.NewBuffer(body))
+		if err != nil {
+			return -1, nil, err
+		}
+	} else {
+		req, err = http.NewRequest("POST", url, nil)
+		if err != nil {
+			return -1, nil, err
+		}
+	}
+
+	if header != nil {
+		for k, v := range header {
+			req.Header.Set(k, v)
+		}
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return -1, nil, err
+	}
+
+	rbody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return resp.StatusCode, nil, err
+	}
+
+	return resp.StatusCode, rbody, nil
+}

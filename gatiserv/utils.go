@@ -153,3 +153,20 @@ func ParsePlayParams(str string) (*PlayParams, error) {
 
 	return ps, nil
 }
+
+// ParsePlayResult - string => *PlayResult
+func ParsePlayResult(str string) (*PlayResult, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	pr := &PlayResult{}
+	err := json.Unmarshal([]byte(str), pr)
+	if err != nil {
+		sgc7utils.Error("gatiserv.ParsePlayResult:JSON",
+			zap.String("str", str),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return pr, nil
+}

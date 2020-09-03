@@ -96,35 +96,36 @@ func (client *Client) Initialize() (*PlayerState, error) {
 
 // PlayEx - play with string parameter
 func (client *Client) PlayEx(param string) (*PlayResult, error) {
-	return nil, nil
-	// sc, buff, err := sgc7http.HTTPGet(
-	// 	sgc7utils.AppendString(client.ServURL, "initialize"),
-	// 	nil)
-	// if err != nil {
-	// 	sgc7utils.Error("gatiserv.Client.Initialize:HTTPGet",
-	// 		zap.String("ServURL", client.ServURL),
-	// 		zap.Error(err))
+	sc, buff, err := sgc7http.HTTPPostEx(
+		sgc7utils.AppendString(client.ServURL, "play"),
+		nil,
+		[]byte(param),
+	)
+	if err != nil {
+		sgc7utils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
+			zap.String("ServURL", client.ServURL),
+			zap.Error(err))
 
-	// 	return nil, err
-	// }
+		return nil, err
+	}
 
-	// if sc != fasthttp.StatusOK {
-	// 	sgc7utils.Error("gatiserv.Client.Initialize:HTTPGet",
-	// 		zap.String("ServURL", client.ServURL),
-	// 		zap.Int("status", sc))
+	if sc != fasthttp.StatusOK {
+		sgc7utils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
+			zap.String("ServURL", client.ServURL),
+			zap.Int("status", sc))
 
-	// 	return nil, ErrNonStatusOK
-	// }
+		return nil, ErrNonStatusOK
+	}
 
-	// ps, err := ParsePlayerState(string(buff))
-	// if err != nil {
-	// 	sgc7utils.Error("gatiserv.Client.Initialize:ParsePlayerState",
-	// 		zap.String("ServURL", client.ServURL),
-	// 		zap.String("body", string(buff)),
-	// 		zap.Error(err))
+	pr, err := ParsePlayResult(string(buff))
+	if err != nil {
+		sgc7utils.Error("gatiserv.Client.PlayEx:ParsePlayResult",
+			zap.String("ServURL", client.ServURL),
+			zap.String("body", string(buff)),
+			zap.Error(err))
 
-	// 	return nil, err
-	// }
+		return nil, err
+	}
 
-	// return ps, nil
+	return pr, nil
 }

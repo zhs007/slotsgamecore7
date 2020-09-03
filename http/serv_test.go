@@ -191,7 +191,16 @@ func Test_Serv(t *testing.T) {
 
 	sc, buff, err = HTTPPost("http://127.0.0.1:7890/index?a=123&b=hello", nil, nil)
 	if err != nil {
-		t.Fatalf("Test_Serv httpGet error %v",
+		t.Fatalf("Test_Serv HTTPPost error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 400, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
+	sc, buff, err = HTTPPostEx("http://127.0.0.1:7890/index?a=123&b=hello", nil, nil)
+	if err != nil {
+		t.Fatalf("Test_Serv HTTPPostEx error %v",
 			err)
 	}
 
@@ -200,7 +209,25 @@ func Test_Serv(t *testing.T) {
 
 	sc, buff, err = HTTPPost("http://127.0.0.1:7890/index2?a=456&b=world", nil, nil)
 	if err != nil {
-		t.Fatalf("Test_Serv httpGet error %v",
+		t.Fatalf("Test_Serv HTTPPost error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+	assert.Equal(t, string(buff), "{\"result\":\"123\"}", "they should be equal")
+
+	err = json.Unmarshal(buff, rr)
+	if err != nil {
+		t.Fatalf("Test_Serv Unmarshal error %v",
+			err)
+	}
+
+	assert.Equal(t, rr.Result, "123", "they should be equal")
+
+	sc, buff, err = HTTPPostEx("http://127.0.0.1:7890/index2?a=456&b=world", nil, nil)
+	if err != nil {
+		t.Fatalf("Test_Serv HTTPPostEx error %v",
 			err)
 	}
 
@@ -222,7 +249,18 @@ func Test_Serv(t *testing.T) {
 	}
 	sc, buff, err = HTTPPost("http://127.0.0.1:7890/index3?a=123&b=hello", header3, post3)
 	if err != nil {
-		t.Fatalf("Test_Serv httpGet error %v",
+		t.Fatalf("Test_Serv HTTPPost error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+	assert.Equal(t, string(buff), "", "they should be equal")
+
+	post3s := "{\"param1\":123,\"param2\":\"hello\"}"
+	sc, buff, err = HTTPPostEx("http://127.0.0.1:7890/index3?a=123&b=hello", header3, []byte(post3s))
+	if err != nil {
+		t.Fatalf("Test_Serv HTTPPostEx error %v",
 			err)
 	}
 
