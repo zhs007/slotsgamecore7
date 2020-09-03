@@ -10,13 +10,13 @@ import (
 )
 
 // GetRngs - get rngs
-func GetRngs(rngURL string, gameID int, nums int) ([]int, error) {
+func GetRngs(rngURL string, gameID string, nums int) ([]int, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	url := sgc7utils.AppendString(rngURL, "?size=", strconv.Itoa(nums))
 
 	mapHeader := make(map[string]string)
-	mapHeader["X-Game-ID"] = strconv.Itoa(gameID)
+	mapHeader["X-Game-ID"] = gameID
 	code, body, err := sgc7http.HTTPGet(url, mapHeader)
 	if err != nil {
 		sgc7utils.Error("gati.GetRngs:HTTPGet",

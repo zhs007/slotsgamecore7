@@ -12,6 +12,11 @@ type BasicPlugin struct {
 	RngUsed []*sgc7utils.RngInfo
 }
 
+// NewBasicPlugin - new a BasicPlugin
+func NewBasicPlugin() *BasicPlugin {
+	return &BasicPlugin{}
+}
+
 // Random - return [0, r)
 func (bp *BasicPlugin) Random(r int) (int, error) {
 	ci := rand.Int()

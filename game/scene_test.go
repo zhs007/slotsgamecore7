@@ -23,7 +23,7 @@ func newtestGame() (*testGame, error) {
 	game.Cfg.Reels = make(map[string]*ReelsData)
 
 	game.Plugin = gati.NewPluginGATI(&gati.Config{
-		GameID:  936207324,
+		GameID:  "936207324",
 		RNGURL:  "http://127.0.0.1:50000/numbers",
 		RngNums: 100,
 	})

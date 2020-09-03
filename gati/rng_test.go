@@ -48,7 +48,7 @@ func Test_GetRngsMock(t *testing.T) {
 			return httpmock.NewStringResponder(200, string(resbuff))(req)
 		})
 
-	lst, err := GetRngs(URL, 936207324, 3)
+	lst, err := GetRngs(URL, "936207324", 3)
 	if err != nil {
 		t.Fatalf("Test_GetRngs GetRngs error %v",
 			err)
