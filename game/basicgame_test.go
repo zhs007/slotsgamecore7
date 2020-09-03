@@ -20,15 +20,15 @@ func Test_BasicGame(t *testing.T) {
 	assert.Equal(t, bps.Public.CurGameMod, "bg", "Test_BasicGame BasicPlayerPublicState CurGameMod")
 
 	bg := NewBasicGameMod("bg", 5, 3)
-	err := game.AddGameMod(&bg)
+	err := game.AddGameMod(bg)
 	assert.Nil(t, err, "Test_BasicGame AddGameMod bg")
 
 	fg := NewBasicGameMod("fg", 6, 4)
-	err = game.AddGameMod(&fg)
+	err = game.AddGameMod(fg)
 	assert.Nil(t, err, "Test_BasicGame AddGameMod fg")
 
 	fg1 := NewBasicGameMod("fg", 6, 4)
-	err = game.AddGameMod(&fg1)
+	err = game.AddGameMod(fg1)
 	assert.Equal(t, err, ErrDuplicateGameMod, "Test_BasicGame AddGameMod fg1")
 
 	var igame IGame
