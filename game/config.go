@@ -69,5 +69,11 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 
 	cfg.DefaultScene = NewGameScene(len(arr), len(arr[0]))
 
+	for x := 0; x < len(arr); x++ {
+		for y := 0; y < len(arr[0]); y++ {
+			cfg.DefaultScene.Arr[x][y] = arr[x][y]
+		}
+	}
+
 	return nil
 }

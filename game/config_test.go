@@ -33,6 +33,22 @@ func Test_Config(t *testing.T) {
 	err = cfg.SetDefaultSceneString("[[1,9,2],[10,7,1],[10,8,2],[4,6,1],[10,6,4]]")
 	assert.NoError(t, err)
 
+	assert.Equal(t, cfg.DefaultScene.Arr[0][0], 1)
+	assert.Equal(t, cfg.DefaultScene.Arr[0][1], 9)
+	assert.Equal(t, cfg.DefaultScene.Arr[0][2], 2)
+	assert.Equal(t, cfg.DefaultScene.Arr[1][0], 10)
+	assert.Equal(t, cfg.DefaultScene.Arr[1][1], 7)
+	assert.Equal(t, cfg.DefaultScene.Arr[1][2], 1)
+	assert.Equal(t, cfg.DefaultScene.Arr[2][0], 10)
+	assert.Equal(t, cfg.DefaultScene.Arr[2][1], 8)
+	assert.Equal(t, cfg.DefaultScene.Arr[2][2], 2)
+	assert.Equal(t, cfg.DefaultScene.Arr[3][0], 4)
+	assert.Equal(t, cfg.DefaultScene.Arr[3][1], 6)
+	assert.Equal(t, cfg.DefaultScene.Arr[3][2], 1)
+	assert.Equal(t, cfg.DefaultScene.Arr[4][0], 10)
+	assert.Equal(t, cfg.DefaultScene.Arr[4][1], 6)
+	assert.Equal(t, cfg.DefaultScene.Arr[4][2], 4)
+
 	err = cfg.SetDefaultSceneString("")
 	assert.Error(t, err)
 
