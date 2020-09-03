@@ -48,8 +48,13 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 	results := []*sgc7game.PlayResult{}
 
+	cmd := params.Cmd
+	if cmd == "" {
+		cmd = "SPIN"
+	}
+
 	for {
-		pr, err := sv.Game.Play(params.Cmd, params.Params, ips, stake, results)
+		pr, err := sv.Game.Play(cmd, params.Params, ips, stake, results)
 		if err != nil {
 			sgc7utils.Error("BasicService.Play:Play",
 				zap.Int("results", len(results)),
