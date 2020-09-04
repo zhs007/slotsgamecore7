@@ -30,4 +30,7 @@ var (
 	ErrNonGameModCalcScene = errors.New("non CalcScene in GameMod")
 	// ErrNonGameModPayout - non Payout in GameMod
 	ErrNonGameModPayout = errors.New("non Payout in GameMod")
+
+	// ErrInvalidWeights - invalid weights
+	ErrInvalidWeights = errors.New("invalid weights")
 )

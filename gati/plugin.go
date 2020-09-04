@@ -44,3 +44,17 @@ func (plugin *PluginGATI) Random(r int) (int, error) {
 
 	return v, nil
 }
+
+// SetCache - set cache
+func (plugin *PluginGATI) SetCache(arr []int) {
+	plugin.Rngs = arr
+}
+
+// ClearCache - clear cached rngs
+func (plugin *PluginGATI) ClearCache() {
+	plugin.Rngs = nil
+}
+
+// Init - initial
+func (plugin *PluginGATI) Init() {
+}

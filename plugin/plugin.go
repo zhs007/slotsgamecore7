@@ -10,4 +10,10 @@ type IPlugin interface {
 	GetUsedRngs() []*sgc7utils.RngInfo
 	// ClearUsedRngs - clear used rngs
 	ClearUsedRngs()
+	// SetCache - set cache
+	SetCache(arr []int)
+	// ClearCache - clear cached rngs
+	ClearCache()
+	// Init - initial
+	Init()
 }

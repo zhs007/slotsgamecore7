@@ -34,6 +34,28 @@ func Test_BasicPlugin(t *testing.T) {
 	lst1 := bp.GetUsedRngs()
 	assert.Nil(t, lst1, "Test_BasicPlugin GetUsedRngs")
 
+	lstcache := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}
+	bp.SetCache(lstcache)
+
+	for i := 0; i < 10; i++ {
+		r, err := bp.Random(100)
+		assert.NoError(t, err)
+		assert.Equal(t, r, lstcache[i], "Test_BasicPlugin Random Cache value")
+		assert.Equal(t, len(bp.Cache), 9-i, "Test_BasicPlugin Random ClearCache")
+	}
+
+	bp.SetCache(lstcache)
+
+	for i := 0; i < 5; i++ {
+		r, err := bp.Random(100)
+		assert.NoError(t, err)
+		assert.Equal(t, r, lstcache[i], "Test_BasicPlugin Random Cache value")
+		assert.Equal(t, len(bp.Cache), 9-i, "Test_BasicPlugin Random ClearCache")
+	}
+
+	bp.ClearCache()
+	assert.Equal(t, len(bp.Cache), 0, "Test_BasicPlugin Random ClearCache")
+
 	var ip IPlugin
 	ip = bp
 	assert.NotNil(t, ip, "Test_BasicPlugin IPlugin")
