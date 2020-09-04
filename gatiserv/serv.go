@@ -106,6 +106,15 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 
 			ret, err := s.Service.Play(params)
+			if err != nil {
+				sgc7utils.Warn("gatiserv.Serv.play:Play",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+
+				return
+			}
+
 			s.SetResponse(ctx, ret)
 		})
 
