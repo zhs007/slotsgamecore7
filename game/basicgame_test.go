@@ -32,7 +32,7 @@ func Test_BasicGame(t *testing.T) {
 	assert.Equal(t, err, ErrDuplicateGameMod, "Test_BasicGame AddGameMod fg1")
 
 	var igame IGame
-	igame = &game
+	igame = game
 	assert.NotNil(t, igame, "Test_BasicGame IGame")
 
 	t.Logf("Test_BasicGame OK")

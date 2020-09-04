@@ -9,7 +9,7 @@ import (
 
 func Test_BasicService(t *testing.T) {
 	bg := sgc7game.NewBasicGame()
-	bs := NewBasicService(&bg)
+	bs := NewBasicService(bg)
 
 	bs.Config()
 

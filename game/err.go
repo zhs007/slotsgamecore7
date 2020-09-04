@@ -33,4 +33,7 @@ var (
 
 	// ErrInvalidWeights - invalid weights
 	ErrInvalidWeights = errors.New("invalid weights")
+
+	// ErrNullConfig - null config
+	ErrNullConfig = errors.New("null config")
 )

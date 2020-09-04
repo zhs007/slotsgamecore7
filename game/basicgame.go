@@ -15,8 +15,8 @@ type BasicGame struct {
 }
 
 // NewBasicGame - new a BasicGame
-func NewBasicGame() BasicGame {
-	return BasicGame{
+func NewBasicGame() *BasicGame {
+	return &BasicGame{
 		Cfg:         NewConfig(),
 		MapGameMods: make(map[string]IGameMod),
 	}

@@ -10,12 +10,12 @@ import (
 
 // testGame - game
 type testGame struct {
-	BasicGame
+	*BasicGame
 }
 
 func newtestGame() (*testGame, error) {
 	game := &testGame{
-		BasicGame: NewBasicGame(),
+		NewBasicGame(),
 	}
 
 	game.Cfg.Width = 5
