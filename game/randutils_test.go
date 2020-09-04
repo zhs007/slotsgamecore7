@@ -22,5 +22,15 @@ func Test_RandWithWeights(t *testing.T) {
 	assert.EqualError(t, err, ErrInvalidWeights.Error())
 	assert.Equal(t, c, -1)
 
+	bp.SetCache([]int{2})
+	c, err = RandWithWeights(bp, 6, []int{1, 2, 3})
+	assert.NoError(t, err)
+	assert.Equal(t, c, 1)
+
+	bp.SetCache([]int{7})
+	c, err = RandWithWeights(bp, 8, []int{1, 2, 3})
+	assert.EqualError(t, err, ErrInvalidWeights.Error())
+	assert.Equal(t, c, -1)
+
 	t.Logf("Test_RandWithWeights OK")
 }
