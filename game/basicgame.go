@@ -81,5 +81,7 @@ func (game *BasicGame) Play(cmd string, param string, ps IPlayerState, stake *St
 		return nil, err
 	}
 
+	bps.Public.CurGameMod = pr.NextGameMod
+
 	return pr, nil
 }
