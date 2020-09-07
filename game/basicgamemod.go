@@ -55,12 +55,14 @@ func (mod *BasicGameMod) OnPlay(game IGame, cmd string, param string, stake *Sta
 // RandomScene - on random scene
 func (mod *BasicGameMod) RandomScene(game IGame, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
 	if mod.Width > 0 && mod.Height > 0 {
-		pr.Scene = NewGameScene(mod.Width, mod.Height)
+		cs := NewGameScene(mod.Width, mod.Height)
 
-		err := pr.Scene.RandReels(game, reelsName)
+		err := cs.RandReels(game, reelsName)
 		if err != nil {
 			return err
 		}
+
+		pr.Scenes = append(pr.Scenes, cs)
 
 		return nil
 	}

@@ -1,6 +1,7 @@
 package gatiserv
 
 import (
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
@@ -24,9 +25,9 @@ type Jackpot struct {
 
 // Result - game result
 type Result struct {
-	CoinWin    int     `json:"coinWin"`
-	CashWin    float64 `json:"cashWin"`
-	ClientData string  `json:"clientData"`
+	CoinWin    int                  `json:"coinWin"`
+	CashWin    float64              `json:"cashWin"`
+	ClientData *sgc7game.PlayResult `json:"clientData"`
 }
 
 // AnalyticEvent - analytic event

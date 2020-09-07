@@ -107,19 +107,19 @@ func BuildStake(stake Stake) *sgc7game.Stake {
 
 // AddWinResult - add sgc7game.PlayResult
 func AddWinResult(pr *PlayResult, stake Stake, playResult *sgc7game.PlayResult) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	// json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	prb, err := json.Marshal(playResult)
-	if err != nil {
-		sgc7utils.Warn("gatiserv.AddWinResult:Marshal PlayResult",
-			zap.Error(err))
+	// prb, err := json.Marshal(playResult)
+	// if err != nil {
+	// 	sgc7utils.Warn("gatiserv.AddWinResult:Marshal PlayResult",
+	// 		zap.Error(err))
 
-		return err
-	}
+	// 	return err
+	// }
 
 	r := &Result{
 		CoinWin:    playResult.CoinWin,
-		ClientData: string(prb),
+		ClientData: playResult,
 	}
 
 	r.CashWin = float64(playResult.CashWin) / 100.0
