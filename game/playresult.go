@@ -2,6 +2,8 @@ package sgc7game
 
 // PlayResult - result for play
 type PlayResult struct {
+	CurGameMod    string     `json:"curgamemod"`
+	NextGameMod   string     `json:"nextgamemod"`
 	Scene         *GameScene `json:"scene"`
 	Results       []*Result  `json:"results"`
 	NextCmds      []string   `json:"-"`
