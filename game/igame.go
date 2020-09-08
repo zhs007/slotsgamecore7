@@ -20,7 +20,7 @@ type IGame interface {
 	Initialize() IPlayerState
 
 	// Play - play
-	Play(cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error)
+	Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error)
 
 	// AddGameMod - add a gamemod
 	AddGameMod(gmod IGameMod) error
