@@ -44,6 +44,9 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 		return nil, err
 	}
 
+	plugin := sv.Game.NewPlugin()
+	defer sv.Game.FreePlugin(plugin)
+
 	stake := BuildStake(params.Stake)
 
 	results := []*sgc7game.PlayResult{}
@@ -85,7 +88,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	}
 
 	pr := &PlayResult{
-		RandomNumbers: sv.Game.GetPlugin().GetUsedRngs(),
+		RandomNumbers: plugin.GetUsedRngs(),
 		// JackpotData   []string             `json:"jackpotData"`
 		// AnalyticsData AnalyticsData        `json:"analyticsData"`
 		// BoostData     string               `json:"boostData"`

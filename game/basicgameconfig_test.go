@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
 func Test_BasicGameConfig(t *testing.T) {
@@ -12,7 +13,9 @@ func Test_BasicGameConfig(t *testing.T) {
 	err := LoadGameConfig("../unittestdata/gamecfg.yaml", &cfg)
 	assert.NoError(t, err)
 
-	game := NewBasicGame()
+	game := NewBasicGame(func() sgc7plugin.IPlugin {
+		return sgc7plugin.NewBasicPlugin()
+	})
 
 	err = cfg.Init5(game)
 	assert.NoError(t, err)

@@ -1,5 +1,7 @@
 package sgc7game
 
+import sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+
 // GameScene - game scene
 type GameScene struct {
 	Arr    [][]int `json:"arr"`
@@ -34,7 +36,7 @@ func (gs *GameScene) Init(w int, h int) error {
 }
 
 // RandReels - random with reels
-func (gs *GameScene) RandReels(game IGame, reelsName string) error {
+func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName string) error {
 	cfg := game.GetConfig()
 
 	reels, isok := cfg.Reels[reelsName]
@@ -43,7 +45,7 @@ func (gs *GameScene) RandReels(game IGame, reelsName string) error {
 	}
 
 	for x, arr := range gs.Arr {
-		cn, err := game.GetPlugin().Random(len(reels.Reels[x]))
+		cn, err := plugin.Random(len(reels.Reels[x]))
 		if err != nil {
 			return err
 		}
