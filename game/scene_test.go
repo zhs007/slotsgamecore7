@@ -1,6 +1,7 @@
 package sgc7game
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -145,4 +146,71 @@ func Test_RandGameScene(t *testing.T) {
 	assert.Equal(t, gs.Arr[4][2], 9, "they should be equal")
 
 	t.Logf("Test_RandGameScene OK")
+}
+
+func Test_ForEachAround(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("GET",
+		"http://127.0.0.1:50000/numbers?size=100",
+		httpmock.NewStringResponder(200, "[0, 1, 2, 3, 4, 0, 1, 2, 3, 32]"))
+
+	game, err := newtestGame()
+	assert.NoError(t, err)
+
+	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+
+	err = gs.RandReels(game, "bg")
+	assert.NoError(t, err)
+
+	gs.ForEachAround(-1, 0, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	gs.ForEachAround(0, 3, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	gs.ForEachAround(5, 0, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	gs.ForEachAround(0, -1, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	lstpos := []int{}
+	lstv := []int{}
+	gs.ForEachAround(0, 0, func(x, y int, val int) {
+		lstpos = append(lstpos, x)
+		lstpos = append(lstpos, y)
+
+		lstv = append(lstv, val)
+	})
+
+	assert.Equal(t, len(lstv), 3)
+	assert.Equal(t, len(lstpos), 6)
+
+	for i, v := range lstv {
+		assert.Equal(t, v, gs.Arr[lstpos[i*2]][lstpos[i*2+1]])
+	}
+
+	lstpos = []int{}
+	lstv = []int{}
+	gs.ForEachAround(1, 1, func(x, y int, val int) {
+		lstpos = append(lstpos, x)
+		lstpos = append(lstpos, y)
+
+		lstv = append(lstv, val)
+	})
+
+	assert.Equal(t, len(lstv), 8)
+	assert.Equal(t, len(lstpos), 16)
+
+	for i, v := range lstv {
+		assert.Equal(t, v, gs.Arr[lstpos[i*2]][lstpos[i*2+1]])
+	}
+
+	t.Logf("Test_ForEachAround OK")
 }
