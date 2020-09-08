@@ -21,3 +21,22 @@ func Test_IndexOfIntSlice(t *testing.T) {
 
 	t.Logf("Test_IndexOfIntSlice OK")
 }
+
+func Test_IndexOfInt2Slice(t *testing.T) {
+	ci := IndexOfInt2Slice([]int{1, 2, 3, 4, 5, 6}, 3, 4, 0)
+	assert.Equal(t, ci, 1)
+
+	ci = IndexOfInt2Slice(nil, 3, 4, -1)
+	assert.Equal(t, ci, -1)
+
+	ci = IndexOfInt2Slice([]int{1, 2, 3, 4, 5, 6}, 3, 4, 5)
+	assert.Equal(t, ci, -1)
+
+	ci = IndexOfInt2Slice([]int{1, 2, 3, 4, 5, 6}, 3, 4, -100)
+	assert.Equal(t, ci, 1)
+
+	ci = IndexOfInt2Slice([]int{1, 2, 3, 4, 5, 6}, 2, 3, -100)
+	assert.Equal(t, ci, -1)
+
+	t.Logf("Test_IndexOfInt2Slice OK")
+}
