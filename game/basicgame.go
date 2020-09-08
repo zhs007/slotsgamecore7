@@ -11,14 +11,15 @@ import (
 type BasicGame struct {
 	Cfg         *Config
 	MapGameMods map[string]IGameMod
-	Plugin      sgc7plugin.IPlugin
+	MgrPlugins  *sgc7plugin.PluginsMgr
 }
 
 // NewBasicGame - new a BasicGame
-func NewBasicGame() *BasicGame {
+func NewBasicGame(funcNewPlugin sgc7plugin.FuncNewPlugin) *BasicGame {
 	return &BasicGame{
 		Cfg:         NewConfig(),
 		MapGameMods: make(map[string]IGameMod),
+		MgrPlugins:  sgc7plugin.NewPluginsMgr(funcNewPlugin),
 	}
 }
 
@@ -27,9 +28,14 @@ func (game *BasicGame) GetConfig() *Config {
 	return game.Cfg
 }
 
-// GetPlugin - get plugin
-func (game *BasicGame) GetPlugin() sgc7plugin.IPlugin {
-	return game.Plugin
+// NewPlugin - new a plugin
+func (game *BasicGame) NewPlugin() sgc7plugin.IPlugin {
+	return game.MgrPlugins.NewPlugin()
+}
+
+// FreePlugin - free a plugin
+func (game *BasicGame) FreePlugin(plugin sgc7plugin.IPlugin) {
+	game.MgrPlugins.FreePlugin(plugin)
 }
 
 // SetVer - set server version

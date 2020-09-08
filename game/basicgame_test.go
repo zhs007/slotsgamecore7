@@ -4,14 +4,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
 func Test_BasicGame(t *testing.T) {
-	game := NewBasicGame()
+	game := NewBasicGame(func() sgc7plugin.IPlugin {
+		return sgc7plugin.NewBasicPlugin()
+	})
 
 	assert.NotNil(t, game.GetConfig(), "Test_BasicGame GetConfig")
 
-	assert.Nil(t, game.GetPlugin(), "Test_BasicGame GetPlugin")
+	p0 := game.NewPlugin()
+	assert.NotNil(t, p0, "Test_BasicGame NewPlugin")
+
+	game.FreePlugin(p0)
 
 	ps := game.Initialize()
 	assert.NotNil(t, ps, "Test_BasicGame Initialize")

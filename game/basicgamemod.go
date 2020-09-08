@@ -1,5 +1,7 @@
 package sgc7game
 
+import sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+
 // BasicGameMod - basic gameMod
 type BasicGameMod struct {
 	Name   string
@@ -27,11 +29,11 @@ func (mod *BasicGameMod) OnPlay(game IGame, cmd string, param string, stake *Sta
 }
 
 // RandomScene - on random scene
-func (mod *BasicGameMod) RandomScene(game IGame, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
+func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
 	if mod.Width > 0 && mod.Height > 0 {
 		cs := NewGameScene(mod.Width, mod.Height)
 
-		err := cs.RandReels(game, reelsName)
+		err := cs.RandReels(game, plugin, reelsName)
 		if err != nil {
 			return err
 		}

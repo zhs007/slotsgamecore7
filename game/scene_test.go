@@ -7,6 +7,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zhs007/slotsgamecore7/gati"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
 // testGame - game
@@ -16,18 +17,24 @@ type testGame struct {
 
 func newtestGame() (*testGame, error) {
 	game := &testGame{
-		NewBasicGame(),
+		NewBasicGame(func() sgc7plugin.IPlugin {
+			return gati.NewPluginGATI(&gati.Config{
+				GameID:  "936207324",
+				RNGURL:  "http://127.0.0.1:50000/numbers",
+				RngNums: 100,
+			})
+		}),
 	}
 
 	game.Cfg.Width = 5
 	game.Cfg.Height = 3
 	game.Cfg.Reels = make(map[string]*ReelsData)
 
-	game.Plugin = gati.NewPluginGATI(&gati.Config{
-		GameID:  "936207324",
-		RNGURL:  "http://127.0.0.1:50000/numbers",
-		RngNums: 100,
-	})
+	// game.Plugin = gati.NewPluginGATI(&gati.Config{
+	// 	GameID:  "936207324",
+	// 	RNGURL:  "http://127.0.0.1:50000/numbers",
+	// 	RngNums: 100,
+	// })
 
 	r, err := LoadReels5JSON("../unittestdata/reels.json")
 	if err != nil {
@@ -91,9 +98,12 @@ func Test_RandGameScene(t *testing.T) {
 			err)
 	}
 
+	plugin := game.NewPlugin()
+	defer game.FreePlugin(plugin)
+
 	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
 
-	err = gs.RandReels(game, "bg")
+	err = gs.RandReels(game, plugin, "bg")
 	if err != nil {
 		t.Fatalf("Test_RandGameScene RandReels err %v",
 			err)
@@ -119,7 +129,7 @@ func Test_RandGameScene(t *testing.T) {
 	assert.Equal(t, gs.Arr[4][1], 6, "they should be equal")
 	assert.Equal(t, gs.Arr[4][2], 0, "they should be equal")
 
-	err = gs.RandReels(game, "fg1")
+	err = gs.RandReels(game, plugin, "fg1")
 	if err != nil {
 		t.Fatalf("Test_RandGameScene RandReels err %v",
 			err)
@@ -159,9 +169,12 @@ func Test_ForEachAround(t *testing.T) {
 	game, err := newtestGame()
 	assert.NoError(t, err)
 
+	plugin := game.NewPlugin()
+	defer game.FreePlugin(plugin)
+
 	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
 
-	err = gs.RandReels(game, "bg")
+	err = gs.RandReels(game, plugin, "bg")
 	assert.NoError(t, err)
 
 	gs.ForEachAround(-1, 0, func(x, y int, val int) {
