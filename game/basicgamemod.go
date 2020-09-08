@@ -23,34 +23,8 @@ func (mod *BasicGameMod) GetName() string {
 
 // OnPlay - on play
 func (mod *BasicGameMod) OnPlay(game IGame, cmd string, param string, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
-	// if cmd == "SPIN" {
-	// 	return mod.OnSpin(game, param, stake, prs)
-	// }
-
 	return nil, ErrInvalidCommand
 }
-
-// // OnSpin - on spin
-// func (mod *BasicGameMod) OnSpin(game IGame, param string, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
-// 	pr := &PlayResult{}
-
-// 	err := mod.OnRandomScene(game, param, prs, pr, mod.Name)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = mod.OnCalcScene(game, param, stake, prs, pr)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = mod.OnPayout(game, param, prs, pr)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return pr, nil
-// }
 
 // RandomScene - on random scene
 func (mod *BasicGameMod) RandomScene(game IGame, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
@@ -69,13 +43,3 @@ func (mod *BasicGameMod) RandomScene(game IGame, param string, prs []*PlayResult
 
 	return ErrInvalidWHGameMod
 }
-
-// // OnCalcScene - on calc scene
-// func (mod *BasicGameMod) OnCalcScene(game IGame, param string, stake *Stake, prs []*PlayResult, pr *PlayResult) error {
-// 	return ErrNonGameModCalcScene
-// }
-
-// // OnPayout - on payout
-// func (mod *BasicGameMod) OnPayout(game IGame, param string, prs []*PlayResult, pr *PlayResult) error {
-// 	return ErrNonGameModPayout
-// }
