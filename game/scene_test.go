@@ -232,72 +232,134 @@ func Test_ForEachAround(t *testing.T) {
 }
 
 func Test_ForEach(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	httpmock.RegisterResponder("GET",
-		"http://127.0.0.1:50000/numbers?size=100",
-		httpmock.NewStringResponder(200, "[0, 1, 2, 3, 4, 0, 1, 2, 3, 32]"))
-
-	game, err := newtestGame()
+	gs, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
 	assert.NoError(t, err)
 
-	plugin := game.NewPlugin()
-	defer game.FreePlugin(plugin)
+	nums := 0
+	gs.ForEach(func(x, y int, v int) {
+		assert.Equal(t, v, gs.Arr[x][y])
+		nums++
+	})
 
-	gs, err := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	assert.Equal(t, nums, 15)
+
+	t.Logf("Test_ForEach OK")
+}
+
+func Test_InitWithArr2(t *testing.T) {
+	gs, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7, 9},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
+	assert.Error(t, err)
+	assert.Nil(t, gs)
+
+	gs, err = NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, gs)
+
+	assert.Equal(t, gs.Arr[0][0], 8)
+	assert.Equal(t, gs.Arr[0][1], 10)
+	assert.Equal(t, gs.Arr[0][2], 1)
+	assert.Equal(t, gs.Arr[1][0], 11)
+	assert.Equal(t, gs.Arr[1][1], 10)
+	assert.Equal(t, gs.Arr[1][2], 7)
+	assert.Equal(t, gs.Arr[2][0], 0)
+	assert.Equal(t, gs.Arr[2][1], 4)
+	assert.Equal(t, gs.Arr[2][2], 6)
+	assert.Equal(t, gs.Arr[3][0], 7)
+	assert.Equal(t, gs.Arr[3][1], 8)
+	assert.Equal(t, gs.Arr[3][2], 0)
+	assert.Equal(t, gs.Arr[4][0], 1)
+	assert.Equal(t, gs.Arr[4][1], 9)
+	assert.Equal(t, gs.Arr[4][2], 5)
+
+	t.Logf("Test_InitWithArr2 OK")
+}
+
+func Test_InitWithArr(t *testing.T) {
+	gs, err := NewGameSceneWithArr(5, 3, []int{8, 10, 1, 11, 10, 7, 9, 0, 4, 6, 7, 8, 0, 1, 9, 5})
+	assert.Error(t, err)
+	assert.Nil(t, gs)
+
+	gs, err = NewGameSceneWithArr(5, 3, []int{8, 10, 1, 11, 10, 7, 0, 4, 6, 7, 8, 0, 1, 9, 5})
+	assert.NoError(t, err)
+	assert.NotNil(t, gs)
+
+	assert.Equal(t, gs.Arr[0][0], 8)
+	assert.Equal(t, gs.Arr[0][1], 10)
+	assert.Equal(t, gs.Arr[0][2], 1)
+	assert.Equal(t, gs.Arr[1][0], 11)
+	assert.Equal(t, gs.Arr[1][1], 10)
+	assert.Equal(t, gs.Arr[1][2], 7)
+	assert.Equal(t, gs.Arr[2][0], 0)
+	assert.Equal(t, gs.Arr[2][1], 4)
+	assert.Equal(t, gs.Arr[2][2], 6)
+	assert.Equal(t, gs.Arr[3][0], 7)
+	assert.Equal(t, gs.Arr[3][1], 8)
+	assert.Equal(t, gs.Arr[3][2], 0)
+	assert.Equal(t, gs.Arr[4][0], 1)
+	assert.Equal(t, gs.Arr[4][1], 9)
+	assert.Equal(t, gs.Arr[4][2], 5)
+
+	t.Logf("Test_InitWithArr OK")
+}
+
+func Test_CountSymbol(t *testing.T) {
+	gs, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
 	assert.NoError(t, err)
 
-	err = gs.RandReels(game, plugin, "bg")
+	s10nums := gs.CountSymbol(10)
+	assert.Equal(t, s10nums, 2)
+
+	s7nums := gs.CountSymbol(7)
+	assert.Equal(t, s7nums, 2)
+
+	s8nums := gs.CountSymbol(8)
+	assert.Equal(t, s8nums, 2)
+
+	s9nums := gs.CountSymbol(9)
+	assert.Equal(t, s9nums, 1)
+
+	t.Logf("Test_CountSymbol OK")
+}
+
+func Test_CountSymbols(t *testing.T) {
+	gs, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
 	assert.NoError(t, err)
 
-	gs.ForEachAround(-1, 0, func(x, y int, val int) {
-		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
-	})
+	arr := gs.CountSymbols([]int{7, 8, 9, 10})
+	assert.Equal(t, arr[0], 2)
+	assert.Equal(t, arr[1], 2)
+	assert.Equal(t, arr[2], 1)
+	assert.Equal(t, arr[3], 2)
 
-	gs.ForEachAround(0, 3, func(x, y int, val int) {
-		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
-	})
-
-	gs.ForEachAround(5, 0, func(x, y int, val int) {
-		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
-	})
-
-	gs.ForEachAround(0, -1, func(x, y int, val int) {
-		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
-	})
-
-	lstpos := []int{}
-	lstv := []int{}
-	gs.ForEachAround(0, 0, func(x, y int, val int) {
-		lstpos = append(lstpos, x)
-		lstpos = append(lstpos, y)
-
-		lstv = append(lstv, val)
-	})
-
-	assert.Equal(t, len(lstv), 3)
-	assert.Equal(t, len(lstpos), 6)
-
-	for i, v := range lstv {
-		assert.Equal(t, v, gs.Arr[lstpos[i*2]][lstpos[i*2+1]])
-	}
-
-	lstpos = []int{}
-	lstv = []int{}
-	gs.ForEachAround(1, 1, func(x, y int, val int) {
-		lstpos = append(lstpos, x)
-		lstpos = append(lstpos, y)
-
-		lstv = append(lstv, val)
-	})
-
-	assert.Equal(t, len(lstv), 8)
-	assert.Equal(t, len(lstpos), 16)
-
-	for i, v := range lstv {
-		assert.Equal(t, v, gs.Arr[lstpos[i*2]][lstpos[i*2+1]])
-	}
-
-	t.Logf("Test_ForEachAround OK")
+	t.Logf("Test_CountSymbol OK")
 }

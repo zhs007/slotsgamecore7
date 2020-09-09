@@ -26,6 +26,7 @@ func (mgr *PluginsMgr) NewPlugin() IPlugin {
 
 	if len(mgr.plugins) > 0 {
 		plugin := mgr.plugins[0]
+		plugin.ClearUsedRngs()
 
 		mgr.plugins = mgr.plugins[1:]
 
@@ -33,6 +34,7 @@ func (mgr *PluginsMgr) NewPlugin() IPlugin {
 	}
 
 	plugin := mgr.funcNewPlugin()
+	plugin.ClearUsedRngs()
 
 	return plugin
 }

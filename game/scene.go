@@ -81,7 +81,7 @@ func (gs *GameScene) InitWithArr2(arr [][]int) error {
 
 // InitWithArr - init scene
 func (gs *GameScene) InitWithArr(w int, h int, arr []int) error {
-	if len(arr) < w*h {
+	if len(arr) != w*h {
 		return ErrInvalidArray
 	}
 
@@ -158,7 +158,7 @@ func (gs *GameScene) CountSymbol(s int) int {
 	nums := 0
 	for _, l := range gs.Arr {
 		for _, v := range l {
-			if v == 2 {
+			if v == s {
 				nums++
 			}
 		}
