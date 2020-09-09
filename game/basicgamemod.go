@@ -45,3 +45,10 @@ func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, para
 
 	return ErrInvalidWHGameMod
 }
+
+// NewPlayResult - new a PlayResult
+func (mod *BasicGameMod) NewPlayResult(curGameMod string) *PlayResult {
+	return &PlayResult{
+		CurGameMod: curGameMod,
+	}
+}

@@ -291,3 +291,39 @@ func Test_CalcLine(t *testing.T) {
 
 	t.Logf("Test_CalcLine OK")
 }
+
+func Test_CalcLine2(t *testing.T) {
+	scene := &GameScene{
+		Arr: [][]int{
+			[]int{8, 10, 1},
+			[]int{11, 10, 7},
+			[]int{0, 4, 6},
+			[]int{7, 8, 0},
+			[]int{1, 9, 5},
+		},
+	}
+
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	ld, err := LoadLine5JSON("../unittestdata/linedata.json")
+	assert.NoError(t, err)
+
+	// 0,1,1,1,9 => 1x4
+	result := CalcLine(scene, pt, ld.Lines[15], 1,
+		func(cs int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || cs == 0 || s == 0
+		})
+
+	assert.Equal(t, result.Symbol, 10, "they should be equal")
+	assert.Equal(t, result.Mul, 5, "they should be equal")
+	assert.Equal(t, result.CoinWin, 5, "they should be equal")
+	assert.Equal(t, result.CashWin, 5, "they should be equal")
+	assert.Equal(t, len(result.Pos), 6, "they should be equal")
+}

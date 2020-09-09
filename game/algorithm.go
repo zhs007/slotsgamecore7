@@ -6,8 +6,8 @@ type FuncIsScatter func(scatter int, cursymbol int) bool
 // FuncIsWild - cursymbol == wild
 type FuncIsWild func(cursymbol int) bool
 
-// FuncIsSameSymbol - cursymbol == symbol
-type FuncIsSameSymbol func(symbol int, cursymbol int) bool
+// FuncIsSameSymbol - cursymbol == startsymbol
+type FuncIsSameSymbol func(cursymbol int, startsymbol int) bool
 
 // FuncIsValidSymbol - is it a valid symbol?
 type FuncIsValidSymbol func(cursymbol int) bool
