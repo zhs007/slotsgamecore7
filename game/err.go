@@ -36,4 +36,7 @@ var (
 
 	// ErrNullConfig - null config
 	ErrNullConfig = errors.New("null config")
+
+	// ErrInvalidArray - invalid array
+	ErrInvalidArray = errors.New("invalid array")
 )

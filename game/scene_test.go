@@ -60,7 +60,8 @@ func Test_NewGameScene(t *testing.T) {
 			err)
 	}
 
-	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	gs, err := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	assert.NoError(t, err)
 
 	if len(gs.Arr) != 5 {
 		t.Fatalf("Test_NewGameScene NewGameScene width err %d",
@@ -101,7 +102,8 @@ func Test_RandGameScene(t *testing.T) {
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
-	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	gs, err := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	assert.NoError(t, err)
 
 	err = gs.RandReels(game, plugin, "bg")
 	if err != nil {
@@ -172,7 +174,79 @@ func Test_ForEachAround(t *testing.T) {
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
-	gs := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	gs, err := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	assert.NoError(t, err)
+
+	err = gs.RandReels(game, plugin, "bg")
+	assert.NoError(t, err)
+
+	gs.ForEachAround(-1, 0, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	gs.ForEachAround(0, 3, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	gs.ForEachAround(5, 0, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	gs.ForEachAround(0, -1, func(x, y int, val int) {
+		assert.NoError(t, errors.New("Test_ForEachAround ForEachAround non-call"))
+	})
+
+	lstpos := []int{}
+	lstv := []int{}
+	gs.ForEachAround(0, 0, func(x, y int, val int) {
+		lstpos = append(lstpos, x)
+		lstpos = append(lstpos, y)
+
+		lstv = append(lstv, val)
+	})
+
+	assert.Equal(t, len(lstv), 3)
+	assert.Equal(t, len(lstpos), 6)
+
+	for i, v := range lstv {
+		assert.Equal(t, v, gs.Arr[lstpos[i*2]][lstpos[i*2+1]])
+	}
+
+	lstpos = []int{}
+	lstv = []int{}
+	gs.ForEachAround(1, 1, func(x, y int, val int) {
+		lstpos = append(lstpos, x)
+		lstpos = append(lstpos, y)
+
+		lstv = append(lstv, val)
+	})
+
+	assert.Equal(t, len(lstv), 8)
+	assert.Equal(t, len(lstpos), 16)
+
+	for i, v := range lstv {
+		assert.Equal(t, v, gs.Arr[lstpos[i*2]][lstpos[i*2+1]])
+	}
+
+	t.Logf("Test_ForEachAround OK")
+}
+
+func Test_ForEach(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	httpmock.RegisterResponder("GET",
+		"http://127.0.0.1:50000/numbers?size=100",
+		httpmock.NewStringResponder(200, "[0, 1, 2, 3, 4, 0, 1, 2, 3, 32]"))
+
+	game, err := newtestGame()
+	assert.NoError(t, err)
+
+	plugin := game.NewPlugin()
+	defer game.FreePlugin(plugin)
+
+	gs, err := NewGameScene(game.Cfg.Width, game.Cfg.Height)
+	assert.NoError(t, err)
 
 	err = gs.RandReels(game, plugin, "bg")
 	assert.NoError(t, err)

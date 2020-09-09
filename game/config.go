@@ -1,6 +1,10 @@
 package sgc7game
 
-import jsoniter "github.com/json-iterator/go"
+import (
+	jsoniter "github.com/json-iterator/go"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	"go.uber.org/zap"
+)
 
 // Config - config
 type Config struct {
@@ -67,13 +71,16 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 		return err
 	}
 
-	cfg.DefaultScene = NewGameScene(len(arr), len(arr[0]))
+	ds, err := NewGameSceneWithArr2(arr)
+	if err != nil {
+		sgc7utils.Error("sgc7game.Config.SetDefaultSceneString:NewGameSceneWithArr2",
+			zap.String("str", str),
+			zap.Error(err))
 
-	for x := 0; x < len(arr); x++ {
-		for y := 0; y < len(arr[0]); y++ {
-			cfg.DefaultScene.Arr[x][y] = arr[x][y]
-		}
+		return err
 	}
+
+	cfg.DefaultScene = ds
 
 	return nil
 }
