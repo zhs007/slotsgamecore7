@@ -1,7 +1,9 @@
 package gatiserv
 
 import (
+	jsoniter "github.com/json-iterator/go"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
@@ -46,6 +48,8 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 	plugin := sv.Game.NewPlugin()
 	defer sv.Game.FreePlugin(plugin)
+
+	sv.ProcCheat(plugin, params.Cheat)
 
 	stake := BuildStake(params.Stake)
 
@@ -114,4 +118,23 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	}
 
 	return pr, nil
+}
+
+// ProcCheat - process cheat
+func (sv *BasicService) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
+	if cheat != "" {
+		str := sgc7utils.AppendString("[", cheat, "]")
+
+		json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+		rngs := []int{}
+		err := json.Unmarshal([]byte(str), &rngs)
+		if err != nil {
+			return err
+		}
+
+		plugin.SetCache(rngs)
+	}
+
+	return nil
 }
