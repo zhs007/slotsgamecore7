@@ -16,7 +16,7 @@ func Test_NextGameModParams(t *testing.T) {
 
 	tp := &TestParams{A: 123, B: "456", C: 7.89, D: []int{10, 11, 12}}
 	pr := &PlayResult{
-		NextGameModParams: tp,
+		CurGameModParams: tp,
 	}
 
 	buf, err := PlayResult2JSON(pr)
@@ -24,12 +24,12 @@ func Test_NextGameModParams(t *testing.T) {
 	t.Logf(string(buf))
 
 	pr2 := &PlayResult{
-		NextGameModParams: &TestParams{},
+		CurGameModParams: &TestParams{},
 	}
 	pr1, err := JSON2PlayResult(buf, pr2)
 	assert.NoError(t, err)
 
-	tp1, isok := pr1.NextGameModParams.(*TestParams)
+	tp1, isok := pr1.CurGameModParams.(*TestParams)
 	assert.Equal(t, isok, true)
 	assert.NotNil(t, tp1)
 

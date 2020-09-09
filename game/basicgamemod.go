@@ -1,6 +1,10 @@
 package sgc7game
 
-import sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+import (
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	"go.uber.org/zap"
+)
 
 // BasicGameMod - basic gameMod
 type BasicGameMod struct {
@@ -31,9 +35,17 @@ func (mod *BasicGameMod) OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd strin
 // RandomScene - on random scene
 func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
 	if mod.Width > 0 && mod.Height > 0 {
-		cs := NewGameScene(mod.Width, mod.Height)
+		cs, err := NewGameScene(mod.Width, mod.Height)
+		if err != nil {
+			sgc7utils.Error("sgc7game.BasicGameMod.RandomScene:NewGameScene",
+				zap.Int("width", mod.Width),
+				zap.Int("height", mod.Height),
+				zap.Error(err))
 
-		err := cs.RandReels(game, plugin, reelsName)
+			return err
+		}
+
+		err = cs.RandReels(game, plugin, reelsName)
 		if err != nil {
 			return err
 		}
@@ -47,8 +59,9 @@ func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, para
 }
 
 // NewPlayResult - new a PlayResult
-func (mod *BasicGameMod) NewPlayResult(curGameMod string) *PlayResult {
+func (mod *BasicGameMod) NewPlayResult(gamemodparams interface{}) *PlayResult {
 	return &PlayResult{
-		CurGameMod: curGameMod,
+		CurGameMod:       mod.Name,
+		CurGameModParams: gamemodparams,
 	}
 }

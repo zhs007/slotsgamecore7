@@ -9,6 +9,9 @@ import (
 func Test_BasicGameMod(t *testing.T) {
 	mod := NewBasicGameMod("bg", 5, 3)
 
+	pr := mod.NewPlayResult(nil)
+	assert.NotNil(t, pr)
+
 	assert.Equal(t, mod.GetName(), "bg", "Test_BasicGameMod GetName")
 
 	// assert.NotNil(t, mod.GetGameScene(), "Test_BasicGameMod GetGameScene")
