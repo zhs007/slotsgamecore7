@@ -66,7 +66,6 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	pos = append(pos, 0, ld[0])
 
 	if isWild(s0) {
-
 		ws := -1
 		wnums := 1
 		wpos := make([]int, 0, len(ld)*2)
@@ -113,6 +112,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 					CoinWin: pt.MapPay[s0][wnums-1],
 					CashWin: pt.MapPay[s0][wnums-1] * bet,
 					Pos:     wpos,
+					HasW:    true,
 				}
 
 				return r
@@ -144,6 +144,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 				CoinWin: pt.MapPay[s0][wnums-1],
 				CashWin: pt.MapPay[s0][wnums-1] * bet,
 				Pos:     wpos,
+				HasW:    true,
 			}
 
 			return r
@@ -156,11 +157,13 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 			CoinWin: pt.MapPay[ws][nums-1],
 			CashWin: pt.MapPay[ws][nums-1] * bet,
 			Pos:     pos,
+			HasW:    true,
 		}
 
 		return r
 	}
 
+	hasw := false
 	for x := 1; x < len(ld); x++ {
 		cs := scene.Arr[x][ld[x]]
 
@@ -169,6 +172,10 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 		}
 
 		if isSameSymbol(cs, s0) {
+			if isWild(cs) {
+				hasw = true
+			}
+
 			nums++
 
 			pos = append(pos, x, ld[x])
@@ -186,6 +193,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 			CoinWin: pt.MapPay[s0][nums-1],
 			CashWin: pt.MapPay[s0][nums-1] * bet,
 			Pos:     pos,
+			HasW:    hasw,
 		}
 
 		return r

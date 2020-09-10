@@ -33,7 +33,7 @@ func (mod *BasicGameMod) OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd strin
 }
 
 // RandomScene - on random scene
-func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, param string, prs []*PlayResult, pr *PlayResult, reelsName string) error {
+func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, reelsName string) (*GameScene, error) {
 	if mod.Width > 0 && mod.Height > 0 {
 		cs, err := NewGameScene(mod.Width, mod.Height)
 		if err != nil {
@@ -42,20 +42,18 @@ func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, para
 				zap.Int("height", mod.Height),
 				zap.Error(err))
 
-			return err
+			return nil, err
 		}
 
 		err = cs.RandReels(game, plugin, reelsName)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		pr.Scenes = append(pr.Scenes, cs)
-
-		return nil
+		return cs, nil
 	}
 
-	return ErrInvalidWHGameMod
+	return nil, ErrInvalidWHGameMod
 }
 
 // NewPlayResult - new a PlayResult
