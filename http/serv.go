@@ -115,11 +115,17 @@ func (s *Serv) SetStringResponse(ctx *fasthttp.RequestCtx, str string) {
 	ctx.SetContentType("application/json;charset=UTF-8")
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody([]byte(str))
+
+	sgc7utils.Debug("gatiserv.Serv.SetStringResponse",
+		zap.String("body", str))
 }
 
 // SetHTTPStatus - set a response with status
 func (s *Serv) SetHTTPStatus(ctx *fasthttp.RequestCtx, statusCode int) {
 	ctx.SetStatusCode(statusCode)
+
+	sgc7utils.Debug("gatiserv.Serv.SetHTTPStatus",
+		zap.Int("statusCode", statusCode))
 }
 
 func (s *Serv) outputDebugInfo(ctx *fasthttp.RequestCtx) {
