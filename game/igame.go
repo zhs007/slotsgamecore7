@@ -19,6 +19,8 @@ type IGame interface {
 	// Initialize - initialize PlayerState
 	Initialize() IPlayerState
 
+	// CheckStake - check stake
+	CheckStake(stake *Stake) error
 	// Play - play
 	Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error)
 

@@ -9,6 +9,9 @@ var (
 	// ErrInvalidReels - invalid reels name
 	ErrInvalidReels = errors.New("invalid reels name")
 
+	// ErrInvalidStake - invalid stake
+	ErrInvalidStake = errors.New("invalid stake")
+
 	// ErrDuplicateGameMod - duplicate gamemod
 	ErrDuplicateGameMod = errors.New("duplicate gamemod")
 	// ErrInvalidGameMod - invalid GameMod

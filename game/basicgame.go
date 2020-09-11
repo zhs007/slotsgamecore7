@@ -91,3 +91,8 @@ func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string,
 
 	return pr, nil
 }
+
+// CheckStake - check stake
+func (game *BasicGame) CheckStake(stake *Stake) error {
+	return ErrInvalidStake
+}
