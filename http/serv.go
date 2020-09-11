@@ -105,6 +105,9 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 	ctx.SetContentType("application/json;charset=UTF-8")
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody(b)
+
+	sgc7utils.Debug("gatiserv.Serv.SetResponse",
+		zap.String("body", string(b)))
 }
 
 // SetStringResponse - set a response with string
