@@ -52,6 +52,14 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	sv.ProcCheat(plugin, params.Cheat)
 
 	stake := BuildStake(params.Stake)
+	err = sv.Game.CheckStake(stake)
+	if err != nil {
+		sgc7utils.Error("BasicService.Play:CheckStake",
+			sgc7utils.JSON("stake", stake),
+			zap.Error(err))
+
+		return nil, err
+	}
 
 	results := []*sgc7game.PlayResult{}
 

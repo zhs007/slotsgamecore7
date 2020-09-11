@@ -8,6 +8,7 @@ import (
 	"sync"
 	"syscall"
 
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -235,4 +236,19 @@ func ClearLogs() error {
 // GetLogger - get zap.Logger
 func GetLogger() *zap.Logger {
 	return logger
+}
+
+// JSON - It's like zap.String(name, str)
+func JSON(name string, jobj interface{}) zap.Field {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	b, err := json.Marshal(jobj)
+	if err != nil {
+		Warn("sgc7utils.JSON",
+			zap.Error(err))
+
+		return zap.String(name, err.Error())
+	}
+
+	return zap.String(name, string(b))
 }
