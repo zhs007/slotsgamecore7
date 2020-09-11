@@ -10,6 +10,10 @@ type IPlugin interface {
 	GetUsedRngs() []*sgc7utils.RngInfo
 	// ClearUsedRngs - clear used rngs
 	ClearUsedRngs()
+	// TagUsedRngs - new a tag for current UsedRngs
+	TagUsedRngs()
+	// RollbackUsedRngs - rollback UsedRngs with the latest tag
+	RollbackUsedRngs() error
 	// SetCache - set cache
 	SetCache(arr []int)
 	// ClearCache - clear cached rngs

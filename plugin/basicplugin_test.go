@@ -62,3 +62,55 @@ func Test_BasicPlugin(t *testing.T) {
 
 	t.Logf("Test_BasicPlugin OK")
 }
+
+func Test_BasicPlugin2(t *testing.T) {
+	bp := NewBasicPlugin()
+
+	var lstr []int
+
+	for i := 0; i < 10; i++ {
+		r, err := bp.Random(100)
+		assert.NoError(t, err)
+		assert.True(t, func() bool {
+			return r >= 0 && r < 100
+		}())
+
+		lstr = append(lstr, r)
+	}
+
+	bp.TagUsedRngs()
+	// assert.Equal(t, tag0, 10)
+
+	for i := 0; i < 10; i++ {
+		r, err := bp.Random(100)
+		assert.NoError(t, err)
+		assert.True(t, func() bool {
+			return r >= 0 && r < 100
+		}())
+
+		lstr = append(lstr, r)
+	}
+
+	usedrngs := bp.GetUsedRngs()
+	assert.Equal(t, len(usedrngs), 20)
+
+	for i := 0; i < len(usedrngs); i++ {
+		assert.Equal(t, usedrngs[i].Value, lstr[i])
+	}
+
+	err := bp.RollbackUsedRngs()
+	assert.NoError(t, err)
+
+	usedrngs = bp.GetUsedRngs()
+	assert.Equal(t, len(usedrngs), 10)
+
+	for i := 0; i < len(usedrngs); i++ {
+		assert.Equal(t, usedrngs[i].Value, lstr[i])
+	}
+
+	bp.ClearUsedRngs()
+	err = bp.RollbackUsedRngs()
+	assert.Error(t, err)
+
+	t.Logf("Test_BasicPlugin2 OK")
+}

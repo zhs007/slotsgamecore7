@@ -13,11 +13,14 @@ var isBasicPluginInited = false
 type BasicPlugin struct {
 	RngUsed []*sgc7utils.RngInfo
 	Cache   []int
+	Tag     int
 }
 
 // NewBasicPlugin - new a BasicPlugin
 func NewBasicPlugin() *BasicPlugin {
-	bp := &BasicPlugin{}
+	bp := &BasicPlugin{
+		Tag: -1,
+	}
 
 	bp.Init()
 
@@ -52,6 +55,7 @@ func (bp *BasicPlugin) GetUsedRngs() []*sgc7utils.RngInfo {
 
 // ClearUsedRngs - clear used rngs
 func (bp *BasicPlugin) ClearUsedRngs() {
+	bp.Tag = -1
 	bp.RngUsed = nil
 }
 
@@ -84,4 +88,20 @@ func (bp *BasicPlugin) Init() {
 
 		isBasicPluginInited = true
 	}
+}
+
+// TagUsedRngs - new a tag for current UsedRngs
+func (bp *BasicPlugin) TagUsedRngs() {
+	bp.Tag = len(bp.RngUsed)
+}
+
+// RollbackUsedRngs - rollback UsedRngs with a tag
+func (bp *BasicPlugin) RollbackUsedRngs() error {
+	if bp.Tag >= 0 && bp.Tag <= len(bp.RngUsed) {
+		bp.RngUsed = bp.RngUsed[0:bp.Tag]
+
+		return nil
+	}
+
+	return ErrInvalidTag
 }
