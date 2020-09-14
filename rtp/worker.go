@@ -24,7 +24,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				rtp.Bet(stake.CashBet)
 
 				for {
-					pr, err := game.Play(plugin, cmd, "", ps, stake, nil)
+					pr, err := game.Play(plugin, cmd, "", ps, stake, results)
 					if err != nil {
 						sgc7utils.Error("StartRTP.Play",
 							zap.Int("results", len(results)),
