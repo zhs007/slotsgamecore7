@@ -1,6 +1,9 @@
 package sgc7game
 
-import sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+import (
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+)
 
 // GameScene - game scene
 type GameScene struct {
@@ -172,7 +175,7 @@ func (gs *GameScene) CountSymbols(arr []int) []int {
 	narr := make([]int, len(arr))
 	for _, l := range gs.Arr {
 		for _, v := range l {
-			i := IndexOfIntSlice(arr, v, 0)
+			i := sgc7utils.IndexOfIntSlice(arr, v, 0)
 			if i >= 0 {
 				narr[i]++
 			}

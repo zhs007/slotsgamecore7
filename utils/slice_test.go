@@ -1,4 +1,4 @@
-package sgc7game
+package sgc7utils
 
 import (
 	"testing"
@@ -39,4 +39,20 @@ func Test_IndexOfInt2Slice(t *testing.T) {
 	assert.Equal(t, ci, -1)
 
 	t.Logf("Test_IndexOfInt2Slice OK")
+}
+
+func Test_IndexOfStringSlice(t *testing.T) {
+	ci := IndexOfStringSlice([]string{"1", "2", "3"}, "3", 0)
+	assert.Equal(t, ci, 2)
+
+	ci = IndexOfStringSlice(nil, "3", -1)
+	assert.Equal(t, ci, -1)
+
+	ci = IndexOfStringSlice([]string{"1", "2", "3"}, "3", 5)
+	assert.Equal(t, ci, -1)
+
+	ci = IndexOfStringSlice([]string{"1", "2", "3"}, "3", -100)
+	assert.Equal(t, ci, 2)
+
+	t.Logf("Test_IndexOfStringSlice OK")
 }
