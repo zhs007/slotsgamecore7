@@ -290,6 +290,17 @@ func (node *RTPNode) GetSymbolNumsWon(gamemod string, symbol int, sn int) int64 
 	return -1
 }
 
+// ChgSymbolNumsFunc -
+func (node *RTPNode) ChgSymbolNumsFunc(funcOnResult FuncOnResult) {
+	if node.Symbol >= 0 && node.SymbolNums > 0 {
+		node.funcOnResult = funcOnResult
+	}
+
+	for _, v := range node.MapChildren {
+		v.ChgSymbolNumsFunc(funcOnResult)
+	}
+}
+
 // RTP -
 type RTP struct {
 	BetNums  int64
