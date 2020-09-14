@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 func Test_RTP(t *testing.T) {
@@ -184,6 +185,11 @@ func Test_RTP(t *testing.T) {
 	assert.Equal(t, rtp.Root.MapChildren["fg"].MapChildren["1"].TotalWin, int64(0))
 	assert.Equal(t, rtp.Root.MapChildren["fg"].MapChildren["5"].TriggerNums, int64(0))
 	assert.Equal(t, rtp.Root.MapChildren["fg"].MapChildren["5"].TotalWin, int64(0))
+
+	rtp.Save2CSV("../unittestdata/rtptest.csv")
+
+	issame := sgc7utils.IsSameFile("../unittestdata/rtptest.csv", "../unittestdata/rtptestok.csv")
+	assert.Equal(t, issame, true)
 
 	t.Logf("Test_RTP OK")
 }

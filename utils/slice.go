@@ -1,4 +1,4 @@
-package sgc7game
+package sgc7utils
 
 // IndexOfIntSlice - indexof for []int
 func IndexOfIntSlice(arr []int, v int, start int) int {
@@ -25,6 +25,21 @@ func IndexOfInt2Slice(arr []int, x, y int, start int) int {
 	for i := start * 2; i < len(arr); i += 2 {
 		if arr[i] == x && arr[i+1] == y {
 			return i / 2
+		}
+	}
+
+	return -1
+}
+
+// IndexOfStringSlice - indexof for []string
+func IndexOfStringSlice(arr []string, v string, start int) int {
+	if start < 0 {
+		start = 0
+	}
+
+	for i := start; i < len(arr); i++ {
+		if arr[i] == v {
+			return i
 		}
 	}
 
