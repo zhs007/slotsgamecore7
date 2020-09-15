@@ -11,10 +11,10 @@ import (
 )
 
 // FuncOnResult - onResult(*RTPNode, *sgc7game.PlayResult)
-type FuncOnResult func(node *RTPNode, pr *sgc7game.PlayResult)
+type FuncOnResult func(node *RTPNode, pr *sgc7game.PlayResult) bool
 
 // OnRootResult - on root
-func OnRootResult(node *RTPNode, pr *sgc7game.PlayResult) {
+func OnRootResult(node *RTPNode, pr *sgc7game.PlayResult) bool {
 	if pr.CashWin > 0 {
 		if pr.IsFinish {
 			node.TriggerNums++
@@ -22,19 +22,28 @@ func OnRootResult(node *RTPNode, pr *sgc7game.PlayResult) {
 
 		node.TotalWin += pr.CashWin
 	}
+
+	return true
 }
 
 // OnGameModResult - on gamemod
-func OnGameModResult(node *RTPNode, pr *sgc7game.PlayResult) {
-	if pr.CurGameMod == node.GameMod && pr.CashWin > 0 {
-		node.TriggerNums++
-		node.TotalWin += pr.CashWin
+func OnGameModResult(node *RTPNode, pr *sgc7game.PlayResult) bool {
+	if pr.CurGameMod == node.GameMod {
+		if pr.CashWin > 0 {
+			node.TriggerNums++
+			node.TotalWin += pr.CashWin
+		}
+
+		return true
 	}
+
+	return false
 }
 
 // OnSymbolResult - on symbol
-func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult) {
-	if pr.CurGameMod == node.GameMod && pr.CashWin > 0 {
+func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult) bool {
+	// if pr.CurGameMod == node.GameMod {
+	if pr.CashWin > 0 {
 		for _, v := range pr.Results {
 			if v.Symbol == node.Symbol {
 				node.TriggerNums++
@@ -42,10 +51,15 @@ func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult) {
 			}
 		}
 	}
+
+	return true
+	// }
+
+	// return false
 }
 
 // OnSymbolNumsResult - on symbol nums
-func OnSymbolNumsResult(node *RTPNode, pr *sgc7game.PlayResult) {
+func OnSymbolNumsResult(node *RTPNode, pr *sgc7game.PlayResult) bool {
 	if pr.CurGameMod == node.GameMod && pr.CashWin > 0 {
 		for _, v := range pr.Results {
 			if v.Symbol == node.Symbol && len(v.Pos) == node.SymbolNums*2 {
@@ -54,6 +68,8 @@ func OnSymbolNumsResult(node *RTPNode, pr *sgc7game.PlayResult) {
 			}
 		}
 	}
+
+	return false
 }
 
 // RTPNode -
@@ -88,42 +104,73 @@ func NewRTPGameMod(gamemod string) *RTPNode {
 	}
 }
 
+// NewRTPGameModTag - new RTPNode
+func NewRTPGameModTag(gamemod string, tag string, funcTag FuncOnResult) *RTPNode {
+	return &RTPNode{
+		MapChildren:  make(map[string]*RTPNode),
+		GameMod:      gamemod,
+		funcOnResult: funcTag,
+		TagName:      tag,
+		Symbol:       -1,
+		SymbolNums:   -1,
+	}
+}
+
 // InitGameMod - new RTPNode
-func InitGameMod(node *RTPNode, symbols []int, nums []int) {
+func InitGameMod(node *RTPNode, tags []string, funcTag []FuncOnResult, symbols []int, nums []int) {
+	if len(tags) > 0 {
+		for i, tag := range tags {
+			ctn := NewRTPGameModTag(node.GameMod, tag, funcTag[i])
+			InitGameModTag(ctn, tag, symbols, nums)
+			node.AddChild(tag, ctn)
+		}
+	} else {
+		for _, sv := range symbols {
+			csn := NewRTPSymbol(node.GameMod, "", sv)
+			InitSymbol(csn, "", sv, nums)
+			node.AddChild(strconv.Itoa(sv), csn)
+		}
+	}
+}
+
+// InitGameModTag - new RTPNode
+func InitGameModTag(node *RTPNode, tag string, symbols []int, nums []int) {
 	for _, sv := range symbols {
-		csn := NewRTPSymbol(node.GameMod, sv)
-		InitSymbol(csn, sv, nums)
+		csn := NewRTPSymbol(node.GameMod, tag, sv)
+		InitSymbol(csn, tag, sv, nums)
 		node.AddChild(strconv.Itoa(sv), csn)
 	}
 }
 
 // InitSymbol - new RTPNode
-func InitSymbol(node *RTPNode, symbol int, nums []int) {
+func InitSymbol(node *RTPNode, tag string, symbol int, nums []int) {
 	for _, nv := range nums {
-		csnn := NewRTPSymbolNums(node.GameMod, symbol, nv)
+		csnn := NewRTPSymbolNums(node.GameMod, tag, symbol, nv)
 		node.AddChild(strconv.Itoa(nv), csnn)
 	}
 }
 
 // NewRTPSymbol - new RTPNode
-func NewRTPSymbol(gamemod string, symbol int) *RTPNode {
+func NewRTPSymbol(gamemod string, tag string, symbol int) *RTPNode {
 	return &RTPNode{
 		MapChildren:  make(map[string]*RTPNode),
 		GameMod:      gamemod,
 		Symbol:       symbol,
 		funcOnResult: OnSymbolResult,
+		TagName:      tag,
 		SymbolNums:   -1,
 	}
 }
 
 // NewRTPSymbolNums - new RTPNode
-func NewRTPSymbolNums(gamemod string, symbol int, nums int) *RTPNode {
+func NewRTPSymbolNums(gamemod string, tag string, symbol int, nums int) *RTPNode {
 	return &RTPNode{
 		MapChildren:  make(map[string]*RTPNode),
 		GameMod:      gamemod,
 		Symbol:       symbol,
 		SymbolNums:   nums,
 		funcOnResult: OnSymbolNumsResult,
+		TagName:      tag,
 	}
 }
 
@@ -143,7 +190,10 @@ func (node *RTPNode) AddChild(name string, c *RTPNode) {
 
 // OnResult -
 func (node *RTPNode) OnResult(pr *sgc7game.PlayResult) {
-	node.funcOnResult(node, pr)
+	ismine := node.funcOnResult(node, pr)
+	if !ismine {
+		return
+	}
 
 	for _, v := range node.MapChildren {
 		v.OnResult(pr)
@@ -175,6 +225,21 @@ func (node *RTPNode) GetGameMods(arr []string) []string {
 
 	for _, v := range node.MapChildren {
 		arr = v.GetGameMods(arr)
+	}
+
+	return arr
+}
+
+// GetTags -
+func (node *RTPNode) GetTags(arr []string) []string {
+	if node.TagName != "" {
+		if sgc7utils.IndexOfStringSlice(arr, node.TagName, 0) < 0 {
+			arr = append(arr, node.TagName)
+		}
+	}
+
+	for _, v := range node.MapChildren {
+		arr = v.GetTags(arr)
 	}
 
 	return arr
@@ -225,7 +290,37 @@ func (node *RTPNode) GenGameModString(gamemod string, sn []int, totalbet int64) 
 
 	if node.GameMod == gamemod {
 		if node.Symbol < 0 && node.SymbolNums < 0 {
-			str := sgc7utils.AppendString(node.GameMod, ",,", strconv.FormatInt(totalbet, 10))
+			str := sgc7utils.AppendString(node.GameMod, ",,,", strconv.FormatInt(totalbet, 10))
+			for range sn {
+				str = sgc7utils.AppendString(str, ",")
+			}
+			str = sgc7utils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
+
+			return str
+		}
+	}
+
+	return ""
+}
+
+// GenTagString -
+func (node *RTPNode) GenTagString(gamemod string, tag string, sn []int, totalbet int64) string {
+	if node.GameMod == "" ||
+		(node.TagName == tag && node.GameMod == gamemod) {
+
+		for _, v := range node.MapChildren {
+			str := v.GenTagString(gamemod, tag, sn, totalbet)
+			if str != "" {
+				return str
+			}
+		}
+
+		return ""
+	}
+
+	if node.GameMod == gamemod {
+		if node.Symbol < 0 && node.SymbolNums < 0 {
+			str := sgc7utils.AppendString(node.GameMod, ",", tag, ",,", strconv.FormatInt(totalbet, 10))
 			for range sn {
 				str = sgc7utils.AppendString(str, ",")
 			}
@@ -239,10 +334,12 @@ func (node *RTPNode) GenGameModString(gamemod string, sn []int, totalbet int64) 
 }
 
 // GenSymbolString -
-func (node *RTPNode) GenSymbolString(gamemod string, symbol int, sn []int, totalbet int64) string {
-	if node.GameMod == "" || (node.GameMod == gamemod && node.Symbol < 0 && node.SymbolNums < 0) {
+func (node *RTPNode) GenSymbolString(gamemod string, tag string, symbol int, sn []int, totalbet int64) string {
+	if node.GameMod == "" ||
+		(node.GameMod == gamemod && (node.TagName == tag || node.TagName == "") && node.Symbol < 0 && node.SymbolNums < 0) {
+
 		for _, v := range node.MapChildren {
-			str := v.GenSymbolString(gamemod, symbol, sn, totalbet)
+			str := v.GenSymbolString(gamemod, tag, symbol, sn, totalbet)
 			if str != "" {
 				return str
 			}
@@ -251,8 +348,8 @@ func (node *RTPNode) GenSymbolString(gamemod string, symbol int, sn []int, total
 		return ""
 	}
 
-	if node.GameMod == gamemod && node.Symbol == symbol && node.SymbolNums < 0 {
-		str := sgc7utils.AppendString(node.GameMod, ",", strconv.Itoa(symbol), ",", strconv.FormatInt(totalbet, 10))
+	if node.GameMod == gamemod && node.TagName == tag && node.Symbol == symbol && node.SymbolNums < 0 {
+		str := sgc7utils.AppendString(node.GameMod, ",", tag, ",", strconv.Itoa(symbol), ",", strconv.FormatInt(totalbet, 10))
 		for _, v := range sn {
 			won := node.GetSymbolNumsWon(gamemod, symbol, v)
 			if won < 0 {
@@ -272,7 +369,10 @@ func (node *RTPNode) GenSymbolString(gamemod string, symbol int, sn []int, total
 
 // GetSymbolNumsWon -
 func (node *RTPNode) GetSymbolNumsWon(gamemod string, symbol int, sn int) int64 {
-	if node.GameMod == "" || (node.GameMod == gamemod && node.Symbol < 0 && node.SymbolNums < 0) || (node.GameMod == gamemod && node.Symbol == symbol && node.SymbolNums < 0) {
+	if node.GameMod == "" ||
+		(node.GameMod == gamemod && node.Symbol < 0 && node.SymbolNums < 0) ||
+		(node.GameMod == gamemod && node.Symbol == symbol && node.SymbolNums < 0) {
+
 		for _, v := range node.MapChildren {
 			won := v.GetSymbolNumsWon(gamemod, symbol, sn)
 			if won >= 0 {
@@ -343,6 +443,7 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	defer f.Close()
 
 	gms := rtp.Root.GetGameMods(nil)
+	tags := rtp.Root.GetTags(nil)
 	sn := rtp.Root.GetSymbolNums(nil)
 	symbols := rtp.Root.GetSymbols(nil)
 
@@ -358,7 +459,15 @@ func (rtp *RTP) Save2CSV(fn string) error {
 		return gms[i] < gms[j]
 	})
 
-	strhead := "gamemod,symbol,totalbet"
+	if len(tags) == 0 {
+		tags = append(tags, "")
+	} else {
+		sort.Slice(tags, func(i, j int) bool {
+			return tags[i] < tags[j]
+		})
+	}
+
+	strhead := "gamemod,tag,symbol,totalbet"
 	for _, v := range sn {
 		strhead = sgc7utils.AppendString(strhead, ",X", strconv.Itoa(v))
 	}
@@ -367,8 +476,13 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	f.WriteString(strhead)
 
 	for _, gm := range gms {
-		for _, symbol := range symbols {
-			str := rtp.Root.GenSymbolString(gm, symbol, sn, rtp.TotalBet)
+		for _, tag := range tags {
+			for _, symbol := range symbols {
+				str := rtp.Root.GenSymbolString(gm, tag, symbol, sn, rtp.TotalBet)
+				f.WriteString(str)
+			}
+
+			str := rtp.Root.GenTagString(gm, tag, sn, rtp.TotalBet)
 			f.WriteString(str)
 		}
 

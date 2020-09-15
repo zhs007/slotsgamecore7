@@ -108,7 +108,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -126,7 +126,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -154,13 +154,97 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
 	assert.Equal(t, result.Mul, 1000, "they should be equal")
 	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
 	assert.Equal(t, result.CashWin, 1000, "they should be equal")
+	assert.Equal(t, len(result.Pos), 10, "they should be equal")
+
+	scene = &GameScene{
+		Arr: [][]int{
+			[]int{9, 0, 11},
+			[]int{9, 0, 11},
+			[]int{0, 0, 11},
+			[]int{9, 0, 11},
+			[]int{1, 2, 11},
+		},
+	}
+
+	// 0,0,0,0,2 => 0x4 | 2x5 => 0x4
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
+		func(cs int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, result.Symbol, 0, "they should be equal")
+	assert.Equal(t, result.Mul, 500, "they should be equal")
+	assert.Equal(t, result.CoinWin, 500, "they should be equal")
+	assert.Equal(t, result.CashWin, 500, "they should be equal")
+	assert.Equal(t, len(result.Pos), 8, "they should be equal")
+
+	scene = &GameScene{
+		Arr: [][]int{
+			[]int{9, 0, 11},
+			[]int{9, 0, 11},
+			[]int{0, 0, 11},
+			[]int{9, 0, 11},
+			[]int{1, 2, 11},
+		},
+	}
+
+	// 0,0,0,0,3 => 0x4 | 3x5 => 0x4
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
+		func(cs int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, result.Symbol, 0, "they should be equal")
+	assert.Equal(t, result.Mul, 500, "they should be equal")
+	assert.Equal(t, result.CoinWin, 500, "they should be equal")
+	assert.Equal(t, result.CashWin, 500, "they should be equal")
+	assert.Equal(t, len(result.Pos), 8, "they should be equal")
+
+	scene = &GameScene{
+		Arr: [][]int{
+			[]int{9, 0, 11},
+			[]int{9, 0, 11},
+			[]int{0, 0, 11},
+			[]int{9, 0, 11},
+			[]int{1, 0, 11},
+		},
+	}
+
+	// 0,0,0,0,0 => 0x5
+	result = CalcLine(scene, pt, ld.Lines[0], 1,
+		func(cs int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, result.Symbol, 0, "they should be equal")
+	assert.Equal(t, result.Mul, 2000, "they should be equal")
+	assert.Equal(t, result.CoinWin, 2000, "they should be equal")
+	assert.Equal(t, result.CashWin, 2000, "they should be equal")
 	assert.Equal(t, len(result.Pos), 10, "they should be equal")
 
 	// 11,0,0,0,11 => nil
@@ -172,7 +256,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Nil(t, result, "it should be nil")
@@ -186,7 +270,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Nil(t, result, "it should be nil")
@@ -200,7 +284,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 9, "they should be equal")
@@ -228,7 +312,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -256,7 +340,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Nil(t, result, "it should be nil")
@@ -280,7 +364,7 @@ func Test_CalcLine(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -318,7 +402,7 @@ func Test_CalcLine2(t *testing.T) {
 			return cs == 0
 		},
 		func(s int, cs int) bool {
-			return cs == s || cs == 0 || s == 0
+			return cs == s || s == 0
 		})
 
 	assert.Equal(t, result.Symbol, 10, "they should be equal")
