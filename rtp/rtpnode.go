@@ -413,6 +413,28 @@ func (node *RTPNode) ChgSymbolNumsFunc(funcOnResult FuncOnResult) {
 	}
 }
 
+// Clone - clone
+func (node *RTPNode) Clone() *RTPNode {
+	node1 := &RTPNode{
+		NodeType:     node.NodeType,
+		TriggerNums:  node.TriggerNums,
+		TotalWin:     node.TotalWin,
+		RTP:          node.RTP,
+		MapChildren:  make(map[string]*RTPNode),
+		GameMod:      node.GameMod,
+		Symbol:       node.Symbol,
+		SymbolNums:   node.SymbolNums,
+		TagName:      node.TagName,
+		FuncOnResult: node.FuncOnResult,
+	}
+
+	for k, v := range node.MapChildren {
+		node1.MapChildren[k] = v.Clone()
+	}
+
+	return node1
+}
+
 // Add - add
 func (node *RTPNode) Add(node1 *RTPNode) {
 	if node.NodeType == node1.NodeType &&

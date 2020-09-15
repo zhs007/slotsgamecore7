@@ -471,8 +471,8 @@ func Test_RTPTags(t *testing.T) {
 	issame := sgc7utils.IsSameFile("../unittestdata/rtptesttag.csv", "../unittestdata/rtptesttagok.csv")
 	assert.Equal(t, issame, true)
 
-	rtp1, err := rtp.Clone()
-	assert.NoError(t, err)
+	rtp1 := rtp.Clone()
+	assert.NotNil(t, rtp1)
 
 	rtp.Add(rtp1)
 

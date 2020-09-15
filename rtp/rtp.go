@@ -1,8 +1,6 @@
 package sgc7rtp
 
 import (
-	"bytes"
-	"encoding/gob"
 	"os"
 	"sort"
 	"strconv"
@@ -29,20 +27,19 @@ func NewRTP() *RTP {
 }
 
 // Clone - clone
-func (rtp *RTP) Clone() (*RTP, error) {
-	var buf bytes.Buffer
-	err := gob.NewEncoder(&buf).Encode(rtp)
-	if err != nil {
-		return nil, err
+func (rtp *RTP) Clone() *RTP {
+	nrtp := &RTP{
+		BetNums:  rtp.BetNums,
+		TotalBet: rtp.TotalBet,
+		Root:     rtp.Root.Clone(),
+		MapHR:    make(map[string]*HitRateNode),
 	}
 
-	nrtp := &RTP{}
-	err = gob.NewDecoder(bytes.NewBuffer(buf.Bytes())).Decode(nrtp)
-	if err != nil {
-		return nil, err
+	for k, v := range rtp.MapHR {
+		nrtp.MapHR[k] = v.Clone()
 	}
 
-	return nrtp, nil
+	return nrtp
 }
 
 // Add - add

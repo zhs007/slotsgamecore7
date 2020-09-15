@@ -13,13 +13,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 	for i := 0; i < worknums; i++ {
 		go func() {
-			currtp, err := rtp.Clone()
-			if err != nil {
-				sgc7utils.Error("StartRTP.Clone",
-					zap.Error(err))
-
-				return
-			}
+			currtp := rtp.Clone()
 
 			plugin := game.NewPlugin()
 			defer game.FreePlugin(plugin)
