@@ -1,6 +1,8 @@
 package sgc7rtp
 
 import (
+	"bytes"
+	"encoding/gob"
 	"os"
 	"sort"
 	"strconv"
@@ -26,6 +28,35 @@ func NewRTP() *RTP {
 	}
 }
 
+// Clone - clone
+func (rtp *RTP) Clone() (*RTP, error) {
+	var buf bytes.Buffer
+	err := gob.NewEncoder(&buf).Encode(rtp)
+	if err != nil {
+		return nil, err
+	}
+
+	nrtp := &RTP{}
+	err = gob.NewDecoder(bytes.NewBuffer(buf.Bytes())).Decode(nrtp)
+	if err != nil {
+		return nil, err
+	}
+
+	return nrtp, nil
+}
+
+// Add - add
+func (rtp *RTP) Add(rtp1 *RTP) {
+	rtp.BetNums += rtp1.BetNums
+	rtp.TotalBet += rtp1.TotalBet
+
+	rtp.Root.Add(rtp1.Root)
+
+	for k, v := range rtp.MapHR {
+		v.Add(rtp1.MapHR[k])
+	}
+}
+
 // CalcRTP -
 func (rtp *RTP) CalcRTP() {
 	rtp.Root.CalcRTP(rtp.TotalBet)
@@ -46,7 +77,7 @@ func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
 	rtp.Root.OnResult(pr)
 
 	for _, v := range rtp.MapHR {
-		v.funcOnResult(v, pr)
+		v.FuncOnResult(v, pr)
 	}
 }
 

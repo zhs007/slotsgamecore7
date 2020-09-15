@@ -9,10 +9,18 @@ import (
 // StartRTP - start RTP
 func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake) error {
 	lastnums := worknums
-	ch := make(chan int)
+	ch := make(chan *RTP)
 
 	for i := 0; i < worknums; i++ {
 		go func() {
+			currtp, err := rtp.Clone()
+			if err != nil {
+				sgc7utils.Error("StartRTP.Clone",
+					zap.Error(err))
+
+				return
+			}
+
 			plugin := game.NewPlugin()
 			defer game.FreePlugin(plugin)
 
@@ -21,7 +29,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			cmd := "SPIN"
 
 			for i := int64(0); i < spinnums/int64(worknums); i++ {
-				rtp.Bet(stake.CashBet)
+				currtp.Bet(stake.CashBet)
 
 				for {
 					pr, err := game.Play(plugin, cmd, "", ps, stake, results)
@@ -54,18 +62,20 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				}
 
 				for _, v := range results {
-					rtp.OnResult(v)
+					currtp.OnResult(v)
 				}
 
 				results = results[:0]
 			}
 
-			ch <- 0
+			ch <- currtp
 		}()
 	}
 
 	for {
-		<-ch
+		currtp := <-ch
+
+		rtp.Add(currtp)
 
 		lastnums--
 
