@@ -231,15 +231,15 @@ func (node *RTPNode) GetGameMods(arr []string) []string {
 }
 
 // GetTags -
-func (node *RTPNode) GetTags(arr []string) []string {
-	if node.TagName != "" {
+func (node *RTPNode) GetTags(arr []string, gamemod string) []string {
+	if node.GameMod == gamemod && node.TagName != "" {
 		if sgc7utils.IndexOfStringSlice(arr, node.TagName, 0) < 0 {
 			arr = append(arr, node.TagName)
 		}
 	}
 
 	for _, v := range node.MapChildren {
-		arr = v.GetTags(arr)
+		arr = v.GetTags(arr, gamemod)
 	}
 
 	return arr
@@ -443,7 +443,6 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	defer f.Close()
 
 	gms := rtp.Root.GetGameMods(nil)
-	tags := rtp.Root.GetTags(nil)
 	sn := rtp.Root.GetSymbolNums(nil)
 	symbols := rtp.Root.GetSymbols(nil)
 
@@ -459,14 +458,6 @@ func (rtp *RTP) Save2CSV(fn string) error {
 		return gms[i] < gms[j]
 	})
 
-	if len(tags) == 0 {
-		tags = append(tags, "")
-	} else {
-		sort.Slice(tags, func(i, j int) bool {
-			return tags[i] < tags[j]
-		})
-	}
-
 	strhead := "gamemod,tag,symbol,totalbet"
 	for _, v := range sn {
 		strhead = sgc7utils.AppendString(strhead, ",X", strconv.Itoa(v))
@@ -476,6 +467,15 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	f.WriteString(strhead)
 
 	for _, gm := range gms {
+		tags := rtp.Root.GetTags(nil, gm)
+		if len(tags) == 0 {
+			tags = append(tags, "")
+		} else {
+			sort.Slice(tags, func(i, j int) bool {
+				return tags[i] < tags[j]
+			})
+		}
+
 		for _, tag := range tags {
 			for _, symbol := range symbols {
 				str := rtp.Root.GenSymbolString(gm, tag, symbol, sn, rtp.TotalBet)
