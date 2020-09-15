@@ -36,6 +36,19 @@ func (node *HitRateNode) GenString() string {
 	return str
 }
 
+// Clone - clone
+func (node *HitRateNode) Clone() *HitRateNode {
+	node1 := &HitRateNode{
+		TagName:      node.TagName,
+		BetNums:      node.BetNums,
+		TriggerNums:  node.TriggerNums,
+		TotalNums:    node.TotalNums,
+		FuncOnResult: node.FuncOnResult,
+	}
+
+	return node1
+}
+
 // Add - add
 func (node *HitRateNode) Add(node1 *HitRateNode) {
 	if node.TagName == node1.TagName {
