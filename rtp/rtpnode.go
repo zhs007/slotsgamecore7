@@ -93,7 +93,7 @@ type RTPNode struct {
 	Symbol       int
 	SymbolNums   int
 	TagName      string
-	funcOnResult FuncOnResult
+	FuncOnResult FuncOnResult
 }
 
 // NewRTPRoot - new RTPNode
@@ -101,7 +101,7 @@ func NewRTPRoot() *RTPNode {
 	return &RTPNode{
 		NodeType:     RTPNodeRoot,
 		MapChildren:  make(map[string]*RTPNode),
-		funcOnResult: OnRootResult,
+		FuncOnResult: OnRootResult,
 	}
 }
 
@@ -111,7 +111,7 @@ func NewRTPGameMod(gamemod string) *RTPNode {
 		NodeType:     RTPNodeGameMod,
 		MapChildren:  make(map[string]*RTPNode),
 		GameMod:      gamemod,
-		funcOnResult: OnGameModResult,
+		FuncOnResult: OnGameModResult,
 		Symbol:       -1,
 		SymbolNums:   -1,
 	}
@@ -123,7 +123,7 @@ func NewRTPGameModTag(gamemod string, tag string, funcTag FuncOnResult) *RTPNode
 		NodeType:     RTPNodeTag,
 		MapChildren:  make(map[string]*RTPNode),
 		GameMod:      gamemod,
-		funcOnResult: funcTag,
+		FuncOnResult: funcTag,
 		TagName:      tag,
 		Symbol:       -1,
 		SymbolNums:   -1,
@@ -171,7 +171,7 @@ func NewRTPSymbol(gamemod string, tag string, symbol int) *RTPNode {
 		MapChildren:  make(map[string]*RTPNode),
 		GameMod:      gamemod,
 		Symbol:       symbol,
-		funcOnResult: OnSymbolResult,
+		FuncOnResult: OnSymbolResult,
 		TagName:      tag,
 		SymbolNums:   -1,
 	}
@@ -185,7 +185,7 @@ func NewRTPSymbolNums(gamemod string, tag string, symbol int, nums int) *RTPNode
 		GameMod:      gamemod,
 		Symbol:       symbol,
 		SymbolNums:   nums,
-		funcOnResult: OnSymbolNumsResult,
+		FuncOnResult: OnSymbolNumsResult,
 		TagName:      tag,
 	}
 }
@@ -206,7 +206,7 @@ func (node *RTPNode) AddChild(name string, c *RTPNode) {
 
 // OnResult -
 func (node *RTPNode) OnResult(pr *sgc7game.PlayResult) {
-	ismine := node.funcOnResult(node, pr)
+	ismine := node.FuncOnResult(node, pr)
 	if !ismine {
 		return
 	}
@@ -405,10 +405,27 @@ func (node *RTPNode) GetSymbolNumsWon(gamemod string, tag string, symbol int, sn
 // ChgSymbolNumsFunc -
 func (node *RTPNode) ChgSymbolNumsFunc(funcOnResult FuncOnResult) {
 	if node.Symbol >= 0 && node.SymbolNums > 0 {
-		node.funcOnResult = funcOnResult
+		node.FuncOnResult = funcOnResult
 	}
 
 	for _, v := range node.MapChildren {
 		v.ChgSymbolNumsFunc(funcOnResult)
+	}
+}
+
+// Add - add
+func (node *RTPNode) Add(node1 *RTPNode) {
+	if node.NodeType == node1.NodeType &&
+		node.GameMod == node1.GameMod &&
+		node.Symbol == node1.Symbol &&
+		node.SymbolNums == node1.SymbolNums &&
+		node.TagName == node1.TagName {
+
+		node.TriggerNums += node1.TriggerNums
+		node.TotalWin += node1.TotalWin
+
+		for k, v := range node.MapChildren {
+			v.Add(node1.MapChildren[k])
+		}
 	}
 }

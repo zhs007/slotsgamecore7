@@ -16,14 +16,14 @@ type HitRateNode struct {
 	BetNums      int64
 	TriggerNums  int64
 	TotalNums    int64
-	funcOnResult FuncHROnResult
+	FuncOnResult FuncHROnResult
 }
 
 // NewSpecialHitRate - new HitRateNode
 func NewSpecialHitRate(tag string, funcOnResult FuncHROnResult) *HitRateNode {
 	return &HitRateNode{
 		TagName:      tag,
-		funcOnResult: funcOnResult,
+		FuncOnResult: funcOnResult,
 	}
 }
 
@@ -34,4 +34,13 @@ func (node *HitRateNode) GenString() string {
 		strconv.FormatFloat(float64(node.TotalNums)/float64(node.TriggerNums), 'f', -1, 64), "\n")
 
 	return str
+}
+
+// Add - add
+func (node *HitRateNode) Add(node1 *HitRateNode) {
+	if node.TagName == node1.TagName {
+		node.TriggerNums += node1.TriggerNums
+		node.TotalNums += node1.TotalNums
+		node.BetNums += node1.BetNums
+	}
 }
