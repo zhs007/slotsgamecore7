@@ -121,8 +121,18 @@ func (rtp *RTP) Save2CSV(fn string) error {
 		f.WriteString("\n\n\n")
 
 		f.WriteString("name,hitrate,average\n")
-		for _, v := range rtp.MapHR {
-			str := v.GenString()
+
+		keys := []string{}
+		for k := range rtp.MapHR {
+			keys = append(keys, k)
+		}
+
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i] < keys[j]
+		})
+
+		for _, v := range keys {
+			str := rtp.MapHR[v].GenString()
 			f.WriteString(str)
 		}
 	}
