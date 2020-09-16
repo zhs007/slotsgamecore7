@@ -184,3 +184,19 @@ func (gs *GameScene) CountSymbols(arr []int) []int {
 
 	return narr
 }
+
+// Clone - clone
+func (gs *GameScene) Clone() *GameScene {
+	ngs := &GameScene{
+		Arr:    make([][]int, gs.Width),
+		Width:  gs.Width,
+		Height: gs.Height,
+	}
+
+	for i := 0; i < gs.Width; i++ {
+		ngs.Arr[i] = make([]int, gs.Height)
+		copy(ngs.Arr[i], gs.Arr[i])
+	}
+
+	return ngs
+}

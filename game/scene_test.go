@@ -363,3 +363,42 @@ func Test_CountSymbols(t *testing.T) {
 
 	t.Logf("Test_CountSymbol OK")
 }
+
+func Test_CloneGS(t *testing.T) {
+	gs, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	ngs := gs.Clone()
+
+	assert.Equal(t, ngs.Arr[0][0], 8)
+	assert.Equal(t, ngs.Arr[0][1], 10)
+	assert.Equal(t, ngs.Arr[0][2], 1)
+	assert.Equal(t, ngs.Arr[1][0], 11)
+	assert.Equal(t, ngs.Arr[1][1], 10)
+	assert.Equal(t, ngs.Arr[1][2], 7)
+	assert.Equal(t, ngs.Arr[2][0], 0)
+	assert.Equal(t, ngs.Arr[2][1], 4)
+	assert.Equal(t, ngs.Arr[2][2], 6)
+	assert.Equal(t, ngs.Arr[3][0], 7)
+	assert.Equal(t, ngs.Arr[3][1], 8)
+	assert.Equal(t, ngs.Arr[3][2], 0)
+	assert.Equal(t, ngs.Arr[4][0], 1)
+	assert.Equal(t, ngs.Arr[4][1], 9)
+	assert.Equal(t, ngs.Arr[4][2], 5)
+
+	gs.Arr[0][0] = 0
+	assert.Equal(t, gs.Arr[0][0], 0)
+	assert.Equal(t, ngs.Arr[0][0], 8)
+
+	gs.Arr[3][2] = 8
+	assert.Equal(t, gs.Arr[3][2], 8)
+	assert.Equal(t, ngs.Arr[3][2], 0)
+
+	t.Logf("Test_CountSymbol OK")
+}
