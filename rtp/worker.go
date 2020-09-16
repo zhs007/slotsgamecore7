@@ -48,6 +48,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			off := 0
 
 			for i := int64(0); i < spinnums/int64(worknums); i++ {
+				plugin.ClearUsedRngs()
+
 				currtp.Bet(stake.CashBet)
 
 				for {
