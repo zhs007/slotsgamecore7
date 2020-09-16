@@ -12,7 +12,7 @@ import (
 type FuncOnRTPTimer func(totalnums int64, curnums int64, curtime time.Duration)
 
 // StartRTP - start RTP
-func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, ontimer FuncOnRTPTimer) time.Duration {
+func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, numsTimer int, ontimer FuncOnRTPTimer) time.Duration {
 	t1 := time.Now()
 
 	lastnums := worknums
@@ -87,7 +87,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				results = results[:0]
 
 				off++
-				if off > 1000 {
+				if off >= numsTimer {
 					chTimer <- off
 
 					off = 0
