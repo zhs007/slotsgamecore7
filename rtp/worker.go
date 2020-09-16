@@ -1,15 +1,39 @@
 package sgc7rtp
 
 import (
+	"time"
+
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
+// FuncOnRTPTimer - on timer for rtp
+type FuncOnRTPTimer func(totalnums int64, curnums int64, curtime time.Duration)
+
 // StartRTP - start RTP
-func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake) error {
+func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, ontimer FuncOnRTPTimer) time.Duration {
+	t1 := time.Now()
+
 	lastnums := worknums
 	ch := make(chan *RTP)
+	chTimer := make(chan int)
+
+	go func() {
+		lastspinnums := spinnums
+
+		for {
+			curnums := <-chTimer
+
+			lastspinnums -= int64(curnums)
+
+			ontimer(spinnums, spinnums-lastspinnums, time.Since(t1))
+
+			if lastspinnums <= 0 {
+				break
+			}
+		}
+	}()
 
 	for i := 0; i < worknums; i++ {
 		go func() {
@@ -21,6 +45,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
 			cmd := "SPIN"
+			off := 0
 
 			for i := int64(0); i < spinnums/int64(worknums); i++ {
 				currtp.Bet(stake.CashBet)
@@ -60,6 +85,13 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				}
 
 				results = results[:0]
+
+				off++
+				if off > 1000 {
+					chTimer <- off
+
+					off = 0
+				}
 			}
 
 			ch <- currtp
@@ -78,5 +110,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 		}
 	}
 
-	return nil
+	elapsed := time.Since(t1)
+
+	return elapsed
 }
