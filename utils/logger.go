@@ -109,11 +109,16 @@ func initLogger(appName string, appVersion string, strLevel string, isConsole bo
 		return cl, nil
 	}
 
+	pwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
 	cfg := &zap.Config{}
 
 	cfg.Level = zap.NewAtomicLevelAt(level)
-	cfg.OutputPaths = []string{path.Join(logpath, buildLogFilename("output", logSubName))}
-	cfg.ErrorOutputPaths = []string{path.Join(logpath, buildLogFilename("error", logSubName))}
+	cfg.OutputPaths = []string{"stdout", path.Join(pwd, logpath, buildLogFilename("output", logSubName))}
+	cfg.ErrorOutputPaths = []string{"stderr", path.Join(pwd, logpath, buildLogFilename("error", logSubName))}
 	cfg.Encoding = "json"
 	cfg.EncoderConfig = zapcore.EncoderConfig{
 		TimeKey:     "T",

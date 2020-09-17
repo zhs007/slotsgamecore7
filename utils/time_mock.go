@@ -5,36 +5,37 @@
 package sgc7utils
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 	time "time"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockTimeI is a mock of TimeI interface
-type MockTimeI struct {
+// MockITime is a mock of ITime interface
+type MockITime struct {
 	ctrl     *gomock.Controller
-	recorder *MockTimeIMockRecorder
+	recorder *MockITimeMockRecorder
 }
 
-// MockTimeIMockRecorder is the mock recorder for MockTimeI
-type MockTimeIMockRecorder struct {
-	mock *MockTimeI
+// MockITimeMockRecorder is the mock recorder for MockITime
+type MockITimeMockRecorder struct {
+	mock *MockITime
 }
 
-// NewMockTimeI creates a new mock instance
-func NewMockTimeI(ctrl *gomock.Controller) *MockTimeI {
-	mock := &MockTimeI{ctrl: ctrl}
-	mock.recorder = &MockTimeIMockRecorder{mock}
+// NewMockITime creates a new mock instance
+func NewMockITime(ctrl *gomock.Controller) *MockITime {
+	mock := &MockITime{ctrl: ctrl}
+	mock.recorder = &MockITimeMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockTimeI) EXPECT() *MockTimeIMockRecorder {
+func (m *MockITime) EXPECT() *MockITimeMockRecorder {
 	return m.recorder
 }
 
 // Now mocks base method
-func (m *MockTimeI) Now() time.Time {
+func (m *MockITime) Now() time.Time {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Now")
 	ret0, _ := ret[0].(time.Time)
@@ -42,7 +43,7 @@ func (m *MockTimeI) Now() time.Time {
 }
 
 // Now indicates an expected call of Now
-func (mr *MockTimeIMockRecorder) Now() *gomock.Call {
+func (mr *MockITimeMockRecorder) Now() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Now", reflect.TypeOf((*MockTimeI)(nil).Now))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Now", reflect.TypeOf((*MockITime)(nil).Now))
 }
