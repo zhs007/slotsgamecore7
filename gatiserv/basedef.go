@@ -86,3 +86,30 @@ type PlayResult struct {
 	AnalyticsData AnalyticsData        `json:"analyticsData"`
 	BoostData     string               `json:"boostData"`
 }
+
+// CriticalComponent -
+type CriticalComponent struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
+}
+
+// ComponentChecksum -
+type ComponentChecksum struct {
+	ID       int    `json:"id"`
+	Checksum string `json:"checksum"`
+}
+
+// GATICriticalComponent -
+type GATICriticalComponent struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
+	Filename string `json:"filename"`
+	Checksum string `json:"checksum"`
+}
+
+// GATICriticalComponents -
+type GATICriticalComponents struct {
+	Components map[int]*GATICriticalComponent `json:"components"`
+}

@@ -2,8 +2,8 @@ package sgc7utils
 
 import "time"
 
-// TimeI - Time
-type TimeI interface {
+// ITime - Time
+type ITime interface {
 	// Now - get now time
 	Now() time.Time
 }
@@ -17,11 +17,11 @@ func (t Time) Now() time.Time {
 	return time.Now()
 }
 
-var gTime TimeI
+var gTime ITime
 var gUTCLocal *time.Location
 
 // FormatNow - format time
-func FormatNow(t TimeI) string {
+func FormatNow(t ITime) string {
 	return t.Now().In(gUTCLocal).Format("2006-01-02_15:04:05")
 }
 

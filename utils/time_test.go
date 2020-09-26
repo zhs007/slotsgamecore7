@@ -11,7 +11,7 @@ func Test_TimeI_Now(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := NewMockTimeI(ctrl)
+	m := NewMockITime(ctrl)
 	m.EXPECT().Now().Return(time.Unix(1597647832, 0))
 
 	curtime := m.Now()
@@ -27,7 +27,7 @@ func Test_FormatNow(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := NewMockTimeI(ctrl)
+	m := NewMockITime(ctrl)
 	m.EXPECT().Now().Return(time.Unix(1597647832, 0))
 
 	strnow := FormatNow(m)

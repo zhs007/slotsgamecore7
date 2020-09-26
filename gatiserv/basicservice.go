@@ -10,14 +10,26 @@ import (
 
 // BasicService - basic service
 type BasicService struct {
-	Game sgc7game.IGame
+	Game               sgc7game.IGame
+	CriticalComponents *GATICriticalComponents
 }
 
 // NewBasicService - new a BasicService
-func NewBasicService(game sgc7game.IGame) *BasicService {
-	return &BasicService{
-		Game: game,
+func NewBasicService(game sgc7game.IGame, ccfn string) (*BasicService, error) {
+
+	ccs, err := LoadGATICriticalComponents(ccfn)
+	if err != nil {
+		sgc7utils.Error("NewBasicService:LoadGATICriticalComponents",
+			zap.String("ccfn", ccfn),
+			zap.Error(err))
+
+		return nil, err
 	}
+
+	return &BasicService{
+		Game:               game,
+		CriticalComponents: ccs,
+	}, nil
 }
 
 // Config - get configuration
@@ -145,4 +157,23 @@ func (sv *BasicService) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error
 	}
 
 	return nil
+}
+
+// Checksum - checksum
+func (sv *BasicService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum, error) {
+	lstret := []*ComponentChecksum{}
+
+	for _, v := range lst {
+		cc, isok := sv.CriticalComponents.Components[v.ID]
+		if !isok {
+			return nil, ErrInvalidCriticalComponentID
+		}
+
+		lstret = append(lstret, &ComponentChecksum{
+			ID:       v.ID,
+			Checksum: cc.Checksum,
+		})
+	}
+
+	return lstret, nil
 }

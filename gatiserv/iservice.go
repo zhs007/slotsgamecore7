@@ -14,4 +14,6 @@ type IService interface {
 	Validate(params *ValidateParams) []ValidationError
 	// Play - play game
 	Play(params *PlayParams) (*PlayResult, error)
+	// Checksum - checksum
+	Checksum(lst []*CriticalComponent) ([]*ComponentChecksum, error)
 }

@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	gomock "github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
@@ -85,7 +86,7 @@ func Test_MockLogger(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := NewMockTimeI(ctrl)
+	m := NewMockITime(ctrl)
 	m.EXPECT().Now().Return(time.Unix(1597647832, 0))
 	m.EXPECT().Now().Return(time.Unix(1597648787, 0))
 	m.EXPECT().Now().Return(time.Unix(1597647832, 0))
@@ -122,7 +123,9 @@ func Test_MockLogger(t *testing.T) {
 		}
 	}
 
-	initLogger("main", "v1.0.0", "debug", false, "./")
+	log, err := initLogger("main", "v1.0.0", "debug", false, "./")
+	assert.NoError(t, err)
+	assert.NotNil(t, log)
 
 	InitLogger("main", "v1.0.0", "debug", true, "./")
 
@@ -152,6 +155,8 @@ func Test_MockLogger(t *testing.T) {
 	Warn("warn", zap.Int("value", 123))
 
 	Error("info", zap.Int("value", 123))
+
+	Error("info", JSON("value", []int{1, 2, 3}))
 
 	t.Logf("Test_MockLogger OK")
 }

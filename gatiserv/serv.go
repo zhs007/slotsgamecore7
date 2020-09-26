@@ -118,5 +118,37 @@ func NewServ(service IService, cfg *Config) *Serv {
 			s.SetResponse(ctx, ret)
 		})
 
+	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/checksum"),
+		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			if !ctx.Request.Header.IsPost() {
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
+			params := []*CriticalComponent{}
+			err := s.ParseBody(ctx, params)
+			if err != nil {
+				sgc7utils.Warn("gatiserv.Serv.checksum:ParseBody",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
+			ret, err := s.Service.Checksum(params)
+			if err != nil {
+				sgc7utils.Warn("gatiserv.Serv.checksum:Checksum",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+
+				return
+			}
+
+			s.SetResponse(ctx, ret)
+		})
+
 	return s
 }
