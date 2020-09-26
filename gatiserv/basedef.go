@@ -113,3 +113,13 @@ type GATICriticalComponent struct {
 type GATICriticalComponents struct {
 	Components map[int]*GATICriticalComponent `json:"components"`
 }
+
+// VersionInfo -
+type VersionInfo struct {
+	GameTitle     string `json:"gameTitle"`
+	GameVersion   string `json:"gameVersion"`
+	VSCVersion    string `json:"vscVersion"`
+	BuildChecksum string `json:"buildChecksum"`
+	BuildTime     string `json:"buildTime"`
+	Vendor        string `json:"vendor"`
+}
