@@ -82,6 +82,11 @@ func (sv *testService) Play(params *PlayParams) (*PlayResult, error) {
 	return nil, nil
 }
 
+// Checksum - checksum
+func (sv *testService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum, error) {
+	return nil, nil
+}
+
 func Test_Serv(t *testing.T) {
 	sgc7utils.InitLogger("", "", "debug", true, "")
 

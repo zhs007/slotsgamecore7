@@ -12,7 +12,8 @@ func Test_BasicService(t *testing.T) {
 	bg := sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewBasicPlugin()
 	})
-	bs := NewBasicService(bg)
+	bs, err := NewBasicService(bg, "")
+	assert.NoError(t, err)
 
 	bs.Config()
 
@@ -23,7 +24,7 @@ func Test_BasicService(t *testing.T) {
 	bs.Play(&PlayParams{})
 
 	plugin := bg.NewPlugin()
-	err := bs.ProcCheat(plugin, "1,2,3")
+	err = bs.ProcCheat(plugin, "1,2,3")
 	assert.NoError(t, err)
 
 	cr0, err := plugin.Random(100)
