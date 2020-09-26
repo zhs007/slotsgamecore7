@@ -123,3 +123,9 @@ type VersionInfo struct {
 	BuildTime     string `json:"buildTime"`
 	Vendor        string `json:"vendor"`
 }
+
+// GATIGameInfo - GATIGameInfo
+type GATIGameInfo struct {
+	Components map[int]*GATICriticalComponent `json:"components"`
+	Info       VersionInfo                    `json:"info"`
+}
