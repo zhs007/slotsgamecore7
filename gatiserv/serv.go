@@ -150,5 +150,18 @@ func NewServ(service IService, cfg *Config) *Serv {
 			s.SetResponse(ctx, ret)
 		})
 
+	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/version"),
+		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+			if !ctx.Request.Header.IsGet() {
+				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+				return
+			}
+
+			ret := s.Service.Version()
+
+			s.SetResponse(ctx, ret)
+		})
+
 	return s
 }

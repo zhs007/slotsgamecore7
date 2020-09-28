@@ -47,10 +47,54 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 	return ccs, nil
 }
 
-// LoadGATICriticalComponents - load
-func LoadGATICriticalComponents(fn string) (*GATICriticalComponents, error) {
+// // LoadGATICriticalComponents - load
+// func LoadGATICriticalComponents(fn string) (*GATICriticalComponents, error) {
+// 	if fn == "" {
+// 		return &GATICriticalComponents{
+// 			Components: make(map[int]*GATICriticalComponent),
+// 		}, nil
+// 	}
+
+// 	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+// 	data, err := ioutil.ReadFile(fn)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	ccs := &GATICriticalComponents{}
+// 	err = json.Unmarshal(data, ccs)
+// 	if err != nil {
+// 		sgc7utils.Warn("gatiserv.LoadGATICriticalComponents",
+// 			zap.Error(err))
+
+// 		return nil, err
+// 	}
+
+// 	return ccs, nil
+// }
+
+// // SaveGATICriticalComponents - save
+// func SaveGATICriticalComponents(ccs *GATICriticalComponents, fn string) error {
+// 	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+// 	b, err := json.Marshal(ccs)
+// 	if err != nil {
+// 		sgc7utils.Warn("gatiserv.SaveGATICriticalComponents",
+// 			zap.Error(err))
+
+// 		return err
+// 	}
+
+// 	ioutil.WriteFile(fn, b, 0640)
+
+// 	return nil
+// }
+
+// LoadGATIGameInfo - load
+func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 	if fn == "" {
-		return &GATICriticalComponents{
+		return &GATIGameInfo{
 			Components: make(map[int]*GATICriticalComponent),
 		}, nil
 	}
@@ -62,10 +106,10 @@ func LoadGATICriticalComponents(fn string) (*GATICriticalComponents, error) {
 		return nil, err
 	}
 
-	ccs := &GATICriticalComponents{}
+	ccs := &GATIGameInfo{}
 	err = json.Unmarshal(data, ccs)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.LoadGATICriticalComponents",
+		sgc7utils.Warn("gatiserv.LoadGATIGameInfo",
 			zap.Error(err))
 
 		return nil, err
@@ -74,13 +118,13 @@ func LoadGATICriticalComponents(fn string) (*GATICriticalComponents, error) {
 	return ccs, nil
 }
 
-// SaveGATICriticalComponents - save
-func SaveGATICriticalComponents(ccs *GATICriticalComponents, fn string) error {
+// SaveGATIGameInfo - save
+func SaveGATIGameInfo(gi *GATIGameInfo, fn string) error {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	b, err := json.Marshal(ccs)
+	b, err := json.Marshal(gi)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.SaveGATICriticalComponents",
+		sgc7utils.Warn("gatiserv.SaveGATIGameInfo",
 			zap.Error(err))
 
 		return err

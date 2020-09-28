@@ -10,25 +10,25 @@ import (
 
 // BasicService - basic service
 type BasicService struct {
-	Game               sgc7game.IGame
-	CriticalComponents *GATICriticalComponents
+	Game     sgc7game.IGame
+	GameInfo *GATIGameInfo
 }
 
 // NewBasicService - new a BasicService
-func NewBasicService(game sgc7game.IGame, ccfn string) (*BasicService, error) {
+func NewBasicService(game sgc7game.IGame, gifn string) (*BasicService, error) {
 
-	ccs, err := LoadGATICriticalComponents(ccfn)
+	gi, err := LoadGATIGameInfo(gifn)
 	if err != nil {
-		sgc7utils.Error("NewBasicService:LoadGATICriticalComponents",
-			zap.String("ccfn", ccfn),
+		sgc7utils.Error("NewBasicService:LoadGATIGameInfo",
+			zap.String("gifn", gifn),
 			zap.Error(err))
 
 		return nil, err
 	}
 
 	return &BasicService{
-		Game:               game,
-		CriticalComponents: ccs,
+		Game:     game,
+		GameInfo: gi,
 	}, nil
 }
 
@@ -164,7 +164,7 @@ func (sv *BasicService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum
 	lstret := []*ComponentChecksum{}
 
 	for _, v := range lst {
-		cc, isok := sv.CriticalComponents.Components[v.ID]
+		cc, isok := sv.GameInfo.Components[v.ID]
 		if !isok {
 			return nil, ErrInvalidCriticalComponentID
 		}
@@ -176,4 +176,9 @@ func (sv *BasicService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum
 	}
 
 	return lstret, nil
+}
+
+// Version - version
+func (sv *BasicService) Version() *VersionInfo {
+	return &sv.GameInfo.Info
 }

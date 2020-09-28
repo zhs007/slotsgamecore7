@@ -170,3 +170,10 @@ func ParsePlayResult(str string) (*PlayResult, error) {
 
 	return pr, nil
 }
+
+// NewGATIGameInfo -
+func NewGATIGameInfo() *GATIGameInfo {
+	return &GATIGameInfo{
+		Components: make(map[int]*GATICriticalComponent),
+	}
+}

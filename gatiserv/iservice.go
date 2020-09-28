@@ -16,4 +16,6 @@ type IService interface {
 	Play(params *PlayParams) (*PlayResult, error)
 	// Checksum - checksum
 	Checksum(lst []*CriticalComponent) ([]*ComponentChecksum, error)
+	// Version - version
+	Version() *VersionInfo
 }
