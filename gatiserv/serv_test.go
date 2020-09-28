@@ -87,6 +87,11 @@ func (sv *testService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum,
 	return nil, nil
 }
 
+// Version - version
+func (sv *testService) Version() *VersionInfo {
+	return &VersionInfo{}
+}
+
 func Test_Serv(t *testing.T) {
 	sgc7utils.InitLogger("", "", "debug", true, "")
 
