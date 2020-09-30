@@ -77,14 +77,14 @@ type PlayParams struct {
 
 // PlayResult - play output parameters for the game
 type PlayResult struct {
-	RandomNumbers []*sgc7utils.RngInfo `json:"randomNumbers"`
-	PlayerState   *PlayerState         `json:"playerState"`
-	JackpotData   []string             `json:"jackpotData"`
-	Finished      bool                 `json:"finished"`
-	Results       []*Result            `json:"results"`
-	NextCommands  []string             `json:"nextCommands"`
-	AnalyticsData AnalyticsData        `json:"analyticsData"`
-	BoostData     interface{}          `json:"boostData"`
+	RandomNumbers []*sgc7utils.RngInfo      `json:"randomNumbers"`
+	PlayerState   *PlayerState              `json:"playerState"`
+	JackpotData   []string                  `json:"jackpotData"`
+	Finished      bool                      `json:"finished"`
+	Results       []*Result                 `json:"results"`
+	NextCommands  []string                  `json:"nextCommands"`
+	AnalyticsData AnalyticsData             `json:"analyticsData"`
+	BoostData     *BasicMissionBoostDataMap `json:"boostData"`
 }
 
 // CriticalComponent -
