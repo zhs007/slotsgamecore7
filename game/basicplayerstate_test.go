@@ -7,7 +7,7 @@ import (
 )
 
 func Test_BasicPlayerState(t *testing.T) {
-	ps := NewBasicPlayerState("BG", NewBPSNoBoostData)
+	ps := NewBasicPlayerState("BG")
 	assert.NotNil(t, ps, "Test_BasicPlayerState NewBasicPlayerState")
 
 	assert.Equal(t, ps.Public.CurGameMod, "BG", "Test_BasicPlayerState BasicPlayerPublicState CurGameMod")

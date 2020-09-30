@@ -142,3 +142,40 @@ type MissionObject struct {
 type GATIGameConfig struct {
 	GameObjectives []*MissionObject `json:"gameObjectives"`
 }
+
+// EvaluateParams -
+type EvaluateParams struct {
+	BoostData []*BasicMissionBoostDataMap `json:"boostData"`
+	State     *BasicMissionStateMap       `json:"state"`
+}
+
+// EvaluateResult -
+type EvaluateResult struct {
+	Progress int                   `json:"progress"`
+	State    *BasicMissionStateMap `json:"state"`
+}
+
+// BasicMissionState -
+type BasicMissionState struct {
+	ObjectiveID string `json:"objectiveId"`
+	Goal        int    `json:"goal"`
+	Current     int    `json:"current"`
+	Arr         []int  `json:"arr"`
+}
+
+// BasicMissionBoostData -
+type BasicMissionBoostData struct {
+	ObjectiveID string `json:"objectiveId"`
+	Counter     int    `json:"counter"`
+	Arr         []int  `json:"arr"`
+}
+
+// BasicMissionStateMap -
+type BasicMissionStateMap struct {
+	MapBoostData map[string]*BasicMissionState `json:"mapstate"`
+}
+
+// BasicMissionBoostDataMap -
+type BasicMissionBoostDataMap struct {
+	MapBoostData map[string]*BasicMissionBoostData `json:"mapboostdata"`
+}

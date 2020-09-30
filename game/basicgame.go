@@ -51,7 +51,7 @@ func (game *BasicGame) NewPlayerState() IPlayerState {
 
 // Initialize - initialize PlayerState
 func (game *BasicGame) Initialize() IPlayerState {
-	return NewBasicPlayerState("bg", NewBPSNoBoostData)
+	return NewBasicPlayerState("bg")
 }
 
 // AddGameMod - add a gamemod

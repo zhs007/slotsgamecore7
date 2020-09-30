@@ -54,8 +54,9 @@ func (ps *testPlayerState) GetPrivate() interface{} {
 // testService
 
 type testService struct {
-	cfg      *sgc7game.Config
-	initmode int
+	cfg        *sgc7game.Config
+	initmode   int
+	GameConfig *GATIGameConfig
 }
 
 // Config - get configuration
@@ -92,19 +93,34 @@ func (sv *testService) Version() *VersionInfo {
 	return &VersionInfo{}
 }
 
-// NewBoostData - new a BoostData
-func (sv *testService) NewBoostData() interface{} {
-	return nil
-}
+// // NewBoostData - new a BoostData
+// func (sv *testService) NewBoostData() interface{} {
+// 	return nil
+// }
 
-// NewPlayerBoostData - new a PlayerBoostData
-func (sv *testService) NewPlayerBoostData() interface{} {
-	return nil
-}
+// // NewBoostDataList - new a list for BoostData
+// func (sv *testService) NewBoostDataList() []interface{} {
+// 	return nil
+// }
+
+// // NewPlayerBoostData - new a PlayerBoostData
+// func (sv *testService) NewPlayerBoostData() interface{} {
+// 	return nil
+// }
 
 // OnPlayBoostData - after call Play
 func (sv *testService) OnPlayBoostData(params *PlayParams, result *PlayResult) error {
 	return nil
+}
+
+// GetGameConfig - get GATIGameConfig
+func (sv *testService) GetGameConfig() *GATIGameConfig {
+	return nil
+}
+
+// Evaluate -
+func (sv *testService) Evaluate(params *EvaluateParams, id string) (*EvaluateResult, error) {
+	return nil, nil
 }
 
 func Test_Serv(t *testing.T) {
@@ -118,12 +134,16 @@ func Test_Serv(t *testing.T) {
 		IsDebugMode: true,
 	}
 
+	gc, err := LoadGATIGameConfig("../unittestdata/game_configuration.json")
+	assert.NoError(t, err)
+
 	service := &testService{
 		&sgc7game.Config{
 			Width:  5,
 			Height: 3,
 		},
 		0,
+		gc,
 	}
 
 	serv := NewServ(service, cfg)
@@ -187,7 +207,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\",\\\"boostdata\\\":null}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
 
 	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/initialize", nil, nil)
 	if err != nil {

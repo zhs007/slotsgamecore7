@@ -16,8 +16,7 @@ func NewBPSNoBoostData() *BasicPlayerState {
 
 // BasicPlayerPublicState - basic PlayerPublicState
 type BasicPlayerPublicState struct {
-	CurGameMod      string      `json:"curgamemod"`
-	PlayerBoostData interface{} `json:"boostdata"`
+	CurGameMod string `json:"curgamemod"`
 }
 
 // BasicPlayerPrivateState - basic PlayerPrivateState
@@ -31,8 +30,8 @@ type BasicPlayerState struct {
 }
 
 // NewBasicPlayerStateEx - new BasicPlayerState
-func NewBasicPlayerStateEx(pub string, pri string, newBPS FuncNewBasicPlayerState) *BasicPlayerState {
-	ps := newBPS()
+func NewBasicPlayerStateEx(pub string, pri string) *BasicPlayerState {
+	ps := &BasicPlayerState{}
 
 	err := ps.SetPublicString(pub)
 	if err != nil {
@@ -58,8 +57,8 @@ func NewBasicPlayerStateEx(pub string, pri string, newBPS FuncNewBasicPlayerStat
 }
 
 // NewBasicPlayerState - new BasicPlayerState
-func NewBasicPlayerState(curgamemod string, newBPS FuncNewBasicPlayerState) *BasicPlayerState {
-	bps := newBPS()
+func NewBasicPlayerState(curgamemod string) *BasicPlayerState {
+	bps := &BasicPlayerState{}
 
 	bps.Public.CurGameMod = curgamemod
 

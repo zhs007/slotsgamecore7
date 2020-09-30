@@ -10,12 +10,13 @@ import (
 
 // BasicService - basic service
 type BasicService struct {
-	Game     sgc7game.IGame
-	GameInfo *GATIGameInfo
+	Game       sgc7game.IGame
+	GameInfo   *GATIGameInfo
+	GameConfig *GATIGameConfig
 }
 
 // NewBasicService - new a BasicService
-func NewBasicService(game sgc7game.IGame, gifn string) (*BasicService, error) {
+func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicService, error) {
 
 	gi, err := LoadGATIGameInfo(gifn)
 	if err != nil {
@@ -26,9 +27,19 @@ func NewBasicService(game sgc7game.IGame, gifn string) (*BasicService, error) {
 		return nil, err
 	}
 
+	gc, err := LoadGATIGameConfig(gcfn)
+	if err != nil {
+		sgc7utils.Error("NewBasicService:LoadGATIGameConfig",
+			zap.String("gcfn", gcfn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
 	return &BasicService{
-		Game:     game,
-		GameInfo: gi,
+		Game:       game,
+		GameInfo:   gi,
+		GameConfig: gc,
 	}, nil
 }
 
@@ -185,17 +196,32 @@ func (sv *BasicService) Version() *VersionInfo {
 	return &sv.GameInfo.Info
 }
 
-// NewBoostData - new a BoostData
-func (sv *BasicService) NewBoostData() interface{} {
-	return nil
-}
+// // NewBoostData - new a BoostData
+// func (sv *BasicService) NewBoostData() interface{} {
+// 	return nil
+// }
 
-// NewPlayerBoostData - new a PlayerBoostData
-func (sv *BasicService) NewPlayerBoostData() interface{} {
-	return nil
-}
+// // NewBoostDataList - new a list for BoostData
+// func (sv *BasicService) NewBoostDataList() []interface{} {
+// 	return []*BasicMissionBoostDataMap{}
+// }
+
+// // NewPlayerBoostData - new a PlayerBoostData
+// func (sv *BasicService) NewPlayerBoostData() interface{} {
+// 	return nil
+// }
 
 // OnPlayBoostData - after call Play
 func (sv *BasicService) OnPlayBoostData(params *PlayParams, result *PlayResult) error {
 	return nil
+}
+
+// GetGameConfig - get GATIGameConfig
+func (sv *BasicService) GetGameConfig() *GATIGameConfig {
+	return sv.GameConfig
+}
+
+// Evaluate -
+func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateResult, error) {
+	return nil, nil
 }

@@ -12,7 +12,7 @@ func Test_BasicService(t *testing.T) {
 	bg := sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewBasicPlugin()
 	})
-	bs, err := NewBasicService(bg, "")
+	bs, err := NewBasicService(bg, "", "../unittestdata/game_configuration.json")
 	assert.NoError(t, err)
 
 	bs.Config()

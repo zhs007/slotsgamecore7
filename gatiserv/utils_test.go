@@ -101,10 +101,10 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, ps)
 
-	ips := sgc7game.NewBasicPlayerState("BG", sgc7game.NewBPSNoBoostData)
+	ips := sgc7game.NewBasicPlayerState("BG")
 	str, err = BuildPlayerStateString(ips)
 	assert.Nil(t, err)
-	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\",\\\"boostdata\\\":null}\",\"playerStatePrivate\":\"{}\"}")
+	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}")
 
 	ps, err = ParsePlayerState(str)
 	assert.Nil(t, err)
@@ -155,7 +155,7 @@ func Test_ParsePlayParams(t *testing.T) {
 	assert.Equal(t, pp.Stake.CashBet, 1.0)
 	assert.Equal(t, pp.Stake.Currency, "EUR")
 
-	bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private, sgc7game.NewBPSNoBoostData)
+	bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private)
 	assert.Equal(t, bps.Public.CurGameMod, "BG")
 
 	assert.Equal(t, pp.Params, "")
@@ -175,4 +175,21 @@ func Test_ParsePlayParams(t *testing.T) {
 	assert.Nil(t, pp)
 
 	t.Logf("Test_ParsePlayParams OK")
+}
+
+func Test_LoadGATIGameConfig(t *testing.T) {
+	gc, err := LoadGATIGameConfig("../unittestdata/game_configuration.json")
+	assert.NoError(t, err)
+	assert.Equal(t, len(gc.GameObjectives), 3)
+
+	assert.Equal(t, gc.GameObjectives[0].ObjectiveID, "50freespins")
+	assert.Equal(t, gc.GameObjectives[0].Goal, 50)
+
+	assert.Equal(t, gc.GameObjectives[1].ObjectiveID, "10luckyspins")
+	assert.Equal(t, gc.GameObjectives[1].Goal, 10)
+
+	assert.Equal(t, gc.GameObjectives[2].ObjectiveID, "collect4princesses")
+	assert.Equal(t, gc.GameObjectives[2].Goal, 4)
+
+	t.Logf("Test_LoadGATIGameConfig OK")
 }
