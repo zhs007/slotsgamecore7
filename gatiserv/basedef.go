@@ -168,11 +168,12 @@ type BasicMissionBoostData struct {
 	ObjectiveID string `json:"objectiveId"`
 	Counter     int    `json:"counter"`
 	Arr         []int  `json:"arr"`
+	Type        int    `json:"type"` // 0 - counter, 1 - arr
 }
 
 // BasicMissionStateMap -
 type BasicMissionStateMap struct {
-	MapBoostData map[string]*BasicMissionState `json:"mapstate"`
+	MapState map[string]*BasicMissionState `json:"mapstate"`
 }
 
 // BasicMissionBoostDataMap -

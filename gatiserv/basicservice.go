@@ -223,5 +223,47 @@ func (sv *BasicService) GetGameConfig() *GATIGameConfig {
 
 // Evaluate -
 func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateResult, error) {
-	return nil, nil
+	result := &EvaluateResult{}
+	cs, isok := params.State.MapState[id]
+	if !isok {
+		cs = &BasicMissionState{
+			ObjectiveID: id,
+		}
+	}
+
+	result.State = &BasicMissionStateMap{
+		MapState: make(map[string]*BasicMissionState),
+	}
+
+	result.State.MapState[id] = cs
+
+	for _, v := range params.BoostData {
+		cbd, isok := v.MapBoostData[id]
+		if isok {
+			if cbd.Type == 0 {
+				cs.Current += cbd.Counter
+
+				result.Progress = cs.Current
+			} else if cbd.Type == 1 {
+				for _, n := range cbd.Arr {
+					hasn := false
+					for _, sn := range cs.Arr {
+						if n == sn {
+							hasn = true
+
+							break
+						}
+					}
+
+					if !hasn {
+						cs.Arr = append(cs.Arr, n)
+					}
+				}
+
+				result.Progress = len(cs.Arr)
+			}
+		}
+	}
+
+	return result, nil
 }
