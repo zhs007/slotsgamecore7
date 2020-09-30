@@ -50,12 +50,14 @@ func (sv *BasicService) Validate(params *ValidateParams) []ValidationError {
 // Play - play game
 func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	ips := sv.Game.NewPlayerState()
-	err := BuildIPlayerState(ips, params.PlayerState)
-	if err != nil {
-		sgc7utils.Error("BasicService.Play:BuildIPlayerState",
-			zap.Error(err))
+	if params.PlayerState.Public != "" || params.PlayerState.Private != "" {
+		err := BuildIPlayerState(ips, params.PlayerState)
+		if err != nil {
+			sgc7utils.Error("BasicService.Play:BuildIPlayerState",
+				zap.Error(err))
 
-		return nil, err
+			return nil, err
+		}
 	}
 
 	plugin := sv.Game.NewPlugin()
@@ -64,7 +66,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	sv.ProcCheat(plugin, params.Cheat)
 
 	stake := BuildStake(params.Stake)
-	err = sv.Game.CheckStake(stake)
+	err := sv.Game.CheckStake(stake)
 	if err != nil {
 		sgc7utils.Error("BasicService.Play:CheckStake",
 			sgc7utils.JSON("stake", stake),
