@@ -115,6 +115,16 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
+			err = s.Service.OnPlayBoostData(params, ret)
+			if err != nil {
+				sgc7utils.Warn("gatiserv.Serv.play:OnPlayBoostData",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+
+				return
+			}
+
 			s.SetResponse(ctx, ret)
 		})
 
@@ -162,6 +172,45 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 			s.SetResponse(ctx, ret)
 		})
+
+	gc := s.Service.GetGameConfig()
+	if gc != nil {
+		for _, v := range gc.GameObjectives {
+			s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/evaluate/"+v.ObjectiveID),
+				func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
+					if !ctx.Request.Header.IsPost() {
+						s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+						return
+					}
+
+					params := &EvaluateParams{}
+					err := s.ParseBody(ctx, params)
+					if err != nil {
+						sgc7utils.Warn("gatiserv.Serv.evaluate:ParseBody",
+							zap.String("id", v.ObjectiveID),
+							zap.Error(err))
+
+						s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+						return
+					}
+
+					ret, err := s.Service.Evaluate(params, v.ObjectiveID)
+					if err != nil {
+						sgc7utils.Warn("gatiserv.Serv.evaluate:Evaluate",
+							zap.String("id", v.ObjectiveID),
+							zap.Error(err))
+
+						s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+
+						return
+					}
+
+					s.SetResponse(ctx, ret)
+				})
+		}
+	}
 
 	return s
 }

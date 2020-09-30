@@ -1,6 +1,8 @@
 package gatiserv
 
 import (
+	"io/ioutil"
+
 	jsoniter "github.com/json-iterator/go"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
@@ -176,4 +178,29 @@ func NewGATIGameInfo() *GATIGameInfo {
 	return &GATIGameInfo{
 		Components: make(map[int]*GATICriticalComponent),
 	}
+}
+
+// LoadGATIGameConfig - load
+func LoadGATIGameConfig(fn string) (*GATIGameConfig, error) {
+	if fn == "" {
+		return &GATIGameConfig{}, nil
+	}
+
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	ccs := &GATIGameConfig{}
+	err = json.Unmarshal(data, ccs)
+	if err != nil {
+		sgc7utils.Warn("gatiserv.LoadGATIGameConfig",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return ccs, nil
 }

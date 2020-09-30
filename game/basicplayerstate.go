@@ -6,6 +6,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// FuncNewBasicPlayerState - new BasicPlayerState and set PlayerBoostData
+type FuncNewBasicPlayerState func() *BasicPlayerState
+
+// NewBPSNoBoostData - new a BasicPlayerState without boostdata
+func NewBPSNoBoostData() *BasicPlayerState {
+	return &BasicPlayerState{}
+}
+
 // BasicPlayerPublicState - basic PlayerPublicState
 type BasicPlayerPublicState struct {
 	CurGameMod string `json:"curgamemod"`
@@ -50,12 +58,11 @@ func NewBasicPlayerStateEx(pub string, pri string) *BasicPlayerState {
 
 // NewBasicPlayerState - new BasicPlayerState
 func NewBasicPlayerState(curgamemod string) *BasicPlayerState {
-	return &BasicPlayerState{
-		Public: BasicPlayerPublicState{
-			CurGameMod: curgamemod,
-		},
-		Private: BasicPlayerPrivateState{},
-	}
+	bps := &BasicPlayerState{}
+
+	bps.Public.CurGameMod = curgamemod
+
+	return bps
 }
 
 // SetPublic - set player public state

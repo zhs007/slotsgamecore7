@@ -10,12 +10,13 @@ import (
 
 // BasicService - basic service
 type BasicService struct {
-	Game     sgc7game.IGame
-	GameInfo *GATIGameInfo
+	Game       sgc7game.IGame
+	GameInfo   *GATIGameInfo
+	GameConfig *GATIGameConfig
 }
 
 // NewBasicService - new a BasicService
-func NewBasicService(game sgc7game.IGame, gifn string) (*BasicService, error) {
+func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicService, error) {
 
 	gi, err := LoadGATIGameInfo(gifn)
 	if err != nil {
@@ -26,9 +27,19 @@ func NewBasicService(game sgc7game.IGame, gifn string) (*BasicService, error) {
 		return nil, err
 	}
 
+	gc, err := LoadGATIGameConfig(gcfn)
+	if err != nil {
+		sgc7utils.Error("NewBasicService:LoadGATIGameConfig",
+			zap.String("gcfn", gcfn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
 	return &BasicService{
-		Game:     game,
-		GameInfo: gi,
+		Game:       game,
+		GameInfo:   gi,
+		GameConfig: gc,
 	}, nil
 }
 
@@ -183,4 +194,76 @@ func (sv *BasicService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum
 // Version - version
 func (sv *BasicService) Version() *VersionInfo {
 	return &sv.GameInfo.Info
+}
+
+// // NewBoostData - new a BoostData
+// func (sv *BasicService) NewBoostData() interface{} {
+// 	return nil
+// }
+
+// // NewBoostDataList - new a list for BoostData
+// func (sv *BasicService) NewBoostDataList() []interface{} {
+// 	return []*BasicMissionBoostDataMap{}
+// }
+
+// // NewPlayerBoostData - new a PlayerBoostData
+// func (sv *BasicService) NewPlayerBoostData() interface{} {
+// 	return nil
+// }
+
+// OnPlayBoostData - after call Play
+func (sv *BasicService) OnPlayBoostData(params *PlayParams, result *PlayResult) error {
+	return nil
+}
+
+// GetGameConfig - get GATIGameConfig
+func (sv *BasicService) GetGameConfig() *GATIGameConfig {
+	return sv.GameConfig
+}
+
+// Evaluate -
+func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateResult, error) {
+	result := &EvaluateResult{}
+	cs, isok := params.State.MapState[id]
+	if !isok {
+		cs = &BasicMissionState{
+			ObjectiveID: id,
+		}
+	}
+
+	result.State = &BasicMissionStateMap{
+		MapState: make(map[string]*BasicMissionState),
+	}
+
+	result.State.MapState[id] = cs
+
+	for _, v := range params.BoostData {
+		cbd, isok := v.MapBoostData[id]
+		if isok {
+			if cbd.Type == 0 {
+				cs.Current += cbd.Counter
+
+				result.Progress = cs.Current
+			} else if cbd.Type == 1 {
+				for _, n := range cbd.Arr {
+					hasn := false
+					for _, sn := range cs.Arr {
+						if n == sn {
+							hasn = true
+
+							break
+						}
+					}
+
+					if !hasn {
+						cs.Arr = append(cs.Arr, n)
+					}
+				}
+
+				result.Progress = len(cs.Arr)
+			}
+		}
+	}
+
+	return result, nil
 }

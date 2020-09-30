@@ -84,7 +84,7 @@ type PlayResult struct {
 	Results       []*Result            `json:"results"`
 	NextCommands  []string             `json:"nextCommands"`
 	AnalyticsData AnalyticsData        `json:"analyticsData"`
-	BoostData     string               `json:"boostData"`
+	BoostData     interface{}          `json:"boostData"`
 }
 
 // CriticalComponent -
@@ -128,4 +128,55 @@ type VersionInfo struct {
 type GATIGameInfo struct {
 	Components map[int]*GATICriticalComponent `json:"components"`
 	Info       VersionInfo                    `json:"info"`
+}
+
+// MissionObject -
+type MissionObject struct {
+	ObjectiveID string `json:"objectiveId"`
+	Description string `json:"description"`
+	Goal        int    `json:"goal"`
+	Period      int    `json:"period"`
+}
+
+// GATIGameConfig - game_configuration.json
+type GATIGameConfig struct {
+	GameObjectives []*MissionObject `json:"gameObjectives"`
+}
+
+// EvaluateParams -
+type EvaluateParams struct {
+	BoostData []*BasicMissionBoostDataMap `json:"boostData"`
+	State     *BasicMissionStateMap       `json:"state"`
+}
+
+// EvaluateResult -
+type EvaluateResult struct {
+	Progress int                   `json:"progress"`
+	State    *BasicMissionStateMap `json:"state"`
+}
+
+// BasicMissionState -
+type BasicMissionState struct {
+	ObjectiveID string `json:"objectiveId"`
+	Goal        int    `json:"goal"`
+	Current     int    `json:"current"`
+	Arr         []int  `json:"arr"`
+}
+
+// BasicMissionBoostData -
+type BasicMissionBoostData struct {
+	ObjectiveID string `json:"objectiveId"`
+	Counter     int    `json:"counter"`
+	Arr         []int  `json:"arr"`
+	Type        int    `json:"type"` // 0 - counter, 1 - arr
+}
+
+// BasicMissionStateMap -
+type BasicMissionStateMap struct {
+	MapState map[string]*BasicMissionState `json:"mapstate"`
+}
+
+// BasicMissionBoostDataMap -
+type BasicMissionBoostDataMap struct {
+	MapBoostData map[string]*BasicMissionBoostData `json:"mapboostdata"`
 }

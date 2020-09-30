@@ -176,3 +176,20 @@ func Test_ParsePlayParams(t *testing.T) {
 
 	t.Logf("Test_ParsePlayParams OK")
 }
+
+func Test_LoadGATIGameConfig(t *testing.T) {
+	gc, err := LoadGATIGameConfig("../unittestdata/game_configuration.json")
+	assert.NoError(t, err)
+	assert.Equal(t, len(gc.GameObjectives), 3)
+
+	assert.Equal(t, gc.GameObjectives[0].ObjectiveID, "50freespins")
+	assert.Equal(t, gc.GameObjectives[0].Goal, 50)
+
+	assert.Equal(t, gc.GameObjectives[1].ObjectiveID, "10luckyspins")
+	assert.Equal(t, gc.GameObjectives[1].Goal, 10)
+
+	assert.Equal(t, gc.GameObjectives[2].ObjectiveID, "collect4princesses")
+	assert.Equal(t, gc.GameObjectives[2].Goal, 4)
+
+	t.Logf("Test_LoadGATIGameConfig OK")
+}
