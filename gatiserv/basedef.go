@@ -84,7 +84,7 @@ type PlayResult struct {
 	Results       []*Result            `json:"results"`
 	NextCommands  []string             `json:"nextCommands"`
 	AnalyticsData AnalyticsData        `json:"analyticsData"`
-	BoostData     string               `json:"boostData"`
+	BoostData     interface{}          `json:"boostData"`
 }
 
 // CriticalComponent -
@@ -128,4 +128,17 @@ type VersionInfo struct {
 type GATIGameInfo struct {
 	Components map[int]*GATICriticalComponent `json:"components"`
 	Info       VersionInfo                    `json:"info"`
+}
+
+// MissionObject -
+type MissionObject struct {
+	ObjectiveID string `json:"objectiveId"`
+	Description string `json:"description"`
+	Goal        int    `json:"goal"`
+	Period      int    `json:"period"`
+}
+
+// GATIGameConfig - game_configuration.json
+type GATIGameConfig struct {
+	GameObjectives []*MissionObject `json:"gameObjectives"`
 }

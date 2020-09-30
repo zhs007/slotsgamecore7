@@ -184,3 +184,18 @@ func (sv *BasicService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum
 func (sv *BasicService) Version() *VersionInfo {
 	return &sv.GameInfo.Info
 }
+
+// NewBoostData - new a BoostData
+func (sv *BasicService) NewBoostData() interface{} {
+	return nil
+}
+
+// NewPlayerBoostData - new a PlayerBoostData
+func (sv *BasicService) NewPlayerBoostData() interface{} {
+	return nil
+}
+
+// OnPlayBoostData - after call Play
+func (sv *BasicService) OnPlayBoostData(params *PlayParams, result *PlayResult) error {
+	return nil
+}

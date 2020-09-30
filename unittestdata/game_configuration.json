@@ -1,0 +1,22 @@
+{
+  "gameObjectives": [
+    {
+      "objectiveId": "50freespins",
+      "description": "Play 50 freespins",
+      "goal": 50,
+      "period": 1
+    },
+    {
+      "objectiveId": "10luckyspins",
+      "description": "Play 10 lucky spins",
+      "goal": 10,
+      "period": 1
+    },
+    {
+      "objectiveId": "collect4princesses",
+      "description": "Collect 4 princesses",
+      "goal": 4,
+      "period": 1
+    }
+  ]
+}

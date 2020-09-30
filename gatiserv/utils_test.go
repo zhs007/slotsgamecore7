@@ -101,10 +101,10 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, ps)
 
-	ips := sgc7game.NewBasicPlayerState("BG")
+	ips := sgc7game.NewBasicPlayerState("BG", sgc7game.NewBPSNoBoostData)
 	str, err = BuildPlayerStateString(ips)
 	assert.Nil(t, err)
-	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}")
+	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\",\\\"boostdata\\\":null}\",\"playerStatePrivate\":\"{}\"}")
 
 	ps, err = ParsePlayerState(str)
 	assert.Nil(t, err)
@@ -155,7 +155,7 @@ func Test_ParsePlayParams(t *testing.T) {
 	assert.Equal(t, pp.Stake.CashBet, 1.0)
 	assert.Equal(t, pp.Stake.Currency, "EUR")
 
-	bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private)
+	bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private, sgc7game.NewBPSNoBoostData)
 	assert.Equal(t, bps.Public.CurGameMod, "BG")
 
 	assert.Equal(t, pp.Params, "")

@@ -18,4 +18,10 @@ type IService interface {
 	Checksum(lst []*CriticalComponent) ([]*ComponentChecksum, error)
 	// Version - version
 	Version() *VersionInfo
+	// NewBoostData - new a BoostData
+	NewBoostData() interface{}
+	// NewPlayerBoostData - new a PlayerBoostData
+	NewPlayerBoostData() interface{}
+	// OnPlayBoostData - after call Play
+	OnPlayBoostData(params *PlayParams, result *PlayResult) error
 }

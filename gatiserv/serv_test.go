@@ -92,6 +92,21 @@ func (sv *testService) Version() *VersionInfo {
 	return &VersionInfo{}
 }
 
+// NewBoostData - new a BoostData
+func (sv *testService) NewBoostData() interface{} {
+	return nil
+}
+
+// NewPlayerBoostData - new a PlayerBoostData
+func (sv *testService) NewPlayerBoostData() interface{} {
+	return nil
+}
+
+// OnPlayBoostData - after call Play
+func (sv *testService) OnPlayBoostData(params *PlayParams, result *PlayResult) error {
+	return nil
+}
+
 func Test_Serv(t *testing.T) {
 	sgc7utils.InitLogger("", "", "debug", true, "")
 
@@ -172,7 +187,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\",\\\"boostdata\\\":null}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
 
 	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/initialize", nil, nil)
 	if err != nil {

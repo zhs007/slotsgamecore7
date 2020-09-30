@@ -42,7 +42,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			plugin := game.NewPlugin()
 			defer game.FreePlugin(plugin)
 
-			ps := sgc7game.NewBasicPlayerState("bg")
+			ps := sgc7game.NewBasicPlayerState("bg", sgc7game.NewBPSNoBoostData)
 			results := []*sgc7game.PlayResult{}
 			cmd := "SPIN"
 			off := 0
