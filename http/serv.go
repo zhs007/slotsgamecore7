@@ -107,6 +107,7 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 	ctx.SetBody(b)
 
 	sgc7utils.Debug("gatiserv.Serv.SetResponse",
+		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.String("body", string(b)))
 }
 
@@ -117,6 +118,7 @@ func (s *Serv) SetStringResponse(ctx *fasthttp.RequestCtx, str string) {
 	ctx.SetBody([]byte(str))
 
 	sgc7utils.Debug("gatiserv.Serv.SetStringResponse",
+		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.String("body", str))
 }
 
@@ -125,6 +127,7 @@ func (s *Serv) SetHTTPStatus(ctx *fasthttp.RequestCtx, statusCode int) {
 	ctx.SetStatusCode(statusCode)
 
 	sgc7utils.Debug("gatiserv.Serv.SetHTTPStatus",
+		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.Int("statusCode", statusCode))
 }
 
