@@ -176,6 +176,9 @@ func NewServ(service IService, cfg *Config) *Serv {
 	gc := s.Service.GetGameConfig()
 	if gc != nil {
 		for _, v := range gc.GameObjectives {
+			sgc7utils.Info("gatiserv.Serv.RegHandle",
+				zap.String("id", v.ObjectiveID))
+
 			s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/evaluate/"+v.ObjectiveID),
 				func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 					if !ctx.Request.Header.IsPost() {
