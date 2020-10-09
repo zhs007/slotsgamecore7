@@ -225,6 +225,19 @@ func (sv *BasicService) GetGameConfig() *GATIGameConfig {
 func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateResult, error) {
 	result := &EvaluateResult{}
 
+	var mc *MissionObject
+	for _, v := range sv.GameConfig.GameObjectives {
+		if v.ObjectiveID == id {
+			mc = v
+
+			break
+		}
+	}
+
+	if mc == nil {
+		return nil, ErrInvalidObjectiveID
+	}
+
 	var cs *BasicMissionState
 	if params.State == nil {
 		result.State = &BasicMissionStateMap{
@@ -233,15 +246,19 @@ func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateRe
 
 		cs = &BasicMissionState{
 			ObjectiveID: id,
+			Goal:        mc.Goal,
 		}
 	} else {
 		cs1, isok := params.State.MapState[id]
 		if !isok {
 			cs = &BasicMissionState{
 				ObjectiveID: id,
+				Goal:        mc.Goal,
 			}
 		} else {
 			cs = cs1
+
+			cs.Goal = mc.Goal
 		}
 	}
 

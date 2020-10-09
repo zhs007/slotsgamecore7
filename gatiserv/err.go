@@ -12,6 +12,9 @@ var (
 	// ErrInvalidCriticalComponentID - invalid CriticalComponentID
 	ErrInvalidCriticalComponentID = errors.New("invalid CriticalComponentID")
 
+	// ErrInvalidObjectiveID - invalid ObjectiveID
+	ErrInvalidObjectiveID = errors.New("invalid ObjectiveID")
+
 	// ErrNonStatusOK - non statusOK
 	ErrNonStatusOK = errors.New("non statusOK")
 )
