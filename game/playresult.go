@@ -52,10 +52,12 @@ func JSON2PlayResult(buf []byte, pr *PlayResult) (*PlayResult, error) {
 }
 
 // CountEndingSymbols - count symbol number
-func (pr *PlayResult) CountEndingSymbols(isSymbol FuncIsSymbol) int {
+func (pr *PlayResult) CountEndingSymbols(symbols []int) []int {
 	if len(pr.Scenes) > 0 {
-		return CountSymbols(pr.Scenes[len(pr.Scenes)-1], isSymbol)
+		cs := pr.Scenes[len(pr.Scenes)-1]
+
+		return cs.CountSymbols(symbols)
 	}
 
-	return 0
+	return nil
 }

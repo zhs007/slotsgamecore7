@@ -205,17 +205,17 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	return nil
 }
 
-// CountSymbols - count symbol number
-func CountSymbols(scene *GameScene, isSymbol FuncIsSymbol) int {
-	nums := 0
+// // CountSymbols - count symbol number
+// func CountSymbols(scene *GameScene, isSymbol FuncIsSymbol) int {
+// 	nums := 0
 
-	for x := 0; x < len(scene.Arr); x++ {
-		for y := 0; y < len(scene.Arr[x]); y++ {
-			if isSymbol(scene.Arr[x][y]) {
-				nums++
-			}
-		}
-	}
+// 	for x := 0; x < len(scene.Arr); x++ {
+// 		for y := 0; y < len(scene.Arr[x]); y++ {
+// 			if isSymbol(scene.Arr[x][y]) {
+// 				nums++
+// 			}
+// 		}
+// 	}
 
-	return nums
-}
+// 	return nums
+// }
