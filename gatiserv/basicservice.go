@@ -224,10 +224,24 @@ func (sv *BasicService) GetGameConfig() *GATIGameConfig {
 // Evaluate -
 func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateResult, error) {
 	result := &EvaluateResult{}
-	cs, isok := params.State.MapState[id]
-	if !isok {
+
+	var cs *BasicMissionState
+	if params.State == nil {
+		result.State = &BasicMissionStateMap{
+			MapState: make(map[string]*BasicMissionState),
+		}
+
 		cs = &BasicMissionState{
 			ObjectiveID: id,
+		}
+	} else {
+		cs1, isok := params.State.MapState[id]
+		if !isok {
+			cs = &BasicMissionState{
+				ObjectiveID: id,
+			}
+		} else {
+			cs = cs1
 		}
 	}
 
