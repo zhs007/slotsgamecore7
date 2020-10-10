@@ -85,9 +85,11 @@ func Test_ClientInitialize(t *testing.T) {
 			return httpmock.NewStringResponder(404, "")(req)
 		})
 
-	ps, err := client.Initialize()
+	ps := &PlayerState{}
+
+	err := client.Initialize(ps)
 	assert.Equal(t, err, ErrNonStatusOK, "Test_ClientInitialize Initialize")
-	assert.Nil(t, ps, "Test_ClientInitialize Initialize")
+	// assert.Nil(t, ps, "Test_ClientInitialize Initialize")
 
 	httpmock.RegisterResponder("GET",
 		configURL,
@@ -95,9 +97,9 @@ func Test_ClientInitialize(t *testing.T) {
 			return nil, ErrNonStatusOK
 		})
 
-	ps, err = client.Initialize()
+	err = client.Initialize(ps)
 	assert.NotNil(t, err, "Test_ClientInitialize Initialize")
-	assert.Nil(t, ps, "Test_ClientInitialize Initialize")
+	// assert.Nil(t, ps, "Test_ClientInitialize Initialize")
 
 	httpmock.RegisterResponder("GET",
 		configURL,
@@ -105,9 +107,9 @@ func Test_ClientInitialize(t *testing.T) {
 			return httpmock.NewStringResponder(200, "")(req)
 		})
 
-	ps, err = client.Initialize()
+	err = client.Initialize(ps)
 	assert.NotNil(t, err, "Test_ClientInitialize Initialize")
-	assert.Nil(t, ps, "Test_ClientInitialize Initialize")
+	// assert.Nil(t, ps, "Test_ClientInitialize Initialize")
 
 	httpmock.RegisterResponder("GET",
 		configURL,
@@ -119,9 +121,27 @@ func Test_ClientInitialize(t *testing.T) {
 			return httpmock.NewStringResponder(200, string(resbuff))(req)
 		})
 
-	ps, err = client.Initialize()
+	err = client.Initialize(ps)
 	assert.Nil(t, err, "Test_ClientInitialize Initialize")
 	assert.NotNil(t, ps, "Test_ClientInitialize Initialize")
+
+	httpmock.RegisterResponder("GET",
+		configURL,
+		func(req *http.Request) (*http.Response, error) {
+			return httpmock.NewStringResponder(200, "{\"playerStatePublic\":{\"curgamemod\":\"BG\"},\"playerStatePrivate\":{}}")(req)
+		})
+
+	ps = &PlayerState{
+		Public:  &sgc7game.BasicPlayerPublicState{},
+		Private: &sgc7game.BasicPlayerPrivateState{},
+	}
+	err = client.Initialize(ps)
+	assert.Nil(t, err, "Test_ClientInitialize Initialize")
+	assert.NotNil(t, ps, "Test_ClientInitialize Initialize")
+
+	bps, isok := ps.Public.(*sgc7game.BasicPlayerPublicState)
+	assert.Equal(t, isok, true)
+	assert.Equal(t, bps.CurGameMod, "BG")
 
 	t.Logf("Test_ClientInitialize OK")
 }

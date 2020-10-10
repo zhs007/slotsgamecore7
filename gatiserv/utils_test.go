@@ -105,7 +105,12 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, str, "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}")
 
-	ps, err := ParsePlayerState(str)
+	ps := &PlayerState{
+		Public:  &sgc7game.BasicPlayerPublicState{},
+		Private: &sgc7game.BasicPlayerPrivateState{},
+	}
+
+	err = ParsePlayerState(str, ps)
 	assert.Nil(t, err)
 	assert.NotNil(t, ps)
 
@@ -114,13 +119,13 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, str, "{\"playerStatePublic\":{\"curgamemod\":\"BG\"},\"playerStatePrivate\":{}}")
 
-	ps, err = ParsePlayerState(str)
+	err = ParsePlayerState(str, ps)
 	assert.Nil(t, err)
 	assert.NotNil(t, ps)
 
-	ps, err = ParsePlayerState("")
+	err = ParsePlayerState("", ps)
 	assert.NotNil(t, err)
-	assert.Nil(t, ps)
+	// assert.Nil(t, ps)
 
 	// eps := &errPlayerState{}
 	// str, err = BuildPlayerStateString(eps)
