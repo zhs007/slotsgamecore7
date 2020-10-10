@@ -12,10 +12,10 @@
             "remotePath": "",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceFolder}/rtp/rtp_test.go",
+            "program": "${workspaceFolder}/gatiserv/serv_test.go",
             "env": {},
             "args": [],
-            "cwd": "${workspaceFolder}/rtp",
+            "cwd": "${workspaceFolder}/gatiserv",
             "showLog": true
         }
     ]

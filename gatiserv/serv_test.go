@@ -279,11 +279,32 @@ func Test_Serv(t *testing.T) {
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
+	playParams = &PlayParams{
+		PlayerState: &PlayerState{
+			Public: &sgc7game.BasicPlayerPublicState{
+				CurGameMod: "BG",
+			},
+			Private: &sgc7game.BasicPlayerPrivateState{},
+		},
+	}
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/play", nil, playParams)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
 	clientcfg, err := client.GetConfig()
 	assert.Nil(t, err)
 	assert.NotNil(t, clientcfg)
 
-	clientps, err := client.Initialize()
+	clientps := &PlayerState{
+		Public:  &sgc7game.BasicPlayerPublicState{},
+		Private: &sgc7game.BasicPlayerPrivateState{},
+	}
+	err = client.Initialize(clientps)
 	assert.Nil(t, err)
 	assert.NotNil(t, clientps)
 

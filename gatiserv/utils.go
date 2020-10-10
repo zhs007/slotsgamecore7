@@ -82,20 +82,19 @@ func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
 }
 
 // ParsePlayerState - json => PlayerState
-func ParsePlayerState(str string) (*PlayerState, error) {
+func ParsePlayerState(str string, ps *PlayerState) error {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	ps := &PlayerState{}
 	err := json.Unmarshal([]byte(str), ps)
 	if err != nil {
 		sgc7utils.Error("gatiserv.ParsePlayerState:JSON",
 			zap.String("str", str),
 			zap.Error(err))
 
-		return nil, err
+		return err
 	}
 
-	return ps, nil
+	return nil
 }
 
 // BuildStake - PlayerState => sgc7game.IPlayerState
