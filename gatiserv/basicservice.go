@@ -49,8 +49,13 @@ func (sv *BasicService) Config() *sgc7game.Config {
 }
 
 // Initialize - initialize a player
-func (sv *BasicService) Initialize() sgc7game.IPlayerState {
-	return sv.Game.Initialize()
+func (sv *BasicService) Initialize() *PlayerState {
+	ips := sv.Game.Initialize()
+
+	return &PlayerState{
+		Public:  ips.GetPrivate(),
+		Private: ips.GetPrivate(),
+	}
 }
 
 // Validate - validate game
@@ -61,7 +66,7 @@ func (sv *BasicService) Validate(params *ValidateParams) []ValidationError {
 // Play - play game
 func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	ips := sv.Game.NewPlayerState()
-	if params.PlayerState.Public != "" || params.PlayerState.Private != "" {
+	if params.PlayerState != nil {
 		err := BuildIPlayerState(ips, params.PlayerState)
 		if err != nil {
 			sgc7utils.Error("BasicService.Play:BuildIPlayerState",
