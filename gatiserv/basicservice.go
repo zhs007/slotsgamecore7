@@ -301,13 +301,13 @@ func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateRe
 		}
 	}
 
-	if result.Progress <= 0 {
-		if cs.Current > 0 {
-			result.Progress = cs.Current
-		} else if len(cs.Arr) > 0 {
-			result.Progress = len(cs.Arr)
-		}
-	}
+	// if result.Progress <= 0 {
+	// 	if cs.Current > 0 {
+	// 		result.Progress = cs.Current
+	// 	} else if len(cs.Arr) > 0 {
+	// 		result.Progress = len(cs.Arr)
+	// 	}
+	// }
 
 	return result, nil
 }
