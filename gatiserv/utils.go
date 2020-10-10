@@ -10,13 +10,13 @@ import (
 )
 
 // BuildIPlayerState - PlayerState => sgc7game.IPlayerState
-func BuildIPlayerState(ips sgc7game.IPlayerState, ps PlayerState) error {
-	err := ips.SetPublicString(ps.Public)
+func BuildIPlayerState(ips sgc7game.IPlayerState, ps *PlayerState) error {
+	err := ips.SetPublic(ps.Public)
 	if err != nil {
 		return err
 	}
 
-	err = ips.SetPrivateString(ps.Private)
+	err = ips.SetPrivate(ps.Private)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	if ps == nil {
-		return "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}", nil
+		return "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}", nil
 	}
 
 	dps, err := BuildPlayerState(ps)
@@ -53,31 +53,31 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 
 // BuildPlayerState - sgc7game.IPlayerState => PlayerState
 func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	// json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	if ips == nil {
 		return nil, nil
 	}
 
-	psb, err := json.Marshal(ips.GetPublic())
-	if err != nil {
-		sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPublic",
-			zap.Error(err))
+	// psb, err := json.Marshal(ips.GetPublic())
+	// if err != nil {
+	// 	sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPublic",
+	// 		zap.Error(err))
 
-		return nil, err
-	}
+	// 	return nil, err
+	// }
 
-	psp, err := json.Marshal(ips.GetPrivate())
-	if err != nil {
-		sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPrivate",
-			zap.Error(err))
+	// psp, err := json.Marshal(ips.GetPrivate())
+	// if err != nil {
+	// 	sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPrivate",
+	// 		zap.Error(err))
 
-		return nil, err
-	}
+	// 	return nil, err
+	// }
 
 	return &PlayerState{
-		Public:  string(psb),
-		Private: string(psp),
+		Public:  ips.GetPublic(),
+		Private: ips.GetPrivate(),
 	}, nil
 }
 
@@ -140,11 +140,13 @@ func AddPlayResult(pr *PlayResult, stake Stake, results []*sgc7game.PlayResult) 
 }
 
 // ParsePlayParams - string => *PlayParams
-func ParsePlayParams(str string) (*PlayParams, error) {
+func ParsePlayParams(str string, ps *PlayerState) (*PlayParams, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	ps := &PlayParams{}
-	err := json.Unmarshal([]byte(str), ps)
+	pp := &PlayParams{
+		PlayerState: ps,
+	}
+	err := json.Unmarshal([]byte(str), pp)
 	if err != nil {
 		sgc7utils.Error("gatiserv.ParsePlayParams:JSON",
 			zap.String("str", str),
@@ -153,7 +155,7 @@ func ParsePlayParams(str string) (*PlayParams, error) {
 		return nil, err
 	}
 
-	return ps, nil
+	return pp, nil
 }
 
 // ParsePlayResult - string => *PlayResult

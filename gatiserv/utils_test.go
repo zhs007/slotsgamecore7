@@ -24,15 +24,15 @@ func (eps *errPlayerState) SetPrivate(pri interface{}) error {
 	return nil
 }
 
-// SetPublicString - set player public state
-func (eps *errPlayerState) SetPublicString(pub string) error {
-	return nil
-}
+// // SetPublicString - set player public state
+// func (eps *errPlayerState) SetPublicString(pub string) error {
+// 	return nil
+// }
 
-// SetPrivateString - set player private state
-func (eps *errPlayerState) SetPrivateString(pri string) error {
-	return nil
-}
+// // SetPrivateString - set player private state
+// func (eps *errPlayerState) SetPrivateString(pri string) error {
+// 	return nil
+// }
 
 // GetPublic - get player public state
 func (eps *errPlayerState) GetPublic() interface{} {
@@ -47,45 +47,53 @@ func (eps *errPlayerState) GetPrivate() interface{} {
 func Test_BuildIPlayerState(t *testing.T) {
 	ips := &sgc7game.BasicPlayerState{}
 
-	err := BuildIPlayerState(ips, PlayerState{
-		Public:  "{\"curgamemod\":\"BG\"}",
-		Private: "{}",
+	err := BuildIPlayerState(ips, &PlayerState{
+		Public: &sgc7game.BasicPlayerPublicState{
+			CurGameMod: "BG",
+		},
+		Private: &sgc7game.BasicPlayerPrivateState{},
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, ips.Public.CurGameMod, "BG")
 
-	pbs, isok := ips.GetPublic().(sgc7game.BasicPlayerPublicState)
+	pbs, isok := ips.GetPublic().(*sgc7game.BasicPlayerPublicState)
 	assert.Equal(t, isok, true)
 	assert.Equal(t, pbs.CurGameMod, "BG")
 
-	pps, isok := ips.GetPrivate().(sgc7game.BasicPlayerPrivateState)
+	pps, isok := ips.GetPrivate().(*sgc7game.BasicPlayerPrivateState)
 	assert.Equal(t, isok, true)
 	assert.NotNil(t, pps)
 
-	err = BuildIPlayerState(ips, PlayerState{
-		Public:  "",
-		Private: "",
+	err = BuildIPlayerState(ips, &PlayerState{
+		Public:  &sgc7game.BasicPlayerPublicState{},
+		Private: &sgc7game.BasicPlayerPrivateState{},
 	})
-	assert.NotNil(t, err)
+	assert.NoError(t, err)
 
-	err = BuildIPlayerState(ips, PlayerState{
-		Public:  "{}",
-		Private: "",
+	err = BuildIPlayerState(ips, &PlayerState{
+		Public:  &sgc7game.BasicPlayerPrivateState{},
+		Private: &sgc7game.BasicPlayerPrivateState{},
 	})
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
-	err = BuildIPlayerState(ips, PlayerState{
-		Public:  "{}",
-		Private: "{}",
-	})
-	assert.Nil(t, err)
+	// err = BuildIPlayerState(ips, PlayerState{
+	// 	Public:  "{}",
+	// 	Private: "",
+	// })
+	// assert.NotNil(t, err)
 
-	pbs, isok = ips.GetPublic().(sgc7game.BasicPlayerPublicState)
+	// err = BuildIPlayerState(ips, PlayerState{
+	// 	Public:  "{}",
+	// 	Private: "{}",
+	// })
+	// assert.Nil(t, err)
+
+	pbs, isok = ips.GetPublic().(*sgc7game.BasicPlayerPublicState)
 	assert.Equal(t, isok, true)
 	assert.NotNil(t, pbs)
 
-	pps, isok = ips.GetPrivate().(sgc7game.BasicPlayerPrivateState)
+	pps, isok = ips.GetPrivate().(*sgc7game.BasicPlayerPrivateState)
 	assert.Equal(t, isok, true)
 	assert.NotNil(t, pps)
 
@@ -95,7 +103,7 @@ func Test_BuildIPlayerState(t *testing.T) {
 func Test_BuildPlayerStateString(t *testing.T) {
 	str, err := BuildPlayerStateString(nil)
 	assert.Nil(t, err)
-	assert.Equal(t, str, "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}")
+	assert.Equal(t, str, "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}")
 
 	ps, err := ParsePlayerState(str)
 	assert.Nil(t, err)
@@ -104,7 +112,7 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	ips := sgc7game.NewBasicPlayerState("BG")
 	str, err = BuildPlayerStateString(ips)
 	assert.Nil(t, err)
-	assert.Equal(t, str, "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}")
+	assert.Equal(t, str, "{\"playerStatePublic\":{\"curgamemod\":\"BG\"},\"playerStatePrivate\":{}}")
 
 	ps, err = ParsePlayerState(str)
 	assert.Nil(t, err)
@@ -147,7 +155,13 @@ func Test_BuildStake(t *testing.T) {
 }
 
 func Test_ParsePlayParams(t *testing.T) {
-	pp, err := ParsePlayParams("{\"stakeValue\":{\"coinBet\":0.0500,\"cashBet\":1.00,\"currency\":\"EUR\"},\"playerState\":{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"},\"clientParams\":null,\"cheat\":\"\",\"command\":\"\",\"freespinsActive\":false,\"jackpotStakeValue\":null,\"jackpotValues\":null}")
+	bps := sgc7game.NewBasicPlayerState("")
+	pp, err := ParsePlayParams(
+		"{\"stakeValue\":{\"coinBet\":0.0500,\"cashBet\":1.00,\"currency\":\"EUR\"},\"playerState\":{\"playerStatePublic\":{\"curgamemod\":\"BG\"},\"playerStatePrivate\":{}},\"clientParams\":null,\"cheat\":\"\",\"command\":\"\",\"freespinsActive\":false,\"jackpotStakeValue\":null,\"jackpotValues\":null}",
+		&PlayerState{
+			Public:  bps.GetPublic(),
+			Private: bps.GetPrivate(),
+		})
 	assert.Nil(t, err)
 	assert.NotNil(t, pp)
 
@@ -155,8 +169,10 @@ func Test_ParsePlayParams(t *testing.T) {
 	assert.Equal(t, pp.Stake.CashBet, 1.0)
 	assert.Equal(t, pp.Stake.Currency, "EUR")
 
-	bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private)
-	assert.Equal(t, bps.Public.CurGameMod, "BG")
+	// bps := sgc7game.NewBasicPlayerStateEx(pp.PlayerState.Public, pp.PlayerState.Private)
+	bpsp, isok := pp.PlayerState.Public.(*sgc7game.BasicPlayerPublicState)
+	assert.Equal(t, isok, true)
+	assert.Equal(t, bpsp.CurGameMod, "BG")
 
 	assert.Equal(t, pp.Params, "")
 
@@ -170,7 +186,10 @@ func Test_ParsePlayParams(t *testing.T) {
 
 	assert.Nil(t, pp.JackpotValues)
 
-	pp, err = ParsePlayParams("")
+	pp, err = ParsePlayParams("", &PlayerState{
+		Public:  bps.GetPublic(),
+		Private: bps.GetPrivate(),
+	})
 	assert.NotNil(t, err)
 	assert.Nil(t, pp)
 
