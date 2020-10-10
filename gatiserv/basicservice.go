@@ -53,7 +53,7 @@ func (sv *BasicService) Initialize() *PlayerState {
 	ips := sv.Game.Initialize()
 
 	return &PlayerState{
-		Public:  ips.GetPrivate(),
+		Public:  ips.GetPublic(),
 		Private: ips.GetPrivate(),
 	}
 }
