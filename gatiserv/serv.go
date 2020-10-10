@@ -2,6 +2,7 @@ package gatiserv
 
 import (
 	"github.com/valyala/fasthttp"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
@@ -109,6 +110,12 @@ func NewServ(service IService, cfg *Config) *Serv {
 			if err != nil {
 				sgc7utils.Warn("gatiserv.Serv.play:Play",
 					zap.Error(err))
+
+				if err == sgc7game.ErrInvalidStake {
+					s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+					return
+				}
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 
