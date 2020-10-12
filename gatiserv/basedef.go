@@ -118,7 +118,7 @@ type GATICriticalComponents struct {
 type VersionInfo struct {
 	GameTitle     string `json:"gameTitle"`
 	GameVersion   string `json:"gameVersion"`
-	VSCVersion    string `json:"vscVersion"`
+	VCSVersion    string `json:"vcsVersion"`
 	BuildChecksum string `json:"buildChecksum"`
 	BuildTime     string `json:"buildTime"`
 	Vendor        string `json:"vendor"`
