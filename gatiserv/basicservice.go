@@ -279,8 +279,9 @@ func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateRe
 			if cbd.Type == 0 {
 				cs.Current += cbd.Counter
 
-				result.Progress = cs.Current
+				result.Progress += cbd.Counter
 			} else if cbd.Type == 1 {
+				ln := len(cs.Arr)
 				for _, n := range cbd.Arr {
 					hasn := false
 					for _, sn := range cs.Arr {
@@ -296,7 +297,7 @@ func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateRe
 					}
 				}
 
-				result.Progress = len(cs.Arr)
+				result.Progress += len(cs.Arr) - ln
 			}
 		}
 	}
