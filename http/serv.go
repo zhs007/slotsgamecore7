@@ -46,7 +46,7 @@ func (s *Serv) HandleFastHTTP(ctx *fasthttp.RequestCtx) {
 	if isok && h != nil {
 		h(ctx, s)
 	} else {
-		s.SetHTTPStatus(ctx, fasthttp.StatusNotFound)
+		s.SetHTTPStatus(ctx, fasthttp.StatusMethodNotAllowed)
 	}
 }
 

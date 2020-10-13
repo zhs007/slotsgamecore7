@@ -186,7 +186,7 @@ func Test_Serv(t *testing.T) {
 			err)
 	}
 
-	assert.Equal(t, sc, 404, "they should be equal")
+	assert.Equal(t, sc, 405, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
 	sc, buff, err = HTTPPost("http://127.0.0.1:7890/index?a=123&b=hello", nil, nil)
