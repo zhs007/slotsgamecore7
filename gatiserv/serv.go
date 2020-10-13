@@ -2,6 +2,7 @@ package gatiserv
 
 import (
 	"github.com/valyala/fasthttp"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
@@ -50,17 +51,22 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 
 			ps := s.Service.Initialize()
-			str, err := BuildPlayerStateString(ps)
-			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.initialize:BuildPlayerStateString",
-					zap.Error(err))
-
-				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+			if ps == nil {
+				s.SetStringResponse(ctx, "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}")
 
 				return
 			}
+			// str, err := BuildPlayerStateString(ps)
+			// if err != nil {
+			// 	sgc7utils.Warn("gatiserv.Serv.initialize:BuildPlayerStateString",
+			// 		zap.Error(err))
 
-			s.SetStringResponse(ctx, str)
+			// 	s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+
+			// 	return
+			// }
+
+			s.SetResponse(ctx, ps)
 		})
 
 	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/validate"),
@@ -94,7 +100,9 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			params := &PlayParams{}
+			params := &PlayParams{
+				PlayerState: s.Service.Initialize(),
+			}
 			err := s.ParseBody(ctx, params)
 			if err != nil {
 				sgc7utils.Warn("gatiserv.Serv.play:ParseBody",
@@ -109,6 +117,12 @@ func NewServ(service IService, cfg *Config) *Serv {
 			if err != nil {
 				sgc7utils.Warn("gatiserv.Serv.play:Play",
 					zap.Error(err))
+
+				if err == sgc7game.ErrInvalidStake {
+					s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+					return
+				}
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 

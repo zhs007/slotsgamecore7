@@ -49,8 +49,13 @@ func (sv *BasicService) Config() *sgc7game.Config {
 }
 
 // Initialize - initialize a player
-func (sv *BasicService) Initialize() sgc7game.IPlayerState {
-	return sv.Game.Initialize()
+func (sv *BasicService) Initialize() *PlayerState {
+	ips := sv.Game.Initialize()
+
+	return &PlayerState{
+		Public:  ips.GetPublic(),
+		Private: ips.GetPrivate(),
+	}
 }
 
 // Validate - validate game
@@ -61,7 +66,7 @@ func (sv *BasicService) Validate(params *ValidateParams) []ValidationError {
 // Play - play game
 func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	ips := sv.Game.NewPlayerState()
-	if params.PlayerState.Public != "" || params.PlayerState.Private != "" {
+	if params.PlayerState != nil {
 		err := BuildIPlayerState(ips, params.PlayerState)
 		if err != nil {
 			sgc7utils.Error("BasicService.Play:BuildIPlayerState",
@@ -274,8 +279,9 @@ func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateRe
 			if cbd.Type == 0 {
 				cs.Current += cbd.Counter
 
-				result.Progress = cs.Current
+				result.Progress += cbd.Counter
 			} else if cbd.Type == 1 {
+				ln := len(cs.Arr)
 				for _, n := range cbd.Arr {
 					hasn := false
 					for _, sn := range cs.Arr {
@@ -291,18 +297,18 @@ func (sv *BasicService) Evaluate(params *EvaluateParams, id string) (*EvaluateRe
 					}
 				}
 
-				result.Progress = len(cs.Arr)
+				result.Progress += len(cs.Arr) - ln
 			}
 		}
 	}
 
-	if result.Progress <= 0 {
-		if cs.Current > 0 {
-			result.Progress = cs.Current
-		} else if len(cs.Arr) > 0 {
-			result.Progress = len(cs.Arr)
-		}
-	}
+	// if result.Progress <= 0 {
+	// 	if cs.Current > 0 {
+	// 		result.Progress = cs.Current
+	// 	} else if len(cs.Arr) > 0 {
+	// 		result.Progress = len(cs.Arr)
+	// 	}
+	// }
 
 	return result, nil
 }

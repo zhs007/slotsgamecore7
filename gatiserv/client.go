@@ -60,7 +60,7 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 }
 
 // Initialize - initialize a player
-func (client *Client) Initialize() (*PlayerState, error) {
+func (client *Client) Initialize(ps *PlayerState) error {
 
 	sc, buff, err := sgc7http.HTTPGet(
 		sgc7utils.AppendString(client.ServURL, "initialize"),
@@ -70,7 +70,7 @@ func (client *Client) Initialize() (*PlayerState, error) {
 			zap.String("ServURL", client.ServURL),
 			zap.Error(err))
 
-		return nil, err
+		return err
 	}
 
 	if sc != fasthttp.StatusOK {
@@ -78,20 +78,20 @@ func (client *Client) Initialize() (*PlayerState, error) {
 			zap.String("ServURL", client.ServURL),
 			zap.Int("status", sc))
 
-		return nil, ErrNonStatusOK
+		return ErrNonStatusOK
 	}
 
-	ps, err := ParsePlayerState(string(buff))
+	err = ParsePlayerState(string(buff), ps)
 	if err != nil {
 		sgc7utils.Error("gatiserv.Client.Initialize:ParsePlayerState",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buff)),
 			zap.Error(err))
 
-		return nil, err
+		return err
 	}
 
-	return ps, nil
+	return nil
 }
 
 // PlayEx - play with string parameter

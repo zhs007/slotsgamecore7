@@ -7,8 +7,8 @@ import (
 
 // PlayerState - player state
 type PlayerState struct {
-	Public  string `json:"playerStatePublic"`
-	Private string `json:"playerStatePrivate"`
+	Public  interface{} `json:"playerStatePublic"`
+	Private interface{} `json:"playerStatePrivate"`
 }
 
 // Stake - stake
@@ -65,7 +65,7 @@ type ValidationError struct {
 
 // PlayParams - play input parameters for the game
 type PlayParams struct {
-	PlayerState       PlayerState        `json:"playerState"`
+	PlayerState       *PlayerState       `json:"playerState"`
 	Cheat             string             `json:"cheat"`
 	Stake             Stake              `json:"stakeValue"`
 	Params            string             `json:"clientParams"`
@@ -118,7 +118,7 @@ type GATICriticalComponents struct {
 type VersionInfo struct {
 	GameTitle     string `json:"gameTitle"`
 	GameVersion   string `json:"gameVersion"`
-	VSCVersion    string `json:"vscVersion"`
+	VCSVersion    string `json:"vcsVersion"`
 	BuildChecksum string `json:"buildChecksum"`
 	BuildTime     string `json:"buildTime"`
 	Vendor        string `json:"vendor"`

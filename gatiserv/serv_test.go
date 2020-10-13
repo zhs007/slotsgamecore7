@@ -28,15 +28,15 @@ func (ps *testPlayerState) SetPrivate(pri interface{}) error {
 	return nil
 }
 
-// SetPublicString - set player public state
-func (ps *testPlayerState) SetPublicString(pub string) error {
-	return nil
-}
+// // SetPublicString - set player public state
+// func (ps *testPlayerState) SetPublicString(pub string) error {
+// 	return nil
+// }
 
-// SetPrivateString - set player private state
-func (ps *testPlayerState) SetPrivateString(pri string) error {
-	return nil
-}
+// // SetPrivateString - set player private state
+// func (ps *testPlayerState) SetPrivateString(pri string) error {
+// 	return nil
+// }
 
 // GetPublic - get player public state
 func (ps *testPlayerState) GetPublic() interface{} {
@@ -65,12 +65,17 @@ func (sv *testService) Config() *sgc7game.Config {
 }
 
 // Initialize - initialize a player
-func (sv *testService) Initialize() sgc7game.IPlayerState {
+func (sv *testService) Initialize() *PlayerState {
 	if sv.initmode == 0 {
 		return nil
 	}
 
-	return &testPlayerState{}
+	ips := &testPlayerState{}
+
+	return &PlayerState{
+		Public:  ips.GetPublic(),
+		Private: ips.GetPrivate(),
+	}
 }
 
 // Validate - validate game
@@ -195,7 +200,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}", "they should be equal")
 
 	service.initmode = 1
 
@@ -207,7 +212,7 @@ func Test_Serv(t *testing.T) {
 
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
-	assert.Equal(t, string(buff), "{\"playerStatePublic\":\"{\\\"curgamemod\\\":\\\"BG\\\"}\",\"playerStatePrivate\":\"{}\"}", "they should be equal")
+	assert.Equal(t, string(buff), "{\"playerStatePublic\":{\"curgamemod\":\"BG\"},\"playerStatePrivate\":{}}", "they should be equal")
 
 	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/initialize", nil, nil)
 	if err != nil {
@@ -274,11 +279,32 @@ func Test_Serv(t *testing.T) {
 	assert.Equal(t, sc, 200, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
+	playParams = &PlayParams{
+		PlayerState: &PlayerState{
+			Public: &sgc7game.BasicPlayerPublicState{
+				CurGameMod: "BG",
+			},
+			Private: &sgc7game.BasicPlayerPrivateState{},
+		},
+	}
+	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/play", nil, playParams)
+	if err != nil {
+		t.Fatalf("Test_Serv httpGet error %v",
+			err)
+	}
+
+	assert.Equal(t, sc, 200, "they should be equal")
+	assert.NotNil(t, buff, "there is a valid buffer")
+
 	clientcfg, err := client.GetConfig()
 	assert.Nil(t, err)
 	assert.NotNil(t, clientcfg)
 
-	clientps, err := client.Initialize()
+	clientps := &PlayerState{
+		Public:  &sgc7game.BasicPlayerPublicState{},
+		Private: &sgc7game.BasicPlayerPrivateState{},
+	}
+	err = client.Initialize(clientps)
 	assert.Nil(t, err)
 	assert.NotNil(t, clientps)
 
