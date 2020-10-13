@@ -83,7 +83,7 @@ type PlayResult struct {
 	Finished      bool                      `json:"finished"`
 	Results       []*Result                 `json:"results"`
 	NextCommands  []string                  `json:"nextCommands"`
-	AnalyticsData AnalyticsData             `json:"analyticsData"`
+	AnalyticsData *AnalyticsData            `json:"analyticsData"`
 	BoostData     *BasicMissionBoostDataMap `json:"boostData"`
 }
 
