@@ -71,25 +71,29 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/validate"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
-			if !ctx.Request.Header.IsPost() {
-				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+			s.SetHTTPStatus(ctx, fasthttp.StatusMethodNotAllowed)
 
-				return
-			}
+			return
 
-			params := &ValidateParams{}
-			err := s.ParseBody(ctx, params)
-			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.validate:ParseBody",
-					zap.Error(err))
+			// if !ctx.Request.Header.IsPost() {
+			// 	s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
 
-				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+			// 	return
+			// }
 
-				return
-			}
+			// params := &ValidateParams{}
+			// err := s.ParseBody(ctx, params)
+			// if err != nil {
+			// 	sgc7utils.Warn("gatiserv.Serv.validate:ParseBody",
+			// 		zap.Error(err))
 
-			ret := s.Service.Validate(params)
-			s.SetResponse(ctx, ret)
+			// 	s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
+
+			// 	return
+			// }
+
+			// ret := s.Service.Validate(params)
+			// s.SetResponse(ctx, ret)
 		})
 
 	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/play"),

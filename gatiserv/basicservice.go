@@ -60,7 +60,7 @@ func (sv *BasicService) Initialize() *PlayerState {
 
 // Validate - validate game
 func (sv *BasicService) Validate(params *ValidateParams) []ValidationError {
-	return nil
+	return []ValidationError{}
 }
 
 // Play - play game

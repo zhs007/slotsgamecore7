@@ -229,7 +229,7 @@ func Test_Serv(t *testing.T) {
 			err)
 	}
 
-	assert.Equal(t, sc, 400, "they should be equal")
+	assert.Equal(t, sc, 405, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
 	sc, buff, err = sgc7http.HTTPPost("http://127.0.0.1:7891/v2/games/1019/validate", nil, nil)
@@ -238,7 +238,7 @@ func Test_Serv(t *testing.T) {
 			err)
 	}
 
-	assert.Equal(t, sc, 400, "they should be equal")
+	assert.Equal(t, sc, 405, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
 	validateParams := &ValidateParams{}
@@ -248,7 +248,7 @@ func Test_Serv(t *testing.T) {
 			err)
 	}
 
-	assert.Equal(t, sc, 200, "they should be equal")
+	assert.Equal(t, sc, 405, "they should be equal")
 	assert.NotNil(t, buff, "there is a valid buffer")
 
 	sc, buff, err = sgc7http.HTTPGet("http://127.0.0.1:7891/v2/games/1019/play", nil)
