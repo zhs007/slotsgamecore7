@@ -25,6 +25,8 @@ func Test_FastReelsRandomSP(t *testing.T) {
 			// ?
 			if y >= 1 {
 				arr = append(arr, y-1)
+			} else {
+				arr = append(arr, len(r.Reels[x])+y-1)
 			}
 
 			// ?
@@ -32,6 +34,8 @@ func Test_FastReelsRandomSP(t *testing.T) {
 			// X
 			if y >= 2 {
 				arr = append(arr, y-2)
+			} else {
+				arr = append(arr, len(r.Reels[x])+y-2)
 			}
 
 			return arr
