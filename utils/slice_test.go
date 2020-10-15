@@ -56,3 +56,19 @@ func Test_IndexOfStringSlice(t *testing.T) {
 
 	t.Logf("Test_IndexOfStringSlice OK")
 }
+
+func Test_InsUniqueIntSlice(t *testing.T) {
+	arr := InsUniqueIntSlice([]int{1, 2, 3}, 3)
+	assert.Equal(t, len(arr), 3)
+
+	arr = InsUniqueIntSlice([]int{}, 3)
+	assert.Equal(t, len(arr), 1)
+
+	arr = InsUniqueIntSlice(nil, 3)
+	assert.Equal(t, len(arr), 1)
+
+	arr = InsUniqueIntSlice([]int{1, 2, 3}, 4)
+	assert.Equal(t, len(arr), 4)
+
+	t.Logf("Test_InsUniqueIntSlice OK")
+}

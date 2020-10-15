@@ -48,6 +48,20 @@ func NewGameSceneWithArr(w, h int, arr []int) (*GameScene, error) {
 	return gs, nil
 }
 
+// NewGameSceneWithReels - new a GameScene
+func NewGameSceneWithReels(reels *ReelsData, w, h int, arr []int) (*GameScene, error) {
+	gs := &GameScene{}
+
+	err := gs.Init(w, h)
+	if err != nil {
+		return nil, err
+	}
+
+	gs.Fill(reels, arr)
+
+	return gs, nil
+}
+
 // Init - init scene
 func (gs *GameScene) Init(w int, h int) error {
 	gs.Arr = nil
@@ -199,4 +213,18 @@ func (gs *GameScene) Clone() *GameScene {
 	}
 
 	return ngs
+}
+
+// Fill - fill with reels and indexs
+func (gs *GameScene) Fill(reels *ReelsData, arr []int) {
+	for x, v := range arr {
+		for y := 0; y < gs.Height; y++ {
+			gs.Arr[x][y] = reels.Reels[x][v]
+
+			v++
+			if v >= len(reels.Reels[x]) {
+				v -= len(reels.Reels[x])
+			}
+		}
+	}
 }

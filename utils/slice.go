@@ -45,3 +45,12 @@ func IndexOfStringSlice(arr []string, v string, start int) int {
 
 	return -1
 }
+
+// InsUniqueIntSlice - Insert unique int array
+func InsUniqueIntSlice(arr []int, v int) []int {
+	if IndexOfIntSlice(arr, v, 0) >= 0 {
+		return arr
+	}
+
+	return append(arr, v)
+}
