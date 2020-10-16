@@ -90,7 +90,7 @@ func (sv *testService) Play(params *PlayParams) (*PlayResult, error) {
 
 // Checksum - checksum
 func (sv *testService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum, error) {
-	return nil, nil
+	return []*ComponentChecksum{&ComponentChecksum{ID: 1, Checksum: "1234567"}}, nil
 }
 
 // Version - version
@@ -307,6 +307,15 @@ func Test_Serv(t *testing.T) {
 	err = client.Initialize(clientps)
 	assert.Nil(t, err)
 	assert.NotNil(t, clientps)
+
+	retChecksum, err := client.Checksum([]*CriticalComponent{
+		&CriticalComponent{ID: 1, Name: "test", Location: "test/test"},
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, retChecksum)
+	assert.Equal(t, len(retChecksum), 1)
+	assert.Equal(t, retChecksum[0].ID, 1)
+	assert.Equal(t, retChecksum[0].Checksum, "1234567")
 
 	serv.Stop()
 
