@@ -129,3 +129,52 @@ func (client *Client) PlayEx(param string) (*PlayResult, error) {
 
 	return pr, nil
 }
+
+// Checksum - checksum
+func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	buf, err := json.Marshal(arr)
+	if err != nil {
+		sgc7utils.Error("gatiserv.Client.Checksum:Marshal",
+			zap.String("ServURL", client.ServURL),
+			zap.String("body", string(buf)),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	sc, buff, err := sgc7http.HTTPPostEx(
+		sgc7utils.AppendString(client.ServURL, "checksum"),
+		nil,
+		buf,
+	)
+	if err != nil {
+		sgc7utils.Error("gatiserv.Client.Checksum:HTTPPostEx",
+			zap.String("ServURL", client.ServURL),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	if sc != fasthttp.StatusOK {
+		sgc7utils.Error("gatiserv.Client.Checksum:HTTPPostEx",
+			zap.String("ServURL", client.ServURL),
+			zap.Int("status", sc))
+
+		return nil, ErrNonStatusOK
+	}
+
+	ret := []*ComponentChecksum{}
+	err = json.Unmarshal(buff, &ret)
+	if err != nil {
+		sgc7utils.Error("gatiserv.Client.Checksum:Unmarshal",
+			zap.String("ServURL", client.ServURL),
+			zap.String("body", string(buff)),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return ret, nil
+}

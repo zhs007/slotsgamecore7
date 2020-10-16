@@ -155,7 +155,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 
 			params := []*CriticalComponent{}
-			err := s.ParseBody(ctx, params)
+			err := s.ParseBody(ctx, &params)
 			if err != nil {
 				sgc7utils.Warn("gatiserv.Serv.checksum:ParseBody",
 					zap.Error(err))
