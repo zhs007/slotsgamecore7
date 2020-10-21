@@ -21,5 +21,6 @@ type Result struct {
 	CoinWin   int        `json:"coinwin"`
 	CashWin   int        `json:"cashwin"`
 	Pos       []int      `json:"pos"`
-	HasW      bool       `json:"-"`
+	OtherMul  int        `json:"othermul"`
+	Wilds     int        `json:"wilds"`
 }

@@ -13,6 +13,7 @@ type PlayResult struct {
 	NextGameMod      string       `json:"nextgamemod"`
 	Scenes           []*GameScene `json:"scenes"`
 	Results          []*Result    `json:"results"`
+	MainScene        int          `json:"mainscene"`
 	NextCmds         []string     `json:"-"`
 	NextCmdParams    []string     `json:"-"`
 	CoinWin          int          `json:"-"`
