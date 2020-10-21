@@ -8,6 +8,8 @@ const (
 	RTScatter = 1
 	// RTLine - line
 	RTLine = 2
+	// RTFullLine - full line
+	RTFullLine = 3
 )
 
 // Result - result for slots game

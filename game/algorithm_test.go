@@ -410,4 +410,79 @@ func Test_CalcLine2(t *testing.T) {
 	assert.Equal(t, result.CoinWin, 5, "they should be equal")
 	assert.Equal(t, result.CashWin, 5, "they should be equal")
 	assert.Equal(t, len(result.Pos), 6, "they should be equal")
+
+	t.Logf("Test_CalcLine2 OK")
+}
+
+func Test_CalcFullLine(t *testing.T) {
+	scene, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// 0,1,1,1,9 => 1x4
+	results := CalcFullLine(scene, pt, 1,
+		func(cs int, scene *GameScene, x, y int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, len(results), 1)
+	assert.Equal(t, len(results[0].Pos), 8)
+	assert.Equal(t, results[0].Symbol, 10)
+	assert.Equal(t, results[0].Mul, 15)
+
+	t.Logf("Test_CalcFullLine OK")
+}
+
+func Test_CalcFullLine2(t *testing.T) {
+	scene, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 7},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 8, 0},
+		[]int{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// 0,1,1,1,9 => 1x4
+	results := CalcFullLine(scene, pt, 1,
+		func(cs int, scene *GameScene, x, y int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, len(results), 3)
+
+	assert.Equal(t, len(results[0].Pos), 8)
+	assert.Equal(t, results[0].Symbol, 10)
+	assert.Equal(t, results[0].Mul, 15)
+
+	assert.Equal(t, len(results[1].Pos), 8)
+	assert.Equal(t, results[1].Symbol, 7)
+
+	assert.Equal(t, len(results[2].Pos), 8)
+	assert.Equal(t, results[2].Symbol, 7)
+
+	t.Logf("Test_CalcFullLine2 OK")
 }
