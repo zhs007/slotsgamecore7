@@ -12,8 +12,8 @@ type PlayResult struct {
 	CurGameModParams interface{}  `json:"curgamemodparams"`
 	NextGameMod      string       `json:"nextgamemod"`
 	Scenes           []*GameScene `json:"scenes"`
+	OtherScenes      []*GameScene `json:"otherscenes"`
 	Results          []*Result    `json:"results"`
-	MainScene        int          `json:"mainscene"`
 	NextCmds         []string     `json:"-"`
 	NextCmdParams    []string     `json:"-"`
 	CoinWin          int          `json:"-"`
