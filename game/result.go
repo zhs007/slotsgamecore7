@@ -8,6 +8,8 @@ const (
 	RTScatter = 1
 	// RTLine - line
 	RTLine = 2
+	// RTFullLine - full line
+	RTFullLine = 3
 )
 
 // Result - result for slots game
@@ -19,5 +21,6 @@ type Result struct {
 	CoinWin   int        `json:"coinwin"`
 	CashWin   int        `json:"cashwin"`
 	Pos       []int      `json:"pos"`
-	HasW      bool       `json:"-"`
+	OtherMul  int        `json:"othermul"`
+	Wilds     int        `json:"wilds"`
 }
