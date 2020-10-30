@@ -23,22 +23,25 @@ message ReelsData {
     repeated Column reels = 1;
 }
 
-// PayInfo
-message PayInfo {
-    int32 symbol = 1;
-    repeated int32 payouts = 2;
-}
-
 // GameScene
 message GameScene {
     repeated Column values = 1;
+}
+
+// BasicPlayerPublicState - basic PlayerPublicState
+message BasicPlayerPublicState {
+	string curGameMod = 1;
+}
+
+// BasicPlayerPrivateState - basic PlayerPrivateState
+message BasicPlayerPrivateState {
 }
 
 // GameConfig
 message GameConfig {
     LinesData lines = 1;
     map<string, ReelsData> reels = 2;
-    map<int32, PayInfo> payTables = 3;
+    map<int32, Row> payTables = 3;
     int32 width = 4;
     int32 height = 5;
     string ver = 6;
