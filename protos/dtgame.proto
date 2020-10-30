@@ -1,0 +1,134 @@
+syntax = "proto3";
+package sgc7pb;
+option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
+import "google/protobuf/any.proto";
+
+// Column
+message Column {
+    repeated int32 values = 1;
+}
+
+// Row
+message Row {
+    repeated int32 values = 1;
+}
+
+// LinesData
+message LinesData {
+    repeated Row lines = 1;
+}
+
+// ReelsData
+message ReelsData {
+    repeated Column reels = 1;
+}
+
+// PayInfo
+message PayInfo {
+    int32 symbol = 1;
+    repeated int32 payouts = 2;
+}
+
+// GameScene
+message GameScene {
+    repeated Column values = 1;
+}
+
+// GameConfig
+message GameConfig {
+    LinesData lines = 1;
+    map<string, ReelsData> reels = 2;
+    map<int32, PayInfo> payTables = 3;
+    int32 width = 4;
+    int32 height = 5;
+    string ver = 6;
+    string coreVer = 7;
+    GameScene defaultScene = 8;
+}
+
+// RequestConfig
+message RequestConfig {
+}
+
+// PlayerState
+message PlayerState {
+    google.protobuf.Any public = 1;
+    google.protobuf.Any private = 2;
+}
+
+// RequestInitialize
+message RequestInitialize {
+}
+
+message Stake {
+    double coinBet = 1;
+    double cashBet = 2;
+    string currency = 3;
+}
+
+// RequestPlay - play input parameters for the game
+message RequestPlay {
+    PlayerState playerState = 1;
+    string cheat = 2;
+    Stake stake = 3;
+    string clientParams = 4;
+    string command = 5;
+    double jackpotStakeValue = 6;
+    bool freespinsActive = 7;
+}
+
+// RngInfo - rng infomation
+message RngInfo {
+    int32 bits = 1;
+    int32 range = 2;
+    int32 value = 3;
+}
+
+// GameScenePlayResult - result for slots game
+message GameScenePlayResult {
+    int32 type = 1;
+    int32 lineIndex = 2;
+    int32 symbol = 3;
+    int32 mul = 4;
+    int32 coinWin = 5;
+    int32 cashWin = 6;
+    repeated int32 pos = 7;
+    int32 otherMul = 8;
+    int32 wilds = 9;
+}
+
+// PlayResult - result for play
+message PlayResult {
+    string curGameMod = 1;
+    google.protobuf.Any curGameModParams = 2;
+    string nextGameMod = 3;
+    repeated GameScene scenes = 4;
+    repeated GameScene otherScenes = 5;
+    repeated GameScenePlayResult results = 6;
+}
+
+// GameResult - game result
+message GameResult {
+    int32 coinWin = 1;
+    double cashWin = 2;
+    PlayResult clientData = 3;
+}
+
+// ReplyPlay - play output parameters for the game
+message ReplyPlay {
+    repeated RngInfo randomNumbers = 1;
+    PlayerState playerState = 2;
+    bool finished = 3;
+    repeated GameResult results = 4;
+    repeated string nextCommands = 5;
+}
+
+// TradingDB2Service - TradingDB2 service
+service DTGameService {
+	// getConfig - get config
+    rpc getConfig(RequestConfig) returns (GameConfig) {}
+    // initialize - initialize a player
+    rpc initialize(RequestInitialize) returns (PlayerState) {}
+    // play - play game
+    rpc play(RequestPlay) returns (ReplyPlay) {}    
+}
