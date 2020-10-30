@@ -5,6 +5,9 @@ import (
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
+// FuncCountSymbolExIsSymbol -
+type FuncCountSymbolExIsSymbol func(cursymbol int, x, y int) bool
+
 // GameScene - game scene
 type GameScene struct {
 	Arr    [][]int `json:"arr"`
@@ -227,4 +230,18 @@ func (gs *GameScene) Fill(reels *ReelsData, arr []int) {
 			}
 		}
 	}
+}
+
+// CountSymbolEx - count a symbol
+func (gs *GameScene) CountSymbolEx(issymbol FuncCountSymbolExIsSymbol) int {
+	nums := 0
+	for x, l := range gs.Arr {
+		for y, v := range l {
+			if issymbol(v, x, y) {
+				nums++
+			}
+		}
+	}
+
+	return nums
 }

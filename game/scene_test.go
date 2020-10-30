@@ -400,5 +400,28 @@ func Test_CloneGS(t *testing.T) {
 	assert.Equal(t, gs.Arr[3][2], 8)
 	assert.Equal(t, ngs.Arr[3][2], 0)
 
-	t.Logf("Test_CountSymbol OK")
+	t.Logf("Test_CloneGS OK")
+}
+
+func Test_CountSymbolEx(t *testing.T) {
+	gs, err := NewGameSceneWithArr2([][]int{
+		[]int{8, 10, 1},
+		[]int{11, 10, 7},
+		[]int{0, 4, 6},
+		[]int{7, 0, 0},
+		[]int{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	nums := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
+		if y == 1 && (cursymbol == 10 || cursymbol == 0) {
+			return true
+		}
+
+		return false
+	})
+
+	assert.Equal(t, nums, 3)
+
+	t.Logf("Test_CountSymbolEx OK")
 }
