@@ -23,22 +23,25 @@ message ReelsData {
     repeated Column reels = 1;
 }
 
-// PayInfo
-message PayInfo {
-    int32 symbol = 1;
-    repeated int32 payouts = 2;
-}
-
 // GameScene
 message GameScene {
     repeated Column values = 1;
+}
+
+// BasicPlayerPublicState - basic PlayerPublicState
+message BasicPlayerPublicState {
+	string curGameMod = 1;
+}
+
+// BasicPlayerPrivateState - basic PlayerPrivateState
+message BasicPlayerPrivateState {
 }
 
 // GameConfig
 message GameConfig {
     LinesData lines = 1;
     map<string, ReelsData> reels = 2;
-    map<int32, PayInfo> payTables = 3;
+    map<int32, Row> payTables = 3;
     int32 width = 4;
     int32 height = 5;
     string ver = 6;
@@ -61,8 +64,8 @@ message RequestInitialize {
 }
 
 message Stake {
-    double coinBet = 1;
-    double cashBet = 2;
+    int32 coinBet = 1;
+    int32 cashBet = 2;
     string currency = 3;
 }
 
@@ -100,7 +103,7 @@ message GameScenePlayResult {
 // PlayResult - result for play
 message PlayResult {
     string curGameMod = 1;
-    google.protobuf.Any curGameModParams = 2;
+    google.protobuf.Any curGameModParam = 2;
     string nextGameMod = 3;
     repeated GameScene scenes = 4;
     repeated GameScene otherScenes = 5;
@@ -123,12 +126,12 @@ message ReplyPlay {
     repeated string nextCommands = 5;
 }
 
-// TradingDB2Service - TradingDB2 service
-service DTGameService {
+// DTGameLogic - DTGameLogic
+service DTGameLogic {
 	// getConfig - get config
     rpc getConfig(RequestConfig) returns (GameConfig) {}
     // initialize - initialize a player
     rpc initialize(RequestInitialize) returns (PlayerState) {}
     // play - play game
-    rpc play(RequestPlay) returns (ReplyPlay) {}    
+    rpc play(RequestPlay) returns (stream ReplyPlay) {}    
 }

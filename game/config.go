@@ -8,7 +8,7 @@ import (
 
 // Config - config
 type Config struct {
-	Line         *LineData             `json:"line"`
+	Lines        *LineData             `json:"lines"`
 	Reels        map[string]*ReelsData `json:"reels"`
 	PayTables    *PayTables            `json:"paytables"`
 	Width        int                   `json:"width"`
@@ -32,7 +32,7 @@ func (cfg *Config) LoadLine5(fn string) error {
 		return err
 	}
 
-	cfg.Line = ld
+	cfg.Lines = ld
 
 	return nil
 }
