@@ -3,6 +3,8 @@ package dtserv
 import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	"go.uber.org/zap"
 )
 
 // BuildLineData - *sgc7game.LineData -> *sgc7pb.LinesData
@@ -103,4 +105,96 @@ func BuildGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 	}
 
 	return pbcfg
+}
+
+// BuildStake - PlayerState => sgc7game.IPlayerState
+func BuildStake(stake *sgc7pb.Stake) *sgc7game.Stake {
+	return &sgc7game.Stake{
+		CoinBet:  int64(stake.CoinBet),
+		CashBet:  int64(stake.CashBet),
+		Currency: stake.Currency,
+	}
+}
+
+// BuildPBRngs - []*sgc7utils.RngInfo => []*sgc7pb.RngInfo
+func BuildPBRngs(rngs []*sgc7utils.RngInfo) []*sgc7pb.RngInfo {
+	pbrngs := []*sgc7pb.RngInfo{}
+
+	for _, v := range rngs {
+		pbrngs = append(pbrngs, &sgc7pb.RngInfo{
+			Bits:  int32(v.Bits),
+			Range: int32(v.Range),
+			Value: int32(v.Value),
+		})
+	}
+
+	return pbrngs
+}
+
+// BuildPBGameScenePlayResult - *sgc7game.Result -> *sgc7pb.GameScenePlayResult
+func BuildPBGameScenePlayResult(r *sgc7game.Result) *sgc7pb.GameScenePlayResult {
+	pr := &sgc7pb.GameScenePlayResult{
+		Type:     int32(r.Type),
+		Symbol:   int32(r.Symbol),
+		Mul:      int32(r.Mul),
+		CoinWin:  int32(r.CoinWin),
+		CashWin:  int32(r.CashWin),
+		OtherMul: int32(r.OtherMul),
+		Wilds:    int32(r.Wilds),
+	}
+
+	for _, v := range r.Pos {
+		pr.Pos = append(pr.Pos, int32(v))
+	}
+
+	return pr
+}
+
+// AddWinResult - add sgc7game.PlayResult
+func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayResult) error {
+	r := &sgc7pb.GameResult{
+		CoinWin: int32(playResult.CoinWin),
+		ClientData: &sgc7pb.PlayResult{
+			CurGameMod:  playResult.CurGameMod,
+			NextGameMod: playResult.NextGameMod,
+		},
+	}
+
+	gp, err := sv.BuildPBGameModParam(playResult.CurGameModParams)
+	if err != nil {
+		sgc7utils.Error("AddWinResult:BuildPBGameModParam",
+			zap.Error(err))
+
+		return err
+	}
+
+	r.ClientData.CurGameModParam = gp
+
+	for _, v := range playResult.Scenes {
+		cs := BuildGameScene(v)
+		r.ClientData.Scenes = append(r.ClientData.Scenes, cs)
+	}
+
+	for _, v := range playResult.OtherScenes {
+		cs := BuildGameScene(v)
+		r.ClientData.OtherScenes = append(r.ClientData.OtherScenes, cs)
+	}
+
+	for _, v := range playResult.Results {
+		cr := BuildPBGameScenePlayResult(v)
+		r.ClientData.Results = append(r.ClientData.Results, cr)
+	}
+
+	r.CashWin = float64(playResult.CashWin) / 100.0
+
+	pr.Results = append(pr.Results, r)
+
+	return nil
+}
+
+// AddPlayResult - []*sgc7game.PlayResult => *PlayResult
+func AddPlayResult(sv IService, pr *sgc7pb.ReplyPlay, results []*sgc7game.PlayResult) {
+	for _, v := range results {
+		AddWinResult(sv, pr, v)
+	}
 }

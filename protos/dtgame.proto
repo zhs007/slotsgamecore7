@@ -64,8 +64,8 @@ message RequestInitialize {
 }
 
 message Stake {
-    double coinBet = 1;
-    double cashBet = 2;
+    int32 coinBet = 1;
+    int32 cashBet = 2;
     string currency = 3;
 }
 
@@ -103,7 +103,7 @@ message GameScenePlayResult {
 // PlayResult - result for play
 message PlayResult {
     string curGameMod = 1;
-    google.protobuf.Any curGameModParams = 2;
+    google.protobuf.Any curGameModParam = 2;
     string nextGameMod = 3;
     repeated GameScene scenes = 4;
     repeated GameScene otherScenes = 5;
@@ -126,12 +126,12 @@ message ReplyPlay {
     repeated string nextCommands = 5;
 }
 
-// TradingDB2Service - TradingDB2 service
-service DTGameService {
+// DTGameLogic - DTGameLogic
+service DTGameLogic {
 	// getConfig - get config
     rpc getConfig(RequestConfig) returns (GameConfig) {}
     // initialize - initialize a player
     rpc initialize(RequestInitialize) returns (PlayerState) {}
     // play - play game
-    rpc play(RequestPlay) returns (ReplyPlay) {}    
+    rpc play(RequestPlay) returns (stream ReplyPlay) {}    
 }
