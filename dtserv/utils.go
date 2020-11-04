@@ -198,3 +198,26 @@ func AddPlayResult(sv IService, pr *sgc7pb.ReplyPlay, results []*sgc7game.PlayRe
 		AddWinResult(sv, pr, v)
 	}
 }
+
+// MergeReplyPlay - merge ReplyPlay
+func MergeReplyPlay(dst *sgc7pb.ReplyPlay, src *sgc7pb.ReplyPlay) {
+	if len(src.RandomNumbers) > 0 {
+		dst.RandomNumbers = append(dst.RandomNumbers, src.RandomNumbers...)
+	}
+
+	if src.PlayerState != nil {
+		dst.PlayerState = src.PlayerState
+	}
+
+	if src.Finished {
+		dst.Finished = true
+	}
+
+	if len(src.Results) > 0 {
+		dst.Results = append(dst.Results, src.Results...)
+	}
+
+	if src.NextCommands != nil {
+		dst.NextCommands = src.NextCommands
+	}
+}
