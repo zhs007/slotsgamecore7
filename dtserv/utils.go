@@ -153,7 +153,7 @@ func BuildPBGameScenePlayResult(r *sgc7game.Result) *sgc7pb.GameScenePlayResult 
 // AddWinResult - add sgc7game.PlayResult
 func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayResult) error {
 	r := &sgc7pb.GameResult{
-		CoinWin: int32(playResult.CoinWin),
+		CoinWin: int64(playResult.CoinWin),
 		ClientData: &sgc7pb.PlayResult{
 			CurGameMod:  playResult.CurGameMod,
 			NextGameMod: playResult.NextGameMod,
@@ -185,7 +185,7 @@ func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		r.ClientData.Results = append(r.ClientData.Results, cr)
 	}
 
-	r.CashWin = float64(playResult.CashWin) / 100.0
+	r.CashWin = playResult.CashWin
 
 	pr.Results = append(pr.Results, r)
 

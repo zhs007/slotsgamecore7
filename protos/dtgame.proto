@@ -76,7 +76,7 @@ message RequestPlay {
     Stake stake = 3;
     string clientParams = 4;
     string command = 5;
-    double jackpotStakeValue = 6;
+    int64 jackpotStakeValue = 6;
     bool freespinsActive = 7;
 }
 
@@ -112,8 +112,8 @@ message PlayResult {
 
 // GameResult - game result
 message GameResult {
-    int32 coinWin = 1;
-    double cashWin = 2;
+    int64 coinWin = 1;
+    int64 cashWin = 2;
     PlayResult clientData = 3;
 }
 
