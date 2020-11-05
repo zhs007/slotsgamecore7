@@ -67,7 +67,7 @@ func (serv *Serv) Stop() {
 func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sgc7pb.GameConfig, error) {
 	cfg := serv.game.GetConfig()
 
-	return BuildGameConfig(cfg), nil
+	return BuildPBGameConfig(cfg), nil
 }
 
 // Initialize - initialize a player
