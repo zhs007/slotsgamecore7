@@ -7,8 +7,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// BuildLineData - *sgc7game.LineData -> *sgc7pb.LinesData
-func BuildLineData(ld *sgc7game.LineData) *sgc7pb.LinesData {
+// BuildPBLineData - *sgc7game.LineData -> *sgc7pb.LinesData
+func BuildPBLineData(ld *sgc7game.LineData) *sgc7pb.LinesData {
 	pbld := &sgc7pb.LinesData{}
 
 	for _, l := range ld.Lines {
@@ -24,8 +24,8 @@ func BuildLineData(ld *sgc7game.LineData) *sgc7pb.LinesData {
 	return pbld
 }
 
-// BuildReelsData - *sgc7game.ReelsData -> *sgc7pb.ReelsData
-func BuildReelsData(rd *sgc7game.ReelsData) *sgc7pb.ReelsData {
+// BuildPBReelsData - *sgc7game.ReelsData -> *sgc7pb.ReelsData
+func BuildPBReelsData(rd *sgc7game.ReelsData) *sgc7pb.ReelsData {
 	pbrd := &sgc7pb.ReelsData{}
 
 	for _, l := range rd.Reels {
@@ -41,8 +41,8 @@ func BuildReelsData(rd *sgc7game.ReelsData) *sgc7pb.ReelsData {
 	return pbrd
 }
 
-// BuildPayTables - *sgc7game.PayTables -> map[int32]*Row
-func BuildPayTables(pt *sgc7game.PayTables) map[int32]*sgc7pb.Row {
+// BuildPBPayTables - *sgc7game.PayTables -> map[int32]*Row
+func BuildPBPayTables(pt *sgc7game.PayTables) map[int32]*sgc7pb.Row {
 	pbpt := make(map[int32]*sgc7pb.Row)
 
 	for k, l := range pt.MapPay {
@@ -58,8 +58,8 @@ func BuildPayTables(pt *sgc7game.PayTables) map[int32]*sgc7pb.Row {
 	return pbpt
 }
 
-// BuildGameScene - *sgc7game.GameScene -> *sgc7pb.GameScene
-func BuildGameScene(gs *sgc7game.GameScene) *sgc7pb.GameScene {
+// BuildPBGameScene - *sgc7game.GameScene -> *sgc7pb.GameScene
+func BuildPBGameScene(gs *sgc7game.GameScene) *sgc7pb.GameScene {
 	pbgs := &sgc7pb.GameScene{}
 
 	for _, l := range gs.Arr {
@@ -75,8 +75,8 @@ func BuildGameScene(gs *sgc7game.GameScene) *sgc7pb.GameScene {
 	return pbgs
 }
 
-// BuildGameConfig - *sgc7game.Config -> *sgc7pb.GameConfig
-func BuildGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
+// BuildPBGameConfig - *sgc7game.Config -> *sgc7pb.GameConfig
+func BuildPBGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 	pbcfg := &sgc7pb.GameConfig{
 		Width:   int32(cfg.Width),
 		Height:  int32(cfg.Height),
@@ -85,23 +85,23 @@ func BuildGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 	}
 
 	if cfg.Lines != nil {
-		pbcfg.Lines = BuildLineData(cfg.Lines)
+		pbcfg.Lines = BuildPBLineData(cfg.Lines)
 	}
 
 	if cfg.Reels != nil {
 		pbcfg.Reels = make(map[string]*sgc7pb.ReelsData)
 
 		for k, rd := range cfg.Reels {
-			pbcfg.Reels[k] = BuildReelsData(rd)
+			pbcfg.Reels[k] = BuildPBReelsData(rd)
 		}
 	}
 
 	if cfg.PayTables != nil {
-		pbcfg.PayTables = BuildPayTables(cfg.PayTables)
+		pbcfg.PayTables = BuildPBPayTables(cfg.PayTables)
 	}
 
 	if cfg.DefaultScene != nil {
-		pbcfg.DefaultScene = BuildGameScene(cfg.DefaultScene)
+		pbcfg.DefaultScene = BuildPBGameScene(cfg.DefaultScene)
 	}
 
 	return pbcfg
@@ -150,10 +150,10 @@ func BuildPBGameScenePlayResult(r *sgc7game.Result) *sgc7pb.GameScenePlayResult 
 	return pr
 }
 
-// AddWinResult - add sgc7game.PlayResult
-func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayResult) error {
+// addWinResult - add sgc7game.PlayResult
+func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayResult) error {
 	r := &sgc7pb.GameResult{
-		CoinWin: int32(playResult.CoinWin),
+		CoinWin: int64(playResult.CoinWin),
 		ClientData: &sgc7pb.PlayResult{
 			CurGameMod:  playResult.CurGameMod,
 			NextGameMod: playResult.NextGameMod,
@@ -162,7 +162,7 @@ func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 
 	gp, err := sv.BuildPBGameModParam(playResult.CurGameModParams)
 	if err != nil {
-		sgc7utils.Error("AddWinResult:BuildPBGameModParam",
+		sgc7utils.Error("addWinResult:BuildPBGameModParam",
 			zap.Error(err))
 
 		return err
@@ -171,12 +171,12 @@ func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 	r.ClientData.CurGameModParam = gp
 
 	for _, v := range playResult.Scenes {
-		cs := BuildGameScene(v)
+		cs := BuildPBGameScene(v)
 		r.ClientData.Scenes = append(r.ClientData.Scenes, cs)
 	}
 
 	for _, v := range playResult.OtherScenes {
-		cs := BuildGameScene(v)
+		cs := BuildPBGameScene(v)
 		r.ClientData.OtherScenes = append(r.ClientData.OtherScenes, cs)
 	}
 
@@ -185,7 +185,7 @@ func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		r.ClientData.Results = append(r.ClientData.Results, cr)
 	}
 
-	r.CashWin = float64(playResult.CashWin) / 100.0
+	r.CashWin = playResult.CashWin
 
 	pr.Results = append(pr.Results, r)
 
@@ -195,7 +195,7 @@ func AddWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 // AddPlayResult - []*sgc7game.PlayResult => *PlayResult
 func AddPlayResult(sv IService, pr *sgc7pb.ReplyPlay, results []*sgc7game.PlayResult) {
 	for _, v := range results {
-		AddWinResult(sv, pr, v)
+		addWinResult(sv, pr, v)
 	}
 }
 
