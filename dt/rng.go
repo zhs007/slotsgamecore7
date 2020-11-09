@@ -38,7 +38,7 @@ func (client *RngClient) reset() {
 }
 
 // GetRngs - get rngs
-func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]int32, error) {
+func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]int64, error) {
 	if client.conn == nil || client.client == nil {
 		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {

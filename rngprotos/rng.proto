@@ -5,11 +5,12 @@ option go_package = "github.com/zhs007/slotsgamecore7/dtrngpb";
 // RequestRngs - request some rngs
 message RequestRngs {
     int32 nums = 1;
+    string gamecode = 2;
 }
 
 // ReplyRngs - reply rngs
 message ReplyRngs {
-    repeated int32 rngs = 1;
+    repeated int64 rngs = 1;
 }
 
 // DTRng - DTGameLogic
