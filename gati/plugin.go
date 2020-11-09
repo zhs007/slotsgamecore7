@@ -1,6 +1,8 @@
 package gati
 
 import (
+	"context"
+
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
@@ -21,7 +23,7 @@ func NewPluginGATI(cfg *Config) *PluginGATI {
 }
 
 // Random - return [0, r)
-func (plugin *PluginGATI) Random(r int) (int, error) {
+func (plugin *PluginGATI) Random(ctx context.Context, r int) (int, error) {
 	if len(plugin.Rngs) == 0 {
 		rngs, err := GetRngs(plugin.Cfg.RNGURL, plugin.Cfg.GameID, plugin.Cfg.RngNums)
 		if err != nil {
