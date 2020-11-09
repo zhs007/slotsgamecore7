@@ -1,6 +1,7 @@
 package sgc7plugin
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ func Test_BasicPlugin(t *testing.T) {
 	var lstr []int
 
 	for i := 0; i < 1000; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err, "Test_BasicPlugin Random")
 		assert.True(t, func() bool {
 			return r >= 0 && r < 100
@@ -38,7 +39,7 @@ func Test_BasicPlugin(t *testing.T) {
 	bp.SetCache(lstcache)
 
 	for i := 0; i < 10; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err)
 		assert.Equal(t, r, lstcache[i], "Test_BasicPlugin Random Cache value")
 		assert.Equal(t, len(bp.Cache), 9-i, "Test_BasicPlugin Random ClearCache")
@@ -47,7 +48,7 @@ func Test_BasicPlugin(t *testing.T) {
 	bp.SetCache(lstcache)
 
 	for i := 0; i < 5; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err)
 		assert.Equal(t, r, lstcache[i], "Test_BasicPlugin Random Cache value")
 		assert.Equal(t, len(bp.Cache), 9-i, "Test_BasicPlugin Random ClearCache")
@@ -69,7 +70,7 @@ func Test_BasicPlugin2(t *testing.T) {
 	var lstr []int
 
 	for i := 0; i < 10; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err)
 		assert.True(t, func() bool {
 			return r >= 0 && r < 100
@@ -82,7 +83,7 @@ func Test_BasicPlugin2(t *testing.T) {
 	// assert.Equal(t, tag0, 10)
 
 	for i := 0; i < 10; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err)
 		assert.True(t, func() bool {
 			return r >= 0 && r < 100

@@ -1,0 +1,19 @@
+syntax = "proto3";
+package dtrngpb;
+option go_package = "github.com/zhs007/slotsgamecore7/dtrngpb";
+
+// RequestRngs - request some rngs
+message RequestRngs {
+    int32 nums = 1;
+}
+
+// ReplyRngs - reply rngs
+message ReplyRngs {
+    repeated int32 rngs = 1;
+}
+
+// DTRng - DTGameLogic
+service DTRng {
+	// getRngs - get rngs
+    rpc getRngs(RequestRngs) returns (ReplyRngs) {}
+}

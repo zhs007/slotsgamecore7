@@ -1,6 +1,8 @@
 package sgc7game
 
 import (
+	"context"
+
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
@@ -43,7 +45,7 @@ func (frr *FastReelsRandomSP) Random(plugin sgc7plugin.IPlugin) ([]int, error) {
 	arr := []int{}
 
 	for _, l := range frr.ArrIndex {
-		y, err := plugin.Random(len(l))
+		y, err := plugin.Random(context.Background(), len(l))
 		if err != nil {
 			return nil, err
 		}

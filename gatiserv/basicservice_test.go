@@ -1,6 +1,7 @@
 package gatiserv
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,19 +28,19 @@ func Test_BasicService(t *testing.T) {
 	err = bs.ProcCheat(plugin, "1,2,3")
 	assert.NoError(t, err)
 
-	cr0, err := plugin.Random(100)
+	cr0, err := plugin.Random(context.Background(), 100)
 	assert.NoError(t, err)
 	assert.Equal(t, cr0, 1)
 
-	cr1, err := plugin.Random(100)
+	cr1, err := plugin.Random(context.Background(), 100)
 	assert.NoError(t, err)
 	assert.Equal(t, cr1, 2)
 
-	cr2, err := plugin.Random(100)
+	cr2, err := plugin.Random(context.Background(), 100)
 	assert.NoError(t, err)
 	assert.Equal(t, cr2, 3)
 
-	cr3, err := plugin.Random(100)
+	cr3, err := plugin.Random(context.Background(), 100)
 	assert.NoError(t, err)
 	assert.Equal(t, func() bool { return cr3 >= 0 }(), true)
 

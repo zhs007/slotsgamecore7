@@ -1,6 +1,8 @@
 package sgc7game
 
 import (
+	"context"
+
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
@@ -126,7 +128,7 @@ func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName 
 	}
 
 	for x, arr := range gs.Arr {
-		cn, err := plugin.Random(len(reels.Reels[x]))
+		cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
 		if err != nil {
 			return err
 		}

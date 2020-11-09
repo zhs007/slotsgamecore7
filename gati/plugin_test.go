@@ -1,6 +1,7 @@
 package gati
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -40,7 +41,7 @@ func Test_PluginGATI(t *testing.T) {
 	var lstr []int
 
 	for i := 0; i < 1000; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err, "Test_PluginGATI Random")
 		assert.True(t, func() bool {
 			return r >= 0 && r < 100
@@ -68,7 +69,7 @@ func Test_PluginGATI(t *testing.T) {
 	bp.SetCache(lstcache)
 
 	for i := 0; i < 10; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err)
 		assert.Equal(t, r, lstcache[i], "Test_PluginGATI Random Cache value")
 		assert.Equal(t, len(bp.Rngs), 9-i, "Test_PluginGATI Random ClearCache")
@@ -77,7 +78,7 @@ func Test_PluginGATI(t *testing.T) {
 	bp.SetCache(lstcache)
 
 	for i := 0; i < 5; i++ {
-		r, err := bp.Random(100)
+		r, err := bp.Random(context.Background(), 100)
 		assert.NoError(t, err)
 		assert.Equal(t, r, lstcache[i], "Test_PluginGATI Random Cache value")
 		assert.Equal(t, len(bp.Rngs), 9-i, "Test_PluginGATI Random ClearCache")
