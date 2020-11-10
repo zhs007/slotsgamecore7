@@ -245,6 +245,8 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 			continue
 		}
 
+		arrSymbol = append(arrSymbol, cs)
+
 		arrpos := make([]int, 0, scene.Height*scene.Width*2)
 		symbolnums := 0
 		wildnums := 0
