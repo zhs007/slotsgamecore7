@@ -255,6 +255,10 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 		for x := 0; x < scene.Width; x++ {
 			curnums := 0
 			for y := 0; y < scene.Height; y++ {
+				if !isValidSymbolEx(cs, scene, x, y) {
+					continue
+				}
+
 				if isSameSymbol(scene.Arr[x][y], cs) {
 
 					arrpos = append(arrpos, x, y)
