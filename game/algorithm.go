@@ -1,5 +1,9 @@
 package sgc7game
 
+import (
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+)
+
 // FuncIsSymbol - is symbol
 type FuncIsSymbol func(cursymbol int) bool
 
@@ -221,9 +225,73 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 }
 
 // CalcFullLineEx - calc fullline & no wild in reel0
-func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int, cursymbol int,
-	countSymbolInReel FuncCountSymbolInReel) *Result {
-	return nil
+//		用数个数的方式来计算全线游戏，第一轴不能有wild
+func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
+	isValidSymbolEx FuncIsValidSymbolEx,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol) []*Result {
+
+	results := []*Result{}
+
+	arrSymbol := make([]int, 0, scene.Height)
+
+	for y0 := 0; y0 < scene.Height; y0++ {
+		cs := scene.Arr[0][y0]
+		if !isValidSymbolEx(cs, scene, 0, y0) {
+			continue
+		}
+
+		if sgc7utils.IndexOfIntSlice(arrSymbol, cs, 0) >= 0 {
+			continue
+		}
+
+		arrpos := make([]int, 0, scene.Height*scene.Width*2)
+		symbolnums := 0
+		wildnums := 0
+		mul := 1
+
+		for x := 0; x < scene.Width; x++ {
+			curnums := 0
+			for y := 0; y < scene.Height; y++ {
+				if isSameSymbol(scene.Arr[x][y], cs) {
+
+					arrpos = append(arrpos, x, y)
+
+					if isWild(scene.Arr[x][y]) {
+						wildnums++
+					}
+
+					if curnums == 0 {
+						symbolnums++
+					}
+
+					curnums++
+				}
+			}
+
+			if curnums == 0 {
+				break
+			}
+
+			mul *= curnums
+		}
+
+		if symbolnums > 0 && pt.MapPay[cs][symbolnums-1] > 0 {
+			r := &Result{
+				Symbol:  cs,
+				Type:    RTFullLineEx,
+				Mul:     pt.MapPay[cs][symbolnums-1],
+				CoinWin: pt.MapPay[cs][symbolnums-1] * mul,
+				CashWin: pt.MapPay[cs][symbolnums-1] * bet * mul,
+				Pos:     arrpos,
+				Wilds:   wildnums,
+			}
+
+			results = append(results, r)
+		}
+	}
+
+	return results
 }
 
 func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry []int) *Result {
@@ -293,7 +361,9 @@ func calcDeepFullLine(scene *GameScene, pt *PayTables, bet int, s0 int, arry []i
 	return results, iswin
 }
 
-// CalcFullLine - calc fullline
+// CalcFullLine - calc fullline & no wild in reel0
+// 		还是用算线的方式来计算全线游戏，效率会低一些，数据量也会大一些，但某些特殊类型的游戏只能这样计算
+//		也没有考虑第一轴有wild的情况（后续可调整算法）
 func CalcFullLine(scene *GameScene, pt *PayTables, bet int,
 	isValidSymbolEx FuncIsValidSymbolEx,
 	isWild FuncIsWild,
@@ -317,18 +387,3 @@ func CalcFullLine(scene *GameScene, pt *PayTables, bet int,
 
 	return results
 }
-
-// // CountSymbols - count symbol number
-// func CountSymbols(scene *GameScene, isSymbol FuncIsSymbol) int {
-// 	nums := 0
-
-// 	for x := 0; x < len(scene.Arr); x++ {
-// 		for y := 0; y < len(scene.Arr[x]); y++ {
-// 			if isSymbol(scene.Arr[x][y]) {
-// 				nums++
-// 			}
-// 		}
-// 	}
-
-// 	return nums
-// }

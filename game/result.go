@@ -10,6 +10,8 @@ const (
 	RTLine = 2
 	// RTFullLine - full line
 	RTFullLine = 3
+	// RTFullLineEx - full line ex
+	RTFullLineEx = 4
 )
 
 // Result - result for slots game
