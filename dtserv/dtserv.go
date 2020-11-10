@@ -65,20 +65,44 @@ func (serv *Serv) Stop() {
 
 // GetConfig - get config
 func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sgc7pb.GameConfig, error) {
+	sgc7utils.Debug("Serv.GetConfig",
+		sgc7utils.JSON("req", req))
+
 	cfg := serv.game.GetConfig()
 
-	return BuildPBGameConfig(cfg), nil
+	res := BuildPBGameConfig(cfg)
+
+	sgc7utils.Debug("Serv.GetConfig",
+		sgc7utils.JSON("reply", res))
+
+	return res, nil
 }
 
 // Initialize - initialize a player
 func (serv *Serv) Initialize(ctx context.Context, req *sgc7pb.RequestInitialize) (*sgc7pb.PlayerState, error) {
-	ps := serv.game.Initialize()
+	sgc7utils.Debug("Serv.Initialize",
+		sgc7utils.JSON("req", req))
 
-	return serv.service.BuildPBPlayerState(ps)
+	ps := serv.game.Initialize()
+	res, err := serv.service.BuildPBPlayerState(ps)
+	if err != nil {
+		sgc7utils.Error("Serv.Initialize:BuildPBPlayerState",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	sgc7utils.Debug("Serv.Initialize",
+		sgc7utils.JSON("reply", res))
+
+	return res, nil
 }
 
 // Play - play game
 func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlayServer) error {
+	sgc7utils.Debug("Serv.Play",
+		sgc7utils.JSON("req", req))
+
 	res, err := serv.onPlay(req)
 	if err != nil {
 		sgc7utils.Error("Serv.Play:onPlay",
@@ -86,6 +110,9 @@ func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlaySe
 
 		return err
 	}
+
+	sgc7utils.Debug("Serv.Play",
+		sgc7utils.JSON("reply", res))
 
 	return stream.Send(res)
 }
