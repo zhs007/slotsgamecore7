@@ -124,6 +124,7 @@ message ReplyPlay {
     bool finished = 3;
     repeated GameResult results = 4;
     repeated string nextCommands = 5;
+    Stake stake = 6;
 }
 
 // DTGameLogic - DTGameLogic
