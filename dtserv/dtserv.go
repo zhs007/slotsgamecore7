@@ -206,6 +206,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 	pr := &sgc7pb.ReplyPlay{
 		RandomNumbers: BuildPBRngs(plugin.GetUsedRngs()),
+		Stake:         req.Stake,
 	}
 
 	ps, err := serv.service.BuildPBPlayerState(ips)
