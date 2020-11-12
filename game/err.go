@@ -42,4 +42,7 @@ var (
 
 	// ErrInvalidArray - invalid array
 	ErrInvalidArray = errors.New("invalid array")
+
+	// ErrInvalidSceneX - invalid scene x
+	ErrInvalidSceneX = errors.New("invalid scene x")
 )

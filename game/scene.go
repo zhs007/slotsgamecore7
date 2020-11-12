@@ -12,9 +12,10 @@ type FuncCountSymbolExIsSymbol func(cursymbol int, x, y int) bool
 
 // GameScene - game scene
 type GameScene struct {
-	Arr    [][]int `json:"arr"`
-	Width  int     `json:"-"`
-	Height int     `json:"-"`
+	Arr     [][]int `json:"arr"`
+	Width   int     `json:"-"`
+	Height  int     `json:"-"`
+	Indexes []int   `json:"-"`
 }
 
 // NewGameScene - new a GameScene
@@ -127,11 +128,19 @@ func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName 
 		return ErrInvalidReels
 	}
 
+	if gs.Indexes == nil {
+		gs.Indexes = make([]int, 0, gs.Width)
+	} else {
+		gs.Indexes = gs.Indexes[0:0:cap(gs.Indexes)]
+	}
+
 	for x, arr := range gs.Arr {
 		cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
 		if err != nil {
 			return err
 		}
+
+		gs.Indexes = append(gs.Indexes, cn)
 
 		for y := range arr {
 			gs.Arr[x][y] = reels.Reels[x][cn]
@@ -140,6 +149,42 @@ func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName 
 			if cn >= len(reels.Reels[x]) {
 				cn -= len(reels.Reels[x])
 			}
+		}
+	}
+
+	return nil
+}
+
+// ResetReelIndex - reset reel with index
+// 	某些游戏里，可能会出现重新移动某一轴，这个就是移动某一轴的接口
+func (gs *GameScene) ResetReelIndex(game IGame, reelsName string, x int, index int) error {
+	if x < 0 || x >= gs.Width {
+		return ErrInvalidSceneX
+	}
+
+	cfg := game.GetConfig()
+
+	reels, isok := cfg.Reels[reelsName]
+	if !isok {
+		return ErrInvalidReels
+	}
+
+	if gs.Indexes != nil {
+		gs.Indexes[x] = index
+	}
+
+	for ; index < 0; index += len(reels.Reels[x]) {
+	}
+
+	for ; index >= len(reels.Reels[x]); index -= len(reels.Reels[x]) {
+	}
+
+	for y := range gs.Arr[x] {
+		gs.Arr[x][y] = reels.Reels[x][index]
+
+		index++
+		if index >= len(reels.Reels[x]) {
+			index -= len(reels.Reels[x])
 		}
 	}
 
