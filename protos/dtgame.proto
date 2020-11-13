@@ -25,7 +25,9 @@ message ReelsData {
 
 // GameScene
 message GameScene {
-    repeated Column values = 1;
+    repeated Column values = 1;     // 列
+    repeated int32 indexes = 2;     // 轮子索引
+    repeated int32 validRow = 3;    // 有效的行
 }
 
 // BasicPlayerPublicState - basic PlayerPublicState
@@ -89,32 +91,33 @@ message RngInfo {
 
 // GameScenePlayResult - result for slots game
 message GameScenePlayResult {
-    int32 type = 1;
-    int32 lineIndex = 2;
-    int32 symbol = 3;
-    int32 mul = 4;
-    int32 coinWin = 5;
-    int32 cashWin = 6;
-    repeated int32 pos = 7;
-    int32 otherMul = 8;
-    int32 wilds = 9;
+    int32 type = 1;         // 类型，譬如是线、scatter、还是全线等
+    int32 lineIndex = 2;    // 如果是类型是线，这就是线的索引
+    int32 symbol = 3;       // 中奖符号
+    int32 mul = 4;          // 中奖符号的基本赔付，paytables里读取
+    int32 coinWin = 5;      // 线注的倍数
+    int32 cashWin = 6;      // 实际的赔付
+    repeated int32 pos = 7; // 中奖图标的坐标，[x0,y0,x1,y1,x2,y2]这样的
+    int32 otherMul = 8;     // 其它的赔付倍数，譬如一些规则会有其它的翻倍赔付等
+    int32 wilds = 9;        // wilds的数量，某些情况下用来特殊赔付
 }
 
 // PlayResult - result for play
 message PlayResult {
-    string curGameMod = 1;
-    google.protobuf.Any curGameModParam = 2;
-    string nextGameMod = 3;
-    repeated GameScene scenes = 4;
-    repeated GameScene otherScenes = 5;
-    repeated GameScenePlayResult results = 6;
+    string curGameMod = 1;                      // 当前游戏模块，一般是 bg、fg 等等
+    google.protobuf.Any curGameModParam = 2;    // 这个是游戏参数，每个游戏不一样，保存不同游戏的特殊数据
+    string nextGameMod = 3;                     // 下一个 game round 是什么模块，可能是 bg、fg 等等
+    repeated GameScene scenes = 4;              // 游戏场景列表，如果中间可能出现场景变化，譬如符号变wild==，这里就会有多个场景，赔付始终用最后一个场景
+    repeated GameScene otherScenes = 5;         // 轮子以外的场景数据，这个用法会根据游戏有差别，譬如每个格子上需要有单独的奖励，就会放这里
+    repeated GameScenePlayResult results = 6;   // 中奖的结算列表
 }
 
 // GameResult - game result
+//      每个game round的结算数据
 message GameResult {
-    int64 coinWin = 1;
-    int64 cashWin = 2;
-    PlayResult clientData = 3;
+    int64 coinWin = 1;          // 线注的倍数
+    int64 cashWin = 2;          // 实际的赢得
+    PlayResult clientData = 3;  // 局面数据
 }
 
 // ReplyPlay - play output parameters for the game
