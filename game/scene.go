@@ -12,10 +12,11 @@ type FuncCountSymbolExIsSymbol func(cursymbol int, x, y int) bool
 
 // GameScene - game scene
 type GameScene struct {
-	Arr     [][]int `json:"arr"`
-	Width   int     `json:"-"`
-	Height  int     `json:"-"`
-	Indexes []int   `json:"-"`
+	Arr      [][]int `json:"arr"`
+	Width    int     `json:"-"`
+	Height   int     `json:"-"`
+	Indexes  []int   `json:"indexes"`
+	ValidRow []int   `json:"validrow"`
 }
 
 // NewGameScene - new a GameScene
