@@ -146,13 +146,14 @@ func BuildPBRngs(rngs []*sgc7utils.RngInfo) []*sgc7pb.RngInfo {
 // BuildPBGameScenePlayResult - *sgc7game.Result -> *sgc7pb.GameScenePlayResult
 func BuildPBGameScenePlayResult(r *sgc7game.Result) *sgc7pb.GameScenePlayResult {
 	pr := &sgc7pb.GameScenePlayResult{
-		Type:     int32(r.Type),
-		Symbol:   int32(r.Symbol),
-		Mul:      int32(r.Mul),
-		CoinWin:  int32(r.CoinWin),
-		CashWin:  int32(r.CashWin),
-		OtherMul: int32(r.OtherMul),
-		Wilds:    int32(r.Wilds),
+		Type:       int32(r.Type),
+		Symbol:     int32(r.Symbol),
+		Mul:        int32(r.Mul),
+		CoinWin:    int32(r.CoinWin),
+		CashWin:    int32(r.CashWin),
+		OtherMul:   int32(r.OtherMul),
+		Wilds:      int32(r.Wilds),
+		SymbolNums: int32(r.SymbolNums),
 	}
 
 	for _, v := range r.Pos {
