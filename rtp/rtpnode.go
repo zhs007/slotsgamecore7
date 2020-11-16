@@ -72,7 +72,7 @@ func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult) bool {
 func OnSymbolNumsResult(node *RTPNode, pr *sgc7game.PlayResult) bool {
 	if pr.CurGameMod == node.GameMod && pr.CashWin > 0 {
 		for _, v := range pr.Results {
-			if v.Symbol == node.Symbol && len(v.Pos) == node.SymbolNums*2 {
+			if v.Symbol == node.Symbol && v.SymbolNums == node.SymbolNums {
 				node.TriggerNums++
 				node.TotalWin += int64(v.CashWin)
 			}

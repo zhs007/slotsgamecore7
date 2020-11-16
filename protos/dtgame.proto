@@ -100,6 +100,7 @@ message GameScenePlayResult {
     repeated int32 pos = 7; // 中奖图标的坐标，[x0,y0,x1,y1,x2,y2]这样的
     int32 otherMul = 8;     // 其它的赔付倍数，譬如一些规则会有其它的翻倍赔付等
     int32 wilds = 9;        // wilds的数量，某些情况下用来特殊赔付
+    int32 symbolNums = 10;  // 赔付的符号数量
 }
 
 // PlayResult - result for play

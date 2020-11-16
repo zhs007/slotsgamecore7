@@ -50,13 +50,14 @@ func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins in
 
 	if nums > 0 && pt.MapPay[scatter][nums-1] > 0 {
 		r := &Result{
-			Symbol:    scatter,
-			Type:      RTScatter,
-			LineIndex: -1,
-			Mul:       pt.MapPay[scatter][nums-1],
-			CoinWin:   pt.MapPay[scatter][nums-1] * coins,
-			CashWin:   pt.MapPay[scatter][nums-1] * coins * bet,
-			Pos:       pos,
+			Symbol:     scatter,
+			Type:       RTScatter,
+			LineIndex:  -1,
+			Mul:        pt.MapPay[scatter][nums-1],
+			CoinWin:    pt.MapPay[scatter][nums-1] * coins,
+			CashWin:    pt.MapPay[scatter][nums-1] * coins * bet,
+			Pos:        pos,
+			SymbolNums: nums,
 		}
 
 		return r
@@ -129,13 +130,14 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 		if ws == -1 {
 			if wnums > 0 && pt.MapPay[s0][wnums-1] > 0 {
 				r := &Result{
-					Symbol:  s0,
-					Type:    RTLine,
-					Mul:     pt.MapPay[s0][wnums-1],
-					CoinWin: pt.MapPay[s0][wnums-1],
-					CashWin: pt.MapPay[s0][wnums-1] * bet,
-					Pos:     wpos,
-					Wilds:   wilds,
+					Symbol:     s0,
+					Type:       RTLine,
+					Mul:        pt.MapPay[s0][wnums-1],
+					CoinWin:    pt.MapPay[s0][wnums-1],
+					CashWin:    pt.MapPay[s0][wnums-1] * bet,
+					Pos:        wpos,
+					Wilds:      wilds,
+					SymbolNums: wnums,
 				}
 
 				return r
@@ -161,26 +163,28 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 		if wmul >= mul {
 			r := &Result{
-				Symbol:  s0,
-				Type:    RTLine,
-				Mul:     pt.MapPay[s0][wnums-1],
-				CoinWin: pt.MapPay[s0][wnums-1],
-				CashWin: pt.MapPay[s0][wnums-1] * bet,
-				Pos:     wpos,
-				Wilds:   wilds,
+				Symbol:     s0,
+				Type:       RTLine,
+				Mul:        pt.MapPay[s0][wnums-1],
+				CoinWin:    pt.MapPay[s0][wnums-1],
+				CashWin:    pt.MapPay[s0][wnums-1] * bet,
+				Pos:        wpos,
+				Wilds:      wilds,
+				SymbolNums: wnums,
 			}
 
 			return r
 		}
 
 		r := &Result{
-			Symbol:  ws,
-			Type:    RTLine,
-			Mul:     pt.MapPay[ws][nums-1],
-			CoinWin: pt.MapPay[ws][nums-1],
-			CashWin: pt.MapPay[ws][nums-1] * bet,
-			Pos:     pos,
-			Wilds:   wilds,
+			Symbol:     ws,
+			Type:       RTLine,
+			Mul:        pt.MapPay[ws][nums-1],
+			CoinWin:    pt.MapPay[ws][nums-1],
+			CashWin:    pt.MapPay[ws][nums-1] * bet,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
 		}
 
 		return r
@@ -209,13 +213,14 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
 		r := &Result{
-			Symbol:  s0,
-			Type:    RTLine,
-			Mul:     pt.MapPay[s0][nums-1],
-			CoinWin: pt.MapPay[s0][nums-1],
-			CashWin: pt.MapPay[s0][nums-1] * bet,
-			Pos:     pos,
-			Wilds:   wilds,
+			Symbol:     s0,
+			Type:       RTLine,
+			Mul:        pt.MapPay[s0][nums-1],
+			CoinWin:    pt.MapPay[s0][nums-1],
+			CashWin:    pt.MapPay[s0][nums-1] * bet,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
 		}
 
 		return r
@@ -284,13 +289,14 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 
 		if symbolnums > 0 && pt.MapPay[cs][symbolnums-1] > 0 {
 			r := &Result{
-				Symbol:  cs,
-				Type:    RTFullLineEx,
-				Mul:     pt.MapPay[cs][symbolnums-1],
-				CoinWin: pt.MapPay[cs][symbolnums-1] * mul,
-				CashWin: pt.MapPay[cs][symbolnums-1] * bet * mul,
-				Pos:     arrpos,
-				Wilds:   wildnums,
+				Symbol:     cs,
+				Type:       RTFullLineEx,
+				Mul:        pt.MapPay[cs][symbolnums-1],
+				CoinWin:    pt.MapPay[cs][symbolnums-1] * mul,
+				CashWin:    pt.MapPay[cs][symbolnums-1] * bet * mul,
+				Pos:        arrpos,
+				Wilds:      wildnums,
+				SymbolNums: symbolnums,
 			}
 
 			results = append(results, r)
@@ -305,11 +311,12 @@ func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry 
 
 	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
 		r := &Result{
-			Symbol:  s0,
-			Type:    RTFullLine,
-			Mul:     pt.MapPay[s0][nums-1],
-			CoinWin: pt.MapPay[s0][nums-1],
-			CashWin: pt.MapPay[s0][nums-1] * bet,
+			Symbol:     s0,
+			Type:       RTFullLine,
+			Mul:        pt.MapPay[s0][nums-1],
+			CoinWin:    pt.MapPay[s0][nums-1],
+			CashWin:    pt.MapPay[s0][nums-1] * bet,
+			SymbolNums: nums,
 		}
 
 		for x, y := range arry {

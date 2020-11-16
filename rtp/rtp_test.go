@@ -29,21 +29,24 @@ func Test_RTP(t *testing.T) {
 	}
 
 	pr0.Results = append(pr0.Results, &sgc7game.Result{
-		Symbol:  0,
-		CashWin: 200,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     0,
+		CashWin:    200,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr0.Results = append(pr0.Results, &sgc7game.Result{
-		Symbol:  1,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1, 3, 1},
+		Symbol:     1,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1, 3, 1},
+		SymbolNums: 4,
 	})
 
 	pr0.Results = append(pr0.Results, &sgc7game.Result{
-		Symbol:  1,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     1,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	rtp.Bet(100)
@@ -73,21 +76,24 @@ func Test_RTP(t *testing.T) {
 	}
 
 	pr1.Results = append(pr1.Results, &sgc7game.Result{
-		Symbol:  2,
-		CashWin: 200,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     2,
+		CashWin:    200,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr1.Results = append(pr1.Results, &sgc7game.Result{
-		Symbol:  3,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1, 3, 1},
+		Symbol:     3,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1, 3, 1},
+		SymbolNums: 4,
 	})
 
 	pr1.Results = append(pr1.Results, &sgc7game.Result{
-		Symbol:  4,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     4,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	rtp.Bet(100)
@@ -117,21 +123,24 @@ func Test_RTP(t *testing.T) {
 	}
 
 	pr2.Results = append(pr2.Results, &sgc7game.Result{
-		Symbol:  2,
-		CashWin: 200,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     2,
+		CashWin:    200,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr2.Results = append(pr2.Results, &sgc7game.Result{
-		Symbol:  3,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1, 3, 1},
+		Symbol:     3,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1, 3, 1},
+		SymbolNums: 4,
 	})
 
 	pr2.Results = append(pr2.Results, &sgc7game.Result{
-		Symbol:  4,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     4,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr0.IsFinish = false
@@ -293,21 +302,24 @@ func Test_RTPTags(t *testing.T) {
 	}
 
 	pr0.Results = append(pr0.Results, &sgc7game.Result{
-		Symbol:  0,
-		CashWin: 200,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     0,
+		CashWin:    200,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr0.Results = append(pr0.Results, &sgc7game.Result{
-		Symbol:  1,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1, 3, 1},
+		Symbol:     1,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1, 3, 1},
+		SymbolNums: 4,
 	})
 
 	pr0.Results = append(pr0.Results, &sgc7game.Result{
-		Symbol:  1,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     1,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	rtp.Bet(100)
@@ -344,21 +356,24 @@ func Test_RTPTags(t *testing.T) {
 	}
 
 	pr1.Results = append(pr1.Results, &sgc7game.Result{
-		Symbol:  2,
-		CashWin: 200,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     2,
+		CashWin:    200,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr1.Results = append(pr1.Results, &sgc7game.Result{
-		Symbol:  3,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1, 3, 1},
+		Symbol:     3,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1, 3, 1},
+		SymbolNums: 4,
 	})
 
 	pr1.Results = append(pr1.Results, &sgc7game.Result{
-		Symbol:  4,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     4,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	rtp.Bet(100)
@@ -395,21 +410,24 @@ func Test_RTPTags(t *testing.T) {
 	}
 
 	pr2.Results = append(pr2.Results, &sgc7game.Result{
-		Symbol:  2,
-		CashWin: 200,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     2,
+		CashWin:    200,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr2.Results = append(pr2.Results, &sgc7game.Result{
-		Symbol:  3,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1, 3, 1},
+		Symbol:     3,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1, 3, 1},
+		SymbolNums: 4,
 	})
 
 	pr2.Results = append(pr2.Results, &sgc7game.Result{
-		Symbol:  4,
-		CashWin: 50,
-		Pos:     []int{0, 1, 1, 1, 2, 1},
+		Symbol:     4,
+		CashWin:    50,
+		Pos:        []int{0, 1, 1, 1, 2, 1},
+		SymbolNums: 3,
 	})
 
 	pr0.IsFinish = false
