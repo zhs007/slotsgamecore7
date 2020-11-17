@@ -10,7 +10,7 @@ message RequestRngs {
 
 // ReplyRngs - reply rngs
 message ReplyRngs {
-    repeated int64 rngs = 1;
+    repeated uint32 rngs = 1;
 }
 
 // DTRng - DTGameLogic
