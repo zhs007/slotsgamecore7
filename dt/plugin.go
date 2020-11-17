@@ -11,7 +11,7 @@ import (
 type PluginDT struct {
 	sgc7plugin.BasicPlugin
 
-	Rngs      []int64
+	Rngs      []uint32
 	RngClient *RngClient
 }
 
@@ -52,7 +52,7 @@ func (plugin *PluginDT) SetCache(arr []int) {
 	plugin.Rngs = nil
 
 	for _, v := range arr {
-		plugin.Rngs = append(plugin.Rngs, int64(v))
+		plugin.Rngs = append(plugin.Rngs, uint32(v))
 	}
 }
 
