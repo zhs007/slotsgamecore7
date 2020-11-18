@@ -293,3 +293,16 @@ func (gs *GameScene) CountSymbolEx(issymbol FuncCountSymbolExIsSymbol) int {
 
 	return nums
 }
+
+// HasSymbol - has a symbol
+func (gs *GameScene) HasSymbol(s int) bool {
+	for _, l := range gs.Arr {
+		for _, v := range l {
+			if v == s {
+				return true
+			}
+		}
+	}
+
+	return false
+}
