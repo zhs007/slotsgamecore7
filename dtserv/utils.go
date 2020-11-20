@@ -154,6 +154,7 @@ func BuildPBGameScenePlayResult(r *sgc7game.Result) *sgc7pb.GameScenePlayResult 
 		OtherMul:   int32(r.OtherMul),
 		Wilds:      int32(r.Wilds),
 		SymbolNums: int32(r.SymbolNums),
+		LineIndex:  int32(r.LineIndex),
 	}
 
 	for _, v := range r.Pos {
