@@ -9,8 +9,10 @@ const (
 	// RTLine - line
 	RTLine = 2
 	// RTFullLine - full line
+	// 243线游戏，最多会出现243条记录，某些游戏必须要这种方式
 	RTFullLine = 3
 	// RTFullLineEx - full line ex
+	// 全线游戏的汇总记录，243线最多3条记录
 	RTFullLineEx = 4
 )
 

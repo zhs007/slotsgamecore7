@@ -111,6 +111,7 @@ message PlayResult {
     repeated GameScene scenes = 4;              // 游戏场景列表，如果中间可能出现场景变化，譬如符号变wild==，这里就会有多个场景，赔付始终用最后一个场景
     repeated GameScene otherScenes = 5;         // 轮子以外的场景数据，这个用法会根据游戏有差别，譬如每个格子上需要有单独的奖励，就会放这里
     repeated GameScenePlayResult results = 6;   // 中奖的结算列表
+    repeated int32 mulPos = 7;                  // 倍数位置队列，类似[x0,y0,mul0,x1,y1,mul1]
 }
 
 // GameResult - game result
