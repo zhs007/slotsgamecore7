@@ -199,6 +199,10 @@ func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		r.ClientData.Results = append(r.ClientData.Results, cr)
 	}
 
+	for _, v := range playResult.MulPos {
+		r.ClientData.MulPos = append(r.ClientData.MulPos, int32(v))
+	}
+
 	r.CashWin = playResult.CashWin
 
 	pr.Results = append(pr.Results, r)
