@@ -117,7 +117,7 @@ func Test_BuildPlayerStateString(t *testing.T) {
 	ips := sgc7game.NewBasicPlayerState("BG")
 	str, err = BuildPlayerStateString(ips)
 	assert.Nil(t, err)
-	assert.Equal(t, str, "{\"playerStatePublic\":{\"curgamemod\":\"BG\"},\"playerStatePrivate\":{}}")
+	assert.Equal(t, str, "{\"playerStatePublic\":{\"curgamemod\":\"BG\",\"nextm\":0},\"playerStatePrivate\":{}}")
 
 	err = ParsePlayerState(str, ps)
 	assert.Nil(t, err)

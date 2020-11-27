@@ -11,6 +11,7 @@ func NewBPSNoBoostData() *BasicPlayerState {
 // BasicPlayerPublicState - basic PlayerPublicState
 type BasicPlayerPublicState struct {
 	CurGameMod string `json:"curgamemod"`
+	NextM      int    `json:"nextm"`
 }
 
 // BasicPlayerPrivateState - basic PlayerPrivateState

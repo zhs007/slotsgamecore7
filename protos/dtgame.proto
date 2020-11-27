@@ -32,7 +32,8 @@ message GameScene {
 
 // BasicPlayerPublicState - basic PlayerPublicState
 message BasicPlayerPublicState {
-	string curGameMod = 1;
+    string curGameMod = 1;
+    int32 nextM = 2;
 }
 
 // BasicPlayerPrivateState - basic PlayerPrivateState

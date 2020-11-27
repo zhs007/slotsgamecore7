@@ -35,6 +35,7 @@ func (bs *BasicService) BuildPlayerStateFromPB(ps *sgc7pb.PlayerState) (sgc7game
 
 		ips.SetPublic(&sgc7game.BasicPlayerPublicState{
 			CurGameMod: pub.CurGameMod,
+			NextM:      int(pub.NextM),
 		})
 	}
 
@@ -62,6 +63,7 @@ func (bs *BasicService) BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.Pl
 
 	pub := &sgc7pb.BasicPlayerPublicState{
 		CurGameMod: curps.Public.CurGameMod,
+		NextM:      int32(curps.Public.NextM),
 	}
 	pri := &sgc7pb.BasicPlayerPrivateState{}
 
