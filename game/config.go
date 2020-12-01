@@ -37,6 +37,18 @@ func (cfg *Config) LoadLine5(fn string) error {
 	return nil
 }
 
+// LoadLine3 - load linedata for reels 3
+func (cfg *Config) LoadLine3(fn string) error {
+	ld, err := LoadLine3JSON(fn)
+	if err != nil {
+		return err
+	}
+
+	cfg.Lines = ld
+
+	return nil
+}
+
 // LoadPayTables5 - load paytables for reels 5
 func (cfg *Config) LoadPayTables5(fn string) error {
 	pt, err := LoadPayTables5JSON(fn)
