@@ -65,3 +65,31 @@ func LoadLine5JSON(fn string) (*LineData, error) {
 
 	return d, nil
 }
+
+// LoadLine3JSON - load json file
+func LoadLine3JSON(fn string) (*LineData, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	var li []lineInfo5
+	err = json.Unmarshal(data, &li)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isValidLI5(li) {
+		return nil, nil
+	}
+
+	d := &LineData{}
+	for _, v := range li {
+		cl := []int{v.R1, v.R2, v.R3}
+		d.Lines = append(d.Lines, cl)
+	}
+
+	return d, nil
+}
