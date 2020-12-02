@@ -126,7 +126,7 @@ func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName 
 
 	reels, isok := cfg.Reels[reelsName]
 	if !isok {
-		return ErrInvalidReels
+		return ErrInvalidReelsName
 	}
 
 	if gs.Indexes == nil {
@@ -167,7 +167,7 @@ func (gs *GameScene) ResetReelIndex(game IGame, reelsName string, x int, index i
 
 	reels, isok := cfg.Reels[reelsName]
 	if !isok {
-		return ErrInvalidReels
+		return ErrInvalidReelsName
 	}
 
 	if gs.Indexes != nil {

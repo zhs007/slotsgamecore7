@@ -49,6 +49,17 @@ func (cfg *Config) LoadLine3(fn string) error {
 	return nil
 }
 
+// LoadLine - load linedata for reels
+func (cfg *Config) LoadLine(fn string, reels int) error {
+	if reels == 5 {
+		return cfg.LoadLine5(fn)
+	} else if reels == 3 {
+		return cfg.LoadLine3(fn)
+	}
+
+	return ErrInvalidReels
+}
+
 // LoadPayTables5 - load paytables for reels 5
 func (cfg *Config) LoadPayTables5(fn string) error {
 	pt, err := LoadPayTables5JSON(fn)
@@ -61,6 +72,29 @@ func (cfg *Config) LoadPayTables5(fn string) error {
 	return nil
 }
 
+// LoadPayTables3 - load paytables for reels 3
+func (cfg *Config) LoadPayTables3(fn string) error {
+	pt, err := LoadPayTables3JSON(fn)
+	if err != nil {
+		return err
+	}
+
+	cfg.PayTables = pt
+
+	return nil
+}
+
+// LoadPayTables - load paytables for reels
+func (cfg *Config) LoadPayTables(fn string, reels int) error {
+	if reels == 5 {
+		return cfg.LoadPayTables5(fn)
+	} else if reels == 3 {
+		return cfg.LoadPayTables3(fn)
+	}
+
+	return ErrInvalidReels
+}
+
 // LoadReels5 - load reels 5
 func (cfg *Config) LoadReels5(name string, fn string) error {
 	reels, err := LoadReels5JSON(fn)
@@ -71,6 +105,29 @@ func (cfg *Config) LoadReels5(name string, fn string) error {
 	cfg.Reels[name] = reels
 
 	return nil
+}
+
+// LoadReels3 - load reels 3
+func (cfg *Config) LoadReels3(name string, fn string) error {
+	reels, err := LoadReels3JSON(fn)
+	if err != nil {
+		return err
+	}
+
+	cfg.Reels[name] = reels
+
+	return nil
+}
+
+// LoadReels - load reels for reels
+func (cfg *Config) LoadReels(name string, fn string, reels int) error {
+	if reels == 5 {
+		return cfg.LoadReels5(name, fn)
+	} else if reels == 3 {
+		return cfg.LoadReels3(name, fn)
+	}
+
+	return ErrInvalidReels
 }
 
 // SetDefaultSceneString - [][]int in json

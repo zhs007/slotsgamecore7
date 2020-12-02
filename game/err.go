@@ -6,8 +6,8 @@ var (
 	// ErrUnkonow - unknow error
 	ErrUnkonow = errors.New("unknow error")
 
-	// ErrInvalidReels - invalid reels name
-	ErrInvalidReels = errors.New("invalid reels name")
+	// ErrInvalidReelsName - invalid reels name
+	ErrInvalidReelsName = errors.New("invalid reels name")
 
 	// ErrInvalidStake - invalid stake
 	ErrInvalidStake = errors.New("invalid stake")
@@ -45,4 +45,7 @@ var (
 
 	// ErrInvalidSceneX - invalid scene x
 	ErrInvalidSceneX = errors.New("invalid scene x")
+
+	// ErrInvalidReels - invalid reels
+	ErrInvalidReels = errors.New("invalid reels")
 )

@@ -91,3 +91,49 @@ func LoadReels5JSON(fn string) (*ReelsData, error) {
 
 	return p, nil
 }
+
+// LoadReels3JSON - load json file
+func LoadReels3JSON(fn string) (*ReelsData, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	w := 3
+
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	var ri []reelsInfo5
+	err = json.Unmarshal(data, &ri)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isValidRI5(ri) {
+		return nil, nil
+	}
+
+	p := &ReelsData{
+		Reels: [][]int{},
+	}
+
+	for i := 0; i < w; i++ {
+		p.Reels = append(p.Reels, []int{})
+	}
+
+	for _, v := range ri {
+		if v.R1 >= 0 {
+			p.Reels[0] = append(p.Reels[0], v.R1)
+		}
+
+		if v.R2 >= 0 {
+			p.Reels[1] = append(p.Reels[1], v.R2)
+		}
+
+		if v.R3 >= 0 {
+			p.Reels[2] = append(p.Reels[2], v.R3)
+		}
+	}
+
+	return p, nil
+}
