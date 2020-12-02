@@ -48,4 +48,13 @@ var (
 
 	// ErrInvalidReels - invalid reels
 	ErrInvalidReels = errors.New("invalid reels")
+
+	// ErrInvalidSymbolWeightReelsSetType1 - invalid settype1 in SymbolWeightReels
+	ErrInvalidSymbolWeightReelsSetType1 = errors.New("invalid settype1 in SymbolWeightReels")
+
+	// ErrInvalidSymbolWeightReelsSetType2 - invalid settype2 in SymbolWeightReels
+	ErrInvalidSymbolWeightReelsSetType2 = errors.New("invalid settype2 in SymbolWeightReels")
+
+	// ErrInvalidSymbolWeightWidthReels - invalid width in SymbolWeightReels
+	ErrInvalidSymbolWeightWidthReels = errors.New("invalid width in SymbolWeightReels")
 )
