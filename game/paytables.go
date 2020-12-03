@@ -51,3 +51,34 @@ func LoadPayTables5JSON(fn string) (*PayTables, error) {
 
 	return p, nil
 }
+
+// LoadPayTables3JSON - load json file
+func LoadPayTables3JSON(fn string) (*PayTables, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	var li []payInfo5
+	err = json.Unmarshal(data, &li)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(li) <= 0 {
+		return nil, nil
+	}
+
+	p := &PayTables{
+		MapPay: make(map[int][]int),
+	}
+
+	for _, v := range li {
+		cl := []int{v.X1, v.X2, v.X3}
+		p.MapPay[v.Code] = cl
+	}
+
+	return p, nil
+}
