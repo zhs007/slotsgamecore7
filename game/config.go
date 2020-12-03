@@ -8,20 +8,22 @@ import (
 
 // Config - config
 type Config struct {
-	Lines        *LineData             `json:"lines"`
-	Reels        map[string]*ReelsData `json:"reels"`
-	PayTables    *PayTables            `json:"paytables"`
-	Width        int                   `json:"width"`
-	Height       int                   `json:"height"`
-	DefaultScene *GameScene            `json:"defaultscene"`
-	Ver          string                `json:"ver"`
-	CoreVer      string                `json:"corever"`
+	Lines        *LineData                     `json:"lines"`
+	Reels        map[string]*ReelsData         `json:"reels"`
+	PayTables    *PayTables                    `json:"paytables"`
+	Width        int                           `json:"width"`
+	Height       int                           `json:"height"`
+	DefaultScene *GameScene                    `json:"defaultscene"`
+	Ver          string                        `json:"ver"`
+	CoreVer      string                        `json:"corever"`
+	SWReels      map[string]*SymbolWeightReels `json:"-"`
 }
 
 // NewConfig - new a Config
 func NewConfig() *Config {
 	return &Config{
-		Reels: make(map[string]*ReelsData),
+		Reels:   make(map[string]*ReelsData),
+		SWReels: make(map[string]*SymbolWeightReels),
 	}
 }
 
@@ -128,6 +130,18 @@ func (cfg *Config) LoadReels(name string, fn string, reels int) error {
 	}
 
 	return ErrInvalidReels
+}
+
+// LoadSymboloWeightReels - load reels for SymbolWeightReels
+func (cfg *Config) LoadSymboloWeightReels(name string, fn string, reels int) error {
+	swreels, err := LoadSymbolWeightReels5JSON(fn)
+	if err != nil {
+		return err
+	}
+
+	cfg.SWReels[name] = swreels
+
+	return nil
 }
 
 // SetDefaultSceneString - [][]int in json
