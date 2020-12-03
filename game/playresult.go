@@ -21,6 +21,28 @@ type PlayResult struct {
 	CashWin          int64        `json:"-"`
 	IsFinish         bool         `json:"-"`
 	IsWait           bool         `json:"-"`
+	CurIndex         int          `json:"-"`
+	ParentIndex      int          `json:"-"`
+	ModType          string       `json:"-"`
+}
+
+// NewPlayResult - new a PlayResult
+func NewPlayResult(curGameMod string, curIndex int, parentIndex int, modType string) *PlayResult {
+	return &PlayResult{
+		CurGameMod:  curGameMod,
+		CurIndex:    curIndex,
+		ParentIndex: parentIndex,
+		ModType:     modType,
+	}
+}
+
+// GetPlayResultCurIndex - get current index
+func GetPlayResultCurIndex(prs []*PlayResult) int {
+	if len(prs) == 0 {
+		return 0
+	}
+
+	return prs[len(prs)-1].CurIndex + 1
 }
 
 // PlayResult2JSON - PlayResult => json
