@@ -4,7 +4,7 @@ package sgc7game
 func RemoveSymbolWithResult(scene *GameScene, result *PlayResult) error {
 	for _, v := range result.Results {
 		for i := 0; i < len(v.Pos)/2; i++ {
-			scene.Arr[v.Pos[i*2]][v.Pos[i*2]+1] = -1
+			scene.Arr[v.Pos[i*2]][v.Pos[i*2+1]] = -1
 		}
 	}
 
