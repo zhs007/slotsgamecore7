@@ -171,6 +171,9 @@ func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		ClientData: &sgc7pb.PlayResult{
 			CurGameMod:  playResult.CurGameMod,
 			NextGameMod: playResult.NextGameMod,
+			CurIndex:    int32(playResult.CurIndex),
+			ParentIndex: int32(playResult.ParentIndex),
+			ModType:     playResult.ModType,
 		},
 	}
 
