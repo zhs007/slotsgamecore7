@@ -67,3 +67,12 @@ func (mod *BasicGameMod) NewPlayResult(gamemodparams interface{}) *PlayResult {
 		CurGameModParams: gamemodparams,
 	}
 }
+
+// NewPlayResult2 - new a PlayResult
+func (mod *BasicGameMod) NewPlayResult2(gamemodparams interface{}, prs []*PlayResult, parentIndex int, modType string) *PlayResult {
+	ci := GetPlayResultCurIndex(prs)
+	pr := NewPlayResult(mod.Name, ci, parentIndex, modType)
+	pr.CurGameModParams = gamemodparams
+
+	return pr
+}
