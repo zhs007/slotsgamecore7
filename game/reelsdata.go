@@ -137,3 +137,30 @@ func LoadReels3JSON(fn string) (*ReelsData, error) {
 
 	return p, nil
 }
+
+// DropDownIntoGameScene - 用轮子当前位置处理下落
+//		注意：
+//			1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
+//			2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
+func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]int, error) {
+	narr := []int{}
+	for x, arr := range scene.Arr {
+
+		ci := indexes[x]
+
+		for y, v := range arr {
+			if v == -1 {
+				ci--
+				if ci < 0 {
+					ci += len(rd.Reels[x])
+				}
+
+				scene.Arr[x][y] = rd.Reels[x][ci]
+			}
+		}
+
+		narr = append(narr, ci)
+	}
+
+	return narr, nil
+}
