@@ -116,6 +116,7 @@ message PlayResult {
     int32 curIndex = 8;                         // 当前局面索引，因为游戏逻辑服不保存状态，所以每次从0开始
     int32 parentIndex = 9;                      // 产生当前局面的索引
     string modType = 10;                        // 当前局面模式类型，bg、fg、respin、bonus、jackpot 等等
+    repeated GameScene prizeScenes = 11;        // 场景奖励数据，线注的倍数
 }
 
 // GameResult - game result

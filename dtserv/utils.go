@@ -197,6 +197,11 @@ func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		r.ClientData.OtherScenes = append(r.ClientData.OtherScenes, cs)
 	}
 
+	for _, v := range playResult.PrizeScenes {
+		cs := BuildPBGameScene(v)
+		r.ClientData.PrizeScenes = append(r.ClientData.PrizeScenes, cs)
+	}
+
 	for _, v := range playResult.Results {
 		cr := BuildPBGameScenePlayResult(v)
 		r.ClientData.Results = append(r.ClientData.Results, cr)
