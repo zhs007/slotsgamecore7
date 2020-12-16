@@ -202,6 +202,9 @@ func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		r.ClientData.PrizeScenes = append(r.ClientData.PrizeScenes, cs)
 	}
 
+	r.ClientData.PrizeCoinWin = int64(playResult.PrizeCoinWin)
+	r.ClientData.PrizeCashWin = playResult.PrizeCashWin
+
 	for _, v := range playResult.Results {
 		cr := BuildPBGameScenePlayResult(v)
 		r.ClientData.Results = append(r.ClientData.Results, cr)

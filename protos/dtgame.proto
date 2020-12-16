@@ -117,6 +117,8 @@ message PlayResult {
     int32 parentIndex = 9;                      // 产生当前局面的索引
     string modType = 10;                        // 当前局面模式类型，bg、fg、respin、bonus、jackpot 等等
     repeated GameScene prizeScenes = 11;        // 场景奖励数据，线注的倍数
+    int64 prizeCoinWin = 12;                    // 如果有额外的奖励数据，这里是额外奖励的汇总，单位是coin，也就是线注的倍数
+    int64 prizeCashWin = 13;                    // 如果有额外的奖励数据，这里是额外奖励的汇总，单位是货币单位，也就是实际的赢得
 }
 
 // GameResult - game result
