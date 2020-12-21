@@ -14,6 +14,8 @@ const (
 	// RTFullLineEx - full line ex
 	// 全线游戏的汇总记录，243线最多3条记录
 	RTFullLineEx = 4
+	// RTScatterEx - scatter只计数量
+	RTScatterEx = 5
 )
 
 // Result - result for slots game
