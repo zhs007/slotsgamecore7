@@ -119,6 +119,9 @@ message PlayResult {
     repeated GameScene prizeScenes = 11;        // 场景奖励数据，线注的倍数
     int64 prizeCoinWin = 12;                    // 如果有额外的奖励数据，这里是额外奖励的汇总，单位是coin，也就是线注的倍数
     int64 prizeCashWin = 13;                    // 如果有额外的奖励数据，这里是额外奖励的汇总，单位是货币单位，也就是实际的赢得
+    int64 jackpotCoinWin = 14;                  // 如果有游戏自身的jackpot奖励数据，这里是jackpot奖励的汇总，单位是coin，也就是线注的倍数
+    int64 jackpotCashWin = 15;                  // 如果有游戏自身的jackpot奖励数据，这里是jackpot奖励的汇总，单位是货币单位，也就是实际的赢得
+    int32 jackpotType = 16;                     // jackpot类型
 }
 
 // GameResult - game result
