@@ -16,6 +16,9 @@ type PlayResult struct {
 	PrizeScenes      []*GameScene `json:"prizescenes"`
 	PrizeCoinWin     int          `json:"prizecoinwin"`
 	PrizeCashWin     int64        `json:"prizecashwin"`
+	JackpotCoinWin   int          `json:"jackpotcoinwin"`
+	JackpotCashWin   int64        `json:"jackpotcashwin"`
+	JackpotType      int          `json:"jackpottype"`
 	Results          []*Result    `json:"results"`
 	MulPos           []int        `json:"mulpos"`
 	NextCmds         []string     `json:"-"`
