@@ -233,11 +233,11 @@ func Test_ForEachAround(t *testing.T) {
 
 func Test_ForEach(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
@@ -254,21 +254,21 @@ func Test_ForEach(t *testing.T) {
 
 func Test_InitWithArr2(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7, 9},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7, 9},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.Error(t, err)
 	assert.Nil(t, gs)
 
 	gs, err = NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, gs)
@@ -322,11 +322,11 @@ func Test_InitWithArr(t *testing.T) {
 
 func Test_CountSymbol(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
@@ -347,11 +347,11 @@ func Test_CountSymbol(t *testing.T) {
 
 func Test_CountSymbols(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
@@ -366,11 +366,11 @@ func Test_CountSymbols(t *testing.T) {
 
 func Test_CloneGS(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
@@ -405,11 +405,11 @@ func Test_CloneGS(t *testing.T) {
 
 func Test_CountSymbolEx(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 0, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 0, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 

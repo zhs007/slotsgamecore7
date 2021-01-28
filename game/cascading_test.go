@@ -8,11 +8,11 @@ import (
 
 func Test_DropDownSymbols(t *testing.T) {
 	gs, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, -1},
-		[]int{11, -1, 7},
-		[]int{-1, 4, 6},
-		[]int{-1, 8, -1},
-		[]int{5, -1, -1},
+		{8, 10, -1},
+		{11, -1, 7},
+		{-1, 4, 6},
+		{-1, 8, -1},
+		{5, -1, -1},
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, gs)
