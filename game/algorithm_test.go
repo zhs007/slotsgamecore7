@@ -9,11 +9,11 @@ import (
 func Test_CalcScatter(t *testing.T) {
 	scene := &GameScene{
 		Arr: [][]int{
-			[]int{1, 0, 1},
-			[]int{9, 11, 9},
-			[]int{7, 1, 7},
-			[]int{6, 11, 11},
-			[]int{1, 9, 0},
+			{1, 0, 1},
+			{9, 11, 9},
+			{7, 1, 7},
+			{6, 11, 11},
+			{1, 9, 0},
 		},
 	}
 
@@ -35,11 +35,11 @@ func Test_CalcScatter(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{1, 0, 1},
-			[]int{9, 11, 9},
-			[]int{11, 1, 7},
-			[]int{6, 11, 11},
-			[]int{1, 11, 0},
+			{1, 0, 1},
+			{9, 11, 9},
+			{11, 1, 7},
+			{6, 11, 11},
+			{1, 11, 0},
 		},
 	}
 
@@ -55,11 +55,11 @@ func Test_CalcScatter(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{11, 0, 11},
-			[]int{9, 11, 9},
-			[]int{11, 1, 7},
-			[]int{6, 11, 11},
-			[]int{1, 11, 0},
+			{11, 0, 11},
+			{9, 11, 9},
+			{11, 1, 7},
+			{6, 11, 11},
+			{1, 11, 0},
 		},
 	}
 
@@ -79,11 +79,11 @@ func Test_CalcScatter(t *testing.T) {
 func Test_CalcLine(t *testing.T) {
 	scene := &GameScene{
 		Arr: [][]int{
-			[]int{1, 0, 1},
-			[]int{9, 1, 9},
-			[]int{7, 1, 7},
-			[]int{6, 1, 6},
-			[]int{1, 9, 0},
+			{1, 0, 1},
+			{9, 1, 9},
+			{7, 1, 7},
+			{6, 1, 6},
+			{1, 9, 0},
 		},
 	}
 
@@ -137,11 +137,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{9, 0, 11},
-			[]int{9, 0, 11},
-			[]int{0, 0, 11},
-			[]int{9, 0, 11},
-			[]int{1, 1, 11},
+			{9, 0, 11},
+			{9, 0, 11},
+			{0, 0, 11},
+			{9, 0, 11},
+			{1, 1, 11},
 		},
 	}
 
@@ -165,11 +165,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{9, 0, 11},
-			[]int{9, 0, 11},
-			[]int{0, 0, 11},
-			[]int{9, 0, 11},
-			[]int{1, 2, 11},
+			{9, 0, 11},
+			{9, 0, 11},
+			{0, 0, 11},
+			{9, 0, 11},
+			{1, 2, 11},
 		},
 	}
 
@@ -193,11 +193,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{9, 0, 11},
-			[]int{9, 0, 11},
-			[]int{0, 0, 11},
-			[]int{9, 0, 11},
-			[]int{1, 2, 11},
+			{9, 0, 11},
+			{9, 0, 11},
+			{0, 0, 11},
+			{9, 0, 11},
+			{1, 2, 11},
 		},
 	}
 
@@ -221,11 +221,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{9, 0, 11},
-			[]int{9, 0, 11},
-			[]int{0, 0, 11},
-			[]int{9, 0, 11},
-			[]int{1, 0, 11},
+			{9, 0, 11},
+			{9, 0, 11},
+			{0, 0, 11},
+			{9, 0, 11},
+			{1, 0, 11},
 		},
 	}
 
@@ -295,11 +295,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{1, 0, 1},
-			[]int{9, 1, 9},
-			[]int{7, 1, 7},
-			[]int{6, 0, 6},
-			[]int{1, 1, 0},
+			{1, 0, 1},
+			{9, 1, 9},
+			{7, 1, 7},
+			{6, 0, 6},
+			{1, 1, 0},
 		},
 	}
 
@@ -323,11 +323,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{1, 0, 1},
-			[]int{9, 1, 9},
-			[]int{7, 2, 7},
-			[]int{6, 2, 6},
-			[]int{1, 0, 0},
+			{1, 0, 1},
+			{9, 1, 9},
+			{7, 2, 7},
+			{6, 2, 6},
+			{1, 0, 0},
 		},
 	}
 
@@ -347,11 +347,11 @@ func Test_CalcLine(t *testing.T) {
 
 	scene = &GameScene{
 		Arr: [][]int{
-			[]int{1, 0, 1},
-			[]int{9, 1, 9},
-			[]int{7, 1, 7},
-			[]int{6, 2, 6},
-			[]int{1, 0, 0},
+			{1, 0, 1},
+			{9, 1, 9},
+			{7, 1, 7},
+			{6, 2, 6},
+			{1, 0, 0},
 		},
 	}
 
@@ -379,11 +379,11 @@ func Test_CalcLine(t *testing.T) {
 func Test_CalcLine2(t *testing.T) {
 	scene := &GameScene{
 		Arr: [][]int{
-			[]int{8, 10, 1},
-			[]int{11, 10, 7},
-			[]int{0, 4, 6},
-			[]int{7, 8, 0},
-			[]int{1, 9, 5},
+			{8, 10, 1},
+			{11, 10, 7},
+			{0, 4, 6},
+			{7, 8, 0},
+			{1, 9, 5},
 		},
 	}
 
@@ -416,11 +416,11 @@ func Test_CalcLine2(t *testing.T) {
 
 func Test_CalcFullLine(t *testing.T) {
 	scene, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 1},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 1},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
@@ -449,11 +449,11 @@ func Test_CalcFullLine(t *testing.T) {
 
 func Test_CalcFullLine2(t *testing.T) {
 	scene, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 7},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 7},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
@@ -488,11 +488,11 @@ func Test_CalcFullLine2(t *testing.T) {
 
 func Test_CalcFullLineEx(t *testing.T) {
 	scene, err := NewGameSceneWithArr2([][]int{
-		[]int{8, 10, 7},
-		[]int{11, 10, 7},
-		[]int{0, 4, 6},
-		[]int{7, 8, 0},
-		[]int{1, 9, 5},
+		{8, 10, 7},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
 	})
 	assert.NoError(t, err)
 
