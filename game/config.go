@@ -51,12 +51,26 @@ func (cfg *Config) LoadLine3(fn string) error {
 	return nil
 }
 
+// LoadLine6 - load linedata for reels 6
+func (cfg *Config) LoadLine6(fn string) error {
+	ld, err := LoadLine6JSON(fn)
+	if err != nil {
+		return err
+	}
+
+	cfg.Lines = ld
+
+	return nil
+}
+
 // LoadLine - load linedata for reels
 func (cfg *Config) LoadLine(fn string, reels int) error {
 	if reels == 5 {
 		return cfg.LoadLine5(fn)
 	} else if reels == 3 {
 		return cfg.LoadLine3(fn)
+	} else if reels == 6 {
+		return cfg.LoadLine6(fn)
 	}
 
 	return ErrInvalidReels

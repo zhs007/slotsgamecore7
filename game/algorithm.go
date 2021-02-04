@@ -335,7 +335,7 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 	return results
 }
 
-func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry []int) *Result {
+func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry []int, wildNums int) *Result {
 	nums := len(arry)
 
 	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
@@ -346,6 +346,7 @@ func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry 
 			CoinWin:    pt.MapPay[s0][nums-1],
 			CashWin:    pt.MapPay[s0][nums-1] * bet,
 			SymbolNums: nums,
+			Wilds:      wildNums,
 		}
 
 		for x, y := range arry {
@@ -362,22 +363,28 @@ func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry 
 func calcDeepFullLine(scene *GameScene, pt *PayTables, bet int, s0 int, arry []int, results []*Result,
 	isValidSymbolEx FuncIsValidSymbolEx,
 	isWild FuncIsWild,
-	isSameSymbol FuncIsSameSymbol) ([]*Result, bool) {
+	isSameSymbol FuncIsSameSymbol, wildNums int) ([]*Result, bool) {
 
 	iswin := false
 	cx := len(arry)
+	// wildnums := 0
+
 	for y, cs := range scene.Arr[cx] {
 		if isValidSymbolEx(cs, scene, cx, y) && isSameSymbol(cs, s0) {
+			if isWild(cs) {
+				wildNums++
+			}
+
 			arry = append(arry, y)
 
 			if cx < scene.Width-1 {
 				curiswin := false
-				results, iswin = calcDeepFullLine(scene, pt, bet, s0, arry, results, isValidSymbolEx, isWild, isSameSymbol)
+				results, iswin = calcDeepFullLine(scene, pt, bet, s0, arry, results, isValidSymbolEx, isWild, isSameSymbol, wildNums)
 				if curiswin {
 					iswin = true
 				}
 			} else {
-				r := buildFullLineResult(scene, pt, bet, s0, arry)
+				r := buildFullLineResult(scene, pt, bet, s0, arry, wildNums)
 
 				if r != nil {
 					results = append(results, r)
@@ -391,7 +398,7 @@ func calcDeepFullLine(scene *GameScene, pt *PayTables, bet int, s0 int, arry []i
 	}
 
 	if !iswin {
-		r := buildFullLineResult(scene, pt, bet, s0, arry)
+		r := buildFullLineResult(scene, pt, bet, s0, arry, wildNums)
 
 		if r != nil {
 			results = append(results, r)
@@ -421,7 +428,7 @@ func CalcFullLine(scene *GameScene, pt *PayTables, bet int,
 		if isValidSymbolEx(s0, scene, 0, y) {
 			yarr = append(yarr, y)
 
-			results, _ = calcDeepFullLine(scene, pt, bet, s0, yarr, results, isValidSymbolEx, isWild, isSameSymbol)
+			results, _ = calcDeepFullLine(scene, pt, bet, s0, yarr, results, isValidSymbolEx, isWild, isSameSymbol, 0)
 
 			yarr = yarr[0:0]
 		}
