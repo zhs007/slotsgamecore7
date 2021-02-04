@@ -100,12 +100,26 @@ func (cfg *Config) LoadPayTables3(fn string) error {
 	return nil
 }
 
+// LoadPayTables6 - load paytables for reels 6
+func (cfg *Config) LoadPayTables6(fn string) error {
+	pt, err := LoadPayTables6JSON(fn)
+	if err != nil {
+		return err
+	}
+
+	cfg.PayTables = pt
+
+	return nil
+}
+
 // LoadPayTables - load paytables for reels
 func (cfg *Config) LoadPayTables(fn string, reels int) error {
 	if reels == 5 {
 		return cfg.LoadPayTables5(fn)
 	} else if reels == 3 {
 		return cfg.LoadPayTables3(fn)
+	} else if reels == 6 {
+		return cfg.LoadPayTables6(fn)
 	}
 
 	return ErrInvalidReels
