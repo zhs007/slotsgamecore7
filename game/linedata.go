@@ -6,12 +6,13 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-type lineInfo5 struct {
+type lineInfo struct {
 	R1   int `json:"R1"`
 	R2   int `json:"R2"`
 	R3   int `json:"R3"`
 	R4   int `json:"R4"`
 	R5   int `json:"R5"`
+	R6   int `json:"R6"`
 	Line int `json:"line"`
 }
 
@@ -21,7 +22,7 @@ type LineData struct {
 }
 
 // isValidLI5 - is it valid lineInfo5
-func isValidLI5(li5s []lineInfo5) bool {
+func isValidLI5(li5s []lineInfo) bool {
 	if len(li5s) <= 0 {
 		return false
 	}
@@ -47,7 +48,7 @@ func LoadLine5JSON(fn string) (*LineData, error) {
 		return nil, err
 	}
 
-	var li []lineInfo5
+	var li []lineInfo
 	err = json.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
@@ -75,7 +76,7 @@ func LoadLine3JSON(fn string) (*LineData, error) {
 		return nil, err
 	}
 
-	var li []lineInfo5
+	var li []lineInfo
 	err = json.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
@@ -88,6 +89,34 @@ func LoadLine3JSON(fn string) (*LineData, error) {
 	d := &LineData{}
 	for _, v := range li {
 		cl := []int{v.R1, v.R2, v.R3}
+		d.Lines = append(d.Lines, cl)
+	}
+
+	return d, nil
+}
+
+// LoadLine6JSON - load json file
+func LoadLine6JSON(fn string) (*LineData, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	var li []lineInfo
+	err = json.Unmarshal(data, &li)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isValidLI5(li) {
+		return nil, nil
+	}
+
+	d := &LineData{}
+	for _, v := range li {
+		cl := []int{v.R1, v.R2, v.R3, v.R4, v.R5, v.R6}
 		d.Lines = append(d.Lines, cl)
 	}
 
