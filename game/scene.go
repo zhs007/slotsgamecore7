@@ -17,6 +17,20 @@ type GameScene struct {
 	Height   int     `json:"-"`
 	Indexes  []int   `json:"indexes"`
 	ValidRow []int   `json:"validrow"`
+	HeightEx []int   `json:"-"`
+}
+
+// isArrEx - is a GameSceneEx
+func isArrEx(arr [][]int) bool {
+	h := len(arr[0])
+
+	for _, v := range arr {
+		if h != len(v) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // NewGameScene - new a GameScene
@@ -31,11 +45,35 @@ func NewGameScene(width int, height int) (*GameScene, error) {
 	return gs, nil
 }
 
+// NewGameSceneEx - new a GameScene
+func NewGameSceneEx(heights []int) (*GameScene, error) {
+	gs := &GameScene{}
+
+	err := gs.InitEx(heights)
+	if err != nil {
+		return nil, err
+	}
+
+	return gs, nil
+}
+
 // NewGameSceneWithArr2 - new a GameScene
 func NewGameSceneWithArr2(arr [][]int) (*GameScene, error) {
 	gs := &GameScene{}
 
 	err := gs.InitWithArr2(arr)
+	if err != nil {
+		return nil, err
+	}
+
+	return gs, nil
+}
+
+// NewGameSceneWithArr2Ex - new a GameScene
+func NewGameSceneWithArr2Ex(arr [][]int) (*GameScene, error) {
+	gs := &GameScene{}
+
+	err := gs.InitWithArr2Ex(arr)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +124,65 @@ func (gs *GameScene) Init(w int, h int) error {
 	return nil
 }
 
+// InitEx - init scene
+func (gs *GameScene) InitEx(h []int) error {
+	gs.Arr = nil
+	gs.Height = 0
+	for x := 0; x < len(h); x++ {
+		gs.Arr = append(gs.Arr, []int{})
+
+		for y := 0; y < h[x]; y++ {
+			gs.Arr[x] = append(gs.Arr[x], -1)
+		}
+
+		if gs.Height < h[x] {
+			gs.Height = h[x]
+		}
+	}
+
+	gs.Width = len(h)
+	gs.HeightEx = h
+
+	return nil
+}
+
 // InitWithArr2 - init scene
 func (gs *GameScene) InitWithArr2(arr [][]int) error {
+	gs.Arr = nil
+	gs.Width = len(arr)
+	gs.Height = len(arr[0])
+
+	for _, l := range arr {
+		if len(l) != gs.Height {
+			return ErrInvalidArray
+		}
+
+		gs.Arr = append(gs.Arr, l)
+	}
+
+	return nil
+}
+
+// InitWithArr2Ex - init scene
+func (gs *GameScene) InitWithArr2Ex(arr [][]int) error {
+	if isArrEx(arr) {
+		gs.Arr = nil
+		gs.Width = len(arr)
+		gs.Height = len(arr[0])
+
+		for _, l := range arr {
+			if len(l) > gs.Height {
+				gs.Height = len(l)
+			}
+
+			gs.Arr = append(gs.Arr, l)
+
+			gs.HeightEx = append(gs.HeightEx, len(l))
+		}
+
+		return nil
+	}
+
 	gs.Arr = nil
 	gs.Width = len(arr)
 	gs.Height = len(arr[0])
@@ -197,6 +292,24 @@ type FuncForEach func(x, y int, val int)
 
 // ForEachAround - for each around positions
 func (gs *GameScene) ForEachAround(x, y int, funcEachAround FuncForEach) {
+	if len(gs.HeightEx) > 0 {
+		if x >= 0 && x < gs.Width && y >= 0 && y < gs.HeightEx[x] {
+			for ox := -1; ox <= 1; ox++ {
+				for oy := -1; oy <= 1; oy++ {
+					if ox == 0 && oy == 0 {
+						continue
+					}
+
+					if x+ox >= 0 && x+ox < gs.Width && y+oy >= 0 && y+oy < gs.HeightEx[x+ox] {
+						funcEachAround(x+ox, y+oy, gs.Arr[x+ox][y+oy])
+					}
+				}
+			}
+		}
+
+		return
+	}
+
 	if x >= 0 && x < gs.Width && y >= 0 && y < gs.Height {
 		for ox := -1; ox <= 1; ox++ {
 			for oy := -1; oy <= 1; oy++ {
@@ -259,8 +372,13 @@ func (gs *GameScene) Clone() *GameScene {
 	}
 
 	for i := 0; i < gs.Width; i++ {
-		ngs.Arr[i] = make([]int, gs.Height)
+		ngs.Arr[i] = make([]int, len(gs.Arr[i]))
 		copy(ngs.Arr[i], gs.Arr[i])
+	}
+
+	if len(gs.HeightEx) > 0 {
+		ngs.HeightEx = make([]int, len(gs.HeightEx))
+		copy(ngs.HeightEx, gs.HeightEx)
 	}
 
 	return ngs
@@ -269,7 +387,7 @@ func (gs *GameScene) Clone() *GameScene {
 // Fill - fill with reels and indexs
 func (gs *GameScene) Fill(reels *ReelsData, arr []int) {
 	for x, v := range arr {
-		for y := 0; y < gs.Height; y++ {
+		for y := 0; y < len(gs.Arr[x]); y++ {
 			gs.Arr[x][y] = reels.Reels[x][v]
 
 			v++
