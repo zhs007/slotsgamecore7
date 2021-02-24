@@ -7,8 +7,8 @@ import (
 func Test_AppendString(t *testing.T) {
 
 	in := [][]string{
-		[]string{"abc", "efg", "hijklmn"},
-		[]string{"abc", "", "hijklmn"},
+		{"abc", "efg", "hijklmn"},
+		{"abc", "", "hijklmn"},
 	}
 
 	out := []string{
