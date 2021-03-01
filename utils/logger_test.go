@@ -56,11 +56,11 @@ func Test_buildLogFilename(t *testing.T) {
 	}
 
 	in := []blf{
-		blf{
+		{
 			logtype: "debug",
 			subname: "main",
 		},
-		blf{
+		{
 			logtype: "error",
 			subname: "gamename",
 		},
@@ -100,11 +100,11 @@ func Test_MockLogger(t *testing.T) {
 	}
 
 	in := []blsf{
-		blsf{
+		{
 			appName: "game",
 			version: "v1.0.100",
 		},
-		blsf{
+		{
 			appName: "game2",
 			version: "v2.100.256",
 		},
