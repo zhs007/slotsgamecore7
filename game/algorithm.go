@@ -269,7 +269,7 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 
 	arrSymbol := make([]int, 0, scene.Height)
 
-	for y0 := 0; y0 < scene.Height; y0++ {
+	for y0 := 0; y0 < len(scene.Arr[0]); y0++ {
 		cs := scene.Arr[0][y0]
 		if !isValidSymbolEx(cs, scene, 0, y0) {
 			continue
@@ -288,7 +288,7 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 
 		for x := 0; x < scene.Width; x++ {
 			curnums := 0
-			for y := 0; y < scene.Height; y++ {
+			for y := 0; y < len(scene.Arr[x]); y++ {
 				if !isValidSymbolEx(cs, scene, x, y) {
 					continue
 				}
