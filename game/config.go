@@ -182,9 +182,9 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 		return err
 	}
 
-	ds, err := NewGameSceneWithArr2(arr)
+	ds, err := NewGameSceneWithArr2Ex(arr)
 	if err != nil {
-		sgc7utils.Error("sgc7game.Config.SetDefaultSceneString:NewGameSceneWithArr2",
+		sgc7utils.Error("sgc7game.Config.SetDefaultSceneString:NewGameSceneWithArr2Ex",
 			zap.String("str", str),
 			zap.Error(err))
 
