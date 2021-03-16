@@ -147,6 +147,23 @@ func InitGameMod(node *RTPNode, tags []string, funcTag []FuncOnResult, symbols [
 	}
 }
 
+// InitGameMod2 - new RTPNode
+func InitGameMod2(node *RTPNode, tags []string, funcTag []FuncOnResult, symbols []int, nums []int, onSymbolNumsResult FuncOnResult) {
+	if len(tags) > 0 {
+		for i, tag := range tags {
+			ctn := NewRTPGameModTag(node.GameMod, tag, funcTag[i])
+			InitGameModTag2(ctn, tag, symbols, nums, onSymbolNumsResult)
+			node.AddChild(tag, ctn)
+		}
+	} else {
+		for _, sv := range symbols {
+			csn := NewRTPSymbol(node.GameMod, "", sv)
+			InitSymbol2(csn, "", sv, nums, onSymbolNumsResult)
+			node.AddChild(strconv.Itoa(sv), csn)
+		}
+	}
+}
+
 // InitGameModTag - new RTPNode
 func InitGameModTag(node *RTPNode, tag string, symbols []int, nums []int) {
 	for _, sv := range symbols {
@@ -156,10 +173,27 @@ func InitGameModTag(node *RTPNode, tag string, symbols []int, nums []int) {
 	}
 }
 
+// InitGameModTag2 - new RTPNode
+func InitGameModTag2(node *RTPNode, tag string, symbols []int, nums []int, onSymbolNumsResult FuncOnResult) {
+	for _, sv := range symbols {
+		csn := NewRTPSymbol(node.GameMod, tag, sv)
+		InitSymbol2(csn, tag, sv, nums, onSymbolNumsResult)
+		node.AddChild(strconv.Itoa(sv), csn)
+	}
+}
+
 // InitSymbol - new RTPNode
 func InitSymbol(node *RTPNode, tag string, symbol int, nums []int) {
 	for _, nv := range nums {
 		csnn := NewRTPSymbolNums(node.GameMod, tag, symbol, nv)
+		node.AddChild(strconv.Itoa(nv), csnn)
+	}
+}
+
+// InitSymbol2 - new RTPNode
+func InitSymbol2(node *RTPNode, tag string, symbol int, nums []int, onSymbolNumsResult FuncOnResult) {
+	for _, nv := range nums {
+		csnn := NewRTPSymbolNums2(node.GameMod, tag, symbol, nv, onSymbolNumsResult)
 		node.AddChild(strconv.Itoa(nv), csnn)
 	}
 }
@@ -186,6 +220,19 @@ func NewRTPSymbolNums(gamemod string, tag string, symbol int, nums int) *RTPNode
 		Symbol:       symbol,
 		SymbolNums:   nums,
 		FuncOnResult: OnSymbolNumsResult,
+		TagName:      tag,
+	}
+}
+
+// NewRTPSymbolNums2 - new RTPNode
+func NewRTPSymbolNums2(gamemod string, tag string, symbol int, nums int, onSymbolNumsResult FuncOnResult) *RTPNode {
+	return &RTPNode{
+		NodeType:     RTPNodeSymbolNums,
+		MapChildren:  make(map[string]*RTPNode),
+		GameMod:      gamemod,
+		Symbol:       symbol,
+		SymbolNums:   nums,
+		FuncOnResult: onSymbolNumsResult,
 		TagName:      tag,
 	}
 }
