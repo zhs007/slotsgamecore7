@@ -6,7 +6,6 @@ import (
 	"path"
 	"path/filepath"
 	"sync"
-	"syscall"
 
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -17,28 +16,28 @@ var logger *zap.Logger
 var onceLogger sync.Once
 var logPath string
 
-var panicFile *os.File
+// var panicFile *os.File
 var logSubName string
 
 func initPanicFile() error {
-	file, err := os.OpenFile(
-		path.Join(logPath, buildLogFilename("panic", logSubName)),
-		os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		Warn("initPanicFile:OpenFile",
-			zap.Error(err))
+	// file, err := os.OpenFile(
+	// 	path.Join(logPath, buildLogFilename("panic", logSubName)),
+	// 	os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	// if err != nil {
+	// 	Warn("initPanicFile:OpenFile",
+	// 		zap.Error(err))
 
-		return err
-	}
+	// 	return err
+	// }
 
-	panicFile = file
+	// // panicFile = file
 
-	if err = syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd())); err != nil {
-		Warn("initPanicFile:Dup2",
-			zap.Error(err))
+	// if err = syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd())); err != nil {
+	// 	Warn("initPanicFile:Dup2",
+	// 		zap.Error(err))
 
-		return err
-	}
+	// 	return err
+	// }
 
 	return nil
 }
@@ -156,7 +155,7 @@ func InitLogger(logname string, appVersion string, level string, isConsole bool,
 		logger = cl
 	})
 
-	return
+	// return
 }
 
 // // Log a message at the given level with given fields
