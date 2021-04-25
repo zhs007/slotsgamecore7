@@ -269,6 +269,11 @@ func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
 	r := CalcLine(scene, pt, ld, bet, isValidSymbol, isWild, isSameSymbol)
 	if r != nil {
 		r.OtherMul = calcOtherMul(scene, r)
+
+		if r.OtherMul > 1 {
+			r.CoinWin = r.CoinWin * r.OtherMul
+			r.CashWin = r.CashWin * r.OtherMul
+		}
 	}
 
 	return r
