@@ -270,6 +270,8 @@ func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
 	if r != nil {
 		r.OtherMul = calcOtherMul(scene, r)
 	}
+
+	return r
 }
 
 // CalcFullLineEx - calc fullline & no wild in reel0
