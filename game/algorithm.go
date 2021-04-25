@@ -28,6 +28,9 @@ type FuncIsValidSymbolEx func(cursymbol int, scene *GameScene, x, y int) bool
 // FuncCountSymbolInReel - count symbol nums in a reel
 type FuncCountSymbolInReel func(cursymbol int, scene *GameScene, x int) int
 
+// FuncCalcOtherMul - calc other multi
+type FuncCalcOtherMul func(scene *GameScene, result *Result) int
+
 // CalcScatter - calc scatter
 func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins int,
 	isScatter FuncIsScatter) *Result {
@@ -256,6 +259,19 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	}
 
 	return nil
+}
+
+// CalcLineEx - calc line
+func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
+	isValidSymbol FuncIsValidSymbol,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol, calcOtherMul FuncCalcOtherMul) *Result {
+	r := CalcLine(scene, pt, ld, bet, isValidSymbol, isWild, isSameSymbol)
+	if r != nil {
+		r.OtherMul = calcOtherMul(scene, r)
+	}
+
+	return r
 }
 
 // CalcFullLineEx - calc fullline & no wild in reel0
