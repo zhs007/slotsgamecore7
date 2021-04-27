@@ -8,15 +8,16 @@ import (
 
 // Config - config
 type Config struct {
-	Lines        *LineData                     `json:"lines"`
-	Reels        map[string]*ReelsData         `json:"reels"`
-	PayTables    *PayTables                    `json:"paytables"`
-	Width        int                           `json:"width"`
-	Height       int                           `json:"height"`
-	DefaultScene *GameScene                    `json:"defaultscene"`
-	Ver          string                        `json:"ver"`
-	CoreVer      string                        `json:"corever"`
-	SWReels      map[string]*SymbolWeightReels `json:"-"`
+	Lines         *LineData                     `json:"lines"`
+	Reels         map[string]*ReelsData         `json:"reels"`
+	PayTables     *PayTables                    `json:"paytables"`
+	Width         int                           `json:"width"`
+	Height        int                           `json:"height"`
+	DefaultScene  *GameScene                    `json:"defaultscene"`
+	Ver           string                        `json:"ver"`
+	CoreVer       string                        `json:"corever"`
+	SWReels       map[string]*SymbolWeightReels `json:"-"`
+	DefaultScene2 []*GameScene                  `json:"defaultscene2"`
 }
 
 // NewConfig - new a Config
