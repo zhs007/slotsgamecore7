@@ -109,6 +109,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -127,6 +129,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -155,6 +159,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -183,6 +189,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 0, "they should be equal")
@@ -211,6 +219,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 0, "they should be equal")
@@ -239,6 +249,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 0, "they should be equal")
@@ -257,6 +269,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Nil(t, result, "it should be nil")
@@ -271,6 +285,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Nil(t, result, "it should be nil")
@@ -285,6 +301,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 9, "they should be equal")
@@ -313,6 +331,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -341,6 +361,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Nil(t, result, "it should be nil")
@@ -365,6 +387,8 @@ func Test_CalcLine(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 1, "they should be equal")
@@ -403,6 +427,8 @@ func Test_CalcLine2(t *testing.T) {
 		},
 		func(s int, cs int) bool {
 			return cs == s || s == 0
+		}, func(cs int) int {
+			return cs
 		})
 
 	assert.Equal(t, result.Symbol, 10, "they should be equal")
