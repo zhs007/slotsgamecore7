@@ -31,6 +31,9 @@ type FuncCountSymbolInReel func(cursymbol int, scene *GameScene, x int) int
 // FuncCalcOtherMul - calc other multi
 type FuncCalcOtherMul func(scene *GameScene, result *Result) int
 
+// FuncGetSymbol - get symbol
+type FuncGetSymbol func(cursymbol int) int
+
 // CalcScatter - calc scatter
 func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins int,
 	isScatter FuncIsScatter) *Result {
@@ -102,9 +105,10 @@ func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScat
 func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	isValidSymbol FuncIsValidSymbol,
 	isWild FuncIsWild,
-	isSameSymbol FuncIsSameSymbol) *Result {
+	isSameSymbol FuncIsSameSymbol,
+	getSymbol FuncGetSymbol) *Result {
 
-	s0 := scene.Arr[0][ld[0]]
+	s0 := getSymbol(scene.Arr[0][ld[0]])
 	if !isValidSymbol(s0) {
 		return nil
 	}
@@ -265,8 +269,10 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
 	isValidSymbol FuncIsValidSymbol,
 	isWild FuncIsWild,
-	isSameSymbol FuncIsSameSymbol, calcOtherMul FuncCalcOtherMul) *Result {
-	r := CalcLine(scene, pt, ld, bet, isValidSymbol, isWild, isSameSymbol)
+	isSameSymbol FuncIsSameSymbol,
+	calcOtherMul FuncCalcOtherMul,
+	getSymbol FuncGetSymbol) *Result {
+	r := CalcLine(scene, pt, ld, bet, isValidSymbol, isWild, isSameSymbol, getSymbol)
 	if r != nil {
 		r.OtherMul = calcOtherMul(scene, r)
 
