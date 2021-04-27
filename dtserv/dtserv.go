@@ -16,6 +16,7 @@ import (
 
 // Serv - DreamTech Service
 type Serv struct {
+	sgc7pb.UnimplementedDTGameLogicServer
 	lis      net.Listener
 	grpcServ *grpc.Server
 	service  IService

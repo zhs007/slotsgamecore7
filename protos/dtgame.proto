@@ -50,6 +50,7 @@ message GameConfig {
     string ver = 6;
     string coreVer = 7;
     GameScene defaultScene = 8;
+    repeated GameScene defaultScene2 = 9;
 }
 
 // RequestConfig

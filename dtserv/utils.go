@@ -116,6 +116,12 @@ func BuildPBGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 		pbcfg.DefaultScene = BuildPBGameScene(cfg.DefaultScene)
 	}
 
+	if len(cfg.DefaultScene2) > 0 {
+		for _, v := range cfg.DefaultScene2 {
+			pbcfg.DefaultScene2 = append(pbcfg.DefaultScene2, BuildPBGameScene(v))
+		}
+	}
+
 	return pbcfg
 }
 
