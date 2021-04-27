@@ -196,3 +196,27 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 
 	return nil
 }
+
+// AddDefaultSceneString2 - [][]int in json
+func (cfg *Config) AddDefaultSceneString2(str string) error {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	var arr [][]int
+	err := json.Unmarshal([]byte(str), &arr)
+	if err != nil {
+		return err
+	}
+
+	ds, err := NewGameSceneWithArr2Ex(arr)
+	if err != nil {
+		sgc7utils.Error("sgc7game.Config.AddDefaultSceneString2:NewGameSceneWithArr2Ex",
+			zap.String("str", str),
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg.DefaultScene2 = append(cfg.DefaultScene2, ds)
+
+	return nil
+}
