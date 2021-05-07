@@ -6,6 +6,7 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
@@ -157,8 +158,10 @@ func Test_Serv(t *testing.T) {
 	go func() {
 		err := serv.Start()
 		if err != nil {
-			t.Fatalf("Test_Serv Start error %v",
-				err)
+			sgc7utils.Error("Test_Serv Start error",
+				zap.Error(err))
+			// t.Fatalf("Test_Serv Start error %v",
+			// 	err)
 		}
 	}()
 
