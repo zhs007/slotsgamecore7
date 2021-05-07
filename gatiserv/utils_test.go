@@ -8,19 +8,19 @@ import (
 )
 
 //--------------------------------------------------------------------------------------
-// errPlayerState
+// ErrPlayerState
 
-type errPlayerState struct {
+type ErrPlayerState struct {
 }
 
 // SetPublic - set player public state
-func (eps *errPlayerState) SetPublic(pub interface{}) error {
+func (eps *ErrPlayerState) SetPublic(pub interface{}) error {
 	return nil
 
 }
 
 // SetPrivate - set player private state
-func (eps *errPlayerState) SetPrivate(pri interface{}) error {
+func (eps *ErrPlayerState) SetPrivate(pri interface{}) error {
 	return nil
 }
 
@@ -35,12 +35,12 @@ func (eps *errPlayerState) SetPrivate(pri interface{}) error {
 // }
 
 // GetPublic - get player public state
-func (eps *errPlayerState) GetPublic() interface{} {
+func (eps *ErrPlayerState) GetPublic() interface{} {
 	return nil
 }
 
 // GetPrivate - get player private state
-func (eps *errPlayerState) GetPrivate() interface{} {
+func (eps *ErrPlayerState) GetPrivate() interface{} {
 	return nil
 }
 

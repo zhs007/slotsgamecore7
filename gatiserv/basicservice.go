@@ -1,6 +1,8 @@
 package gatiserv
 
 import (
+	"os"
+
 	jsoniter "github.com/json-iterator/go"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
@@ -29,8 +31,11 @@ func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicServi
 
 	gc, err := LoadGATIGameConfig(gcfn)
 	if err != nil {
+		curpwd, _ := os.Getwd()
+
 		sgc7utils.Error("NewBasicService:LoadGATIGameConfig",
 			zap.String("gcfn", gcfn),
+			zap.String("pwd", curpwd),
 			zap.Error(err))
 
 		return nil, err

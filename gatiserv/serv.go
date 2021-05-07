@@ -73,7 +73,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			s.SetHTTPStatus(ctx, fasthttp.StatusMethodNotAllowed)
 
-			return
+			// return
 
 			// if !ctx.Request.Header.IsPost() {
 			// 	s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
