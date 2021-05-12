@@ -119,7 +119,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	pos = append(pos, 0, ld[0])
 
 	if isWild(s0) {
-		wilds := 0
+		wilds := 1
 		ws := -1
 		wnums := 1
 		wpos := make([]int, 0, len(ld)*2)

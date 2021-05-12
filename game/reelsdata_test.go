@@ -5,25 +5,25 @@ import (
 )
 
 func Test_LoadReels5JSON(t *testing.T) {
-	ld, err := LoadReels5JSON("../unittestdata/reels1.json")
+	_, err := LoadReels5JSON("../unittestdata/reels1.json")
 	if err == nil {
 		t.Fatalf("Test_LoadReels5JSON LoadReels5JSON non-file error %v",
 			err)
 	}
 
-	ld, err = LoadReels5JSON("../unittestdata/errjson.json")
+	_, err = LoadReels5JSON("../unittestdata/errjson.json")
 	if err == nil {
 		t.Fatalf("Test_LoadReels5JSON LoadReels5JSON errjson error %v",
 			err)
 	}
 
-	ld, err = LoadReels5JSON("../unittestdata/empty.json")
+	_, err = LoadReels5JSON("../unittestdata/empty.json")
 	if err == nil {
 		t.Fatalf("Test_LoadReels5JSON LoadReels5JSON empty error %v",
 			err)
 	}
 
-	ld, err = LoadReels5JSON("../unittestdata/paytables.json")
+	ld, err := LoadReels5JSON("../unittestdata/paytables.json")
 	if err != nil || ld != nil {
 		t.Fatalf("Test_LoadReels5JSON LoadReels5JSON format error %v",
 			err)

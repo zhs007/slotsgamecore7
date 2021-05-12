@@ -27,7 +27,7 @@ func NewFastReelsRandomSP(reels *ReelsData, onSelectReelIndex FuncOnSelectReelIn
 
 		for y := range l {
 			carr := onSelectReelIndex(reels, x, y)
-			if carr != nil {
+			if len(carr) > 0 {
 				for _, v := range carr {
 					arr = sgc7utils.InsUniqueIntSlice(arr, v)
 				}
