@@ -44,8 +44,8 @@ func Test_BasicService(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, func() bool { return cr3 >= 0 }(), true)
 
-	var iservice IService
-	iservice = bs
+	var iservice IService = bs
+	// iservice = bs
 	assert.NotNil(t, iservice, "Test_BasicService IService")
 
 	t.Logf("Test_BasicService OK")

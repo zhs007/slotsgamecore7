@@ -27,8 +27,8 @@ func Test_BasicPlayerState(t *testing.T) {
 	assert.Equal(t, isok, true, "Test_BasicPlayerState BasicPlayerPrivateState")
 	assert.NotNil(t, bppri, "Test_BasicPlayerState BasicPlayerPrivateState")
 
-	var ips IPlayerState
-	ips = ps
+	var ips IPlayerState = ps
+	// ips = ps
 	assert.NotNil(t, ips, "Test_BasicPlayerState IPlayerState")
 
 	// err := ips.SetPublicString("")
