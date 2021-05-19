@@ -282,31 +282,6 @@ func main() {
 		"debug", true, "./logs")
 
 	// genElemental2()
-	genMedusa2()
-	// genLotsalines()
-
-	// ccs, err := gatiserv.GenChecksum([]*gatiserv.GATICriticalComponent{
-	// 	{
-	// 		ID:       1,
-	// 		Name:     "dtgatigame",
-	// 		Location: "gitlab.heyalgo.io/slotsgames7/lotsalines",
-	// 		Filename: "./gatidocker/dtgatigame/dtgatigame",
-	// 	},
-	// })
-	// if err != nil {
-	// 	sgc7utils.Error("GenChecksum", zap.Error(err))
-
-	// 	return
-	// }
-
-	// gatiserv.SaveGATIGameInfo(&gatiserv.GATIGameInfo{
-	// 	Components: ccs.Components,
-	// 	Info: gatiserv.VersionInfo{
-	// 		GameTitle:     "lotsalines",
-	// 		GameVersion:   dtgame.Version,
-	// 		VCSVersion:    "6c9ac1ec7bfb8e914456fb2c5476ae3c4a2f425e",
-	// 		BuildChecksum: ccs.Components[1].Checksum,
-	// 		BuildTime:     time.Now().Format("2006-01-02 15:04:05"),
-	// 	},
-	// }, "./gatidocker/dtgatigame/gameinfo.json")
+	// genMedusa2()
+	genLotsalines()
 }
