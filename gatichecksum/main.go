@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"syscall"
 	"time"
@@ -14,11 +16,51 @@ import (
 	"go.uber.org/zap"
 )
 
+func copyFile(dstName, srcName string) (written int64, err error) {
+	src, err := os.Open(srcName)
+	if err != nil {
+		return
+	}
+	defer src.Close()
+	dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return
+	}
+	defer dst.Close()
+	return io.Copy(dst, src)
+}
+
 func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename string, circleComponents [][]string) {
 	starttime := time.Now()
 	tsPath := starttime.Format("2006-01-02_15:04:05")
 
-	os.MkdirAll(path.Join(tsPath, gamename), os.ModePerm)
+	os.MkdirAll(gamename, os.ModePerm)
+
+	dir, err := ioutil.ReadDir(path.Join(gamename, "bins"))
+	if err == nil {
+		for _, d := range dir {
+			os.RemoveAll(path.Join(gamename, "bins", d.Name()))
+		}
+	}
+
+	os.MkdirAll(path.Join(gamename, "bins"), os.ModePerm)
+
+	// command := fmt.Sprintf("cd %s\nsource buildgati.docker.sh\nsource buildgati.sh", pathRoot)
+	command := fmt.Sprintf("cd %s\nsource buildgati.docker.sh", pathRoot)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	output, err := cmd.Output()
+	if err != nil {
+		sgc7utils.Error("Command",
+			zap.String("command", command),
+			zap.Error(err))
+
+		return
+	}
+	ioutil.WriteFile(path.Join(gamename, "backendBuildOutput.txt"), output, 0644)
+
+	copyFile(path.Join(gamename, "bins", "dtgatigame"), path.Join(pathRoot, "gatidocker/dtgatigame/dtgatigame"))
+
+	os.MkdirAll(path.Join(gamename, tsPath, gamename), os.ModePerm)
 
 	strBin := ""
 	for _, v := range binFiles {
@@ -34,7 +76,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		strBin += fmt.Sprintf("%s\t%s\n", cs, path.Join("certificationBuildOutput", tsPath, "bins", v))
 	}
-	ioutil.WriteFile(path.Join("./", "shasumBins.txt"), []byte(strBin), 0644)
+	ioutil.WriteFile(path.Join(gamename, "shasumBins.txt"), []byte(strBin), 0644)
 
 	strBin = ""
 	for _, v := range binFiles {
@@ -57,7 +99,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		strBin += fmt.Sprintf("Modify:\t%s\n", time.Unix(linuxFileAttr.Mtim.Sec, 0).Format("2006-01-02_15:04:05"))
 		strBin += fmt.Sprintf(" Birth:\t%s\n", time.Unix(linuxFileAttr.Ctim.Sec, 0).Format("2006-01-02_15:04:05"))
 	}
-	ioutil.WriteFile(path.Join(tsPath, gamename, "sBuildBinData.txt"), []byte(strBin), 0644)
+	ioutil.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildBinData.txt"), []byte(strBin), 0644)
 
 	strSrc := ""
 	for _, v := range srcFiles {
@@ -73,7 +115,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		strSrc += fmt.Sprintf("%s\t%s\n", cs, path.Join("certificationBuildOutput", tsPath, gamename, v))
 	}
-	ioutil.WriteFile(path.Join("./", "shasumSourceCode.txt"), []byte(strSrc), 0644)
+	ioutil.WriteFile(path.Join(gamename, "shasumSourceCode.txt"), []byte(strSrc), 0644)
 
 	strSrc = ""
 	for _, v := range srcFiles {
@@ -92,7 +134,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		linuxFileAttr := finfo.Sys().(*syscall.Stat_t)
 		strSrc += fmt.Sprintf("%s\t%s\n", time.Unix(linuxFileAttr.Mtim.Sec, 0).Format("2006-01-02_15:04:05"), path.Join("certificationBuildOutput", tsPath, "bins", v))
 	}
-	ioutil.WriteFile(path.Join(tsPath, gamename, "sBuildSrcData.txt"), []byte(strSrc), 0644)
+	ioutil.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildSrcData.txt"), []byte(strSrc), 0644)
 
 	strCC := ""
 	ccid := 1
@@ -111,7 +153,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		ccid++
 	}
-	ioutil.WriteFile(path.Join("./", "circleComponents.txt"), []byte(strCC), 0644)
+	ioutil.WriteFile(path.Join(gamename, "circleComponents.txt"), []byte(strCC), 0644)
 
 	strBuild := "SBuild started.\n"
 	strBuild += starttime.Format("2006-01-02 15:04:05")
@@ -119,7 +161,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 	strBuild += "SBuild finished.\n"
 	strBuild += time.Now().Format("2006-01-02 15:04:05")
 	strBuild += "\n"
-	ioutil.WriteFile(path.Join("./", "executionTime.txt"), []byte(strBuild), 0644)
+	ioutil.WriteFile(path.Join(gamename, "executionTime.txt"), []byte(strBuild), 0644)
 }
 
 func genLotsalines() {
@@ -157,11 +199,91 @@ func genLotsalines() {
 	genSBuild(pathRoot, binFiles, srcFiles, "lotsalines", circleComponents)
 }
 
+func genElemental2() {
+	pathRoot := "../../elemental2/"
+	binFiles := []string{
+		"gatidocker/dtgatigame/dtgatigame",
+	}
+	srcFiles := []string{
+		"cfg/bg.json",
+		"cfg/linedata.json",
+		"cfg/paytables.json",
+		"cfg/fg0.json",
+		"cfg/fg1.json",
+		"cfg/fg2.json",
+		"cfg/fg3.json",
+		"cfg/rtp96.yaml",
+		"basedef.go",
+		"basegame.go",
+		"config.go",
+		"err.go",
+		"freegame.go",
+		"game.go",
+		"gatiservice.go",
+		"go.mod",
+		"go.sum",
+		// "utils.go",
+		"version.go",
+		"freegame0earth.go",
+		"freegame1fire.go",
+		"freegame2air.go",
+		"freegame3water.go",
+	}
+	circleComponents := [][]string{
+		{"gatidocker/dtgatigame/dtgatigame", "dtgatigame", "app/"},
+		{"cfg/bg.json", "bg.json", "app/cfg/"},
+		{"cfg/linedata.json", "linedata.json", "app/cfg/"},
+		{"cfg/paytables.json", "paytables.json", "app/cfg/"},
+		{"cfg/fg0.json", "fg0.json", "app/cfg/"},
+		{"cfg/fg1.json", "fg1.json", "app/cfg/"},
+		{"cfg/fg2.json", "fg2.json", "app/cfg/"},
+		{"cfg/fg3.json", "fg3.json", "app/cfg/"},
+		{"cfg/rtp96.yaml", "rtp96.yaml", "app/cfg/"},
+	}
+
+	genSBuild(pathRoot, binFiles, srcFiles, "elemental2", circleComponents)
+}
+
+func genMedusa2() {
+	pathRoot := "../../medusa2/"
+	binFiles := []string{
+		"gatidocker/dtgatigame/dtgatigame",
+	}
+	srcFiles := []string{
+		"cfg/bg.json",
+		"cfg/fg.json",
+		"cfg/paytables.json",
+		"cfg/rtp96.yaml",
+		"basedef.go",
+		"basegame.go",
+		"config.go",
+		"err.go",
+		"freegame.go",
+		"game.go",
+		"gatiservice.go",
+		"go.mod",
+		"go.sum",
+		"utils.go",
+		"version.go",
+	}
+	circleComponents := [][]string{
+		{"gatidocker/dtgatigame/dtgatigame", "dtgatigame", "app/"},
+		{"cfg/bg.json", "bg.json", "app/cfg/"},
+		{"cfg/fg.json", "fg.json", "app/cfg/"},
+		{"cfg/paytables.json", "paytables.json", "app/cfg/"},
+		{"cfg/rtp96.yaml", "rtp96.yaml", "app/cfg/"},
+	}
+
+	genSBuild(pathRoot, binFiles, srcFiles, "medusa2", circleComponents)
+}
+
 func main() {
 	sgc7utils.InitLogger("gatiChecksum", sgc7ver.Version,
 		"debug", true, "./logs")
 
-	genLotsalines()
+	// genElemental2()
+	genMedusa2()
+	// genLotsalines()
 
 	// ccs, err := gatiserv.GenChecksum([]*gatiserv.GATICriticalComponent{
 	// 	{
