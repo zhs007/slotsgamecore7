@@ -164,6 +164,17 @@ func InitGameMod2(node *RTPNode, tags []string, funcTag []FuncOnResult, symbols 
 	}
 }
 
+// InitGameMod3 - new RTPNode
+func InitGameMod3(node *RTPNode, tags []string, funcTag []FuncOnResult, symbols []int, nums []int, onSymbolResult []FuncOnResult, onSymbolNumsResult []FuncOnResult) {
+	if len(tags) > 0 {
+		for i, tag := range tags {
+			ctn := NewRTPGameModTag(node.GameMod, tag, funcTag[i])
+			InitGameModTag2(ctn, tag, symbols, nums, onSymbolResult[i], onSymbolNumsResult[i])
+			node.AddChild(tag, ctn)
+		}
+	}
+}
+
 // InitGameModTag - new RTPNode
 func InitGameModTag(node *RTPNode, tag string, symbols []int, nums []int) {
 	for _, sv := range symbols {
