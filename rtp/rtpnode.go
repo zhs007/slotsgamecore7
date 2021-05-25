@@ -172,12 +172,6 @@ func InitGameMod3(node *RTPNode, tags []string, funcTag []FuncOnResult, symbols 
 			InitGameModTag2(ctn, tag, symbols, nums, onSymbolResult[i], onSymbolNumsResult[i])
 			node.AddChild(tag, ctn)
 		}
-	} else {
-		for _, sv := range symbols {
-			csn := NewRTPSymbol2(node.GameMod, "", sv, onSymbolResult)
-			InitSymbol2(csn, "", sv, nums, onSymbolNumsResult)
-			node.AddChild(strconv.Itoa(sv), csn)
-		}
 	}
 }
 
