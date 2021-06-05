@@ -74,6 +74,10 @@ func (rtp *RTP) Bet(bet int64) {
 	for _, v := range rtp.MapHR {
 		v.BetNums++
 	}
+
+	for _, v := range rtp.MapFeature {
+		v.BetNums++
+	}
 }
 
 // OnResult -
@@ -188,7 +192,7 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	if len(rtp.MapFeature) > 0 {
 		f.WriteString("\n\n\n")
 
-		f.WriteString("name,betnums,triggernums,totalnums,hitrate,average\n")
+		f.WriteString("name,betnums,triggernums\n")
 
 		keys := []string{}
 		for k := range rtp.MapFeature {

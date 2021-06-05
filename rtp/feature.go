@@ -15,7 +15,6 @@ type FeatureNode struct {
 	TagName       string
 	BetNums       int64
 	TriggerNums   int64
-	TotalNums     int64
 	FuncOnResults FuncFeatureOnResults
 }
 
@@ -31,10 +30,7 @@ func NewFeatureNode(tag string, funcOnResults FuncFeatureOnResults) *FeatureNode
 func (node *FeatureNode) GenString() string {
 	str := sgc7utils.AppendString(node.TagName, ",",
 		strconv.FormatInt(node.BetNums, 10), ",",
-		strconv.FormatInt(node.TriggerNums, 10), ",",
-		strconv.FormatInt(node.TotalNums, 10), ",",
-		strconv.FormatFloat(float64(node.TriggerNums)/float64(node.BetNums), 'f', -1, 64), ",",
-		strconv.FormatFloat(float64(node.TotalNums)/float64(node.TriggerNums), 'f', -1, 64), "\n")
+		strconv.FormatInt(node.TriggerNums, 10), "\n")
 
 	return str
 }
@@ -45,7 +41,6 @@ func (node *FeatureNode) Clone() *FeatureNode {
 		TagName:       node.TagName,
 		BetNums:       node.BetNums,
 		TriggerNums:   node.TriggerNums,
-		TotalNums:     node.TotalNums,
 		FuncOnResults: node.FuncOnResults,
 	}
 
@@ -56,7 +51,6 @@ func (node *FeatureNode) Clone() *FeatureNode {
 func (node *FeatureNode) Add(node1 *FeatureNode) {
 	if node.TagName == node1.TagName {
 		node.TriggerNums += node1.TriggerNums
-		node.TotalNums += node1.TotalNums
 		node.BetNums += node1.BetNums
 	}
 }
