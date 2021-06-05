@@ -30,6 +30,9 @@ func NewSpecialHitRate(tag string, funcOnResult FuncHROnResult) *HitRateNode {
 // GenString -
 func (node *HitRateNode) GenString() string {
 	str := sgc7utils.AppendString(node.TagName, ",",
+		strconv.FormatInt(node.BetNums, 10), ",",
+		strconv.FormatInt(node.TriggerNums, 10), ",",
+		strconv.FormatInt(node.TotalNums, 10), ",",
 		strconv.FormatFloat(float64(node.TriggerNums)/float64(node.BetNums), 'f', -1, 64), ",",
 		strconv.FormatFloat(float64(node.TotalNums)/float64(node.TriggerNums), 'f', -1, 64), "\n")
 
