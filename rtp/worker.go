@@ -86,6 +86,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					currtp.OnResult(v)
 				}
 
+				currtp.OnResults(results)
+
 				results = results[:0]
 
 				off++

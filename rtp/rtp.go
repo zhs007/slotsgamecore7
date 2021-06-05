@@ -12,31 +12,38 @@ import (
 
 // RTP -
 type RTP struct {
-	BetNums  int64
-	TotalBet int64
-	Root     *RTPNode
-	MapHR    map[string]*HitRateNode
+	BetNums    int64
+	TotalBet   int64
+	Root       *RTPNode
+	MapHR      map[string]*HitRateNode
+	MapFeature map[string]*FeatureNode
 }
 
 // NewRTP - new RTP
 func NewRTP() *RTP {
 	return &RTP{
-		Root:  NewRTPRoot(),
-		MapHR: make(map[string]*HitRateNode),
+		Root:       NewRTPRoot(),
+		MapHR:      make(map[string]*HitRateNode),
+		MapFeature: make(map[string]*FeatureNode),
 	}
 }
 
 // Clone - clone
 func (rtp *RTP) Clone() *RTP {
 	nrtp := &RTP{
-		BetNums:  rtp.BetNums,
-		TotalBet: rtp.TotalBet,
-		Root:     rtp.Root.Clone(),
-		MapHR:    make(map[string]*HitRateNode),
+		BetNums:    rtp.BetNums,
+		TotalBet:   rtp.TotalBet,
+		Root:       rtp.Root.Clone(),
+		MapHR:      make(map[string]*HitRateNode),
+		MapFeature: make(map[string]*FeatureNode),
 	}
 
 	for k, v := range rtp.MapHR {
 		nrtp.MapHR[k] = v.Clone()
+	}
+
+	for k, v := range rtp.MapFeature {
+		nrtp.MapFeature[k] = v.Clone()
 	}
 
 	return nrtp
@@ -75,6 +82,14 @@ func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
 
 	for _, v := range rtp.MapHR {
 		v.FuncOnResult(v, pr)
+	}
+}
+
+// OnResults -
+func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult) {
+
+	for _, v := range rtp.MapFeature {
+		v.FuncOnResults(v, lst)
 	}
 }
 
@@ -148,7 +163,7 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	if len(rtp.MapHR) > 0 {
 		f.WriteString("\n\n\n")
 
-		f.WriteString("name,hitrate,average\n")
+		f.WriteString("name,betnums,triggernums,totalnums,hitrate,average\n")
 
 		keys := []string{}
 		for k := range rtp.MapHR {
@@ -161,6 +176,26 @@ func (rtp *RTP) Save2CSV(fn string) error {
 
 		for _, v := range keys {
 			str := rtp.MapHR[v].GenString()
+			f.WriteString(str)
+		}
+	}
+
+	if len(rtp.MapFeature) > 0 {
+		f.WriteString("\n\n\n")
+
+		f.WriteString("name,betnums,triggernums,totalnums,hitrate,average\n")
+
+		keys := []string{}
+		for k := range rtp.MapFeature {
+			keys = append(keys, k)
+		}
+
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i] < keys[j]
+		})
+
+		for _, v := range keys {
+			str := rtp.MapFeature[v].GenString()
 			f.WriteString(str)
 		}
 	}

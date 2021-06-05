@@ -41,5 +41,5 @@ fg,,,300,,,,,,300
 
 
 
-name,hitrate,average
-special,0.3333333333333333,3
+name,betnums,triggernums,totalnums,hitrate,average
+special,3,1,3,0.3333333333333333,3
