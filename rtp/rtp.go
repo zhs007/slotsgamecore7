@@ -98,6 +98,11 @@ func (rtp *RTP) AddHitRateNode(tag string, funcOnResult FuncHROnResult) {
 	rtp.MapHR[tag] = NewSpecialHitRate(tag, funcOnResult)
 }
 
+// AddFeature -
+func (rtp *RTP) AddFeature(tag string, funcOnResults FuncFeatureOnResults) {
+	rtp.MapFeature[tag] = NewFeatureNode(tag, funcOnResults)
+}
+
 // Save2CSV -
 func (rtp *RTP) Save2CSV(fn string) error {
 	f, err := os.Create(fn)
