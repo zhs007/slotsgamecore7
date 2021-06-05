@@ -59,6 +59,10 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	for k, v := range rtp.MapHR {
 		v.Add(rtp1.MapHR[k])
 	}
+
+	for k, v := range rtp.MapFeature {
+		v.Add(rtp1.MapFeature[k])
+	}
 }
 
 // CalcRTP -
