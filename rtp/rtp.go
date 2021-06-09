@@ -233,8 +233,8 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	}
 
 	f.WriteString("\n\n\n")
-	f.WriteString("totalnums,winnums,Hit Frequency\n")
-	str = fmt.Sprintf("%v,%v,%v\n", rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums))
+	f.WriteString("totalnums,winnums,Hit Frequency,Variance\n")
+	str = fmt.Sprintf("%v,%v,%v,%v\n", rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance)
 	f.WriteString(str)
 
 	f.Sync()
