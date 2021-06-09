@@ -19,6 +19,8 @@ type RTP struct {
 	Root       *RTPNode
 	MapHR      map[string]*HitRateNode
 	MapFeature map[string]*FeatureNode
+	Variance   float64
+	Returns    []float64
 }
 
 // NewRTP - new RTP
@@ -56,6 +58,7 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	rtp.WinNums += rtp1.WinNums
 	rtp.BetNums += rtp1.BetNums
 	rtp.TotalBet += rtp1.TotalBet
+	rtp.Returns = append(rtp.Returns, rtp1.Returns...)
 
 	rtp.Root.Add(rtp1.Root)
 
