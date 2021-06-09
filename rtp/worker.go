@@ -211,6 +211,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					}
 
 					if cr <= val {
+						results = results[:0]
+
 						continue
 					}
 				}
