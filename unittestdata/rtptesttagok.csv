@@ -43,3 +43,8 @@ fg,,,300,,,,,,300
 
 name,betnums,triggernums,totalnums,hitrate,average
 special,3,1,3,0.3333333333333333,3
+
+
+
+totalnums,winnums,Hit Frequency
+3,0,0

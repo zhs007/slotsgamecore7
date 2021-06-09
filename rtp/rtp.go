@@ -1,6 +1,7 @@
 package sgc7rtp
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 
 // RTP -
 type RTP struct {
+	WinNums    int64
 	BetNums    int64
 	TotalBet   int64
 	Root       *RTPNode
@@ -95,6 +97,19 @@ func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
 
 // OnResults -
 func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult) {
+	iswin := false
+
+	for _, v := range lst {
+		if v.CoinWin > 0 {
+			iswin = true
+
+			break
+		}
+	}
+
+	if iswin {
+		rtp.WinNums++
+	}
 
 	for _, v := range rtp.MapFeature {
 		v.FuncOnResults(v, lst)
@@ -212,6 +227,11 @@ func (rtp *RTP) Save2CSV(fn string) error {
 			f.WriteString(str)
 		}
 	}
+
+	f.WriteString("\n\n\n")
+	f.WriteString("totalnums,winnums,Hit Frequency\n")
+	str = fmt.Sprintf("%v,%v,%v\n", rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums))
+	f.WriteString(str)
 
 	f.Sync()
 
