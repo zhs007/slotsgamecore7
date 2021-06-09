@@ -21,5 +21,5 @@ fg,,,300,,,,,,300
 
 
 
-totalnums,winnums,Hit Frequency
-3,0,0
+totalnums,winnums,Hit Frequency,Variance
+3,0,0,0
