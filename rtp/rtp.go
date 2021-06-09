@@ -53,6 +53,7 @@ func (rtp *RTP) Clone() *RTP {
 
 // Add - add
 func (rtp *RTP) Add(rtp1 *RTP) {
+	rtp.WinNums += rtp1.WinNums
 	rtp.BetNums += rtp1.BetNums
 	rtp.TotalBet += rtp1.TotalBet
 
