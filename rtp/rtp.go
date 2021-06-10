@@ -13,14 +13,15 @@ import (
 
 // RTP -
 type RTP struct {
-	WinNums    int64
-	BetNums    int64
-	TotalBet   int64
-	Root       *RTPNode
-	MapHR      map[string]*HitRateNode
-	MapFeature map[string]*FeatureNode
-	Variance   float64
-	Returns    []float64
+	WinNums       int64
+	BetNums       int64
+	TotalBet      int64
+	Root          *RTPNode
+	MapHR         map[string]*HitRateNode
+	MapFeature    map[string]*FeatureNode
+	Variance      float64
+	Returns       []float64
+	ReturnWeights []float64
 }
 
 // NewRTP - new RTP
@@ -59,6 +60,7 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	rtp.BetNums += rtp1.BetNums
 	rtp.TotalBet += rtp1.TotalBet
 	rtp.Returns = append(rtp.Returns, rtp1.Returns...)
+	rtp.ReturnWeights = append(rtp.ReturnWeights, rtp1.ReturnWeights...)
 
 	rtp.Root.Add(rtp1.Root)
 
@@ -240,4 +242,18 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	f.Sync()
 
 	return nil
+}
+
+// AddReturns -
+func (rtp *RTP) AddReturns(ret float64) {
+	for i, v := range rtp.Returns {
+		if sgc7utils.IsFloatEquals(v, ret) {
+			rtp.ReturnWeights[i]++
+
+			return
+		}
+	}
+
+	rtp.Returns = append(rtp.Returns, ret)
+	rtp.ReturnWeights = append(rtp.ReturnWeights, 1)
 }

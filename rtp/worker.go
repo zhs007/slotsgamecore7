@@ -97,7 +97,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				currtp.OnResults(results)
 
 				if needVariance {
-					rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
+					rtp.AddReturns(float64(totalReturn / stake.CashBet))
 				}
 
 				results = results[:0]
@@ -129,7 +129,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 	elapsed := time.Since(t1)
 
 	if needVariance {
-		rtp.Variance = stat.Variance(rtp.Returns, nil)
+		rtp.Variance = stat.Variance(rtp.Returns, rtp.ReturnWeights)
 	}
 
 	return elapsed
@@ -244,7 +244,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 				currtp.OnResults(results)
 
 				if needVariance {
-					rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
+					rtp.AddReturns(float64(totalReturn / stake.CashBet))
+					// rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
 				}
 
 				results = results[:0]
@@ -278,7 +279,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 	elapsed := time.Since(t1)
 
 	if needVariance {
-		rtp.Variance = stat.Variance(rtp.Returns, nil)
+		rtp.Variance = stat.Variance(rtp.Returns, rtp.ReturnWeights)
 	}
 
 	return elapsed
