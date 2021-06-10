@@ -15,7 +15,9 @@ import (
 type FuncOnRTPTimer func(totalnums int64, curnums int64, curtime time.Duration)
 
 // StartRTP - start RTP
-func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, numsTimer int, ontimer FuncOnRTPTimer) time.Duration {
+func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, numsTimer int,
+	ontimer FuncOnRTPTimer, needVariance bool) time.Duration {
+
 	t1 := time.Now()
 
 	lastnums := worknums
@@ -94,7 +96,9 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 				currtp.OnResults(results)
 
-				rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
+				if needVariance {
+					rtp.AddReturns(float64(totalReturn / stake.CashBet))
+				}
 
 				results = results[:0]
 
@@ -124,14 +128,16 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 	elapsed := time.Since(t1)
 
-	rtp.Variance = stat.Variance(rtp.Returns, nil)
+	if needVariance {
+		rtp.Variance = stat.Variance(rtp.Returns, rtp.ReturnWeights)
+	}
 
 	return elapsed
 }
 
 // StartRTP - start RTP
 func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, numsTimer int,
-	ontimer FuncOnRTPTimer, hitFrequency float64, originalRTP float64, targetRTP float64) time.Duration {
+	ontimer FuncOnRTPTimer, hitFrequency float64, originalRTP float64, targetRTP float64, needVariance bool) time.Duration {
 
 	val := int((targetRTP/originalRTP - hitFrequency) / (1 - hitFrequency) * math.MaxInt32)
 
@@ -237,7 +243,10 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 
 				currtp.OnResults(results)
 
-				rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
+				if needVariance {
+					rtp.AddReturns(float64(totalReturn / stake.CashBet))
+					// rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
+				}
 
 				results = results[:0]
 
@@ -269,7 +278,9 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 
 	elapsed := time.Since(t1)
 
-	rtp.Variance = stat.Variance(rtp.Returns, nil)
+	if needVariance {
+		rtp.Variance = stat.Variance(rtp.Returns, rtp.ReturnWeights)
+	}
 
 	return elapsed
 }
