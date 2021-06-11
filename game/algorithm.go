@@ -31,6 +31,9 @@ type FuncCountSymbolInReel func(cursymbol int, scene *GameScene, x int) int
 // FuncCalcOtherMul - calc other multi
 type FuncCalcOtherMul func(scene *GameScene, result *Result) int
 
+// FuncCalcOtherMulEx - calc other multi
+type FuncCalcOtherMulEx func(scene *GameScene, symbol int, pos []int) int
+
 // FuncGetSymbol - get symbol
 type FuncGetSymbol func(cursymbol int) int
 
@@ -283,6 +286,176 @@ func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
 	}
 
 	return r
+}
+
+// CalcLineOtherMul - calc line with otherMul
+func CalcLineOtherMul(scene *GameScene, pt *PayTables, ld []int, bet int,
+	isValidSymbol FuncIsValidSymbol,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol,
+	calcOtherMul FuncCalcOtherMulEx,
+	getSymbol FuncGetSymbol) *Result {
+	s0 := getSymbol(scene.Arr[0][ld[0]])
+	if !isValidSymbol(s0) {
+		return nil
+	}
+
+	nums := 1
+	pos := make([]int, 0, len(ld)*2)
+
+	pos = append(pos, 0, ld[0])
+
+	if isWild(s0) {
+		wilds := 1
+		ws := -1
+		wnums := 1
+		wpos := make([]int, 0, len(ld)*2)
+
+		wpos = append(wpos, 0, ld[0])
+
+		for x := 1; x < len(ld); x++ {
+			cs := scene.Arr[x][ld[x]]
+
+			if !isValidSymbol(cs) {
+				break
+			}
+
+			if ws == -1 {
+				if isWild(cs) {
+					wilds++
+
+					wnums++
+					nums++
+
+					pos = append(pos, x, ld[x])
+					wpos = append(wpos, x, ld[x])
+				} else {
+					ws = cs
+
+					nums++
+					pos = append(pos, x, ld[x])
+				}
+			} else {
+				if isWild(cs) {
+					wilds++
+				}
+
+				if isSameSymbol(cs, ws) {
+					nums++
+
+					pos = append(pos, x, ld[x])
+				} else {
+					break
+				}
+			}
+		}
+
+		if ws == -1 {
+			if wnums > 0 && pt.MapPay[s0][wnums-1] > 0 {
+				r := &Result{
+					Symbol:     s0,
+					Type:       RTLine,
+					Mul:        pt.MapPay[s0][wnums-1],
+					CoinWin:    pt.MapPay[s0][wnums-1],
+					CashWin:    pt.MapPay[s0][wnums-1] * bet,
+					Pos:        wpos,
+					Wilds:      wilds,
+					SymbolNums: wnums,
+				}
+
+				return r
+			}
+
+			return nil
+		}
+
+		wmul := 0
+		mul := 0
+		wothermul := 1
+		othermul := 1
+
+		if wnums > 0 {
+			wothermul = calcOtherMul(scene, s0, wpos)
+			wmul = pt.MapPay[s0][wnums-1]
+		}
+
+		if nums > 0 {
+			othermul = calcOtherMul(scene, ws, pos)
+			mul = pt.MapPay[ws][nums-1]
+		}
+
+		if wmul == 0 && mul == 0 {
+			return nil
+		}
+
+		if wmul*wothermul >= mul*othermul {
+			r := &Result{
+				Symbol:     s0,
+				Type:       RTLine,
+				Mul:        pt.MapPay[s0][wnums-1],
+				CoinWin:    pt.MapPay[s0][wnums-1] * wothermul,
+				CashWin:    pt.MapPay[s0][wnums-1] * wothermul * bet,
+				Pos:        wpos,
+				Wilds:      wilds,
+				SymbolNums: wnums,
+				OtherMul:   wothermul,
+			}
+
+			return r
+		}
+
+		r := &Result{
+			Symbol:     ws,
+			Type:       RTLine,
+			Mul:        pt.MapPay[ws][nums-1],
+			CoinWin:    pt.MapPay[ws][nums-1] * othermul,
+			CashWin:    pt.MapPay[ws][nums-1] * othermul * bet,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
+			OtherMul:   othermul,
+		}
+
+		return r
+	}
+
+	wilds := 0
+	for x := 1; x < len(ld); x++ {
+		cs := scene.Arr[x][ld[x]]
+
+		if !isValidSymbol(cs) {
+			break
+		}
+
+		if isSameSymbol(cs, s0) {
+			if isWild(cs) {
+				wilds++
+			}
+
+			nums++
+
+			pos = append(pos, x, ld[x])
+		} else {
+			break
+		}
+	}
+
+	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
+		r := &Result{
+			Symbol:     s0,
+			Type:       RTLine,
+			Mul:        pt.MapPay[s0][nums-1],
+			CoinWin:    pt.MapPay[s0][nums-1],
+			CashWin:    pt.MapPay[s0][nums-1] * bet,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	return nil
 }
 
 // CalcFullLineEx - calc fullline & no wild in reel0
