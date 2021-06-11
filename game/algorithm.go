@@ -352,15 +352,18 @@ func CalcLineOtherMul(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 		if ws == -1 {
 			if wnums > 0 && pt.MapPay[s0][wnums-1] > 0 {
+				wothermul := calcOtherMul(scene, s0, wpos)
+
 				r := &Result{
 					Symbol:     s0,
 					Type:       RTLine,
 					Mul:        pt.MapPay[s0][wnums-1],
-					CoinWin:    pt.MapPay[s0][wnums-1],
-					CashWin:    pt.MapPay[s0][wnums-1] * bet,
+					CoinWin:    pt.MapPay[s0][wnums-1] * wothermul,
+					CashWin:    pt.MapPay[s0][wnums-1] * wothermul * bet,
 					Pos:        wpos,
 					Wilds:      wilds,
 					SymbolNums: wnums,
+					OtherMul:   wothermul,
 				}
 
 				return r
@@ -441,15 +444,18 @@ func CalcLineOtherMul(scene *GameScene, pt *PayTables, ld []int, bet int,
 	}
 
 	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
+		othermul := calcOtherMul(scene, s0, pos)
+
 		r := &Result{
 			Symbol:     s0,
 			Type:       RTLine,
 			Mul:        pt.MapPay[s0][nums-1],
-			CoinWin:    pt.MapPay[s0][nums-1],
-			CashWin:    pt.MapPay[s0][nums-1] * bet,
+			CoinWin:    pt.MapPay[s0][nums-1] * othermul,
+			CashWin:    pt.MapPay[s0][nums-1] * othermul * bet,
 			Pos:        pos,
 			Wilds:      wilds,
 			SymbolNums: nums,
+			OtherMul:   othermul,
 		}
 
 		return r
