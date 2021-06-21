@@ -224,10 +224,14 @@ func genElemental2() {
 		"go.sum",
 		// "utils.go",
 		"version.go",
+		"freegame0earth_test.go",
 		"freegame0earth.go",
 		"freegame1fire.go",
 		"freegame2air.go",
 		"freegame3water.go",
+		"gati/main.go",
+		"sbuildsrc/plugin.go",
+		"sbuildsrc/rng.go",
 	}
 	circleComponents := [][]string{
 		{"gatidocker/dtgatigame/dtgatigame", "dtgatigame", "app/"},
@@ -265,6 +269,9 @@ func genMedusa2() {
 		"go.sum",
 		"utils.go",
 		"version.go",
+		"gati/main.go",
+		"sbuildsrc/plugin.go",
+		"sbuildsrc/rng.go",
 	}
 	circleComponents := [][]string{
 		{"gatidocker/dtgatigame/dtgatigame", "dtgatigame", "app/"},
@@ -282,6 +289,6 @@ func main() {
 		"debug", true, "./logs")
 
 	// genElemental2()
-	// genMedusa2()
-	genLotsalines()
+	genMedusa2()
+	// genLotsalines()
 }

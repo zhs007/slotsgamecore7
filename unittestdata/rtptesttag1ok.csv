@@ -41,5 +41,10 @@ fg,,,600,,,,,,600
 
 
 
-name,hitrate,average
-special,0.3333333333333333,3
+name,betnums,triggernums,totalnums,hitrate,average
+special,6,2,6,0.3333333333333333,3
+
+
+
+totalnums,winnums,Hit Frequency,Variance
+6,0,0,0
