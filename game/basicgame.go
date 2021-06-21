@@ -68,15 +68,15 @@ func (game *BasicGame) AddGameMod(gmod IGameMod) error {
 
 // Play - play
 func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
-	bps, isok := ps.(*BasicPlayerState)
-	if !isok {
-		return nil, ErrInvalidBasicPlayerState
-	}
+	// bps, isok := ps.(*BasicPlayerState)
+	// if !isok {
+	// 	return nil, ErrInvalidBasicPlayerState
+	// }
 
-	curgamemod, isok := game.MapGameMods[bps.Public.CurGameMod]
+	curgamemod, isok := game.MapGameMods[ps.GetCurGameMod()]
 	if !isok {
 		sgc7utils.Error("sgc7game.BasicGame.Play:MapGameMods[CurGameMod]",
-			zap.String("CurGameMod", bps.Public.CurGameMod),
+			zap.String("CurGameMod", ps.GetCurGameMod()),
 			zap.Error(ErrInvalidGameMod))
 
 		return nil, ErrInvalidGameMod
@@ -87,7 +87,8 @@ func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string,
 		return nil, err
 	}
 
-	bps.Public.CurGameMod = pr.NextGameMod
+	ps.SetCurGameMod(pr.NextGameMod)
+	// bps.Public.CurGameMod = pr.NextGameMod
 
 	return pr, nil
 }
