@@ -9,7 +9,7 @@ import (
 // IService - service
 type IService interface {
 	// BuildPlayerStateFromPB - *sgc7pb.PlayerState -> sgc7game.IPlayerState
-	BuildPlayerStateFromPB(ps *sgc7pb.PlayerState) (sgc7game.IPlayerState, error)
+	BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *sgc7pb.PlayerState) error
 	// BuildPBPlayerState - sgc7game.IPlayerState -> *sgc7pb.PlayerState
 	BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.PlayerState, error)
 	// BuildPBGameModParam - interface{} -> *any.Any

@@ -60,8 +60,6 @@ func (serv *Serv) Start(ctx context.Context) error {
 // Stop - stop service
 func (serv *Serv) Stop() {
 	serv.lis.Close()
-
-	return
 }
 
 // GetConfig - get config
@@ -141,15 +139,13 @@ func (serv *Serv) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
 func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	ips := serv.game.NewPlayerState()
 	if req.PlayerState != nil {
-		ips1, err := serv.service.BuildPlayerStateFromPB(req.PlayerState)
+		err := serv.service.BuildPlayerStateFromPB(ips, req.PlayerState)
 		if err != nil {
 			sgc7utils.Error("Serv.onPlay:BuildPlayerStateFromPB",
 				zap.Error(err))
 
 			return nil, err
 		}
-
-		ips = ips1
 	}
 
 	plugin := serv.game.NewPlugin()
