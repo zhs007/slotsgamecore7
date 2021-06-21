@@ -141,3 +141,13 @@ func (ps *BasicPlayerState) GetPrivateJson() string {
 
 	return string(bpri)
 }
+
+// SetCurGameMod - set current game module
+func (ps *BasicPlayerState) SetCurGameMod(gamemod string) {
+	ps.Public.CurGameMod = gamemod
+}
+
+// GetCurGameMod - get current game module
+func (ps *BasicPlayerState) GetCurGameMod() string {
+	return ps.Public.CurGameMod
+}

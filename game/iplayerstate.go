@@ -21,4 +21,9 @@ type IPlayerState interface {
 	GetPublicJson() string
 	// GetPrivateJson - set player private state
 	GetPrivateJson() string
+
+	// SetCurGameMod - set current game module
+	SetCurGameMod(gamemod string)
+	// GetCurGameMod - get current game module
+	GetCurGameMod() string
 }
