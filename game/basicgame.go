@@ -82,7 +82,7 @@ func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string,
 		return nil, ErrInvalidGameMod
 	}
 
-	pr, err := curgamemod.OnPlay(game, plugin, cmd, param, stake, prs)
+	pr, err := curgamemod.OnPlay(game, plugin, cmd, param, ps, stake, prs)
 	if err != nil {
 		return nil, err
 	}
