@@ -8,35 +8,30 @@ import (
 	anypb "google.golang.org/protobuf/types/known/anypb"
 )
 
-// BasicService - BasicService
-type BasicService struct {
+// BasicService2 - BasicService2
+type BasicService2 struct {
 }
 
-// NewBasicService - new BasicService
-func NewBasicService() *BasicService {
-	return &BasicService{}
+// NewBasicService - new BasicService2
+func NewBasicService2() *BasicService2 {
+	return &BasicService2{}
 }
 
 // BuildPlayerStateFromPB - *sgc7pb.PlayerState -> sgc7game.IPlayerState
-func (bs *BasicService) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *sgc7pb.PlayerState) error {
-	// ips := &sgc7game.BasicPlayerState{}
-
-	pub := &sgc7pb.BasicPlayerPublicState{}
-	pri := &sgc7pb.BasicPlayerPrivateState{}
+func (bs *BasicService2) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *sgc7pb.PlayerState) error {
+	pub := &sgc7pb.BasicPlayerPublicState2{}
+	pri := &sgc7pb.BasicPlayerPrivateState2{}
 
 	if pspb.Public != nil {
 		err := pspb.Public.UnmarshalTo(pub)
 		if err != nil {
-			sgc7utils.Error("BasicService.BuildPlayerStateFromPB:Public.UnmarshalTo",
+			sgc7utils.Error("BasicService2.BuildPlayerStateFromPB:Public.UnmarshalTo",
 				zap.Error(err))
 
 			return err
 		}
 
-		ps.SetPublic(&sgc7game.BasicPlayerPublicState{
-			CurGameMod: pub.CurGameMod,
-			NextM:      int(pub.NextM),
-		})
+		ps.SetPublicJson(pub.Json)
 	}
 
 	if pspb.Private != nil {
@@ -55,21 +50,17 @@ func (bs *BasicService) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *s
 }
 
 // BuildPBPlayerState - sgc7game.IPlayerState -> *sgc7pb.PlayerState
-func (bs *BasicService) BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.PlayerState, error) {
-	curps, isok := ps.(*sgc7game.BasicPlayerState)
-	if !isok {
-		return nil, ErrInvalidBasicPlayerState
+func (bs *BasicService2) BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.PlayerState, error) {
+	pub := &sgc7pb.BasicPlayerPublicState2{
+		Json: ps.GetPublicJson(),
 	}
-
-	pub := &sgc7pb.BasicPlayerPublicState{
-		CurGameMod: curps.Public.CurGameMod,
-		NextM:      int32(curps.Public.NextM),
+	pri := &sgc7pb.BasicPlayerPrivateState2{
+		Json: ps.GetPrivateJson(),
 	}
-	pri := &sgc7pb.BasicPlayerPrivateState{}
 
 	pbpub, err := anypb.New(pub)
 	if err != nil {
-		sgc7utils.Error("BasicService.BuildPBPlayerState:New(pub)",
+		sgc7utils.Error("BasicService2.BuildPBPlayerState:New(pub)",
 			zap.Error(err))
 
 		return nil, err

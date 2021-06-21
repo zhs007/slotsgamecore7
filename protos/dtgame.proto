@@ -40,6 +40,16 @@ message BasicPlayerPublicState {
 message BasicPlayerPrivateState {
 }
 
+// BasicPlayerPublicState2 - basic PlayerPublicState
+message BasicPlayerPublicState2 {
+    string json = 1;
+}
+
+// BasicPlayerPrivateState2 - basic PlayerPrivateState
+message BasicPlayerPrivateState2 {
+    string json = 1;
+}
+
 // GameConfig
 message GameConfig {
     LinesData lines = 1;

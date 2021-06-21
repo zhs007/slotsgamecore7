@@ -1,5 +1,11 @@
 package sgc7game
 
+import (
+	jsoniter "github.com/json-iterator/go"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	"go.uber.org/zap"
+)
+
 // FuncNewBasicPlayerState - new BasicPlayerState and set PlayerBoostData
 type FuncNewBasicPlayerState func() *BasicPlayerState
 
@@ -68,4 +74,70 @@ func (ps *BasicPlayerState) GetPublic() interface{} {
 // GetPrivate - get player private state
 func (ps *BasicPlayerState) GetPrivate() interface{} {
 	return ps.Private
+}
+
+// SetPublicJson - set player public state
+func (ps *BasicPlayerState) SetPublicJson(pubjson string) error {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	pub := &BasicPlayerPublicState{}
+	err := json.Unmarshal([]byte(pubjson), pub)
+	if err != nil {
+		sgc7utils.Warn("BasicPlayerState.SetPublicJson",
+			zap.Error(err))
+
+		return err
+	}
+
+	ps.SetPublic(pub)
+
+	return nil
+}
+
+// SetPrivateJson - set player private state
+func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	pub := &BasicPlayerPrivateState{}
+	err := json.Unmarshal([]byte(prijson), pub)
+	if err != nil {
+		sgc7utils.Warn("BasicPlayerState.SetPrivateJson",
+			zap.Error(err))
+
+		return err
+	}
+
+	ps.SetPrivate(pub)
+
+	return nil
+}
+
+// GetPublicJson - set player public state
+func (ps *BasicPlayerState) GetPublicJson() string {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	bpub, err := json.Marshal(ps.GetPublic())
+	if err != nil {
+		sgc7utils.Warn("BasicPlayerState.GetPublicJson",
+			zap.Error(err))
+
+		return ""
+	}
+
+	return string(bpub)
+}
+
+// GetPrivateJson - set player private state
+func (ps *BasicPlayerState) GetPrivateJson() string {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	bpri, err := json.Marshal(ps.GetPrivate())
+	if err != nil {
+		sgc7utils.Warn("BasicPlayerState.GetPrivateJson",
+			zap.Error(err))
+
+		return ""
+	}
+
+	return string(bpri)
 }
