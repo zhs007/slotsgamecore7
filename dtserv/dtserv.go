@@ -11,6 +11,7 @@ import (
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 )
 
@@ -110,8 +111,9 @@ func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlaySe
 		return err
 	}
 
-	sgc7utils.Debug("Serv.Play",
-		sgc7utils.JSON("reply", res))
+	// sgc7utils.Debug("Serv.Play",
+	// 	sgc7utils.JSON("reply", res))
+	serv.LogReplyPlay("Serv.Play", res, zapcore.DebugLevel)
 
 	return stream.Send(res)
 }
@@ -225,4 +227,30 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	}
 
 	return pr, nil
+}
+
+// Play - play game
+func (serv *Serv) LogReplyPlay(str string, reply *sgc7pb.ReplyPlay, logLevel zapcore.Level) {
+	arr := []interface{}{}
+	for _, v := range reply.Results {
+		msg, err := serv.service.BuildPBGameModParamFromAny(v.ClientData.CurGameModParam)
+		if err != nil {
+			sgc7utils.Warn("Serv.LogReplyPlay",
+				zap.Error(err))
+		}
+
+		if msg != nil {
+			arr = append(arr, msg)
+		}
+	}
+
+	if logLevel == zapcore.DebugLevel {
+		sgc7utils.Debug(str,
+			sgc7utils.JSON("reply", reply),
+			sgc7utils.JSON("curgamemodparam", arr))
+	} else if logLevel == zapcore.InfoLevel {
+		sgc7utils.Info(str,
+			sgc7utils.JSON("reply", reply),
+			sgc7utils.JSON("curgamemodparam", arr))
+	}
 }
