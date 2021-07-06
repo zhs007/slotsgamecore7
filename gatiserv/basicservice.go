@@ -75,6 +75,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 		err := BuildIPlayerState(ips, params.PlayerState)
 		if err != nil {
 			sgc7utils.Error("BasicService.Play:BuildIPlayerState",
+				sgc7utils.JSON("PlayerState", params.PlayerState),
 				zap.Error(err))
 
 			return nil, err
