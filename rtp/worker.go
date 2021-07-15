@@ -47,7 +47,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			plugin := game.NewPlugin()
 			defer game.FreePlugin(plugin)
 
-			ps := sgc7game.NewBasicPlayerState("bg")
+			ps := game.NewPlayerState()
+			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
 			cmd := "SPIN"
 			off := 0
@@ -170,7 +171,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 			plugin := game.NewPlugin()
 			defer game.FreePlugin(plugin)
 
-			ps := sgc7game.NewBasicPlayerState("bg")
+			ps := game.NewPlayerState()
+			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
 			cmd := "SPIN"
 			off := 0
