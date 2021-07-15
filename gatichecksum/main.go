@@ -284,11 +284,54 @@ func genMedusa2() {
 	genSBuild(pathRoot, binFiles, srcFiles, "medusa2", circleComponents)
 }
 
+func genDualreel() {
+	pathRoot := "../../dualreel/"
+	binFiles := []string{
+		"gatidocker/dtgatigame/dtgatigame",
+	}
+	srcFiles := []string{
+		"cfg/bgleft.json",
+		"cfg/bgright.json",
+		"cfg/fgleft.json",
+		"cfg/fgright.json",
+		"cfg/linedata.json",
+		"cfg/paytables.json",
+		"cfg/rtp96.yaml",
+		"basedef.go",
+		"basegame.go",
+		"config.go",
+		"err.go",
+		"freegame.go",
+		"game.go",
+		"gatiservice.go",
+		"go.mod",
+		"go.sum",
+		"utils.go",
+		"version.go",
+		"gati/main.go",
+		"sbuildsrc/plugin.go",
+		"sbuildsrc/rng.go",
+	}
+	circleComponents := [][]string{
+		{"gatidocker/dtgatigame/dtgatigame", "dtgatigame", "app/"},
+		{"cfg/bgleft.json", "bgleft.json", "app/cfg/"},
+		{"cfg/bgright.json", "bgright.json", "app/cfg/"},
+		{"cfg/fgleft.json", "fgleft.json", "app/cfg/"},
+		{"cfg/fgright.json", "fgright.json", "app/cfg/"},
+		{"cfg/linedata.json", "linedata.json", "app/cfg/"},
+		{"cfg/paytables.json", "paytables.json", "app/cfg/"},
+		{"cfg/rtp96.yaml", "rtp96.yaml", "app/cfg/"},
+	}
+
+	genSBuild(pathRoot, binFiles, srcFiles, "dualreel", circleComponents)
+}
+
 func main() {
 	sgc7utils.InitLogger("gatiChecksum", sgc7ver.Version,
 		"debug", true, "./logs")
 
 	// genElemental2()
-	genMedusa2()
+	// genMedusa2()
 	// genLotsalines()
+	genDualreel()
 }
