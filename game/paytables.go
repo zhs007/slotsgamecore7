@@ -28,7 +28,8 @@ type payInfo struct {
 
 // PayTables - pay tables
 type PayTables struct {
-	MapPay map[int][]int `json:"paytables"`
+	MapPay     map[int][]int  `json:"paytables"`
+	MapSymbols map[string]int `json:"symbols"`
 }
 
 // LoadPayTables5JSON - load json file
@@ -51,12 +52,15 @@ func LoadPayTables5JSON(fn string) (*PayTables, error) {
 	}
 
 	p := &PayTables{
-		MapPay: make(map[int][]int),
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
 	}
 
 	for _, v := range li {
 		cl := []int{v.X1, v.X2, v.X3, v.X4, v.X5}
 		p.MapPay[v.Code] = cl
+
+		p.MapSymbols[v.Symbol] = v.Code
 	}
 
 	return p, nil
@@ -82,12 +86,15 @@ func LoadPayTables3JSON(fn string) (*PayTables, error) {
 	}
 
 	p := &PayTables{
-		MapPay: make(map[int][]int),
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
 	}
 
 	for _, v := range li {
 		cl := []int{v.X1, v.X2, v.X3}
 		p.MapPay[v.Code] = cl
+
+		p.MapSymbols[v.Symbol] = v.Code
 	}
 
 	return p, nil
@@ -113,12 +120,15 @@ func LoadPayTables6JSON(fn string) (*PayTables, error) {
 	}
 
 	p := &PayTables{
-		MapPay: make(map[int][]int),
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
 	}
 
 	for _, v := range li {
 		cl := []int{v.X1, v.X2, v.X3, v.X4, v.X5, v.X6}
 		p.MapPay[v.Code] = cl
+
+		p.MapSymbols[v.Symbol] = v.Code
 	}
 
 	return p, nil
@@ -144,12 +154,15 @@ func LoadPayTables15JSON(fn string) (*PayTables, error) {
 	}
 
 	p := &PayTables{
-		MapPay: make(map[int][]int),
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
 	}
 
 	for _, v := range li {
 		cl := []int{v.X1, v.X2, v.X3, v.X4, v.X5, v.X6, v.X7, v.X8, v.X9, v.X10, v.X11, v.X12, v.X13, v.X14, v.X15}
 		p.MapPay[v.Code] = cl
+
+		p.MapSymbols[v.Symbol] = v.Code
 	}
 
 	return p, nil
