@@ -12,7 +12,7 @@ func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 
 	for x, arr := range scene.Arr {
 		for y := range arr {
-			if isValidSymbol(scene0.Arr[x][y]) {
+			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
 				cr := calcClusterResult(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol)
 				// if err != nil {
 				// 	sgc7utils.Error("sgc7game.CalcClusterResult:calcClusterResult",
@@ -27,6 +27,12 @@ func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 
 				if cr != nil {
 					results = append(results, cr)
+
+					for i := 0; i < len(cr.Pos)/2; i++ {
+						if !isWild(scene0.Arr[cr.Pos[i*2]][cr.Pos[i*2+1]]) {
+							scene0.Arr[cr.Pos[i*2]][cr.Pos[i*2+1]] = -1
+						}
+					}
 				}
 			}
 		}
