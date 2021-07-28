@@ -16,6 +16,8 @@ const (
 	RTFullLineEx = 4
 	// RTScatterEx - scatter只计数量
 	RTScatterEx = 5
+	// RTCluster - cluster，族群方式
+	RTCluster = 6
 )
 
 // Result - result for slots game
