@@ -90,13 +90,16 @@ func calcClusterResult(scene *GameScene, x, y int, symbol int, pt *PayTables, be
 
 	nums := len(pos) / 2
 
-	if pt.MapPay[symbol][nums] > 0 {
+	if pt.MapPay[symbol][nums-1] > 0 {
 		r := &Result{
 			Symbol:     symbol,
 			Type:       RTCluster,
 			LineIndex:  -1,
 			Pos:        pos,
 			SymbolNums: nums,
+			Mul:        pt.MapPay[symbol][nums-1],
+			CoinWin:    pt.MapPay[symbol][nums-1],
+			CashWin:    pt.MapPay[symbol][nums-1] * bet,
 		}
 
 		return r
