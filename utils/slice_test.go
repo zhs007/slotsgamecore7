@@ -72,3 +72,23 @@ func Test_InsUniqueIntSlice(t *testing.T) {
 
 	t.Logf("Test_InsUniqueIntSlice OK")
 }
+
+func Test_IntArr2ToInt32Arr(t *testing.T) {
+	arr := IntArr2ToInt32Arr([][]int{
+		{1, 2, 3},
+		{4, 5, 6},
+		{7, 8, 9},
+	})
+	assert.Equal(t, len(arr), 9)
+	assert.Equal(t, arr[0], int32(1))
+	assert.Equal(t, arr[1], int32(2))
+	assert.Equal(t, arr[2], int32(3))
+	assert.Equal(t, arr[3], int32(4))
+	assert.Equal(t, arr[4], int32(5))
+	assert.Equal(t, arr[5], int32(6))
+	assert.Equal(t, arr[6], int32(7))
+	assert.Equal(t, arr[7], int32(8))
+	assert.Equal(t, arr[8], int32(9))
+
+	t.Logf("Test_IntArr2ToInt32Arr OK")
+}
