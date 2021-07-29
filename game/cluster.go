@@ -102,6 +102,10 @@ func calcClusterResult(scene *GameScene, x, y int, symbol int, pt *PayTables, be
 
 	nums := len(pos) / 2
 
+	if nums > len(pt.MapPay[symbol]) {
+		nums = len(pt.MapPay[symbol])
+	}
+
 	if pt.MapPay[symbol][nums-1] > 0 {
 		r := &Result{
 			Symbol:     symbol,
