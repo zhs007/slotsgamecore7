@@ -59,35 +59,35 @@ func calcClusterSymbol(scene *GameScene, x, y int, symbol int, pos []int,
 		pos = append(pos, x, y)
 
 		if x > 0 {
-			if y > 0 {
-				pos = calcClusterSymbol(scene, x-1, y-1, symbol, pos, isSameSymbol)
-			}
+			// if y > 0 {
+			// 	pos = calcClusterSymbol(scene, x-1, y-1, symbol, pos, isSameSymbol)
+			// }
 
-			// pos = calcClusterSymbol(scene, x-1, y, symbol, pos, isSameSymbol)
+			pos = calcClusterSymbol(scene, x-1, y, symbol, pos, isSameSymbol)
 
-			if y < scene.Height-1 {
-				pos = calcClusterSymbol(scene, x-1, y+1, symbol, pos, isSameSymbol)
-			}
+			// if y < scene.Height-1 {
+			// 	pos = calcClusterSymbol(scene, x-1, y+1, symbol, pos, isSameSymbol)
+			// }
 		}
 
-		// if y > 0 {
-		// 	pos = calcClusterSymbol(scene, x, y-1, symbol, pos, isSameSymbol)
-		// }
+		if y > 0 {
+			pos = calcClusterSymbol(scene, x, y-1, symbol, pos, isSameSymbol)
+		}
 
-		// if y < scene.Height-1 {
-		// 	pos = calcClusterSymbol(scene, x, y+1, symbol, pos, isSameSymbol)
-		// }
+		if y < scene.Height-1 {
+			pos = calcClusterSymbol(scene, x, y+1, symbol, pos, isSameSymbol)
+		}
 
 		if x < scene.Width-1 {
-			if y > 0 {
-				pos = calcClusterSymbol(scene, x+1, y-1, symbol, pos, isSameSymbol)
-			}
+			// if y > 0 {
+			// 	pos = calcClusterSymbol(scene, x+1, y-1, symbol, pos, isSameSymbol)
+			// }
 
-			// pos = calcClusterSymbol(scene, x+1, y, symbol, pos, isSameSymbol)
+			pos = calcClusterSymbol(scene, x+1, y, symbol, pos, isSameSymbol)
 
-			if y < scene.Height-1 {
-				pos = calcClusterSymbol(scene, x+1, y+1, symbol, pos, isSameSymbol)
-			}
+			// if y < scene.Height-1 {
+			// 	pos = calcClusterSymbol(scene, x+1, y+1, symbol, pos, isSameSymbol)
+			// }
 		}
 	}
 
