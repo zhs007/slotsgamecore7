@@ -326,6 +326,46 @@ func genDualreel() {
 	genSBuild(pathRoot, binFiles, srcFiles, "dualreel", circleComponents)
 }
 
+func genToysoldier() {
+	pathRoot := "../../toysolider/"
+	binFiles := []string{
+		"gatidocker/dtgatigame/dtgatigame",
+	}
+	srcFiles := []string{
+		"cfg/reels.json",
+		"cfg/weights.json",
+		"cfg/lines.json",
+		"cfg/paytables.json",
+		"cfg/rtp96.yaml",
+		"basedef.go",
+		"basegame.go",
+		"config.go",
+		"err.go",
+		"freegame.go",
+		"game.go",
+		"gatiservice.go",
+		"go.mod",
+		"go.sum",
+		"utils.go",
+		"reels.go",
+		"weights.go",
+		"version.go",
+		"gati/main.go",
+		"sbuildsrc/plugin.go",
+		"sbuildsrc/rng.go",
+	}
+	circleComponents := [][]string{
+		{"gatidocker/dtgatigame/dtgatigame", "dtgatigame", "app/"},
+		{"cfg/reels.json", "reels.json", "app/cfg/"},
+		{"cfg/weights.json", "weights.json", "app/cfg/"},
+		{"cfg/lines.json", "lines.json", "app/cfg/"},
+		{"cfg/paytables.json", "paytables.json", "app/cfg/"},
+		{"cfg/rtp96.yaml", "rtp96.yaml", "app/cfg/"},
+	}
+
+	genSBuild(pathRoot, binFiles, srcFiles, "toysoldier", circleComponents)
+}
+
 func main() {
 	sgc7utils.InitLogger("gatiChecksum", sgc7ver.Version,
 		"debug", true, "./logs")
@@ -333,5 +373,6 @@ func main() {
 	// genElemental2()
 	// genMedusa2()
 	// genLotsalines()
-	genDualreel()
+	// genDualreel()
+	genToysoldier()
 }

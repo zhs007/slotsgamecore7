@@ -1,5 +1,7 @@
 package sgc7game
 
+import sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+
 // CalcClusterResult - cluster
 func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 	isValidSymbol FuncIsValidSymbol,
@@ -48,6 +50,10 @@ func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 // calcClusterSymbol - cluster
 func calcClusterSymbol(scene *GameScene, x, y int, symbol int, pos []int,
 	isSameSymbol FuncIsSameSymbol) []int {
+
+	if sgc7utils.IndexOfInt2Slice(pos, x, y, 0) >= 0 {
+		return pos
+	}
 
 	if isSameSymbol(scene.Arr[x][y], symbol) {
 		pos = append(pos, x, y)
