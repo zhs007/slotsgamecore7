@@ -23,7 +23,7 @@ func DropDownSymbols(scene *GameScene) error {
 						arr[y1] = -1
 
 						hass = true
-						y = y1
+						y--
 						break
 					}
 				}
