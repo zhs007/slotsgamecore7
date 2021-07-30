@@ -67,3 +67,31 @@ func IntArr2ToInt32Arr(arr [][]int) []int32 {
 
 	return arr2
 }
+
+// CloneIntArr2 - clone a [][]int
+func CloneIntArr2(arr [][]int) [][]int {
+	rarr := [][]int{}
+
+	for _, arr1 := range arr {
+		rarr = append(rarr, arr1[0:])
+	}
+
+	return rarr
+}
+
+// FlipIntArr2 - arr[x][y] -> arr[y][x]
+func FlipIntArr2(arr [][]int) [][]int {
+	rarr := [][]int{}
+
+	for y := 0; y < len(arr[0]); y++ {
+		carr := []int{}
+
+		for x := 0; x < len(arr); x++ {
+			carr = append(carr, arr[x][y])
+		}
+
+		rarr = append(rarr, carr)
+	}
+
+	return rarr
+}
