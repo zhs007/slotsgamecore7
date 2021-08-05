@@ -98,7 +98,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				currtp.OnResults(results)
 
 				if needVariance {
-					rtp.AddReturns(float64(totalReturn / stake.CashBet))
+					currtp.AddReturns(float64(totalReturn / stake.CashBet))
 				}
 
 				results = results[:0]
