@@ -22,6 +22,8 @@ type RTP struct {
 	Variance      float64
 	Returns       []float64
 	ReturnWeights []float64
+	MaxReturn     int64
+	MaxReturnNums int64
 }
 
 // NewRTP - new RTP
@@ -61,6 +63,13 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	rtp.TotalBet += rtp1.TotalBet
 	rtp.Returns = append(rtp.Returns, rtp1.Returns...)
 	rtp.ReturnWeights = append(rtp.ReturnWeights, rtp1.ReturnWeights...)
+
+	if rtp1.MaxReturn > rtp.MaxReturn {
+		rtp.MaxReturn = rtp1.MaxReturn
+		rtp.MaxReturnNums = rtp1.MaxReturnNums
+	} else if rtp1.MaxReturn == rtp.MaxReturn {
+		rtp.MaxReturnNums += rtp1.MaxReturnNums
+	}
 
 	rtp.Root.Add(rtp1.Root)
 
@@ -235,8 +244,9 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	}
 
 	f.WriteString("\n\n\n")
-	f.WriteString("totalnums,winnums,Hit Frequency,Variance\n")
-	str = fmt.Sprintf("%v,%v,%v,%v\n", rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance)
+	f.WriteString("totalnums,winnums,Hit Frequency,Variance,MaxReturn,MaxReturnNums\n")
+	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v\n",
+		rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance, rtp.MaxReturn, rtp.MaxReturnNums)
 	f.WriteString(str)
 
 	f.Sync()
@@ -246,6 +256,13 @@ func (rtp *RTP) Save2CSV(fn string) error {
 
 // AddReturns -
 func (rtp *RTP) AddReturns(ret float64) {
+	if rtp.MaxReturn < int64(ret) {
+		rtp.MaxReturn = int64(ret)
+		rtp.MaxReturnNums = 1
+	} else if rtp.MaxReturn == int64(ret) {
+		rtp.MaxReturnNums++
+	}
+
 	for i, v := range rtp.Returns {
 		if sgc7utils.IsFloatEquals(v, ret) {
 			rtp.ReturnWeights[i]++
