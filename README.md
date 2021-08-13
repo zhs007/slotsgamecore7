@@ -8,6 +8,7 @@ This is a golang project for slots game.
 
 - support gameserver
 - support gateway
+- support websocket
 
 ##### v0.6
 
@@ -17,6 +18,8 @@ This is a golang project for slots game.
 
 - support grpc
 - improve RTP
+- support cluster
+- support cascading
 
 ##### v0.3
 
