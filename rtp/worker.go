@@ -54,6 +54,10 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			off := 0
 
 			for i := int64(0); i < spinnums/int64(worknums); i++ {
+				pbsjson := ps.GetPublicJson()
+				ppsjson := ps.GetPrivateJson()
+				iserrturn := false
+
 				plugin.ClearUsedRngs()
 
 				currtp.Bet(stake.CashBet)
@@ -62,6 +66,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				for {
 					pr, err := game.Play(plugin, cmd, "", ps, stake, results)
 					if err != nil {
+						iserrturn = true
+
 						sgc7utils.Error("StartRTP.Play",
 							zap.Int("results", len(results)),
 							zap.Error(err))
@@ -89,25 +95,32 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					}
 				}
 
-				for _, v := range results {
-					totalReturn += v.CashWin
+				if iserrturn {
+					ps.SetPublicJson(pbsjson)
+					ps.SetPrivateJson(ppsjson)
 
-					currtp.OnResult(v)
-				}
+					i--
+				} else {
+					for _, v := range results {
+						totalReturn += v.CashWin
 
-				currtp.OnResults(results)
+						currtp.OnResult(v)
+					}
 
-				if needVariance {
-					currtp.AddReturns(float64(totalReturn / stake.CashBet))
-				}
+					currtp.OnResults(results)
 
-				results = results[:0]
+					if needVariance {
+						currtp.AddReturns(float64(totalReturn / stake.CashBet))
+					}
 
-				off++
-				if off >= numsTimer {
-					chTimer <- off
+					results = results[:0]
 
-					off = 0
+					off++
+					if off >= numsTimer {
+						chTimer <- off
+
+						off = 0
+					}
 				}
 			}
 
@@ -220,57 +233,57 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 				if iserrturn {
 					ps.SetPublicJson(pbsjson)
 					ps.SetPrivateJson(ppsjson)
-				}
+				} else {
+					iswin := false
+					for _, v := range results {
+						if v.CoinWin > 0 {
+							iswin = true
 
-				iswin := false
-				for _, v := range results {
-					if v.CoinWin > 0 {
-						iswin = true
-
-						break
-					}
-				}
-
-				if iswin {
-					cr, err := plugin.Random(context.Background(), math.MaxInt32)
-					if err != nil {
-						sgc7utils.Error("StartScaleRTPDown.Random",
-							zap.Int("results", len(results)),
-							zap.Error(err))
+							break
+						}
 					}
 
-					if cr > val {
-						results = results[:0]
+					if iswin {
+						cr, err := plugin.Random(context.Background(), math.MaxInt32)
+						if err != nil {
+							sgc7utils.Error("StartScaleRTPDown.Random",
+								zap.Int("results", len(results)),
+								zap.Error(err))
+						}
 
-						continue
+						if cr > val {
+							results = results[:0]
+
+							continue
+						}
 					}
+
+					currtp.Bet(stake.CashBet)
+
+					for _, v := range results {
+						totalReturn += v.CashWin
+
+						currtp.OnResult(v)
+					}
+
+					currtp.OnResults(results)
+
+					if needVariance {
+						rtp.AddReturns(float64(totalReturn / stake.CashBet))
+						// rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
+					}
+
+					results = results[:0]
+
+					off++
+					if off >= numsTimer {
+						chTimer <- off
+
+						off = 0
+					}
+
+					i++
 				}
-
-				currtp.Bet(stake.CashBet)
-
-				for _, v := range results {
-					totalReturn += v.CashWin
-
-					currtp.OnResult(v)
-				}
-
-				currtp.OnResults(results)
-
-				if needVariance {
-					rtp.AddReturns(float64(totalReturn / stake.CashBet))
-					// rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
-				}
-
-				results = results[:0]
-
-				off++
-				if off >= numsTimer {
-					chTimer <- off
-
-					off = 0
-				}
-
-				i++
 			}
 
 			ch <- currtp
