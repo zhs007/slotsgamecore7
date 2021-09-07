@@ -178,12 +178,18 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 			off := 0
 
 			for i := int64(0); i < spinnums/int64(worknums); {
+				pbsjson := ps.GetPublicJson()
+				ppsjson := ps.GetPrivateJson()
+				iserrturn := false
+
 				plugin.ClearUsedRngs()
 
 				totalReturn := int64(0)
 				for {
 					pr, err := game.Play(plugin, cmd, "", ps, stake, results)
 					if err != nil {
+						iserrturn = true
+
 						sgc7utils.Error("StartScaleRTPDown.Play",
 							zap.Int("results", len(results)),
 							zap.Error(err))
@@ -209,6 +215,11 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					} else {
 						cmd = "SPIN"
 					}
+				}
+
+				if iserrturn {
+					ps.SetPublicJson(pbsjson)
+					ps.SetPrivateJson(ppsjson)
 				}
 
 				iswin := false
