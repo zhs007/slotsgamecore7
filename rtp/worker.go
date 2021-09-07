@@ -99,6 +99,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					ps.SetPublicJson(pbsjson)
 					ps.SetPrivateJson(ppsjson)
 
+					results = results[:0]
+
 					i--
 				} else {
 					for _, v := range results {
@@ -233,6 +235,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 				if iserrturn {
 					ps.SetPublicJson(pbsjson)
 					ps.SetPrivateJson(ppsjson)
+
+					results = results[:0]
 				} else {
 					iswin := false
 					for _, v := range results {
