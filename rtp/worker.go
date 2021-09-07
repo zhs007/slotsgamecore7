@@ -60,7 +60,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 				plugin.ClearUsedRngs()
 
-				currtp.Bet(stake.CashBet)
+				// currtp.Bet(stake.CashBet)
 
 				totalReturn := int64(0)
 				for {
@@ -103,6 +103,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 					i--
 				} else {
+					currtp.Bet(stake.CashBet)
+
 					for _, v := range results {
 						totalReturn += v.CashWin
 
