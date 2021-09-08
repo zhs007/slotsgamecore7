@@ -3,8 +3,8 @@ package dt
 import (
 	"context"
 
+	goutils "github.com/zhs007/goutils"
 	dtrngpb "github.com/zhs007/slotsgamecore7/dtrngpb"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -42,7 +42,7 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 	if client.conn == nil || client.client == nil {
 		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
-			sgc7utils.Error("RngClient.GetRngs:grpc.Dial",
+			goutils.Error("RngClient.GetRngs:grpc.Dial",
 				zap.String("server address", client.servAddr),
 				zap.Error(err))
 
@@ -57,7 +57,7 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 		Nums: int32(nums),
 	})
 	if err != nil {
-		sgc7utils.Error("RngClient.GetRngs:GetRngs",
+		goutils.Error("RngClient.GetRngs:GetRngs",
 			zap.String("server address", client.servAddr),
 			zap.String("gamecode", client.gameCode),
 			zap.Int("nums", nums),

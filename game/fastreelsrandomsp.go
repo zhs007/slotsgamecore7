@@ -3,8 +3,8 @@ package sgc7game
 import (
 	"context"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // FuncOnSelectReelIndex - onSelectReelIndex
@@ -29,7 +29,7 @@ func NewFastReelsRandomSP(reels *ReelsData, onSelectReelIndex FuncOnSelectReelIn
 			carr := onSelectReelIndex(reels, x, y)
 			if len(carr) > 0 {
 				for _, v := range carr {
-					arr = sgc7utils.InsUniqueIntSlice(arr, v)
+					arr = goutils.InsUniqueIntSlice(arr, v)
 				}
 			}
 		}

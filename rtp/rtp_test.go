@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 func Test_RTP(t *testing.T) {
@@ -197,7 +197,7 @@ func Test_RTP(t *testing.T) {
 
 	rtp.Save2CSV("../unittestdata/rtptest.csv")
 
-	issame := sgc7utils.IsSameFile("../unittestdata/rtptest.csv", "../unittestdata/rtptestok.csv")
+	issame := goutils.IsSameFile("../unittestdata/rtptest.csv", "../unittestdata/rtptestok.csv")
 	assert.Equal(t, issame, true)
 
 	t.Logf("Test_RTP OK")
@@ -486,7 +486,7 @@ func Test_RTPTags(t *testing.T) {
 
 	rtp.Save2CSV("../unittestdata/rtptesttag.csv")
 
-	issame := sgc7utils.IsSameFile("../unittestdata/rtptesttag.csv", "../unittestdata/rtptesttagok.csv")
+	issame := goutils.IsSameFile("../unittestdata/rtptesttag.csv", "../unittestdata/rtptesttagok.csv")
 	assert.Equal(t, issame, true)
 
 	rtp1 := rtp.Clone()
@@ -496,7 +496,7 @@ func Test_RTPTags(t *testing.T) {
 
 	rtp.Save2CSV("../unittestdata/rtptesttag1.csv")
 
-	issame = sgc7utils.IsSameFile("../unittestdata/rtptesttag1.csv", "../unittestdata/rtptesttag1ok.csv")
+	issame = goutils.IsSameFile("../unittestdata/rtptesttag1.csv", "../unittestdata/rtptesttag1ok.csv")
 	assert.Equal(t, issame, true)
 
 	t.Logf("Test_RTPTags OK")

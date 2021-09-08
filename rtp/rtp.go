@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strconv"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
@@ -156,7 +156,7 @@ func (rtp *RTP) AddFeature(tag string, funcOnResults FuncFeatureOnResults) {
 func (rtp *RTP) Save2CSV(fn string) error {
 	f, err := os.Create(fn)
 	if err != nil {
-		sgc7utils.Error("sgc7rtp.RTP.Save2CSV",
+		goutils.Error("sgc7rtp.RTP.Save2CSV",
 			zap.Error(err))
 
 		return err
@@ -181,9 +181,9 @@ func (rtp *RTP) Save2CSV(fn string) error {
 
 	strhead := "gamemod,tag,symbol,totalbet"
 	for _, v := range sn {
-		strhead = sgc7utils.AppendString(strhead, ",X", strconv.Itoa(v))
+		strhead = goutils.AppendString(strhead, ",X", strconv.Itoa(v))
 	}
-	strhead = sgc7utils.AppendString(strhead, ",totalwin\n")
+	strhead = goutils.AppendString(strhead, ",totalwin\n")
 
 	f.WriteString(strhead)
 
@@ -295,7 +295,7 @@ func (rtp *RTP) AddReturns(ret float64) {
 	}
 
 	for i, v := range rtp.Returns {
-		if sgc7utils.IsFloatEquals(v, ret) {
+		if goutils.IsFloatEquals(v, ret) {
 			rtp.ReturnWeights[i]++
 
 			return

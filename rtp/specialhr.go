@@ -3,8 +3,8 @@ package sgc7rtp
 import (
 	"strconv"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // FuncHROnResult - onResult(*HitRateNode, *sgc7game.PlayResult)
@@ -29,7 +29,7 @@ func NewSpecialHitRate(tag string, funcOnResult FuncHROnResult) *HitRateNode {
 
 // GenString -
 func (node *HitRateNode) GenString() string {
-	str := sgc7utils.AppendString(node.TagName, ",",
+	str := goutils.AppendString(node.TagName, ",",
 		strconv.FormatInt(node.BetNums, 10), ",",
 		strconv.FormatInt(node.TriggerNums, 10), ",",
 		strconv.FormatInt(node.TotalNums, 10), ",",

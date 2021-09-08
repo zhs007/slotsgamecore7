@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
+	goutils "github.com/zhs007/goutils"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
@@ -13,13 +13,13 @@ import (
 func GetRngs(rngURL string, gameID string, nums int) ([]int, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	url := sgc7utils.AppendString(rngURL, "?size=", strconv.Itoa(nums))
+	url := goutils.AppendString(rngURL, "?size=", strconv.Itoa(nums))
 
 	mapHeader := make(map[string]string)
 	mapHeader["X-Game-ID"] = gameID
 	code, body, err := sgc7http.HTTPGet(url, mapHeader)
 	if err != nil {
-		sgc7utils.Error("gati.GetRngs:HTTPGet",
+		goutils.Error("gati.GetRngs:HTTPGet",
 			zap.Error(err),
 			zap.String("url", url))
 
@@ -27,7 +27,7 @@ func GetRngs(rngURL string, gameID string, nums int) ([]int, error) {
 	}
 
 	if code != 200 {
-		sgc7utils.Error("gati.GetRngs:HTTPGet",
+		goutils.Error("gati.GetRngs:HTTPGet",
 			zap.Int("code", code),
 			zap.String("url", url))
 

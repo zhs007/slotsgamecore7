@@ -3,8 +3,8 @@ package sgc7rtp
 import (
 	"strconv"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 const (
@@ -290,7 +290,7 @@ func (node *RTPNode) OnResult(pr *sgc7game.PlayResult) {
 // GetSymbolNums -
 func (node *RTPNode) GetSymbolNums(arr []int) []int {
 	if node.SymbolNums > 0 {
-		if sgc7utils.IndexOfIntSlice(arr, node.SymbolNums, 0) < 0 {
+		if goutils.IndexOfIntSlice(arr, node.SymbolNums, 0) < 0 {
 			arr = append(arr, node.SymbolNums)
 		}
 	}
@@ -305,7 +305,7 @@ func (node *RTPNode) GetSymbolNums(arr []int) []int {
 // GetGameMods -
 func (node *RTPNode) GetGameMods(arr []string) []string {
 	if node.GameMod != "" {
-		if sgc7utils.IndexOfStringSlice(arr, node.GameMod, 0) < 0 {
+		if goutils.IndexOfStringSlice(arr, node.GameMod, 0) < 0 {
 			arr = append(arr, node.GameMod)
 		}
 	}
@@ -320,7 +320,7 @@ func (node *RTPNode) GetGameMods(arr []string) []string {
 // GetTags -
 func (node *RTPNode) GetTags(arr []string, gamemod string) []string {
 	if node.GameMod == gamemod && node.TagName != "" {
-		if sgc7utils.IndexOfStringSlice(arr, node.TagName, 0) < 0 {
+		if goutils.IndexOfStringSlice(arr, node.TagName, 0) < 0 {
 			arr = append(arr, node.TagName)
 		}
 	}
@@ -335,7 +335,7 @@ func (node *RTPNode) GetTags(arr []string, gamemod string) []string {
 // GetSymbols -
 func (node *RTPNode) GetSymbols(arr []int) []int {
 	if node.Symbol >= 0 {
-		if sgc7utils.IndexOfIntSlice(arr, node.Symbol, 0) < 0 {
+		if goutils.IndexOfIntSlice(arr, node.Symbol, 0) < 0 {
 			arr = append(arr, node.Symbol)
 		}
 	}
@@ -350,11 +350,11 @@ func (node *RTPNode) GetSymbols(arr []int) []int {
 // GenRootString -
 func (node *RTPNode) GenRootString(sn []int, totalbet int64) string {
 	if node.NodeType == RTPNodeRoot {
-		str := sgc7utils.AppendString(",,,", strconv.FormatInt(totalbet, 10))
+		str := goutils.AppendString(",,,", strconv.FormatInt(totalbet, 10))
 		for range sn {
-			str = sgc7utils.AppendString(str, ",")
+			str = goutils.AppendString(str, ",")
 		}
-		str = sgc7utils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
+		str = goutils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
 
 		return str
 	}
@@ -376,11 +376,11 @@ func (node *RTPNode) GenGameModString(gamemod string, sn []int, totalbet int64) 
 	}
 
 	if node.NodeType == RTPNodeGameMod && node.GameMod == gamemod {
-		str := sgc7utils.AppendString(node.GameMod, ",,,", strconv.FormatInt(totalbet, 10))
+		str := goutils.AppendString(node.GameMod, ",,,", strconv.FormatInt(totalbet, 10))
 		for range sn {
-			str = sgc7utils.AppendString(str, ",")
+			str = goutils.AppendString(str, ",")
 		}
-		str = sgc7utils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
+		str = goutils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
 
 		return str
 	}
@@ -402,11 +402,11 @@ func (node *RTPNode) GenTagString(gamemod string, tag string, sn []int, totalbet
 	}
 
 	if node.NodeType == RTPNodeTag && node.GameMod == gamemod && node.TagName == tag {
-		str := sgc7utils.AppendString(node.GameMod, ",", tag, ",,", strconv.FormatInt(totalbet, 10))
+		str := goutils.AppendString(node.GameMod, ",", tag, ",,", strconv.FormatInt(totalbet, 10))
 		for range sn {
-			str = sgc7utils.AppendString(str, ",")
+			str = goutils.AppendString(str, ",")
 		}
-		str = sgc7utils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
+		str = goutils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
 
 		return str
 	}
@@ -431,17 +431,17 @@ func (node *RTPNode) GenSymbolString(gamemod string, tag string, symbol int, sn 
 	}
 
 	if node.NodeType == RTPNodeSymbol && node.GameMod == gamemod && node.TagName == tag && node.Symbol == symbol {
-		str := sgc7utils.AppendString(node.GameMod, ",", tag, ",", strconv.Itoa(symbol), ",", strconv.FormatInt(totalbet, 10))
+		str := goutils.AppendString(node.GameMod, ",", tag, ",", strconv.Itoa(symbol), ",", strconv.FormatInt(totalbet, 10))
 		for _, v := range sn {
 			won := node.GetSymbolNumsWon(gamemod, tag, symbol, v)
 			if won < 0 {
-				str = sgc7utils.AppendString(str, ",")
+				str = goutils.AppendString(str, ",")
 			} else {
-				str = sgc7utils.AppendString(str, ",", strconv.FormatInt(won, 10))
+				str = goutils.AppendString(str, ",", strconv.FormatInt(won, 10))
 			}
 		}
 
-		str = sgc7utils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
+		str = goutils.AppendString(str, ",", strconv.FormatInt(node.TotalWin, 10), "\n")
 
 		return str
 	}

@@ -5,8 +5,8 @@ import (
 	"math"
 	"time"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 	"gonum.org/v1/gonum/stat"
 )
@@ -68,7 +68,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					if err != nil {
 						iserrturn = true
 
-						sgc7utils.Error("StartRTP.Play",
+						goutils.Error("StartRTP.Play",
 							zap.Int("results", len(results)),
 							zap.Error(err))
 
@@ -209,7 +209,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					if err != nil {
 						iserrturn = true
 
-						sgc7utils.Error("StartScaleRTPDown.Play",
+						goutils.Error("StartScaleRTPDown.Play",
 							zap.Int("results", len(results)),
 							zap.Error(err))
 
@@ -254,7 +254,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					if iswin {
 						cr, err := plugin.Random(context.Background(), math.MaxInt32)
 						if err != nil {
-							sgc7utils.Error("StartScaleRTPDown.Random",
+							goutils.Error("StartScaleRTPDown.Random",
 								zap.Int("results", len(results)),
 								zap.Error(err))
 						}

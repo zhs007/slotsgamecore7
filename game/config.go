@@ -2,7 +2,7 @@ package sgc7game
 
 import (
 	jsoniter "github.com/json-iterator/go"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
 
@@ -199,7 +199,7 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 
 	ds, err := NewGameSceneWithArr2Ex(arr)
 	if err != nil {
-		sgc7utils.Error("sgc7game.Config.SetDefaultSceneString:NewGameSceneWithArr2Ex",
+		goutils.Error("sgc7game.Config.SetDefaultSceneString:NewGameSceneWithArr2Ex",
 			zap.String("str", str),
 			zap.Error(err))
 
@@ -223,7 +223,7 @@ func (cfg *Config) AddDefaultSceneString2(str string) error {
 
 	ds, err := NewGameSceneWithArr2Ex(arr)
 	if err != nil {
-		sgc7utils.Error("sgc7game.Config.AddDefaultSceneString2:NewGameSceneWithArr2Ex",
+		goutils.Error("sgc7game.Config.AddDefaultSceneString2:NewGameSceneWithArr2Ex",
 			zap.String("str", str),
 			zap.Error(err))
 

@@ -3,7 +3,7 @@ package sgc7game
 import (
 	"io/ioutil"
 
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -34,7 +34,7 @@ func LoadGameConfig(fn string, cfg interface{}) error {
 func (bgc BasicGameConfig) Init5(ig IGame) error {
 	cfg := ig.GetConfig()
 	if cfg == nil {
-		sgc7utils.Error("BasicGameConfig.Init5:GetConfig",
+		goutils.Error("BasicGameConfig.Init5:GetConfig",
 			zap.Error(ErrNullConfig))
 
 		return ErrNullConfig
@@ -42,7 +42,7 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 
 	err := cfg.LoadLine5(bgc.LineData)
 	if err != nil {
-		sgc7utils.Error("BasicGameConfig.Init5:LoadLine5",
+		goutils.Error("BasicGameConfig.Init5:LoadLine5",
 			zap.String("LineData", bgc.LineData),
 			zap.Error(err))
 
@@ -51,7 +51,7 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 
 	err = cfg.LoadPayTables5(bgc.PayTables)
 	if err != nil {
-		sgc7utils.Error("BasicGameConfig.Init5:LoadPayTables5",
+		goutils.Error("BasicGameConfig.Init5:LoadPayTables5",
 			zap.String("PayTables", bgc.PayTables),
 			zap.Error(err))
 
@@ -61,7 +61,7 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 	for k, v := range bgc.Reels {
 		err = cfg.LoadReels5(k, v)
 		if err != nil {
-			sgc7utils.Error("BasicGameConfig.Init5:LoadReels5",
+			goutils.Error("BasicGameConfig.Init5:LoadReels5",
 				zap.String("reels", v),
 				zap.Error(err))
 

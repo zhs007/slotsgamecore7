@@ -2,9 +2,9 @@ package gatiserv
 
 import (
 	"github.com/valyala/fasthttp"
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
@@ -26,7 +26,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 		cfg,
 	}
 
-	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/config"),
+	s.RegHandle(goutils.AppendString(BasicURL, cfg.GameID, "/config"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			if !ctx.Request.Header.IsGet() {
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -42,7 +42,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 		})
 
-	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/initialize"),
+	s.RegHandle(goutils.AppendString(BasicURL, cfg.GameID, "/initialize"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			if !ctx.Request.Header.IsGet() {
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -58,7 +58,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 			// str, err := BuildPlayerStateString(ps)
 			// if err != nil {
-			// 	sgc7utils.Warn("gatiserv.Serv.initialize:BuildPlayerStateString",
+			// 	goutils.Warn("gatiserv.Serv.initialize:BuildPlayerStateString",
 			// 		zap.Error(err))
 
 			// 	s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
@@ -69,7 +69,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			s.SetResponse(ctx, ps)
 		})
 
-	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/validate"),
+	s.RegHandle(goutils.AppendString(BasicURL, cfg.GameID, "/validate"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			s.SetHTTPStatus(ctx, fasthttp.StatusMethodNotAllowed)
 
@@ -84,7 +84,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			// params := &ValidateParams{}
 			// err := s.ParseBody(ctx, params)
 			// if err != nil {
-			// 	sgc7utils.Warn("gatiserv.Serv.validate:ParseBody",
+			// 	goutils.Warn("gatiserv.Serv.validate:ParseBody",
 			// 		zap.Error(err))
 
 			// 	s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -96,7 +96,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			// s.SetResponse(ctx, ret)
 		})
 
-	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/play"),
+	s.RegHandle(goutils.AppendString(BasicURL, cfg.GameID, "/play"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			if !ctx.Request.Header.IsPost() {
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -109,7 +109,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			}
 			err := s.ParseBody(ctx, params)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.play:ParseBody",
+				goutils.Warn("gatiserv.Serv.play:ParseBody",
 					zap.Error(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -119,7 +119,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 			ret, err := s.Service.Play(params)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.play:Play",
+				goutils.Warn("gatiserv.Serv.play:Play",
 					zap.Error(err))
 
 				if err == sgc7game.ErrInvalidStake {
@@ -135,7 +135,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 			err = s.Service.OnPlayBoostData(params, ret)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.play:OnPlayBoostData",
+				goutils.Warn("gatiserv.Serv.play:OnPlayBoostData",
 					zap.Error(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
@@ -146,7 +146,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			s.SetResponse(ctx, ret)
 		})
 
-	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/checksum"),
+	s.RegHandle(goutils.AppendString(BasicURL, cfg.GameID, "/checksum"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			if !ctx.Request.Header.IsPost() {
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -157,7 +157,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			params := []*CriticalComponent{}
 			err := s.ParseBody(ctx, &params)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.checksum:ParseBody",
+				goutils.Warn("gatiserv.Serv.checksum:ParseBody",
 					zap.Error(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -167,7 +167,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 			ret, err := s.Service.Checksum(params)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.checksum:Checksum",
+				goutils.Warn("gatiserv.Serv.checksum:Checksum",
 					zap.Error(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
@@ -178,7 +178,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			s.SetResponse(ctx, ret)
 		})
 
-	s.RegHandle(sgc7utils.AppendString(BasicURL, cfg.GameID, "/version"),
+	s.RegHandle(goutils.AppendString(BasicURL, cfg.GameID, "/version"),
 		func(ctx *fasthttp.RequestCtx, serv *sgc7http.Serv) {
 			if !ctx.Request.Header.IsGet() {
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -203,10 +203,10 @@ func NewServ(service IService, cfg *Config) *Serv {
 
 // RegMission -
 func (serv *Serv) RegMission(id string) {
-	sgc7utils.Info("gatiserv.Serv.RegHandle",
+	goutils.Info("gatiserv.Serv.RegHandle",
 		zap.String("id", id))
 
-	serv.RegHandle(sgc7utils.AppendString(BasicURL, serv.Cfg.GameID, "/evaluate/"+id),
+	serv.RegHandle(goutils.AppendString(BasicURL, serv.Cfg.GameID, "/evaluate/"+id),
 		func(ctx *fasthttp.RequestCtx, serv1 *sgc7http.Serv) {
 			if !ctx.Request.Header.IsPost() {
 				serv.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -217,7 +217,7 @@ func (serv *Serv) RegMission(id string) {
 			params := &EvaluateParams{}
 			err := serv.ParseBody(ctx, params)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.evaluate:ParseBody",
+				goutils.Warn("gatiserv.Serv.evaluate:ParseBody",
 					zap.String("id", id),
 					zap.Error(err))
 
@@ -228,7 +228,7 @@ func (serv *Serv) RegMission(id string) {
 
 			ret, err := serv.Service.Evaluate(params, id)
 			if err != nil {
-				sgc7utils.Warn("gatiserv.Serv.evaluate:Evaluate",
+				goutils.Warn("gatiserv.Serv.evaluate:Evaluate",
 					zap.String("id", id),
 					zap.Error(err))
 

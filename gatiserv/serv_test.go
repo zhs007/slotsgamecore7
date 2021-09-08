@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 //--------------------------------------------------------------------------------------
@@ -130,7 +130,7 @@ func (sv *testService) Evaluate(params *EvaluateParams, id string) (*EvaluateRes
 }
 
 func Test_Serv(t *testing.T) {
-	sgc7utils.InitLogger("", "", "debug", true, "")
+	goutils.InitLogger("", "", "debug", true, "")
 
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
@@ -158,7 +158,7 @@ func Test_Serv(t *testing.T) {
 	go func() {
 		err := serv.Start()
 		if err != nil {
-			sgc7utils.Error("Test_Serv Start error",
+			goutils.Error("Test_Serv Start error",
 				zap.Error(err))
 			// t.Fatalf("Test_Serv Start error %v",
 			// 	err)

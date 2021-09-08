@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 
 	jsoniter "github.com/json-iterator/go"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +32,7 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 	for _, v := range lst {
 		hash, err := Checksum(v.Filename)
 		if err != nil {
-			sgc7utils.Error("GenChecksum:Checksum",
+			goutils.Error("GenChecksum:Checksum",
 				zap.String("filename", v.Filename),
 				zap.Error(err))
 
@@ -65,7 +65,7 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 // 	ccs := &GATICriticalComponents{}
 // 	err = json.Unmarshal(data, ccs)
 // 	if err != nil {
-// 		sgc7utils.Warn("gatiserv.LoadGATICriticalComponents",
+// 		goutils.Warn("gatiserv.LoadGATICriticalComponents",
 // 			zap.Error(err))
 
 // 		return nil, err
@@ -80,7 +80,7 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 
 // 	b, err := json.Marshal(ccs)
 // 	if err != nil {
-// 		sgc7utils.Warn("gatiserv.SaveGATICriticalComponents",
+// 		goutils.Warn("gatiserv.SaveGATICriticalComponents",
 // 			zap.Error(err))
 
 // 		return err
@@ -109,7 +109,7 @@ func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 	ccs := &GATIGameInfo{}
 	err = json.Unmarshal(data, ccs)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.LoadGATIGameInfo",
+		goutils.Warn("gatiserv.LoadGATIGameInfo",
 			zap.Error(err))
 
 		return nil, err
@@ -124,7 +124,7 @@ func SaveGATIGameInfo(gi *GATIGameInfo, fn string) error {
 
 	b, err := json.Marshal(gi)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.SaveGATIGameInfo",
+		goutils.Warn("gatiserv.SaveGATIGameInfo",
 			zap.Error(err))
 
 		return err

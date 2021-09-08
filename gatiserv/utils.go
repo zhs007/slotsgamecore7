@@ -4,8 +4,8 @@ import (
 	"io/ioutil"
 
 	jsoniter "github.com/json-iterator/go"
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +34,7 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 
 	dps, err := BuildPlayerState(ps)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.BuildPlayerStateString:BuildPlayerState",
+		goutils.Warn("gatiserv.BuildPlayerStateString:BuildPlayerState",
 			zap.Error(err))
 
 		return "", err
@@ -42,7 +42,7 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 
 	psfb, err := json.Marshal(dps)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.BuildPlayerStateString:Marshal PlayerState",
+		goutils.Warn("gatiserv.BuildPlayerStateString:Marshal PlayerState",
 			zap.Error(err))
 
 		return "", err
@@ -61,7 +61,7 @@ func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
 
 	// psb, err := json.Marshal(ips.GetPublic())
 	// if err != nil {
-	// 	sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPublic",
+	// 	goutils.Warn("gatiserv.BuildPlayerState:Marshal GetPublic",
 	// 		zap.Error(err))
 
 	// 	return nil, err
@@ -69,7 +69,7 @@ func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
 
 	// psp, err := json.Marshal(ips.GetPrivate())
 	// if err != nil {
-	// 	sgc7utils.Warn("gatiserv.BuildPlayerState:Marshal GetPrivate",
+	// 	goutils.Warn("gatiserv.BuildPlayerState:Marshal GetPrivate",
 	// 		zap.Error(err))
 
 	// 	return nil, err
@@ -87,7 +87,7 @@ func ParsePlayerState(str string, ps *PlayerState) error {
 
 	err := json.Unmarshal([]byte(str), ps)
 	if err != nil {
-		sgc7utils.Error("gatiserv.ParsePlayerState:JSON",
+		goutils.Error("gatiserv.ParsePlayerState:JSON",
 			zap.String("str", str),
 			zap.Error(err))
 
@@ -112,7 +112,7 @@ func AddWinResult(pr *PlayResult, stake Stake, playResult *sgc7game.PlayResult) 
 
 	// prb, err := json.Marshal(playResult)
 	// if err != nil {
-	// 	sgc7utils.Warn("gatiserv.AddWinResult:Marshal PlayResult",
+	// 	goutils.Warn("gatiserv.AddWinResult:Marshal PlayResult",
 	// 		zap.Error(err))
 
 	// 	return err
@@ -147,7 +147,7 @@ func ParsePlayParams(str string, ps *PlayerState) (*PlayParams, error) {
 	}
 	err := json.Unmarshal([]byte(str), pp)
 	if err != nil {
-		sgc7utils.Error("gatiserv.ParsePlayParams:JSON",
+		goutils.Error("gatiserv.ParsePlayParams:JSON",
 			zap.String("str", str),
 			zap.Error(err))
 
@@ -164,7 +164,7 @@ func ParsePlayResult(str string) (*PlayResult, error) {
 	pr := &PlayResult{}
 	err := json.Unmarshal([]byte(str), pr)
 	if err != nil {
-		sgc7utils.Error("gatiserv.ParsePlayResult:JSON",
+		goutils.Error("gatiserv.ParsePlayResult:JSON",
 			zap.String("str", str),
 			zap.Error(err))
 
@@ -197,7 +197,7 @@ func LoadGATIGameConfig(fn string) (*GATIGameConfig, error) {
 	ccs := &GATIGameConfig{}
 	err = json.Unmarshal(data, ccs)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.LoadGATIGameConfig",
+		goutils.Warn("gatiserv.LoadGATIGameConfig",
 			zap.Error(err))
 
 		return nil, err

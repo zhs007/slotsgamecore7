@@ -1,6 +1,6 @@
 package sgc7game
 
-import sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+import goutils "github.com/zhs007/goutils"
 
 // CalcClusterResult - cluster
 func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
@@ -17,11 +17,11 @@ func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
 				cr := calcClusterResult(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol)
 				// if err != nil {
-				// 	sgc7utils.Error("sgc7game.CalcClusterResult:calcClusterResult",
+				// 	goutils.Error("sgc7game.CalcClusterResult:calcClusterResult",
 				// 		zap.Int("x", x),
 				// 		zap.Int("y", y),
-				// 		sgc7utils.JSON("scene", scene),
-				// 		sgc7utils.JSON("scene0", scene0),
+				// 		goutils.JSON("scene", scene),
+				// 		goutils.JSON("scene0", scene0),
 				// 		zap.Error(err))
 
 				// 	return nil, err
@@ -51,7 +51,7 @@ func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 func calcClusterSymbol(scene *GameScene, x, y int, symbol int, pos []int,
 	isSameSymbol FuncIsSameSymbol) []int {
 
-	if sgc7utils.IndexOfInt2Slice(pos, x, y, 0) >= 0 {
+	if goutils.IndexOfInt2Slice(pos, x, y, 0) >= 0 {
 		return pos
 	}
 

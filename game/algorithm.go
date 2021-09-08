@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 )
 
 // FuncIsSymbol - is symbol
@@ -481,7 +481,7 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 			continue
 		}
 
-		if sgc7utils.IndexOfIntSlice(arrSymbol, cs, 0) >= 0 {
+		if goutils.IndexOfIntSlice(arrSymbol, cs, 0) >= 0 {
 			continue
 		}
 

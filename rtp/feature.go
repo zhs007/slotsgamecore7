@@ -3,8 +3,8 @@ package sgc7rtp
 import (
 	"strconv"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // FuncFeatureOnResults - onResult(*FeatureNode, []*sgc7game.PlayResult)
@@ -28,7 +28,7 @@ func NewFeatureNode(tag string, funcOnResults FuncFeatureOnResults) *FeatureNode
 
 // GenString -
 func (node *FeatureNode) GenString() string {
-	str := sgc7utils.AppendString(node.TagName, ",",
+	str := goutils.AppendString(node.TagName, ",",
 		strconv.FormatInt(node.BetNums, 10), ",",
 		strconv.FormatInt(node.TriggerNums, 10), "\n")
 

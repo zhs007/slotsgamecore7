@@ -3,8 +3,8 @@ package sgc7rtp
 import (
 	"strconv"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // FuncOnPlayer - onPlayer(*PlayerPoolData, sgc7game.IPlayerState)
@@ -47,5 +47,5 @@ func (pd *PlayerPoolData) Add(pd1 *PlayerPoolData) {
 }
 
 func (pd *PlayerPoolData) GenString() string {
-	return sgc7utils.AppendString(pd.TagName, ",", strconv.FormatInt(pd.PlayerNums, 10), ",", strconv.FormatInt(pd.Total, 10), "\n")
+	return goutils.AppendString(pd.TagName, ",", strconv.FormatInt(pd.PlayerNums, 10), ",", strconv.FormatInt(pd.Total, 10), "\n")
 }
