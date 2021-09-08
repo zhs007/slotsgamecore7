@@ -128,6 +128,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 				}
 			}
 
+			currtp.OnPlayerPoolData(ps)
+
 			ch <- currtp
 		}()
 	}
@@ -291,6 +293,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					i++
 				}
 			}
+
+			currtp.OnPlayerPoolData(ps)
 
 			ch <- currtp
 		}()

@@ -4,7 +4,13 @@ This is a golang project for slots game.
 
 ### Update log
 
-##### v0.7
+##### v0.8
+
+- support gameserver
+- support gateway
+- support websocket
+
+##### v0.7 deprecated
 
 - support gameserver
 - support gateway
