@@ -24,25 +24,28 @@ type RTP struct {
 	ReturnWeights []float64
 	MaxReturn     int64
 	MaxReturnNums int64
+	MapPlayerPool map[string]*PlayerPoolData
 }
 
 // NewRTP - new RTP
 func NewRTP() *RTP {
 	return &RTP{
-		Root:       NewRTPRoot(),
-		MapHR:      make(map[string]*HitRateNode),
-		MapFeature: make(map[string]*FeatureNode),
+		Root:          NewRTPRoot(),
+		MapHR:         make(map[string]*HitRateNode),
+		MapFeature:    make(map[string]*FeatureNode),
+		MapPlayerPool: make(map[string]*PlayerPoolData),
 	}
 }
 
 // Clone - clone
 func (rtp *RTP) Clone() *RTP {
 	nrtp := &RTP{
-		BetNums:    rtp.BetNums,
-		TotalBet:   rtp.TotalBet,
-		Root:       rtp.Root.Clone(),
-		MapHR:      make(map[string]*HitRateNode),
-		MapFeature: make(map[string]*FeatureNode),
+		BetNums:       rtp.BetNums,
+		TotalBet:      rtp.TotalBet,
+		Root:          rtp.Root.Clone(),
+		MapHR:         make(map[string]*HitRateNode),
+		MapFeature:    make(map[string]*FeatureNode),
+		MapPlayerPool: make(map[string]*PlayerPoolData),
 	}
 
 	for k, v := range rtp.MapHR {
@@ -51,6 +54,10 @@ func (rtp *RTP) Clone() *RTP {
 
 	for k, v := range rtp.MapFeature {
 		nrtp.MapFeature[k] = v.Clone()
+	}
+
+	for k, v := range rtp.MapPlayerPool {
+		nrtp.MapPlayerPool[k] = v.Clone()
 	}
 
 	return nrtp
@@ -79,6 +86,10 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 
 	for k, v := range rtp.MapFeature {
 		v.Add(rtp1.MapFeature[k])
+	}
+
+	for k, v := range rtp.MapPlayerPool {
+		v.Add(rtp1.MapPlayerPool[k])
 	}
 }
 
@@ -273,4 +284,9 @@ func (rtp *RTP) AddReturns(ret float64) {
 
 	rtp.Returns = append(rtp.Returns, ret)
 	rtp.ReturnWeights = append(rtp.ReturnWeights, 1)
+}
+
+// AddPlayerPoolData -
+func (rtp *RTP) AddPlayerPoolData(tag string, funcOnPlayer FuncOnPlayer) {
+	rtp.MapPlayerPool[tag] = NewPlayerPoolData(tag, funcOnPlayer)
 }
