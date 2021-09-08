@@ -2,7 +2,7 @@ package sgc7game
 
 import (
 	jsoniter "github.com/json-iterator/go"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
 
@@ -57,7 +57,7 @@ func PlayResult2JSON(pr *PlayResult) ([]byte, error) {
 
 	b, err := json.Marshal(pr)
 	if err != nil {
-		sgc7utils.Warn("sgc7game.PlayResult2JSON",
+		goutils.Warn("sgc7game.PlayResult2JSON",
 			zap.Error(err))
 
 		return nil, err
@@ -73,7 +73,7 @@ func JSON2PlayResult(buf []byte, pr *PlayResult) (*PlayResult, error) {
 	// pr := &PlayResult{}
 	err := json.Unmarshal(buf, &pr)
 	if err != nil {
-		sgc7utils.Warn("sgc7game.JSON2PlayResult",
+		goutils.Warn("sgc7game.JSON2PlayResult",
 			zap.Error(err))
 		return nil, err
 	}

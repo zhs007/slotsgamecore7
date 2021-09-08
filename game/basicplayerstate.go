@@ -2,7 +2,7 @@ package sgc7game
 
 import (
 	jsoniter "github.com/json-iterator/go"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
 
@@ -83,7 +83,7 @@ func (ps *BasicPlayerState) SetPublicJson(pubjson string) error {
 	pub := &BasicPlayerPublicState{}
 	err := json.Unmarshal([]byte(pubjson), pub)
 	if err != nil {
-		sgc7utils.Warn("BasicPlayerState.SetPublicJson",
+		goutils.Warn("BasicPlayerState.SetPublicJson",
 			zap.Error(err))
 
 		return err
@@ -101,7 +101,7 @@ func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
 	pub := &BasicPlayerPrivateState{}
 	err := json.Unmarshal([]byte(prijson), pub)
 	if err != nil {
-		sgc7utils.Warn("BasicPlayerState.SetPrivateJson",
+		goutils.Warn("BasicPlayerState.SetPrivateJson",
 			zap.Error(err))
 
 		return err
@@ -118,7 +118,7 @@ func (ps *BasicPlayerState) GetPublicJson() string {
 
 	bpub, err := json.Marshal(ps.GetPublic())
 	if err != nil {
-		sgc7utils.Warn("BasicPlayerState.GetPublicJson",
+		goutils.Warn("BasicPlayerState.GetPublicJson",
 			zap.Error(err))
 
 		return ""
@@ -133,7 +133,7 @@ func (ps *BasicPlayerState) GetPrivateJson() string {
 
 	bpri, err := json.Marshal(ps.GetPrivate())
 	if err != nil {
-		sgc7utils.Warn("BasicPlayerState.GetPrivateJson",
+		goutils.Warn("BasicPlayerState.GetPrivateJson",
 			zap.Error(err))
 
 		return ""

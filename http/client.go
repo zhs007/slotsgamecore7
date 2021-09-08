@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	jsoniter "github.com/json-iterator/go"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
 
@@ -49,7 +49,7 @@ func HTTPPost(url string, header map[string]string, bodyObj interface{}) (int, [
 
 		bb, err := json.Marshal(bodyObj)
 		if err != nil {
-			sgc7utils.Warn("sgc7http.HTTPPost:Marshal",
+			goutils.Warn("sgc7http.HTTPPost:Marshal",
 				zap.Error(err))
 
 			return -1, nil, err

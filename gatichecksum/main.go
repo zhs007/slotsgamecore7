@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	goutils "github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/gatiserv"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.uber.org/zap"
 )
@@ -50,7 +50,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.Output()
 	if err != nil {
-		sgc7utils.Error("Command",
+		goutils.Error("Command",
 			zap.String("command", command),
 			zap.Error(err))
 
@@ -67,7 +67,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		fn := path.Join(pathRoot, v)
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
-			sgc7utils.Error("Checksum",
+			goutils.Error("Checksum",
 				zap.String("fn", fn),
 				zap.Error(err))
 
@@ -83,7 +83,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		fn := path.Join(pathRoot, v)
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
-			sgc7utils.Error("Checksum",
+			goutils.Error("Checksum",
 				zap.String("fn", fn),
 				zap.Error(err))
 
@@ -106,7 +106,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		fn := path.Join(pathRoot, v)
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
-			sgc7utils.Error("Checksum",
+			goutils.Error("Checksum",
 				zap.String("fn", fn),
 				zap.Error(err))
 
@@ -122,7 +122,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		fn := path.Join(pathRoot, v)
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
-			sgc7utils.Error("Checksum",
+			goutils.Error("Checksum",
 				zap.String("fn", fn),
 				zap.Error(err))
 
@@ -142,7 +142,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		fn := path.Join(pathRoot, v[0])
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
-			sgc7utils.Error("Checksum",
+			goutils.Error("Checksum",
 				zap.String("fn", fn),
 				zap.Error(err))
 
@@ -367,7 +367,7 @@ func genToysoldier() {
 }
 
 func main() {
-	sgc7utils.InitLogger("gatiChecksum", sgc7ver.Version,
+	goutils.InitLogger("gatiChecksum", sgc7ver.Version,
 		"debug", true, "./logs")
 
 	// genElemental2()

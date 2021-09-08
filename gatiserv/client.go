@@ -4,9 +4,9 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
@@ -27,10 +27,10 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
 	sc, buff, err := sgc7http.HTTPGet(
-		sgc7utils.AppendString(client.ServURL, "config"),
+		goutils.AppendString(client.ServURL, "config"),
 		nil)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.GetConfig:HTTPGet",
+		goutils.Error("gatiserv.Client.GetConfig:HTTPGet",
 			zap.String("ServURL", client.ServURL),
 			zap.Error(err))
 
@@ -38,7 +38,7 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 	}
 
 	if sc != fasthttp.StatusOK {
-		sgc7utils.Error("gatiserv.Client.GetConfig:HTTPGet",
+		goutils.Error("gatiserv.Client.GetConfig:HTTPGet",
 			zap.String("ServURL", client.ServURL),
 			zap.Int("status", sc))
 
@@ -48,7 +48,7 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 	cfg := &sgc7game.Config{}
 	err = json.Unmarshal(buff, cfg)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.GetConfig:JSON",
+		goutils.Error("gatiserv.Client.GetConfig:JSON",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buff)),
 			zap.Error(err))
@@ -63,10 +63,10 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 func (client *Client) Initialize(ps *PlayerState) error {
 
 	sc, buff, err := sgc7http.HTTPGet(
-		sgc7utils.AppendString(client.ServURL, "initialize"),
+		goutils.AppendString(client.ServURL, "initialize"),
 		nil)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.Initialize:HTTPGet",
+		goutils.Error("gatiserv.Client.Initialize:HTTPGet",
 			zap.String("ServURL", client.ServURL),
 			zap.Error(err))
 
@@ -74,7 +74,7 @@ func (client *Client) Initialize(ps *PlayerState) error {
 	}
 
 	if sc != fasthttp.StatusOK {
-		sgc7utils.Error("gatiserv.Client.Initialize:HTTPGet",
+		goutils.Error("gatiserv.Client.Initialize:HTTPGet",
 			zap.String("ServURL", client.ServURL),
 			zap.Int("status", sc))
 
@@ -83,7 +83,7 @@ func (client *Client) Initialize(ps *PlayerState) error {
 
 	err = ParsePlayerState(string(buff), ps)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.Initialize:ParsePlayerState",
+		goutils.Error("gatiserv.Client.Initialize:ParsePlayerState",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buff)),
 			zap.Error(err))
@@ -97,12 +97,12 @@ func (client *Client) Initialize(ps *PlayerState) error {
 // PlayEx - play with string parameter
 func (client *Client) PlayEx(param string) (*PlayResult, error) {
 	sc, buff, err := sgc7http.HTTPPostEx(
-		sgc7utils.AppendString(client.ServURL, "play"),
+		goutils.AppendString(client.ServURL, "play"),
 		nil,
 		[]byte(param),
 	)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
+		goutils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
 			zap.String("ServURL", client.ServURL),
 			zap.Error(err))
 
@@ -110,7 +110,7 @@ func (client *Client) PlayEx(param string) (*PlayResult, error) {
 	}
 
 	if sc != fasthttp.StatusOK {
-		sgc7utils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
+		goutils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
 			zap.String("ServURL", client.ServURL),
 			zap.Int("status", sc))
 
@@ -119,7 +119,7 @@ func (client *Client) PlayEx(param string) (*PlayResult, error) {
 
 	pr, err := ParsePlayResult(string(buff))
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.PlayEx:ParsePlayResult",
+		goutils.Error("gatiserv.Client.PlayEx:ParsePlayResult",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buff)),
 			zap.Error(err))
@@ -136,7 +136,7 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 
 	buf, err := json.Marshal(arr)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.Checksum:Marshal",
+		goutils.Error("gatiserv.Client.Checksum:Marshal",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buf)),
 			zap.Error(err))
@@ -145,12 +145,12 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	}
 
 	sc, buff, err := sgc7http.HTTPPostEx(
-		sgc7utils.AppendString(client.ServURL, "checksum"),
+		goutils.AppendString(client.ServURL, "checksum"),
 		nil,
 		buf,
 	)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.Checksum:HTTPPostEx",
+		goutils.Error("gatiserv.Client.Checksum:HTTPPostEx",
 			zap.String("ServURL", client.ServURL),
 			zap.Error(err))
 
@@ -158,7 +158,7 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	}
 
 	if sc != fasthttp.StatusOK {
-		sgc7utils.Error("gatiserv.Client.Checksum:HTTPPostEx",
+		goutils.Error("gatiserv.Client.Checksum:HTTPPostEx",
 			zap.String("ServURL", client.ServURL),
 			zap.Int("status", sc))
 
@@ -168,7 +168,7 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	ret := []*ComponentChecksum{}
 	err = json.Unmarshal(buff, &ret)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Client.Checksum:Unmarshal",
+		goutils.Error("gatiserv.Client.Checksum:Unmarshal",
 			zap.String("ServURL", client.ServURL),
 			zap.String("body", string(buff)),
 			zap.Error(err))

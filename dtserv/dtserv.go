@@ -5,10 +5,10 @@ import (
 	"net"
 
 	jsoniter "github.com/json-iterator/go"
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -28,7 +28,7 @@ type Serv struct {
 func NewServ(service IService, game sgc7game.IGame, bindaddr string, version string) (*Serv, error) {
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
-		sgc7utils.Error("NewServ.Listen",
+		goutils.Error("NewServ.Listen",
 			zap.Error(err))
 
 		return nil, err
@@ -45,7 +45,7 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 
 	sgc7pb.RegisterDTGameLogicServer(grpcServ, serv)
 
-	sgc7utils.Info("NewServ OK.",
+	goutils.Info("NewServ OK.",
 		zap.String("addr", bindaddr),
 		zap.String("ver", version),
 		zap.String("corever", sgc7ver.Version))
@@ -65,54 +65,54 @@ func (serv *Serv) Stop() {
 
 // GetConfig - get config
 func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sgc7pb.GameConfig, error) {
-	sgc7utils.Debug("Serv.GetConfig",
-		sgc7utils.JSON("req", req))
+	goutils.Debug("Serv.GetConfig",
+		goutils.JSON("req", req))
 
 	cfg := serv.game.GetConfig()
 
 	res := BuildPBGameConfig(cfg)
 
-	sgc7utils.Debug("Serv.GetConfig",
-		sgc7utils.JSON("reply", res))
+	goutils.Debug("Serv.GetConfig",
+		goutils.JSON("reply", res))
 
 	return res, nil
 }
 
 // Initialize - initialize a player
 func (serv *Serv) Initialize(ctx context.Context, req *sgc7pb.RequestInitialize) (*sgc7pb.PlayerState, error) {
-	sgc7utils.Debug("Serv.Initialize",
-		sgc7utils.JSON("req", req))
+	goutils.Debug("Serv.Initialize",
+		goutils.JSON("req", req))
 
 	ps := serv.game.Initialize()
 	res, err := serv.service.BuildPBPlayerState(ps)
 	if err != nil {
-		sgc7utils.Error("Serv.Initialize:BuildPBPlayerState",
+		goutils.Error("Serv.Initialize:BuildPBPlayerState",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	sgc7utils.Debug("Serv.Initialize",
-		sgc7utils.JSON("reply", res))
+	goutils.Debug("Serv.Initialize",
+		goutils.JSON("reply", res))
 
 	return res, nil
 }
 
 // Play - play game
 func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlayServer) error {
-	sgc7utils.Debug("Serv.Play",
-		sgc7utils.JSON("req", req))
+	goutils.Debug("Serv.Play",
+		goutils.JSON("req", req))
 
 	res, err := serv.onPlay(req)
 	if err != nil {
-		sgc7utils.Error("Serv.Play:onPlay",
+		goutils.Error("Serv.Play:onPlay",
 			zap.Error(err))
 
 		return err
 	}
 
-	// sgc7utils.Debug("Serv.Play",
-	// 	sgc7utils.JSON("reply", res))
+	// goutils.Debug("Serv.Play",
+	// 	goutils.JSON("reply", res))
 	serv.LogReplyPlay("Serv.Play", res, zapcore.DebugLevel)
 
 	return stream.Send(res)
@@ -121,7 +121,7 @@ func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlaySe
 // ProcCheat - process cheat
 func (serv *Serv) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
 	if cheat != "" {
-		str := sgc7utils.AppendString("[", cheat, "]")
+		str := goutils.AppendString("[", cheat, "]")
 
 		json := jsoniter.ConfigCompatibleWithStandardLibrary
 
@@ -143,7 +143,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	if req.PlayerState != nil {
 		err := serv.service.BuildPlayerStateFromPB(ips, req.PlayerState)
 		if err != nil {
-			sgc7utils.Error("Serv.onPlay:BuildPlayerStateFromPB",
+			goutils.Error("Serv.onPlay:BuildPlayerStateFromPB",
 				zap.Error(err))
 
 			return nil, err
@@ -158,8 +158,8 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	stake := BuildStake(req.Stake)
 	err := serv.game.CheckStake(stake)
 	if err != nil {
-		sgc7utils.Error("Serv.onPlay:CheckStake",
-			sgc7utils.JSON("stake", stake),
+		goutils.Error("Serv.onPlay:CheckStake",
+			goutils.JSON("stake", stake),
 			zap.Error(err))
 
 		return nil, err
@@ -176,7 +176,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 		pr, err := serv.game.Play(plugin, cmd, req.ClientParams, ips, stake, results)
 		if err != nil {
-			sgc7utils.Error("Serv.onPlay:Play",
+			goutils.Error("Serv.onPlay:Play",
 				zap.Int("results", len(results)),
 				zap.Error(err))
 
@@ -209,7 +209,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 	ps, err := serv.service.BuildPBPlayerState(ips)
 	if err != nil {
-		sgc7utils.Error("Serv.onPlay:BuildPlayerState",
+		goutils.Error("Serv.onPlay:BuildPlayerState",
 			zap.Error(err))
 
 		return nil, err
@@ -235,7 +235,7 @@ func (serv *Serv) LogReplyPlay(str string, reply *sgc7pb.ReplyPlay, logLevel zap
 	for _, v := range reply.Results {
 		msg, err := serv.service.BuildPBGameModParamFromAny(v.ClientData.CurGameModParam)
 		if err != nil {
-			sgc7utils.Warn("Serv.LogReplyPlay",
+			goutils.Warn("Serv.LogReplyPlay",
 				zap.Error(err))
 		}
 
@@ -245,12 +245,12 @@ func (serv *Serv) LogReplyPlay(str string, reply *sgc7pb.ReplyPlay, logLevel zap
 	}
 
 	if logLevel == zapcore.DebugLevel {
-		sgc7utils.Debug(str,
-			sgc7utils.JSON("reply", reply),
-			sgc7utils.JSON("curgamemodparam", arr))
+		goutils.Debug(str,
+			goutils.JSON("reply", reply),
+			goutils.JSON("curgamemodparam", arr))
 	} else if logLevel == zapcore.InfoLevel {
-		sgc7utils.Info(str,
-			sgc7utils.JSON("reply", reply),
-			sgc7utils.JSON("curgamemodparam", arr))
+		goutils.Info(str,
+			goutils.JSON("reply", reply),
+			goutils.JSON("curgamemodparam", arr))
 	}
 }

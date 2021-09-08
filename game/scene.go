@@ -3,8 +3,8 @@ package sgc7game
 import (
 	"context"
 
+	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // FuncCountSymbolExIsSymbol -
@@ -353,7 +353,7 @@ func (gs *GameScene) CountSymbols(arr []int) []int {
 	narr := make([]int, len(arr))
 	for _, l := range gs.Arr {
 		for _, v := range l {
-			i := sgc7utils.IndexOfIntSlice(arr, v, 0)
+			i := goutils.IndexOfIntSlice(arr, v, 0)
 			if i >= 0 {
 				narr[i]++
 			}

@@ -5,7 +5,7 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
+	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
 
@@ -69,7 +69,7 @@ func (s *Serv) Start() error {
 
 	ln, err := net.Listen("tcp4", s.bindAddr)
 	if err != nil {
-		sgc7utils.Error("gatiserv.Serv.Start:Listen",
+		goutils.Error("gatiserv.Serv.Start:Listen",
 			zap.Error(err))
 
 		return err
@@ -94,7 +94,7 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 
 	b, err := json.Marshal(jsonObj)
 	if err != nil {
-		sgc7utils.Warn("gatiserv.Serv.SetResponse",
+		goutils.Warn("gatiserv.Serv.SetResponse",
 			zap.Error(err))
 
 		s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
@@ -106,7 +106,7 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody(b)
 
-	sgc7utils.Debug("gatiserv.Serv.SetResponse",
+	goutils.Debug("gatiserv.Serv.SetResponse",
 		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.String("body", string(b)))
 }
@@ -117,7 +117,7 @@ func (s *Serv) SetStringResponse(ctx *fasthttp.RequestCtx, str string) {
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.SetBody([]byte(str))
 
-	sgc7utils.Debug("gatiserv.Serv.SetStringResponse",
+	goutils.Debug("gatiserv.Serv.SetStringResponse",
 		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.String("body", str))
 }
@@ -126,13 +126,13 @@ func (s *Serv) SetStringResponse(ctx *fasthttp.RequestCtx, str string) {
 func (s *Serv) SetHTTPStatus(ctx *fasthttp.RequestCtx, statusCode int) {
 	ctx.SetStatusCode(statusCode)
 
-	sgc7utils.Debug("gatiserv.Serv.SetHTTPStatus",
+	goutils.Debug("gatiserv.Serv.SetHTTPStatus",
 		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.Int("statusCode", statusCode))
 }
 
 func (s *Serv) outputDebugInfo(ctx *fasthttp.RequestCtx) {
-	sgc7utils.Debug("Request infomation",
+	goutils.Debug("Request infomation",
 		zap.String("Method", string(ctx.Method())),
 		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.String("Path", string(ctx.Path())),
@@ -145,19 +145,19 @@ func (s *Serv) outputDebugInfo(ctx *fasthttp.RequestCtx) {
 	)
 
 	if ctx.QueryArgs() != nil {
-		sgc7utils.Debug("Request infomation QueryArgs",
+		goutils.Debug("Request infomation QueryArgs",
 			zap.String("QueryArgs", ctx.QueryArgs().String()),
 		)
 	}
 
 	if ctx.PostArgs() != nil {
-		sgc7utils.Debug("Request infomation PostArgs",
+		goutils.Debug("Request infomation PostArgs",
 			zap.String("PostArgs", ctx.PostArgs().String()),
 		)
 	}
 
 	if ctx.PostBody() != nil {
-		sgc7utils.Debug("Request infomation PostBody",
+		goutils.Debug("Request infomation PostBody",
 			zap.String("PostBody", string(ctx.PostBody())),
 		)
 	}

@@ -4,9 +4,9 @@ import (
 	"os"
 
 	jsoniter "github.com/json-iterator/go"
+	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +22,7 @@ func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicServi
 
 	gi, err := LoadGATIGameInfo(gifn)
 	if err != nil {
-		sgc7utils.Error("NewBasicService:LoadGATIGameInfo",
+		goutils.Error("NewBasicService:LoadGATIGameInfo",
 			zap.String("gifn", gifn),
 			zap.Error(err))
 
@@ -33,7 +33,7 @@ func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicServi
 	if err != nil {
 		curpwd, _ := os.Getwd()
 
-		sgc7utils.Error("NewBasicService:LoadGATIGameConfig",
+		goutils.Error("NewBasicService:LoadGATIGameConfig",
 			zap.String("gcfn", gcfn),
 			zap.String("pwd", curpwd),
 			zap.Error(err))
@@ -74,8 +74,8 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	if params.PlayerState != nil {
 		err := BuildIPlayerState(ips, params.PlayerState)
 		if err != nil {
-			sgc7utils.Error("BasicService.Play:BuildIPlayerState",
-				sgc7utils.JSON("PlayerState", params.PlayerState),
+			goutils.Error("BasicService.Play:BuildIPlayerState",
+				goutils.JSON("PlayerState", params.PlayerState),
 				zap.Error(err))
 
 			return nil, err
@@ -90,8 +90,8 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	stake := BuildStake(params.Stake)
 	err := sv.Game.CheckStake(stake)
 	if err != nil {
-		sgc7utils.Error("BasicService.Play:CheckStake",
-			sgc7utils.JSON("stake", stake),
+		goutils.Error("BasicService.Play:CheckStake",
+			goutils.JSON("stake", stake),
 			zap.Error(err))
 
 		return nil, err
@@ -108,7 +108,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 		pr, err := sv.Game.Play(plugin, cmd, params.Params, ips, stake, results)
 		if err != nil {
-			sgc7utils.Error("BasicService.Play:Play",
+			goutils.Error("BasicService.Play:Play",
 				zap.Int("results", len(results)),
 				zap.Error(err))
 
@@ -144,7 +144,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 	ps, err := BuildPlayerState(ips)
 	if err != nil {
-		sgc7utils.Error("BasicService.Play:BuildPlayerState",
+		goutils.Error("BasicService.Play:BuildPlayerState",
 			zap.Error(err))
 
 		return nil, err
@@ -167,7 +167,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 // ProcCheat - process cheat
 func (sv *BasicService) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
 	if cheat != "" {
-		str := sgc7utils.AppendString("[", cheat, "]")
+		str := goutils.AppendString("[", cheat, "]")
 
 		json := jsoniter.ConfigCompatibleWithStandardLibrary
 
