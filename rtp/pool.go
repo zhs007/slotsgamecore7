@@ -1,11 +1,14 @@
 package sgc7rtp
 
 import (
+	"strconv"
+
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
 // FuncOnPlayer - onPlayer(*PlayerPoolData, sgc7game.IPlayerState)
-type FuncOnPlayer func(pd *PlayerPoolData, ps *sgc7game.IPlayerState) bool
+type FuncOnPlayer func(pd *PlayerPoolData, ps sgc7game.IPlayerState) bool
 
 // PlayerPoolData -
 type PlayerPoolData struct {
@@ -41,4 +44,8 @@ func (pd *PlayerPoolData) Add(pd1 *PlayerPoolData) {
 		pd.Total += pd1.Total
 		pd.PlayerNums += pd1.PlayerNums
 	}
+}
+
+func (pd *PlayerPoolData) GenString() string {
+	return sgc7utils.AppendString(pd.TagName, ",", strconv.FormatInt(pd.PlayerNums, 10), ",", strconv.FormatInt(pd.Total, 10), "\n")
 }

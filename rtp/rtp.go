@@ -254,6 +254,26 @@ func (rtp *RTP) Save2CSV(fn string) error {
 		}
 	}
 
+	if len(rtp.MapPlayerPool) > 0 {
+		f.WriteString("\n\n\n")
+
+		f.WriteString("name,playernums,values\n")
+
+		keys := []string{}
+		for k := range rtp.MapPlayerPool {
+			keys = append(keys, k)
+		}
+
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i] < keys[j]
+		})
+
+		for _, v := range keys {
+			str := rtp.MapPlayerPool[v].GenString()
+			f.WriteString(str)
+		}
+	}
+
 	f.WriteString("\n\n\n")
 	f.WriteString("totalnums,winnums,Hit Frequency,Variance,MaxReturn,MaxReturnNums\n")
 	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v\n",
@@ -289,4 +309,11 @@ func (rtp *RTP) AddReturns(ret float64) {
 // AddPlayerPoolData -
 func (rtp *RTP) AddPlayerPoolData(tag string, funcOnPlayer FuncOnPlayer) {
 	rtp.MapPlayerPool[tag] = NewPlayerPoolData(tag, funcOnPlayer)
+}
+
+// OnPlayerPoolData -
+func (rtp *RTP) OnPlayerPoolData(ps sgc7game.IPlayerState) {
+	for _, v := range rtp.MapPlayerPool {
+		v.OnPlayer(v, ps)
+	}
 }
