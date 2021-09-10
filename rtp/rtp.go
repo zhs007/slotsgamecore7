@@ -13,39 +13,42 @@ import (
 
 // RTP -
 type RTP struct {
-	WinNums       int64
-	BetNums       int64
-	TotalBet      int64
-	Root          *RTPNode
-	MapHR         map[string]*HitRateNode
-	MapFeature    map[string]*FeatureNode
-	Variance      float64
-	Returns       []float64
-	ReturnWeights []float64
-	MaxReturn     int64
-	MaxReturnNums int64
-	MapPlayerPool map[string]*PlayerPoolData
+	WinNums             int64
+	BetNums             int64
+	TotalBet            int64
+	Root                *RTPNode
+	MapHR               map[string]*HitRateNode
+	MapFeature          map[string]*FeatureNode
+	Variance            float64
+	Returns             []float64
+	ReturnWeights       []float64
+	MaxReturn           int64
+	MaxReturnNums       int64
+	MapPlayerPool       map[string]*PlayerPoolData
+	MapHitFrequencyData map[string]*HitFrequencyData
 }
 
 // NewRTP - new RTP
 func NewRTP() *RTP {
 	return &RTP{
-		Root:          NewRTPRoot(),
-		MapHR:         make(map[string]*HitRateNode),
-		MapFeature:    make(map[string]*FeatureNode),
-		MapPlayerPool: make(map[string]*PlayerPoolData),
+		Root:                NewRTPRoot(),
+		MapHR:               make(map[string]*HitRateNode),
+		MapFeature:          make(map[string]*FeatureNode),
+		MapPlayerPool:       make(map[string]*PlayerPoolData),
+		MapHitFrequencyData: make(map[string]*HitFrequencyData),
 	}
 }
 
 // Clone - clone
 func (rtp *RTP) Clone() *RTP {
 	nrtp := &RTP{
-		BetNums:       rtp.BetNums,
-		TotalBet:      rtp.TotalBet,
-		Root:          rtp.Root.Clone(),
-		MapHR:         make(map[string]*HitRateNode),
-		MapFeature:    make(map[string]*FeatureNode),
-		MapPlayerPool: make(map[string]*PlayerPoolData),
+		BetNums:             rtp.BetNums,
+		TotalBet:            rtp.TotalBet,
+		Root:                rtp.Root.Clone(),
+		MapHR:               make(map[string]*HitRateNode),
+		MapFeature:          make(map[string]*FeatureNode),
+		MapPlayerPool:       make(map[string]*PlayerPoolData),
+		MapHitFrequencyData: make(map[string]*HitFrequencyData),
 	}
 
 	for k, v := range rtp.MapHR {
@@ -58,6 +61,10 @@ func (rtp *RTP) Clone() *RTP {
 
 	for k, v := range rtp.MapPlayerPool {
 		nrtp.MapPlayerPool[k] = v.Clone()
+	}
+
+	for k, v := range rtp.MapHitFrequencyData {
+		nrtp.MapHitFrequencyData[k] = v.Clone()
 	}
 
 	return nrtp
@@ -91,6 +98,10 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	for k, v := range rtp.MapPlayerPool {
 		v.Add(rtp1.MapPlayerPool[k])
 	}
+
+	for k, v := range rtp.MapHitFrequencyData {
+		v.Add(rtp1.MapHitFrequencyData[k])
+	}
 }
 
 // CalcRTP -
@@ -110,6 +121,10 @@ func (rtp *RTP) Bet(bet int64) {
 	for _, v := range rtp.MapFeature {
 		v.BetNums++
 	}
+
+	for _, v := range rtp.MapHitFrequencyData {
+		v.OnHitFrequencyBet(v, bet)
+	}
 }
 
 // OnResult -
@@ -118,6 +133,10 @@ func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
 
 	for _, v := range rtp.MapHR {
 		v.FuncOnResult(v, pr)
+	}
+
+	for _, v := range rtp.MapHitFrequencyData {
+		v.OnHitFrequencyResult(v, pr)
 	}
 }
 
@@ -274,6 +293,26 @@ func (rtp *RTP) Save2CSV(fn string) error {
 		}
 	}
 
+	if len(rtp.MapHitFrequencyData) > 0 {
+		f.WriteString("\n\n\n")
+
+		f.WriteString("name,total,trigger times\n")
+
+		keys := []string{}
+		for k := range rtp.MapHitFrequencyData {
+			keys = append(keys, k)
+		}
+
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i] < keys[j]
+		})
+
+		for _, v := range keys {
+			str := rtp.MapHitFrequencyData[v].GenString()
+			f.WriteString(str)
+		}
+	}
+
 	f.WriteString("\n\n\n")
 	f.WriteString("totalnums,winnums,Hit Frequency,Variance,MaxReturn,MaxReturnNums\n")
 	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v\n",
@@ -316,4 +355,9 @@ func (rtp *RTP) OnPlayerPoolData(ps sgc7game.IPlayerState) {
 	for _, v := range rtp.MapPlayerPool {
 		v.OnPlayer(v, ps)
 	}
+}
+
+// AddHitFrequencyData -
+func (rtp *RTP) AddHitFrequencyData(tag string, onHitFrequencyBet FuncOnHitFrequencyBet, onHitFrequencyResult FuncOnHitFrequencyResult) {
+	rtp.MapHitFrequencyData[tag] = NewHitFrequencyData(tag, onHitFrequencyBet, onHitFrequencyResult)
 }

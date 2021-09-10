@@ -8,7 +8,7 @@ import (
 )
 
 // FuncOnPlayer - onPlayer(*PlayerPoolData, sgc7game.IPlayerState)
-type FuncOnPlayer func(pd *PlayerPoolData, ps sgc7game.IPlayerState) bool
+type FuncOnPlayer func(pd *PlayerPoolData, ps sgc7game.IPlayerState)
 
 // PlayerPoolData -
 type PlayerPoolData struct {
