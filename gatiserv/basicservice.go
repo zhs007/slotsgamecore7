@@ -188,15 +188,14 @@ func (sv *BasicService) Checksum(lst []*CriticalComponent) ([]*ComponentChecksum
 	lstret := []*ComponentChecksum{}
 
 	for _, v := range lst {
-		cc, isok := sv.GameInfo.Components[v.ID]
-		if !isok {
-			return nil, ErrInvalidCriticalComponentID
+		cc := sv.GameInfo.FindComponentChecksum(v)
+		if cc != nil {
+			lstret = append(lstret, cc)
 		}
-
-		lstret = append(lstret, &ComponentChecksum{
-			ID:       v.ID,
-			Checksum: cc.Checksum,
-		})
+		// cc, isok := sv.GameInfo.Components[v.ID]
+		// if !isok {
+		// 	return nil, ErrInvalidCriticalComponentID
+		// }
 	}
 
 	return lstret, nil
