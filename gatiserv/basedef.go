@@ -130,6 +130,20 @@ type GATIGameInfo struct {
 	Info       VersionInfo                    `json:"info"`
 }
 
+// Checksum - checksum
+func (gatiGI *GATIGameInfo) FindComponentChecksum(cc *CriticalComponent) *ComponentChecksum {
+	for _, v := range gatiGI.Components {
+		if cc.Name == v.Name && cc.Location == v.Location {
+			return &ComponentChecksum{
+				ID:       v.ID,
+				Checksum: v.Checksum,
+			}
+		}
+	}
+
+	return nil
+}
+
 // MissionObject -
 type MissionObject struct {
 	ObjectiveID string `json:"objectiveId"`
