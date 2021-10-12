@@ -324,6 +324,29 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	return nil
 }
 
+// SaveReturns2CSV -
+func (rtp *RTP) SaveReturns2CSV(fn string) error {
+	f, err := os.Create(fn)
+	if err != nil {
+		goutils.Error("sgc7rtp.RTP.SaveReturns2CSV",
+			zap.Error(err))
+
+		return err
+	}
+	defer f.Close()
+
+	f.WriteString("returns,times\n")
+	for i, v := range rtp.Returns {
+		str := fmt.Sprintf("%v,%v\n",
+			v, rtp.ReturnWeights[i])
+		f.WriteString(str)
+	}
+
+	f.Sync()
+
+	return nil
+}
+
 // AddReturns -
 func (rtp *RTP) AddReturns(ret float64) {
 	if rtp.MaxReturn < int64(ret) {
