@@ -11,6 +11,12 @@ import (
 	"go.uber.org/zap"
 )
 
+type RTPReturnData struct {
+	Return     float64
+	TotalTimes int64
+	Times      int64
+}
+
 // RTP -
 type RTP struct {
 	WinNums             int64
@@ -326,6 +332,23 @@ func (rtp *RTP) Save2CSV(fn string) error {
 
 // SaveReturns2CSV -
 func (rtp *RTP) SaveReturns2CSV(fn string) error {
+	results := []*RTPReturnData{}
+	totaltimes := int64(0)
+	for i, v := range rtp.Returns {
+		crd := &RTPReturnData{
+			Return: v,
+			Times:  int64(rtp.ReturnWeights[i]),
+		}
+
+		totaltimes += crd.Times
+
+		results = append(results, crd)
+	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Return < results[j].Return
+	})
+
 	f, err := os.Create(fn)
 	if err != nil {
 		goutils.Error("sgc7rtp.RTP.SaveReturns2CSV",
@@ -335,10 +358,10 @@ func (rtp *RTP) SaveReturns2CSV(fn string) error {
 	}
 	defer f.Close()
 
-	f.WriteString("returns,times\n")
-	for i, v := range rtp.Returns {
-		str := fmt.Sprintf("%v,%v\n",
-			v, rtp.ReturnWeights[i])
+	f.WriteString("returns,totaltimes,times,per\n")
+	for _, v := range results {
+		str := fmt.Sprintf("%v,%v,%v,%v\n",
+			v.Return, totaltimes, v.Times, float64(v.Times)/float64(totaltimes))
 		f.WriteString(str)
 	}
 
