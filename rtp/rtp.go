@@ -335,14 +335,9 @@ func (rtp *RTP) SaveReturns2CSV(fn string) error {
 	results := []*RTPReturnData{}
 	totaltimes := int64(0)
 	for i, v := range rtp.Returns {
-		crd := &RTPReturnData{
-			Return: v,
-			Times:  int64(rtp.ReturnWeights[i]),
-		}
+		results = addResults(results, v, int64(rtp.ReturnWeights[i]))
 
-		totaltimes += crd.Times
-
-		results = append(results, crd)
+		totaltimes += int64(rtp.ReturnWeights[i])
 	}
 
 	sort.Slice(results, func(i, j int) bool {
