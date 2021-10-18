@@ -1,5 +1,0 @@
-063d125262ff17b2e4b726a8d7172ddfb9ea2aa2	certificationBuildOutput/2021-10-18_03:52:36/bins/gatidocker/dtgatigame/dtgatigame
-  File:	certificationBuildOutput/2021-10-18_03:52:36/bins/gatidocker/dtgatigame/dtgatigame
-Access:	2021-10-18_03:53:36
-Modify:	2021-10-18_03:53:19
- Birth:	2021-10-18_03:53:23
