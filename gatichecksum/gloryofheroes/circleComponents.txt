@@ -1,0 +1,5 @@
+1	dtgatigame	app/	063d125262ff17b2e4b726a8d7172ddfb9ea2aa2
+2	reels.json	app/cfg/	83852aba4953ba6871b4365585e450dc5c3b8d6e
+3	stage.json	app/cfg/	9270c338d72ca9e822cd8ce84a551d49677fb386
+4	paytables.json	app/cfg/	ec6f150670718db642a06698291c17abe1781946
+5	rtp96.yaml	app/cfg/	4f6526b0383e12aa0875792f208361178844f01e

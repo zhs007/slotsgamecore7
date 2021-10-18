@@ -1,0 +1,26 @@
+Sending build context to Docker daemon  22.55MB
+Step 1/7 : FROM golang:1.14.10
+ ---> d5ddd1861619
+Step 2/7 : ENV GOPROXY https://goproxy.io
+ ---> Using cache
+ ---> 7ef599e0fbc2
+Step 3/7 : WORKDIR /src/dtgatigame
+ ---> Using cache
+ ---> e9fec2501320
+Step 4/7 : COPY ./go.* /src/dtgatigame/
+ ---> Using cache
+ ---> 616ade2bd1ff
+Step 5/7 : RUN go mod download
+ ---> Using cache
+ ---> 786e4a648f26
+Step 6/7 : COPY . /src/dtgatigame
+ ---> Using cache
+ ---> 202c028678ce
+Step 7/7 : RUN CGO_ENABLED=0 GOOS=linux go build -a -o dtgatigame ./gati     && mkdir /app     && mkdir /app/dtgatigame     && mkdir /app/dtgatigame/cfg     && mkdir /app/dtgatigame/logs     && cp ./dtgatigame /app/dtgatigame/     && cp ./VERSION /app/dtgatigame/     && cp -r ./cfg /app/dtgatigame/
+ ---> Using cache
+ ---> 7d53bc250ad5
+Successfully built 7d53bc250ad5
+Successfully tagged dtgatigame:latest
+e7ae80bef1954d2b55acd720d38a68be8135268231d3f03c664805a327df1d23
+dtgatigame
+dtgatigame
