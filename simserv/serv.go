@@ -38,7 +38,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			ret := s.Service.GetConfig()
+			ret := s.Service.GetGame().GetConfig()
 			if ret == nil {
 				s.SetStringResponse(ctx, "{}")
 			} else {
@@ -54,7 +54,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			ps := s.Service.Initialize()
+			ps := s.Service.GetGame().Initialize()
 			if ps == nil {
 				s.SetStringResponse(ctx, "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}")
 
@@ -83,7 +83,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			ret, err := s.Service.Play(params)
+			ret, err := s.onPlay(params)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.play:Play",
 					zap.Error(err))

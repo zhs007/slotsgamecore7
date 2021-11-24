@@ -10,12 +10,6 @@ import (
 type IService interface {
 	// GetGame - get game
 	GetGame() sgc7game.IGame
-	// GetConfig - get configuration
-	GetConfig() *sgc7game.Config
-	// Initialize - initialize a player
-	Initialize() sgc7game.IPlayerState
-	// Play - play game
-	Play(params *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error)
 	// BuildPlayerStateFromPB - *sgc7pb.PlayerState -> sgc7game.IPlayerState
 	BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *sgc7pb.PlayerState) error
 	// BuildPBPlayerState - sgc7game.IPlayerState -> *sgc7pb.PlayerState
