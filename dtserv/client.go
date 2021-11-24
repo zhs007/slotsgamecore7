@@ -5,6 +5,7 @@ import (
 	"io"
 
 	goutils "github.com/zhs007/goutils"
+	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -153,7 +154,7 @@ func (client *Client) Play(ctx context.Context, ps *sgc7pb.PlayerState,
 		}
 
 		if rp != nil {
-			MergeReplyPlay(reply, rp)
+			sgc7pbutils.MergeReplyPlay(reply, rp)
 		}
 	}
 }
