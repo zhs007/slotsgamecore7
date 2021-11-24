@@ -7,6 +7,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
@@ -70,7 +71,7 @@ func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sg
 
 	cfg := serv.game.GetConfig()
 
-	res := BuildPBGameConfig(cfg)
+	res := sgc7pbutils.BuildPBGameConfig(cfg)
 
 	goutils.Debug("Serv.GetConfig",
 		goutils.JSON("reply", res))
@@ -155,7 +156,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 	serv.ProcCheat(plugin, req.Cheat)
 
-	stake := BuildStake(req.Stake)
+	stake := sgc7pbutils.BuildStake(req.Stake)
 	err := serv.game.CheckStake(stake)
 	if err != nil {
 		goutils.Error("Serv.onPlay:CheckStake",
@@ -204,7 +205,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	}
 
 	pr := &sgc7pb.ReplyPlay{
-		RandomNumbers: BuildPBRngs(plugin.GetUsedRngs()),
+		RandomNumbers: sgc7pbutils.BuildPBRngs(plugin.GetUsedRngs()),
 	}
 
 	ps, err := serv.service.BuildPBPlayerState(ips)
