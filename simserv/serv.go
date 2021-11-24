@@ -1,10 +1,13 @@
 package simserv
 
 import (
+	jsoniter "github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
+	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 )
@@ -35,7 +38,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			ret := s.Service.Config()
+			ret := s.Service.GetConfig()
 			if ret == nil {
 				s.SetStringResponse(ctx, "{}")
 			} else {
@@ -100,4 +103,115 @@ func NewServ(service IService, cfg *Config) *Serv {
 		})
 
 	return s
+}
+
+// ProcCheat - process cheat
+func (serv *Serv) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
+	if cheat != "" {
+		str := goutils.AppendString("[", cheat, "]")
+
+		json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+		rngs := []int{}
+		err := json.Unmarshal([]byte(str), &rngs)
+		if err != nil {
+			return err
+		}
+
+		plugin.SetCache(rngs)
+	}
+
+	return nil
+}
+
+// Play - play game
+func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
+	ips := serv.Service.GetGame().NewPlayerState()
+	if req.PlayerState != nil {
+		err := serv.Service.BuildPlayerStateFromPB(ips, req.PlayerState)
+		if err != nil {
+			goutils.Error("BasicService.onPlay:BuildPlayerStateFromPB",
+				zap.Error(err))
+
+			return nil, err
+		}
+	}
+
+	plugin := serv.Service.GetGame().NewPlugin()
+	defer serv.Service.GetGame().FreePlugin(plugin)
+
+	serv.ProcCheat(plugin, req.Cheat)
+
+	stake := sgc7pbutils.BuildStake(req.Stake)
+	err := serv.Service.GetGame().CheckStake(stake)
+	if err != nil {
+		goutils.Error("BasicService.onPlay:CheckStake",
+			goutils.JSON("stake", stake),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	results := []*sgc7game.PlayResult{}
+
+	cmd := req.Command
+
+	for {
+		if cmd == "" {
+			cmd = "SPIN"
+		}
+
+		pr, err := serv.Service.GetGame().Play(plugin, cmd, req.ClientParams, ips, stake, results)
+		if err != nil {
+			goutils.Error("BasicService.onPlay:Play",
+				zap.Int("results", len(results)),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		if pr == nil {
+			break
+		}
+
+		results = append(results, pr)
+		if pr.IsFinish {
+			break
+		}
+
+		if pr.IsWait {
+			break
+		}
+
+		if len(pr.NextCmds) > 0 {
+			cmd = pr.NextCmds[0]
+		} else {
+			cmd = ""
+		}
+	}
+
+	pr := &sgc7pb.ReplyPlay{
+		RandomNumbers: sgc7pbutils.BuildPBRngs(plugin.GetUsedRngs()),
+	}
+
+	ps, err := serv.Service.BuildPBPlayerState(ips)
+	if err != nil {
+		goutils.Error("BasicService.onPlay:BuildPlayerState",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	pr.PlayerState = ps
+
+	if len(results) > 0 {
+		AddPlayResult(serv.Service, pr, results)
+
+		lastr := results[len(results)-1]
+
+		pr.Finished = lastr.IsFinish
+		pr.NextCommands = lastr.NextCmds
+	}
+
+	return pr, nil
 }
