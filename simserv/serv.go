@@ -61,7 +61,15 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
-			s.SetResponse(ctx, ps)
+			pbps, err := s.Service.BuildPBPlayerState(ps)
+			if err != nil {
+				goutils.Warn("gatiserv.Serv.initialize:BuildPBPlayerState",
+					zap.Error(err))
+
+				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+			}
+
+			s.SetResponse(ctx, pbps)
 		})
 
 	s.RegHandle(goutils.AppendString(BasicURL, "/play"),
