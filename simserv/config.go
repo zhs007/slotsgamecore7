@@ -11,6 +11,7 @@ type Config struct {
 	GameCode    string `yaml:"gamecode"`
 	BindAddr    string `yaml:"bindaddr"`
 	IsDebugMode bool   `yaml:"isdebugmode"`
+	LogLevel    string `yaml:"loglevel"`
 }
 
 // LoadConfig - load configuration
