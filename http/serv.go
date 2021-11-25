@@ -7,6 +7,8 @@ import (
 	"github.com/valyala/fasthttp"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 // APIHandle - handle
@@ -109,6 +111,35 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj interface{}) {
 	goutils.Debug("gatiserv.Serv.SetResponse",
 		zap.String("RequestURI", string(ctx.RequestURI())),
 		zap.String("body", string(b)))
+}
+
+// SetResponse - set a response
+func (s *Serv) SetPBResponse(ctx *fasthttp.RequestCtx, msg proto.Message) {
+	if msg == nil {
+		ctx.SetContentType("application/json;charset=UTF-8")
+		ctx.SetStatusCode(fasthttp.StatusOK)
+		ctx.SetBody([]byte(""))
+
+		return
+	}
+
+	result, err := protojson.Marshal(msg)
+	if err != nil {
+		goutils.Warn("gatiserv.Serv.SetResponse",
+			zap.Error(err))
+
+		s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
+
+		return
+	}
+
+	ctx.SetContentType("application/json;charset=UTF-8")
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.SetBody([]byte(result))
+
+	goutils.Debug("gatiserv.Serv.SetResponse",
+		zap.String("RequestURI", string(ctx.RequestURI())),
+		zap.String("body", string(result)))
 }
 
 // SetStringResponse - set a response with string
