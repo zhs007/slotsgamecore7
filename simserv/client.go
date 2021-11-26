@@ -144,3 +144,53 @@ func (client *Client) PlayEx(param *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, erro
 
 	return rp, nil
 }
+
+// Initialize2 - initialize a player
+func (client *Client) Initialize2() (string, error) {
+	sc, buff, err := sgc7http.HTTPGet(
+		goutils.AppendString(client.ServURL, "initialize"),
+		nil)
+	if err != nil {
+		goutils.Error("gatiserv.Client.Initialize:HTTPGet",
+			zap.String("ServURL", client.ServURL),
+			zap.Error(err))
+
+		return "", err
+	}
+
+	if sc != fasthttp.StatusOK {
+		goutils.Error("gatiserv.Client.Initialize:HTTPGet",
+			zap.String("ServURL", client.ServURL),
+			zap.Int("status", sc))
+
+		return "", ErrNonStatusOK
+	}
+
+	return string(buff), nil
+}
+
+// PlayEx2 - play with string parameter
+func (client *Client) PlayEx2(param string) (string, error) {
+	sc, buff, err := sgc7http.HTTPPostEx(
+		goutils.AppendString(client.ServURL, "play"),
+		nil,
+		[]byte(param),
+	)
+	if err != nil {
+		goutils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
+			zap.String("ServURL", client.ServURL),
+			zap.Error(err))
+
+		return "", err
+	}
+
+	if sc != fasthttp.StatusOK {
+		goutils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
+			zap.String("ServURL", client.ServURL),
+			zap.Int("status", sc))
+
+		return "", ErrNonStatusOK
+	}
+
+	return string(buff), nil
+}

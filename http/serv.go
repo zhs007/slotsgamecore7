@@ -123,6 +123,9 @@ func (s *Serv) SetPBResponse(ctx *fasthttp.RequestCtx, msg proto.Message) {
 		return
 	}
 
+	// m := protojson.MarshalOptions{
+	// 	Resolver:
+	//   }
 	result, err := protojson.Marshal(msg)
 	if err != nil {
 		goutils.Warn("gatiserv.Serv.SetResponse",
