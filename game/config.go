@@ -18,6 +18,7 @@ type Config struct {
 	CoreVer       string                        `json:"corever"`
 	SWReels       map[string]*SymbolWeightReels `json:"-"`
 	DefaultScene2 []*GameScene                  `json:"defaultscene2"`
+	BetMuls       []int32                       `json:"betMuls"`
 }
 
 // NewConfig - new a Config
