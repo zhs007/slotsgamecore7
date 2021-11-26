@@ -93,6 +93,7 @@ func BuildPBGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 		Height:  int32(cfg.Height),
 		Ver:     cfg.Ver,
 		CoreVer: cfg.CoreVer,
+		BetMuls: cfg.BetMuls,
 	}
 
 	if cfg.Lines != nil {
