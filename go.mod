@@ -11,7 +11,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/valyala/fasthttp v1.22.0
-	github.com/zhs007/goutils v0.1.0
+	github.com/xuri/excelize/v2 v2.4.1
+	github.com/zhs007/goutils v0.1.18
 	go.uber.org/zap v1.19.0
 	gonum.org/v1/gonum v0.9.1
 	google.golang.org/genproto v0.0.0-20210315173758-2651cd453018 // indirect

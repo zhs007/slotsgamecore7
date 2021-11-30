@@ -57,4 +57,7 @@ var (
 
 	// ErrInvalidSymbolWeightWidthReels - invalid width in SymbolWeightReels
 	ErrInvalidSymbolWeightWidthReels = errors.New("invalid width in SymbolWeightReels")
+
+	// ErrInvalidReelsExcelFile - invalid reels xlsx
+	ErrInvalidReelsExcelFile = errors.New("invalid reels xlsx")
 )
