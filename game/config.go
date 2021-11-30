@@ -235,3 +235,48 @@ func (cfg *Config) AddDefaultSceneString2(str string) error {
 
 	return nil
 }
+
+// LoadLineDataFromExcel - load linedata for reels
+func (cfg *Config) LoadLineDataFromExcel(fn string) error {
+	ld, err := LoadLineDataFromExcel(fn)
+	if err != nil {
+		goutils.Error("Config.LoadLineDataFromExcel",
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg.Lines = ld
+
+	return nil
+}
+
+// LoadReelsFromExcel - load linedata for reels
+func (cfg *Config) LoadReelsFromExcel(tag string, fn string) error {
+	rd, err := LoadReelsFromExcel(fn)
+	if err != nil {
+		goutils.Error("Config.LoadReelsFromExcel",
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg.Reels[tag] = rd
+
+	return nil
+}
+
+// LoadPaytablesFromExcel - load linedata for reels
+func (cfg *Config) LoadPaytablesFromExcel(fn string) error {
+	pt, err := LoadPaytablesFromExcel(fn)
+	if err != nil {
+		goutils.Error("Config.LoadPaytablesFromExcel",
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg.PayTables = pt
+
+	return nil
+}
