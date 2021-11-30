@@ -4,6 +4,9 @@ import (
 	"io/ioutil"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/xuri/excelize/v2"
+	goutils "github.com/zhs007/goutils"
+	"go.uber.org/zap"
 )
 
 type lineInfo struct {
@@ -121,4 +124,118 @@ func LoadLine6JSON(fn string) (*LineData, error) {
 	}
 
 	return d, nil
+}
+
+// LoadLineDataFromExcel - load xlsx file
+func LoadLineDataFromExcel(fn string) (*LineData, error) {
+	f, err := excelize.OpenFile(fn)
+	if err != nil {
+		goutils.Error("LoadLineDataFromExcel:OpenFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	lstname := f.GetSheetList()
+	if len(lstname) <= 0 {
+		goutils.Error("LoadLineDataFromExcel:GetSheetList",
+			goutils.JSON("SheetList", lstname),
+			zap.String("fn", fn),
+			zap.Error(ErrInvalidReelsExcelFile))
+
+		return nil, ErrInvalidReelsExcelFile
+	}
+
+	rows, err := f.GetRows(lstname[0])
+	if err != nil {
+		goutils.Error("LoadLineDataFromExcel:GetRows",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	ld := &LineData{}
+
+	// x -> ri
+	mapli := make(map[int]int)
+	maxli := 0
+
+	for y, row := range rows {
+		if y == 0 {
+			for x, colCell := range row {
+				if colCell[0] == 'r' || colCell[0] == 'R' {
+					iv, err := goutils.String2Int64(colCell[1:])
+					if err != nil {
+						goutils.Error("LoadLineDataFromExcel:String2Int64",
+							zap.String("fn", fn),
+							zap.String("header", colCell),
+							zap.Error(err))
+
+						return nil, err
+					}
+
+					if iv <= 0 {
+						goutils.Error("LoadLineDataFromExcel",
+							zap.String("info", "check iv"),
+							zap.String("fn", fn),
+							zap.String("header", colCell),
+							zap.Error(ErrInvalidReelsExcelFile))
+
+						return nil, ErrInvalidReelsExcelFile
+					}
+
+					mapli[x] = int(iv) - 1
+					if int(iv) > maxli {
+						maxli = int(iv)
+					}
+				}
+			}
+
+			if maxli != len(mapli) {
+				goutils.Error("LoadLineDataFromExcel",
+					zap.String("info", "check len"),
+					zap.String("fn", fn),
+					zap.Int("maxli", maxli),
+					goutils.JSON("mapli", mapli),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return nil, ErrInvalidReelsExcelFile
+			}
+
+			if maxli <= 0 {
+				goutils.Error("LoadLineDataFromExcel",
+					zap.String("info", "check empty"),
+					zap.String("fn", fn),
+					zap.Int("maxli", maxli),
+					goutils.JSON("mapli", mapli),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return nil, ErrInvalidReelsExcelFile
+			}
+		} else {
+			cld := make([]int, maxli)
+
+			for x, colCell := range row {
+				ri, isok := mapli[x]
+				if isok {
+					v, err := goutils.String2Int64(colCell)
+					if err != nil {
+						goutils.Error("LoadLineDataFromExcel:String2Int64",
+							zap.String("val", colCell),
+							zap.Error(err))
+
+						return nil, err
+					}
+
+					cld[ri] = int(v)
+				}
+			}
+
+			ld.Lines = append(ld.Lines, cld)
+		}
+	}
+
+	return ld, nil
 }

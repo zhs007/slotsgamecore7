@@ -2,6 +2,8 @@ package sgc7game
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_LoadPayTables5JSON(t *testing.T) {
@@ -74,4 +76,39 @@ func Test_LoadPayTables5JSON(t *testing.T) {
 	}
 
 	t.Logf("Test_LoadPayTables5JSON OK")
+}
+
+func Test_LoadPaytablesFromExcel(t *testing.T) {
+	pt, err := LoadPaytablesFromExcel("../unittestdata/paytables.xlsx")
+	assert.NoError(t, err)
+
+	assert.Equal(t, len(pt.MapPay), 13)
+	assert.Equal(t, len(pt.MapSymbols), 13)
+
+	assert.Equal(t, pt.MapSymbols["WL"], 0)
+	assert.Equal(t, pt.MapSymbols["A"], 1)
+	assert.Equal(t, pt.MapSymbols["MY"], 12)
+
+	assert.Equal(t, len(pt.MapPay[0]), 5)
+	assert.Equal(t, pt.MapPay[0][0], 0)
+	assert.Equal(t, pt.MapPay[0][1], 0)
+	assert.Equal(t, pt.MapPay[0][2], 0)
+	assert.Equal(t, pt.MapPay[0][3], 0)
+	assert.Equal(t, pt.MapPay[0][4], 0)
+
+	assert.Equal(t, len(pt.MapPay[1]), 5)
+	assert.Equal(t, pt.MapPay[1][0], 0)
+	assert.Equal(t, pt.MapPay[1][1], 0)
+	assert.Equal(t, pt.MapPay[1][2], 40)
+	assert.Equal(t, pt.MapPay[1][3], 200)
+	assert.Equal(t, pt.MapPay[1][4], 1000)
+
+	assert.Equal(t, len(pt.MapPay[12]), 5)
+	assert.Equal(t, pt.MapPay[12][0], 0)
+	assert.Equal(t, pt.MapPay[12][1], 0)
+	assert.Equal(t, pt.MapPay[12][2], 0)
+	assert.Equal(t, pt.MapPay[12][3], 0)
+	assert.Equal(t, pt.MapPay[12][4], 0)
+
+	t.Logf("Test_LoadPaytablesFromExcel OK")
 }

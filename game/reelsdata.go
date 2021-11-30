@@ -4,6 +4,9 @@ import (
 	"io/ioutil"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/xuri/excelize/v2"
+	goutils "github.com/zhs007/goutils"
+	"go.uber.org/zap"
 )
 
 type reelsInfo5 struct {
@@ -163,4 +166,135 @@ func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]i
 	}
 
 	return narr, nil
+}
+
+// LoadReelsFromExcel - load xlsx file
+func LoadReelsFromExcel(fn string) (*ReelsData, error) {
+	f, err := excelize.OpenFile(fn)
+	if err != nil {
+		goutils.Error("LoadReelsFromExcel:OpenFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	lstname := f.GetSheetList()
+	if len(lstname) <= 0 {
+		goutils.Error("LoadReelsFromExcel:GetSheetList",
+			goutils.JSON("SheetList", lstname),
+			zap.String("fn", fn),
+			zap.Error(ErrInvalidReelsExcelFile))
+
+		return nil, ErrInvalidReelsExcelFile
+	}
+
+	rows, err := f.GetRows(lstname[0])
+	if err != nil {
+		goutils.Error("LoadReelsFromExcel:GetRows",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	p := &ReelsData{
+		Reels: [][]int{},
+	}
+
+	// x -> ri
+	mapri := make(map[int]int)
+	maxri := 0
+	isend := []bool{}
+
+	for y, row := range rows {
+		if y == 0 {
+			for x, colCell := range row {
+				if colCell[0] == 'r' || colCell[0] == 'R' {
+					iv, err := goutils.String2Int64(colCell[1:])
+					if err != nil {
+						goutils.Error("LoadReelsFromExcel:String2Int64",
+							zap.String("fn", fn),
+							zap.String("header", colCell),
+							zap.Error(err))
+
+						return nil, err
+					}
+
+					if iv <= 0 {
+						goutils.Error("LoadReelsFromExcel",
+							zap.String("info", "check iv"),
+							zap.String("fn", fn),
+							zap.String("header", colCell),
+							zap.Error(ErrInvalidReelsExcelFile))
+
+						return nil, ErrInvalidReelsExcelFile
+					}
+
+					mapri[x] = int(iv) - 1
+					if int(iv) > maxri {
+						maxri = int(iv)
+					}
+				}
+			}
+
+			if maxri != len(mapri) {
+				goutils.Error("LoadReelsFromExcel",
+					zap.String("info", "check len"),
+					zap.String("fn", fn),
+					zap.Int("maxri", maxri),
+					goutils.JSON("mapri", mapri),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return nil, ErrInvalidReelsExcelFile
+			}
+
+			if maxri <= 0 {
+				goutils.Error("LoadReelsFromExcel",
+					zap.String("info", "check empty"),
+					zap.String("fn", fn),
+					zap.Int("maxri", maxri),
+					goutils.JSON("mapri", mapri),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return nil, ErrInvalidReelsExcelFile
+			}
+
+			for i := 0; i < maxri; i++ {
+				p.Reels = append(p.Reels, []int{})
+				isend = append(isend, false)
+			}
+		} else {
+			for x, colCell := range row {
+				ri, isok := mapri[x]
+				if isok {
+					v, err := goutils.String2Int64(colCell)
+					if err != nil {
+						goutils.Error("LoadReelsFromExcel:String2Int64",
+							zap.String("val", colCell),
+							zap.Error(err))
+
+						return nil, err
+					}
+
+					if v < 0 {
+						isend[ri] = true
+					} else if isend[ri] {
+						goutils.Error("LoadReelsFromExcel",
+							zap.String("info", "check already finished."),
+							zap.String("val", colCell),
+							zap.Int("y", y),
+							zap.Int("x", x),
+							zap.Error(err))
+
+						return nil, err
+					} else {
+						p.Reels[ri] = append(p.Reels[ri], int(v))
+					}
+				}
+			}
+		}
+	}
+
+	return p, nil
 }

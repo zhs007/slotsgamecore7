@@ -2,6 +2,8 @@ package sgc7game
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_LoadReels5JSON(t *testing.T) {
@@ -80,4 +82,30 @@ func Test_LoadReels5JSON(t *testing.T) {
 	// }
 
 	t.Logf("Test_LoadReels5JSON OK")
+}
+
+func Test_LoadReelsFromExcel(t *testing.T) {
+	rd, err := LoadReelsFromExcel("../unittestdata/reels.xlsx")
+	assert.NoError(t, err)
+
+	assert.Equal(t, len(rd.Reels), 5)
+	assert.Equal(t, len(rd.Reels[0]), 36)
+	assert.Equal(t, len(rd.Reels[1]), 196)
+	assert.Equal(t, len(rd.Reels[2]), 200)
+	assert.Equal(t, len(rd.Reels[3]), 260)
+	assert.Equal(t, len(rd.Reels[4]), 180)
+
+	assert.Equal(t, rd.Reels[0][0], 1)
+	assert.Equal(t, rd.Reels[1][0], 2)
+	assert.Equal(t, rd.Reels[2][0], 4)
+	assert.Equal(t, rd.Reels[3][0], 5)
+	assert.Equal(t, rd.Reels[4][0], 4)
+
+	assert.Equal(t, rd.Reels[0][35], 12)
+	assert.Equal(t, rd.Reels[1][195], 12)
+	assert.Equal(t, rd.Reels[2][199], 7)
+	assert.Equal(t, rd.Reels[3][259], 12)
+	assert.Equal(t, rd.Reels[4][179], 12)
+
+	t.Logf("Test_LoadReelsFromExcel OK")
 }

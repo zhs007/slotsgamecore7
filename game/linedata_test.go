@@ -2,6 +2,8 @@ package sgc7game
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_LoadLine5JSON(t *testing.T) {
@@ -79,4 +81,27 @@ func Test_LoadLine5JSON(t *testing.T) {
 	}
 
 	t.Logf("Test_LoadLine5JSON OK")
+}
+
+func Test_LoadLineDataFromExcel(t *testing.T) {
+	ld, err := LoadLineDataFromExcel("../unittestdata/linedata.xlsx")
+	assert.NoError(t, err)
+
+	assert.Equal(t, len(ld.Lines), 40)
+	assert.Equal(t, len(ld.Lines[0]), 5)
+	assert.Equal(t, len(ld.Lines[39]), 5)
+
+	assert.Equal(t, ld.Lines[0][0], 1)
+	assert.Equal(t, ld.Lines[0][1], 1)
+	assert.Equal(t, ld.Lines[0][2], 1)
+	assert.Equal(t, ld.Lines[0][3], 1)
+	assert.Equal(t, ld.Lines[0][4], 1)
+
+	assert.Equal(t, ld.Lines[39][0], 4)
+	assert.Equal(t, ld.Lines[39][1], 3)
+	assert.Equal(t, ld.Lines[39][2], 2)
+	assert.Equal(t, ld.Lines[39][3], 1)
+	assert.Equal(t, ld.Lines[39][4], 0)
+
+	t.Logf("Test_LoadLineDataFromExcel OK")
 }
