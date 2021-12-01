@@ -104,6 +104,43 @@ func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScat
 	return nil
 }
 
+// CalcScatterOnReels - calc scatter
+func CalcScatterOnReels(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter) *Result {
+	curnums := 0
+	reelnums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+	for x := 0; x < len(scene.Arr); x++ {
+		hasscatter := false
+		for y := 0; y < len(scene.Arr[x]); y++ {
+			if isScatter(scatter, scene.Arr[x][y]) {
+				curnums++
+
+				if !hasscatter {
+					reelnums++
+
+					hasscatter = true
+				}
+
+				pos = append(pos, x, y)
+			}
+		}
+	}
+
+	if reelnums >= nums {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatterOnReels,
+			LineIndex:  -1,
+			Pos:        pos,
+			SymbolNums: reelnums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcLine - calc line
 func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	isValidSymbol FuncIsValidSymbol,
