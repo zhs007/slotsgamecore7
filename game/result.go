@@ -18,6 +18,8 @@ const (
 	RTScatterEx = 5
 	// RTCluster - cluster，族群方式
 	RTCluster = 6
+	// RTScatterOnReels - scatter只统计列数
+	RTScatterOnReels = 7
 )
 
 // Result - result for slots game
