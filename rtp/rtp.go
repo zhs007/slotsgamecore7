@@ -3,6 +3,7 @@ package sgc7rtp
 import (
 	"fmt"
 	"os"
+	"path"
 	"sort"
 	"strconv"
 
@@ -32,6 +33,7 @@ type RTP struct {
 	MaxReturnNums       int64
 	MapPlayerPool       map[string]*PlayerPoolData
 	MapHitFrequencyData map[string]*HitFrequencyData
+	MapReturn           map[string]*RTPReturnDataList
 }
 
 // NewRTP - new RTP
@@ -42,6 +44,7 @@ func NewRTP() *RTP {
 		MapFeature:          make(map[string]*FeatureNode),
 		MapPlayerPool:       make(map[string]*PlayerPoolData),
 		MapHitFrequencyData: make(map[string]*HitFrequencyData),
+		MapReturn:           make(map[string]*RTPReturnDataList),
 	}
 }
 
@@ -55,6 +58,7 @@ func (rtp *RTP) Clone() *RTP {
 		MapFeature:          make(map[string]*FeatureNode),
 		MapPlayerPool:       make(map[string]*PlayerPoolData),
 		MapHitFrequencyData: make(map[string]*HitFrequencyData),
+		MapReturn:           make(map[string]*RTPReturnDataList),
 	}
 
 	for k, v := range rtp.MapHR {
@@ -71,6 +75,10 @@ func (rtp *RTP) Clone() *RTP {
 
 	for k, v := range rtp.MapHitFrequencyData {
 		nrtp.MapHitFrequencyData[k] = v.Clone()
+	}
+
+	for k, v := range rtp.MapReturn {
+		nrtp.MapReturn[k] = v.Clone()
 	}
 
 	return nrtp
@@ -107,6 +115,10 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 
 	for k, v := range rtp.MapHitFrequencyData {
 		v.Add(rtp1.MapHitFrequencyData[k])
+	}
+
+	for k, v := range rtp.MapReturn {
+		v.Merge(rtp1.MapReturn[k])
 	}
 }
 
@@ -165,6 +177,10 @@ func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult) {
 	for _, v := range rtp.MapFeature {
 		v.FuncOnResults(v, lst)
 	}
+
+	for _, v := range rtp.MapReturn {
+		v.onResults(v, lst)
+	}
 }
 
 // AddHitRateNode -
@@ -175,6 +191,11 @@ func (rtp *RTP) AddHitRateNode(tag string, funcOnResult FuncHROnResult) {
 // AddFeature -
 func (rtp *RTP) AddFeature(tag string, funcOnResults FuncFeatureOnResults) {
 	rtp.MapFeature[tag] = NewFeatureNode(tag, funcOnResults)
+}
+
+// AddReturnNode -
+func (rtp *RTP) AddReturnNode(tag string, funcOnResults FuncRDLOnResults) {
+	rtp.MapReturn[tag] = NewRTPReturnDataList(tag, funcOnResults)
 }
 
 // Save2CSV -
@@ -401,4 +422,12 @@ func (rtp *RTP) OnPlayerPoolData(ps sgc7game.IPlayerState) {
 // AddHitFrequencyData -
 func (rtp *RTP) AddHitFrequencyData(tag string, onHitFrequencyBet FuncOnHitFrequencyBet, onHitFrequencyResult FuncOnHitFrequencyResult) {
 	rtp.MapHitFrequencyData[tag] = NewHitFrequencyData(tag, onHitFrequencyBet, onHitFrequencyResult)
+}
+
+// SaveAllReturns -
+func (rtp *RTP) SaveAllReturns(dir string, fnprefix string) {
+	for k, v := range rtp.MapReturn {
+		fn := path.Join(dir, fmt.Sprintf("fnprefix_%v", k))
+		v.SaveReturns2CSV(fn)
+	}
 }
