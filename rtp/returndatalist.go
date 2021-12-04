@@ -87,6 +87,7 @@ func (rdlst *RTPReturnDataList) Clone() *RTPReturnDataList {
 		ReturnWeights: rdlst.ReturnWeights[0:],
 		MaxReturn:     rdlst.MaxReturn,
 		MaxReturnNums: rdlst.MaxReturnNums,
+		onResults:     rdlst.onResults,
 	}
 }
 
