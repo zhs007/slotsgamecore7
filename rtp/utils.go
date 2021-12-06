@@ -48,3 +48,24 @@ func addResults2(lst []*RTPReturnData, iret int64, times int64) []*RTPReturnData
 
 	return lst
 }
+
+func addResults3(lst []*RTPReturnData, iret int64, times int64, rval float64) []*RTPReturnData {
+	fret := float64(iret) / 100
+	d := findResults(lst, fret)
+	if d == nil {
+		crd := &RTPReturnData{
+			Return: fret,
+			Times:  times,
+			Total:  rval,
+		}
+
+		lst = append(lst, crd)
+
+		return lst
+	}
+
+	d.Times += times
+	d.Total += rval
+
+	return lst
+}
