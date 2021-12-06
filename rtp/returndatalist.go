@@ -130,10 +130,10 @@ func (rdlst *RTPReturnDataList) SaveReturns2CSV(fn string) error {
 
 	arr2 := rdlst.procValRange()
 	f.WriteString("\n\n\n")
-	f.WriteString("returns,totaltimes,times,per\n")
+	f.WriteString("returns,totaltimes,times,per,total\n")
 	for _, v := range arr2 {
-		str := fmt.Sprintf("%v,%v,%v,%v\n",
-			v.Return, totaltimes, v.Times, float64(v.Times)/float64(totaltimes))
+		str := fmt.Sprintf("%v,%v,%v,%v,%v\n",
+			v.Return, totaltimes, v.Times, float64(v.Times)/float64(totaltimes), v.Total)
 		f.WriteString(str)
 	}
 
@@ -147,7 +147,7 @@ func (rdlst *RTPReturnDataList) calcSD() float64 {
 	lstWeights := []float64{}
 
 	for i, v := range rdlst.Returns {
-		lstRets = append(lstRets, float64(v))
+		lstRets = append(lstRets, float64(v)/100)
 		lstWeights = append(lstWeights, float64(rdlst.ReturnWeights[i]))
 	}
 

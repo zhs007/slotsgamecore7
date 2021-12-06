@@ -16,6 +16,7 @@ type RTPReturnData struct {
 	Return     float64
 	TotalTimes int64
 	Times      int64
+	Total      float64
 }
 
 // RTP -
