@@ -35,6 +35,7 @@ func addResults2(lst []*RTPReturnData, iret int64, times int64) []*RTPReturnData
 		crd := &RTPReturnData{
 			Return: fret,
 			Times:  times,
+			Total:  fret,
 		}
 
 		lst = append(lst, crd)
@@ -43,6 +44,7 @@ func addResults2(lst []*RTPReturnData, iret int64, times int64) []*RTPReturnData
 	}
 
 	d.Times += times
+	d.Total += fret
 
 	return lst
 }
