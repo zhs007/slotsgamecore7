@@ -427,7 +427,7 @@ func (rtp *RTP) AddHitFrequencyData(tag string, onHitFrequencyBet FuncOnHitFrequ
 // SaveAllReturns -
 func (rtp *RTP) SaveAllReturns(dir string, fnprefix string) {
 	for k, v := range rtp.MapReturn {
-		fn := path.Join(dir, fmt.Sprintf("fnprefix_%v", k))
+		fn := path.Join(dir, fmt.Sprintf("fnprefix_%v.csv", k))
 		v.SaveReturns2CSV(fn)
 	}
 }
