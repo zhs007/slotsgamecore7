@@ -121,10 +121,10 @@ func (rdlst *RTPReturnDataList) SaveReturns2CSV(fn string) error {
 	f.WriteString("Standard Deviation\n")
 	f.WriteString(fmt.Sprintf("%v\n\n\n", rdlst.calcSD()))
 
-	f.WriteString("returns,totaltimes,times,per\n")
+	f.WriteString("returns,totaltimes,times,per,total\n")
 	for _, v := range results {
-		str := fmt.Sprintf("%v,%v,%v,%v\n",
-			v.Return, totaltimes, v.Times, float64(v.Times)/float64(totaltimes))
+		str := fmt.Sprintf("%v,%v,%v,%v,%v\n",
+			v.Return, totaltimes, v.Times, float64(v.Times)/float64(totaltimes), v.Total)
 		f.WriteString(str)
 	}
 
