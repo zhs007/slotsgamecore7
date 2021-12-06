@@ -21,6 +21,7 @@ type RTPReturnDataList struct {
 	MaxReturn     int64
 	MaxReturnNums int64
 	ValRange      []float64
+	TotalReturns  []float64
 	onResults     FuncRDLOnResults
 }
 
@@ -46,6 +47,7 @@ func (rdlst *RTPReturnDataList) AddReturns(fret float64) {
 	for i, v := range rdlst.Returns {
 		if v == iret {
 			rdlst.ReturnWeights[i]++
+			rdlst.TotalReturns[i] += fret
 
 			return
 		}
@@ -53,6 +55,7 @@ func (rdlst *RTPReturnDataList) AddReturns(fret float64) {
 
 	rdlst.Returns = append(rdlst.Returns, iret)
 	rdlst.ReturnWeights = append(rdlst.ReturnWeights, 1)
+	rdlst.TotalReturns = append(rdlst.TotalReturns, fret)
 }
 
 // AddReturnsEx -
@@ -91,6 +94,7 @@ func (rdlst *RTPReturnDataList) Clone() *RTPReturnDataList {
 		MaxReturn:     rdlst.MaxReturn,
 		MaxReturnNums: rdlst.MaxReturnNums,
 		ValRange:      rdlst.ValRange,
+		TotalReturns:  rdlst.TotalReturns[0:],
 		onResults:     rdlst.onResults,
 	}
 }
@@ -100,7 +104,7 @@ func (rdlst *RTPReturnDataList) SaveReturns2CSV(fn string) error {
 	results := []*RTPReturnData{}
 	totaltimes := int64(0)
 	for i, v := range rdlst.Returns {
-		results = addResults2(results, v, rdlst.ReturnWeights[i])
+		results = addResults3(results, v, rdlst.ReturnWeights[i], rdlst.TotalReturns[i])
 
 		totaltimes += rdlst.ReturnWeights[i]
 	}
@@ -158,7 +162,7 @@ func (rdlst *RTPReturnDataList) procValRange() []*RTPReturnData {
 	results := []*RTPReturnData{}
 	for i, v := range rdlst.Returns {
 		vv := rdlst.countValRange(v)
-		results = addResults3(results, vv, rdlst.ReturnWeights[i], float64(v)/100)
+		results = addResults3(results, vv, rdlst.ReturnWeights[i], rdlst.TotalReturns[i])
 	}
 
 	sort.Slice(results, func(i, j int) bool {
