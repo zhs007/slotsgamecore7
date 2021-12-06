@@ -158,7 +158,7 @@ func (rdlst *RTPReturnDataList) procValRange() []*RTPReturnData {
 	results := []*RTPReturnData{}
 	for i, v := range rdlst.Returns {
 		vv := rdlst.countValRange(v)
-		results = addResults2(results, vv, rdlst.ReturnWeights[i])
+		results = addResults3(results, vv, rdlst.ReturnWeights[i], float64(v)/100)
 	}
 
 	sort.Slice(results, func(i, j int) bool {
