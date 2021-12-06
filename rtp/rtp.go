@@ -194,8 +194,8 @@ func (rtp *RTP) AddFeature(tag string, funcOnResults FuncFeatureOnResults) {
 }
 
 // AddReturnNode -
-func (rtp *RTP) AddReturnNode(tag string, funcOnResults FuncRDLOnResults) {
-	rtp.MapReturn[tag] = NewRTPReturnDataList(tag, funcOnResults)
+func (rtp *RTP) AddReturnNode(tag string, valRange []float64, funcOnResults FuncRDLOnResults) {
+	rtp.MapReturn[tag] = NewRTPReturnDataList(tag, valRange, funcOnResults)
 }
 
 // Save2CSV -
