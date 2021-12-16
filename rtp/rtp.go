@@ -28,6 +28,7 @@ type RTP struct {
 	MapHR               map[string]*HitRateNode
 	MapFeature          map[string]*FeatureNode
 	Variance            float64
+	StdDev              float64
 	Returns             []float64
 	ReturnWeights       []float64
 	MaxReturn           int64
@@ -342,9 +343,9 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	}
 
 	f.WriteString("\n\n\n")
-	f.WriteString("totalnums,winnums,Hit Frequency,Variance,MaxReturn,MaxReturnNums\n")
-	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v\n",
-		rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance, rtp.MaxReturn, rtp.MaxReturnNums)
+	f.WriteString("totalnums,winnums,Hit Frequency,Variance,StdDev,MaxReturn,MaxReturnNums\n")
+	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v\n",
+		rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance, rtp.StdDev, rtp.MaxReturn, rtp.MaxReturnNums)
 	f.WriteString(str)
 
 	f.Sync()
