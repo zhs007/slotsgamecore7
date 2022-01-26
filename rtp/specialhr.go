@@ -7,8 +7,8 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
-// FuncHROnResult - onResult(*HitRateNode, *sgc7game.PlayResult)
-type FuncHROnResult func(node *HitRateNode, pr *sgc7game.PlayResult) bool
+// FuncHROnResult - onResult(*RTP, *HitRateNode, *sgc7game.PlayResult)
+type FuncHROnResult func(rtp *RTP, node *HitRateNode, pr *sgc7game.PlayResult) bool
 
 // HitRateNode -
 type HitRateNode struct {

@@ -178,7 +178,7 @@ func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
 	rtp.Root.OnResult(pr)
 
 	for _, v := range rtp.MapHR {
-		v.FuncOnResult(v, pr)
+		v.FuncOnResult(rtp, v, pr)
 	}
 
 	for _, v := range rtp.MapHitFrequencyData {
