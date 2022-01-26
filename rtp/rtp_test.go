@@ -273,7 +273,7 @@ func Test_RTPTags(t *testing.T) {
 	}, []int{0, 1, 2, 3, 4, 5, 6, 7}, []int{1, 2, 3, 4, 5})
 	rtp.Root.AddChild("fg", fg)
 
-	rtp.AddHitRateNode("special", func(node *HitRateNode, pr *sgc7game.PlayResult) bool {
+	rtp.AddHitRateNode("special", func(rtp *RTP, node *HitRateNode, pr *sgc7game.PlayResult) bool {
 		gp, isok := pr.CurGameModParams.(*gameparams)
 		if isok && gp != nil {
 			if gp.isSpecial && node.TagName == "special" {
