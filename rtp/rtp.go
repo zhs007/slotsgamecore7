@@ -36,6 +36,7 @@ type RTP struct {
 	MapPlayerPool       map[string]*PlayerPoolData
 	MapHitFrequencyData map[string]*HitFrequencyData
 	MapReturn           map[string]*RTPReturnDataList
+	MapStats            map[string]*RTPStats
 }
 
 // NewRTP - new RTP
@@ -47,6 +48,7 @@ func NewRTP() *RTP {
 		MapPlayerPool:       make(map[string]*PlayerPoolData),
 		MapHitFrequencyData: make(map[string]*HitFrequencyData),
 		MapReturn:           make(map[string]*RTPReturnDataList),
+		MapStats:            make(map[string]*RTPStats),
 	}
 }
 
@@ -61,6 +63,7 @@ func (rtp *RTP) Clone() *RTP {
 		MapPlayerPool:       make(map[string]*PlayerPoolData),
 		MapHitFrequencyData: make(map[string]*HitFrequencyData),
 		MapReturn:           make(map[string]*RTPReturnDataList),
+		MapStats:            make(map[string]*RTPStats),
 	}
 
 	for k, v := range rtp.MapHR {
@@ -81,6 +84,10 @@ func (rtp *RTP) Clone() *RTP {
 
 	for k, v := range rtp.MapReturn {
 		nrtp.MapReturn[k] = v.Clone()
+	}
+
+	for k, v := range rtp.MapStats {
+		nrtp.MapStats[k] = v.Clone()
 	}
 
 	return nrtp
@@ -121,6 +128,25 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 
 	for k, v := range rtp.MapReturn {
 		v.Merge(rtp1.MapReturn[k])
+	}
+
+	for k, v := range rtp.MapStats {
+		v.Merge(rtp1.MapStats[k])
+	}
+}
+
+// NewStats -
+func (rtp *RTP) NewStats(tagname string) {
+	rtp.MapStats[tagname] = &RTPStats{
+		TagName: tagname,
+	}
+}
+
+// OnStats -
+func (rtp *RTP) OnStats(tagname string, val int64) {
+	stats, isok := rtp.MapStats[tagname]
+	if isok {
+		stats.OnRTPStats(val)
 	}
 }
 
@@ -338,6 +364,17 @@ func (rtp *RTP) Save2CSV(fn string) error {
 
 		for _, v := range keys {
 			str := rtp.MapHitFrequencyData[v].GenString()
+			f.WriteString(str)
+		}
+	}
+
+	if len(rtp.MapStats) > 0 {
+		f.WriteString("\n\n\n")
+
+		f.WriteString("name,total,min,max,avg,times\n")
+
+		for _, v := range rtp.MapStats {
+			str := v.GenString()
 			f.WriteString(str)
 		}
 	}
