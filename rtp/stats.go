@@ -16,6 +16,16 @@ type RTPStats struct {
 }
 
 func (rtpstats *RTPStats) OnRTPStats(val int64) {
+	if rtpstats.Times == 0 {
+		rtpstats.MaxVal = val
+		rtpstats.MinVal = val
+
+		rtpstats.TotalVal += val
+		rtpstats.Times++
+
+		return
+	}
+
 	if val > rtpstats.MaxVal {
 		rtpstats.MaxVal = val
 	}
