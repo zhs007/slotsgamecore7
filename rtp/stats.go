@@ -64,7 +64,9 @@ func (rtpstats *RTPStats) Merge(stats1 *RTPStats) {
 		rtpstats.TotalVal += stats1.TotalVal
 		rtpstats.Times += stats1.Times
 
-		rtpstats.AvgVal = rtpstats.TotalVal / rtpstats.Times
+		if rtpstats.Times > 0 {
+			rtpstats.AvgVal = rtpstats.TotalVal / rtpstats.Times
+		}
 
 		if stats1.MaxVal > rtpstats.MaxVal {
 			rtpstats.MaxVal = stats1.MaxVal
