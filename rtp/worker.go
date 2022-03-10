@@ -106,7 +106,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					if limitPayout > 0 {
 						cp := int64(0)
 						for _, v := range results {
-							if cp+v.CashWin > limitPayout {
+							if cp+v.CashWin < limitPayout {
 								cp += v.CashWin
 							} else {
 								v.CashWin = limitPayout - cp
