@@ -16,7 +16,7 @@ type FuncOnRTPTimer func(totalnums int64, curnums int64, curtime time.Duration)
 
 // StartRTP - start RTP
 func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake *sgc7game.Stake, numsTimer int,
-	ontimer FuncOnRTPTimer, needVariance bool) time.Duration {
+	ontimer FuncOnRTPTimer, needVariance bool, limitPayout int64) time.Duration {
 
 	t1 := time.Now()
 
@@ -103,6 +103,18 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 					i--
 				} else {
+					if limitPayout > 0 {
+						cp := 0
+						for _, v := range results {
+							if cp+v.CashWin > limitPayout {
+								cp += v.CashWin
+							} else {
+								v.CashWin = limitPayout - cp
+								cp = limitPayout
+							}
+						}
+					}
+
 					currtp.Bet(stake.CashBet)
 
 					for _, v := range results {
