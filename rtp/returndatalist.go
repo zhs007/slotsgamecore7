@@ -67,9 +67,12 @@ func (rdlst *RTPReturnDataList) addReturnsEx(ret int64, times int64) {
 		rdlst.MaxReturnNums++
 	}
 
+	fret := float64(ret) / 100 * float64(times)
+
 	for i, v := range rdlst.Returns {
 		if v == ret {
 			rdlst.ReturnWeights[i] += times
+			rdlst.TotalReturns[i] += fret
 
 			return
 		}
@@ -77,6 +80,7 @@ func (rdlst *RTPReturnDataList) addReturnsEx(ret int64, times int64) {
 
 	rdlst.Returns = append(rdlst.Returns, ret)
 	rdlst.ReturnWeights = append(rdlst.ReturnWeights, times)
+	rdlst.TotalReturns = append(rdlst.TotalReturns, fret)
 }
 
 // Merge -
@@ -88,19 +92,33 @@ func (rdlst *RTPReturnDataList) Merge(lst *RTPReturnDataList) {
 
 // Clone -
 func (rdlst *RTPReturnDataList) Clone() *RTPReturnDataList {
-	return &RTPReturnDataList{
-		Returns:       rdlst.Returns[0:],
-		ReturnWeights: rdlst.ReturnWeights[0:],
+	rdl := &RTPReturnDataList{
 		MaxReturn:     rdlst.MaxReturn,
 		MaxReturnNums: rdlst.MaxReturnNums,
 		ValRange:      rdlst.ValRange,
-		TotalReturns:  rdlst.TotalReturns[0:],
 		onResults:     rdlst.onResults,
 	}
+
+	copy(rdl.Returns, rdlst.Returns)
+	copy(rdl.ReturnWeights, rdlst.ReturnWeights)
+	copy(rdl.TotalReturns, rdlst.TotalReturns)
+
+	return rdl
 }
 
 // SaveReturns2CSV -
 func (rdlst *RTPReturnDataList) SaveReturns2CSV(fn string) error {
+	if len(rdlst.Returns) != len(rdlst.ReturnWeights) ||
+		len(rdlst.Returns) != len(rdlst.TotalReturns) {
+		goutils.Error("RTPReturnDataList:SaveReturns2CSV",
+			zap.Int("Returns len", len(rdlst.Returns)),
+			zap.Int("ReturnWeights len", len(rdlst.ReturnWeights)),
+			zap.Int("TotalReturns len", len(rdlst.TotalReturns)),
+			zap.Error(ErrInvalidReturnLen))
+
+		return ErrInvalidReturnLen
+	}
+
 	results := []*RTPReturnData{}
 	totaltimes := int64(0)
 	for i, v := range rdlst.Returns {
