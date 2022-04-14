@@ -37,6 +37,7 @@ type RTP struct {
 	MapHitFrequencyData map[string]*HitFrequencyData
 	MapReturn           map[string]*RTPReturnDataList
 	MapStats            map[string]*RTPStats
+	MaxCoincidingWin    float64
 }
 
 // NewRTP - new RTP
@@ -64,6 +65,7 @@ func (rtp *RTP) Clone() *RTP {
 		MapHitFrequencyData: make(map[string]*HitFrequencyData),
 		MapReturn:           make(map[string]*RTPReturnDataList),
 		MapStats:            make(map[string]*RTPStats),
+		MaxCoincidingWin:    rtp.MaxCoincidingWin,
 	}
 
 	for k, v := range rtp.MapHR {
@@ -106,6 +108,10 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 		rtp.MaxReturnNums = rtp1.MaxReturnNums
 	} else if rtp1.MaxReturn == rtp.MaxReturn {
 		rtp.MaxReturnNums += rtp1.MaxReturnNums
+	}
+
+	if rtp1.MaxCoincidingWin > rtp.MaxCoincidingWin {
+		rtp.MaxCoincidingWin = rtp1.MaxCoincidingWin
 	}
 
 	rtp.Root.Add(rtp1.Root)
@@ -174,7 +180,7 @@ func (rtp *RTP) Bet(bet int64) {
 }
 
 // OnResult -
-func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
+func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult) {
 	rtp.Root.OnResult(pr)
 
 	for _, v := range rtp.MapHR {
@@ -183,6 +189,11 @@ func (rtp *RTP) OnResult(pr *sgc7game.PlayResult) {
 
 	for _, v := range rtp.MapHitFrequencyData {
 		v.OnHitFrequencyResult(v, pr)
+	}
+
+	curwin := float64(pr.CashWin) / float64(stake.CashBet)
+	if curwin > rtp.MaxCoincidingWin {
+		rtp.MaxCoincidingWin = curwin
 	}
 }
 
@@ -380,9 +391,9 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	}
 
 	f.WriteString("\n\n\n")
-	f.WriteString("totalnums,winnums,Hit Frequency,Variance,StdDev,MaxReturn,MaxReturnNums\n")
-	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v\n",
-		rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance, rtp.StdDev, rtp.MaxReturn, rtp.MaxReturnNums)
+	f.WriteString("totalnums,winnums,Hit Frequency,Variance,StdDev,MaxReturn,MaxReturnNums,MaxCoincidingWin\n")
+	str = fmt.Sprintf("%v,%v,%v,%v,%v,%v,%v,%v\n",
+		rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance, rtp.StdDev, rtp.MaxReturn, rtp.MaxReturnNums, rtp.MaxCoincidingWin)
 	f.WriteString(str)
 
 	f.Sync()
