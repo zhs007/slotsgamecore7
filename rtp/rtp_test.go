@@ -12,6 +12,11 @@ func Test_RTP(t *testing.T) {
 	rtp := NewRTP()
 	assert.NotNil(t, rtp)
 
+	stake := &sgc7game.Stake{
+		CoinBet: 100,
+		CashBet: 100,
+	}
+
 	bg := NewRTPGameMod("bg")
 	InitGameMod(bg, nil, nil, []int{0, 1, 2, 3, 4, 5, 6, 7}, []int{1, 2, 3, 4, 5})
 	rtp.Root.AddChild("bg", bg)
@@ -50,7 +55,7 @@ func Test_RTP(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(pr0)
+	rtp.OnResult(stake, pr0)
 
 	assert.Equal(t, rtp.BetNums, int64(1))
 	assert.Equal(t, rtp.TotalBet, int64(100))
@@ -97,7 +102,7 @@ func Test_RTP(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(pr1)
+	rtp.OnResult(stake, pr1)
 
 	assert.Equal(t, rtp.BetNums, int64(2))
 	assert.Equal(t, rtp.TotalBet, int64(200))
@@ -146,8 +151,8 @@ func Test_RTP(t *testing.T) {
 	pr0.IsFinish = false
 
 	rtp.Bet(100)
-	rtp.OnResult(pr0)
-	rtp.OnResult(pr2)
+	rtp.OnResult(stake, pr0)
+	rtp.OnResult(stake, pr2)
 
 	assert.Equal(t, rtp.BetNums, int64(3))
 	assert.Equal(t, rtp.TotalBet, int64(300))
@@ -210,6 +215,11 @@ func Test_RTPTags(t *testing.T) {
 
 	rtp := NewRTP()
 	assert.NotNil(t, rtp)
+
+	stake := &sgc7game.Stake{
+		CoinBet: 100,
+		CashBet: 100,
+	}
 
 	bg := NewRTPGameMod("bg")
 	InitGameMod(bg, []string{"normal", "special"}, []FuncOnResult{
@@ -323,7 +333,7 @@ func Test_RTPTags(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(pr0)
+	rtp.OnResult(stake, pr0)
 
 	assert.Equal(t, rtp.BetNums, int64(1))
 	assert.Equal(t, rtp.TotalBet, int64(100))
@@ -377,7 +387,7 @@ func Test_RTPTags(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(pr1)
+	rtp.OnResult(stake, pr1)
 
 	assert.Equal(t, rtp.BetNums, int64(2))
 	assert.Equal(t, rtp.TotalBet, int64(200))
@@ -433,8 +443,8 @@ func Test_RTPTags(t *testing.T) {
 	pr0.IsFinish = false
 
 	rtp.Bet(100)
-	rtp.OnResult(pr0)
-	rtp.OnResult(pr2)
+	rtp.OnResult(stake, pr0)
+	rtp.OnResult(stake, pr2)
 
 	assert.Equal(t, rtp.BetNums, int64(3))
 	assert.Equal(t, rtp.TotalBet, int64(300))
