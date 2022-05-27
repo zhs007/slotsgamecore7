@@ -14,6 +14,7 @@ require (
 	github.com/xuri/excelize/v2 v2.4.1
 	github.com/zhs007/goutils v0.1.18
 	go.uber.org/zap v1.19.0
+	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
 	gonum.org/v1/gonum v0.9.1
 	google.golang.org/genproto v0.0.0-20210315173758-2651cd453018 // indirect
 	google.golang.org/grpc v1.36.0
