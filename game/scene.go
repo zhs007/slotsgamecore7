@@ -424,3 +424,40 @@ func (gs *GameScene) HasSymbol(s int) bool {
 
 	return false
 }
+
+// SetReels - set reels
+func (gs *GameScene) SetReels(game IGame, reelsName string, pos []int) error {
+	cfg := game.GetConfig()
+
+	reels, isok := cfg.Reels[reelsName]
+	if !isok {
+		return ErrInvalidReelsName
+	}
+
+	if gs.Indexes == nil {
+		gs.Indexes = make([]int, 0, gs.Width)
+	} else {
+		gs.Indexes = gs.Indexes[0:0:cap(gs.Indexes)]
+	}
+
+	for x, arr := range gs.Arr {
+		cn := pos[x]
+		// cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
+		// if err != nil {
+		// 	return err
+		// }
+
+		gs.Indexes = append(gs.Indexes, cn)
+
+		for y := range arr {
+			gs.Arr[x][y] = reels.Reels[x][cn]
+
+			cn++
+			if cn >= len(reels.Reels[x]) {
+				cn -= len(reels.Reels[x])
+			}
+		}
+	}
+
+	return nil
+}
