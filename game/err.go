@@ -60,4 +60,7 @@ var (
 
 	// ErrInvalidReelsExcelFile - invalid reels xlsx
 	ErrInvalidReelsExcelFile = errors.New("invalid reels xlsx")
+
+	// ErrInvalidParam - invalid param
+	ErrInvalidParam = errors.New("invalid param")
 )
