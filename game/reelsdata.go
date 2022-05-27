@@ -18,11 +18,6 @@ type reelsInfo5 struct {
 	Line int `json:"line"`
 }
 
-// ReelsData - reels data
-type ReelsData struct {
-	Reels [][]int `json:"reels"`
-}
-
 // isValidRI5 - is it valid reelsInfo5
 func isValidRI5(ri5s []reelsInfo5) bool {
 	if len(ri5s) <= 0 {
@@ -39,6 +34,56 @@ func isValidRI5(ri5s []reelsInfo5) bool {
 	}
 
 	return false
+}
+
+// ReelsData - reels data
+type ReelsData struct {
+	Reels [][]int `json:"reels"`
+}
+
+// 主要用于BuildReelsPosData接口
+type FuncReelsDataPos func(rd *ReelsData, x, y int) bool
+
+// DropDownIntoGameScene - 用轮子当前位置处理下落
+//		注意：
+//			1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
+//			2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
+func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]int, error) {
+	narr := []int{}
+	for x, arr := range scene.Arr {
+
+		ci := indexes[x]
+
+		for y, v := range arr {
+			if v == -1 {
+				ci--
+				if ci < 0 {
+					ci += len(rd.Reels[x])
+				}
+
+				scene.Arr[x][y] = rd.Reels[x][ci]
+			}
+		}
+
+		narr = append(narr, ci)
+	}
+
+	return narr, nil
+}
+
+// BuildReelsPosData - 构建轮子坐标数据，一般用于后续的转轮算法，主要起到随机优化效率用
+func (rd *ReelsData) BuildReelsPosData(onpos FuncReelsDataPos) (*ReelsPosData, error) {
+	rpd := NewReelsPosData(rd)
+
+	for x, arr := range rd.Reels {
+		for y := range arr {
+			if onpos(rd, x, y) {
+				rpd.AddPos(x, y)
+			}
+		}
+	}
+
+	return rpd, nil
 }
 
 // LoadReels5JSON - load json file
@@ -139,33 +184,6 @@ func LoadReels3JSON(fn string) (*ReelsData, error) {
 	}
 
 	return p, nil
-}
-
-// DropDownIntoGameScene - 用轮子当前位置处理下落
-//		注意：
-//			1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
-//			2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
-func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]int, error) {
-	narr := []int{}
-	for x, arr := range scene.Arr {
-
-		ci := indexes[x]
-
-		for y, v := range arr {
-			if v == -1 {
-				ci--
-				if ci < 0 {
-					ci += len(rd.Reels[x])
-				}
-
-				scene.Arr[x][y] = rd.Reels[x][ci]
-			}
-		}
-
-		narr = append(narr, ci)
-	}
-
-	return narr, nil
 }
 
 // LoadReelsFromExcel - load xlsx file
