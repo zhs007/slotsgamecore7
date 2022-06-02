@@ -53,3 +53,26 @@ func BuildSymbols(symbols []string) *Symbols {
 
 	return ret
 }
+
+func BuildReels(reels []*sgc7game.ReelsData, pt *sgc7game.PayTables) *Reels {
+	ret := &Reels{}
+
+	for _, arr2d := range reels {
+		t := &Table{}
+
+		for _, arr := range arr2d.Reels {
+			lststr := &StringList{}
+
+			for _, s := range arr {
+				ss := pt.GetStringFromInt(s)
+				lststr.Vals = append(lststr.Vals, ss)
+			}
+
+			t.Reel = append(t.Reel, lststr)
+		}
+
+		ret.Tables = append(ret.Tables, t)
+	}
+
+	return ret
+}

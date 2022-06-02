@@ -36,34 +36,13 @@ func Test_Config2(t *testing.T) {
 	cfg.Payouts = BuildPayouts(pt)
 
 	tcfg := &TestConfig2{
-		cfg,
-		&Reels{
-			Tables: []*Table{
-				{
-					TableComment: "table 0",
-					Reel: []*StringList{
-						{
-							Vals: []string{"A", "B", "A"},
-						},
-						{
-							Vals: []string{"B", "B", "A"},
-						},
-					},
-				},
-				{
-					TableComment: "table 1",
-					Reel: []*StringList{
-						{
-							Vals: []string{"A", "B", "A"},
-						},
-						{
-							Vals: []string{"B", "B", "A"},
-						},
-					},
-				},
-			},
-		},
+		Config: cfg,
 	}
+
+	reels, err := sgc7game.LoadReelsFromExcel("../unittestdata/reels.xlsx")
+	assert.NoError(t, err)
+
+	tcfg.BaseReels = BuildReels([]*sgc7game.ReelsData{reels}, pt)
 
 	err = SaveConfig("../unittestdata/relaxconfig2.xml", tcfg)
 	assert.NoError(t, err)
