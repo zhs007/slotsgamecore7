@@ -18,3 +18,4 @@ unittestdata/rtptest.csv
 unittestdata/rtptesttag.csv
 unittestdata/rtptesttag1.csv
 utils/*.log
+unittestdata/relaxconfig.xml

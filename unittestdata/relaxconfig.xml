@@ -2,4 +2,65 @@
   <config>
       <!--General game information-->
       <sd>1.56</sd>
+      <rtp>0.9607</rtp>
+      <id>123</id>
+      <name>game001</name>
+      <configVersion>1.0</configVersion>
+      <!--RTP infomation-->
+      <rtps>
+          <item>0.9607</item>
+          <item>0.9608</item>
+          <item>0.9609</item>
+      </rtps>
+      <!--Configuration-->
+      <symbols>
+          <symbol name="A" value="1"></symbol>
+          <symbol name="B" value="2"></symbol>
+      </symbols>
+      <wilds>
+          <item>WL</item>
+      </wilds>
+      <CREDITS_PER_BET>25</CREDITS_PER_BET>
+      <FS_AWARDED>15</FS_AWARDED>
+      <FS_AWARDED_RETRIGGER>5</FS_AWARDED_RETRIGGER>
+      <payouts>
+          <symbol name="A">
+              <win count="3" payout="100"></win>
+              <win count="4" payout="200"></win>
+              <win count="5" payout="300"></win>
+          </symbol>
+          <symbol name="B">
+              <win count="3" payout="150"></win>
+              <win count="4" payout="250"></win>
+              <win count="5" payout="350"></win>
+          </symbol>
+      </payouts>
+      <basereels>
+          <table>
+              <!--table 0-->
+              <reel>
+                  <item>A</item>
+                  <item>B</item>
+                  <item>A</item>
+              </reel>
+              <reel>
+                  <item>B</item>
+                  <item>B</item>
+                  <item>A</item>
+              </reel>
+          </table>
+          <table>
+              <!--table 1-->
+              <reel>
+                  <item>A</item>
+                  <item>B</item>
+                  <item>A</item>
+              </reel>
+              <reel>
+                  <item>B</item>
+                  <item>B</item>
+                  <item>A</item>
+              </reel>
+          </table>
+      </basereels>
   </config>
