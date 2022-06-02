@@ -55,22 +55,19 @@ type Reels struct {
 }
 
 type Config struct {
-	XMLName            xml.Name    `xml:"config"`
-	GeneralComment     string      `xml:",comment"`
-	SD                 float32     `xml:"sd"`
-	RTP                float32     `xml:"rtp"`
-	ID                 int         `xml:"id"`
-	Name               string      `xml:"name"`
-	ConfigVersion      string      `xml:"configVersion"`
-	RTPsComment        string      `xml:",comment"`
-	RTPs               *FloatList  `xml:"rtps"`
-	ConfigComment      string      `xml:",comment"`
-	Symbols            *Symbols    `xml:"symbols"`
-	Wilds              *StringList `xml:"wilds"`
-	CreditsPerBet      int         `xml:"CREDITS_PER_BET"`
-	FSAwarded          int         `xml:"FS_AWARDED"`
-	FSAwardedRetrigger int         `xml:"FS_AWARDED_RETRIGGER"`
-	Payouts            *Payouts    `xml:"payouts"`
+	XMLName        xml.Name    `xml:"config"`
+	GeneralComment string      `xml:",comment"`
+	SD             float32     `xml:"sd"`
+	RTP            float32     `xml:"rtp"`
+	ID             int         `xml:"id"`
+	Name           string      `xml:"name"`
+	ConfigVersion  string      `xml:"configVersion"`
+	RTPsComment    string      `xml:",comment"`
+	RTPs           *FloatList  `xml:"rtps"`
+	ConfigComment  string      `xml:",comment"`
+	Symbols        *Symbols    `xml:"symbols"`
+	Wilds          *StringList `xml:"wilds"`
+	Payouts        *Payouts    `xml:"payouts"`
 }
 
 func SaveConfig(fn string, cfg interface{}) error {

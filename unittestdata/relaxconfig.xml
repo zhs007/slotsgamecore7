@@ -20,9 +20,6 @@
       <wilds>
           <item>WL</item>
       </wilds>
-      <CREDITS_PER_BET>25</CREDITS_PER_BET>
-      <FS_AWARDED>15</FS_AWARDED>
-      <FS_AWARDED_RETRIGGER>5</FS_AWARDED_RETRIGGER>
       <payouts>
           <symbol name="A">
               <win count="3" payout="100"></win>
@@ -35,6 +32,9 @@
               <win count="5" payout="350"></win>
           </symbol>
       </payouts>
+      <CREDITS_PER_BET>25</CREDITS_PER_BET>
+      <FS_AWARDED>15</FS_AWARDED>
+      <FS_AWARDED_RETRIGGER>5</FS_AWARDED_RETRIGGER>
       <basereels>
           <table>
               <!--table 0-->

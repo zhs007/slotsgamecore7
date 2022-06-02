@@ -36,6 +36,16 @@ type PayTables struct {
 	MapSymbols map[string]int `json:"symbols"`
 }
 
+func (pt *PayTables) GetStringFromInt(s int) string {
+	for k, v := range pt.MapSymbols {
+		if v == s {
+			return k
+		}
+	}
+
+	return ""
+}
+
 // LoadPayTables5JSON - load json file
 func LoadPayTables5JSON(fn string) (*PayTables, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
