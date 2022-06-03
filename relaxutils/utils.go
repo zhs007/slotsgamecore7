@@ -76,3 +76,17 @@ func BuildReels(reels []*sgc7game.ReelsData, pt *sgc7game.PayTables) *Reels {
 
 	return ret
 }
+
+func BuildWeights(weights []int) *Weights {
+	ret := &Weights{}
+
+	for i, v := range weights {
+		lst := &IntList{
+			Vals: []int{i, v},
+		}
+
+		ret.Entries = append(ret.Entries, lst)
+	}
+
+	return ret
+}
