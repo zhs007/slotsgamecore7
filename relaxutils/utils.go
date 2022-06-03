@@ -90,3 +90,65 @@ func BuildWeights(weights []int) *Weights {
 
 	return ret
 }
+
+func BuildWeightsEx(vals []int, weights []int) *Weights {
+	if len(vals) != len(weights) {
+		return nil
+	}
+
+	ret := &Weights{}
+
+	for i, v := range weights {
+		lst := &IntList{
+			Vals: []int{vals[i], v},
+		}
+
+		ret.Entries = append(ret.Entries, lst)
+	}
+
+	return ret
+}
+
+func BuildWeightsArr(weights [][]int) *WeightsArr {
+	ret := &WeightsArr{}
+
+	for _, arr := range weights {
+		w := &Weights{}
+
+		for i, v := range arr {
+			lst := &IntList{
+				Vals: []int{i, v},
+			}
+
+			w.Entries = append(w.Entries, lst)
+		}
+
+		ret.Weights = append(ret.Weights, w)
+	}
+
+	return ret
+}
+
+func BuildWeightsArrEx(vals []int, weights [][]int) *WeightsArr {
+	if len(vals) != len(weights[0]) {
+		return nil
+	}
+
+	ret := &WeightsArr{}
+
+	for _, arr := range weights {
+		w := &Weights{}
+
+		for i, v := range arr {
+			lst := &IntList{
+				Vals: []int{vals[i], v},
+			}
+
+			w.Entries = append(w.Entries, lst)
+		}
+
+		ret.Weights = append(ret.Weights, w)
+	}
+
+	return ret
+}

@@ -62,6 +62,10 @@ type Weights struct {
 	Entries []*IntList `xml:"entry"`
 }
 
+type WeightsArr struct {
+	Weights []*Weights `xml:"weights"`
+}
+
 type Config struct {
 	XMLName        xml.Name    `xml:"config"`
 	GeneralComment string      `xml:",comment"`
