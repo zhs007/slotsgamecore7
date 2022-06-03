@@ -16,6 +16,10 @@ type StringList struct {
 	Vals []string `xml:"item"`
 }
 
+type IntList struct {
+	Vals []int `xml:"item"`
+}
+
 type Symbol struct {
 	XMLName xml.Name `xml:"symbol"`
 	Name    string   `xml:"name,attr"`
@@ -54,6 +58,10 @@ type Reels struct {
 	Tables []*Table
 }
 
+type Weights struct {
+	Entries []*IntList `xml:"entry"`
+}
+
 type Config struct {
 	XMLName        xml.Name    `xml:"config"`
 	GeneralComment string      `xml:",comment"`
@@ -68,6 +76,7 @@ type Config struct {
 	Symbols        *Symbols    `xml:"symbols"`
 	Wilds          *StringList `xml:"wilds"`
 	Payouts        *Payouts    `xml:"payouts"`
+	PayingSymbols  *StringList `xml:"payingSymbols"`
 }
 
 func SaveConfig(fn string, cfg interface{}) error {

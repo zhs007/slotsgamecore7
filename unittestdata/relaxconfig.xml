@@ -32,6 +32,12 @@
               <win count="5" payout="350"></win>
           </symbol>
       </payouts>
+      <payingSymbols>
+          <item>A</item>
+          <item>B</item>
+          <item>C</item>
+          <item>D</item>
+      </payingSymbols>
       <CREDITS_PER_BET>25</CREDITS_PER_BET>
       <FS_AWARDED>15</FS_AWARDED>
       <FS_AWARDED_RETRIGGER>5</FS_AWARDED_RETRIGGER>
@@ -63,4 +69,14 @@
               </reel>
           </table>
       </basereels>
+      <baseReelWeights>
+          <entry>
+              <item>0</item>
+              <item>15</item>
+          </entry>
+          <entry>
+              <item>1</item>
+              <item>25</item>
+          </entry>
+      </baseReelWeights>
   </config>

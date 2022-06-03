@@ -8,10 +8,11 @@ import (
 
 type TestConfig struct {
 	Config
-	CreditsPerBet      int    `xml:"CREDITS_PER_BET"`
-	FSAwarded          int    `xml:"FS_AWARDED"`
-	FSAwardedRetrigger int    `xml:"FS_AWARDED_RETRIGGER"`
-	BaseReels          *Reels `xml:"basereels"`
+	CreditsPerBet      int      `xml:"CREDITS_PER_BET"`
+	FSAwarded          int      `xml:"FS_AWARDED"`
+	FSAwardedRetrigger int      `xml:"FS_AWARDED_RETRIGGER"`
+	BaseReels          *Reels   `xml:"basereels"`
+	BaseReelWeights    *Weights `xml:"baseReelWeights"`
 }
 
 func Test_Config(t *testing.T) {
@@ -80,6 +81,9 @@ func Test_Config(t *testing.T) {
 				},
 			},
 		},
+		PayingSymbols: &StringList{
+			Vals: []string{"A", "B", "C", "D"},
+		},
 	}
 
 	tcfg := &TestConfig{
@@ -110,6 +114,16 @@ func Test_Config(t *testing.T) {
 							Vals: []string{"B", "B", "A"},
 						},
 					},
+				},
+			},
+		},
+		&Weights{
+			[]*IntList{
+				{
+					Vals: []int{0, 15},
+				},
+				{
+					Vals: []int{1, 25},
 				},
 			},
 		},
