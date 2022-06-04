@@ -152,3 +152,21 @@ func BuildWeightsArrEx(vals []int, weights [][]int) *WeightsArr {
 
 	return ret
 }
+
+func BuildInt3DArray(lst []*sgc7game.ReelsPosData) *Int3DArray {
+	arr := &Int3DArray{}
+
+	for _, rpd := range lst {
+		arr2d := &Int2DArray{}
+
+		for _, r := range rpd.ReelsPos {
+			arr1d := &IntList{Vals: r}
+
+			arr2d.Rows = append(arr2d.Rows, arr1d)
+		}
+
+		arr.Tables = append(arr.Tables, arr2d)
+	}
+
+	return arr
+}
