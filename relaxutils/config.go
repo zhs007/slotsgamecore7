@@ -66,6 +66,14 @@ type WeightsArr struct {
 	Weights []*Weights `xml:"weights"`
 }
 
+type Int2DArray struct {
+	Rows []*IntList `xml:"row"`
+}
+
+type Int3DArray struct {
+	Tables []*Int2DArray `xml:"tbl"`
+}
+
 type Config struct {
 	XMLName        xml.Name    `xml:"config"`
 	GeneralComment string      `xml:",comment"`
