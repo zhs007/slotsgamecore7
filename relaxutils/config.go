@@ -83,6 +83,14 @@ type Config struct {
 	PayingSymbols  *StringList `xml:"payingSymbols"`
 }
 
+func NewConfig() *Config {
+	return &Config{
+		GeneralComment: " General game information ",
+		RTPsComment:    " RTP infomation ",
+		ConfigComment:  " Configuration ",
+	}
+}
+
 func SaveConfig(fn string, cfg interface{}) error {
 	output, err := xml.MarshalIndent(cfg, "  ", "    ")
 	if err != nil {
