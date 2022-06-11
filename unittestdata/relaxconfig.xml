@@ -14,22 +14,22 @@
       </rtps>
       <!--Configuration-->
       <symbols>
-          <symbol name="A" value="1"></symbol>
-          <symbol name="B" value="2"></symbol>
+          <symbol name="A" value="1"/>
+          <symbol name="B" value="2"/>
       </symbols>
       <wilds>
           <item>WL</item>
       </wilds>
       <payouts>
           <symbol name="A">
-              <win count="3" payout="100"></win>
-              <win count="4" payout="200"></win>
-              <win count="5" payout="300"></win>
+              <win count="3" payout="100"/>
+              <win count="4" payout="200"/>
+              <win count="5" payout="300"/>
           </symbol>
           <symbol name="B">
-              <win count="3" payout="150"></win>
-              <win count="4" payout="250"></win>
-              <win count="5" payout="350"></win>
+              <win count="3" payout="150"/>
+              <win count="4" payout="250"/>
+              <win count="5" payout="350"/>
           </symbol>
       </payouts>
       <payingSymbols>
