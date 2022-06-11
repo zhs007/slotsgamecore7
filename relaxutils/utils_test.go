@@ -1,6 +1,7 @@
 package relaxutils
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,7 +45,12 @@ func Test_Config2(t *testing.T) {
 
 	tcfg.BaseReels = BuildReels([]*sgc7game.ReelsData{reels}, pt)
 
-	err = SaveConfig("../unittestdata/relaxconfig2.xml", tcfg)
+	err = SaveConfig("../unittestdata/relaxconfig2.xml", tcfg, func(str string) string {
+		str = strings.ReplaceAll(str, "></symbol>", "/>")
+		str = strings.ReplaceAll(str, "></win>", "/>")
+
+		return str
+	})
 	assert.NoError(t, err)
 
 	t.Logf("Test_CalcScatter OK")

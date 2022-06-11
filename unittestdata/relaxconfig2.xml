@@ -18,57 +18,57 @@
       </wilds>
       <payouts>
           <symbol name="A">
-              <win count="3" payout="40"></win>
-              <win count="4" payout="200"></win>
-              <win count="5" payout="1000"></win>
+              <win count="3" payout="40"/>
+              <win count="4" payout="200"/>
+              <win count="5" payout="1000"/>
           </symbol>
           <symbol name="B">
-              <win count="3" payout="20"></win>
-              <win count="4" payout="100"></win>
-              <win count="5" payout="500"></win>
+              <win count="3" payout="20"/>
+              <win count="4" payout="100"/>
+              <win count="5" payout="500"/>
           </symbol>
           <symbol name="C">
-              <win count="3" payout="20"></win>
-              <win count="4" payout="50"></win>
-              <win count="5" payout="250"></win>
+              <win count="3" payout="20"/>
+              <win count="4" payout="50"/>
+              <win count="5" payout="250"/>
           </symbol>
           <symbol name="D">
-              <win count="3" payout="15"></win>
-              <win count="4" payout="30"></win>
-              <win count="5" payout="125"></win>
+              <win count="3" payout="15"/>
+              <win count="4" payout="30"/>
+              <win count="5" payout="125"/>
           </symbol>
           <symbol name="E">
-              <win count="3" payout="10"></win>
-              <win count="4" payout="25"></win>
-              <win count="5" payout="100"></win>
+              <win count="3" payout="10"/>
+              <win count="4" payout="25"/>
+              <win count="5" payout="100"/>
           </symbol>
           <symbol name="F">
-              <win count="3" payout="10"></win>
-              <win count="4" payout="25"></win>
-              <win count="5" payout="100"></win>
+              <win count="3" payout="10"/>
+              <win count="4" payout="25"/>
+              <win count="5" payout="100"/>
           </symbol>
           <symbol name="FG">
-              <win count="3" payout="5"></win>
+              <win count="3" payout="5"/>
           </symbol>
           <symbol name="G">
-              <win count="3" payout="5"></win>
-              <win count="4" payout="20"></win>
-              <win count="5" payout="75"></win>
+              <win count="3" payout="5"/>
+              <win count="4" payout="20"/>
+              <win count="5" payout="75"/>
           </symbol>
           <symbol name="H">
-              <win count="3" payout="5"></win>
-              <win count="4" payout="20"></win>
-              <win count="5" payout="75"></win>
+              <win count="3" payout="5"/>
+              <win count="4" payout="20"/>
+              <win count="5" payout="75"/>
           </symbol>
           <symbol name="J">
-              <win count="3" payout="5"></win>
-              <win count="4" payout="15"></win>
-              <win count="5" payout="50"></win>
+              <win count="3" payout="5"/>
+              <win count="4" payout="15"/>
+              <win count="5" payout="50"/>
           </symbol>
           <symbol name="K">
-              <win count="3" payout="5"></win>
-              <win count="4" payout="15"></win>
-              <win count="5" payout="50"></win>
+              <win count="3" payout="5"/>
+              <win count="4" payout="15"/>
+              <win count="5" payout="50"/>
           </symbol>
       </payouts>
       <baseReels>

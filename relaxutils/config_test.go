@@ -1,6 +1,7 @@
 package relaxutils
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -129,7 +130,12 @@ func Test_Config(t *testing.T) {
 		},
 	}
 
-	err := SaveConfig("../unittestdata/relaxconfig.xml", tcfg)
+	err := SaveConfig("../unittestdata/relaxconfig.xml", tcfg, func(str string) string {
+		str = strings.ReplaceAll(str, "></symbol>", "/>")
+		str = strings.ReplaceAll(str, "></win>", "/>")
+
+		return str
+	})
 	assert.NoError(t, err)
 
 	t.Logf("Test_CalcScatter OK")

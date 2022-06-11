@@ -99,7 +99,9 @@ func NewConfig() *Config {
 	}
 }
 
-func SaveConfig(fn string, cfg interface{}) error {
+type FuncOnSelfCloseTags func(string) string
+
+func SaveConfig(fn string, cfg interface{}, procSelfCloseTags FuncOnSelfCloseTags) error {
 	output, err := xml.MarshalIndent(cfg, "  ", "    ")
 	if err != nil {
 		goutils.Error("SaveConfig:MarshalIndent",
@@ -111,6 +113,10 @@ func SaveConfig(fn string, cfg interface{}) error {
 	xmlhead := "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	buf := []byte(xmlhead)
 	buf = append(buf, output...)
+
+	if procSelfCloseTags != nil {
+		buf = []byte(procSelfCloseTags(string(buf)))
+	}
 
 	err = ioutil.WriteFile(fn, buf, 0644)
 	if err != nil {
