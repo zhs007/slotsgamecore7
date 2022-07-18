@@ -5,6 +5,7 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"go.uber.org/zap"
 )
 
 // FuncCountSymbolExIsSymbol -
@@ -252,7 +253,17 @@ func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName 
 }
 
 // RandReelsEx - random with reels
-func (gs *GameScene) RandReelsEx(game IGame, plugin sgc7plugin.IPlugin, reelsName string, rpd *ReelsPosData) error {
+func (gs *GameScene) RandReelsEx(game IGame, plugin sgc7plugin.IPlugin, reelsName string, rpd *ReelsPosData, nums int) error {
+	if nums < 0 {
+		nums = 0
+	}
+
+	if nums > gs.Width {
+		nums = gs.Width
+	}
+
+	rarr := []int{}
+
 	cfg := game.GetConfig()
 
 	reels, isok := cfg.Reels[reelsName]
@@ -266,8 +277,33 @@ func (gs *GameScene) RandReelsEx(game IGame, plugin sgc7plugin.IPlugin, reelsNam
 		gs.Indexes = gs.Indexes[0:0:cap(gs.Indexes)]
 	}
 
+	for x := 0; x < gs.Width; x++ {
+		rarr = append(rarr, x)
+	}
+
+	for i := 0; i < gs.Width-nums; i++ {
+		cr, err := plugin.Random(context.Background(), len(rarr))
+		if err != nil {
+			goutils.Error("GameScene.RandReelsEx:Random",
+				zap.Error(err))
+
+			return err
+		}
+
+		rarr = append(rarr[0:cr], rarr[cr+1:]...)
+	}
+
 	for x, arr := range gs.Arr {
-		cn, err := rpd.RandReel(context.Background(), plugin, x)
+		var cn int
+		var err error
+
+		if goutils.IndexOfIntSlice(rarr, x, 0) < 0 {
+			cn, err = plugin.Random(context.Background(), len(reels.Reels[x]))
+		} else {
+			cn, err = rpd.RandReel(context.Background(), plugin, x)
+		}
+
+		// cn, err := rpd.RandReel(context.Background(), plugin, x)
 		// cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
 		if err != nil {
 			return err
