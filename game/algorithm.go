@@ -578,6 +578,173 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 	return results
 }
 
+// calcSymbolFullLineEx2 - calc fullline
+//		用数个数的方式来计算全线游戏
+func calcSymbolFullLineEx2(scene *GameScene, pt *PayTables, symbol int, bet int,
+	isValidSymbolEx FuncIsValidSymbolEx,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol) *Result {
+
+	arrpos := make([]int, 0, scene.Height*scene.Width*2)
+	symbolnums := 0
+	wildnums := 0
+	mul := 1
+
+	for x := 0; x < scene.Width; x++ {
+		curnums := 0
+		for y := 0; y < len(scene.Arr[x]); y++ {
+			if !isValidSymbolEx(symbol, scene, x, y) {
+				continue
+			}
+
+			if isSameSymbol(scene.Arr[x][y], symbol) {
+
+				arrpos = append(arrpos, x, y)
+
+				if isWild(scene.Arr[x][y]) {
+					wildnums++
+				}
+
+				if curnums == 0 {
+					symbolnums++
+				}
+
+				curnums++
+			}
+		}
+
+		if curnums == 0 {
+			break
+		}
+
+		mul *= curnums
+	}
+
+	if symbolnums > 0 && pt.MapPay[symbol][symbolnums-1] > 0 {
+		r := &Result{
+			Symbol:     symbol,
+			Type:       RTFullLineEx,
+			Mul:        pt.MapPay[symbol][symbolnums-1],
+			CoinWin:    pt.MapPay[symbol][symbolnums-1] * mul,
+			CashWin:    pt.MapPay[symbol][symbolnums-1] * bet * mul,
+			Pos:        arrpos,
+			Wilds:      wildnums,
+			SymbolNums: symbolnums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
+// CalcFullLineEx2 - calc fullline
+//		用数个数的方式来计算全线游戏
+func CalcFullLineEx2(scene *GameScene, pt *PayTables, bet int,
+	isValidSymbolEx FuncIsValidSymbolEx,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol) []*Result {
+
+	results := []*Result{}
+
+	arrSymbol := make([]int, 0, scene.Height)
+
+	for y0 := 0; y0 < len(scene.Arr[0]); y0++ {
+		cs := scene.Arr[0][y0]
+		if !isValidSymbolEx(cs, scene, 0, y0) {
+			continue
+		}
+
+		if goutils.IndexOfIntSlice(arrSymbol, cs, 0) >= 0 {
+			continue
+		}
+
+		arrSymbol = append(arrSymbol, cs)
+
+		// is wild
+		if isWild(cs) {
+			arrpos := make([]int, 0, scene.Height*scene.Width*2)
+			symbolnums := 0
+			wildnums := 0
+			mul := 1
+
+			for x := 0; x < scene.Width; x++ {
+				curnums := 0
+
+				for y := 0; y < len(scene.Arr[x]); y++ {
+					if isWild(scene.Arr[x][y]) {
+						arrpos = append(arrpos, x, y)
+
+						if isWild(scene.Arr[x][y]) {
+							wildnums++
+						}
+
+						if curnums == 0 {
+							symbolnums++
+						}
+
+						curnums++
+					}
+				}
+
+				if curnums == 0 {
+					break
+				}
+
+				mul *= curnums
+			}
+
+			wx := symbolnums
+
+			if wx == scene.Width {
+				if pt.MapPay[cs][wx-1] > 0 {
+					r := &Result{
+						Symbol:     cs,
+						Type:       RTFullLineEx,
+						Mul:        pt.MapPay[cs][wx-1],
+						CoinWin:    pt.MapPay[cs][wx-1] * mul,
+						CashWin:    pt.MapPay[cs][wx-1] * bet * mul,
+						Pos:        arrpos,
+						Wilds:      wildnums,
+						SymbolNums: wx,
+					}
+
+					results = append(results, r)
+				}
+
+				continue
+			}
+
+			for ty := 0; ty < len(scene.Arr[wx]); ty++ {
+				ws := scene.Arr[wx][ty]
+				if !isValidSymbolEx(ws, scene, wx, ty) {
+					continue
+				}
+
+				if goutils.IndexOfIntSlice(arrSymbol, ws, 0) >= 0 {
+					continue
+				}
+
+				arrSymbol = append(arrSymbol, ws)
+
+				r := calcSymbolFullLineEx2(scene, pt, ws, bet, isValidSymbolEx, isWild, isSameSymbol)
+				if r != nil {
+					results = append(results, r)
+				}
+			}
+
+			continue
+		}
+
+		r := calcSymbolFullLineEx2(scene, pt, cs, bet, isValidSymbolEx, isWild, isSameSymbol)
+		if r != nil {
+			results = append(results, r)
+		}
+	}
+
+	return results
+}
+
 func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry []int, wildNums int) *Result {
 	nums := len(arry)
 
