@@ -550,3 +550,86 @@ func Test_CalcFullLineEx(t *testing.T) {
 
 	t.Logf("Test_CalcFullLineEx OK")
 }
+
+func Test_CalcFullLineEx2(t *testing.T) {
+	scene, err := NewGameSceneWithArr2([][]int{
+		{8, 10, 7},
+		{11, 10, 7},
+		{0, 4, 6},
+		{7, 8, 0},
+		{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// 0,1,1,1,9 => 1x4
+	results := CalcFullLineEx2(scene, pt, 1,
+		func(cs int, scene *GameScene, x, y int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, len(results), 2)
+
+	assert.Equal(t, len(results[0].Pos), 8)
+	assert.Equal(t, results[0].Symbol, 10)
+	assert.Equal(t, results[0].Mul, 15)
+
+	assert.Equal(t, len(results[1].Pos), 10)
+	assert.Equal(t, results[1].Symbol, 7)
+	assert.Equal(t, results[1].Mul, 30)
+	assert.Equal(t, results[1].CoinWin, 30*2)
+
+	t.Logf("Test_CalcFullLineEx OK")
+}
+
+func Test_CalcFullLineEx2w(t *testing.T) {
+	scene, err := NewGameSceneWithArr2([][]int{
+		{0, 10, 7},
+		{11, 10, 0},
+		{10, 4, 7},
+		{7, 8, 7},
+		{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// 0,1,1,1,9 => 1x4
+	results := CalcFullLineEx2(scene, pt, 1,
+		func(cs int, scene *GameScene, x, y int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		})
+
+	assert.Equal(t, len(results), 3)
+
+	assert.Equal(t, len(results[0].Pos), 10)
+	assert.Equal(t, results[0].Symbol, 10)
+	assert.Equal(t, results[0].Mul, 5)
+	assert.Equal(t, results[0].CoinWin, 4*5)
+
+	assert.Equal(t, len(results[1].Pos), 6)
+	assert.Equal(t, results[1].Symbol, 4)
+	assert.Equal(t, results[1].Mul, 30)
+
+	assert.Equal(t, len(results[2].Pos), 12)
+	assert.Equal(t, results[2].Symbol, 7)
+	assert.Equal(t, results[2].Mul, 30)
+	assert.Equal(t, results[2].CoinWin, 30*4)
+
+	t.Logf("Test_CalcFullLineEx OK")
+}
