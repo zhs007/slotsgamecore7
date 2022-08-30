@@ -100,7 +100,7 @@ func BuildPBGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 		pbcfg.Lines = BuildPBLineData(cfg.Lines)
 	}
 
-	if cfg.Reels != nil {
+	if len(cfg.Reels) > 0 {
 		pbcfg.Reels = make(map[string]*sgc7pb.ReelsData)
 
 		for k, rd := range cfg.Reels {
