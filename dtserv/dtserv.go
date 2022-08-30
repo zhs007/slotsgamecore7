@@ -73,8 +73,8 @@ func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sg
 
 	res := sgc7pbutils.BuildPBGameConfig(cfg)
 
-	goutils.Debug("Serv.GetConfig",
-		goutils.JSON("reply", res))
+	// goutils.Debug("Serv.GetConfig",
+	// 	goutils.JSON("reply", res))
 
 	return res, nil
 }
