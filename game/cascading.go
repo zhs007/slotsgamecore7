@@ -39,3 +39,33 @@ func DropDownSymbols(scene *GameScene) error {
 
 	return nil
 }
+
+// DropDownSymbols2 - drop down symbols, y0 is at the buttom
+func DropDownSymbols2(scene *GameScene) error {
+	for _, arr := range scene.Arr {
+		for y, s := range arr {
+			if s == -1 {
+				hass := false
+				for y1 := y + 1; y1 < len(arr); y1++ {
+					if arr[y1] != -1 {
+						arr[y] = arr[y1]
+						arr[y1] = -1
+
+						hass = true
+						// y--
+						break
+					}
+				}
+
+				if !hass {
+					break
+				}
+			}
+			// else {
+			// y--
+			// }
+		}
+	}
+
+	return nil
+}
