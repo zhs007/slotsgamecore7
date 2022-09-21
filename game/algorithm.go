@@ -75,6 +75,44 @@ func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins in
 	return nil
 }
 
+// CalcScatter2 - calc scatter
+func CalcScatter2(scene *GameScene, pt *PayTables, scatter int, bet int, coins int,
+	isScatter FuncIsScatter) *Result {
+
+	nums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+	for x := 0; x < len(scene.Arr); x++ {
+		for y := 0; y < len(scene.Arr[x]); y++ {
+			if isScatter(scatter, scene.Arr[x][y]) {
+				nums++
+
+				pos = append(pos, x, y)
+			}
+		}
+	}
+
+	if nums > len(pt.MapPay[scatter]) {
+		nums = len(pt.MapPay[scatter])
+	}
+
+	if nums > 0 && pt.MapPay[scatter][nums-1] > 0 {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatter,
+			LineIndex:  -1,
+			Mul:        pt.MapPay[scatter][nums-1],
+			CoinWin:    pt.MapPay[scatter][nums-1] * coins,
+			CashWin:    pt.MapPay[scatter][nums-1] * coins * bet,
+			Pos:        pos,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcScatterEx - calc scatter
 func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter) *Result {
 	curnums := 0
