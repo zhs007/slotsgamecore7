@@ -28,6 +28,16 @@ type payInfo struct {
 	X13    int    `json:"X13"`
 	X14    int    `json:"X14"`
 	X15    int    `json:"X15"`
+	X16    int    `json:"X16"`
+	X17    int    `json:"X17"`
+	X18    int    `json:"X18"`
+	X19    int    `json:"X19"`
+	X20    int    `json:"X20"`
+	X21    int    `json:"X21"`
+	X22    int    `json:"X22"`
+	X23    int    `json:"X23"`
+	X24    int    `json:"X24"`
+	X25    int    `json:"X25"`
 }
 
 // PayTables - pay tables
@@ -174,6 +184,40 @@ func LoadPayTables15JSON(fn string) (*PayTables, error) {
 
 	for _, v := range li {
 		cl := []int{v.X1, v.X2, v.X3, v.X4, v.X5, v.X6, v.X7, v.X8, v.X9, v.X10, v.X11, v.X12, v.X13, v.X14, v.X15}
+		p.MapPay[v.Code] = cl
+
+		p.MapSymbols[v.Symbol] = v.Code
+	}
+
+	return p, nil
+}
+
+// LoadPayTables25JSON - load json file
+func LoadPayTables25JSON(fn string) (*PayTables, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+
+	data, err := ioutil.ReadFile(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	var li []payInfo
+	err = json.Unmarshal(data, &li)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(li) <= 0 {
+		return nil, nil
+	}
+
+	p := &PayTables{
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
+	}
+
+	for _, v := range li {
+		cl := []int{v.X1, v.X2, v.X3, v.X4, v.X5, v.X6, v.X7, v.X8, v.X9, v.X10, v.X11, v.X12, v.X13, v.X14, v.X15, v.X16, v.X17, v.X18, v.X19, v.X20, v.X21, v.X22, v.X23, v.X24, v.X25}
 		p.MapPay[v.Code] = cl
 
 		p.MapSymbols[v.Symbol] = v.Code
