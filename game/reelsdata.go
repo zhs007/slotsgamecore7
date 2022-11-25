@@ -71,6 +71,34 @@ func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]i
 	return narr, nil
 }
 
+// DropDownIntoGameScene2 - 用轮子当前位置处理下落
+//		注意：
+//			1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
+//			2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
+func (rd *ReelsData) DropDownIntoGameScene2(scene *GameScene, indexes []int) ([]int, error) {
+	narr := []int{}
+	for x, arr := range scene.Arr {
+
+		ci := indexes[x]
+
+		for y := len(arr) - 1; y >= 0; y-- {
+			v := arr[y]
+			if v == -1 {
+				ci--
+				if ci < 0 {
+					ci += len(rd.Reels[x])
+				}
+
+				scene.Arr[x][y] = rd.Reels[x][ci]
+			}
+		}
+
+		narr = append(narr, ci)
+	}
+
+	return narr, nil
+}
+
 // BuildReelsPosData - 构建轮子坐标数据，一般用于后续的转轮算法，主要起到随机优化效率用
 func (rd *ReelsData) BuildReelsPosData(onpos FuncReelsDataPos) (*ReelsPosData, error) {
 	rpd := NewReelsPosData(rd)
