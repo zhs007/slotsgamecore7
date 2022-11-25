@@ -397,6 +397,58 @@ func (gs *GameScene) RandReelsEx2(game IGame, plugin sgc7plugin.IPlugin, reelsNa
 	return nil
 }
 
+// RandReelsEx3 - random with reels
+func (gs *GameScene) RandReelsEx3(game IGame, plugin sgc7plugin.IPlugin, reelsName string, rpd0 *ReelsPosData, rpd1 *ReelsPosData, nums int) error {
+	if nums < 0 {
+		nums = 0
+	}
+
+	if nums > gs.Width {
+		nums = gs.Width
+	}
+
+	cfg := game.GetConfig()
+
+	reels, isok := cfg.Reels[reelsName]
+	if !isok {
+		return ErrInvalidReelsName
+	}
+
+	if gs.Indexes == nil {
+		gs.Indexes = make([]int, 0, gs.Width)
+	} else {
+		gs.Indexes = gs.Indexes[0:0:cap(gs.Indexes)]
+	}
+
+	for x, arr := range gs.Arr {
+		var cn int
+		var err error
+
+		if x < nums {
+			cn, err = rpd0.RandReel(context.Background(), plugin, x)
+		} else {
+			cn, err = rpd1.RandReel(context.Background(), plugin, x)
+		}
+
+		if err != nil {
+			return err
+		}
+
+		gs.Indexes = append(gs.Indexes, cn)
+
+		for y := range arr {
+			gs.Arr[x][y] = reels.Reels[x][cn]
+
+			cn++
+			if cn >= len(reels.Reels[x]) {
+				cn -= len(reels.Reels[x])
+			}
+		}
+	}
+
+	return nil
+}
+
 // ResetReelIndex - reset reel with index
 // 	某些游戏里，可能会出现重新移动某一轴，这个就是移动某一轴的接口
 func (gs *GameScene) ResetReelIndex(game IGame, reelsName string, x int, index int) error {
