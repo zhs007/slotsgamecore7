@@ -191,3 +191,16 @@ func BuildLineData(ld *sgc7game.LineData) *Int2DArray {
 
 	return arr2d
 }
+
+func BuildInt2DArray(arr2 [][]int) *Int2DArray {
+	arr2d := &Int2DArray{}
+
+	for _, arr := range arr2 {
+		arr1d := &IntList{Vals: make([]int, len(arr))}
+		copy(arr1d.Vals, arr)
+
+		arr2d.Rows = append(arr2d.Rows, arr1d)
+	}
+
+	return arr2d
+}
