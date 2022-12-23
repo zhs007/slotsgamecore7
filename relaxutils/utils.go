@@ -204,3 +204,33 @@ func BuildInt2DArray(arr2 [][]int) *Int2DArray {
 
 	return arr2d
 }
+
+func BuildWeightsArrEx2(vals [][]int, weights [][]int) *WeightsArr {
+	if len(vals) != len(weights) {
+		return nil
+	}
+
+	ret := &WeightsArr{}
+
+	for i, arr := range weights {
+		if len(vals[i]) != len(weights[i]) {
+			return nil
+		}
+
+		w := &Weights{}
+
+		for j, v := range arr {
+			if v > 0 {
+				lst := &IntList{
+					Vals: []int{vals[i][j], v},
+				}
+
+				w.Entries = append(w.Entries, lst)
+			}
+		}
+
+		ret.Weights = append(ret.Weights, w)
+	}
+
+	return ret
+}
