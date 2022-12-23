@@ -178,3 +178,16 @@ func BuildInt3DArray(lst []*sgc7game.ReelsPosData) *Int3DArray {
 
 	return arr
 }
+
+func BuildLineData(ld *sgc7game.LineData) *Int2DArray {
+	arr2d := &Int2DArray{}
+
+	for _, arr := range ld.Lines {
+		arr1d := &IntList{Vals: make([]int, len(arr))}
+		copy(arr1d.Vals, arr)
+
+		arr2d.Rows = append(arr2d.Rows, arr1d)
+	}
+
+	return arr2d
+}
