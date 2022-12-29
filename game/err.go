@@ -63,4 +63,7 @@ var (
 
 	// ErrInvalidParam - invalid param
 	ErrInvalidParam = errors.New("invalid param")
+
+	// ErrInvalidValWeights - invalid ValWeights
+	ErrInvalidValWeights = errors.New("invalid ValWeights")
 )
