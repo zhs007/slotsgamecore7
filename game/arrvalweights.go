@@ -9,30 +9,35 @@ import (
 	"go.uber.org/zap"
 )
 
-// ValWeights
-type ValWeights struct {
-	Vals      []int
+// ArrValWeights
+type ArrValWeights struct {
+	ArrVals   [][]int
 	Weights   []int
 	MaxWeight int
 }
 
-func NewValWeights(vals []int, weights []int) (*ValWeights, error) {
-	if len(vals) != len(weights) {
-		goutils.Error("NewValWeights",
-			zap.Int("vals", len(vals)),
+func NewArrValWeights(arrvals [][]int, weights []int) (*ArrValWeights, error) {
+	if len(arrvals) != len(weights) {
+		goutils.Error("NewArrValWeights",
+			zap.Int("vals", len(arrvals)),
 			zap.Int("weights", len(weights)),
 			zap.Error(ErrInvalidValWeights))
 
 		return nil, ErrInvalidValWeights
 	}
 
-	vw := &ValWeights{
-		Vals:      make([]int, len(vals)),
-		Weights:   make([]int, len(vals)),
+	vw := &ArrValWeights{
+		Weights:   make([]int, len(arrvals)),
 		MaxWeight: 0,
 	}
 
-	copy(vw.Vals, vals)
+	for _, arr := range arrvals {
+		carr := make([]int, len(arr))
+		copy(carr, arr)
+
+		vw.ArrVals = append(vw.ArrVals, carr)
+	}
+
 	copy(vw.Weights, weights)
 
 	for _, v := range weights {
@@ -42,23 +47,23 @@ func NewValWeights(vals []int, weights []int) (*ValWeights, error) {
 	return vw, nil
 }
 
-func (vw *ValWeights) RandVal(plugin sgc7plugin.IPlugin) (int, error) {
+func (vw *ArrValWeights) RandVal(plugin sgc7plugin.IPlugin) ([]int, error) {
 	ci, err := RandWithWeights(plugin, vw.MaxWeight, vw.Weights)
 	if err != nil {
-		goutils.Error("ValWeights.RandVal:RandWithWeights",
+		goutils.Error("ArrValWeights.RandVal:RandWithWeights",
 			zap.Error(err))
 
-		return 0, err
+		return nil, err
 	}
 
-	return vw.Vals[ci], nil
+	return vw.ArrVals[ci], nil
 }
 
-// LoadValWeightsFromExcel - load xlsx file
-func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
+// LoadArrValWeightsFromExcel - load xlsx file
+func LoadArrValWeightsFromExcel(fn string) (*ArrValWeights, error) {
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
-		goutils.Error("LoadValWeightsFromExcel:OpenFile",
+		goutils.Error("LoadArrValWeightsFromExcel:OpenFile",
 			zap.String("fn", fn),
 			zap.Error(err))
 
@@ -67,7 +72,7 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
-		goutils.Error("LoadValWeightsFromExcel:GetSheetList",
+		goutils.Error("LoadArrValWeightsFromExcel:GetSheetList",
 			goutils.JSON("SheetList", lstname),
 			zap.String("fn", fn),
 			zap.Error(ErrInvalidReelsExcelFile))
@@ -77,7 +82,7 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 
 	rows, err := f.GetRows(lstname[0])
 	if err != nil {
-		goutils.Error("LoadValWeightsFromExcel:GetRows",
+		goutils.Error("LoadArrValWeightsFromExcel:GetRows",
 			zap.String("fn", fn),
 			zap.Error(err))
 
@@ -86,7 +91,7 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 
 	mapcolname := make(map[int]string)
 
-	vals := []int{}
+	arrvals := [][]int{}
 	weights := []int{}
 
 	for y, row := range rows {
@@ -95,13 +100,15 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 				mapcolname[x] = strings.ToLower(colCell)
 			}
 		} else {
+			vals := []int{}
+
 			for x, colCell := range row {
 				colname, isok := mapcolname[x]
 				if isok {
-					if colname == "val" {
+					if strings.Index(colname, "val") == 0 {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
-							goutils.Error("LoadValWeightsFromExcel:String2Int64",
+							goutils.Error("LoadArrValWeightsFromExcel:String2Int64",
 								zap.String("val", colCell),
 								zap.Error(err))
 
@@ -112,7 +119,7 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 					} else if colname == "weight" {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
-							goutils.Error("LoadValWeightsFromExcel:String2Int64",
+							goutils.Error("LoadArrValWeightsFromExcel:String2Int64",
 								zap.String("weight", colCell),
 								zap.Error(err))
 
@@ -123,8 +130,10 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 					}
 				}
 			}
+
+			arrvals = append(arrvals, vals)
 		}
 	}
 
-	return NewValWeights(vals, weights)
+	return NewArrValWeights(arrvals, weights)
 }
