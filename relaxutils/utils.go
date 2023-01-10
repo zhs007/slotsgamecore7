@@ -113,6 +113,22 @@ func BuildWeightsEx(vals []int, weights []int) *Weights {
 	return ret
 }
 
+func BuildWeightsEx2(vw *sgc7game.ValWeights) *Weights {
+	ret := &Weights{}
+
+	for i, v := range vw.Weights {
+		if v > 0 {
+			lst := &IntList{
+				Vals: []int{vw.Vals[i], v},
+			}
+
+			ret.Entries = append(ret.Entries, lst)
+		}
+	}
+
+	return ret
+}
+
 func BuildWeightsArr(weights [][]int) *WeightsArr {
 	ret := &WeightsArr{}
 
@@ -205,6 +221,19 @@ func BuildInt2DArray(arr2 [][]int) *Int2DArray {
 	return arr2d
 }
 
+func BuildInt2DArrayEx(avw *sgc7game.ArrValWeights) *Int2DArray {
+	arr2d := &Int2DArray{}
+
+	for _, arr := range avw.ArrVals {
+		arr1d := &IntList{Vals: make([]int, len(arr))}
+		copy(arr1d.Vals, arr)
+
+		arr2d.Rows = append(arr2d.Rows, arr1d)
+	}
+
+	return arr2d
+}
+
 func BuildWeightsArrEx2(vals [][]int, weights [][]int) *WeightsArr {
 	if len(vals) != len(weights) {
 		return nil
@@ -223,6 +252,28 @@ func BuildWeightsArrEx2(vals [][]int, weights [][]int) *WeightsArr {
 			if v > 0 {
 				lst := &IntList{
 					Vals: []int{vals[i][j], v},
+				}
+
+				w.Entries = append(w.Entries, lst)
+			}
+		}
+
+		ret.Weights = append(ret.Weights, w)
+	}
+
+	return ret
+}
+
+func BuildWeightsArrEx3(vws []*sgc7game.ValWeights) *WeightsArr {
+	ret := &WeightsArr{}
+
+	for _, vw := range vws {
+		w := &Weights{}
+
+		for j, v := range vw.Weights {
+			if v > 0 {
+				lst := &IntList{
+					Vals: []int{vw.Vals[j], v},
 				}
 
 				w.Entries = append(w.Entries, lst)
