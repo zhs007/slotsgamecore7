@@ -42,7 +42,24 @@ func NewValWeights(vals []int, weights []int) (*ValWeights, error) {
 	return vw, nil
 }
 
+func (vw *ValWeights) Clone() *ValWeights {
+	nvw := &ValWeights{
+		Vals:      make([]int, len(vw.Vals)),
+		Weights:   make([]int, len(vw.Weights)),
+		MaxWeight: vw.MaxWeight,
+	}
+
+	copy(nvw.Vals, vw.Vals)
+	copy(nvw.Weights, vw.Weights)
+
+	return nvw
+}
+
 func (vw *ValWeights) RandVal(plugin sgc7plugin.IPlugin) (int, error) {
+	if len(vw.Vals) == 1 {
+		return vw.Vals[0], nil
+	}
+
 	ci, err := RandWithWeights(plugin, vw.MaxWeight, vw.Weights)
 	if err != nil {
 		goutils.Error("ValWeights.RandVal:RandWithWeights",
@@ -52,6 +69,33 @@ func (vw *ValWeights) RandVal(plugin sgc7plugin.IPlugin) (int, error) {
 	}
 
 	return vw.Vals[ci], nil
+}
+
+// CloneExcludeVal - clone & exclude a val
+func (vw *ValWeights) CloneExcludeVal(val int) (*ValWeights, error) {
+	if len(vw.Vals) <= 1 {
+		goutils.Error("ValWeights.RandVal:CloneExcludeVal",
+			zap.Error(ErrInvalidValWeights))
+
+		return nil, ErrInvalidValWeights
+	}
+
+	nvw := vw.Clone()
+
+	for i, v := range vw.Vals {
+		if v == val {
+			nvw.Vals = append(nvw.Vals[0:i], nvw.Vals[i+1:]...)
+			nvw.Weights = append(nvw.Weights[0:i], nvw.Weights[i+1:]...)
+			nvw.MaxWeight -= vw.Weights[i]
+
+			return nvw, nil
+		}
+	}
+
+	goutils.Error("ValWeights.RandVal:CloneExcludeVal",
+		zap.Error(ErrInvalidValWeightsVal))
+
+	return nil, ErrInvalidValWeightsVal
 }
 
 // LoadValWeightsFromExcel - load xlsx file
