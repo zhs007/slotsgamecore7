@@ -4,6 +4,16 @@ This is a golang project for slots game.
 
 ### Update log
 
+##### v0.10
+
+- add math toolset
+
+##### v0.9
+
+- support for xlsx configuration files
+- generate xml configuration file (support for Relax GameEngine)
+- upgrade RTP statistics
+
 ##### v0.8
 
 - support gameserver
