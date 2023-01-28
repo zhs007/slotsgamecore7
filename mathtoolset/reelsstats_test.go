@@ -24,5 +24,8 @@ func Test_BuildReelsStats(t *testing.T) {
 	assert.Equal(t, len(rss.Reels[3].MapSymbols), 13)
 	assert.Equal(t, len(rss.Reels[4].MapSymbols), 12)
 
+	err = rss.SaveExcel("../unittestdata/reelsstats.xlsx")
+	assert.NoError(t, err)
+
 	t.Logf("Test_BuildReelsStats OK")
 }

@@ -1,6 +1,10 @@
 package mathtoolset
 
 import (
+	"fmt"
+	"sort"
+
+	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
@@ -51,7 +55,64 @@ func BuildReelStats(reel []int) (*ReelStats, error) {
 }
 
 type ReelsStats struct {
-	Reels []*ReelStats
+	Reels   []*ReelStats
+	Symbols []SymbolType
+}
+
+func (rss *ReelsStats) HasSymbols(symbol SymbolType) bool {
+	for _, v := range rss.Symbols {
+		if v == symbol {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (rss *ReelsStats) buildMapSymbols() {
+	rss.Symbols = nil
+
+	for _, r := range rss.Reels {
+		for s := range r.MapSymbols {
+			if !rss.HasSymbols(s) {
+				rss.Symbols = append(rss.Symbols, s)
+			}
+		}
+	}
+
+	sort.Slice(rss.Symbols, func(i, j int) bool {
+		return rss.Symbols[i] < rss.Symbols[j]
+	})
+}
+
+func (rss *ReelsStats) SaveExcel(fn string) error {
+	f := excelize.NewFile()
+
+	sheet := f.GetSheetName(0)
+
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "symbol")
+	for i := range rss.Reels {
+		f.SetCellStr(sheet, goutils.Pos2Cell(i+1, 0), fmt.Sprintf("reel%v", i+1))
+	}
+
+	y := 1
+
+	for _, s := range rss.Symbols {
+		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), int(s))
+
+		for i, reel := range rss.Reels {
+			statsSymbol, isok := reel.MapSymbols[s]
+			if isok {
+				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), statsSymbol.Num)
+			} else {
+				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), 0)
+			}
+		}
+
+		y++
+	}
+
+	return f.SaveAs(fn)
 }
 
 func BuildReelsStats(reels *sgc7game.ReelsData) (*ReelsStats, error) {
@@ -70,6 +131,8 @@ func BuildReelsStats(reels *sgc7game.ReelsData) (*ReelsStats, error) {
 
 		rss.Reels[i] = rs
 	}
+
+	rss.buildMapSymbols()
 
 	return rss, nil
 }
