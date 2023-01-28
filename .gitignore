@@ -19,3 +19,5 @@ unittestdata/rtptesttag.csv
 unittestdata/rtptesttag1.csv
 utils/*.log
 unittestdata/relaxconfig.xml
+unittestdata/reelsstats.xlsx
+unittestdata/symbolswinsstats.xlsx
