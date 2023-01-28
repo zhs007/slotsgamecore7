@@ -15,7 +15,7 @@ type SymbolStats struct {
 	Num    int
 }
 
-func NewSymbolStats(s SymbolType, num int) *SymbolStats {
+func newSymbolStats(s SymbolType, num int) *SymbolStats {
 	return &SymbolStats{
 		Symbol: s,
 		Num:    num,
@@ -23,7 +23,19 @@ func NewSymbolStats(s SymbolType, num int) *SymbolStats {
 }
 
 type ReelStats struct {
-	MapSymbols map[SymbolType]*SymbolStats
+	MapSymbols     map[SymbolType]*SymbolStats
+	TotalSymbolNum int
+}
+
+func (rs *ReelStats) GetSymbolStats(symbol SymbolType) *SymbolStats {
+	v, isok := rs.MapSymbols[symbol]
+	if isok {
+		return v
+	}
+
+	rs.MapSymbols[symbol] = newSymbolStats(symbol, 0)
+
+	return rs.MapSymbols[symbol]
 }
 
 func NewReelStats() *ReelStats {
@@ -43,13 +55,11 @@ func BuildReelStats(reel []int) (*ReelStats, error) {
 	rs := NewReelStats()
 
 	for _, s := range reel {
-		v, isok := rs.MapSymbols[SymbolType(s)]
-		if !isok {
-			rs.MapSymbols[SymbolType(s)] = NewSymbolStats(SymbolType(s), 1)
-		} else {
-			v.Num++
-		}
+		ss := rs.GetSymbolStats(SymbolType(s))
+		ss.Num++
 	}
+
+	rs.TotalSymbolNum = len(reel)
 
 	return rs, nil
 }
@@ -69,7 +79,7 @@ func (rss *ReelsStats) HasSymbols(symbol SymbolType) bool {
 	return false
 }
 
-func (rss *ReelsStats) buildMapSymbols() {
+func (rss *ReelsStats) buildSortedSymbols() {
 	rss.Symbols = nil
 
 	for _, r := range rss.Reels {
@@ -112,6 +122,10 @@ func (rss *ReelsStats) SaveExcel(fn string) error {
 		y++
 	}
 
+	for i, rs := range rss.Reels {
+		f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
+	}
+
 	return f.SaveAs(fn)
 }
 
@@ -132,7 +146,7 @@ func BuildReelsStats(reels *sgc7game.ReelsData) (*ReelsStats, error) {
 		rss.Reels[i] = rs
 	}
 
-	rss.buildMapSymbols()
+	rss.buildSortedSymbols()
 
 	return rss, nil
 }
