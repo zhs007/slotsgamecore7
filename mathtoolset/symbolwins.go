@@ -10,6 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
+type SymbolsWinsFileMode int
+
+const (
+	RTPMode     SymbolsWinsFileMode = 1
+	WinsNumMode SymbolsWinsFileMode = 2
+	WinsMode    SymbolsWinsFileMode = 3
+)
+
 type SymbolWinsStats struct {
 	Symbol  SymbolType
 	WinsNum []int64
@@ -49,7 +57,7 @@ func (ssws *SymbolsWinsStats) buildSortedSymbols() {
 	})
 }
 
-func (ssws *SymbolsWinsStats) SaveExcel(fn string) error {
+func (ssws *SymbolsWinsStats) SaveExcel(fn string, fm SymbolsWinsFileMode) error {
 	f := excelize.NewFile()
 
 	sheet := f.GetSheetName(0)
@@ -71,7 +79,14 @@ func (ssws *SymbolsWinsStats) SaveExcel(fn string) error {
 
 		for i := 0; i < ssws.Num; i++ {
 			sws := ssws.GetSymbolWinsStats(s)
-			f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.Wins[i])
+
+			if fm == RTPMode {
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), float64(sws.Wins[i])*100.0/float64(ssws.Total))
+			} else if fm == WinsNumMode {
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.WinsNum[i])
+			} else {
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.Wins[i])
+			}
 		}
 
 		y++
@@ -118,7 +133,9 @@ func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, symbol SymbolType, num int) 
 	return curwins
 }
 
-func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData, symbols []SymbolType) (*SymbolsWinsStats, error) {
+func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
+	symbols []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
+
 	rss, err := BuildReelsStats(reels)
 	if err != nil {
 		goutils.Error("AnalyzeReelsWithLine:BuildReelsStats",
@@ -134,6 +151,8 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 		ssws.Total *= int64(len(arr))
 	}
 
+	ssws.Total *= int64(betMul)
+
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
 
@@ -142,7 +161,7 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 			for i := 0; i < len(arrPay); i++ {
 				if arrPay[i] > 0 {
 					sws.WinsNum[i] = CalcSymbolWinsInReelsWithLine(rss, s, i+1)
-					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i]
+					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
 				}
 			}
 		}
