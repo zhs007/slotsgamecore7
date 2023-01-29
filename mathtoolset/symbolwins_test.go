@@ -20,7 +20,7 @@ func Test_AnalyzeReelsWithLine(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, ssws)
 
-	err = ssws.SaveExcel("../unittestdata/symbolswinsstats.xlsx", RTPMode)
+	err = ssws.SaveExcel("../unittestdata/symbolswinsstats.xlsx", SWFModeRTP)
 	assert.NoError(t, err)
 
 	t.Logf("Test_AnalyzeReelsWithLine OK")

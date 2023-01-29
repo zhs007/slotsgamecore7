@@ -95,6 +95,149 @@ func (rss *ReelsStats) buildSortedSymbols() {
 	})
 }
 
+func (rss *ReelsStats) GetNum(reelindex int, symbol SymbolType, symbol2 SymbolType,
+	wilds []SymbolType, irstype InReelSymbolType) int {
+
+	if irstype == IRSTypeAll {
+		return rss.Reels[reelindex].TotalSymbolNum
+	}
+
+	if irstype == IRSTypeSymbol2 || irstype == IRSTypeSymbol2AndWild {
+		if symbol2 < 0 {
+			return -1
+		}
+
+		s2s := rss.Reels[reelindex].GetSymbolStats(symbol2)
+
+		if irstype == IRSTypeSymbol2 {
+			return s2s.Num
+		}
+
+		wildnum := 0
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[reelindex].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		return s2s.Num + wildnum
+	}
+
+	wildnum := 0
+
+	if irstype == IRSTypeWild ||
+		irstype == IRSTypeNoSymbolAndNoWild ||
+		irstype == IRSTypeSymbolAndWild ||
+		irstype == IRSTypeNoWild {
+
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[reelindex].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		if irstype == IRSTypeWild {
+			return wildnum
+		}
+
+		if irstype == IRSTypeNoWild {
+			return rss.Reels[reelindex].TotalSymbolNum - wildnum
+		}
+	}
+
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	if irstype == IRSTypeSymbol {
+		return ss.Num
+	}
+
+	if irstype == IRSTypeSymbolAndWild {
+		return ss.Num + wildnum
+	}
+
+	if irstype == IRSTypeNoSymbolAndNoWild {
+		return rss.Reels[reelindex].TotalSymbolNum - ss.Num - wildnum
+	}
+
+	return -1
+}
+
+func (rss *ReelsStats) GetSymbolNum(reelindex int, symbol SymbolType, wilds []SymbolType) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	wildnum := 0
+	for _, w := range wilds {
+		if w == symbol {
+			continue
+		}
+
+		ws := rss.Reels[reelindex].GetSymbolStats(w)
+		if ws.Num > 0 {
+			wildnum += ws.Num
+		}
+	}
+
+	return ss.Num + wildnum
+}
+
+func (rss *ReelsStats) GetSymbolNumNoWild(reelindex int, symbol SymbolType, wilds []SymbolType) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	if HasSymbol(wilds, symbol) {
+		wildnum := 0
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[reelindex].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		return ss.Num + wildnum
+	}
+
+	return ss.Num
+}
+
+func (rss *ReelsStats) GetReelLengthNoSymbol(reelindex int, symbol SymbolType, wilds []SymbolType) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	if HasSymbol(wilds, symbol) {
+		wildnum := 0
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[reelindex].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		return rss.Reels[reelindex].TotalSymbolNum - (ss.Num + wildnum)
+	}
+
+	return rss.Reels[reelindex].TotalSymbolNum - ss.Num
+}
+
+func (rss *ReelsStats) GetReelLength(reelindex int) int {
+	return rss.Reels[reelindex].TotalSymbolNum
+}
+
 func (rss *ReelsStats) SaveExcel(fn string) error {
 	f := excelize.NewFile()
 
