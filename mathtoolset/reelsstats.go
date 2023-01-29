@@ -95,6 +95,72 @@ func (rss *ReelsStats) buildSortedSymbols() {
 	})
 }
 
+func (rss *ReelsStats) GetSymbolNum(reelindex int, symbol SymbolType, wilds []SymbolType) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	wildnum := 0
+	for _, w := range wilds {
+		if w == symbol {
+			continue
+		}
+
+		ws := rss.Reels[reelindex].GetSymbolStats(w)
+		if ws.Num > 0 {
+			wildnum += ws.Num
+		}
+	}
+
+	return ss.Num + wildnum
+}
+
+func (rss *ReelsStats) GetSymbolNumNoWild(reelindex int, symbol SymbolType, wilds []SymbolType) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	if HasSymbol(wilds, symbol) {
+		wildnum := 0
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[reelindex].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		return ss.Num + wildnum
+	}
+
+	return ss.Num
+}
+
+func (rss *ReelsStats) GetReelLengthNoSymbol(reelindex int, symbol SymbolType, wilds []SymbolType) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	if HasSymbol(wilds, symbol) {
+		wildnum := 0
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[reelindex].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		return rss.Reels[reelindex].TotalSymbolNum - (ss.Num + wildnum)
+	}
+
+	return rss.Reels[reelindex].TotalSymbolNum - ss.Num
+}
+
+func (rss *ReelsStats) GetReelLength(reelindex int) int {
+	return rss.Reels[reelindex].TotalSymbolNum
+}
+
 func (rss *ReelsStats) SaveExcel(fn string) error {
 	f := excelize.NewFile()
 

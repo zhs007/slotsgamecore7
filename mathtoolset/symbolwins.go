@@ -114,14 +114,41 @@ func newSymbolsWinsStatsWithPaytables(paytables *sgc7game.PayTables, symbols []S
 	return ssws
 }
 
-func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, num int) int64 {
+// w X wildnum >= symbol X num
+func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, num int, wildnum int) int64 {
 	curwins := int64(1)
+
+	// if symbol is wild
+	if HasSymbol(wilds, symbol) {
+		for i := 0; i < num; i++ {
+			cn := rss.GetSymbolNum(i, symbol, wilds)
+
+			if cn <= 0 {
+				return 0
+			}
+
+			curwins *= int64(cn)
+		}
+
+		if num == len(rss.Reels) {
+			return curwins
+		}
+
+		curwins *= int64(rss.GetReelLengthNoSymbol(num, symbol, wilds))
+
+		for i := num + 1; i < len(rss.Reels); i++ {
+			curwins *= int64(rss.GetReelLength(i))
+		}
+
+		return curwins
+	}
+
+	if wildnum <= 0 || wildnum >= len(rss.Reels) {
+
+	}
 
 	for i := 0; i < num; i++ {
 		ss := rss.Reels[i].GetSymbolStats(symbol)
-		if ss.Num <= 0 {
-			return 0
-		}
 
 		wildnum := 0
 		for _, w := range wilds {
@@ -135,7 +162,15 @@ func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, wilds []SymbolType, symbol S
 			}
 		}
 
+		if ss.Num <= 0 && wildnum <= 0 {
+			return 0
+		}
+
 		curwins *= int64(ss.Num + wildnum)
+	}
+
+	if num == len(rss.Reels) {
+		return curwins
 	}
 
 	for i := num; i < len(rss.Reels); i++ {
@@ -143,6 +178,19 @@ func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, wilds []SymbolType, symbol S
 	}
 
 	return curwins
+}
+
+func analyzeWildNum(paytables *sgc7game.PayTables, symbol SymbolType, num int, wild SymbolType) int {
+	sp := paytables.MapPay[int(symbol)][num-1]
+	warr := paytables.MapPay[int(wild)]
+
+	for i := 0; i < len(warr); i++ {
+		if warr[i] >= sp {
+			return i + 1
+		}
+	}
+
+	return 0
 }
 
 func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
@@ -172,7 +220,7 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 		if isok {
 			for i := 0; i < len(arrPay); i++ {
 				if arrPay[i] > 0 {
-					sws.WinsNum[i] = CalcSymbolWinsInReelsWithLine(rss, wilds, s, i+1)
+					sws.WinsNum[i] = CalcSymbolWinsInReelsWithLine(rss, wilds, s, i+1, analyzeWildNum(paytables, s, i+1, wilds[0]))
 					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
 				}
 			}
