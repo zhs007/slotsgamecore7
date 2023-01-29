@@ -8,4 +8,7 @@ var (
 
 	// ErrInvalidReel - invalid reel
 	ErrInvalidReel = errors.New("invalid reel")
+
+	// ErrInvalidInReelSymbolType - invalid InReelSymbolType
+	ErrInvalidInReelSymbolType = errors.New("invalid InReelSymbolType")
 )
