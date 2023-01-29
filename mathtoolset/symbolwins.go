@@ -114,7 +114,7 @@ func newSymbolsWinsStatsWithPaytables(paytables *sgc7game.PayTables, symbols []S
 	return ssws
 }
 
-func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, symbol SymbolType, num int) int64 {
+func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, num int) int64 {
 	curwins := int64(1)
 
 	for i := 0; i < num; i++ {
@@ -123,7 +123,19 @@ func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, symbol SymbolType, num int) 
 			return 0
 		}
 
-		curwins *= int64(ss.Num)
+		wildnum := 0
+		for _, w := range wilds {
+			if w == symbol {
+				continue
+			}
+
+			ws := rss.Reels[i].GetSymbolStats(w)
+			if ws.Num > 0 {
+				wildnum += ws.Num
+			}
+		}
+
+		curwins *= int64(ss.Num + wildnum)
 	}
 
 	for i := num; i < len(rss.Reels); i++ {
@@ -134,7 +146,7 @@ func CalcSymbolWinsInReelsWithLine(rss *ReelsStats, symbol SymbolType, num int) 
 }
 
 func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
-	symbols []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, wilds []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
 
 	rss, err := BuildReelsStats(reels)
 	if err != nil {
@@ -160,7 +172,7 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 		if isok {
 			for i := 0; i < len(arrPay); i++ {
 				if arrPay[i] > 0 {
-					sws.WinsNum[i] = CalcSymbolWinsInReelsWithLine(rss, s, i+1)
+					sws.WinsNum[i] = CalcSymbolWinsInReelsWithLine(rss, wilds, s, i+1)
 					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
 				}
 			}
