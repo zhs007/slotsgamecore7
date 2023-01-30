@@ -450,15 +450,15 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 }
 
 // calcScatterWinsInReels -
-func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, num int, lst []int, ci int) (int64, error) {
+func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, num int, lst []int, ci int, height int) (int64, error) {
 	if len(lst) == num {
 		curwin := int64(1)
 
 		for i := 0; i < len(rss.Reels); i++ {
 			if goutils.IndexOfIntSlice(lst, i, 0) >= 0 {
-				curwin *= int64(rss.GetNum(i, symbol, -1, nil, IRSTypeSymbol))
+				curwin *= int64(rss.GetScatterNum(i, symbol, IRSTypeSymbol, height))
 			} else {
-				curwin *= int64(rss.GetNum(i, symbol, -1, nil, IRSTypeNoSymbol))
+				curwin *= int64(rss.GetScatterNum(i, symbol, IRSTypeNoSymbol, height))
 			}
 		}
 
@@ -480,7 +480,7 @@ func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 			lst = append(lst, ci)
 		}
 
-		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, ci+1)
+		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, ci+1, height)
 		if err != nil {
 			goutils.Error("calcScatterWinsInReels:calcScatterWinsInReels",
 				zap.Error(err))
@@ -495,7 +495,7 @@ func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 }
 
 // CalcScatterWinsInReels -
-func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, num int) (int64, error) {
+func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, num int, height int) (int64, error) {
 	curwins := int64(0)
 
 	for t := 0; t <= 1; t++ {
@@ -505,7 +505,7 @@ func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 			lst = append(lst, 0)
 		}
 
-		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, 1)
+		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, 1, height)
 		if err != nil {
 			goutils.Error("CalcScatterWinsInReels:calcScatterWinsInReels",
 				zap.Error(err))
@@ -520,7 +520,7 @@ func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 }
 
 func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
-	symbols []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, height int) (*SymbolsWinsStats, error) {
 
 	rss, err := BuildReelsStats(reels)
 	if err != nil {
@@ -537,7 +537,7 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 		ssws.Total *= int64(len(arr))
 	}
 
-	ssws.Total *= int64(betMul)
+	// ssws.Total *= int64(betMul)
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -546,7 +546,7 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 		if isok {
 			for i := 0; i < len(arrPay); i++ {
 				if arrPay[i] > 0 {
-					cw, err := CalcScatterWinsInReels(paytables, rss, s, i+1)
+					cw, err := CalcScatterWinsInReels(paytables, rss, s, i+1, height)
 					if err != nil {
 						goutils.Error("AnalyzeReelsScatter:CalcScatterWinsInReels",
 							zap.Error(err))
@@ -555,7 +555,7 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 					}
 
 					sws.WinsNum[i] = cw
-					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
+					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i]
 				}
 			}
 		}
