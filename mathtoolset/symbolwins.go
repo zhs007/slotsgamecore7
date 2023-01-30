@@ -205,7 +205,7 @@ func calcNotWildWins(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, num
 func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symbols []SymbolType,
 	wilds []SymbolType, symbol SymbolType, ci int, num int, lst []InReelSymbolType, wildPayoutSymbol SymbolType, wildNum int) (int64, error) {
 
-	if ci == num-1 {
+	if ci == num {
 		// 如果 wild 赔付就是 sumbol，那么需要处理3w以后的可能性
 		if wildPayoutSymbol == symbol {
 			// 如果要计算 3a，如果是w开头，且前面至少有1个a，那么第4个只要不是a和w就好了
@@ -354,6 +354,10 @@ func CalcSymbolWinsInReelsWithLine(paytables *sgc7game.PayTables, rss *ReelsStat
 }
 
 func analyzeWildNum(paytables *sgc7game.PayTables, symbol SymbolType, num int, wild SymbolType) int {
+	if symbol == wild {
+		return 0
+	}
+
 	sp := paytables.MapPay[int(symbol)][num-1]
 	warr := paytables.MapPay[int(wild)]
 
