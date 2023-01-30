@@ -289,6 +289,13 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 			return CalcSymbolWins(rss, wilds, symbol, -1, lst)
 		}
 
+		// 第2种情况
+		if wildPayoutSymbol != symbol && wildNum > 0 && ci == wildNum {
+			if IsFirstWild(lst, ci) {
+				return 0, nil
+			}
+		}
+
 		lst[ci] = IRSTypeNoSymbolAndNoWild
 		for j := ci + 1; j < len(rss.Reels); j++ {
 			lst[j] = IRSTypeAll
