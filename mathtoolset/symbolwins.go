@@ -295,8 +295,8 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 	}
 
 	// 第2种情况
-	if wildPayoutSymbol != symbol && wildNum > 0 && ci == wildNum-1 {
-		if IsFirstWild(lst, ci-1) {
+	if wildPayoutSymbol != symbol && wildNum > 0 && ci == wildNum {
+		if IsFirstWild(lst, ci) {
 			return 0, nil
 		}
 	}
