@@ -169,6 +169,10 @@ func (rss *ReelsStats) GetNum(reelindex int, symbol SymbolType, symbol2 SymbolTy
 		return rss.Reels[reelindex].TotalSymbolNum - ss.Num - wildnum
 	}
 
+	if irstype == IRSTypeNoSymbol {
+		return rss.Reels[reelindex].TotalSymbolNum - ss.Num
+	}
+
 	return -1
 }
 
