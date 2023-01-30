@@ -472,8 +472,8 @@ func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 	totalwin := int64(0)
 
 	for t := 0; t <= 1; t++ {
-		if len(lst) > ci {
-			lst = lst[0:ci]
+		if len(lst) >= ci {
+			lst = lst[0 : ci-1]
 		}
 
 		if t == 0 {
