@@ -206,6 +206,13 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 	wilds []SymbolType, symbol SymbolType, ci int, num int, lst []InReelSymbolType, wildPayoutSymbol SymbolType, wildNum int) (int64, error) {
 
 	if ci == num {
+		// 第2种情况
+		if wildPayoutSymbol != symbol && wildNum > 0 && ci == wildNum {
+			if IsFirstWild(lst, ci) {
+				return 0, nil
+			}
+		}
+
 		if ci == len(rss.Reels) {
 			return CalcSymbolWins(rss, wilds, symbol, -1, lst)
 		}
@@ -287,13 +294,6 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 			lst[ci] = IRSTypeNoSymbolAndNoWild
 
 			return CalcSymbolWins(rss, wilds, symbol, -1, lst)
-		}
-
-		// 第2种情况
-		if wildPayoutSymbol != symbol && wildNum > 0 && ci == wildNum {
-			if IsFirstWild(lst, ci) {
-				return 0, nil
-			}
 		}
 
 		lst[ci] = IRSTypeNoSymbolAndNoWild
