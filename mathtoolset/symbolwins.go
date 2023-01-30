@@ -206,13 +206,12 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 	wilds []SymbolType, symbol SymbolType, ci int, num int, lst []InReelSymbolType, wildPayoutSymbol SymbolType, wildNum int) (int64, error) {
 
 	if ci == num {
+		if ci == len(rss.Reels) {
+			return CalcSymbolWins(rss, wilds, symbol, -1, lst)
+		}
+
 		// 如果 wild 赔付就是 sumbol，那么需要处理3w以后的可能性
 		if wildPayoutSymbol == symbol {
-
-			if ci == len(rss.Reels) {
-				return CalcSymbolWins(rss, wilds, symbol, -1, lst)
-			}
-
 			// 如果要计算 3a，如果是w开头，且前面至少有1个a，那么第4个只要不是a和w就好了
 			if IsFirstWild(lst, num) {
 				// 如果是 3w，用加法来算
@@ -290,8 +289,12 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 			return CalcSymbolWins(rss, wilds, symbol, -1, lst)
 		}
 
-		// 否则，直接返回0
-		return 0, nil
+		lst[ci] = IRSTypeNoSymbolAndNoWild
+		for j := ci + 1; j < len(rss.Reels); j++ {
+			lst[j] = IRSTypeAll
+		}
+
+		return CalcSymbolWins(rss, wilds, symbol, -1, lst)
 	}
 
 	// 第2种情况
