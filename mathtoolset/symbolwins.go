@@ -302,7 +302,7 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 
 	curwins := int64(0)
 
-	for t := IRSTypeSymbol; t < IRSTypeWild; t++ {
+	for t := IRSTypeSymbol; t <= IRSTypeWild; t++ {
 		lst[ci] = t
 
 		cw, err := calcSymbolWinsFromList(paytables, rss, symbols, wilds, symbol, ci+1, num, lst, wildPayoutSymbol, wildNum)
