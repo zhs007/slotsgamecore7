@@ -449,6 +449,123 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 	return ssws, nil
 }
 
+// calcScatterWinsInReels -
+func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, num int, lst []int, ci int) (int64, error) {
+	if len(lst) == num {
+		curwin := int64(1)
+
+		for i := 0; i < len(rss.Reels); i++ {
+			if goutils.IndexOfIntSlice(lst, i, 0) >= 0 {
+				curwin *= int64(rss.GetNum(i, symbol, -1, nil, IRSTypeSymbol))
+			} else {
+				curwin *= int64(rss.GetNum(i, symbol, -1, nil, IRSTypeNoSymbol))
+			}
+		}
+
+		return curwin, nil
+	}
+
+	if ci == len(rss.Reels) {
+		return 0, nil
+	}
+
+	totalwin := int64(0)
+
+	for t := 0; t <= 1; t++ {
+		if len(lst) > ci {
+			lst = lst[0:ci]
+		}
+
+		if t == 0 {
+			lst = append(lst, ci)
+		}
+
+		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, ci+1)
+		if err != nil {
+			goutils.Error("calcScatterWinsInReels:calcScatterWinsInReels",
+				zap.Error(err))
+
+			return 0, err
+		}
+
+		totalwin += cw
+	}
+
+	return totalwin, nil
+}
+
+// CalcScatterWinsInReels -
+func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, num int) (int64, error) {
+	curwins := int64(0)
+
+	for t := 0; t <= 1; t++ {
+		lst := []int{}
+
+		if t == 0 {
+			lst = append(lst, 0)
+		}
+
+		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, 1)
+		if err != nil {
+			goutils.Error("CalcScatterWinsInReels:calcScatterWinsInReels",
+				zap.Error(err))
+
+			return 0, err
+		}
+
+		curwins += cw
+	}
+
+	return curwins, nil
+}
+
+func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
+	symbols []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
+
+	rss, err := BuildReelsStats(reels)
+	if err != nil {
+		goutils.Error("AnalyzeReelsWithScatter:BuildReelsStats",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
+
+	ssws.Total = 1
+	for _, arr := range reels.Reels {
+		ssws.Total *= int64(len(arr))
+	}
+
+	ssws.Total *= int64(betMul)
+
+	for _, s := range symbols {
+		sws := ssws.GetSymbolWinsStats(s)
+
+		arrPay, isok := paytables.MapPay[int(s)]
+		if isok {
+			for i := 0; i < len(arrPay); i++ {
+				if arrPay[i] > 0 {
+					cw, err := CalcScatterWinsInReels(paytables, rss, s, i+1)
+					if err != nil {
+						goutils.Error("AnalyzeReelsScatter:CalcScatterWinsInReels",
+							zap.Error(err))
+
+						return nil, err
+					}
+
+					sws.WinsNum[i] = cw
+					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
+				}
+			}
+		}
+	}
+
+	ssws.buildSortedSymbols()
+
+	return ssws, nil
+}
+
 func NewSymbolsWinsStats(num int) *SymbolsWinsStats {
 	return &SymbolsWinsStats{
 		MapSymbols: make(map[SymbolType]*SymbolWinsStats),

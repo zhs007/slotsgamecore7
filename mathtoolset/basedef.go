@@ -11,8 +11,9 @@ const (
 	IRSTypeSymbolAndWild     InReelSymbolType = 3
 	IRSTypeNoSymbolAndNoWild InReelSymbolType = 4
 	IRSTypeNoWild            InReelSymbolType = 5
-	IRSTypeSymbol2           InReelSymbolType = 6
-	IRSTypeSymbol2AndWild    InReelSymbolType = 7
+	IRSTypeNoSymbol          InReelSymbolType = 6
+	IRSTypeSymbol2           InReelSymbolType = 7
+	IRSTypeSymbol2AndWild    InReelSymbolType = 8
 )
 
 func HasSymbol(symbols []SymbolType, symbol SymbolType) bool {
