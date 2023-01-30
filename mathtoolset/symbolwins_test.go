@@ -35,7 +35,7 @@ func Test_AnalyzeReelsScatter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, paytables)
 
-	ssws, err := AnalyzeReelsScatter(paytables, reels, []SymbolType{11}, 10, 10)
+	ssws, err := AnalyzeReelsScatter(paytables, reels, []SymbolType{11}, 3)
 	assert.NoError(t, err)
 	assert.NotNil(t, ssws)
 
