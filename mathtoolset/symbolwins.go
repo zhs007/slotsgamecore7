@@ -537,8 +537,6 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 		ssws.Total *= int64(len(arr))
 	}
 
-	// ssws.Total *= int64(betMul)
-
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
 

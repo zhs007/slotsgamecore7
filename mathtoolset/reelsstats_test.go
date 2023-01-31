@@ -27,6 +27,17 @@ func Test_BuildReelsStats(t *testing.T) {
 	err = rss.SaveExcel("../unittestdata/reelsstats.xlsx")
 	assert.NoError(t, err)
 
+	rss2, err := LoadReelsStats("../unittestdata/reelsstats.xlsx")
+	assert.NoError(t, err)
+	assert.NotNil(t, rss2)
+
+	assert.Equal(t, len(rss2.Reels), 5)
+	assert.Equal(t, len(rss2.Reels[0].MapSymbols), 13)
+	assert.Equal(t, len(rss2.Reels[1].MapSymbols), 13)
+	assert.Equal(t, len(rss2.Reels[2].MapSymbols), 13)
+	assert.Equal(t, len(rss2.Reels[3].MapSymbols), 13)
+	assert.Equal(t, len(rss2.Reels[4].MapSymbols), 13)
+
 	t.Logf("Test_BuildReelsStats OK")
 }
 
