@@ -39,6 +39,13 @@ func (rs *ReelStats) GetSymbolStats(symbol SymbolType) *SymbolStats {
 	return rs.MapSymbols[symbol]
 }
 
+func (rs *ReelStats) AddSymbol(symbol SymbolType, num int) {
+	ss := rs.GetSymbolStats(symbol)
+
+	ss.Num += num
+	rs.TotalSymbolNum += num
+}
+
 func NewReelStats() *ReelStats {
 	return &ReelStats{
 		MapSymbols: make(map[SymbolType]*SymbolStats),
@@ -75,8 +82,26 @@ type ReelsStats struct {
 	Symbols []SymbolType
 }
 
-func (rss *ReelsStats) Add(symbol SymbolType) {
+func (rss *ReelsStats) CloneWithMapping(mapSymbols *SymbolsMapping) *ReelsStats {
+	nrss := &ReelsStats{}
 
+	for _, rs := range rss.Reels {
+		nrs := NewReelStats()
+
+		for s, ss := range rs.MapSymbols {
+			if mapSymbols != nil && mapSymbols.Has(s) {
+				nrs.AddSymbol(mapSymbols.MapSymbols[s], ss.Num)
+			} else {
+				nrs.AddSymbol(s, ss.Num)
+			}
+		}
+
+		nrss.Reels = append(nrss.Reels, nrs)
+	}
+
+	nrss.buildSortedSymbols()
+
+	return nrss
 }
 
 func (rss *ReelsStats) HasSymbols(symbol SymbolType) bool {
@@ -457,8 +482,7 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 		rs := NewReelStats()
 
 		for s, arr := range mapSymbols {
-			ss := rs.GetSymbolStats(s)
-			ss.Num = arr[i]
+			rs.AddSymbol(s, arr[i])
 		}
 
 		rss.Reels = append(rss.Reels, rs)

@@ -128,6 +128,10 @@ func CalcSymbolWins(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, symb
 			return 0, ErrInvalidInReelSymbolType
 		}
 
+		if cn == 0 {
+			return 0, nil
+		}
+
 		curwins *= int64(cn)
 	}
 
