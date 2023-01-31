@@ -16,7 +16,10 @@ func Test_AnalyzeReelsWithLine(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, paytables)
 
-	ssws, err := AnalyzeReelsWithLine(paytables, reels, []SymbolType{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, []SymbolType{0}, 10, 10)
+	ms := NewSymbolsMapping()
+	ms.Add(12, 1)
+
+	ssws, err := AnalyzeReelsWithLine(paytables, reels, []SymbolType{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, []SymbolType{0}, ms, 10, 10)
 	assert.NoError(t, err)
 	assert.NotNil(t, ssws)
 
@@ -35,7 +38,10 @@ func Test_AnalyzeReelsScatter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, paytables)
 
-	ssws, err := AnalyzeReelsScatter(paytables, reels, []SymbolType{11}, 3)
+	ms := NewSymbolsMapping()
+	ms.Add(12, 1)
+
+	ssws, err := AnalyzeReelsScatter(paytables, reels, []SymbolType{11}, ms, 3)
 	assert.NoError(t, err)
 	assert.NotNil(t, ssws)
 
