@@ -11,4 +11,10 @@ var (
 
 	// ErrInvalidInReelSymbolType - invalid InReelSymbolType
 	ErrInvalidInReelSymbolType = errors.New("invalid InReelSymbolType")
+
+	// ErrInvalidReelsStatsExcelFile - invalid ReelsStats excel file
+	ErrInvalidReelsStatsExcelFile = errors.New("invalid ReelsStats excel file")
+
+	// ErrInvalidReelsStatsExcelColname - invalid ReelsStats excel colname
+	ErrInvalidReelsStatsExcelColname = errors.New("invalid ReelsStats excel colname")
 )
