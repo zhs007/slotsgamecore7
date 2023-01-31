@@ -44,7 +44,7 @@ func NewReelStats() *ReelStats {
 	}
 }
 
-func BuildReelStats(reel []int) (*ReelStats, error) {
+func BuildReelStats(reel []int, mapSymbols *SymbolsMapping) (*ReelStats, error) {
 	if len(reel) == 0 {
 		goutils.Error("ReelStats.AnalyzeReel",
 			zap.Error(ErrInvalidReel))
@@ -55,7 +55,12 @@ func BuildReelStats(reel []int) (*ReelStats, error) {
 	rs := NewReelStats()
 
 	for _, s := range reel {
-		ss := rs.GetSymbolStats(SymbolType(s))
+		st := SymbolType(s)
+		if mapSymbols != nil && mapSymbols.Has(st) {
+			st = mapSymbols.MapSymbols[st]
+		}
+
+		ss := rs.GetSymbolStats(st)
 		ss.Num++
 	}
 
@@ -290,13 +295,13 @@ func (rss *ReelsStats) SaveExcel(fn string) error {
 	return f.SaveAs(fn)
 }
 
-func BuildReelsStats(reels *sgc7game.ReelsData) (*ReelsStats, error) {
+func BuildReelsStats(reels *sgc7game.ReelsData, mapSymbols *SymbolsMapping) (*ReelsStats, error) {
 	rss := &ReelsStats{
 		Reels: make([]*ReelStats, len(reels.Reels)),
 	}
 
 	for i, r := range reels.Reels {
-		rs, err := BuildReelStats(r)
+		rs, err := BuildReelStats(r, mapSymbols)
 		if err != nil {
 			goutils.Error("BuildReelsStats:BuildReelStats",
 				zap.Error(err))

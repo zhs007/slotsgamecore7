@@ -403,9 +403,9 @@ func getMaxPayoutSymbol(paytables *sgc7game.PayTables, symbols []SymbolType, num
 }
 
 func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
-	symbols []SymbolType, wilds []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, wilds []SymbolType, mapSymbols *SymbolsMapping, betMul int, lineNum int) (*SymbolsWinsStats, error) {
 
-	rss, err := BuildReelsStats(reels)
+	rss, err := BuildReelsStats(reels, mapSymbols)
 	if err != nil {
 		goutils.Error("AnalyzeReelsWithLine:BuildReelsStats",
 			zap.Error(err))
@@ -520,9 +520,9 @@ func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 }
 
 func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsData,
-	symbols []SymbolType, height int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, mapSymbols *SymbolsMapping, height int) (*SymbolsWinsStats, error) {
 
-	rss, err := BuildReelsStats(reels)
+	rss, err := BuildReelsStats(reels, mapSymbols)
 	if err != nil {
 		goutils.Error("AnalyzeReelsWithScatter:BuildReelsStats",
 			zap.Error(err))
