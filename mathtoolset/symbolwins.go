@@ -14,14 +14,27 @@ type SymbolsWinsFileMode int
 
 const (
 	SWFModeRTP     SymbolsWinsFileMode = 1
-	SWFModeWinsNum SymbolsWinsFileMode = 2
-	SWFModeWins    SymbolsWinsFileMode = 3
+	SWFModeWins    SymbolsWinsFileMode = 2
+	SWFModeWinsNum SymbolsWinsFileMode = 3
 )
 
 type SymbolWinsStats struct {
 	Symbol  SymbolType
 	WinsNum []int64
 	Wins    []int64
+	Total   int64
+}
+
+func (sws *SymbolWinsStats) Merge(sws1 *SymbolWinsStats) {
+	for i, v := range sws1.Wins {
+		sws.Wins[i] += v
+	}
+
+	for i, v := range sws1.WinsNum {
+		sws.WinsNum[i] += v
+	}
+
+	sws.Total += sws1.Total
 }
 
 func newSymbolWinsStats(symbol SymbolType, num int) *SymbolWinsStats {
@@ -36,7 +49,15 @@ type SymbolsWinsStats struct {
 	MapSymbols map[SymbolType]*SymbolWinsStats
 	Symbols    []SymbolType
 	Num        int
-	Total      int64
+	total      int64
+}
+
+func (ssws *SymbolsWinsStats) Merge(ssws1 *SymbolsWinsStats) {
+	for s, v := range ssws1.MapSymbols {
+		sws := ssws.GetSymbolWinsStats(s)
+
+		sws.Merge(v)
+	}
 }
 
 func (ssws *SymbolsWinsStats) GetSymbolWinsStats(symbol SymbolType) *SymbolWinsStats {
@@ -51,16 +72,28 @@ func (ssws *SymbolsWinsStats) GetSymbolWinsStats(symbol SymbolType) *SymbolWinsS
 	return ssws.MapSymbols[symbol]
 }
 
-func (ssws *SymbolsWinsStats) buildSortedSymbols() {
+func (ssws *SymbolsWinsStats) onBuildEnd() {
+	ssws.Symbols = nil
+	for s, v := range ssws.MapSymbols {
+		v.Total = ssws.total
+		ssws.Symbols = append(ssws.Symbols, s)
+	}
+
 	sort.Slice(ssws.Symbols, func(i, j int) bool {
 		return ssws.Symbols[i] < ssws.Symbols[j]
 	})
 }
 
-func (ssws *SymbolsWinsStats) SaveExcel(fn string, fm SymbolsWinsFileMode) error {
-	f := excelize.NewFile()
+func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFileMode) error {
+	sheet := "rtp"
 
-	sheet := f.GetSheetName(0)
+	if fm == SWFModeWins {
+		sheet = "wins"
+	} else if fm == SWFModeWinsNum {
+		sheet = "winsnum"
+	}
+
+	f.NewSheet(sheet)
 
 	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "symbol")
 	f.SetCellStr(sheet, goutils.Pos2Cell(1, 0), "total")
@@ -71,26 +104,78 @@ func (ssws *SymbolsWinsStats) SaveExcel(fn string, fm SymbolsWinsFileMode) error
 		f.SetCellStr(sheet, goutils.Pos2Cell(i+si, 0), fmt.Sprintf("X%v", i+1))
 	}
 
+	f.SetCellStr(sheet, goutils.Pos2Cell(si+ssws.Num, 0), "sum")
+
 	y := 1
+	trtp := 0.0
+	twinnum := int64(0)
+	twins := int64(0)
 
 	for _, s := range ssws.Symbols {
+		sws := ssws.GetSymbolWinsStats(s)
+
 		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), int(s))
-		f.SetCellValue(sheet, goutils.Pos2Cell(1, y), ssws.Total)
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, y), sws.Total)
+
+		rtp := 0.0
+		winnum := int64(0)
+		wins := int64(0)
 
 		for i := 0; i < ssws.Num; i++ {
-			sws := ssws.GetSymbolWinsStats(s)
-
 			if fm == SWFModeRTP {
-				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), float64(sws.Wins[i])*100.0/float64(ssws.Total))
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), float64(sws.Wins[i])*100.0/float64(sws.Total))
+
+				rtp += float64(sws.Wins[i]) * 100.0 / float64(sws.Total)
 			} else if fm == SWFModeWinsNum {
 				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.WinsNum[i])
+
+				winnum += sws.WinsNum[i]
 			} else {
 				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.Wins[i])
+
+				wins += sws.Wins[i]
 			}
+		}
+
+		if fm == SWFModeRTP {
+			f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), rtp)
+			trtp += rtp
+		} else if fm == SWFModeWinsNum {
+			f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), winnum)
+			twinnum += winnum
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), wins)
+			twins += wins
 		}
 
 		y++
 	}
+
+	if fm == SWFModeRTP {
+		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), trtp)
+	} else if fm == SWFModeWinsNum {
+		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), twinnum)
+	} else {
+		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), twins)
+	}
+
+	return nil
+}
+
+func (ssws *SymbolsWinsStats) SaveExcel(fn string, fms []SymbolsWinsFileMode) error {
+	f := excelize.NewFile()
+
+	for _, fm := range fms {
+		err := ssws.SaveExcelSheet(f, fm)
+		if err != nil {
+			goutils.Error("SymbolsWinsStats.SaveExcel",
+				zap.Error(err))
+
+			return err
+		}
+	}
+
+	f.DeleteSheet(f.GetSheetName(0))
 
 	return f.SaveAs(fn)
 }
@@ -137,39 +222,6 @@ func CalcSymbolWins(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, symb
 
 	return curwins, nil
 }
-
-// // calcWildWins - 这个接口只能用于处理wild赢得，symbol必须是wild
-// func calcWildWins(paytables *sgc7game.PayTables, rss *ReelsStats, wilds []SymbolType, symbol SymbolType, num int) int64 {
-// 	curwins := int64(1)
-
-// 	// 如果数量最大，不需要处理排除的解
-// 	if num == len(rss.Reels) {
-// 		for i := 0; i < num; i++ {
-// 			cn := rss.GetNum(i, symbol, -1, wilds, IRSTypeWild)
-
-// 			if cn <= 0 {
-// 				return 0
-// 			}
-
-// 			curwins *= int64(cn)
-// 		}
-// 	}
-
-// 	for i := 0; i < num; i++ {
-// 		cn := rss.GetNum(i, symbol, -1, wilds, IRSTypeWild)
-
-// 		if cn <= 0 {
-// 			return 0
-// 		}
-
-// 		curwins *= int64(cn)
-// 	}
-
-// 	// // 如果 A x 5 > W x 4，那么在计算 W x 4 时，就需要排除第5个图标是 A 的情况
-// 	// wp := paytables.MapPay[int(symbol)][num-1]
-
-// 	return curwins
-// }
 
 // calcNotWildWins - 这个接口只能用于处理非wild的赢得，symbol必须不是wild，且只处理 S 开头的情况
 func calcNotWildWins(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, num int) int64 {
@@ -419,12 +471,12 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.Total = 1
+	ssws.total = 1
 	for _, arr := range reels.Reels {
-		ssws.Total *= int64(len(arr))
+		ssws.total *= int64(len(arr))
 	}
 
-	ssws.Total *= int64(betMul)
+	ssws.total *= int64(betMul)
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -448,22 +500,22 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 		}
 	}
 
-	ssws.buildSortedSymbols()
+	ssws.onBuildEnd()
 
 	return ssws, nil
 }
 
 func AnalyzeReelsWithLineEx(paytables *sgc7game.PayTables, rss *ReelsStats,
-	symbols []SymbolType, wilds []SymbolType, mapSymbols *SymbolsMapping, betMul int, lineNum int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, wilds []SymbolType, betMul int, lineNum int) (*SymbolsWinsStats, error) {
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.Total = 1
+	ssws.total = 1
 	for _, rs := range rss.Reels {
-		ssws.Total *= int64(rs.TotalSymbolNum)
+		ssws.total *= int64(rs.TotalSymbolNum)
 	}
 
-	ssws.Total *= int64(betMul)
+	ssws.total *= int64(betMul)
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -487,7 +539,7 @@ func AnalyzeReelsWithLineEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 		}
 	}
 
-	ssws.buildSortedSymbols()
+	ssws.onBuildEnd()
 
 	return ssws, nil
 }
@@ -575,9 +627,9 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.Total = 1
+	ssws.total = 1
 	for _, arr := range reels.Reels {
-		ssws.Total *= int64(len(arr))
+		ssws.total *= int64(len(arr))
 	}
 
 	for _, s := range symbols {
@@ -602,19 +654,19 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 		}
 	}
 
-	ssws.buildSortedSymbols()
+	ssws.onBuildEnd()
 
 	return ssws, nil
 }
 
 func AnalyzeReelsScatterEx(paytables *sgc7game.PayTables, rss *ReelsStats,
-	symbols []SymbolType, mapSymbols *SymbolsMapping, height int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, height int) (*SymbolsWinsStats, error) {
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.Total = 1
+	ssws.total = 1
 	for _, rs := range rss.Reels {
-		ssws.Total *= int64(rs.TotalSymbolNum)
+		ssws.total *= int64(rs.TotalSymbolNum)
 	}
 
 	for _, s := range symbols {
@@ -639,7 +691,7 @@ func AnalyzeReelsScatterEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 		}
 	}
 
-	ssws.buildSortedSymbols()
+	ssws.onBuildEnd()
 
 	return ssws, nil
 }
