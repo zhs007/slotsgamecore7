@@ -1,6 +1,7 @@
 package sgc7game
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	jsoniter "github.com/json-iterator/go"
@@ -43,6 +44,10 @@ type ReelsData struct {
 
 // 主要用于BuildReelsPosData接口
 type FuncReelsDataPos func(rd *ReelsData, x, y int) bool
+
+func (rd *ReelsData) SetReel(ri int, reel []int) {
+	rd.Reels[ri] = reel
+}
 
 // DropDownIntoGameScene - 用轮子当前位置处理下落
 //		注意：
@@ -112,6 +117,35 @@ func (rd *ReelsData) BuildReelsPosData(onpos FuncReelsDataPos) (*ReelsPosData, e
 	}
 
 	return rpd, nil
+}
+
+func (rd *ReelsData) SaveExcel(fn string) error {
+	f := excelize.NewFile()
+
+	sheet := f.GetSheetName(0)
+
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "line")
+	for i := range rd.Reels {
+		f.SetCellStr(sheet, goutils.Pos2Cell(i+1, 0), fmt.Sprintf("R%v", i+1))
+	}
+
+	maxj := 0
+
+	for i, reel := range rd.Reels {
+		if maxj < len(reel) {
+			maxj = len(reel)
+		}
+
+		for j, v := range reel {
+			f.SetCellInt(sheet, goutils.Pos2Cell(i+1, j+1), v)
+		}
+	}
+
+	for i := 0; i < maxj; i++ {
+		f.SetCellInt(sheet, goutils.Pos2Cell(0, i+1), i)
+	}
+
+	return f.SaveAs(fn)
 }
 
 // LoadReels5JSON - load json file
@@ -343,4 +377,13 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 	}
 
 	return p, nil
+}
+
+// NewReelsData - new ReelsData
+func NewReelsData(num int) *ReelsData {
+	rd := &ReelsData{
+		Reels: make([][]int, num),
+	}
+
+	return rd
 }

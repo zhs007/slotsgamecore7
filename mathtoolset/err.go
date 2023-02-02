@@ -17,4 +17,7 @@ var (
 
 	// ErrInvalidReelsStatsExcelColname - invalid ReelsStats excel colname
 	ErrInvalidReelsStatsExcelColname = errors.New("invalid ReelsStats excel colname")
+
+	// ErrNoValidSymbols - no valid symbols
+	ErrNoValidSymbols = errors.New("no valid symbols")
 )
