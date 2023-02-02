@@ -37,6 +37,18 @@ func (sws *SymbolWinsStats) Merge(sws1 *SymbolWinsStats) {
 	sws.Total += sws1.Total
 }
 
+func (sws *SymbolWinsStats) MergeWithMulti(sws1 *SymbolWinsStats, multi int) {
+	for i, v := range sws1.Wins {
+		sws.Wins[i] += v
+	}
+
+	for i, v := range sws1.WinsNum {
+		sws.WinsNum[i] += v
+	}
+
+	sws.Total += sws1.Total * int64(multi)
+}
+
 func newSymbolWinsStats(symbol SymbolType, num int) *SymbolWinsStats {
 	return &SymbolWinsStats{
 		Symbol:  symbol,
@@ -53,6 +65,14 @@ type SymbolsWinsStats struct {
 }
 
 func (ssws *SymbolsWinsStats) Merge(ssws1 *SymbolsWinsStats) {
+	for s, v := range ssws1.MapSymbols {
+		sws := ssws.GetSymbolWinsStats(s)
+
+		sws.Merge(v)
+	}
+}
+
+func (ssws *SymbolsWinsStats) MergeWithMulti(ssws1 *SymbolsWinsStats, multi int) {
 	for s, v := range ssws1.MapSymbols {
 		sws := ssws.GetSymbolWinsStats(s)
 
@@ -108,7 +128,7 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 
 	y := 1
 	trtp := 0.0
-	twinnum := int64(0)
+	twinnum := 0.0
 	twins := int64(0)
 
 	for _, s := range ssws.Symbols {
@@ -118,7 +138,7 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, y), sws.Total)
 
 		rtp := 0.0
-		winnum := int64(0)
+		winnum := 0.0
 		wins := int64(0)
 
 		for i := 0; i < ssws.Num; i++ {
@@ -127,9 +147,9 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 
 				rtp += float64(sws.Wins[i]) * 100.0 / float64(sws.Total)
 			} else if fm == SWFModeWinsNum {
-				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.WinsNum[i])
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), float64(sws.WinsNum[i])*100.0/float64(sws.Total))
 
-				winnum += sws.WinsNum[i]
+				winnum += float64(sws.WinsNum[i]) * 100.0 / float64(sws.Total)
 			} else {
 				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.Wins[i])
 

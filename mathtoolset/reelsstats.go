@@ -28,6 +28,43 @@ type ReelStats struct {
 	TotalSymbolNum int
 }
 
+func (rs *ReelStats) BuildSymbols(excludeSymbols []SymbolType) []SymbolType {
+	symbols := []SymbolType{}
+
+	for s, v := range rs.MapSymbols {
+		if !HasSymbol(excludeSymbols, s) && v.Num > 0 {
+			symbols = append(symbols, s)
+		}
+	}
+
+	return symbols
+}
+
+func (rs *ReelStats) GetSymbolWithIndex(index int) SymbolType {
+	i := 0
+	for s := range rs.MapSymbols {
+		if i == index {
+			return s
+		}
+
+		i++
+	}
+
+	return -1
+}
+
+func (rs *ReelStats) Clone() *ReelStats {
+	nrs := &ReelStats{
+		MapSymbols: make(map[SymbolType]*SymbolStats),
+	}
+
+	for k, v := range rs.MapSymbols {
+		nrs.AddSymbol(k, v.Num)
+	}
+
+	return nrs
+}
+
 func (rs *ReelStats) GetSymbolStats(symbol SymbolType) *SymbolStats {
 	v, isok := rs.MapSymbols[symbol]
 	if isok {
@@ -44,6 +81,26 @@ func (rs *ReelStats) AddSymbol(symbol SymbolType, num int) {
 
 	ss.Num += num
 	rs.TotalSymbolNum += num
+}
+
+func (rs *ReelStats) RemoveSymbol(symbol SymbolType, num int) int {
+	ss := rs.GetSymbolStats(symbol)
+
+	if ss.Num > num {
+		ss.Num -= num
+		rs.TotalSymbolNum -= num
+
+		return num
+	}
+
+	curnum := ss.Num
+
+	rs.TotalSymbolNum -= ss.Num
+	ss.Num = 0
+
+	delete(rs.MapSymbols, symbol)
+
+	return curnum
 }
 
 func NewReelStats() *ReelStats {
@@ -82,6 +139,20 @@ type ReelsStats struct {
 	Symbols []SymbolType
 }
 
+func (rss *ReelsStats) ClearEmptySymbols() {
+	rss.Symbols = nil
+
+	for _, r := range rss.Reels {
+		for s, v := range r.MapSymbols {
+			if v.Num > 0 {
+				if !rss.HasSymbols(s) {
+					rss.Symbols = append(rss.Symbols, s)
+				}
+			}
+		}
+	}
+}
+
 func (rss *ReelsStats) CloneWithMapping(mapSymbols *SymbolsMapping) *ReelsStats {
 	nrss := &ReelsStats{}
 
@@ -94,6 +165,24 @@ func (rss *ReelsStats) CloneWithMapping(mapSymbols *SymbolsMapping) *ReelsStats 
 			} else {
 				nrs.AddSymbol(s, ss.Num)
 			}
+		}
+
+		nrss.Reels = append(nrss.Reels, nrs)
+	}
+
+	nrss.buildSortedSymbols()
+
+	return nrss
+}
+
+func (rss *ReelsStats) Clone() *ReelsStats {
+	nrss := &ReelsStats{}
+
+	for _, rs := range rss.Reels {
+		nrs := NewReelStats()
+
+		for s, ss := range rs.MapSymbols {
+			nrs.AddSymbol(s, ss.Num)
 		}
 
 		nrss.Reels = append(nrss.Reels, nrs)
