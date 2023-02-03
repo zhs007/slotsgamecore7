@@ -32,12 +32,90 @@ func (rs *ReelStats) BuildSymbols(excludeSymbols []SymbolType) []SymbolType {
 	symbols := []SymbolType{}
 
 	for s, v := range rs.MapSymbols {
-		if !HasSymbol(excludeSymbols, s) && v.Num > 0 {
+		if v.Num > 0 && !HasSymbol(excludeSymbols, s) {
 			symbols = append(symbols, s)
 		}
 	}
 
 	return symbols
+}
+
+func (rs *ReelStats) BuildSymbolsWithWeights(excludeSymbols []SymbolType) (*sgc7game.ValWeights, error) {
+	vals := []int{}
+	weights := []int{}
+
+	for s, v := range rs.MapSymbols {
+		if v.Num > 0 && !HasSymbol(excludeSymbols, s) {
+			vals = append(vals, int(s))
+			weights = append(weights, v.Num)
+		}
+	}
+
+	return sgc7game.NewValWeights(vals, weights)
+}
+
+func (rs *ReelStats) BuildSymbolsEx(symbols []SymbolType) []SymbolType {
+	newarr := []SymbolType{}
+
+	for s, v := range rs.MapSymbols {
+		if v.Num > 0 && HasSymbol(symbols, s) {
+			newarr = append(newarr, s)
+		}
+	}
+
+	return newarr
+}
+
+func (rs *ReelStats) BuildSymbolsWithWeightsEx(symbols []SymbolType) (*sgc7game.ValWeights, error) {
+	vals := []int{}
+	weights := []int{}
+
+	for s, v := range rs.MapSymbols {
+		if v.Num > 0 && HasSymbol(symbols, s) {
+			vals = append(vals, int(s))
+			weights = append(weights, v.Num)
+		}
+	}
+
+	return sgc7game.NewValWeights(vals, weights)
+}
+
+func (rs *ReelStats) BuildSymbols2(excludeSymbols1 []SymbolType, excludeSymbols2 []SymbolType) []SymbolType {
+	symbols := []SymbolType{}
+
+	for s, v := range rs.MapSymbols {
+		if v.Num > 0 && !HasSymbol(excludeSymbols1, s) && !HasSymbol(excludeSymbols2, s) {
+			symbols = append(symbols, s)
+		}
+	}
+
+	return symbols
+}
+
+func (rs *ReelStats) BuildSymbolsWithWeights2(excludeSymbols1 []SymbolType, excludeSymbols2 []SymbolType) (*sgc7game.ValWeights, error) {
+	vals := []int{}
+	weights := []int{}
+
+	for s, v := range rs.MapSymbols {
+		if v.Num > 0 && !HasSymbol(excludeSymbols1, s) && !HasSymbol(excludeSymbols2, s) {
+			vals = append(vals, int(s))
+			weights = append(weights, v.Num)
+		}
+	}
+
+	return sgc7game.NewValWeights(vals, weights)
+}
+
+func (rs *ReelStats) CountSymbolsNum(symbols []SymbolType) int {
+	num := 0
+
+	for s, v := range rs.MapSymbols {
+		if v.Num > 0 && HasSymbol(symbols, s) {
+			num += v.Num
+		}
+	}
+
+	return num
 }
 
 func (rs *ReelStats) GetSymbolWithIndex(index int) SymbolType {
