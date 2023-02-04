@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func readStdin(out chan string, in chan bool) {
+func readStdin(out chan byte, in chan bool) {
 	//no buffering
 	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
 	//no visible output
@@ -23,8 +23,26 @@ func readStdin(out chan string, in chan bool) {
 			return
 		default:
 			os.Stdin.Read(b)
-			fmt.Printf(">>> %v: ", b)
-			out <- string(b)
+			out <- b[0]
+		}
+	}
+}
+
+// if return true, then break
+type FuncOnGetChar func(c byte) bool
+
+func getchar(onchar FuncOnGetChar) {
+	chanOutput := make(chan byte)
+	chanEnd := make(chan bool)
+
+	go readStdin(chanOutput, chanEnd)
+	for {
+		c := <-chanOutput
+
+		if onchar(c) {
+			chanEnd <- true
+
+			break
 		}
 	}
 }
@@ -32,8 +50,6 @@ func readStdin(out chan string, in chan bool) {
 type FuncOnResult func(*sgc7game.PlayResult)
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult) error {
-	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
-	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
 	b := make([]byte, 1)
 
 	plugin := game.NewPlugin()
@@ -49,6 +65,23 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 	for {
 		fmt.Print("please press S to start spin, or press Q to quit.")
+		isend := false
+		getchar(func(c byte) bool {
+			if c == 's' || c == 'S' {
+				return true
+			}
+
+			if c == 'q' || c == 'Q' {
+				isend = true
+
+				return true
+			}
+
+			return false
+		})
+		if isend {
+			goto end
+		}
 
 		for {
 			os.Stdin.Read(b)
@@ -91,13 +124,13 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			}
 
 			fmt.Printf("step %v. please press N to jump the next step ...", step)
-			for {
-				os.Stdin.Read(b)
-
-				if b[0] == 'n' || b[0] == 'N' {
-					break
+			getchar(func(c byte) bool {
+				if c == 'n' || c == 'N' {
+					return true
 				}
-			}
+
+				return false
+			})
 
 			step++
 
