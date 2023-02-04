@@ -1,18 +1,41 @@
 package asciigame
 
 import (
-	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
 )
 
+func readStdin(out chan string, in chan bool) {
+	//no buffering
+	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
+	//no visible output
+	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
+
+	var b []byte = make([]byte, 1)
+	for {
+		select {
+		case <-in:
+			return
+		default:
+			os.Stdin.Read(b)
+			fmt.Printf(">>> %v: ", b)
+			out <- string(b)
+		}
+	}
+}
+
 type FuncOnResult func(*sgc7game.PlayResult)
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult) error {
+	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
+	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
+	b := make([]byte, 1)
+
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
@@ -24,25 +47,17 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	balance := 10000
 	totalmoney := 10000
 
-	reader := bufio.NewReader(os.Stdin)
-
 	for {
 		fmt.Print("please press S to start spin, or press Q to quit.")
 
 		for {
-			b, err := reader.ReadByte()
-			if err != nil {
-				goutils.Error("StartGame.ReadByte",
-					zap.Error(err))
+			os.Stdin.Read(b)
 
-				return err
-			}
-
-			if b == 's' || b == 'S' {
+			if b[0] == 's' || b[0] == 'S' {
 				break
 			}
 
-			if b == 'q' || b == 'Q' {
+			if b[0] == 'q' || b[0] == 'Q' {
 				goto end
 			}
 		}
@@ -75,7 +90,14 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
-			fmt.Printf("step %v. please press SPACE to jump the next step ...", step)
+			fmt.Printf("step %v. please press N to jump the next step ...", step)
+			for {
+				os.Stdin.Read(b)
+
+				if b[0] == 'n' || b[0] == 'N' {
+					break
+				}
+			}
 
 			step++
 
