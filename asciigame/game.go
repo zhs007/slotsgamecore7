@@ -1,5 +1,40 @@
 package asciigame
 
+/*
+// Works also for 64 bits
+#ifdef _WIN32
+
+// Lib for console management in windows
+#include "conio.h"
+
+#else
+
+// Libs terminal management in Unix, Linux...
+#include <stdio.h>
+#include <unistd.h>
+#include <termios.h>
+
+// Implement reading a key pressed in terminal
+char getch(){
+    char ch = 0;
+    struct termios old = {0};
+    fflush(stdout);
+    if( tcgetattr(0, &old) < 0 ) perror("tcsetattr()");
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    if( tcsetattr(0, TCSANOW, &old) < 0 ) perror("tcsetattr ICANON");
+    if( read(0, &ch,1) < 0 ) perror("read()");
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if(tcsetattr(0, TCSADRAIN, &old) < 0) perror("tcsetattr ~ICANON");
+    return ch;
+}
+#endif
+*/
+import "C"
+
 import (
 	"fmt"
 	"os"
@@ -32,19 +67,25 @@ func readStdin(out chan byte, in chan bool) {
 type FuncOnGetChar func(c byte) bool
 
 func getchar(onchar FuncOnGetChar) {
-	chanOutput := make(chan byte)
-	chanEnd := make(chan bool)
-
-	go readStdin(chanOutput, chanEnd)
 	for {
-		c := <-chanOutput
-
-		if onchar(c) {
-			chanEnd <- true
-
+		c := C.getch()
+		if onchar(byte(c)) {
 			break
 		}
 	}
+	// chanOutput := make(chan byte)
+	// chanEnd := make(chan bool)
+
+	// go readStdin(chanOutput, chanEnd)
+	// for {
+	// 	c := <-chanOutput
+
+	// 	if onchar(c) {
+	// 		chanEnd <- true
+
+	// 		break
+	// 	}
+	// }
 }
 
 type FuncOnResult func(*sgc7game.PlayResult)
