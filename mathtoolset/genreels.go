@@ -1,6 +1,8 @@
 package mathtoolset
 
 import (
+	"context"
+
 	"github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"go.uber.org/zap"
@@ -73,21 +75,54 @@ func GenReels(rss *ReelsStats, minoff int, trytimes int) (*sgc7game.ReelsData, e
 }
 
 // 随机，主要符号需要尽量分散开
-func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats, mainSymbols []SymbolType, minoff int) ([]int, error) {
+func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
+	mainSymbols []SymbolType, minoff int) ([]int, error) {
+
+	// 应该用圆的切割算法
+	// 1个点没办法将圆切成2段，2个点才能切成2段
+	msn := rs.CountSymbolsNum(mainSymbols)
+	if msn <= 1 {
+		return genReel(plugin, rs, minoff)
+	}
+
 	nrs := rs.Clone()
 	reel := []int{}
 	excsym := []SymbolType{}
 
-	msn := rs.CountSymbolsNum(mainSymbols)
+	// 这里需要注意的是，譬如35，切6份，余5
+	// 如果把5留到最后，就会出现间隔11，所以需要把5分摊到中间去
+
 	msoff := rs.TotalSymbolNum / msn
+	lastoff := rs.TotalSymbolNum % msn
 	curi := 0
+	curoff := msoff
 
 	for nrs.TotalSymbolNum > 0 {
 		var syms *sgc7game.ValWeights
 		var err error
 
-		if curi == msoff-1 {
-			curi = 0
+		if curi == 0 {
+			curoff = msoff
+
+			if lastoff > 0 && msn > 0 {
+				cr, err := plugin.Random(context.Background(), msn)
+				if err != nil {
+					goutils.Error("genReelsMainSymbolsDistance:Random",
+						goutils.JSON("msn", msn),
+						zap.Int("lastoff", lastoff),
+						zap.Error(err))
+
+					return nil, err
+				}
+
+				if cr < lastoff {
+					lastoff--
+
+					curoff++
+				}
+
+				msn--
+			}
 
 			syms, err = nrs.BuildSymbolsWithWeightsEx(mainSymbols)
 			if err != nil || syms.MaxWeight <= 0 {
@@ -102,8 +137,6 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats, mainS
 				}
 			}
 		} else {
-			curi++
-
 			syms, err = nrs.BuildSymbolsWithWeights2(excsym, mainSymbols)
 			if err != nil || syms.MaxWeight <= 0 {
 				goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
@@ -113,6 +146,12 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats, mainS
 
 				return nil, ErrNoValidSymbols
 			}
+		}
+
+		if curi == curoff-1 {
+			curi = 0
+		} else {
+			curi++
 		}
 
 		s, err := syms.RandVal(plugin)
