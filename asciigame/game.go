@@ -52,7 +52,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	totalmoney := 10000
 
 	for {
-		fmt.Print("please press S to start spin, or press Q to quit.")
+		fmt.Print("please press S to start spin, or press Q to quit.\n")
 		isend := false
 		getchar(func(c getch.KeyCode) bool {
 			if c == getch.KeyS {
@@ -99,7 +99,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
-			fmt.Printf("step %v. please press N to jump the next step ...", step)
+			fmt.Printf("step %v. please press N to jump the next step.\n", step)
 			getchar(func(c getch.KeyCode) bool {
 				return c == getch.KeyN
 			})
