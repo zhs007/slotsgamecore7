@@ -2,7 +2,6 @@ package asciigame
 
 import (
 	"fmt"
-	"os"
 
 	"devt.de/krotik/common/termutil/getch"
 	"github.com/zhs007/goutils"
@@ -41,8 +40,6 @@ func getchar(onchar FuncOnGetChar) {
 type FuncOnResult func(*sgc7game.PlayResult)
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult) error {
-	b := make([]byte, 1)
-
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
@@ -74,22 +71,10 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			goto end
 		}
 
-		for {
-			os.Stdin.Read(b)
-
-			if b[0] == 's' || b[0] == 'S' {
-				break
-			}
-
-			if b[0] == 'q' || b[0] == 'Q' {
-				goto end
-			}
-		}
-
 		step := 1
 		fmt.Printf("#%v spin start -->\n", curgamenum)
-		balance -= int(stake.CoinBet)
-		fmt.Printf("bet %v, balance %v\n", stake.CoinBet, balance)
+		balance -= int(stake.CashBet)
+		fmt.Printf("bet %v, balance %v\n", stake.CashBet, balance)
 
 		for {
 			pr, err := game.Play(plugin, cmd, "", ps, stake, results)
@@ -105,7 +90,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
-			balance += pr.CoinWin
+			balance += int(pr.CashWin)
 			results = append(results, pr)
 
 			onResult(pr)
@@ -116,11 +101,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 			fmt.Printf("step %v. please press N to jump the next step ...", step)
 			getchar(func(c getch.KeyCode) bool {
-				if c == getch.KeyN {
-					return true
-				}
-
-				return false
+				return c == getch.KeyN
 			})
 
 			step++
