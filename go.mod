@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	devt.de/krotik/common v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
