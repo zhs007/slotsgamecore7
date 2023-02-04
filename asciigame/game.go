@@ -1,91 +1,41 @@
 package asciigame
 
-/*
-// Works also for 64 bits
-#ifdef _WIN32
-
-// Lib for console management in windows
-#include "conio.h"
-
-#else
-
-// Libs terminal management in Unix, Linux...
-#include <stdio.h>
-#include <unistd.h>
-#include <termios.h>
-
-// Implement reading a key pressed in terminal
-char getch(){
-    char ch = 0;
-    struct termios old = {0};
-    fflush(stdout);
-    if( tcgetattr(0, &old) < 0 ) perror("tcsetattr()");
-    old.c_lflag &= ~ICANON;
-    old.c_lflag &= ~ECHO;
-    old.c_cc[VMIN] = 1;
-    old.c_cc[VTIME] = 0;
-    if( tcsetattr(0, TCSANOW, &old) < 0 ) perror("tcsetattr ICANON");
-    if( read(0, &ch,1) < 0 ) perror("read()");
-    old.c_lflag |= ICANON;
-    old.c_lflag |= ECHO;
-    if(tcsetattr(0, TCSADRAIN, &old) < 0) perror("tcsetattr ~ICANON");
-    return ch;
-}
-#endif
-*/
-import "C"
-
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
+	"devt.de/krotik/common/termutil/getch"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
 )
 
-func readStdin(out chan byte, in chan bool) {
-	//no buffering
-	exec.Command("stty", "-f", "/dev/tty", "cbreak", "min", "1").Run()
-	//no visible output
-	exec.Command("stty", "-f", "/dev/tty", "-echo").Run()
-
-	var b []byte = make([]byte, 1)
-	for {
-		select {
-		case <-in:
-			return
-		default:
-			os.Stdin.Read(b)
-			out <- b[0]
-		}
-	}
-}
-
 // if return true, then break
-type FuncOnGetChar func(c byte) bool
+type FuncOnGetChar func(k getch.KeyCode) bool
 
 func getchar(onchar FuncOnGetChar) {
+	err := getch.Start()
+	if err != nil {
+		goutils.Error("getchar:Start",
+			zap.Error(err))
+
+		return
+	}
+	defer getch.Stop()
+
 	for {
-		c := C.getch()
-		if onchar(byte(c)) {
-			break
+		e, err := getch.Getch()
+		if err != nil {
+			goutils.Error("getchar:Start",
+				zap.Error(err))
+
+			return
+		}
+
+		if onchar(e.Code) {
+			return
 		}
 	}
-	// chanOutput := make(chan byte)
-	// chanEnd := make(chan bool)
-
-	// go readStdin(chanOutput, chanEnd)
-	// for {
-	// 	c := <-chanOutput
-
-	// 	if onchar(c) {
-	// 		chanEnd <- true
-
-	// 		break
-	// 	}
-	// }
 }
 
 type FuncOnResult func(*sgc7game.PlayResult)
@@ -107,12 +57,12 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	for {
 		fmt.Print("please press S to start spin, or press Q to quit.")
 		isend := false
-		getchar(func(c byte) bool {
-			if c == 's' || c == 'S' {
+		getchar(func(c getch.KeyCode) bool {
+			if c == getch.KeyS {
 				return true
 			}
 
-			if c == 'q' || c == 'Q' {
+			if c == getch.KeyQ {
 				isend = true
 
 				return true
@@ -165,8 +115,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			}
 
 			fmt.Printf("step %v. please press N to jump the next step ...", step)
-			getchar(func(c byte) bool {
-				if c == 'n' || c == 'N' {
+			getchar(func(c getch.KeyCode) bool {
+				if c == getch.KeyN {
 					return true
 				}
 
