@@ -53,7 +53,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 	for {
 		fmt.Printf("please press %v to start spin, or press %v to quit.\n",
-			FormatColorString("S", Green), FormatColorString("Q", Red))
+			FormatColorString("S", ColorKey), FormatColorString("Q", ColorExitKey))
 		isend := false
 		getchar(func(c getch.KeyCode) bool {
 			if c == getch.KeyS {
@@ -75,13 +75,13 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		step := 1
 
 		fmt.Printf("%v spin start -->\n",
-			FormatColorString(fmt.Sprintf("#%v", curgamenum), Yellow))
+			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
 
 		balance -= int(stake.CashBet)
 
 		fmt.Printf("bet %v, balance %v\n",
-			FormatColorString(fmt.Sprintf("%v", stake.CashBet), Yellow),
-			FormatColorString(fmt.Sprintf("%v", balance), Yellow))
+			FormatColorString(fmt.Sprintf("%v", stake.CashBet), ColorNumber),
+			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber))
 
 		for {
 			pr, err := game.Play(plugin, cmd, "", ps, stake, results)
@@ -107,8 +107,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			}
 
 			fmt.Printf("step %v. please press %v to jump to the next step.\n",
-				FormatColorString(fmt.Sprintf("%v", step), Yellow),
-				FormatColorString("N", Green))
+				FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
+				FormatColorString("N", ColorKey))
 
 			getchar(func(c getch.KeyCode) bool {
 				return c == getch.KeyN
@@ -128,7 +128,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		}
 
 		fmt.Printf("%v spin end <--\n",
-			FormatColorString(fmt.Sprintf("#%v", curgamenum), Yellow))
+			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
 
 		curgamenum++
 	}
@@ -136,9 +136,15 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 end:
 
 	fmt.Printf("you sipn %v, balance %v, win %v \n",
-		FormatColorString(fmt.Sprintf("%v", curgamenum), Yellow),
-		FormatColorString(fmt.Sprintf("%v", balance), Yellow),
-		FormatColorString(fmt.Sprintf("%v", balance-totalmoney), Red))
+		FormatColorString(fmt.Sprintf("%v", curgamenum), ColorNumber),
+		FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
+		FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {
+			if balance > totalmoney {
+				return true
+			}
+
+			return false
+		}, ColorWin, ColorLose)))
 
 	return nil
 }
