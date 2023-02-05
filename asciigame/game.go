@@ -52,7 +52,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	totalmoney := 10000
 
 	for {
-		fmt.Print("please press S to start spin, or press Q to quit.\n")
+		fmt.Printf("please press %v to start spin, or press %v to quit.\n",
+			FormatColorString("S", Green), FormatColorString("Q", Red))
 		isend := false
 		getchar(func(c getch.KeyCode) bool {
 			if c == getch.KeyS {
@@ -72,9 +73,15 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		}
 
 		step := 1
-		fmt.Printf("#%v spin start -->\n", curgamenum)
+
+		fmt.Printf("%v spin start -->\n",
+			FormatColorString(fmt.Sprintf("#%v", curgamenum), Yellow))
+
 		balance -= int(stake.CashBet)
-		fmt.Printf("bet %v, balance %v\n", stake.CashBet, balance)
+
+		fmt.Printf("bet %v, balance %v\n",
+			FormatColorString(fmt.Sprintf("%v", stake.CashBet), Yellow),
+			FormatColorString(fmt.Sprintf("%v", balance), Yellow))
 
 		for {
 			pr, err := game.Play(plugin, cmd, "", ps, stake, results)
@@ -99,7 +106,10 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
-			fmt.Printf("step %v. please press N to jump the next step.\n", step)
+			fmt.Printf("step %v. please press %v to jump to the next step.\n",
+				FormatColorString(fmt.Sprintf("%v", step), Yellow),
+				FormatColorString("N", Green))
+
 			getchar(func(c getch.KeyCode) bool {
 				return c == getch.KeyN
 			})
@@ -117,14 +127,18 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			}
 		}
 
-		fmt.Printf("#%v spin end <--\n", curgamenum)
+		fmt.Printf("%v spin end <--\n",
+			FormatColorString(fmt.Sprintf("#%v", curgamenum), Yellow))
 
 		curgamenum++
 	}
 
 end:
 
-	fmt.Printf("you sipn %v, balance %v, win %v \n", curgamenum, balance, balance-totalmoney)
+	fmt.Printf("you sipn %v, balance %v, win %v \n",
+		FormatColorString(fmt.Sprintf("%v", curgamenum), Yellow),
+		FormatColorString(fmt.Sprintf("%v", balance), Yellow),
+		FormatColorString(fmt.Sprintf("%v", balance-totalmoney), Red))
 
 	return nil
 }
