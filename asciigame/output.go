@@ -41,17 +41,28 @@ func OutputScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolCo
 	}
 }
 
-func OutputResults(result *sgc7game.PlayResult, mapSymbolColor *SymbolColorMap) {
+type FuncIsResult func(*sgc7game.Result) bool
+
+func OutputResults(str string, result *sgc7game.PlayResult, isResult FuncIsResult, mapSymbolColor *SymbolColorMap) {
 	if result.CoinWin == 0 {
 		fmt.Print("No Wins\n")
 	} else {
 		fmt.Printf("%v Wins\n", FormatColorString(fmt.Sprintf("%v", result.CoinWin), Yellow))
 	}
 
+	isOutputStr := false
+
 	for _, v := range result.Results {
-		fmt.Printf("%vx%v Wins %v\n", mapSymbolColor.GetSymbolString(v.Symbol),
-			FormatColorString(fmt.Sprintf("%v", v.SymbolNums), Yellow),
-			FormatColorString(fmt.Sprintf("%v", v.CoinWin), Yellow))
+		if isResult(v) {
+			if !isOutputStr && len(str) > 0 {
+				fmt.Printf("%v:\n", str)
+				isOutputStr = true
+			}
+
+			fmt.Printf("%vx%v Wins %v\n", mapSymbolColor.GetSymbolString(v.Symbol),
+				FormatColorString(fmt.Sprintf("%v", v.SymbolNums), Yellow),
+				FormatColorString(fmt.Sprintf("%v", v.CoinWin), Yellow))
+		}
 	}
 }
 
