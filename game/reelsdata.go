@@ -3,6 +3,7 @@ package sgc7game
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/xuri/excelize/v2"
@@ -348,28 +349,33 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 			for x, colCell := range row {
 				ri, isok := mapri[x]
 				if isok {
-					v, err := goutils.String2Int64(colCell)
-					if err != nil {
-						goutils.Error("LoadReelsFromExcel:String2Int64",
-							zap.String("val", colCell),
-							zap.Error(err))
+					colCell = strings.TrimSpace(colCell)
+					if len(colCell) > 0 {
+						v, err := goutils.String2Int64(colCell)
+						if err != nil {
+							goutils.Error("LoadReelsFromExcel:String2Int64",
+								zap.String("val", colCell),
+								zap.Error(err))
 
-						return nil, err
-					}
+							return nil, err
+						}
 
-					if v < 0 {
-						isend[ri] = true
-					} else if isend[ri] {
-						goutils.Error("LoadReelsFromExcel",
-							zap.String("info", "check already finished."),
-							zap.String("val", colCell),
-							zap.Int("y", y),
-							zap.Int("x", x),
-							zap.Error(err))
+						if v < 0 {
+							isend[ri] = true
+						} else if isend[ri] {
+							goutils.Error("LoadReelsFromExcel",
+								zap.String("info", "check already finished."),
+								zap.String("val", colCell),
+								zap.Int("y", y),
+								zap.Int("x", x),
+								zap.Error(err))
 
-						return nil, err
+							return nil, err
+						} else {
+							p.Reels[ri] = append(p.Reels[ri], int(v))
+						}
 					} else {
-						p.Reels[ri] = append(p.Reels[ri], int(v))
+						isend[ri] = true
 					}
 				}
 			}
