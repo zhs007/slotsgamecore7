@@ -51,25 +51,44 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	balance := 10000
 	totalmoney := 10000
 
+	autotimes := 0
+
 	for {
-		fmt.Printf("please press %v to start spin, or press %v to quit.\n",
-			FormatColorString("S", ColorKey), FormatColorString("Q", ColorExitKey))
-		isend := false
-		getchar(func(c getch.KeyCode) bool {
-			if c == getch.KeyS {
-				return true
+		if autotimes <= 0 {
+			fmt.Printf("please press %v to start spin, or press %v to spin 100 times, or press %v to spin 1000 times, or press %v to quit.\n",
+				FormatColorString("S", ColorKey), FormatColorString("H", ColorExitKey), FormatColorString("K", ColorExitKey), FormatColorString("Q", ColorExitKey))
+
+			isend := false
+
+			getchar(func(c getch.KeyCode) bool {
+				if c == getch.KeyS {
+					return true
+				}
+
+				if c == getch.KeyH {
+					autotimes = 100
+
+					return true
+				}
+
+				if c == getch.KeyK {
+					autotimes = 1000
+
+					return true
+				}
+
+				if c == getch.KeyQ {
+					isend = true
+
+					return true
+				}
+
+				return false
+			})
+
+			if isend {
+				goto end
 			}
-
-			if c == getch.KeyQ {
-				isend = true
-
-				return true
-			}
-
-			return false
-		})
-		if isend {
-			goto end
 		}
 
 		step := 1
@@ -112,13 +131,15 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 				FormatColorString(fmt.Sprintf("%v", pr.CashWin), ColorNumber))
 
-			fmt.Printf("step %v. please press %v to jump to the next step.\n",
-				FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
-				FormatColorString("N", ColorKey))
+			if autotimes <= 0 {
+				fmt.Printf("step %v. please press %v to jump to the next step.\n",
+					FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
+					FormatColorString("N", ColorKey))
 
-			getchar(func(c getch.KeyCode) bool {
-				return c == getch.KeyN
-			})
+				getchar(func(c getch.KeyCode) bool {
+					return c == getch.KeyN
+				})
+			}
 
 			step++
 
@@ -141,6 +162,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
 
 		curgamenum++
+		autotimes--
 
 		results = nil
 	}
