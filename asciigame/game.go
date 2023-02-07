@@ -37,7 +37,7 @@ func getchar(onchar FuncOnGetChar) {
 	}
 }
 
-type FuncOnResult func(*sgc7game.PlayResult)
+type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult)
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult) error {
 	plugin := game.NewPlugin()
@@ -100,7 +100,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			balance += int(pr.CashWin)
 			results = append(results, pr)
 
-			onResult(pr)
+			onResult(pr, results)
 
 			if pr.IsFinish {
 				break
