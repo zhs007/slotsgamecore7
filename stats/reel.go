@@ -26,6 +26,10 @@ type Reel struct {
 	TotalTimes int64
 }
 
+func (reel *Reel) CalcHitRate(s mathtoolset.SymbolType) float64 {
+	return reel.MapSymbols[s].CalcHitRate(reel.TotalTimes)
+}
+
 func (reel *Reel) OnScene(scene *sgc7game.GameScene) {
 	reel.TotalTimes++
 
@@ -34,6 +38,16 @@ func (reel *Reel) OnScene(scene *sgc7game.GameScene) {
 
 		reel.MapSymbols[mathtoolset.SymbolType(s)].TriggerTimes++
 	}
+}
+
+func (reel *Reel) GenSymbols(symbols []mathtoolset.SymbolType) []mathtoolset.SymbolType {
+	for k := range reel.MapSymbols {
+		if !mathtoolset.HasSymbol(symbols, k) {
+			symbols = append(symbols, k)
+		}
+	}
+
+	return symbols
 }
 
 func NewReel(i int, lst []mathtoolset.SymbolType) *Reel {
