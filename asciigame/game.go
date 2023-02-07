@@ -106,6 +106,12 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
+			fmt.Printf("balance %v , win %v \n",
+				FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
+				FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {
+					return balance > totalmoney
+				}, ColorWin, ColorLose)))
+
 			fmt.Printf("step %v. please press %v to jump to the next step.\n",
 				FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
 				FormatColorString("N", ColorKey))
@@ -127,6 +133,12 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			}
 		}
 
+		fmt.Printf("balance %v , win %v \n",
+			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
+			FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {
+				return balance > totalmoney
+			}, ColorWin, ColorLose)))
+
 		fmt.Printf("%v spin end <--\n",
 			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
 
@@ -139,11 +151,7 @@ end:
 		FormatColorString(fmt.Sprintf("%v", curgamenum), ColorNumber),
 		FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 		FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {
-			if balance > totalmoney {
-				return true
-			}
-
-			return false
+			return balance > totalmoney
 		}, ColorWin, ColorLose)))
 
 	return nil
