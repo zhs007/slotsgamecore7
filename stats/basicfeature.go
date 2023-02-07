@@ -4,7 +4,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
-type FuncAnalyzeFeature func(interface{}, *sgc7game.Stake, []*sgc7game.PlayResult) (bool, int64, int64)
+type FuncAnalyzeFeature func(*Feature, *sgc7game.Stake, []*sgc7game.PlayResult) (bool, int64, int64)
 
 type Feature struct {
 	Name         string
@@ -12,6 +12,7 @@ type Feature struct {
 	TotalWins    int64
 	TriggerTimes int64
 	OnAnalyze    FuncAnalyzeFeature
+	Obj          interface{}
 }
 
 func (feature *Feature) OnResults(stake *sgc7game.Stake, lst []*sgc7game.PlayResult) {
