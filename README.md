@@ -8,6 +8,7 @@ This is a golang project for slots game.
 
 - add math toolset
 - add asciigame
+- add stats
 
 ##### v0.9
 
