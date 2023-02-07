@@ -78,6 +78,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
 
 		balance -= int(stake.CashBet)
+		spinwins := 0
 
 		fmt.Printf("bet %v, balance %v\n",
 			FormatColorString(fmt.Sprintf("%v", stake.CashBet), ColorNumber),
@@ -98,6 +99,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			}
 
 			balance += int(pr.CashWin)
+			spinwins += int(pr.CashWin)
 			results = append(results, pr)
 
 			onResult(pr, results)
@@ -108,9 +110,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 			fmt.Printf("balance %v , win %v \n",
 				FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
-				FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {
-					return balance > totalmoney
-				}, ColorWin, ColorLose)))
+				FormatColorString(fmt.Sprintf("%v", pr.CashWin), ColorNumber))
 
 			fmt.Printf("step %v. please press %v to jump to the next step.\n",
 				FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
@@ -135,14 +135,14 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 		fmt.Printf("balance %v , win %v \n",
 			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
-			FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {
-				return balance > totalmoney
-			}, ColorWin, ColorLose)))
+			FormatColorString(fmt.Sprintf("%v", spinwins), ColorNumber))
 
 		fmt.Printf("%v spin end <--\n",
 			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
 
 		curgamenum++
+
+		results = nil
 	}
 
 end:
