@@ -3,6 +3,8 @@ module github.com/zhs007/slotsgamecore7
 go 1.18
 
 require (
+	devt.de/krotik/common v1.5.1
+	github.com/fatih/color v1.14.1
 	github.com/golang/protobuf v1.5.2
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/json-iterator/go v1.1.12
@@ -19,11 +21,9 @@ require (
 )
 
 require (
-	devt.de/krotik/common v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/fatih/color v1.14.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
