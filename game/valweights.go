@@ -108,6 +108,7 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 
 		return nil, err
 	}
+	defer f.Close()
 
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {

@@ -236,6 +236,7 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 
 		return nil, err
 	}
+	defer f.Close()
 
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
