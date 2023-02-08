@@ -71,6 +71,22 @@ func (vw *StrValWeights) RandVal(plugin sgc7plugin.IPlugin) (string, error) {
 	return vw.Vals[ci], nil
 }
 
+func (vw *StrValWeights) RandIndex(plugin sgc7plugin.IPlugin) (int, error) {
+	if len(vw.Vals) == 1 {
+		return 0, nil
+	}
+
+	ci, err := RandWithWeights(plugin, vw.MaxWeight, vw.Weights)
+	if err != nil {
+		goutils.Error("StrValWeights.RandVal:RandWithWeights",
+			zap.Error(err))
+
+		return -1, err
+	}
+
+	return ci, nil
+}
+
 // CloneExcludeVal - clone & exclude a val
 func (vw *StrValWeights) CloneExcludeVal(val string) (*StrValWeights, error) {
 	if len(vw.Vals) <= 1 {
@@ -108,6 +124,7 @@ func LoadStrValWeightsFromExcel(fn string) (*StrValWeights, error) {
 
 		return nil, err
 	}
+	defer f.Close()
 
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {

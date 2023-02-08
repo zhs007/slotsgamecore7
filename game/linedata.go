@@ -136,6 +136,7 @@ func LoadLineDataFromExcel(fn string) (*LineData, error) {
 
 		return nil, err
 	}
+	defer f.Close()
 
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
