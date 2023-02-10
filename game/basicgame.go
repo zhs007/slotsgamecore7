@@ -97,3 +97,8 @@ func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string,
 func (game *BasicGame) CheckStake(stake *Stake) error {
 	return ErrInvalidStake
 }
+
+// ResetConfig
+func (game *BasicGame) ResetConfig(cfg interface{}) {
+
+}
