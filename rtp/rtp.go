@@ -24,6 +24,7 @@ type RTP struct {
 	WinNums             int64
 	BetNums             int64
 	TotalBet            int64
+	TotalWins           int64
 	Root                *RTPNode
 	MapHR               map[string]*HitRateNode
 	MapFeature          map[string]*FeatureNode
@@ -58,6 +59,7 @@ func (rtp *RTP) Clone() *RTP {
 	nrtp := &RTP{
 		BetNums:             rtp.BetNums,
 		TotalBet:            rtp.TotalBet,
+		TotalWins:           rtp.TotalWins,
 		Root:                rtp.Root.Clone(),
 		MapHR:               make(map[string]*HitRateNode),
 		MapFeature:          make(map[string]*FeatureNode),
@@ -100,6 +102,7 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	rtp.WinNums += rtp1.WinNums
 	rtp.BetNums += rtp1.BetNums
 	rtp.TotalBet += rtp1.TotalBet
+	rtp.TotalWins += rtp1.TotalWins
 	rtp.Returns = append(rtp.Returns, rtp1.Returns...)
 	rtp.ReturnWeights = append(rtp.ReturnWeights, rtp1.ReturnWeights...)
 

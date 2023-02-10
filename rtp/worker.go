@@ -118,6 +118,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					currtp.Bet(stake.CashBet)
 
 					for _, v := range results {
+						currtp.TotalWins += v.CashWin
 						totalReturn += v.CashWin
 
 						currtp.OnResult(stake, v)
@@ -282,6 +283,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					currtp.Bet(stake.CashBet)
 
 					for _, v := range results {
+						currtp.TotalWins += v.CashWin
 						totalReturn += v.CashWin
 
 						currtp.OnResult(stake, v)
