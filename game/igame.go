@@ -26,4 +26,7 @@ type IGame interface {
 
 	// AddGameMod - add a gamemod
 	AddGameMod(gmod IGameMod) error
+
+	// ResetConfig
+	ResetConfig(cfg interface{})
 }
