@@ -11,35 +11,29 @@ import (
 
 // ValWeights
 type ValWeights struct {
-	Vals      []int
-	Weights   []int
-	MaxWeight int
+	Vals      []int `json:"vals"`
+	Weights   []int `json:"weights"`
+	MaxWeight int   `json:"maxWeight"`
 }
 
-func NewValWeights(vals []int, weights []int) (*ValWeights, error) {
-	if len(vals) != len(weights) {
-		goutils.Error("NewValWeights",
-			zap.Int("vals", len(vals)),
-			zap.Int("weights", len(weights)),
-			zap.Error(ErrInvalidValWeights))
+func (vw *ValWeights) ClearExcludeVal(val int) {
+	vw.Vals = []int{val}
+	vw.Weights = []int{1}
+	vw.MaxWeight = 1
+}
 
-		return nil, ErrInvalidValWeights
-	}
-
-	vw := &ValWeights{
-		Vals:      make([]int, len(vals)),
-		Weights:   make([]int, len(vals)),
-		MaxWeight: 0,
-	}
+func (vw *ValWeights) Reset(vals []int, weights []int) {
+	vw.Vals = make([]int, len(vals))
+	vw.Weights = make([]int, len(weights))
 
 	copy(vw.Vals, vals)
 	copy(vw.Weights, weights)
 
-	for _, v := range weights {
+	vw.MaxWeight = 0
+
+	for _, v := range vw.Weights {
 		vw.MaxWeight += v
 	}
-
-	return vw, nil
 }
 
 func (vw *ValWeights) Clone() *ValWeights {
@@ -96,6 +90,32 @@ func (vw *ValWeights) CloneExcludeVal(val int) (*ValWeights, error) {
 		zap.Error(ErrInvalidValWeightsVal))
 
 	return nil, ErrInvalidValWeightsVal
+}
+
+func NewValWeights(vals []int, weights []int) (*ValWeights, error) {
+	if len(vals) != len(weights) {
+		goutils.Error("NewValWeights",
+			zap.Int("vals", len(vals)),
+			zap.Int("weights", len(weights)),
+			zap.Error(ErrInvalidValWeights))
+
+		return nil, ErrInvalidValWeights
+	}
+
+	vw := &ValWeights{
+		Vals:      make([]int, len(vals)),
+		Weights:   make([]int, len(vals)),
+		MaxWeight: 0,
+	}
+
+	copy(vw.Vals, vals)
+	copy(vw.Weights, weights)
+
+	for _, v := range weights {
+		vw.MaxWeight += v
+	}
+
+	return vw, nil
 }
 
 // LoadValWeightsFromExcel - load xlsx file

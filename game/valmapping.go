@@ -8,8 +8,8 @@ import (
 )
 
 // ValMapping
-type ValMapping[T int, V int] struct {
-	MapVals map[T]V
+type ValMapping[T int, V int | float32 | float64] struct {
+	MapVals map[T]V `json:"mapVals"`
 }
 
 func (vm *ValMapping[T, V]) Clone() *ValMapping[T, V] {
@@ -43,6 +43,12 @@ func NewValMapping[T int, V int](typevals []T, vals []V) (*ValMapping[T, V], err
 	}
 
 	return vm, nil
+}
+
+func NewValMappingEx[T int, V int | float32 | float64]() *ValMapping[T, V] {
+	return &ValMapping[T, V]{
+		MapVals: make(map[T]V),
+	}
 }
 
 // LoadValMappingFromExcel - load xlsx file
