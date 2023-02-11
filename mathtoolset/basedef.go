@@ -26,6 +26,16 @@ func HasSymbol(symbols []SymbolType, symbol SymbolType) bool {
 	return false
 }
 
+func FindSymbol(symbols []SymbolType, symbol SymbolType) int {
+	for i, v := range symbols {
+		if v == symbol {
+			return i
+		}
+	}
+
+	return -1
+}
+
 func NewInReelSymbolTypeArr(num int) []InReelSymbolType {
 	arr := make([]InReelSymbolType, num)
 

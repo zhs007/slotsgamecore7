@@ -16,6 +16,13 @@ type ValWeights struct {
 	MaxWeight int   `json:"maxWeight"`
 }
 
+func (vw *ValWeights) Add(val int, weight int) {
+	vw.Vals = append(vw.Vals, val)
+	vw.Weights = append(vw.Weights, weight)
+
+	vw.MaxWeight += weight
+}
+
 func (vw *ValWeights) ClearExcludeVal(val int) {
 	vw.Vals = []int{val}
 	vw.Weights = []int{1}
@@ -90,6 +97,10 @@ func (vw *ValWeights) CloneExcludeVal(val int) (*ValWeights, error) {
 		zap.Error(ErrInvalidValWeightsVal))
 
 	return nil, ErrInvalidValWeightsVal
+}
+
+func NewValWeightsEx() *ValWeights {
+	return &ValWeights{}
 }
 
 func NewValWeights(vals []int, weights []int) (*ValWeights, error) {

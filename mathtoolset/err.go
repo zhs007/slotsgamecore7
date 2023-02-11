@@ -21,6 +21,9 @@ var (
 	// ErrNoValidSymbols - no valid symbols
 	ErrNoValidSymbols = errors.New("no valid symbols")
 
-	// ErrNoValidParamInAutoChgWeights - invalid param in AutoChgWeights
-	ErrNoValidParamInAutoChgWeights = errors.New("invalid param in AutoChgWeights")
+	// ErrValidParamInAutoChgWeights - invalid param in AutoChgWeights
+	ErrValidParamInAutoChgWeights = errors.New("invalid param in AutoChgWeights")
+
+	// ErrInvalidDataInAGRDataList - invalid data in agrDataList
+	ErrInvalidDataInAGRDataList = errors.New("invalid data in agrDataList")
 )
