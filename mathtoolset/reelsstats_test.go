@@ -66,3 +66,43 @@ func Test_BuildReelsStatsMapping(t *testing.T) {
 
 	t.Logf("Test_BuildReelsStatsMapping OK")
 }
+
+func Test_ReelStats_GetCanAddSymbols(t *testing.T) {
+	rs := NewReelStats()
+
+	rs.AddSymbol(0, 1)
+	rs.AddSymbol(1, 1)
+	rs.AddSymbol(2, 1)
+	rs.AddSymbol(3, 1)
+	rs.AddSymbol(4, 1)
+	rs.AddSymbol(5, 1)
+	rs.AddSymbol(6, 1)
+	rs.AddSymbol(7, 1)
+	rs.AddSymbol(8, 1)
+	rs.AddSymbol(9, 1)
+
+	lst := rs.GetCanAddSymbols([]SymbolType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+	assert.Equal(t, len(lst), 1)
+
+	t.Logf("Test_ReelStats_GetCanAddSymbols OK")
+}
+
+func Test_ReelStats_GetCanAddSymbols2(t *testing.T) {
+	rs := NewReelStats()
+
+	rs.AddSymbol(0, 1)
+	rs.AddSymbol(1, 2)
+	rs.AddSymbol(2, 3)
+	rs.AddSymbol(3, 4)
+	rs.AddSymbol(4, 5)
+	rs.AddSymbol(5, 6)
+	rs.AddSymbol(6, 7)
+	rs.AddSymbol(7, 8)
+	rs.AddSymbol(8, 8)
+	rs.AddSymbol(9, 8)
+
+	lst := rs.GetCanAddSymbols([]SymbolType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+	assert.Equal(t, len(lst), 8)
+
+	t.Logf("Test_ReelStats_GetCanAddSymbols2 OK")
+}

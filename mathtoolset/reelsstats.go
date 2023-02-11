@@ -36,7 +36,7 @@ func (rs *ReelStats) canAdd(i int, symbols []SymbolType) bool {
 		cs := symbols[ri]
 		cn := rs.MapSymbols[cs].Num
 
-		if cn < n {
+		if cn <= n {
 			return false
 		}
 	}
