@@ -660,3 +660,41 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 
 	return rss, nil
 }
+
+func BuildBasicReelsStats(reelnum int, paytables *sgc7game.PayTables, excludeSyms []SymbolType) (*ReelsStats, error) {
+	rss := &ReelsStats{}
+
+	for i := 0; i < reelnum; i++ {
+		rs := NewReelStats()
+
+		for s := range paytables.MapPay {
+			if !HasSymbol(excludeSyms, SymbolType(s)) {
+				rs.AddSymbol(SymbolType(s), 1)
+			}
+		}
+
+		rss.Reels = append(rss.Reels, rs)
+	}
+
+	rss.buildSortedSymbols()
+
+	return rss, nil
+}
+
+func BuildBasicReelsStatsEx(reelnum int, syms []SymbolType) (*ReelsStats, error) {
+	rss := &ReelsStats{}
+
+	for i := 0; i < reelnum; i++ {
+		rs := NewReelStats()
+
+		for _, s := range syms {
+			rs.AddSymbol(SymbolType(s), 1)
+		}
+
+		rss.Reels = append(rss.Reels, rs)
+	}
+
+	rss.buildSortedSymbols()
+
+	return rss, nil
+}

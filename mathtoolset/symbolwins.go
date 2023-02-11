@@ -25,6 +25,30 @@ type SymbolWinsStats struct {
 	Total   int64
 }
 
+func (sws *SymbolWinsStats) IsFine() bool {
+	for i := 0; i+1 < len(sws.WinsNum); i++ {
+		if sws.WinsNum[i] > sws.WinsNum[i+1] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (sws *SymbolWinsStats) Clone() *SymbolWinsStats {
+	nsws := &SymbolWinsStats{
+		Symbol:  sws.Symbol,
+		WinsNum: make([]int64, len(sws.WinsNum)),
+		Wins:    make([]int64, len(sws.Wins)),
+		Total:   sws.Total,
+	}
+
+	copy(nsws.Wins, sws.Wins)
+	copy(nsws.WinsNum, sws.WinsNum)
+
+	return nsws
+}
+
 func (sws *SymbolWinsStats) Merge(sws1 *SymbolWinsStats) {
 	for i, v := range sws1.Wins {
 		sws.Wins[i] += v
@@ -61,7 +85,39 @@ type SymbolsWinsStats struct {
 	MapSymbols map[SymbolType]*SymbolWinsStats
 	Symbols    []SymbolType
 	Num        int
-	total      int64
+	TotalBet   int64
+	TotalWins  int64
+}
+
+func (ssws *SymbolsWinsStats) Clone() *SymbolsWinsStats {
+	nssws := &SymbolsWinsStats{
+		MapSymbols: make(map[SymbolType]*SymbolWinsStats),
+		Symbols:    make([]SymbolType, len(ssws.Symbols)),
+		Num:        ssws.Num,
+		TotalBet:   ssws.TotalBet,
+		TotalWins:  ssws.TotalWins,
+	}
+
+	copy(nssws.Symbols, ssws.Symbols)
+	for k, v := range ssws.MapSymbols {
+		nssws.MapSymbols[k] = v.Clone()
+	}
+
+	return nssws
+}
+
+func (ssws *SymbolsWinsStats) CountRTP() float64 {
+	return float64(ssws.TotalWins) / float64(ssws.TotalBet)
+}
+
+func (ssws *SymbolsWinsStats) IsFine() bool {
+	for _, v := range ssws.MapSymbols {
+		if !v.IsFine() {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (ssws *SymbolsWinsStats) Merge(ssws1 *SymbolsWinsStats) {
@@ -95,7 +151,7 @@ func (ssws *SymbolsWinsStats) GetSymbolWinsStats(symbol SymbolType) *SymbolWinsS
 func (ssws *SymbolsWinsStats) onBuildEnd() {
 	ssws.Symbols = nil
 	for s, v := range ssws.MapSymbols {
-		v.Total = ssws.total
+		v.Total = ssws.TotalBet
 		ssws.Symbols = append(ssws.Symbols, s)
 	}
 
@@ -491,12 +547,14 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.total = 1
+	ssws.TotalBet = 1
 	for _, arr := range reels.Reels {
-		ssws.total *= int64(len(arr))
+		ssws.TotalBet *= int64(len(arr))
 	}
 
-	ssws.total *= int64(betMul)
+	ssws.TotalBet *= int64(betMul)
+
+	ssws.TotalWins = 0
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -515,6 +573,8 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 
 					sws.WinsNum[i] = cw
 					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
+
+					ssws.TotalWins += int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
 				}
 			}
 		}
@@ -530,12 +590,14 @@ func AnalyzeReelsWithLineEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.total = 1
+	ssws.TotalBet = 1
 	for _, rs := range rss.Reels {
-		ssws.total *= int64(rs.TotalSymbolNum)
+		ssws.TotalBet *= int64(rs.TotalSymbolNum)
 	}
 
-	ssws.total *= int64(betMul)
+	ssws.TotalBet *= int64(betMul)
+
+	ssws.TotalWins = 0
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -554,6 +616,8 @@ func AnalyzeReelsWithLineEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 
 					sws.WinsNum[i] = cw
 					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
+
+					ssws.TotalWins += int64(arrPay[i]) * sws.WinsNum[i] * int64(lineNum)
 				}
 			}
 		}
@@ -647,10 +711,12 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.total = 1
+	ssws.TotalBet = 1
 	for _, arr := range reels.Reels {
-		ssws.total *= int64(len(arr))
+		ssws.TotalBet *= int64(len(arr))
 	}
+
+	ssws.TotalWins = 0
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -669,6 +735,8 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 
 					sws.WinsNum[i] = cw
 					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i]
+
+					ssws.TotalWins += int64(arrPay[i]) * sws.WinsNum[i]
 				}
 			}
 		}
@@ -684,10 +752,12 @@ func AnalyzeReelsScatterEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
-	ssws.total = 1
+	ssws.TotalBet = 1
 	for _, rs := range rss.Reels {
-		ssws.total *= int64(rs.TotalSymbolNum)
+		ssws.TotalBet *= int64(rs.TotalSymbolNum)
 	}
+
+	ssws.TotalWins = 0
 
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
@@ -706,6 +776,8 @@ func AnalyzeReelsScatterEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 
 					sws.WinsNum[i] = cw
 					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i]
+
+					ssws.TotalWins += int64(arrPay[i]) * sws.WinsNum[i]
 				}
 			}
 		}
