@@ -11,9 +11,9 @@ type FuncRunner[T int | float32 | float64] func(nvw *sgc7game.ValWeights, isfast
 func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T, runner FuncRunner[T]) (*sgc7game.ValWeights, error) {
 	if len(vw.Vals) <= 1 {
 		goutils.Error("AutoChgWeights",
-			zap.Error(ErrNoValidParamInAutoChgWeights))
+			zap.Error(ErrValidParamInAutoChgWeights))
 
-		return nil, ErrNoValidParamInAutoChgWeights
+		return nil, ErrValidParamInAutoChgWeights
 	}
 
 	curval := runner(vw, false)
@@ -46,9 +46,9 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 
 	if !hasbigger || !hassmaller {
 		goutils.Error("AutoChgWeights",
-			zap.Error(ErrNoValidParamInAutoChgWeights))
+			zap.Error(ErrValidParamInAutoChgWeights))
 
-		return nil, ErrNoValidParamInAutoChgWeights
+		return nil, ErrValidParamInAutoChgWeights
 	}
 
 	return nil, nil

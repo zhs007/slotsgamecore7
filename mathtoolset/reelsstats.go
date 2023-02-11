@@ -28,6 +28,34 @@ type ReelStats struct {
 	TotalSymbolNum int
 }
 
+func (rs *ReelStats) canAdd(i int, symbols []SymbolType) bool {
+	s := symbols[i]
+	n := rs.MapSymbols[s].Num
+
+	for ri := i + 1; ri < len(symbols); ri++ {
+		cs := symbols[ri]
+		cn := rs.MapSymbols[cs].Num
+
+		if cn < n {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (rs *ReelStats) GetCanAddSymbols(symbols []SymbolType) []SymbolType {
+	lst := []SymbolType{}
+
+	for ri := len(symbols) - 1; ri >= 0; ri-- {
+		if rs.canAdd(ri, symbols) {
+			lst = append(lst, symbols[ri])
+		}
+	}
+
+	return lst
+}
+
 func (rs *ReelStats) BuildSymbols(excludeSymbols []SymbolType) []SymbolType {
 	symbols := []SymbolType{}
 
