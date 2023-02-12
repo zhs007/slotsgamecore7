@@ -16,9 +16,14 @@ type acwData[T int | float32 | float64] struct {
 
 func (acwd *acwData[T]) calcVal0(vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights) {
 	var val T
+	maxweight := 0
 
 	for _, v := range acwd.group0 {
-		val += T(float64(vm.MapVals[v]) * float64(vw.GetWeight(v)) / float64(vw.MaxWeight))
+		maxweight += vw.GetWeight(v)
+	}
+
+	for _, v := range acwd.group0 {
+		val += T(float64(vm.MapVals[v]) * float64(vw.GetWeight(v)) / float64(maxweight))
 	}
 
 	acwd.val0 = val
@@ -34,9 +39,14 @@ func (acwd *acwData[T]) calcGroup1AndVal1(vm *sgc7game.ValMapping[int, T], vw *s
 	}
 
 	var val T
+	maxweight := 0
 
 	for _, v := range acwd.group1 {
-		val += T(float64(vm.MapVals[v]) * float64(vw.GetWeight(v)) / float64(vw.MaxWeight))
+		maxweight += vw.GetWeight(v)
+	}
+
+	for _, v := range acwd.group1 {
+		val += T(float64(vm.MapVals[v]) * float64(vw.GetWeight(v)) / float64(maxweight))
 	}
 
 	acwd.val1 = val
