@@ -16,6 +16,16 @@ type ValWeights struct {
 	MaxWeight int   `json:"maxWeight"`
 }
 
+func (vw *ValWeights) GetWeight(val int) int {
+	for i, v := range vw.Vals {
+		if v == val {
+			return vw.Weights[i]
+		}
+	}
+
+	return 0
+}
+
 func (vw *ValWeights) Add(val int, weight int) {
 	vw.Vals = append(vw.Vals, val)
 	vw.Weights = append(vw.Weights, weight)
