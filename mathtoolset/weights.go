@@ -74,7 +74,12 @@ func (acwd *acwData[T]) calcOff(vw *sgc7game.ValWeights) float64 {
 	}
 
 	for _, v := range acwd.group0 {
-		off += float64(vw.GetWeight(v))/float64(vw.MaxWeight) - float64(vw.GetWeight(v))/float64(maxweight)*acwd.weight0
+		co := float64(vw.GetWeight(v))/float64(vw.MaxWeight) - float64(vw.GetWeight(v))/float64(maxweight)*acwd.weight0
+		if co < 0 {
+			off += -co
+		} else {
+			off += co
+		}
 	}
 
 	maxweight = 0
@@ -84,7 +89,12 @@ func (acwd *acwData[T]) calcOff(vw *sgc7game.ValWeights) float64 {
 	}
 
 	for _, v := range acwd.group1 {
-		off += float64(vw.GetWeight(v))/float64(vw.MaxWeight) - float64(vw.GetWeight(v))/float64(maxweight)*(1-acwd.weight0)
+		co := float64(vw.GetWeight(v))/float64(vw.MaxWeight) - float64(vw.GetWeight(v))/float64(maxweight)*(1-acwd.weight0)
+		if co < 0 {
+			off += -co
+		} else {
+			off += co
+		}
 	}
 
 	return off
