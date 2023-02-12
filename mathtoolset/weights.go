@@ -93,12 +93,24 @@ func (acwd *acwData[T]) calcOff(vw *sgc7game.ValWeights) float64 {
 func (acwd *acwData[T]) calcNewValWeights(vw *sgc7game.ValWeights, precision int) *sgc7game.ValWeights {
 	nvw := sgc7game.NewValWeightsEx()
 
+	maxweight := 0
+
 	for _, v := range acwd.group0 {
-		nvw.Add(v, vw.GetWeight(v)*int(acwd.weight0*float64(precision)))
+		maxweight += vw.GetWeight(v)
+	}
+
+	for _, v := range acwd.group0 {
+		nvw.Add(v, int(float64(vw.GetWeight(v))/float64(maxweight)*acwd.weight0*float64(precision)))
+	}
+
+	maxweight = 0
+
+	for _, v := range acwd.group1 {
+		maxweight += vw.GetWeight(v)
 	}
 
 	for _, v := range acwd.group1 {
-		nvw.Add(v, vw.GetWeight(v)*int((1-acwd.weight0)*float64(precision)))
+		nvw.Add(v, int(float64(vw.GetWeight(v))/float64(maxweight)*(1-acwd.weight0)*float64(precision)))
 	}
 
 	return nvw
