@@ -16,6 +16,42 @@ type ValWeights struct {
 	MaxWeight int   `json:"maxWeight"`
 }
 
+func (vw *ValWeights) SortBy(dst *ValWeights) error {
+	if len(vw.Vals) != len(dst.Vals) {
+		goutils.Error("ValWeights.SortBy",
+			zap.Error(ErrInvalidValWeights))
+
+		return ErrInvalidValWeights
+	}
+
+	vals := make([]int, len(vw.Vals))
+	weights := make([]int, len(vw.Weights))
+
+	for i, v := range dst.Vals {
+		vals[i] = v
+		weights[i] = vw.GetWeight(v)
+	}
+
+	maxweights := 0
+	for _, v := range weights {
+		maxweights += v
+	}
+
+	if maxweights != vw.MaxWeight {
+		goutils.Error("ValWeights.SortBy",
+			zap.Int("MaxWeight", vw.MaxWeight),
+			zap.Int("NewMaxWeight", maxweights),
+			zap.Error(ErrInvalidValWeights))
+
+		return ErrInvalidValWeights
+	}
+
+	vw.Vals = vals
+	vw.Weights = weights
+
+	return nil
+}
+
 func (vw *ValWeights) GetWeight(val int) int {
 	for i, v := range vw.Vals {
 		if v == val {
