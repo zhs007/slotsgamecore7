@@ -26,4 +26,7 @@ var (
 
 	// ErrInvalidDataInAGRDataList - invalid data in agrDataList
 	ErrInvalidDataInAGRDataList = errors.New("invalid data in agrDataList")
+
+	// ErrNoResultInAutoChgWeights - no result in AutoChgWeights
+	ErrNoResultInAutoChgWeights = errors.New("no result in AutoChgWeights")
 )

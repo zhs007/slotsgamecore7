@@ -7,10 +7,11 @@ import (
 )
 
 type acwData[T int | float32 | float64] struct {
-	group0 []int
-	val0   T
-	group1 []int
-	val1   T
+	group0  []int
+	val0    T
+	group1  []int
+	val1    T
+	weight0 float64
 }
 
 func (acwd *acwData[T]) calcVal0(vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights) {
@@ -39,11 +40,65 @@ func (acwd *acwData[T]) calcGroup1AndVal1(vm *sgc7game.ValMapping[int, T], vw *s
 	acwd.val1 = val
 }
 
+func (acwd *acwData[T]) calcTarget(target T) bool {
+	if acwd.val0 > target && acwd.val1 > target {
+		return false
+	} else if acwd.val0 < target && acwd.val1 < target {
+		return false
+	}
+
+	acwd.weight0 = float64(target-acwd.val1) / float64(acwd.val0-acwd.val1)
+
+	return true
+}
+
+func (acwd *acwData[T]) calcOff(vw *sgc7game.ValWeights) float64 {
+	var off float64
+
+	for _, v := range acwd.group0 {
+		off += float64(vw.GetWeight(v)) / float64(vw.MaxWeight) * acwd.weight0
+	}
+
+	for _, v := range acwd.group1 {
+		off += float64(vw.GetWeight(v)) / float64(vw.MaxWeight) * (1 - acwd.weight0)
+	}
+
+	return off
+}
+
+func (acwd *acwData[T]) calcNewValWeights(vw *sgc7game.ValWeights, precision int) *sgc7game.ValWeights {
+	nvw := sgc7game.NewValWeightsEx()
+
+	for _, v := range acwd.group0 {
+		nvw.Add(v, vw.GetWeight(v)*int(acwd.weight0*float64(precision)))
+	}
+
+	for _, v := range acwd.group1 {
+		nvw.Add(v, vw.GetWeight(v)*int((1-acwd.weight0)*float64(precision)))
+	}
+
+	return nvw
+}
+
 type FuncRunnerWithValWeights[T int | float32 | float64] func(nvw *sgc7game.ValWeights, isfastmode bool) T
 
 type funcFEAWL func([]int)
 
 func forEachArrWithLength(dest []int, src []int, length int, onforeach funcFEAWL) {
+	if length > len(src) {
+		return
+	}
+
+	if length == len(src) {
+		dest = append(dest, src...)
+
+		onforeach(dest)
+
+		dest = dest[0 : len(dest)-len(src)]
+
+		return
+	}
+
 	if length == 1 {
 		for i := 0; i < len(src); i++ {
 			dest = append(dest, src[i])
@@ -56,12 +111,16 @@ func forEachArrWithLength(dest []int, src []int, length int, onforeach funcFEAWL
 		return
 	}
 
-	for i := 0; i < len(src); i++ {
+	nsrc := make([]int, 0, len(src))
+
+	for i := 0; i <= len(src)-length; i++ {
 		dest = append(dest, src[i])
 
-		forEachArrWithLength(dest, append(src[0:i], src[i+1:]...), length-1, onforeach)
+		nsrc = append(nsrc, src[i+1:]...)
+		forEachArrWithLength(dest, nsrc, length-1, onforeach)
 
 		dest = dest[0 : len(dest)-1]
+		nsrc = nsrc[:0]
 	}
 }
 
@@ -100,7 +159,7 @@ func AnalyzeWeights[T int | float32 | float64](vw *sgc7game.ValWeights,
 }
 
 func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T,
-	runner FuncRunnerWithValWeights[T]) (*sgc7game.ValWeights, error) {
+	runner FuncRunnerWithValWeights[T], precision int) (*sgc7game.ValWeights, error) {
 
 	if len(vw.Vals) <= 1 {
 		goutils.Error("AutoChgWeights",
@@ -144,14 +203,32 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 		return nil, ErrValidParamInAutoChgWeights
 	}
 
-	forEachACWData(mappingVals, vw, func(acwd *acwData[T]) {
-		if acwd.val0 > target && acwd.val1 > target {
-			return
-		} else if acwd.val0 < target && acwd.val1 < target {
-			return
-		}
+	var curacwd *acwData[T]
+	var curoff float64
 
+	forEachACWData(mappingVals, vw, func(acwd *acwData[T]) {
+		if acwd.calcTarget(target) {
+			if curacwd == nil {
+				curacwd = acwd
+
+				curoff = curacwd.calcOff(vw)
+			} else {
+				off := acwd.calcOff(vw)
+
+				if off < curoff {
+					curacwd = acwd
+					curoff = off
+				}
+			}
+		}
 	})
 
-	return nil, nil
+	if curacwd != nil {
+		return curacwd.calcNewValWeights(vw, precision), nil
+	}
+
+	goutils.Error("AutoChgWeights",
+		zap.Error(ErrNoResultInAutoChgWeights))
+
+	return nil, ErrNoResultInAutoChgWeights
 }
