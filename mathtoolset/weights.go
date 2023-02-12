@@ -8,6 +8,8 @@ import (
 	"go.uber.org/zap"
 )
 
+type FuncCmpTarget[T int | float32 | float64] func(v0 T, v1 T) int
+
 type acwData[T int | float32 | float64] struct {
 	group0  []int
 	val0    T
@@ -223,7 +225,7 @@ func AnalyzeWeights[T int | float32 | float64](vw *sgc7game.ValWeights,
 }
 
 func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T,
-	runner FuncRunnerWithValWeights[T], precision int) (*sgc7game.ValWeights, error) {
+	runner FuncRunnerWithValWeights[T], precision int, cmpTarget FuncCmpTarget[T]) (*sgc7game.ValWeights, error) {
 
 	if len(vw.Vals) <= 1 {
 		goutils.Error("AutoChgWeights",
@@ -233,7 +235,7 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 	}
 
 	curval := runner(vw, false)
-	if curval == target {
+	if cmpTarget(curval, target) == 0 {
 		return vw, nil
 	}
 
@@ -251,11 +253,11 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 			goutils.JSON("ValWeights", nvw),
 			zap.Any("return", mappingVals.MapVals[v]))
 
-		if mappingVals.MapVals[v] > target {
+		if cmpTarget(mappingVals.MapVals[v], target) > 0 {
 			hasbigger = true
 		}
 
-		if mappingVals.MapVals[v] < target {
+		if cmpTarget(mappingVals.MapVals[v], target) < 0 {
 			hassmaller = true
 		}
 	}
@@ -314,7 +316,7 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 
 func AutoChgWeightsEx[T int | float32 | float64](vm *sgc7game.ValMapping[int, T],
 	vw *sgc7game.ValWeights, target T,
-	runner FuncRunnerWithValWeights[T], precision int) (*sgc7game.ValWeights, error) {
+	runner FuncRunnerWithValWeights[T], precision int, cmpTarget FuncCmpTarget[T]) (*sgc7game.ValWeights, error) {
 
 	if len(vw.Vals) <= 1 {
 		goutils.Error("AutoChgWeightsEx",
@@ -324,7 +326,7 @@ func AutoChgWeightsEx[T int | float32 | float64](vm *sgc7game.ValMapping[int, T]
 	}
 
 	curval := runner(vw, false)
-	if curval == target {
+	if cmpTarget(curval, target) == 0 {
 		return vw, nil
 	}
 
@@ -332,11 +334,11 @@ func AutoChgWeightsEx[T int | float32 | float64](vm *sgc7game.ValMapping[int, T]
 	hassmaller := false
 	mappingVals := vm
 	for _, v := range vw.Vals {
-		if mappingVals.MapVals[v] > target {
+		if cmpTarget(mappingVals.MapVals[v], target) > 0 {
 			hasbigger = true
 		}
 
-		if mappingVals.MapVals[v] < target {
+		if cmpTarget(mappingVals.MapVals[v], target) < 0 {
 			hassmaller = true
 		}
 	}
