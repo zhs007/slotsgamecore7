@@ -12,6 +12,16 @@ type ValMapping[T int, V int | float32 | float64] struct {
 	MapVals map[T]V `json:"mapVals"`
 }
 
+func (vm *ValMapping[T, V]) Vals() []T {
+	lst := []T{}
+
+	for k := range vm.MapVals {
+		lst = append(lst, k)
+	}
+
+	return lst
+}
+
 func (vm *ValMapping[T, V]) Clone() *ValMapping[T, V] {
 	nvm := &ValMapping[T, V]{
 		MapVals: make(map[T]V),
