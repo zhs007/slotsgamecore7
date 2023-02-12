@@ -141,11 +141,18 @@ type funcFEACWD[T int | float32 | float64] func(*acwData[T])
 func forEachACWData[T int | float32 | float64](vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights, foreach funcFEACWD[T]) {
 	arr := vm.Vals()
 
+	// num := len(vm.MapVals) / 2
+	// if len(vm.MapVals)%2 > 1 {
+	// 	num++
+	// }
+
 	for i := 1; i <= len(vm.MapVals)/2; i++ {
 		forEachArrWithLength(nil, arr, i, func(group0 []int) {
 			acwd := &acwData[T]{
-				group0: group0,
+				group0: make([]int, len(group0)),
 			}
+
+			copy(acwd.group0, group0)
 
 			acwd.calcVal0(vm, vw)
 			acwd.calcGroup1AndVal1(vm, vw)
