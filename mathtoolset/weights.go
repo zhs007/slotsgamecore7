@@ -28,7 +28,9 @@ func (acwd *acwData[T]) calcGroup1AndVal1(vm *sgc7game.ValMapping[int, T], vw *s
 	acwd.group1 = nil
 
 	for k := range vm.MapVals {
-		acwd.group1 = append(acwd.group1, k)
+		if goutils.IndexOfIntSlice(acwd.group0, k, 0) == -1 {
+			acwd.group1 = append(acwd.group1, k)
+		}
 	}
 
 	var val T
