@@ -1,6 +1,8 @@
 package mathtoolset
 
 import (
+	"fmt"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
@@ -12,6 +14,11 @@ type acwData[T int | float32 | float64] struct {
 	group1  []int
 	val1    T
 	weight0 float64
+}
+
+func (acwd *acwData[T]) outputString() string {
+	return fmt.Sprintf("group0 - %v val0 - %v group1 - %v val1 - %v weight0 - %v",
+		acwd.group0, acwd.val0, acwd.group1, acwd.val1, acwd.weight0)
 }
 
 func (acwd *acwData[T]) calcVal0(vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights) {
@@ -265,8 +272,16 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 				curacwd = acwd
 
 				curoff = curacwd.calcOff(vw)
+
+				goutils.Info("AutoChgWeights:result",
+					zap.Any("ret", acwd.outputString()),
+					zap.Any("off", curoff))
 			} else {
 				off := acwd.calcOff(vw)
+
+				goutils.Info("AutoChgWeights:result",
+					zap.Any("ret", acwd.outputString()),
+					zap.Any("off", off))
 
 				if off < curoff {
 					curacwd = acwd
