@@ -299,10 +299,95 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 	})
 
 	if curacwd != nil {
-		return curacwd.calcNewValWeights(vw, precision), nil
+		nvw := curacwd.calcNewValWeights(vw, precision)
+
+		nvw.SortBy(vw)
+
+		return nvw, nil
 	}
 
 	goutils.Error("AutoChgWeights",
+		zap.Error(ErrNoResultInAutoChgWeights))
+
+	return nil, ErrNoResultInAutoChgWeights
+}
+
+func AutoChgWeightsEx[T int | float32 | float64](vm *sgc7game.ValMapping[int, T],
+	vw *sgc7game.ValWeights, target T,
+	runner FuncRunnerWithValWeights[T], precision int) (*sgc7game.ValWeights, error) {
+
+	if len(vw.Vals) <= 1 {
+		goutils.Error("AutoChgWeightsEx",
+			zap.Error(ErrValidParamInAutoChgWeights))
+
+		return nil, ErrValidParamInAutoChgWeights
+	}
+
+	curval := runner(vw, false)
+	if curval == target {
+		return vw, nil
+	}
+
+	hasbigger := false
+	hassmaller := false
+	mappingVals := vm
+	for _, v := range vw.Vals {
+		if mappingVals.MapVals[v] > target {
+			hasbigger = true
+		}
+
+		if mappingVals.MapVals[v] < target {
+			hassmaller = true
+		}
+	}
+
+	if !hasbigger || !hassmaller {
+		goutils.Error("AutoChgWeightsEx",
+			zap.Error(ErrValidParamInAutoChgWeights))
+
+		return nil, ErrValidParamInAutoChgWeights
+	}
+
+	var curacwd *acwData[T]
+	var curoff float64
+
+	forEachACWData(mappingVals, vw, func(acwd *acwData[T]) {
+		if acwd.calcTarget(target) {
+			if curacwd == nil {
+				curacwd = acwd
+
+				curoff = curacwd.calcOff(vw)
+
+				goutils.Info("AutoChgWeightsEx:result",
+					zap.Any("ret", acwd.outputString()),
+					zap.Any("off", curoff))
+			} else {
+				off := acwd.calcOff(vw)
+
+				goutils.Info("AutoChgWeightsEx:result",
+					zap.Any("ret", acwd.outputString()),
+					zap.Any("off", off))
+
+				if off < curoff {
+					curacwd = acwd
+					curoff = off
+				}
+			}
+		} else {
+			goutils.Info("AutoChgWeightsEx:result",
+				zap.Any("ret", acwd.outputString()))
+		}
+	})
+
+	if curacwd != nil {
+		nvw := curacwd.calcNewValWeights(vw, precision)
+
+		nvw.SortBy(vw)
+
+		return nvw, nil
+	}
+
+	goutils.Error("AutoChgWeightsEx",
 		zap.Error(ErrNoResultInAutoChgWeights))
 
 	return nil, ErrNoResultInAutoChgWeights
