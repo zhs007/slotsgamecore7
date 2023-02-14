@@ -8,7 +8,7 @@ import (
 )
 
 // ValMapping
-type ValMapping[T int, V int | float32 | float64] struct {
+type ValMapping[T int, V int | int32 | int64 | float32 | float64] struct {
 	MapVals map[T]V `json:"mapVals"`
 }
 
