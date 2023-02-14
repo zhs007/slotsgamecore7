@@ -8,11 +8,11 @@ import (
 )
 
 // ValMapping
-type ValMapping[T int, V int | int32 | int64 | float32 | float64] struct {
+type ValMapping[T int, V int | int32 | int64] struct {
 	MapVals map[T]V `json:"mapVals"`
 }
 
-func (vm *ValMapping[T, V]) Vals() []T {
+func (vm *ValMapping[T, V]) Keys() []T {
 	lst := []T{}
 
 	for k := range vm.MapVals {
@@ -34,7 +34,7 @@ func (vm *ValMapping[T, V]) Clone() *ValMapping[T, V] {
 	return nvm
 }
 
-func NewValMapping[T int, V int | int32 | int64 | float32 | float64](typevals []T, vals []V) (*ValMapping[T, V], error) {
+func NewValMapping[T int, V int | int32 | int64](typevals []T, vals []V) (*ValMapping[T, V], error) {
 	if len(typevals) != len(vals) {
 		goutils.Error("NewValMapping",
 			zap.Int("typevals", len(typevals)),
@@ -55,14 +55,14 @@ func NewValMapping[T int, V int | int32 | int64 | float32 | float64](typevals []
 	return vm, nil
 }
 
-func NewValMappingEx[T int, V int | int32 | int64 | float32 | float64]() *ValMapping[T, V] {
+func NewValMappingEx[T int, V int | int32 | int64]() *ValMapping[T, V] {
 	return &ValMapping[T, V]{
 		MapVals: make(map[T]V),
 	}
 }
 
 // LoadValMappingFromExcel - load xlsx file
-func LoadValMappingFromExcel[T int, V int | int32 | int64 | float32 | float64](fn string, headerType string, headerVal string) (*ValMapping[T, V], error) {
+func LoadValMappingFromExcel[T int, V int | int32 | int64](fn string, headerType string, headerVal string) (*ValMapping[T, V], error) {
 	typevals := []T{}
 	vals := []V{}
 
