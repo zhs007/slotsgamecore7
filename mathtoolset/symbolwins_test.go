@@ -23,7 +23,7 @@ func Test_AnalyzeReelsWithLine(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, ssws)
 
-	err = ssws.SaveExcel("../unittestdata/symbolswinsstats.xlsx", []SymbolsWinsFileMode{SWFModeRTP, SWFModeWinsNum})
+	err = ssws.SaveExcel("../unittestdata/symbolswinsstats.xlsx", []SymbolsWinsFileMode{SWFModeRTP, SWFModeWinsNum, SWFModeWinsNumPer})
 	assert.NoError(t, err)
 
 	t.Logf("Test_AnalyzeReelsWithLine OK")
@@ -45,7 +45,7 @@ func Test_AnalyzeReelsScatter(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, ssws)
 
-	err = ssws.SaveExcel("../unittestdata/scatterswinsstats.xlsx", []SymbolsWinsFileMode{SWFModeRTP, SWFModeWinsNum})
+	err = ssws.SaveExcel("../unittestdata/scatterswinsstats.xlsx", []SymbolsWinsFileMode{SWFModeRTP, SWFModeWinsNum, SWFModeWinsNumPer})
 	assert.NoError(t, err)
 
 	t.Logf("Test_AnalyzeReelsScatter OK")
@@ -73,7 +73,7 @@ func Test_MergeSSWS(t *testing.T) {
 
 	ssws.Merge(ssws1)
 
-	err = ssws.SaveExcel("../unittestdata/mergewinsstats.xlsx", []SymbolsWinsFileMode{SWFModeRTP, SWFModeWinsNum})
+	err = ssws.SaveExcel("../unittestdata/mergewinsstats.xlsx", []SymbolsWinsFileMode{SWFModeRTP, SWFModeWinsNum, SWFModeWinsNumPer})
 	assert.NoError(t, err)
 
 	t.Logf("Test_AnalyzeReelsScatter OK")

@@ -8,9 +8,9 @@ import (
 	"go.uber.org/zap"
 )
 
-type FuncCmpTarget[T int | float32 | float64] func(v0 T, v1 T) int
+type FuncCmpTarget[T float32 | float64] func(v0 T, v1 T) int
 
-type acwData[T int | float32 | float64] struct {
+type acwData[T float32 | float64] struct {
 	group0  []int
 	val0    T
 	group1  []int
@@ -23,7 +23,7 @@ func (acwd *acwData[T]) outputString() string {
 		acwd.group0, acwd.val0, acwd.group1, acwd.val1, acwd.weight0)
 }
 
-func (acwd *acwData[T]) calcVal0(vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights) {
+func (acwd *acwData[T]) calcVal0(vm *sgc7game.FloatValMapping[int, T], vw *sgc7game.ValWeights) {
 	var val T
 	maxweight := 0
 
@@ -38,7 +38,7 @@ func (acwd *acwData[T]) calcVal0(vm *sgc7game.ValMapping[int, T], vw *sgc7game.V
 	acwd.val0 = val
 }
 
-func (acwd *acwData[T]) calcGroup1AndVal1(vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights) {
+func (acwd *acwData[T]) calcGroup1AndVal1(vm *sgc7game.FloatValMapping[int, T], vw *sgc7game.ValWeights) {
 	acwd.group1 = nil
 
 	for k := range vm.MapVals {
@@ -139,7 +139,7 @@ func (acwd *acwData[T]) calcNewValWeights(vw *sgc7game.ValWeights, precision int
 	return nvw
 }
 
-type FuncRunnerWithValWeights[T int | float32 | float64] func(nvw *sgc7game.ValWeights, isfastmode bool) T
+type FuncRunnerWithValWeights[T float32 | float64] func(nvw *sgc7game.ValWeights, isfastmode bool) T
 
 type funcFEAWL func([]int)
 
@@ -183,10 +183,10 @@ func forEachArrWithLength(dest []int, src []int, length int, onforeach funcFEAWL
 	}
 }
 
-type funcFEACWD[T int | float32 | float64] func(*acwData[T])
+type funcFEACWD[T float32 | float64] func(*acwData[T])
 
-func forEachACWData[T int | float32 | float64](vm *sgc7game.ValMapping[int, T], vw *sgc7game.ValWeights, foreach funcFEACWD[T]) {
-	arr := vm.Vals()
+func forEachACWData[T float32 | float64](vm *sgc7game.FloatValMapping[int, T], vw *sgc7game.ValWeights, foreach funcFEACWD[T]) {
+	arr := vm.Keys()
 
 	// num := len(vm.MapVals) / 2
 	// if len(vm.MapVals)%2 > 1 {
@@ -209,10 +209,10 @@ func forEachACWData[T int | float32 | float64](vm *sgc7game.ValMapping[int, T], 
 	}
 }
 
-func AnalyzeWeights[T int | float32 | float64](vw *sgc7game.ValWeights,
-	runner FuncRunnerWithValWeights[T]) (*sgc7game.ValMapping[int, T], error) {
+func AnalyzeWeights[T float32 | float64](vw *sgc7game.ValWeights,
+	runner FuncRunnerWithValWeights[T]) (*sgc7game.FloatValMapping[int, T], error) {
 
-	mappingVals := sgc7game.NewValMappingEx[int, T]()
+	mappingVals := sgc7game.NewFloatValMappingEx[int, T]()
 	for _, v := range vw.Vals {
 		nvw := vw.Clone()
 
@@ -224,7 +224,7 @@ func AnalyzeWeights[T int | float32 | float64](vw *sgc7game.ValWeights,
 	return mappingVals, nil
 }
 
-func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T,
+func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 	runner FuncRunnerWithValWeights[T], precision int, cmpTarget FuncCmpTarget[T]) (*sgc7game.ValWeights, error) {
 
 	if len(vw.Vals) <= 1 {
@@ -241,7 +241,7 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 
 	hasbigger := false
 	hassmaller := false
-	mappingVals := sgc7game.NewValMappingEx[int, T]()
+	mappingVals := sgc7game.NewFloatValMappingEx[int, T]()
 	for _, v := range vw.Vals {
 		nvw := vw.Clone()
 
@@ -314,7 +314,7 @@ func AutoChgWeights[T int | float32 | float64](vw *sgc7game.ValWeights, target T
 	return nil, ErrNoResultInAutoChgWeights
 }
 
-func AutoChgWeightsEx[T int | float32 | float64](vm *sgc7game.ValMapping[int, T],
+func AutoChgWeightsEx[T float32 | float64](vm *sgc7game.FloatValMapping[int, T],
 	vw *sgc7game.ValWeights, target T,
 	runner FuncRunnerWithValWeights[T], precision int, cmpTarget FuncCmpTarget[T]) (*sgc7game.ValWeights, error) {
 

@@ -13,9 +13,10 @@ import (
 type SymbolsWinsFileMode int
 
 const (
-	SWFModeRTP     SymbolsWinsFileMode = 1
-	SWFModeWins    SymbolsWinsFileMode = 2
-	SWFModeWinsNum SymbolsWinsFileMode = 3
+	SWFModeRTP        SymbolsWinsFileMode = 1
+	SWFModeWins       SymbolsWinsFileMode = 2
+	SWFModeWinsNum    SymbolsWinsFileMode = 3
+	SWFModeWinsNumPer SymbolsWinsFileMode = 4
 )
 
 type SymbolWinsStats struct {
@@ -166,7 +167,9 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 	if fm == SWFModeWins {
 		sheet = "wins"
 	} else if fm == SWFModeWinsNum {
-		sheet = "winsnum"
+		sheet = "wins number"
+	} else if fm == SWFModeWinsNumPer {
+		sheet = "wins number percent"
 	}
 
 	f.NewSheet(sheet)
@@ -184,7 +187,8 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 
 	y := 1
 	trtp := 0.0
-	twinnum := 0.0
+	twinnum := int64(0)
+	twinnumper := 0.0
 	twins := int64(0)
 
 	for _, s := range ssws.Symbols {
@@ -194,7 +198,8 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, y), sws.Total)
 
 		rtp := 0.0
-		winnum := 0.0
+		winnum := int64(0)
+		winnumper := 0.0
 		wins := int64(0)
 
 		for i := 0; i < ssws.Num; i++ {
@@ -203,9 +208,13 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 
 				rtp += float64(sws.Wins[i]) * 100.0 / float64(sws.Total)
 			} else if fm == SWFModeWinsNum {
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.WinsNum[i])
+
+				winnum += sws.WinsNum[i]
+			} else if fm == SWFModeWinsNumPer {
 				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), float64(sws.WinsNum[i])*100.0/float64(sws.Total))
 
-				winnum += float64(sws.WinsNum[i]) * 100.0 / float64(sws.Total)
+				winnumper += float64(sws.WinsNum[i]) * 100.0 / float64(sws.Total)
 			} else {
 				f.SetCellValue(sheet, goutils.Pos2Cell(i+si, y), sws.Wins[i])
 
@@ -219,6 +228,9 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 		} else if fm == SWFModeWinsNum {
 			f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), winnum)
 			twinnum += winnum
+		} else if fm == SWFModeWinsNumPer {
+			f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), winnum)
+			twinnumper += winnumper
 		} else {
 			f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), wins)
 			twins += wins
@@ -231,6 +243,8 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), trtp)
 	} else if fm == SWFModeWinsNum {
 		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), twinnum)
+	} else if fm == SWFModeWinsNumPer {
+		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), twinnumper)
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(si+ssws.Num, y), twins)
 	}
