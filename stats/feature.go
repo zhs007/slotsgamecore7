@@ -1,6 +1,8 @@
 package stats
 
 import (
+	"fmt"
+
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -31,6 +33,8 @@ type Feature struct {
 	Parent         *Feature
 	Children       []*Feature
 	OnAnalyze      FuncAnalyzeFeature
+	Reels          *Reels
+	Symbols        *SymbolsRTP
 	Obj            interface{}
 }
 
@@ -69,6 +73,20 @@ func (feature *Feature) onTrigger(stake *sgc7game.Stake, lst []*sgc7game.PlayRes
 	for _, v := range feature.Children {
 		v.OnResults(stake, lst)
 	}
+}
+
+func (feature *Feature) saveOtherSheet(f *excelize.File) error {
+	if feature.Reels != nil {
+		csheet := fmt.Sprintf("symbol in window - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.Reels.SaveSheet(f, csheet)
+	}
+
+	for _, v := range feature.Children {
+		v.saveOtherSheet(f)
+	}
+
+	return nil
 }
 
 func (feature *Feature) saveSheet(f *excelize.File, sheet string, startx, starty int) int {
@@ -115,6 +133,8 @@ func (feature *Feature) SaveExcel(fn string) error {
 	}
 
 	feature.saveSheet(f, sheet, 0, 1)
+
+	feature.saveOtherSheet(f)
 
 	return f.SaveAs(fn)
 }
