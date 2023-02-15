@@ -1,6 +1,8 @@
 package stats
 
 import (
+	"fmt"
+
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -31,7 +33,25 @@ type Feature struct {
 	Parent         *Feature
 	Children       []*Feature
 	OnAnalyze      FuncAnalyzeFeature
+	Reels          *Reels
+	Symbols        *SymbolsRTP
 	Obj            interface{}
+}
+
+func (feature *Feature) GetPlayTimes() int64 {
+	if feature.Parent != nil {
+		return feature.Parent.GetPlayTimes()
+	}
+
+	return feature.PlayTimes
+}
+
+func (feature *Feature) GetTotalBets() int64 {
+	if feature.Parent != nil {
+		return feature.Parent.GetTotalBets()
+	}
+
+	return feature.TotalBets
 }
 
 func (feature *Feature) OnResults(stake *sgc7game.Stake, lst []*sgc7game.PlayResult) {
@@ -55,6 +75,20 @@ func (feature *Feature) onTrigger(stake *sgc7game.Stake, lst []*sgc7game.PlayRes
 	}
 }
 
+func (feature *Feature) saveOtherSheet(f *excelize.File) error {
+	if feature.Reels != nil {
+		csheet := fmt.Sprintf("symbol in window - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.Reels.SaveSheet(f, csheet)
+	}
+
+	for _, v := range feature.Children {
+		v.saveOtherSheet(f)
+	}
+
+	return nil
+}
+
 func (feature *Feature) saveSheet(f *excelize.File, sheet string, startx, starty int) int {
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+0, starty), feature.Name)
 
@@ -62,10 +96,10 @@ func (feature *Feature) saveSheet(f *excelize.File, sheet string, startx, starty
 		f.SetCellValue(sheet, goutils.Pos2Cell(startx+1, starty), feature.Parent.Name)
 	}
 
-	f.SetCellValue(sheet, goutils.Pos2Cell(startx+2, starty), feature.PlayTimes)
+	f.SetCellValue(sheet, goutils.Pos2Cell(startx+2, starty), feature.GetPlayTimes())
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+3, starty), feature.TotalBets)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+4, starty), feature.TotalWins)
-	f.SetCellValue(sheet, goutils.Pos2Cell(startx+5, starty), float64(feature.TotalWins)/float64(feature.TotalBets))
+	f.SetCellValue(sheet, goutils.Pos2Cell(startx+5, starty), float64(feature.TotalWins)/float64(feature.GetTotalBets()))
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+6, starty), feature.TriggerTimes)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+7, starty), feature.RetriggerTimes)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+8, starty), feature.FreeSpinTimes)
@@ -99,6 +133,8 @@ func (feature *Feature) SaveExcel(fn string) error {
 	}
 
 	feature.saveSheet(f, sheet, 0, 1)
+
+	feature.saveOtherSheet(f)
 
 	return f.SaveAs(fn)
 }
