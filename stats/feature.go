@@ -34,6 +34,22 @@ type Feature struct {
 	Obj            interface{}
 }
 
+func (feature *Feature) GetPlayTimes() int64 {
+	if feature.Parent != nil {
+		return feature.Parent.GetPlayTimes()
+	}
+
+	return feature.PlayTimes
+}
+
+func (feature *Feature) GetTotalBets() int64 {
+	if feature.Parent != nil {
+		return feature.Parent.GetTotalBets()
+	}
+
+	return feature.TotalBets
+}
+
 func (feature *Feature) OnResults(stake *sgc7game.Stake, lst []*sgc7game.PlayResult) {
 	feature.PlayTimes++
 
@@ -62,10 +78,10 @@ func (feature *Feature) saveSheet(f *excelize.File, sheet string, startx, starty
 		f.SetCellValue(sheet, goutils.Pos2Cell(startx+1, starty), feature.Parent.Name)
 	}
 
-	f.SetCellValue(sheet, goutils.Pos2Cell(startx+2, starty), feature.PlayTimes)
+	f.SetCellValue(sheet, goutils.Pos2Cell(startx+2, starty), feature.GetPlayTimes())
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+3, starty), feature.TotalBets)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+4, starty), feature.TotalWins)
-	f.SetCellValue(sheet, goutils.Pos2Cell(startx+5, starty), float64(feature.TotalWins)/float64(feature.TotalBets))
+	f.SetCellValue(sheet, goutils.Pos2Cell(startx+5, starty), float64(feature.TotalWins)/float64(feature.GetTotalBets()))
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+6, starty), feature.TriggerTimes)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+7, starty), feature.RetriggerTimes)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+8, starty), feature.FreeSpinTimes)
