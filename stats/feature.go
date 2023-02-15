@@ -97,7 +97,7 @@ func (feature *Feature) saveSheet(f *excelize.File, sheet string, startx, starty
 	}
 
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+2, starty), feature.GetPlayTimes())
-	f.SetCellValue(sheet, goutils.Pos2Cell(startx+3, starty), feature.TotalBets)
+	f.SetCellValue(sheet, goutils.Pos2Cell(startx+3, starty), feature.GetTotalBets())
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+4, starty), feature.TotalWins)
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+5, starty), float64(feature.TotalWins)/float64(feature.GetTotalBets()))
 	f.SetCellValue(sheet, goutils.Pos2Cell(startx+6, starty), feature.TriggerTimes)
@@ -112,7 +112,7 @@ func (feature *Feature) saveSheet(f *excelize.File, sheet string, startx, starty
 		f.SetCellValue(sheet, goutils.Pos2Cell(startx+11, starty), float64(feature.RoundTimes)/float64(feature.TriggerTimes))
 	}
 
-	f.SetCellValue(sheet, goutils.Pos2Cell(startx+12, starty), float64(feature.TriggerTimes)/float64(feature.PlayTimes))
+	f.SetCellValue(sheet, goutils.Pos2Cell(startx+12, starty), float64(feature.TriggerTimes)/float64(feature.GetPlayTimes()))
 
 	starty++
 
