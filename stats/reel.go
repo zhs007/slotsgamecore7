@@ -40,6 +40,14 @@ func (reel *Reel) OnScene(scene *sgc7game.GameScene) {
 	}
 }
 
+func (reel *Reel) OnSymbols(lst []mathtoolset.SymbolType) {
+	reel.TotalTimes++
+
+	for _, s := range lst {
+		reel.MapSymbols[mathtoolset.SymbolType(s)].TriggerTimes++
+	}
+}
+
 func (reel *Reel) GenSymbols(symbols []mathtoolset.SymbolType) []mathtoolset.SymbolType {
 	for k := range reel.MapSymbols {
 		if !mathtoolset.HasSymbol(symbols, k) {

@@ -14,6 +14,10 @@ type Reels struct {
 	Reels []*Reel
 }
 
+func (reels *Reels) OnReelSymbols(ri int, lst []mathtoolset.SymbolType) {
+	reels.Reels[ri].OnSymbols(lst)
+}
+
 func (reels *Reels) OnScene(scene *sgc7game.GameScene) {
 	for _, v := range reels.Reels {
 		v.OnScene(scene)
