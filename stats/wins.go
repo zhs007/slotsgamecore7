@@ -33,9 +33,9 @@ func (wins *Wins) genData() []*winsdata {
 func (wins *Wins) AddWin(win int) {
 	wins.TotalTimes++
 
-	w, isok := wins.MapWins[win]
+	_, isok := wins.MapWins[win]
 	if isok {
-		w++
+		wins.MapWins[win]++
 	} else {
 		wins.MapWins[win] = 1
 	}
