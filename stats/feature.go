@@ -95,6 +95,12 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 		feature.Reels.SaveSheet(f, csheet)
 	}
 
+	if feature.Symbols != nil {
+		csheet := fmt.Sprintf("symbol rtp - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.Symbols.SaveSheet(f, csheet)
+	}
+
 	for _, v := range feature.Children {
 		v.saveOtherSheet(f)
 	}
