@@ -18,6 +18,7 @@ const (
 	FeatureFreeGame = 3
 )
 
+// isTrigger, bet, wins
 type FuncAnalyzeFeature func(*Feature, *sgc7game.Stake, []*sgc7game.PlayResult) (bool, int64, int64)
 
 type Feature struct {
@@ -52,6 +53,18 @@ func (feature *Feature) GetTotalBets() int64 {
 	}
 
 	return feature.TotalBets
+}
+
+func (feature *Feature) Retrigger() {
+	feature.RetriggerTimes++
+}
+
+func (feature *Feature) OnFreeSpin() {
+	feature.FreeSpinTimes++
+}
+
+func (feature *Feature) OnRound() {
+	feature.RoundTimes++
 }
 
 func (feature *Feature) OnResults(stake *sgc7game.Stake, lst []*sgc7game.PlayResult) {
