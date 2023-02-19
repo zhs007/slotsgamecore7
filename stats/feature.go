@@ -98,7 +98,7 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 	if feature.Symbols != nil {
 		csheet := fmt.Sprintf("symbol rtp - %v", feature.Name)
 		f.NewSheet(csheet)
-		feature.Symbols.SaveSheet(f, csheet)
+		feature.Symbols.SaveSheet(f, csheet, feature.GetTotalBets())
 	}
 
 	for _, v := range feature.Children {
