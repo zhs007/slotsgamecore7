@@ -36,6 +36,8 @@ type Feature struct {
 	OnAnalyze      FuncAnalyzeFeature
 	Reels          *Reels
 	Symbols        *SymbolsRTP
+	CurWins        *Wins
+	AllWins        *Wins
 	Obj            interface{}
 }
 
@@ -99,6 +101,18 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 		csheet := fmt.Sprintf("symbol rtp - %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.Symbols.SaveSheet(f, csheet, feature.GetTotalBets())
+	}
+
+	if feature.AllWins != nil {
+		csheet := fmt.Sprintf("total wins - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.AllWins.SaveSheet(f, csheet)
+	}
+
+	if feature.CurWins != nil {
+		csheet := fmt.Sprintf("wins - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.CurWins.SaveSheet(f, csheet)
 	}
 
 	for _, v := range feature.Children {
