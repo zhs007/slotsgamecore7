@@ -34,7 +34,6 @@ func NewSymbolRTP(s mathtoolset.SymbolType, maxSymbolWinNum int) *SymbolRTP {
 
 type SymbolsRTP struct {
 	MapSymbols      map[mathtoolset.SymbolType]*SymbolRTP
-	TotalBets       int64
 	MaxSymbolWinNum int
 }
 
@@ -48,15 +47,11 @@ func (ssrtp *SymbolsRTP) GenSymbols() []mathtoolset.SymbolType {
 	return symbols
 }
 
-func (ssrtp *SymbolsRTP) OnBet(bet int64) {
-	ssrtp.TotalBets += bet
-}
-
 func (ssrtp *SymbolsRTP) OnWin(win *sgc7game.Result) {
 	ssrtp.MapSymbols[mathtoolset.SymbolType(win.Symbol)].OnWin(win)
 }
 
-func (ssrtp *SymbolsRTP) SaveSheet(f *excelize.File, sheet string) error {
+func (ssrtp *SymbolsRTP) SaveSheet(f *excelize.File, sheet string, totalBet int64) error {
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "symbol")
 
 	symbols := ssrtp.GenSymbols()
@@ -74,7 +69,7 @@ func (ssrtp *SymbolsRTP) SaveSheet(f *excelize.File, sheet string) error {
 		f.SetCellValue(sheet, goutils.Pos2Cell(0, y), s)
 
 		for i := 0; i < ssrtp.MaxSymbolWinNum; i++ {
-			f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), ssrtp.MapSymbols[s].CalcRTP(ssrtp.TotalBets, i+1))
+			f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), ssrtp.MapSymbols[s].CalcRTP(totalBet, i+1))
 		}
 
 		y++
