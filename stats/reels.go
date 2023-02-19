@@ -14,8 +14,15 @@ type Reels struct {
 	Reels []*Reel
 }
 
-func (reels *Reels) OnReelSymbols(ri int, lst []mathtoolset.SymbolType) {
-	reels.Reels[ri].OnSymbols(lst)
+func (reels *Reels) OnReelSymbols(mapSyms map[int][]mathtoolset.SymbolType) {
+	for i, v := range reels.Reels {
+		lst, isok := mapSyms[i]
+		if isok {
+			v.OnSymbols(lst)
+		} else {
+			v.OnSymbols(nil)
+		}
+	}
 }
 
 func (reels *Reels) OnScene(scene *sgc7game.GameScene) {
