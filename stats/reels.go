@@ -14,6 +14,12 @@ type Reels struct {
 	Reels []*Reel
 }
 
+func (reels *Reels) Merge(src *Reels) {
+	for i, v := range src.Reels {
+		reels.Reels[i].Merge(v)
+	}
+}
+
 func (reels *Reels) OnReelSymbols(mapSyms map[int][]mathtoolset.SymbolType) {
 	for i, v := range reels.Reels {
 		lst, isok := mapSyms[i]

@@ -17,6 +17,19 @@ type Wins struct {
 	TotalTimes int64
 }
 
+func (wins *Wins) Merge(src *Wins) {
+	wins.TotalTimes += src.TotalTimes
+
+	for k, v := range src.MapWins {
+		_, isok := wins.MapWins[k]
+		if isok {
+			wins.MapWins[k] += v
+		} else {
+			wins.MapWins[k] = v
+		}
+	}
+}
+
 func (wins *Wins) genData() []*winsdata {
 	lst := []*winsdata{}
 

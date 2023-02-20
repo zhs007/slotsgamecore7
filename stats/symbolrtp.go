@@ -51,6 +51,15 @@ func (ssrtp *SymbolsRTP) OnWin(win *sgc7game.Result) {
 	ssrtp.MapSymbols[mathtoolset.SymbolType(win.Symbol)].OnWin(win)
 }
 
+func (ssrtp *SymbolsRTP) Merge(src *SymbolsRTP) {
+	for k, v := range src.MapSymbols {
+		srtp := ssrtp.MapSymbols[k]
+		for i := 0; i < ssrtp.MaxSymbolWinNum; i++ {
+			srtp.Wins[i] += v.Wins[i]
+		}
+	}
+}
+
 func (ssrtp *SymbolsRTP) SaveSheet(f *excelize.File, sheet string, totalBet int64) error {
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "symbol")
 

@@ -26,6 +26,14 @@ type Reel struct {
 	TotalTimes int64
 }
 
+func (reel *Reel) Merge(src *Reel) {
+	for k, v := range src.MapSymbols {
+		s := reel.MapSymbols[k]
+
+		s.TriggerTimes += v.TriggerTimes
+	}
+}
+
 func (reel *Reel) CalcHitRate(s mathtoolset.SymbolType) float64 {
 	return reel.MapSymbols[s].CalcHitRate(reel.TotalTimes)
 }

@@ -41,6 +41,36 @@ type Feature struct {
 	Obj            interface{}
 }
 
+func (feature *Feature) Merge(src *Feature) {
+	feature.PlayTimes += src.PlayTimes
+	feature.TotalBets += src.TotalBets
+	feature.TotalWins += src.TotalWins
+	feature.TriggerTimes += src.TriggerTimes
+	feature.RetriggerTimes += src.RetriggerTimes
+	feature.FreeSpinTimes += src.FreeSpinTimes
+	feature.RoundTimes += src.RoundTimes
+
+	if feature.Reels != nil && src.Reels != nil {
+		feature.Reels.Merge(src.Reels)
+	}
+
+	if feature.Symbols != nil && src.Symbols != nil {
+		feature.Symbols.Merge(src.Symbols)
+	}
+
+	if feature.CurWins != nil && src.CurWins != nil {
+		feature.CurWins.Merge(src.CurWins)
+	}
+
+	if feature.AllWins != nil && src.AllWins != nil {
+		feature.AllWins.Merge(src.AllWins)
+	}
+
+	for i, v := range feature.Children {
+		v.Merge(src.Children[i])
+	}
+}
+
 func (feature *Feature) GetPlayTimes() int64 {
 	if feature.Parent != nil {
 		return feature.Parent.GetPlayTimes()
