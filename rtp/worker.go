@@ -81,6 +81,11 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 					results = append(results, pr)
 					if pr.IsFinish {
+
+						if currtp.Stats2 != nil {
+							currtp.OnResults(results)
+						}
+
 						break
 					}
 
