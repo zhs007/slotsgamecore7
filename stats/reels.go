@@ -16,7 +16,7 @@ type Reels struct {
 
 func (reels *Reels) Clone() *Reels {
 	nr := &Reels{
-		Reels: make([]*Reel, 0, len(reels.Reels)),
+		Reels: make([]*Reel, len(reels.Reels)),
 	}
 
 	return nr
