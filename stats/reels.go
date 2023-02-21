@@ -19,6 +19,10 @@ func (reels *Reels) Clone() *Reels {
 		Reels: make([]*Reel, len(reels.Reels)),
 	}
 
+	for i, v := range reels.Reels {
+		nr.Reels[i] = v.Clone()
+	}
+
 	return nr
 }
 
