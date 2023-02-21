@@ -29,4 +29,7 @@ var (
 
 	// ErrNoResultInAutoChgWeights - no result in AutoChgWeights
 	ErrNoResultInAutoChgWeights = errors.New("no result in AutoChgWeights")
+
+	// ErrInvalidReelsWithMinOff - invalid reels with minoff
+	ErrInvalidReelsWithMinOff = errors.New("invalid reels with minoff")
 )
