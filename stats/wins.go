@@ -17,6 +17,19 @@ type Wins struct {
 	TotalTimes int64
 }
 
+func (wins *Wins) Clone() *Wins {
+	nw := &Wins{
+		MapWins:    make(map[int]int64),
+		TotalTimes: wins.TotalTimes,
+	}
+
+	for k, v := range wins.MapWins {
+		nw.MapWins[k] = v
+	}
+
+	return nw
+}
+
 func (wins *Wins) Merge(src *Wins) {
 	wins.TotalTimes += src.TotalTimes
 

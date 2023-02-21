@@ -9,6 +9,7 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 )
 
@@ -39,6 +40,7 @@ type RTP struct {
 	MapReturn           map[string]*RTPReturnDataList
 	MapStats            map[string]*RTPStats
 	MaxCoincidingWin    float64
+	Stats2              *sgc7stats.Feature
 }
 
 // NewRTP - new RTP
@@ -94,6 +96,10 @@ func (rtp *RTP) Clone() *RTP {
 		nrtp.MapStats[k] = v.Clone()
 	}
 
+	if rtp.Stats2 != nil {
+		nrtp.Stats2 = rtp.Stats2.CloneIncludeChildren()
+	}
+
 	return nrtp
 }
 
@@ -141,6 +147,10 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 
 	for k, v := range rtp.MapStats {
 		v.Merge(rtp1.MapStats[k])
+	}
+
+	if rtp.Stats2 != nil && rtp1.Stats2 != nil {
+		rtp.Stats2.Merge(rtp1.Stats2)
 	}
 }
 

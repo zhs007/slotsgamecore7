@@ -14,6 +14,14 @@ type Reels struct {
 	Reels []*Reel
 }
 
+func (reels *Reels) Clone() *Reels {
+	nr := &Reels{
+		Reels: make([]*Reel, len(reels.Reels)),
+	}
+
+	return nr
+}
+
 func (reels *Reels) Merge(src *Reels) {
 	for i, v := range src.Reels {
 		reels.Reels[i].Merge(v)

@@ -169,7 +169,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 end:
 
-	fmt.Printf("you sipn %v, balance %v, win %v \n",
+	fmt.Printf("you spin %v, balance %v, win %v \n",
 		FormatColorString(fmt.Sprintf("%v", curgamenum), ColorNumber),
 		FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 		FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {

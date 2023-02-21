@@ -41,6 +41,82 @@ type Feature struct {
 	Obj            interface{}
 }
 
+func (feature *Feature) CloneIncludeChildren() *Feature {
+	nf := &Feature{
+		Name:           feature.Name,
+		Type:           feature.Type,
+		PlayTimes:      feature.PlayTimes,
+		TotalBets:      feature.TotalBets,
+		TotalWins:      feature.TotalWins,
+		TriggerTimes:   feature.TriggerTimes,
+		RetriggerTimes: feature.RetriggerTimes,
+		FreeSpinTimes:  feature.FreeSpinTimes,
+		RoundTimes:     feature.RoundTimes,
+		Parent:         feature.Parent,
+		Children:       make([]*Feature, len(feature.Children)),
+		OnAnalyze:      feature.OnAnalyze,
+		Obj:            feature.Obj,
+	}
+
+	if feature.Reels != nil {
+		nf.Reels = feature.Reels.Clone()
+	}
+
+	if feature.Symbols != nil {
+		nf.Symbols = feature.Symbols.Clone()
+	}
+
+	if feature.CurWins != nil {
+		nf.CurWins = feature.CurWins.Clone()
+	}
+
+	if feature.AllWins != nil {
+		nf.AllWins = feature.AllWins.Clone()
+	}
+
+	for _, v := range feature.Children {
+		nf.Children = append(nf.Children, v.CloneIncludeChildren())
+	}
+
+	return nf
+}
+
+func (feature *Feature) Clone() *Feature {
+	nf := &Feature{
+		Name:           feature.Name,
+		Type:           feature.Type,
+		PlayTimes:      feature.PlayTimes,
+		TotalBets:      feature.TotalBets,
+		TotalWins:      feature.TotalWins,
+		TriggerTimes:   feature.TriggerTimes,
+		RetriggerTimes: feature.RetriggerTimes,
+		FreeSpinTimes:  feature.FreeSpinTimes,
+		RoundTimes:     feature.RoundTimes,
+		Parent:         feature.Parent,
+		Children:       make([]*Feature, len(feature.Children)),
+		OnAnalyze:      feature.OnAnalyze,
+		Obj:            feature.Obj,
+	}
+
+	if feature.Reels != nil {
+		nf.Reels = feature.Reels.Clone()
+	}
+
+	if feature.Symbols != nil {
+		nf.Symbols = feature.Symbols.Clone()
+	}
+
+	if feature.CurWins != nil {
+		nf.CurWins = feature.CurWins.Clone()
+	}
+
+	if feature.AllWins != nil {
+		nf.AllWins = feature.AllWins.Clone()
+	}
+
+	return nf
+}
+
 func (feature *Feature) Merge(src *Feature) {
 	feature.PlayTimes += src.PlayTimes
 	feature.TotalBets += src.TotalBets

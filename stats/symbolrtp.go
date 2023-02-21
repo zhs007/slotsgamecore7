@@ -15,6 +15,17 @@ type SymbolRTP struct {
 	Wins   []int64
 }
 
+func (srtp *SymbolRTP) Clone() *SymbolRTP {
+	nsrtp := &SymbolRTP{
+		Symbol: srtp.Symbol,
+		Wins:   make([]int64, len(srtp.Wins)),
+	}
+
+	copy(nsrtp.Wins, srtp.Wins)
+
+	return nsrtp
+}
+
 func (srtp *SymbolRTP) OnWin(win *sgc7game.Result) {
 	if win.Symbol == int(srtp.Symbol) {
 		srtp.Wins[win.SymbolNums-1] += int64(win.CashWin)
@@ -35,6 +46,20 @@ func NewSymbolRTP(s mathtoolset.SymbolType, maxSymbolWinNum int) *SymbolRTP {
 type SymbolsRTP struct {
 	MapSymbols      map[mathtoolset.SymbolType]*SymbolRTP
 	MaxSymbolWinNum int
+}
+
+func (ssrtp *SymbolsRTP) Clone() *SymbolsRTP {
+	nssrtp := &SymbolsRTP{
+		MapSymbols:      make(map[mathtoolset.SymbolType]*SymbolRTP),
+		MaxSymbolWinNum: ssrtp.MaxSymbolWinNum,
+	}
+
+	for k, v := range ssrtp.MapSymbols {
+		nv := v.Clone()
+		nssrtp.MapSymbols[k] = nv
+	}
+
+	return nssrtp
 }
 
 func (ssrtp *SymbolsRTP) GenSymbols() []mathtoolset.SymbolType {
