@@ -48,6 +48,8 @@ func (reel *Reel) Clone() *Reel {
 }
 
 func (reel *Reel) Merge(src *Reel) {
+	reel.TotalTimes += src.TotalTimes
+
 	for k, v := range src.MapSymbols {
 		s := reel.MapSymbols[k]
 
