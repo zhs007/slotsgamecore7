@@ -56,7 +56,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	for {
 		if autotimes <= 0 {
 			fmt.Printf("please press %v to start spin, or press %v to spin 100 times, or press %v to spin 1000 times, or press %v to quit.\n",
-				FormatColorString("S", ColorKey), FormatColorString("H", ColorExitKey), FormatColorString("K", ColorExitKey), FormatColorString("Q", ColorExitKey))
+				FormatColorString("S", ColorKey), FormatColorString("H", ColorKey), FormatColorString("K", ColorKey), FormatColorString("Q", ColorExitKey))
 
 			isend := false
 
@@ -169,7 +169,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 end:
 
-	fmt.Printf("you sipn %v, balance %v, win %v \n",
+	fmt.Printf("you spin %v, balance %v, win %v \n",
 		FormatColorString(fmt.Sprintf("%v", curgamenum), ColorNumber),
 		FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 		FormatColorString(fmt.Sprintf("%v", balance-totalmoney), SelectColor(func() bool {

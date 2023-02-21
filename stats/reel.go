@@ -10,6 +10,13 @@ type SymbolStats struct {
 	TriggerTimes int64
 }
 
+func (ss *SymbolStats) Clone() *SymbolStats {
+	return &SymbolStats{
+		Symbol:       ss.Symbol,
+		TriggerTimes: ss.TriggerTimes,
+	}
+}
+
 func (ss *SymbolStats) CalcHitRate(totalTimes int64) float64 {
 	return float64(ss.TriggerTimes) / float64(totalTimes)
 }
@@ -24,6 +31,28 @@ type Reel struct {
 	Index      int
 	MapSymbols map[mathtoolset.SymbolType]*SymbolStats
 	TotalTimes int64
+}
+
+func (reel *Reel) Clone() *Reel {
+	nr := &Reel{
+		Index:      reel.Index,
+		MapSymbols: make(map[mathtoolset.SymbolType]*SymbolStats),
+		TotalTimes: reel.TotalTimes,
+	}
+
+	for k, v := range reel.MapSymbols {
+		nr.MapSymbols[k] = v.Clone()
+	}
+
+	return nr
+}
+
+func (reel *Reel) Merge(src *Reel) {
+	for k, v := range src.MapSymbols {
+		s := reel.MapSymbols[k]
+
+		s.TriggerTimes += v.TriggerTimes
+	}
 }
 
 func (reel *Reel) CalcHitRate(s mathtoolset.SymbolType) float64 {

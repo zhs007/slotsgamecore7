@@ -15,6 +15,17 @@ type SymbolRTP struct {
 	Wins   []int64
 }
 
+func (srtp *SymbolRTP) Clone() *SymbolRTP {
+	nsrtp := &SymbolRTP{
+		Symbol: srtp.Symbol,
+		Wins:   make([]int64, len(srtp.Wins)),
+	}
+
+	copy(nsrtp.Wins, srtp.Wins)
+
+	return nsrtp
+}
+
 func (srtp *SymbolRTP) OnWin(win *sgc7game.Result) {
 	if win.Symbol == int(srtp.Symbol) {
 		srtp.Wins[win.SymbolNums-1] += int64(win.CashWin)
@@ -37,6 +48,20 @@ type SymbolsRTP struct {
 	MaxSymbolWinNum int
 }
 
+func (ssrtp *SymbolsRTP) Clone() *SymbolsRTP {
+	nssrtp := &SymbolsRTP{
+		MapSymbols:      make(map[mathtoolset.SymbolType]*SymbolRTP),
+		MaxSymbolWinNum: ssrtp.MaxSymbolWinNum,
+	}
+
+	for k, v := range ssrtp.MapSymbols {
+		nv := v.Clone()
+		nssrtp.MapSymbols[k] = nv
+	}
+
+	return nssrtp
+}
+
 func (ssrtp *SymbolsRTP) GenSymbols() []mathtoolset.SymbolType {
 	symbols := []mathtoolset.SymbolType{}
 
@@ -49,6 +74,15 @@ func (ssrtp *SymbolsRTP) GenSymbols() []mathtoolset.SymbolType {
 
 func (ssrtp *SymbolsRTP) OnWin(win *sgc7game.Result) {
 	ssrtp.MapSymbols[mathtoolset.SymbolType(win.Symbol)].OnWin(win)
+}
+
+func (ssrtp *SymbolsRTP) Merge(src *SymbolsRTP) {
+	for k, v := range src.MapSymbols {
+		srtp := ssrtp.MapSymbols[k]
+		for i := 0; i < ssrtp.MaxSymbolWinNum; i++ {
+			srtp.Wins[i] += v.Wins[i]
+		}
+	}
 }
 
 func (ssrtp *SymbolsRTP) SaveSheet(f *excelize.File, sheet string, totalBet int64) error {
