@@ -53,7 +53,7 @@ func (feature *Feature) CloneIncludeChildren() *Feature {
 		FreeSpinTimes:  feature.FreeSpinTimes,
 		RoundTimes:     feature.RoundTimes,
 		Parent:         feature.Parent,
-		Children:       make([]*Feature, len(feature.Children)),
+		Children:       make([]*Feature, 0, len(feature.Children)),
 		OnAnalyze:      feature.OnAnalyze,
 		Obj:            feature.Obj,
 	}
