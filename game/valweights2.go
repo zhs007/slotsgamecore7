@@ -130,7 +130,7 @@ func (vw *ValWeights2) CloneExcludeVal(val IVal) (*ValWeights2, error) {
 	nvw := vw.Clone()
 
 	for i, v := range vw.Vals {
-		if v == val {
+		if val.IsSame(v) {
 			nvw.Vals = append(nvw.Vals[0:i], nvw.Vals[i+1:]...)
 			nvw.Weights = append(nvw.Weights[0:i], nvw.Weights[i+1:]...)
 			nvw.MaxWeight -= vw.Weights[i]

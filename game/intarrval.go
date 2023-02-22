@@ -11,7 +11,7 @@ import (
 const IntArrValType string = "intarrval"
 
 func NewIntArrVal[T int | int32 | int64]() IVal {
-	return &IntVal[T]{}
+	return &IntArrVal[T]{}
 }
 
 // IntArrVal
