@@ -39,7 +39,7 @@ func getchar(onchar FuncOnGetChar) {
 
 type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult)
 
-func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult) error {
+func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int) error {
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
@@ -51,7 +51,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	balance := 10000
 	totalmoney := 10000
 
-	autotimes := 0
+	autotimes := autogametimes
 
 	for {
 		if autotimes <= 0 {
