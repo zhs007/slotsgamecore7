@@ -1,0 +1,13 @@
+syntax = "proto3";
+package sgc7pb;
+option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
+
+// ComponentData
+message ComponentData {
+    repeated int32 usedScenes = 1;
+    repeated int32 usedOtherScenes = 2;
+    repeated int32 usedResults = 3;
+    repeated int32 usedPrizeScenes = 4;
+    int32 coinWin = 5;
+    int64 cashWin = 6;
+}
