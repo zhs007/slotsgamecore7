@@ -386,6 +386,119 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 	return p, nil
 }
 
+// LoadReelsFromExcel2 - load xlsx file
+func LoadReelsFromExcel2(fn string, paytables *PayTables) (*ReelsData, error) {
+	p := &ReelsData{
+		Reels: [][]int{},
+	}
+
+	// x -> ri
+	mapri := make(map[int]int)
+	maxri := 0
+	isend := []bool{}
+	isfirst := true
+
+	err := LoadExcel(fn, "", func(x int, str string) string {
+		header := strings.ToLower(strings.TrimSpace(str))
+		if header[0] == 'r' {
+			iv, err := goutils.String2Int64(header[1:])
+			if err != nil {
+				goutils.Error("LoadReelsFromExcel2:LoadExcel:String2Int64",
+					zap.String("fn", fn),
+					zap.String("header", header),
+					zap.Error(err))
+
+				return ""
+			}
+
+			if iv <= 0 {
+				goutils.Error("LoadReelsFromExcel2:LoadExcel",
+					zap.String("info", "check iv"),
+					zap.String("fn", fn),
+					zap.String("header", header),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return ""
+			}
+
+			mapri[x] = int(iv) - 1
+			if int(iv) > maxri {
+				maxri = int(iv)
+			}
+		}
+
+		return header
+	}, func(x int, y int, header string, data string) error {
+		if isfirst {
+			isfirst = false
+
+			if maxri != len(mapri) {
+				goutils.Error("LoadReelsFromExcel2",
+					zap.String("info", "check len"),
+					zap.String("fn", fn),
+					zap.Int("maxri", maxri),
+					goutils.JSON("mapri", mapri),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return ErrInvalidReelsExcelFile
+			}
+
+			if maxri <= 0 {
+				goutils.Error("LoadReelsFromExcel2",
+					zap.String("info", "check empty"),
+					zap.String("fn", fn),
+					zap.Int("maxri", maxri),
+					goutils.JSON("mapri", mapri),
+					zap.Error(ErrInvalidReelsExcelFile))
+
+				return ErrInvalidReelsExcelFile
+			}
+
+			for i := 0; i < maxri; i++ {
+				p.Reels = append(p.Reels, []int{})
+				isend = append(isend, false)
+			}
+		}
+
+		ri, isok := mapri[x]
+		if isok {
+			data = strings.TrimSpace(data)
+			if len(data) > 0 {
+				s, isok := paytables.MapSymbols[data]
+				if isok {
+					if isend[ri] {
+						goutils.Error("LoadReelsFromExcel2",
+							zap.String("info", "check already finished."),
+							zap.String("val", data),
+							zap.Int("y", y),
+							zap.Int("x", x),
+							zap.Error(ErrInvalidReelsExcelFile))
+
+						return ErrInvalidReelsExcelFile
+					}
+
+					p.Reels[ri] = append(p.Reels[ri], s)
+				} else {
+					isend[ri] = true
+				}
+			} else {
+				isend[ri] = true
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		goutils.Error("LoadReelsFromExcel2:OpenFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return p, nil
+}
+
 // NewReelsData - new ReelsData
 func NewReelsData(num int) *ReelsData {
 	rd := &ReelsData{

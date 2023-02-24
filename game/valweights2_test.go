@@ -31,3 +31,20 @@ func Test_LoadValWeights2FromExcel(t *testing.T) {
 
 	t.Logf("Test_LoadValWeights2FromExcel OK")
 }
+
+func Test_LoadValWeights2FromExcelWithSymbols(t *testing.T) {
+	pt, err := LoadPaytablesFromExcel("../data/game001/paytables.xlsx")
+	assert.NoError(t, err)
+
+	vw, err := LoadValWeights2FromExcelWithSymbols("../data/game001/fgmysteryweights0.xlsx", "val", "weight", pt)
+	assert.NoError(t, err)
+	assert.NotNil(t, vw)
+
+	assert.Equal(t, vw.MaxWeight, 10000)
+	assert.Equal(t, len(vw.Vals), 10)
+	assert.Equal(t, len(vw.Weights), 10)
+	assert.Equal(t, vw.Vals[0].IsSame(&IntVal[int]{Val: 2}), true)
+	assert.Equal(t, vw.Weights[0], 1065)
+
+	t.Logf("Test_LoadValWeights2FromExcelWithSymbols OK")
+}

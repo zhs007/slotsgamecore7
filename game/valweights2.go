@@ -251,3 +251,30 @@ func LoadValWeights2FromExcel(fn string, headerVal string, headerWeight string, 
 
 	return NewValWeights2(vals, weights)
 }
+
+// LoadValWeights2FromExcelWithSymbols - load xlsx file
+func LoadValWeights2FromExcelWithSymbols(fn string, headerVal string, headerWeight string, paytables *PayTables) (*ValWeights2, error) {
+	vw, err := LoadValWeights2FromExcel(fn, headerVal, headerWeight, NewStrVal)
+	if err != nil {
+		goutils.Error("LoadValWeights2FromExcelWithSymbols:LoadValWeights2FromExcel",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	vals := make([]IVal, len(vw.Vals))
+
+	for i, v := range vw.Vals {
+		vals[i] = NewIntValEx[int](paytables.MapSymbols[v.String()])
+	}
+
+	nvw, err := NewValWeights2(vals, vw.Weights)
+	if err != nil {
+		goutils.Error("LoadValWeights2FromExcelWithSymbols:NewValWeights2",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return nvw, nil
+}

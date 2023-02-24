@@ -13,6 +13,12 @@ func NewIntVal[T int | int32 | int64]() IVal {
 	return &IntVal[T]{}
 }
 
+func NewIntValEx[T int | int32 | int64](v T) IVal {
+	return &IntVal[T]{
+		Val: v,
+	}
+}
+
 // IntVal
 type IntVal[T int | int32 | int64] struct {
 	Val T `json:"val"`
