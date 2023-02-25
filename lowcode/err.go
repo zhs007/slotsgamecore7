@@ -11,4 +11,7 @@ var (
 
 	// ErrInvalidGameMod - invalid gamemod
 	ErrInvalidGameMod = errors.New("invalid gamemod")
+
+	// ErrInvalidComponent - invalid component
+	ErrInvalidComponent = errors.New("invalid component")
 )

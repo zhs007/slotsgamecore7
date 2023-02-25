@@ -11,8 +11,9 @@ import (
 // Game - game
 type Game struct {
 	*sgc7game.BasicGame
-	Prop       *GameProperty
-	MgrGameMod *GameModMgr
+	Prop         *GameProperty
+	MgrGameMod   *GameModMgr
+	MgrComponent *ComponentMgr
 }
 
 // NewGame - new a Game
@@ -21,7 +22,8 @@ func NewGame(cfgfn string) (*Game, error) {
 		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
 			return sgc7plugin.NewBasicPlugin()
 		}),
-		MgrGameMod: NewGameModMgr(),
+		MgrGameMod:   NewGameModMgr(),
+		MgrComponent: NewComponentMgr(),
 	}
 
 	err := game.Init(cfgfn)
