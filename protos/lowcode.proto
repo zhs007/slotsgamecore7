@@ -11,3 +11,7 @@ message ComponentData {
     int32 coinWin = 5;
     int64 cashWin = 6;
 }
+
+// GameParam
+message GameParam {
+}

@@ -1,0 +1,27 @@
+width: 5
+height: 6
+
+linedata:
+  line50: ../data/game001/linedata.xlsx
+
+paytables:
+  main: ../data/game001/paytables.xlsx
+
+reels:
+  bg0: ../data/game001/bg0.xlsx
+  bg1: ../data/game001/bg1.xlsx
+  fg0: ../data/game001/fg0.xlsx
+  fg1: ../data/game001/fg1.xlsx
+  fg2: ../data/game001/fg2.xlsx
+  fg3: ../data/game001/fg3.xlsx
+  fg4: ../data/game001/fg4.xlsx
+
+defaultScene: "[[1,1,2,2,3,3],[2,2,3,3,4,4],[4,4,5,5,6,6],[7,7,8,8,9,9],[1,1,1,2,2,2]]"
+
+bets: [10]
+
+gamemods:
+  - type: "bg"
+    components:
+      - type: "basicReels"
+        config: ../data/game001/bgbasic.xlsx
