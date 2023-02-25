@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type FuncNewGameMod func(gameProp *GameProperty) sgc7game.IGameMod
+type FuncNewGameMod func(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) sgc7game.IGameMod
 
 type GameModMgr struct {
 	MapGameMod map[string]FuncNewGameMod
@@ -16,14 +16,14 @@ func (mgr *GameModMgr) Reg(gamemod string, funcNew FuncNewGameMod) {
 	mgr.MapGameMod[gamemod] = funcNew
 }
 
-func (mgr *GameModMgr) NewGameMod(gamemod string, gameProp *GameProperty) sgc7game.IGameMod {
-	funcNew, isok := mgr.MapGameMod[gamemod]
+func (mgr *GameModMgr) NewGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) sgc7game.IGameMod {
+	funcNew, isok := mgr.MapGameMod[cfgGameMod.Type]
 	if isok {
-		return funcNew(gameProp)
+		return funcNew(gameProp, cfgGameMod, mgrComponent)
 	}
 
 	goutils.Error("GameModMgr.NewGameMod",
-		zap.String("gamemod", gamemod),
+		zap.String("gamemod", cfgGameMod.Type),
 		zap.Error(ErrInvalidGameMod))
 
 	return nil

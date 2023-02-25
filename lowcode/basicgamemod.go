@@ -8,14 +8,21 @@ import (
 // BasicGameMod - basic gamemod
 type BasicGameMod struct {
 	*sgc7game.BasicGameMod
-	GameProp *GameProperty
+	GameProp   *GameProperty
+	Components *ComponentList
 }
 
 // NewBasicGameMod - new BaseGame
-func NewBasicGameMod(name string, gameProp *GameProperty) *BasicGameMod {
+func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
 	bgm := &BasicGameMod{
-		sgc7game.NewBasicGameMod(name, gameProp.Config.Width, gameProp.Config.Height),
+		sgc7game.NewBasicGameMod(cfgGameMod.Type, gameProp.Config.Width, gameProp.Config.Height),
 		gameProp,
+		NewComponentList(),
+	}
+
+	for _, v := range cfgGameMod.Components {
+		c := mgrComponent.NewComponent(v.Type)
+		bgm.Components.AddComponent(c)
 	}
 
 	return bgm

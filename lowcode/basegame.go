@@ -11,9 +11,9 @@ type BaseGame struct {
 }
 
 // NewBaseGame - new BaseGame
-func NewBaseGame(gameProp *GameProperty) sgc7game.IGameMod {
+func NewBaseGame(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) sgc7game.IGameMod {
 	bg := &BaseGame{
-		NewBasicGameMod("bg", gameProp),
+		NewBasicGameMod(gameProp, cfgGameMod, mgrComponent),
 	}
 
 	return bg
