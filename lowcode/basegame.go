@@ -7,15 +7,13 @@ import (
 
 // BaseGame - base game
 type BaseGame struct {
-	*sgc7game.BasicGameMod
-	cfg *Config
+	*BasicGameMod
 }
 
 // NewBaseGame - new BaseGame
-func NewBaseGame(cfg *Config, game sgc7game.IGame) *BaseGame {
+func NewBaseGame(gameProp *GameProperty) sgc7game.IGameMod {
 	bg := &BaseGame{
-		sgc7game.NewBasicGameMod("bg", cfg.Width, cfg.Height),
-		cfg,
+		NewBasicGameMod("bg", gameProp),
 	}
 
 	return bg

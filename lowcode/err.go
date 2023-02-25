@@ -8,4 +8,7 @@ var (
 
 	// ErrMustHaveMainPaytables - must have main paytables
 	ErrMustHaveMainPaytables = errors.New("must have main paytables")
+
+	// ErrInvalidGameMod - invalid gamemod
+	ErrInvalidGameMod = errors.New("invalid gamemod")
 )

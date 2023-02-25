@@ -11,7 +11,8 @@ import (
 // Game - game
 type Game struct {
 	*sgc7game.BasicGame
-	Prop *GameProperty
+	Prop       *GameProperty
+	MgrGameMod *GameModMgr
 }
 
 // NewGame - new a Game
@@ -20,6 +21,7 @@ func NewGame(cfgfn string) (*Game, error) {
 		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
 			return sgc7plugin.NewBasicPlugin()
 		}),
+		MgrGameMod: NewGameModMgr(),
 	}
 
 	err := game.Init(cfgfn)
@@ -47,8 +49,9 @@ func (game *Game) Init(cfgfn string) error {
 
 	game.Cfg.SetDefaultSceneString(game.Prop.Config.DefaultScene)
 
-	game.AddGameMod(NewBaseGame(game.Prop.Config, game))
-	// game.AddGameMod(NewFreeGame(cfg))
+	for _, v := range prop.Config.GameMods {
+		game.MgrGameMod.NewGameMod(v.Type, prop)
+	}
 
 	return nil
 }
@@ -73,8 +76,8 @@ func (game *Game) NewPlayerState() sgc7game.IPlayerState {
 func (game *Game) ResetConfig(cfg interface{}) {
 	ncfg := cfg.(*Config)
 
-	bg := game.MapGameMods["bg"].(*BaseGame)
-	bg.cfg = ncfg
-	// fg := game.MapGameMods["fg"].(*FreeGame)
-	// fg.cfg = ncfg
+	for _, v := range game.Prop.Config.GameMods {
+		gm := game.MapGameMods[v.Type].(*BasicGameMod)
+		gm.ResetConfig(ncfg)
+	}
 }
