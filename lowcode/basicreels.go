@@ -39,6 +39,6 @@ func (basicReels *BasicReels) OnPay(curpr *sgc7game.PlayResult, plugin sgc7plugi
 	return nil
 }
 
-func NewBasicReels() IComponent {
+func NewBasicReels(fn string) IComponent {
 	return &BasicReels{}
 }

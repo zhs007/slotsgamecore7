@@ -21,7 +21,7 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 	}
 
 	for _, v := range cfgGameMod.Components {
-		c := mgrComponent.NewComponent(v.Type)
+		c := mgrComponent.NewComponent(v)
 		bgm.Components.AddComponent(c)
 	}
 

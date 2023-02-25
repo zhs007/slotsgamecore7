@@ -5,7 +5,7 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
-type FuncNewComponent func() IComponent
+type FuncNewComponent func(fn string) IComponent
 
 type IComponent interface {
 	// playgame

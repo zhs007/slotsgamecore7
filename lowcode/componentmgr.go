@@ -13,14 +13,14 @@ func (mgr *ComponentMgr) Reg(component string, funcNew FuncNewComponent) {
 	mgr.MapComponent[component] = funcNew
 }
 
-func (mgr *ComponentMgr) NewComponent(component string) IComponent {
-	funcNew, isok := mgr.MapComponent[component]
+func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent {
+	funcNew, isok := mgr.MapComponent[cfgComponent.Type]
 	if isok {
-		return funcNew()
+		return funcNew(cfgComponent.Config)
 	}
 
 	goutils.Error("ComponentMgr.NewComponent",
-		zap.String("component", component),
+		zap.String("component", cfgComponent.Type),
 		zap.Error(ErrInvalidComponent))
 
 	return nil
