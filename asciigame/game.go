@@ -12,13 +12,13 @@ import (
 // if return true, then break
 type FuncOnGetChar func(k getch.KeyCode) bool
 
-func getchar(onchar FuncOnGetChar) {
+func getchar(onchar FuncOnGetChar) error {
 	err := getch.Start()
 	if err != nil {
 		goutils.Error("getchar:Start",
 			zap.Error(err))
 
-		return
+		return err
 	}
 	defer getch.Stop()
 
@@ -28,11 +28,11 @@ func getchar(onchar FuncOnGetChar) {
 			goutils.Error("getchar:Start",
 				zap.Error(err))
 
-			return
+			return err
 		}
 
 		if onchar(e.Code) {
-			return
+			return nil
 		}
 	}
 }
@@ -60,7 +60,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 			isend := false
 
-			getchar(func(c getch.KeyCode) bool {
+			err := getchar(func(c getch.KeyCode) bool {
 				if c == getch.KeyS {
 					return true
 				}
@@ -85,6 +85,9 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 				return false
 			})
+			if err != nil {
+				goto end
+			}
 
 			if isend {
 				goto end

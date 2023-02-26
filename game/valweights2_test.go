@@ -36,7 +36,7 @@ func Test_LoadValWeights2FromExcelWithSymbols(t *testing.T) {
 	pt, err := LoadPaytablesFromExcel("../data/game001/paytables.xlsx")
 	assert.NoError(t, err)
 
-	vw, err := LoadValWeights2FromExcelWithSymbols("../data/game001/fgmysteryweights0.xlsx", "val", "weight", pt)
+	vw, err := LoadValWeights2FromExcelWithSymbols("../data/game001/fgmysteryweight0.xlsx", "val", "weight", pt)
 	assert.NoError(t, err)
 	assert.NotNil(t, vw)
 
