@@ -16,24 +16,6 @@ type Game struct {
 	MgrComponent *ComponentMgr
 }
 
-// NewGame - new a Game
-func NewGame(cfgfn string) (*Game, error) {
-	game := &Game{
-		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
-			return sgc7plugin.NewBasicPlugin()
-		}),
-		MgrGameMod:   NewGameModMgr(),
-		MgrComponent: NewComponentMgr(),
-	}
-
-	err := game.Init(cfgfn)
-	if err != nil {
-		return nil, err
-	}
-
-	return game, nil
-}
-
 // Init - initial game
 func (game *Game) Init(cfgfn string) error {
 	prop, err := InitGameProperty(cfgfn)
@@ -82,4 +64,22 @@ func (game *Game) ResetConfig(cfg interface{}) {
 		gm := game.MapGameMods[v.Type].(*BasicGameMod)
 		gm.ResetConfig(ncfg)
 	}
+}
+
+// NewGame - new a Game
+func NewGame(cfgfn string) (*Game, error) {
+	game := &Game{
+		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
+			return sgc7plugin.NewBasicPlugin()
+		}),
+		MgrGameMod:   NewGameModMgr(),
+		MgrComponent: NewComponentMgr(),
+	}
+
+	err := game.Init(cfgfn)
+	if err != nil {
+		return nil, err
+	}
+
+	return game, nil
 }
