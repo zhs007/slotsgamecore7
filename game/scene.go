@@ -216,6 +216,17 @@ func (gs *GameScene) InitWithArr(w int, h int, arr []int) error {
 	return nil
 }
 
+// ReplaceSymbol - replace a symbol
+func (gs *GameScene) ReplaceSymbol(src int, dst int) {
+	for x, arr := range gs.Arr {
+		for y, v := range arr {
+			if v == src {
+				gs.Arr[x][y] = dst
+			}
+		}
+	}
+}
+
 // RandReels - random with reels
 func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName string) error {
 	cfg := game.GetConfig()
@@ -225,6 +236,11 @@ func (gs *GameScene) RandReels(game IGame, plugin sgc7plugin.IPlugin, reelsName 
 		return ErrInvalidReelsName
 	}
 
+	return gs.RandReelsWithReelData(reels, plugin)
+}
+
+// RandReels - random with reels
+func (gs *GameScene) RandReelsWithReelData(reels *ReelsData, plugin sgc7plugin.IPlugin) error {
 	if gs.Indexes == nil {
 		gs.Indexes = make([]int, 0, gs.Width)
 	} else {

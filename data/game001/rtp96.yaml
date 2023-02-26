@@ -24,4 +24,4 @@ gamemods:
   - type: "bg"
     components:
       - type: "basicReels"
-        config: ../data/game001/bgbasic.xlsx
+        config: ../data/game001/bgbasic.yaml

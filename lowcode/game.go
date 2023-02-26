@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
@@ -29,12 +30,14 @@ func (game *Game) Init(cfgfn string) error {
 
 	game.Prop = prop
 
+	game.Cfg.PayTables = prop.CurPaytables
 	game.SetVer(sgc7ver.Version)
 
 	game.Cfg.SetDefaultSceneString(game.Prop.Config.DefaultScene)
 
 	for _, v := range prop.Config.GameMods {
-		game.AddGameMod(game.MgrGameMod.NewGameMod(prop, v, game.MgrComponent))
+		game.AddGameMod(NewBasicGameMod(prop, v, game.MgrComponent))
+		// game.AddGameMod(game.MgrGameMod.NewGameMod(prop, v, game.MgrComponent))
 	}
 
 	return nil
@@ -64,6 +67,16 @@ func (game *Game) ResetConfig(cfg interface{}) {
 		gm := game.MapGameMods[v.Type].(*BasicGameMod)
 		gm.ResetConfig(ncfg)
 	}
+}
+
+// OnAsciiGame - outpur to asciigame
+func (game *Game) OnAsciiGame(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+	for _, v := range game.Prop.Config.GameMods {
+		gm := game.MapGameMods[v.Type].(*BasicGameMod)
+		gm.OnAsciiGame(pr, lst, mapSymbolColor)
+	}
+
+	return nil
 }
 
 // NewGame - new a Game

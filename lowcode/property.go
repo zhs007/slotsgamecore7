@@ -37,5 +37,8 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 		CurPaytables: cfg.MapPaytables["main"],
 	}
 
+	prop.MapVal[GamePropWidth] = cfg.Width
+	prop.MapVal[GamePropHeight] = cfg.Height
+
 	return prop, nil
 }
