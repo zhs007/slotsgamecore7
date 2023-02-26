@@ -34,7 +34,7 @@ func (game *Game) Init(cfgfn string) error {
 	game.Cfg.SetDefaultSceneString(game.Prop.Config.DefaultScene)
 
 	for _, v := range prop.Config.GameMods {
-		game.MgrGameMod.NewGameMod(prop, v, game.MgrComponent)
+		game.AddGameMod(game.MgrGameMod.NewGameMod(prop, v, game.MgrComponent))
 	}
 
 	return nil

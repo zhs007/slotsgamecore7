@@ -14,4 +14,7 @@ var (
 
 	// ErrInvalidComponent - invalid component
 	ErrInvalidComponent = errors.New("invalid component")
+
+	// ErrInvalidReels - invalid reels
+	ErrInvalidReels = errors.New("invalid reels")
 )

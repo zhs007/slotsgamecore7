@@ -16,7 +16,7 @@ func (mgr *ComponentMgr) Reg(component string, funcNew FuncNewComponent) {
 func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent {
 	funcNew, isok := mgr.MapComponent[cfgComponent.Type]
 	if isok {
-		return funcNew(cfgComponent.Config)
+		return funcNew()
 	}
 
 	goutils.Error("ComponentMgr.NewComponent",

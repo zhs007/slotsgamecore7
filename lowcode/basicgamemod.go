@@ -1,8 +1,10 @@
 package lowcode
 
 import (
+	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"go.uber.org/zap"
 )
 
 // BasicGameMod - basic gamemod
@@ -22,6 +24,14 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 
 	for _, v := range cfgGameMod.Components {
 		c := mgrComponent.NewComponent(v)
+		err := c.Init(v.Config)
+		if err != nil {
+			goutils.Error("NewBasicGameMod:Init",
+				zap.Error(err))
+
+			return nil
+		}
+
 		bgm.Components.AddComponent(c)
 	}
 
@@ -33,7 +43,18 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
 
 	if cmd == "SPIN" {
-		pr := &sgc7game.PlayResult{}
+		pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
+
+		for i, v := range bgm.Components.Components {
+			err := v.OnPlayGame(bgm.GameProp, pr, plugin, cmd, param, ps, stake, prs)
+			if err != nil {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return nil, err
+			}
+		}
 
 		return pr, nil
 	}

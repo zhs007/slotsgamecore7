@@ -22,7 +22,7 @@ func NewBaseGame(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent
 // OnPlay - on play
 func (bg *BaseGame) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
 	if cmd == "SPIN" {
-		pr := &sgc7game.PlayResult{}
+		pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
 
 		return pr, nil
 	}
