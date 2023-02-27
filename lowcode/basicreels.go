@@ -12,16 +12,40 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	WinTypeLines        = "lines"
+	WinTypeWays         = "ways"
+	WinTypeScatters     = "scatters"
+	WinTypeCountScatter = "countscatter"
+
+	BetTypeNormal   = "bet"
+	BetTypeTotalBet = "totalBet"
+)
+
+func GetBet(stake *sgc7game.Stake, bettype string) int {
+	if bettype == BetTypeTotalBet {
+		return int(stake.CashBet) / int(stake.CoinBet)
+	}
+
+	return 1
+}
+
 // TriggerFeatureConfig - configuration for trigger feature
 type TriggerFeatureConfig struct {
-	Symbol  string   `yaml:"symbol"`  // like scatter
-	Type    string   `yaml:"type"`    // like scatters
-	Scripts []string `yaml:"scripts"` // scripts
+	IsBeforMystery bool   `yaml:"isBeforMystery"` // is befor mystery
+	Symbol         string `yaml:"symbol"`         // like scatter
+	Type           string `yaml:"type"`           // like scatters
+	MinNum         int    `yaml:"minNum"`         // like 3
+	Scripts        string `yaml:"scripts"`        // scripts
+	FGNumWeight    string `yaml:"FGNumWeight"`    // FG number weight
+	IsTriggerFG    bool   `yaml:"isTriggerFG"`    // is trigger FG
+	BetType        string `yaml:"betType"`        // bet or totalBet
 }
 
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
 	MainType       string                  `yaml:"mainType"`       // lines or ways
+	BetType        string                  `yaml:"betType"`        // bet or totalBet
 	ExcludeSymbols []string                `yaml:"excludeSymbols"` // w/s etc
 	ReelSetsWeight string                  `yaml:"reelSetWeight"`
 	MysteryWeight  string                  `yaml:"mysteryWeight"`
@@ -35,6 +59,59 @@ type BasicReels struct {
 	ReelSetWeights *sgc7game.ValWeights2
 	MysteryWeights *sgc7game.ValWeights2
 	MysterySymbol  int
+	UsedScenes     []int
+	UsedResults    []int
+}
+
+// AddScene -
+func (basicReels *BasicReels) AddScene(curpr *sgc7game.PlayResult, sc *sgc7game.GameScene) {
+	basicReels.UsedScenes = append(basicReels.UsedScenes, len(curpr.Scenes))
+
+	curpr.Scenes = append(curpr.Scenes, sc)
+}
+
+// AddResult -
+func (basicReels *BasicReels) AddResult(curpr *sgc7game.PlayResult, ret *sgc7game.Result) {
+	basicReels.UsedResults = append(basicReels.UsedResults, len(curpr.Results))
+
+	curpr.Results = append(curpr.Results, ret)
+}
+
+// AddResult -
+func (basicReels *BasicReels) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) {
+	lastsi := basicReels.UsedScenes[len(basicReels.UsedScenes)-1]
+	if tf.IsBeforMystery {
+		lastsi = basicReels.UsedScenes[0]
+	}
+
+	isTrigger := false
+	if tf.Type == WinTypeScatters {
+		ret := sgc7game.CalcScatter3(curpr.Scenes[lastsi], gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], GetBet(stake, tf.BetType), int(stake.CoinBet),
+			func(scatter int, cursymbol int) bool {
+				return cursymbol == scatter
+			}, true)
+
+		if ret != nil {
+			basicReels.AddResult(curpr, ret)
+			isTrigger = true
+		}
+	} else if tf.Type == WinTypeCountScatter {
+		ret := sgc7game.CalcScatterEx(curpr.Scenes[lastsi], gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum, func(scatter int, cursymbol int) bool {
+			return cursymbol == scatter
+		})
+
+		if ret != nil {
+			basicReels.AddResult(curpr, ret)
+			isTrigger = true
+		}
+	}
+
+	if isTrigger {
+		if tf.IsTriggerFG {
+			gameProp.TriggerFGWithWeights(tf.FGNumWeight)
+		}
+	}
 }
 
 // Init -
@@ -126,7 +203,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	curpr.Scenes = append(curpr.Scenes, sc)
+	basicReels.AddScene(curpr, sc)
 
 	if basicReels.MysteryWeights != nil {
 		curm, err := basicReels.MysteryWeights.RandVal(plugin)
@@ -142,7 +219,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		sc2 := sc.Clone()
 		sc2.ReplaceSymbol(basicReels.MysterySymbol, gameProp.MapVal[GamePropCurMystery])
 
-		curpr.Scenes = append(curpr.Scenes, sc2)
+		basicReels.AddScene(curpr, sc2)
 	}
 
 	return nil
@@ -151,6 +228,20 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 // pay
 func (basicReels *BasicReels) OnPay(gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	for _, v := range basicReels.Config.BeforMain {
+		basicReels.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
+	}
+
+	if basicReels.Config.MainType == WinTypeWays {
+		lastsi := basicReels.UsedScenes[len(basicReels.UsedScenes)-1]
+
+		sgc7game.CalcFullLineEx(curpr.Scenes[lastsi], gameProp.CurPaytables, GetBet(stake, basicReels.Config.BetType))
+	}
+
+	for _, v := range basicReels.Config.AfterMain {
+		basicReels.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
+	}
 
 	return nil
 }

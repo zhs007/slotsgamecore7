@@ -5,3 +5,10 @@ excludeSymbols:
 mystery: MYSTERY
 reelSetWeight: ../data/game001/bgreelsetweight.xlsx
 mysteryWeight: ../data/game001/bgmysteryweight.xlsx
+beforMain:
+  - isBeforMystery: true
+    symbol: SCATTER
+    type: scatters
+    minNum: 3
+    FGNumWeight: ../data/game001/fgnumweight.xlsx
+    isTriggerFG: true

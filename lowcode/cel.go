@@ -25,7 +25,7 @@ func newScriptBasicFuncs(gameProp *GameProperty) []cel.EnvOption {
 				cel.BinaryBinding(func(param0, param1 ref.Val) ref.Val {
 					prop, err := String2Property(param0.Value().(string))
 					if err != nil {
-						goutils.Error("newScriptBasicFuncs:String2Property",
+						goutils.Error("newScriptBasicFuncs:setVal:String2Property",
 							zap.Error(err))
 
 						return types.NullType
@@ -34,6 +34,32 @@ func newScriptBasicFuncs(gameProp *GameProperty) []cel.EnvOption {
 					err = gameProp.SetVal(prop, param1.Value().(int))
 					if err != nil {
 						goutils.Error("newScriptBasicFuncs:setVal",
+							zap.Error(err))
+
+						return types.NullType
+					}
+
+					return types.NullType
+				},
+				),
+			),
+		),
+		cel.Function("setStrVal",
+			cel.Overload("setStrVal_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.NullType,
+				cel.BinaryBinding(func(param0, param1 ref.Val) ref.Val {
+					prop, err := String2Property(param0.Value().(string))
+					if err != nil {
+						goutils.Error("newScriptBasicFuncs:setStrVal:String2Property",
+							zap.Error(err))
+
+						return types.NullType
+					}
+
+					err = gameProp.SetStrVal(prop, param1.Value().(string))
+					if err != nil {
+						goutils.Error("newScriptBasicFuncs:SetStrVal",
 							zap.Error(err))
 
 						return types.NullType
