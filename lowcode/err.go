@@ -17,4 +17,20 @@ var (
 
 	// ErrInvalidReels - invalid reels
 	ErrInvalidReels = errors.New("invalid reels")
+
+	// ErrInvalidSymbol - invalid symbol
+	ErrInvalidSymbol = errors.New("invalid symbol")
+
+	// ErrInvalidPaytables - invalid paytables
+	ErrInvalidPaytables = errors.New("invalid paytables")
+
+	// ErrInvalidGamePropertyString - invalid gameProperty string
+	ErrInvalidGamePropertyString = errors.New("invalid gameProperty string")
+
+	// ErrParseScript - parse script error
+	ErrParseScript = errors.New("parse script error")
+	// ErrNoFunctionInScript - no function in script
+	ErrNoFunctionInScript = errors.New("no function in script")
+	// ErrWrongFunctionInScript - wrong function in script
+	ErrWrongFunctionInScript = errors.New("wrong function in script")
 )

@@ -265,7 +265,7 @@ func LoadValWeights2FromExcelWithSymbols(fn string, headerVal string, headerWeig
 	vals := make([]IVal, len(vw.Vals))
 
 	for i, v := range vw.Vals {
-		vals[i] = NewIntValEx[int](paytables.MapSymbols[v.String()])
+		vals[i] = NewIntValEx(paytables.MapSymbols[v.String()])
 	}
 
 	nvw, err := NewValWeights2(vals, vw.Weights)
