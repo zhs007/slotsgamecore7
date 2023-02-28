@@ -6,6 +6,7 @@ import (
 )
 
 type FuncOnSelectColor func() bool
+type FuncGetSymbolString func(int) string
 
 func SelectColor(onselect FuncOnSelectColor, c1 *color.Color, c2 *color.Color) *color.Color {
 	if onselect() {
@@ -16,8 +17,9 @@ func SelectColor(onselect FuncOnSelectColor, c1 *color.Color, c2 *color.Color) *
 }
 
 type SymbolColorMap struct {
-	MapSymbols map[int]*color.Color
-	PayTables  *sgc7game.PayTables
+	MapSymbols        map[int]*color.Color
+	PayTables         *sgc7game.PayTables
+	OnGetSymbolString FuncGetSymbolString
 }
 
 func (mapSymbolColor *SymbolColorMap) AddSymbolColor(s int, c *color.Color) {
@@ -27,15 +29,21 @@ func (mapSymbolColor *SymbolColorMap) AddSymbolColor(s int, c *color.Color) {
 func (mapSymbolColor *SymbolColorMap) GetSymbolString(s int) string {
 	c, isok := mapSymbolColor.MapSymbols[s]
 	if isok {
-		return FormatColorString(mapSymbolColor.PayTables.GetStringFromInt(s), c)
+		return FormatColorString(mapSymbolColor.OnGetSymbolString(s), c)
 	}
 
-	return mapSymbolColor.PayTables.GetStringFromInt(s)
+	return mapSymbolColor.OnGetSymbolString(s)
 }
 
 func NewSymbolColorMap(paytables *sgc7game.PayTables) *SymbolColorMap {
-	return &SymbolColorMap{
+	scm := &SymbolColorMap{
 		MapSymbols: make(map[int]*color.Color),
 		PayTables:  paytables,
 	}
+
+	scm.OnGetSymbolString = func(s int) string {
+		return scm.PayTables.GetStringFromInt(s)
+	}
+
+	return scm
 }

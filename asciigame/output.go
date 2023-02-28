@@ -13,27 +13,6 @@ var ColorExitKey *color.Color
 var ColorWin *color.Color
 var ColorLose *color.Color
 
-// type Color int
-
-// const (
-// 	Red    Color = 1
-// 	Green  Color = 2
-// 	Yellow Color = 3
-// 	Blue   Color = 4
-// 	Purple Color = 5
-// 	Cyan   Color = 6
-// 	White  Color = 7
-// )
-
-// const ColorReset = "\033[0m"
-// const ColorRed = "\033[31m"
-// const ColorGreen = "\033[32m"
-// const ColorYellow = "\033[33m"
-// const ColorBlue = "\033[34m"
-// const ColorPurple = "\033[35m"
-// const ColorCyan = "\033[36m"
-// const ColorWhite = "\033[37m"
-
 func OutputScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolColorMap) {
 	if len(str) > 0 {
 		fmt.Printf("%v:\n", str)
@@ -48,7 +27,7 @@ func OutputScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolCo
 	}
 }
 
-type FuncIsResult func(*sgc7game.Result) bool
+type FuncIsResult func(int, *sgc7game.Result) bool
 
 func OutputResults(str string, result *sgc7game.PlayResult, isResult FuncIsResult, mapSymbolColor *SymbolColorMap) {
 	if len(str) > 0 {
@@ -57,8 +36,8 @@ func OutputResults(str string, result *sgc7game.PlayResult, isResult FuncIsResul
 
 	wins := 0
 
-	for _, v := range result.Results {
-		if isResult(v) {
+	for i, v := range result.Results {
+		if isResult(i, v) {
 			wins += v.CashWin
 		}
 	}
@@ -69,8 +48,8 @@ func OutputResults(str string, result *sgc7game.PlayResult, isResult FuncIsResul
 		fmt.Printf("%v Wins\n", FormatColorString(fmt.Sprintf("%v", wins), ColorNumber))
 	}
 
-	for _, v := range result.Results {
-		if isResult(v) {
+	for i, v := range result.Results {
+		if isResult(i, v) {
 			fmt.Printf("%vx%v Wins %v\n", mapSymbolColor.GetSymbolString(v.Symbol),
 				FormatColorString(fmt.Sprintf("%v", v.SymbolNums), ColorNumber),
 				FormatColorString(fmt.Sprintf("%v", v.CashWin), ColorNumber))

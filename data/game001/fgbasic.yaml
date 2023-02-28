@@ -1,10 +1,7 @@
 mainType: lines
-betType: bet
 excludeSymbols:
   - SCATTER
   - MYSTERY
-wildSymbols:
-  - WILD
 mystery: MYSTERY
 reelSetWeight: ../data/game001/bgreelsetweight.xlsx
 mysteryWeight: ../data/game001/bgmysteryweight.xlsx
@@ -15,4 +12,3 @@ beforMain:
     minNum: 3
     FGNumWeight: ../data/game001/fgnumweight.xlsx
     isTriggerFG: true
-    betType: totalBet
