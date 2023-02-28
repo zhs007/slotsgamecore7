@@ -2,7 +2,6 @@ package lowcode
 
 import (
 	"github.com/zhs007/goutils"
-	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
@@ -13,7 +12,6 @@ import (
 type Game struct {
 	*sgc7game.BasicGame
 	Prop         *GameProperty
-	MgrGameMod   *GameModMgr
 	MgrComponent *ComponentMgr
 }
 
@@ -69,10 +67,10 @@ func (game *Game) ResetConfig(cfg interface{}) {
 }
 
 // OnAsciiGame - outpur to asciigame
-func (game *Game) OnAsciiGame(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (game *Game) OnAsciiGame(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
 	for _, v := range game.Prop.Config.GameMods {
 		gm := game.MapGameMods[v.Type].(*BasicGameMod)
-		gm.OnAsciiGame(pr, lst, mapSymbolColor)
+		gm.OnAsciiGame(game.Prop, pr, lst)
 	}
 
 	return nil
@@ -84,7 +82,6 @@ func NewGame(cfgfn string) (*Game, error) {
 		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
 			return sgc7plugin.NewBasicPlugin()
 		}),
-		MgrGameMod:   NewGameModMgr(),
 		MgrComponent: NewComponentMgr(),
 	}
 

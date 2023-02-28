@@ -2,7 +2,6 @@ package lowcode
 
 import (
 	"github.com/zhs007/goutils"
-	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"go.uber.org/zap"
@@ -80,9 +79,9 @@ func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
 }
 
 // OnAsciiGame - outpur to asciigame
-func (bgm *BasicGameMod) OnAsciiGame(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
 	for _, v := range bgm.Components.Components {
-		v.OnAsciiGame(bgm.GameProp, pr, lst, mapSymbolColor)
+		v.OnAsciiGame(bgm.GameProp, pr, lst, gameProp.MapSymbolColor)
 	}
 
 	return nil

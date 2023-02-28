@@ -28,7 +28,7 @@ func main() {
 		return
 	}
 
-	mapSymbolColor := asciigame.NewSymbolColorMap(game.GetConfig().PayTables)
+	// mapSymbolColor := asciigame.NewSymbolColorMap(game.GetConfig().PayTables)
 	// wColor := color.New(color.BgRed, color.FgHiWhite)
 	// hColor := color.New(color.BgBlue, color.FgHiWhite)
 	// mColor := color.New(color.BgGreen, color.FgHiWhite)
@@ -47,7 +47,7 @@ func main() {
 	}
 
 	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) {
-		game.OnAsciiGame(pr, lst, mapSymbolColor)
+		game.OnAsciiGame(pr, lst)
 		// gp := pr.CurGameModParams.(*dtgame.GameParams)
 		// if len(gp.ExpSyms) > 0 {
 		// 	fmt.Printf("ExpandingSymbols trigger! [ ")

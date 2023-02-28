@@ -28,6 +28,7 @@ type Config struct {
 	MapPaytables     map[string]*sgc7game.PayTables `yaml:"-"`
 	Reels            map[string]string              `yaml:"reels"`
 	MapReels         map[string]*sgc7game.ReelsData `yaml:"-"`
+	SymbolsViewer    string                         `yaml:"symbolsViewer"`
 	DefaultScene     string                         `yaml:"defaultScene"`
 	DefaultPaytables string                         `yaml:"defaultPaytables"`
 	DefaultLinedata  string                         `yaml:"defaultLinedata"`

@@ -1,7 +1,9 @@
 package lowcode
 
 import (
+	"github.com/fatih/color"
 	"github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"go.uber.org/zap"
@@ -44,6 +46,8 @@ type GameProperty struct {
 	CurReels         *sgc7game.ReelsData
 	MapIntValWeights map[string]*sgc7game.ValWeights2
 	Plugin           sgc7plugin.IPlugin
+	SymbolsViewer    *SymbolsViewer
+	MapSymbolColor   *asciigame.SymbolColorMap
 }
 
 func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {
@@ -148,6 +152,37 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 	gameProp.SetStrVal(GamePropCurLineData, cfg.DefaultLinedata)
 	gameProp.SetVal(GamePropWidth, cfg.Width)
 	gameProp.SetVal(GamePropHeight, cfg.Height)
+
+	sv, err := LoadSymbolsViewer(cfg.SymbolsViewer)
+	if err != nil {
+		goutils.Error("InitGameProperty:LoadSymbolsViewer",
+			zap.String("fn", cfg.SymbolsViewer),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	gameProp.SymbolsViewer = sv
+	gameProp.MapSymbolColor = asciigame.NewSymbolColorMap(gameProp.CurPaytables)
+	wColor := color.New(color.BgRed, color.FgHiWhite)
+	hColor := color.New(color.BgBlue, color.FgHiWhite)
+	mColor := color.New(color.BgGreen, color.FgHiWhite)
+	sColor := color.New(color.BgMagenta, color.FgHiWhite)
+	for k, v := range sv.MapSymbols {
+		if v.Color == "wild" {
+			gameProp.MapSymbolColor.AddSymbolColor(k, wColor)
+		} else if v.Color == "high" {
+			gameProp.MapSymbolColor.AddSymbolColor(k, hColor)
+		} else if v.Color == "medium" {
+			gameProp.MapSymbolColor.AddSymbolColor(k, mColor)
+		} else if v.Color == "scatter" {
+			gameProp.MapSymbolColor.AddSymbolColor(k, sColor)
+		}
+	}
+
+	gameProp.MapSymbolColor.OnGetSymbolString = func(s int) string {
+		return gameProp.SymbolsViewer.MapSymbols[s].Output
+	}
 
 	return gameProp, nil
 }
