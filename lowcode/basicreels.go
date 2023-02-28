@@ -24,10 +24,10 @@ const (
 
 func GetBet(stake *sgc7game.Stake, bettype string) int {
 	if bettype == BetTypeTotalBet {
-		return int(stake.CashBet) / int(stake.CoinBet)
+		return int(stake.CashBet)
 	}
 
-	return 1
+	return int(stake.CoinBet)
 }
 
 // TriggerFeatureConfig - configuration for trigger feature
@@ -47,6 +47,7 @@ type BasicReelsConfig struct {
 	MainType       string                  `yaml:"mainType"`       // lines or ways
 	BetType        string                  `yaml:"betType"`        // bet or totalBet
 	ExcludeSymbols []string                `yaml:"excludeSymbols"` // w/s etc
+	WildSymbols    []string                `yaml:"wildSymbols"`    // wild etc
 	ReelSetsWeight string                  `yaml:"reelSetWeight"`
 	MysteryWeight  string                  `yaml:"mysteryWeight"`
 	Mystery        string                  `yaml:"mystery"`
@@ -61,6 +62,8 @@ type BasicReels struct {
 	MysterySymbol  int
 	UsedScenes     []int
 	UsedResults    []int
+	ExcludeSymbols []int
+	WildSymbols    []int
 }
 
 // AddScene -
@@ -72,6 +75,9 @@ func (basicReels *BasicReels) AddScene(curpr *sgc7game.PlayResult, sc *sgc7game.
 
 // AddResult -
 func (basicReels *BasicReels) AddResult(curpr *sgc7game.PlayResult, ret *sgc7game.Result) {
+	curpr.CashWin += int64(ret.CashWin)
+	curpr.CoinWin += ret.CoinWin
+
 	basicReels.UsedResults = append(basicReels.UsedResults, len(curpr.Results))
 
 	curpr.Results = append(curpr.Results, ret)
@@ -87,7 +93,7 @@ func (basicReels *BasicReels) ProcTriggerFeature(tf *TriggerFeatureConfig, gameP
 
 	isTrigger := false
 	if tf.Type == WinTypeScatters {
-		ret := sgc7game.CalcScatter3(curpr.Scenes[lastsi], gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], GetBet(stake, tf.BetType), int(stake.CoinBet),
+		ret := sgc7game.CalcScatter4(curpr.Scenes[lastsi], gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], GetBet(stake, tf.BetType),
 			func(scatter int, cursymbol int) bool {
 				return cursymbol == scatter
 			}, true)
@@ -166,6 +172,14 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 
 	basicReels.MysterySymbol = gameProp.CurPaytables.MapSymbols[basicReels.Config.Mystery]
 
+	for _, v := range cfg.ExcludeSymbols {
+		basicReels.ExcludeSymbols = append(basicReels.ExcludeSymbols, gameProp.CurPaytables.MapSymbols[v])
+	}
+
+	for _, v := range cfg.WildSymbols {
+		basicReels.WildSymbols = append(basicReels.WildSymbols, gameProp.CurPaytables.MapSymbols[v])
+	}
+
 	return nil
 }
 
@@ -236,7 +250,46 @@ func (basicReels *BasicReels) OnPay(gameProp *GameProperty, curpr *sgc7game.Play
 	if basicReels.Config.MainType == WinTypeWays {
 		lastsi := basicReels.UsedScenes[len(basicReels.UsedScenes)-1]
 
-		sgc7game.CalcFullLineEx(curpr.Scenes[lastsi], gameProp.CurPaytables, GetBet(stake, basicReels.Config.BetType))
+		rets := sgc7game.CalcFullLineEx2(curpr.Scenes[lastsi], gameProp.CurPaytables, GetBet(stake, basicReels.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+			return goutils.IndexOfIntSlice(basicReels.ExcludeSymbols, cursymbol, 0) < 0
+		}, func(cursymbol int) bool {
+			return goutils.IndexOfIntSlice(basicReels.WildSymbols, cursymbol, 0) >= 0
+		}, func(cursymbol int, startsymbol int) bool {
+			if cursymbol == startsymbol {
+				return true
+			}
+
+			return goutils.IndexOfIntSlice(basicReels.WildSymbols, cursymbol, 0) >= 0
+		})
+
+		for _, v := range rets {
+			basicReels.AddResult(curpr, v)
+		}
+	} else if basicReels.Config.MainType == WinTypeLines {
+		lastsi := basicReels.UsedScenes[len(basicReels.UsedScenes)-1]
+
+		for i, v := range gameProp.CurLineData.Lines {
+			ret := sgc7game.CalcLineEx(curpr.Scenes[lastsi], gameProp.CurPaytables, v, GetBet(stake, basicReels.Config.BetType), func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(basicReels.ExcludeSymbols, cursymbol, 0) < 0
+			}, func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(basicReels.WildSymbols, cursymbol, 0) >= 0
+			}, func(cursymbol int, startsymbol int) bool {
+				if cursymbol == startsymbol {
+					return true
+				}
+
+				return goutils.IndexOfIntSlice(basicReels.WildSymbols, cursymbol, 0) >= 0
+			}, func(scene *sgc7game.GameScene, result *sgc7game.Result) int {
+				return 1
+			}, func(cursymbol int) int {
+				return cursymbol
+			})
+			if ret != nil {
+				ret.LineIndex = i
+
+				basicReels.AddResult(curpr, ret)
+			}
+		}
 	}
 
 	for _, v := range basicReels.Config.AfterMain {
@@ -248,12 +301,18 @@ func (basicReels *BasicReels) OnPay(gameProp *GameProperty, curpr *sgc7game.Play
 
 // OnAsciiGame - outpur to asciigame
 func (basicReels *BasicReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	asciigame.OutputScene("initial symbols", pr.Scenes[0], mapSymbolColor)
+	if len(basicReels.UsedScenes) > 0 {
+		asciigame.OutputScene("initial symbols", pr.Scenes[basicReels.UsedScenes[0]], mapSymbolColor)
 
-	if basicReels.MysteryWeights != nil {
-		fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(gameProp.MapVal[GamePropCurMystery]))
-		asciigame.OutputScene("after symbols", pr.Scenes[1], mapSymbolColor)
+		if basicReels.MysteryWeights != nil {
+			fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(gameProp.MapVal[GamePropCurMystery]))
+			asciigame.OutputScene("after symbols", pr.Scenes[basicReels.UsedScenes[1]], mapSymbolColor)
+		}
 	}
+
+	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
+		return goutils.IndexOfIntSlice(basicReels.UsedResults, i, 0) >= 0
+	}, mapSymbolColor)
 
 	return nil
 }

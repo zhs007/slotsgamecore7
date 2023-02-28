@@ -37,7 +37,6 @@ func (game *Game) Init(cfgfn string) error {
 
 	for _, v := range prop.Config.GameMods {
 		game.AddGameMod(NewBasicGameMod(prop, v, game.MgrComponent))
-		// game.AddGameMod(game.MgrGameMod.NewGameMod(prop, v, game.MgrComponent))
 	}
 
 	return nil

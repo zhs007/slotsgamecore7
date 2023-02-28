@@ -109,6 +109,17 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		}
 
 		gameProp.CurPaytables = v
+	} else if prop == GamePropCurLineData {
+		v, isok := gameProp.Config.MapLinedate[val]
+		if !isok {
+			goutils.Error("GameProperty.SetStrVal:GamePropCurLineData",
+				zap.String("val", val),
+				zap.Error(ErrInvalidPaytables))
+
+			return ErrInvalidPaytables
+		}
+
+		gameProp.CurLineData = v
 	}
 
 	gameProp.MapStrVal[prop] = val
@@ -133,7 +144,8 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
 	}
 
-	gameProp.SetStrVal(GamePropCurPaytables, "main")
+	gameProp.SetStrVal(GamePropCurPaytables, cfg.DefaultPaytables)
+	gameProp.SetStrVal(GamePropCurLineData, cfg.DefaultLinedata)
 	gameProp.SetVal(GamePropWidth, cfg.Width)
 	gameProp.SetVal(GamePropHeight, cfg.Height)
 

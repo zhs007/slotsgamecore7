@@ -20,17 +20,19 @@ type GameModConfig struct {
 }
 
 type Config struct {
-	Width        int                            `yaml:"width"`
-	Height       int                            `yaml:"height"`
-	Linedata     map[string]string              `yaml:"linedata"`
-	MapLinedate  map[string]*sgc7game.LineData  `yaml:"-"`
-	Paytables    map[string]string              `yaml:"paytables"`
-	MapPaytables map[string]*sgc7game.PayTables `yaml:"-"`
-	Reels        map[string]string              `yaml:"reels"`
-	MapReels     map[string]*sgc7game.ReelsData `yaml:"-"`
-	DefaultScene string                         `yaml:"defaultScene"`
-	Bets         []int                          `yaml:"bets"`
-	GameMods     []*GameModConfig               `yaml:"gamemods"`
+	Width            int                            `yaml:"width"`
+	Height           int                            `yaml:"height"`
+	Linedata         map[string]string              `yaml:"linedata"`
+	MapLinedate      map[string]*sgc7game.LineData  `yaml:"-"`
+	Paytables        map[string]string              `yaml:"paytables"`
+	MapPaytables     map[string]*sgc7game.PayTables `yaml:"-"`
+	Reels            map[string]string              `yaml:"reels"`
+	MapReels         map[string]*sgc7game.ReelsData `yaml:"-"`
+	DefaultScene     string                         `yaml:"defaultScene"`
+	DefaultPaytables string                         `yaml:"defaultPaytables"`
+	DefaultLinedata  string                         `yaml:"defaultLinedata"`
+	Bets             []int                          `yaml:"bets"`
+	GameMods         []*GameModConfig               `yaml:"gamemods"`
 }
 
 func LoadConfig(fn string) (*Config, error) {

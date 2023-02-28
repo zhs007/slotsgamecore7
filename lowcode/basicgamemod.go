@@ -57,6 +57,17 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			}
 		}
 
+		for i, v := range bgm.Components.Components {
+			err := v.OnPay(bgm.GameProp, pr, plugin, cmd, param, ps, stake, prs)
+			if err != nil {
+				goutils.Error("BasicGameMod.OnPlay:OnPay",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return nil, err
+			}
+		}
+
 		return pr, nil
 	}
 
