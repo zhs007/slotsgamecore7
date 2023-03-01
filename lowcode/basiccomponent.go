@@ -2,6 +2,10 @@ package lowcode
 
 import sgc7game "github.com/zhs007/slotsgamecore7/game"
 
+type BasicComponentConfig struct {
+	DefaultNextComponent string `yaml:"defaultNextComponent"` // next component, if no jump to other
+}
+
 type BasicComponent struct {
 	UsedScenes  []int
 	UsedResults []int

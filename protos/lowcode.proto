@@ -10,8 +10,12 @@ message ComponentData {
     repeated int32 usedPrizeScenes = 4;
     int32 coinWin = 5;
     int64 cashWin = 6;
+    string name = 7;
 }
 
 // GameParam
 message GameParam {
+    string firstComponent = 1;
+    string nextStepFirstComponent = 2;
+    repeated ComponentData components = 3;
 }

@@ -33,4 +33,7 @@ var (
 	ErrNoFunctionInScript = errors.New("no function in script")
 	// ErrWrongFunctionInScript - wrong function in script
 	ErrWrongFunctionInScript = errors.New("wrong function in script")
+
+	// ErrIvalidComponentName - invalid component name
+	ErrIvalidComponentName = errors.New("invalid component name")
 )

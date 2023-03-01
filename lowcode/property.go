@@ -19,6 +19,9 @@ const (
 	GamePropTriggerFG = 100
 	GamePropFGNum     = 101
 
+	GamePropNextComponent   = 200
+	GamePropRespinComponent = 201
+
 	GamePropCurMystery = 1000
 )
 
@@ -53,6 +56,8 @@ type GameProperty struct {
 
 func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.MapScenes = make(map[string]int)
+
+	gameProp.SetStrVal(GamePropNextComponent, "")
 
 	return nil
 }

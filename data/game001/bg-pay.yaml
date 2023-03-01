@@ -1,0 +1,16 @@
+mainType: lines
+betType: bet
+mainScene: basicReels.mstery
+excludeSymbols:
+  - SCATTER
+  - MYSTERY
+wildSymbols:
+  - WILD
+beforMain:
+  - targetScene: basicReels.mstery
+    symbol: SCATTER
+    type: countscatter
+    minNum: 3
+    FGNumWeight: ../data/game001/fgnumweight.xlsx
+    isTriggerFG: true
+    betType: totalBet

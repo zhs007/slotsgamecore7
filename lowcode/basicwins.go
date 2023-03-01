@@ -7,6 +7,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -43,13 +44,14 @@ type TriggerFeatureConfig struct {
 
 // BasicWinsConfig - configuration for BasicWins
 type BasicWinsConfig struct {
-	MainType       string                  `yaml:"mainType"`       // lines or ways
-	BetType        string                  `yaml:"betType"`        // bet or totalBet
-	MainScene      string                  `yaml:"mainScene"`      // basicReels.mstery
-	ExcludeSymbols []string                `yaml:"excludeSymbols"` // w/s etc
-	WildSymbols    []string                `yaml:"wildSymbols"`    // wild etc
-	BeforMain      []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
-	AfterMain      []*TriggerFeatureConfig `yaml:"afterMain"`      // after the maintype
+	BasicComponentConfig `yaml:",inline"`
+	MainType             string                  `yaml:"mainType"`       // lines or ways
+	BetType              string                  `yaml:"betType"`        // bet or totalBet
+	MainScene            string                  `yaml:"mainScene"`      // basicReels.mstery
+	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
+	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
+	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
+	AfterMain            []*TriggerFeatureConfig `yaml:"afterMain"`      // after the maintype
 }
 
 type BasicWins struct {
@@ -129,7 +131,7 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 }
 
 // playgame
-func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
+func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *sgc7pb.GameParam, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	for _, v := range basicWins.Config.BeforMain {
@@ -182,6 +184,8 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	for _, v := range basicWins.Config.AfterMain {
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
 	}
+
+	gameProp.SetStrVal(GamePropNextComponent, basicWins.Config.DefaultNextComponent)
 
 	return nil
 }

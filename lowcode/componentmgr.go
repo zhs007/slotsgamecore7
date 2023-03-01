@@ -33,6 +33,7 @@ func NewComponentMgr() *ComponentMgr {
 
 	mgr.Reg("basicReels", NewBasicReels)
 	mgr.Reg("basicWins", NewBasicWins)
+	mgr.Reg("lightning", NewLightning)
 
 	return mgr
 }

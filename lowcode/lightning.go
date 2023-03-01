@@ -7,24 +7,18 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
 // LightningConfig - configuration for Lightning
 type LightningConfig struct {
-	MainType       string                  `yaml:"mainType"`       // lines or ways
-	BetType        string                  `yaml:"betType"`        // bet or totalBet
-	ExcludeSymbols []string                `yaml:"excludeSymbols"` // w/s etc
-	WildSymbols    []string                `yaml:"wildSymbols"`    // wild etc
-	ReelSetsWeight string                  `yaml:"reelSetWeight"`
-	MysteryWeight  string                  `yaml:"mysteryWeight"`
-	Mystery        string                  `yaml:"mystery"`
-	BeforMain      []*TriggerFeatureConfig `yaml:"beforMain"` // befor the maintype
-	AfterMain      []*TriggerFeatureConfig `yaml:"afterMain"` // after the maintype
+	BasicComponentConfig `yaml:",inline"`
 }
 
 type Lightning struct {
+	*BasicComponent
 	Config      *LightningConfig
 	UsedScenes  []int
 	UsedResults []int
@@ -75,15 +69,10 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 }
 
 // playgame
-func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
+func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *sgc7pb.GameParam, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	return nil
-}
-
-// pay
-func (lightning *Lightning) OnPay(gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	gameProp.SetStrVal(GamePropNextComponent, lightning.Config.DefaultNextComponent)
 
 	return nil
 }
@@ -94,5 +83,7 @@ func (lightning *Lightning) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 }
 
 func NewLightning() IComponent {
-	return &Lightning{}
+	return &Lightning{
+		BasicComponent: NewBasicComponent(),
+	}
 }

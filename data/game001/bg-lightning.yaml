@@ -9,7 +9,7 @@ wildSymbols:
 beforMain:
   - targetScene: basicReels.mstery
     symbol: SCATTER
-    type: scatters
+    type: countscatter
     minNum: 3
     FGNumWeight: ../data/game001/fgnumweight.xlsx
     isTriggerFG: true

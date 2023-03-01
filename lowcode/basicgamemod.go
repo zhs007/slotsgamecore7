@@ -4,6 +4,7 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 )
 
@@ -32,10 +33,25 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 			return nil
 		}
 
-		bgm.Components.AddComponent(c)
+		bgm.Components.AddComponent(v.Name, c)
 	}
 
 	return bgm
+}
+
+// OnPlay - on play
+func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *sgc7pb.GameParam) {
+	pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
+	gp := &sgc7pb.GameParam{}
+
+	if len(prs) > 0 {
+		lastrs := prs[len(prs)-1]
+		lastgp := lastrs.CurGameModParams.(*sgc7pb.GameParam)
+
+		gp.FirstComponent = lastgp.NextStepFirstComponent
+	}
+
+	return pr, gp
 }
 
 // OnPlay - on play
@@ -45,18 +61,66 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	bgm.GameProp.OnNewStep()
 
 	if cmd == "SPIN" {
-		pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
+		pr, gp := bgm.newPlayResult(prs)
 
-		for i, v := range bgm.Components.Components {
-			err := v.OnPlayGame(bgm.GameProp, pr, plugin, cmd, param, ps, stake, prs)
+		curComponent := bgm.Components.Components[0]
+
+		if gp.FirstComponent != "" {
+			c, isok := bgm.Components.MapComponents[gp.FirstComponent]
+			if !isok {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					zap.String("FirstComponent", gp.FirstComponent),
+					zap.Error(ErrIvalidComponentName))
+
+				return nil, ErrIvalidComponentName
+			}
+
+			curComponent = c
+		}
+
+		for {
+			err := curComponent.OnPlayGame(bgm.GameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 			if err != nil {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-					zap.Int("i", i),
 					zap.Error(err))
 
 				return nil, err
 			}
+
+			respinComponent := bgm.GameProp.GetStrVal(GamePropRespinComponent)
+			if respinComponent != "" {
+				pr.IsFinish = false
+
+				break
+			}
+
+			nextComponentName := bgm.GameProp.GetStrVal(GamePropNextComponent)
+			if nextComponentName == "" {
+				break
+			}
+
+			c, isok := bgm.Components.MapComponents[nextComponentName]
+			if !isok {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					zap.String("nextComponentName", nextComponentName),
+					zap.Error(ErrIvalidComponentName))
+
+				return nil, ErrIvalidComponentName
+			}
+
+			curComponent = c
 		}
+
+		// for i, v := range bgm.Components.Components {
+		// 	err := v.OnPlayGame(bgm.GameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+		// 	if err != nil {
+		// 		goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+		// 			zap.Int("i", i),
+		// 			zap.Error(err))
+
+		// 		return nil, err
+		// 	}
+		// }
 
 		return pr, nil
 	}

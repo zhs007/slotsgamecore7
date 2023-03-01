@@ -8,15 +8,25 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
+// MysteryTriggerFeatureConfig - configuration for mystery trigger feature
+type MysteryTriggerFeatureConfig struct {
+	Symbol               string `yaml:"symbol"`               // like LIGHTNING
+	SymbolCode           int    `yaml:"-"`                    // like 10
+	RespinFirstComponent string `yaml:"respinFirstComponent"` // like lightning
+}
+
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
-	ReelSetsWeight string `yaml:"reelSetWeight"`
-	MysteryWeight  string `yaml:"mysteryWeight"`
-	Mystery        string `yaml:"mystery"`
+	BasicComponentConfig   `yaml:",inline"`
+	ReelSetsWeight         string                         `yaml:"reelSetWeight"`
+	MysteryWeight          string                         `yaml:"mysteryWeight"`
+	Mystery                string                         `yaml:"mystery"`
+	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
 }
 
 type BasicReels struct {
@@ -81,11 +91,15 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 
 	basicReels.MysterySymbol = gameProp.CurPaytables.MapSymbols[basicReels.Config.Mystery]
 
+	for _, v := range cfg.MysteryTriggerFeatures {
+		v.SymbolCode = gameProp.CurPaytables.MapSymbols[v.Symbol]
+	}
+
 	return nil
 }
 
 // playgame
-func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
+func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *sgc7pb.GameParam, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if basicReels.ReelSetWeights != nil {
@@ -129,13 +143,27 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			return err
 		}
 
+		curmcode := curm.Int()
+
 		gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 		sc2 := sc.Clone()
 		sc2.ReplaceSymbol(basicReels.MysterySymbol, curm.Int())
 
 		basicReels.AddScene(gameProp, curpr, sc2, "basicReels.mestery")
+
+		for _, v := range basicReels.Config.MysteryTriggerFeatures {
+			if v.SymbolCode == curmcode {
+				if v.RespinFirstComponent != "" {
+					gameProp.SetStrVal(GamePropRespinComponent, v.RespinFirstComponent)
+
+					return nil
+				}
+			}
+		}
 	}
+
+	gameProp.SetStrVal(GamePropNextComponent, basicReels.Config.DefaultNextComponent)
 
 	return nil
 }
