@@ -42,6 +42,8 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string,
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
 
+	bgm.GameProp.OnNewStep()
+
 	if cmd == "SPIN" {
 		pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
 
@@ -49,17 +51,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			err := v.OnPlayGame(bgm.GameProp, pr, plugin, cmd, param, ps, stake, prs)
 			if err != nil {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-					zap.Int("i", i),
-					zap.Error(err))
-
-				return nil, err
-			}
-		}
-
-		for i, v := range bgm.Components.Components {
-			err := v.OnPay(bgm.GameProp, pr, plugin, cmd, param, ps, stake, prs)
-			if err != nil {
-				goutils.Error("BasicGameMod.OnPlay:OnPay",
 					zap.Int("i", i),
 					zap.Error(err))
 

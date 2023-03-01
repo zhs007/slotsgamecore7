@@ -39,8 +39,8 @@ func String2Property(str string) (int, error) {
 
 type GameProperty struct {
 	Config           *Config
-	MapVal           map[int]int
-	MapStrVal        map[int]string
+	MapVals          map[int]int
+	MapStrVals       map[int]string
 	CurPaytables     *sgc7game.PayTables
 	CurLineData      *sgc7game.LineData
 	CurReels         *sgc7game.ReelsData
@@ -48,6 +48,26 @@ type GameProperty struct {
 	Plugin           sgc7plugin.IPlugin
 	SymbolsViewer    *SymbolsViewer
 	MapSymbolColor   *asciigame.SymbolColorMap
+	MapScenes        map[string]int
+}
+
+func (gameProp *GameProperty) OnNewStep() error {
+	gameProp.MapScenes = make(map[string]int)
+
+	return nil
+}
+
+func (gameProp *GameProperty) TagScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
+	gameProp.MapScenes[tag] = sceneIndex
+}
+
+func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) *sgc7game.GameScene {
+	si, isok := gameProp.MapScenes[tag]
+	if !isok {
+		return pr.Scenes[len(pr.Scenes)-1]
+	}
+
+	return pr.Scenes[si]
 }
 
 func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {
@@ -85,9 +105,19 @@ func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {
 }
 
 func (gameProp *GameProperty) SetVal(prop int, val int) error {
-	gameProp.MapVal[prop] = val
+	if prop == GamePropCurMystery {
+		str := gameProp.CurPaytables.GetStringFromInt(val)
+
+		gameProp.MapStrVals[prop] = str
+	}
+
+	gameProp.MapVals[prop] = val
 
 	return nil
+}
+
+func (gameProp *GameProperty) GetVal(prop int) int {
+	return gameProp.MapVals[prop]
 }
 
 func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
@@ -101,7 +131,7 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 			return ErrInvalidSymbol
 		}
 
-		gameProp.MapVal[prop] = v
+		gameProp.MapVals[prop] = v
 	} else if prop == GamePropCurPaytables {
 		v, isok := gameProp.Config.MapPaytables[val]
 		if !isok {
@@ -126,9 +156,13 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		gameProp.CurLineData = v
 	}
 
-	gameProp.MapStrVal[prop] = val
+	gameProp.MapStrVals[prop] = val
 
 	return nil
+}
+
+func (gameProp *GameProperty) GetStrVal(prop int) string {
+	return gameProp.MapStrVals[prop]
 }
 
 func InitGameProperty(cfgfn string) (*GameProperty, error) {
@@ -143,8 +177,8 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 
 	gameProp := &GameProperty{
 		Config:           cfg,
-		MapVal:           make(map[int]int),
-		MapStrVal:        make(map[int]string),
+		MapVals:          make(map[int]int),
+		MapStrVals:       make(map[int]string),
 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
 	}
 

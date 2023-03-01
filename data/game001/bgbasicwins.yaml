@@ -1,15 +1,13 @@
 mainType: lines
 betType: bet
+mainScene: basicReels.mstery
 excludeSymbols:
   - SCATTER
   - MYSTERY
 wildSymbols:
   - WILD
-mystery: MYSTERY
-reelSetWeight: ../data/game001/bgreelsetweight.xlsx
-mysteryWeight: ../data/game001/bgmysteryweight.xlsx
 beforMain:
-  - isBeforMystery: true
+  - targetScene: basicReels.mstery
     symbol: SCATTER
     type: scatters
     minNum: 3

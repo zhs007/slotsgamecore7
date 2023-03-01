@@ -28,7 +28,9 @@ gamemods:
   - type: "bg"
     components:
       - type: "basicReels"
-        config: ../data/game001/bgbasic.yaml
+        config: ../data/game001/bgbasicreels.yaml
+      - type: "basicWins"
+        config: ../data/game001/bgbasicwins.yaml        
   - type: "fg"
     components:
       - type: "basicReels"
