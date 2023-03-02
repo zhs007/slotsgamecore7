@@ -52,12 +52,15 @@ type GameProperty struct {
 	SymbolsViewer    *SymbolsViewer
 	MapSymbolColor   *asciigame.SymbolColorMap
 	MapScenes        map[string]int
+	MapOtherScenes   map[string]int
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.MapScenes = make(map[string]int)
+	gameProp.MapOtherScenes = make(map[string]int)
 
 	gameProp.SetStrVal(GamePropNextComponent, "")
+	gameProp.SetStrVal(GamePropRespinComponent, "")
 
 	return nil
 }
@@ -73,6 +76,33 @@ func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) *sgc
 	}
 
 	return pr.Scenes[si]
+}
+
+func (gameProp *GameProperty) TagOtherScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
+	gameProp.MapOtherScenes[tag] = sceneIndex
+}
+
+func (gameProp *GameProperty) GetOtherScene(pr *sgc7game.PlayResult, tag string) *sgc7game.GameScene {
+	si, isok := gameProp.MapOtherScenes[tag]
+	if !isok {
+		return pr.OtherScenes[len(pr.OtherScenes)-1]
+	}
+
+	return pr.OtherScenes[si]
+}
+
+func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, respinComponent string, gs *sgc7game.GameScene, os *sgc7game.GameScene) {
+	if gs != nil {
+		gp.LastScene = gs.Clone()
+	}
+
+	if os != nil {
+		gp.LastOtherScene = os.Clone()
+	}
+
+	gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
+
+	gp.NextStepFirstComponent = respinComponent
 }
 
 func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {

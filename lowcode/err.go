@@ -36,4 +36,10 @@ var (
 
 	// ErrIvalidComponentName - invalid component name
 	ErrIvalidComponentName = errors.New("invalid component name")
+
+	// ErrIvalidCurGameModParams - invalid CurGameModParams
+	ErrIvalidCurGameModParams = errors.New("invalid CurGameModParams")
+
+	// ErrIvalidPlayResultLength - invalid PlayResult Length
+	ErrIvalidPlayResultLength = errors.New("invalid PlayResult Length")
 )

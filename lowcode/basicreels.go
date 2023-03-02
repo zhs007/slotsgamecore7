@@ -68,6 +68,8 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	basicReels.OnNewStep()
+
 	if basicReels.ReelSetWeights != nil {
 		val, err := basicReels.ReelSetWeights.RandVal(plugin)
 		if err != nil {

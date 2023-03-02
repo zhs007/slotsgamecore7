@@ -10,16 +10,17 @@ import (
 // BasicGameMod - basic gamemod
 type BasicGameMod struct {
 	*sgc7game.BasicGameMod
-	GameProp   *GameProperty
-	Components *ComponentList
+	GameProp          *GameProperty
+	Components        *ComponentList
+	HistoryComponents []IComponent
 }
 
 // NewBasicGameMod - new BaseGame
 func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
 	bgm := &BasicGameMod{
-		sgc7game.NewBasicGameMod(cfgGameMod.Type, gameProp.Config.Width, gameProp.Config.Height),
-		gameProp,
-		NewComponentList(),
+		BasicGameMod: sgc7game.NewBasicGameMod(cfgGameMod.Type, gameProp.Config.Width, gameProp.Config.Height),
+		GameProp:     gameProp,
+		Components:   NewComponentList(),
 	}
 
 	for _, v := range cfgGameMod.Components {
@@ -40,8 +41,12 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 
 // OnPlay - on play
 func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
-	pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
 	gp := &GameParams{}
+	pr := &sgc7game.PlayResult{
+		IsFinish:         true,
+		NextGameMod:      "bg",
+		CurGameModParams: gp,
+	}
 
 	if len(prs) > 0 {
 		lastrs := prs[len(prs)-1]
@@ -57,6 +62,7 @@ func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.Pl
 func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string,
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
 
+	bgm.HistoryComponents = nil
 	bgm.GameProp.OnNewStep()
 
 	if cmd == "SPIN" {
@@ -85,6 +91,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 				return nil, err
 			}
+
+			bgm.HistoryComponents = append(bgm.HistoryComponents, curComponent)
 
 			respinComponent := bgm.GameProp.GetStrVal(GamePropRespinComponent)
 			if respinComponent != "" {
@@ -134,7 +142,7 @@ func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
 
 // OnAsciiGame - outpur to asciigame
 func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
-	for _, v := range bgm.Components.Components {
+	for _, v := range bgm.HistoryComponents {
 		v.OnAsciiGame(bgm.GameProp, pr, lst, gameProp.MapSymbolColor)
 	}
 

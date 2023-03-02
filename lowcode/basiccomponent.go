@@ -7,9 +7,17 @@ type BasicComponentConfig struct {
 }
 
 type BasicComponent struct {
-	Name        string
-	UsedScenes  []int
-	UsedResults []int
+	Name            string
+	UsedScenes      []int
+	UsedOtherScenes []int
+	UsedResults     []int
+}
+
+// AddScene -
+func (basicComponent *BasicComponent) OnNewStep() {
+	basicComponent.UsedScenes = nil
+	basicComponent.UsedOtherScenes = nil
+	basicComponent.UsedResults = nil
 }
 
 // AddScene -
@@ -21,6 +29,18 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	if tag != "" {
 		gameProp.TagScene(curpr, tag, si)
+	}
+}
+
+// AddScene -
+func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, sc *sgc7game.GameScene, tag string) {
+	si := len(curpr.OtherScenes)
+	basicComponent.UsedOtherScenes = append(basicComponent.UsedOtherScenes, si)
+
+	curpr.OtherScenes = append(curpr.OtherScenes, sc)
+
+	if tag != "" {
+		gameProp.TagOtherScene(curpr, tag, si)
 	}
 }
 

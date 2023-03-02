@@ -15,7 +15,6 @@ import (
 // MysteryTriggerFeatureConfig - configuration for mystery trigger feature
 type MysteryTriggerFeatureConfig struct {
 	Symbol               string `yaml:"symbol"`               // like LIGHTNING
-	SymbolCode           int    `yaml:"-"`                    // like 10
 	RespinFirstComponent string `yaml:"respinFirstComponent"` // like lightning
 }
 
@@ -30,9 +29,27 @@ type MysteryConfig struct {
 
 type Mystery struct {
 	*BasicComponent
-	Config         *MysteryConfig
-	MysteryWeights *sgc7game.ValWeights2
-	MysterySymbol  int
+	Config                   *MysteryConfig
+	MysteryWeights           *sgc7game.ValWeights2
+	MysterySymbol            int
+	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
+}
+
+// maskOtherScene -
+func (mystery *Mystery) maskOtherScene(gs *sgc7game.GameScene, symbolCode int) *sgc7game.GameScene {
+	cgs := gs.Clone()
+
+	for x, arr := range cgs.Arr {
+		for y, v := range arr {
+			if v != symbolCode {
+				cgs.Arr[x][y] = -1
+			} else {
+				cgs.Arr[x][y] = 1
+			}
+		}
+	}
+
+	return cgs
 }
 
 // Init -
@@ -75,7 +92,9 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 	mystery.MysterySymbol = gameProp.CurPaytables.MapSymbols[mystery.Config.Mystery]
 
 	for _, v := range cfg.MysteryTriggerFeatures {
-		v.SymbolCode = gameProp.CurPaytables.MapSymbols[v.Symbol]
+		symbolCode := gameProp.CurPaytables.MapSymbols[v.Symbol]
+
+		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
 	return nil
@@ -85,30 +104,34 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	mystery.OnNewStep()
+
 	if mystery.MysteryWeights != nil {
-		curm, err := mystery.MysteryWeights.RandVal(plugin)
-		if err != nil {
-			goutils.Error("BasicReels.OnPlayGame:RandVal",
-				zap.Error(err))
-
-			return err
-		}
-
-		curmcode := curm.Int()
-
-		gameProp.SetVal(GamePropCurMystery, curm.Int())
-
 		gs := gameProp.GetScene(curpr, mystery.Config.TargetScene)
+		if gs.HasSymbol(mystery.MysterySymbol) {
+			curm, err := mystery.MysteryWeights.RandVal(plugin)
+			if err != nil {
+				goutils.Error("BasicReels.OnPlayGame:RandVal",
+					zap.Error(err))
 
-		sc2 := gs.Clone()
-		sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
+				return err
+			}
 
-		mystery.AddScene(gameProp, curpr, sc2, fmt.Sprintf("%v.init", mystery.Name))
+			curmcode := curm.Int()
 
-		for _, v := range mystery.Config.MysteryTriggerFeatures {
-			if v.SymbolCode == curmcode {
+			gameProp.SetVal(GamePropCurMystery, curm.Int())
+
+			sc2 := gs.Clone()
+			sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
+
+			mystery.AddScene(gameProp, curpr, sc2, fmt.Sprintf("%v.init", mystery.Name))
+
+			v, isok := mystery.MapMysteryTriggerFeature[curmcode]
+			if isok {
 				if v.RespinFirstComponent != "" {
-					gameProp.SetStrVal(GamePropRespinComponent, v.RespinFirstComponent)
+					os := mystery.maskOtherScene(sc2, curmcode)
+
+					gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 
 					return nil
 				}
@@ -135,7 +158,8 @@ func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRes
 
 func NewMystery(name string) IComponent {
 	mystery := &Mystery{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent:           NewBasicComponent(name),
+		MapMysteryTriggerFeature: make(map[int]*MysteryTriggerFeatureConfig),
 	}
 
 	return mystery
