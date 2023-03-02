@@ -25,11 +25,17 @@ defaultLinedata: line50
 bets: [10]
 
 gamemods:
-  - type: "bg"
+  - type: bg
     components:
-      - type: "basicReels"
-        config: ../data/game001/bgbasic.yaml
-  - type: "fg"
-    components:
-      - type: "basicReels"
-        config: ../data/game001/fgbasic.yaml
+      - name: bg-spin
+        type: basicReels
+        config: ../data/game001/bg-spin.yaml
+      - name: bg-mystery
+        type: mystery
+        config: ../data/game001/bg-mystery.yaml        
+      - name: bg-lightning
+        type: lightning
+        config: ../data/game001/bg-lightning.yaml
+      - name: bg-pay
+        type: basicWins
+        config: ../data/game001/bg-pay.yaml

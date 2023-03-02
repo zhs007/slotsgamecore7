@@ -1,0 +1,14 @@
+symbol: LIGHTNING
+weight: ../data/game001/bglightning.xlsx
+symbolVals:
+  - symbol: COIN
+    weight: ../data/game001/bglightningcoin.xlsx
+    type: val
+  - symbol: MULTIPLIER
+    weight: ../data/game001/bglightningmul.xlsx
+    type: mul
+symbolTriggerFeatures:
+  - symbol: NEW_COLLECTOR
+    feature: collector
+# endingFirstComponent: bg-pay
+defaultNextComponent: bg-pay

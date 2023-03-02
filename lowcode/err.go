@@ -33,4 +33,13 @@ var (
 	ErrNoFunctionInScript = errors.New("no function in script")
 	// ErrWrongFunctionInScript - wrong function in script
 	ErrWrongFunctionInScript = errors.New("wrong function in script")
+
+	// ErrIvalidComponentName - invalid component name
+	ErrIvalidComponentName = errors.New("invalid component name")
+
+	// ErrIvalidCurGameModParams - invalid CurGameModParams
+	ErrIvalidCurGameModParams = errors.New("invalid CurGameModParams")
+
+	// ErrIvalidPlayResultLength - invalid PlayResult Length
+	ErrIvalidPlayResultLength = errors.New("invalid PlayResult Length")
 )

@@ -1,0 +1,7 @@
+defaultNextComponent: bg-pay
+targetScene: bg-spin.init
+mystery: MYSTERY
+mysteryWeight: ../data/game001/bgmysteryweight.xlsx
+mysteryTriggerFeatures:
+  - symbol: LIGHTNING
+    respinFirstComponent: bg-lightning

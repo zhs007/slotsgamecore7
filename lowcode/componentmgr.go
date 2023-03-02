@@ -16,7 +16,7 @@ func (mgr *ComponentMgr) Reg(component string, funcNew FuncNewComponent) {
 func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent {
 	funcNew, isok := mgr.MapComponent[cfgComponent.Type]
 	if isok {
-		return funcNew()
+		return funcNew(cfgComponent.Name)
 	}
 
 	goutils.Error("ComponentMgr.NewComponent",
@@ -32,6 +32,9 @@ func NewComponentMgr() *ComponentMgr {
 	}
 
 	mgr.Reg("basicReels", NewBasicReels)
+	mgr.Reg("mystery", NewMystery)
+	mgr.Reg("basicWins", NewBasicWins)
+	mgr.Reg("lightning", NewLightning)
 
 	return mgr
 }

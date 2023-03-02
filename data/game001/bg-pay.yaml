@@ -1,17 +1,15 @@
 mainType: lines
 betType: bet
+targetScene: bg-mystery.init
 excludeSymbols:
   - SCATTER
   - MYSTERY
 wildSymbols:
   - WILD
-mystery: MYSTERY
-reelSetWeight: ../data/game001/bgreelsetweight.xlsx
-mysteryWeight: ../data/game001/bgmysteryweight.xlsx
 beforMain:
-  - isBeforMystery: true
+  - targetScene: bg-mystery.init
     symbol: SCATTER
-    type: scatters
+    type: countscatter
     minNum: 3
     FGNumWeight: ../data/game001/fgnumweight.xlsx
     isTriggerFG: true

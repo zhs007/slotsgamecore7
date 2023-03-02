@@ -10,6 +10,7 @@ import (
 )
 
 type ComponentConfig struct {
+	Name   string `yaml:"name"`
 	Type   string `yaml:"type"`
 	Config string `yaml:"config"`
 }
