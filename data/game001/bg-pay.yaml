@@ -1,13 +1,13 @@
 mainType: lines
 betType: bet
-mainScene: basicReels.mstery
+targetScene: bg-mystery.init
 excludeSymbols:
   - SCATTER
   - MYSTERY
 wildSymbols:
   - WILD
 beforMain:
-  - targetScene: basicReels.mstery
+  - targetScene: bg-mystery.init
     symbol: SCATTER
     type: countscatter
     minNum: 3

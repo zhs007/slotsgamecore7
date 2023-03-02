@@ -7,7 +7,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -47,7 +46,7 @@ type BasicWinsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	MainType             string                  `yaml:"mainType"`       // lines or ways
 	BetType              string                  `yaml:"betType"`        // bet or totalBet
-	MainScene            string                  `yaml:"mainScene"`      // basicReels.mstery
+	TargetScene          string                  `yaml:"targetScene"`    // basicReels.mstery
 	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
 	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
 	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
@@ -131,14 +130,14 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 }
 
 // playgame
-func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *sgc7pb.GameParam, plugin sgc7plugin.IPlugin,
+func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	for _, v := range basicWins.Config.BeforMain {
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
 	}
 
-	gs := gameProp.GetScene(curpr, basicWins.Config.MainScene)
+	gs := gameProp.GetScene(curpr, basicWins.Config.TargetScene)
 
 	if basicWins.Config.MainType == WinTypeWays {
 		rets := sgc7game.CalcFullLineEx2(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
@@ -199,9 +198,9 @@ func (basicWins *BasicWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	return nil
 }
 
-func NewBasicWins() IComponent {
+func NewBasicWins(name string) IComponent {
 	basicWins := &BasicWins{
-		BasicComponent: NewBasicComponent(),
+		BasicComponent: NewBasicComponent(name),
 	}
 
 	return basicWins

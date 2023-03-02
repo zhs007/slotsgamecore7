@@ -7,7 +7,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -69,7 +68,7 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 }
 
 // playgame
-func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *sgc7pb.GameParam, plugin sgc7plugin.IPlugin,
+func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	gameProp.SetStrVal(GamePropNextComponent, lightning.Config.DefaultNextComponent)
@@ -82,8 +81,8 @@ func (lightning *Lightning) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	return nil
 }
 
-func NewLightning() IComponent {
+func NewLightning(name string) IComponent {
 	return &Lightning{
-		BasicComponent: NewBasicComponent(),
+		BasicComponent: NewBasicComponent(name),
 	}
 }

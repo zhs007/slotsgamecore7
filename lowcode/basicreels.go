@@ -8,35 +8,20 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
-// MysteryTriggerFeatureConfig - configuration for mystery trigger feature
-type MysteryTriggerFeatureConfig struct {
-	Symbol               string `yaml:"symbol"`               // like LIGHTNING
-	SymbolCode           int    `yaml:"-"`                    // like 10
-	RespinFirstComponent string `yaml:"respinFirstComponent"` // like lightning
-}
-
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
-	BasicComponentConfig   `yaml:",inline"`
-	ReelSetsWeight         string                         `yaml:"reelSetWeight"`
-	MysteryWeight          string                         `yaml:"mysteryWeight"`
-	Mystery                string                         `yaml:"mystery"`
-	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
+	BasicComponentConfig `yaml:",inline"`
+	ReelSetsWeight       string `yaml:"reelSetWeight"`
 }
 
 type BasicReels struct {
 	*BasicComponent
 	Config         *BasicReelsConfig
 	ReelSetWeights *sgc7game.ValWeights2
-	MysteryWeights *sgc7game.ValWeights2
-	MysterySymbol  int
-	ExcludeSymbols []int
-	WildSymbols    []int
 }
 
 // Init -
@@ -76,30 +61,11 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 		basicReels.ReelSetWeights = vw2
 	}
 
-	if basicReels.Config.MysteryWeight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(basicReels.Config.MysteryWeight, "val", "weight", gameProp.CurPaytables)
-		if err != nil {
-			goutils.Error("BasicReels.Init:LoadValWeights2FromExcelWithSymbols",
-				zap.String("MysteryWeight", basicReels.Config.MysteryWeight),
-				zap.Error(err))
-
-			return err
-		}
-
-		basicReels.MysteryWeights = vw2
-	}
-
-	basicReels.MysterySymbol = gameProp.CurPaytables.MapSymbols[basicReels.Config.Mystery]
-
-	for _, v := range cfg.MysteryTriggerFeatures {
-		v.SymbolCode = gameProp.CurPaytables.MapSymbols[v.Symbol]
-	}
-
 	return nil
 }
 
 // playgame
-func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *sgc7pb.GameParam, plugin sgc7plugin.IPlugin,
+func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if basicReels.ReelSetWeights != nil {
@@ -132,36 +98,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	basicReels.AddScene(gameProp, curpr, sc, "basicReels.initial")
-
-	if basicReels.MysteryWeights != nil {
-		curm, err := basicReels.MysteryWeights.RandVal(plugin)
-		if err != nil {
-			goutils.Error("BasicReels.OnPlayGame:RandVal",
-				zap.Error(err))
-
-			return err
-		}
-
-		curmcode := curm.Int()
-
-		gameProp.SetVal(GamePropCurMystery, curm.Int())
-
-		sc2 := sc.Clone()
-		sc2.ReplaceSymbol(basicReels.MysterySymbol, curm.Int())
-
-		basicReels.AddScene(gameProp, curpr, sc2, "basicReels.mestery")
-
-		for _, v := range basicReels.Config.MysteryTriggerFeatures {
-			if v.SymbolCode == curmcode {
-				if v.RespinFirstComponent != "" {
-					gameProp.SetStrVal(GamePropRespinComponent, v.RespinFirstComponent)
-
-					return nil
-				}
-			}
-		}
-	}
+	basicReels.AddScene(gameProp, curpr, sc, fmt.Sprintf("%v.init", basicReels.Name))
 
 	gameProp.SetStrVal(GamePropNextComponent, basicReels.Config.DefaultNextComponent)
 
@@ -172,19 +109,14 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 func (basicReels *BasicReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 	if len(basicReels.UsedScenes) > 0 {
 		asciigame.OutputScene("initial symbols", pr.Scenes[basicReels.UsedScenes[0]], mapSymbolColor)
-
-		if basicReels.MysteryWeights != nil {
-			fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
-			asciigame.OutputScene("after symbols", pr.Scenes[basicReels.UsedScenes[1]], mapSymbolColor)
-		}
 	}
 
 	return nil
 }
 
-func NewBasicReels() IComponent {
+func NewBasicReels(name string) IComponent {
 	basicReels := &BasicReels{
-		BasicComponent: NewBasicComponent(),
+		BasicComponent: NewBasicComponent(name),
 	}
 
 	return basicReels

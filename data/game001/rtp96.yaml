@@ -30,6 +30,9 @@ gamemods:
       - name: bg-spin
         type: basicReels
         config: ../data/game001/bg-spin.yaml
+      - name: bg-mystery
+        type: mystery
+        config: ../data/game001/bg-mystery.yaml        
       - name: bg-lightning
         type: lightning
         config: ../data/game001/bg-lightning.yaml

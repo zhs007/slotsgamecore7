@@ -7,6 +7,7 @@ type BasicComponentConfig struct {
 }
 
 type BasicComponent struct {
+	Name        string
 	UsedScenes  []int
 	UsedResults []int
 }
@@ -33,6 +34,8 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 	curpr.Results = append(curpr.Results, ret)
 }
 
-func NewBasicComponent() *BasicComponent {
-	return &BasicComponent{}
+func NewBasicComponent(name string) *BasicComponent {
+	return &BasicComponent{
+		Name: name,
+	}
 }

@@ -4,7 +4,6 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 )
 
@@ -40,13 +39,13 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 }
 
 // OnPlay - on play
-func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *sgc7pb.GameParam) {
+func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
 	pr := &sgc7game.PlayResult{IsFinish: true, NextGameMod: "bg"}
-	gp := &sgc7pb.GameParam{}
+	gp := &GameParams{}
 
 	if len(prs) > 0 {
 		lastrs := prs[len(prs)-1]
-		lastgp := lastrs.CurGameModParams.(*sgc7pb.GameParam)
+		lastgp := lastrs.CurGameModParams.(*GameParams)
 
 		gp.FirstComponent = lastgp.NextStepFirstComponent
 	}

@@ -1,7 +1,2 @@
-defaultNextComponent: bg-pay
-mystery: MYSTERY
+defaultNextComponent: bg-mystery
 reelSetWeight: ../data/game001/bgreelsetweight.xlsx
-mysteryWeight: ../data/game001/bgmysteryweight.xlsx
-mysteryTriggerFeatures:
-  - symbol: LIGHTNING
-    respinFirstComponent: bg-lightning
