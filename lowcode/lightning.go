@@ -145,15 +145,27 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 	return nil
 }
 
-// playgame
-func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+// OnNewGame -
+func (lightning *Lightning) OnNewGame() error {
+	return nil
+}
 
-	lightning.OnNewStep()
+// OnNewStep -
+func (lightning *Lightning) OnNewStep() error {
+
+	lightning.BasicComponent.OnNewStep()
+
 	lightning.Collector = 0
 	lightning.Val = 0
 	lightning.Mul = 0
 	lightning.NewConnector = 0
+
+	return nil
+}
+
+// playgame
+func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if len(prs) <= 0 {
 		goutils.Error("Lightning:prs",

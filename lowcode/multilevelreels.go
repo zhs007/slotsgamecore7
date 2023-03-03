@@ -84,6 +84,21 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, gameProp *GameProperty) 
 	return nil
 }
 
+// OnNewGame -
+func (multiLevelReels *MultiLevelReels) OnNewGame() error {
+	multiLevelReels.CurLevel = 0
+
+	return nil
+}
+
+// OnNewStep -
+func (multiLevelReels *MultiLevelReels) OnNewStep() error {
+
+	multiLevelReels.BasicComponent.OnNewStep()
+
+	return nil
+}
+
 // playgame
 func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {

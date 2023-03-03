@@ -62,8 +62,11 @@ func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.Pl
 func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string,
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
 
-	bgm.HistoryComponents = nil
-	bgm.GameProp.OnNewStep()
+	if len(prs) == 0 {
+		bgm.OnNewGame()
+	}
+
+	bgm.OnNewStep()
 
 	if cmd == "SPIN" {
 		pr, gp := bgm.newPlayResult(prs)
@@ -144,6 +147,41 @@ func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
 func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
 	for _, v := range bgm.HistoryComponents {
 		v.OnAsciiGame(bgm.GameProp, pr, lst, gameProp.MapSymbolColor)
+	}
+
+	return nil
+}
+
+// OnNewGame -
+func (bgm *BasicGameMod) OnNewGame() error {
+	for i, v := range bgm.Components.Components {
+		err := v.OnNewGame()
+		if err != nil {
+			goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// OnNewStep -
+func (bgm *BasicGameMod) OnNewStep() error {
+	bgm.HistoryComponents = nil
+	bgm.GameProp.OnNewStep()
+
+	for i, v := range bgm.Components.Components {
+		err := v.OnNewStep()
+		if err != nil {
+			goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
 	}
 
 	return nil

@@ -13,7 +13,7 @@ type BasicComponent struct {
 	UsedResults     []int
 }
 
-// AddScene -
+// OnNewStep -
 func (basicComponent *BasicComponent) OnNewStep() {
 	basicComponent.UsedScenes = nil
 	basicComponent.UsedOtherScenes = nil

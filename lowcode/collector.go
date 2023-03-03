@@ -52,6 +52,23 @@ func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
 	return nil
 }
 
+// OnNewGame -
+func (collector *Collecotr) OnNewGame() error {
+	collector.Val = 0
+
+	return nil
+}
+
+// OnNewStep -
+func (collector *Collecotr) OnNewStep() error {
+
+	collector.BasicComponent.OnNewStep()
+
+	collector.NewCollector = 0
+
+	return nil
+}
+
 // playgame
 func (collector *Collecotr) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {

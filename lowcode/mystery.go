@@ -100,11 +100,23 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 	return nil
 }
 
+// OnNewGame -
+func (mystery *Mystery) OnNewGame() error {
+
+	return nil
+}
+
+// OnNewStep -
+func (mystery *Mystery) OnNewStep() error {
+
+	mystery.BasicComponent.OnNewStep()
+
+	return nil
+}
+
 // playgame
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-	mystery.OnNewStep()
 
 	if mystery.MysteryWeights != nil {
 		gs := gameProp.GetScene(curpr, mystery.Config.TargetScene)

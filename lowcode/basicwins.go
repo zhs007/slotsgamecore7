@@ -129,11 +129,22 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 	return nil
 }
 
+// OnNewGame -
+func (basicWins *BasicWins) OnNewGame() error {
+	return nil
+}
+
+// OnNewStep -
+func (basicWins *BasicWins) OnNewStep() error {
+
+	basicWins.BasicComponent.OnNewStep()
+
+	return nil
+}
+
 // playgame
 func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-	basicWins.OnNewStep()
 
 	for _, v := range basicWins.Config.BeforMain {
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
