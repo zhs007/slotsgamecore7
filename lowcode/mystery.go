@@ -101,13 +101,13 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 }
 
 // OnNewGame -
-func (mystery *Mystery) OnNewGame() error {
+func (mystery *Mystery) OnNewGame(gameProp *GameProperty) error {
 
 	return nil
 }
 
 // OnNewStep -
-func (mystery *Mystery) OnNewStep() error {
+func (mystery *Mystery) OnNewStep(gameProp *GameProperty) error {
 
 	mystery.BasicComponent.OnNewStep()
 

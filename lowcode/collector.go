@@ -53,14 +53,14 @@ func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
 }
 
 // OnNewGame -
-func (collector *Collecotr) OnNewGame() error {
+func (collector *Collecotr) OnNewGame(gameProp *GameProperty) error {
 	collector.Val = 0
 
 	return nil
 }
 
 // OnNewStep -
-func (collector *Collecotr) OnNewStep() error {
+func (collector *Collecotr) OnNewStep(gameProp *GameProperty) error {
 
 	collector.BasicComponent.OnNewStep()
 

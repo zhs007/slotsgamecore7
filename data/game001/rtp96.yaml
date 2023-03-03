@@ -39,3 +39,15 @@ gamemods:
       - name: bg-pay
         type: basicWins
         config: ../data/game001/bg-pay.yaml
+      - name: fg-spin
+        type: multiLevelReels
+        config: ../data/game001/fg-spin.yaml
+      - name: fg-mystery
+        type: multiLevelMystery
+        config: ../data/game001/fg-mystery.yaml
+      - name: fg-collector
+        type: collector
+        config: ../data/game001/fg-collector.yaml        
+      - name: fg-pay
+        type: basicWins
+        config: ../data/game001/fg-pay.yaml        

@@ -35,6 +35,9 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("mystery", NewMystery)
 	mgr.Reg("basicWins", NewBasicWins)
 	mgr.Reg("lightning", NewLightning)
+	mgr.Reg("multiLevelReels", NewMultiLevelReels)
+	mgr.Reg("collector", NewCollector)
+	mgr.Reg("multiLevelMystery", NewMultiLevelMystery)
 
 	return mgr
 }

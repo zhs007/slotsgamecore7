@@ -16,6 +16,7 @@ import (
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	ReelSetsWeight       string `yaml:"reelSetWeight"`
+	IsFGMainSpin         bool   `yaml:"isFGMainSpin"`
 }
 
 type BasicReels struct {
@@ -65,12 +66,12 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 }
 
 // OnNewGame -
-func (basicReels *BasicReels) OnNewGame() error {
+func (basicReels *BasicReels) OnNewGame(gameProp *GameProperty) error {
 	return nil
 }
 
 // OnNewStep -
-func (basicReels *BasicReels) OnNewStep() error {
+func (basicReels *BasicReels) OnNewStep(gameProp *GameProperty) error {
 
 	basicReels.BasicComponent.OnNewStep()
 
@@ -112,6 +113,10 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
 	basicReels.AddScene(gameProp, curpr, sc, fmt.Sprintf("%v.init", basicReels.Name))
+
+	if basicReels.Config.IsFGMainSpin {
+		gameProp.OnFGSpin()
+	}
 
 	gameProp.SetStrVal(GamePropNextComponent, basicReels.Config.DefaultNextComponent)
 

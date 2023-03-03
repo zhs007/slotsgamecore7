@@ -24,6 +24,7 @@ type MultiLevelReelsLevelConfig struct {
 type MultiLevelReelsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	Levels               []*MultiLevelReelsLevelConfig `yaml:"levels"`
+	IsFGMainSpin         bool                          `yaml:"isFGMainSpin"`
 }
 
 type MultiLevelReels struct {
@@ -85,16 +86,26 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, gameProp *GameProperty) 
 }
 
 // OnNewGame -
-func (multiLevelReels *MultiLevelReels) OnNewGame() error {
+func (multiLevelReels *MultiLevelReels) OnNewGame(gameProp *GameProperty) error {
 	multiLevelReels.CurLevel = 0
 
 	return nil
 }
 
 // OnNewStep -
-func (multiLevelReels *MultiLevelReels) OnNewStep() error {
-
+func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error {
 	multiLevelReels.BasicComponent.OnNewStep()
+
+	for i, v := range multiLevelReels.Config.Levels {
+		if multiLevelReels.CurLevel > i {
+			collecotr, isok := gameProp.MapCollector[v.Collector]
+			if isok {
+				if collecotr.Val >= v.CollectorVal {
+					multiLevelReels.CurLevel = i
+				}
+			}
+		}
+	}
 
 	return nil
 }
@@ -102,8 +113,6 @@ func (multiLevelReels *MultiLevelReels) OnNewStep() error {
 // playgame
 func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-	multiLevelReels.OnNewStep()
 
 	if multiLevelReels.LevelReelSetWeights != nil {
 		val, err := multiLevelReels.LevelReelSetWeights[multiLevelReels.CurLevel].RandVal(plugin)
@@ -151,6 +160,10 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
 	multiLevelReels.AddScene(gameProp, curpr, sc, fmt.Sprintf("%v.init", multiLevelReels.Name))
+
+	if multiLevelReels.Config.IsFGMainSpin {
+		gameProp.OnFGSpin()
+	}
 
 	gameProp.SetStrVal(GamePropNextComponent, multiLevelReels.Config.DefaultNextComponent)
 

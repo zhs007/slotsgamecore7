@@ -12,9 +12,9 @@ type IComponent interface {
 	// Init -
 	Init(fn string, gameProp *GameProperty) error
 	// OnNewGame -
-	OnNewGame() error
+	OnNewGame(gameProp *GameProperty) error
 	// OnNewStep -
-	OnNewStep() error
+	OnNewStep(gameProp *GameProperty) error
 	// OnPlayGame - on playgame
 	OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error

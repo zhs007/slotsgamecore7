@@ -48,11 +48,11 @@ type GameProperty struct {
 	CurLineData      *sgc7game.LineData
 	CurReels         *sgc7game.ReelsData
 	MapIntValWeights map[string]*sgc7game.ValWeights2
-	Plugin           sgc7plugin.IPlugin
 	SymbolsViewer    *SymbolsViewer
 	MapSymbolColor   *asciigame.SymbolColorMap
 	MapScenes        map[string]int
 	MapOtherScenes   map[string]int
+	MapCollector     map[string]*Collecotr
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
@@ -105,7 +105,13 @@ func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, re
 	gp.NextStepFirstComponent = respinComponent
 }
 
-func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {
+func (gameProp *GameProperty) OnFGSpin() error {
+	gameProp.SetVal(GamePropFGNum, gameProp.GetVal(GamePropFGNum)-1)
+
+	return nil
+}
+
+func (gameProp *GameProperty) TriggerFGWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinFirstComponent string) error {
 	vw2, isok := gameProp.MapIntValWeights[fn]
 	if !isok {
 		curvw2, err := sgc7game.LoadValWeights2FromExcel(fn, "val", "weight", sgc7game.NewIntVal[int])
@@ -122,7 +128,7 @@ func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {
 		vw2 = curvw2
 	}
 
-	val, err := vw2.RandVal(gameProp.Plugin)
+	val, err := vw2.RandVal(plugin)
 	if err != nil {
 		goutils.Error("GameProperty.TriggerFGWithWeights:RandVal",
 			zap.String("fn", fn),
@@ -134,6 +140,10 @@ func (gameProp *GameProperty) TriggerFGWithWeights(fn string) error {
 	if val.Int() > 0 {
 		gameProp.SetVal(GamePropTriggerFG, 1)
 		gameProp.SetVal(GamePropFGNum, val.Int())
+
+		gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
+
+		gp.NextStepFirstComponent = respinFirstComponent
 	}
 
 	return nil
@@ -200,6 +210,13 @@ func (gameProp *GameProperty) GetStrVal(prop int) string {
 	return gameProp.MapStrVals[prop]
 }
 
+func (gameProp *GameProperty) onAddComponent(name string, component IComponent) {
+	collector, isok := component.(*Collecotr)
+	if isok {
+		gameProp.MapCollector[name] = collector
+	}
+}
+
 func InitGameProperty(cfgfn string) (*GameProperty, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {
@@ -215,6 +232,7 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 		MapVals:          make(map[int]int),
 		MapStrVals:       make(map[int]string),
 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
+		MapCollector:     make(map[string]*Collecotr),
 	}
 
 	gameProp.SetStrVal(GamePropCurPaytables, cfg.DefaultPaytables)

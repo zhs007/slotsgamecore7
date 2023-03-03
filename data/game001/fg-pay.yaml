@@ -1,0 +1,13 @@
+defaultNextComponent: fg-spin
+mainType: lines
+betType: bet
+targetScene: 
+excludeSymbols:
+  - SCATTER
+  - MYSTERY
+  - NEW_COLLECTOR
+  - COIN
+  - MULTIPLIER
+  - LIGHTNING
+wildSymbols:
+  - WILD

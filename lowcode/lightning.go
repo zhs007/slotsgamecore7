@@ -146,12 +146,12 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 }
 
 // OnNewGame -
-func (lightning *Lightning) OnNewGame() error {
+func (lightning *Lightning) OnNewGame(gameProp *GameProperty) error {
 	return nil
 }
 
 // OnNewStep -
-func (lightning *Lightning) OnNewStep() error {
+func (lightning *Lightning) OnNewStep(gameProp *GameProperty) error {
 
 	lightning.BasicComponent.OnNewStep()
 

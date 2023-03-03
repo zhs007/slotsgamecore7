@@ -4,6 +4,10 @@ targetScene: bg-mystery.init
 excludeSymbols:
   - SCATTER
   - MYSTERY
+  - NEW_COLLECTOR
+  - COIN
+  - MULTIPLIER
+  - LIGHTNING
 wildSymbols:
   - WILD
 beforMain:
@@ -14,3 +18,4 @@ beforMain:
     FGNumWeight: ../data/game001/fgnumweight.xlsx
     isTriggerFG: true
     betType: totalBet
+    respinFirstComponent: fg-spin
