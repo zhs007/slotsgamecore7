@@ -1,0 +1,17 @@
+defaultNextComponent: fg-mystery
+levels: 
+  - reel: fg0
+    collector: fg-collector
+    collectorVal: 0
+  - reel: fg1
+    collector: fg-collector
+    collectorVal: 4
+  - reel: fg2
+    collector: fg-collector
+    collectorVal: 8
+  - reel: fg3
+    collector: fg-collector
+    collectorVal: 12
+  - reel: fg4
+    collector: fg-collector
+    collectorVal: 16

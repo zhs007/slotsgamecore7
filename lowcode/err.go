@@ -42,4 +42,7 @@ var (
 
 	// ErrIvalidPlayResultLength - invalid PlayResult Length
 	ErrIvalidPlayResultLength = errors.New("invalid PlayResult Length")
+
+	// ErrIvalidMultiLevelReelsConfig - invalid MultiLevelReels config
+	ErrIvalidMultiLevelReelsConfig = errors.New("invalid MultiLevelReels config")
 )
