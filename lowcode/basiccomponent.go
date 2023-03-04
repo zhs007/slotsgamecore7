@@ -3,9 +3,10 @@ package lowcode
 import sgc7game "github.com/zhs007/slotsgamecore7/game"
 
 type BasicComponentConfig struct {
-	DefaultNextComponent string   `yaml:"defaultNextComponent"` // next component, if it is empty jump to other
-	TagScenes            []string `yaml:"tagScenes"`            // tag scenes
-	TagOtherScenes       []string `yaml:"tagOtherScenes"`       // tag otherScenes
+	DefaultNextComponent     string   `yaml:"defaultNextComponent"`     // next component, if it is empty jump to ending
+	DefaultFGRespinComponent string   `yaml:"defaultFGRespinComponent"` // respin component, if it is not empty and in FG
+	TagScenes                []string `yaml:"tagScenes"`                // tag scenes
+	TagOtherScenes           []string `yaml:"tagOtherScenes"`           // tag otherScenes
 }
 
 type BasicComponent struct {
@@ -19,6 +20,15 @@ type BasicComponent struct {
 // onInit -
 func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 	basicComponent.Config = cfg
+}
+
+// onStepEnd -
+func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams) {
+	if gameProp.GetVal(GamePropFGNum) > 0 && basicComponent.Config.DefaultFGRespinComponent != "" {
+		gameProp.Respin(curpr, gp, basicComponent.Config.DefaultFGRespinComponent, nil, nil)
+	} else {
+		gameProp.SetStrVal(GamePropNextComponent, basicComponent.Config.DefaultNextComponent)
+	}
 }
 
 // OnNewStep -

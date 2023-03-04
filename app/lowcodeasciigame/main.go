@@ -17,7 +17,15 @@ func main() {
 
 	gamecfg := os.Getenv("GAMECFG")
 	strAutoSpin := os.Getenv("AUTOSPIN")
+	strSkipGetChar := os.Getenv("SKIPGETCHAR")
 	autospin, _ := goutils.String2Int64(strAutoSpin)
+
+	isSkipGetChar := false
+	if strSkipGetChar != "" {
+		i64, _ := goutils.String2Int64(strSkipGetChar)
+
+		isSkipGetChar = i64 > 0
+	}
 
 	game, err := lowcode.NewGame(gamecfg)
 	if err != nil {
@@ -76,5 +84,5 @@ func main() {
 		// if pr.IsFinish {
 		// 	bgStats.OnResults(stake, lst)
 		// }
-	}, int(autospin))
+	}, int(autospin), isSkipGetChar)
 }

@@ -166,7 +166,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		gameProp.OnFGSpin()
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, multiLevelReels.Config.DefaultNextComponent)
+	multiLevelReels.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

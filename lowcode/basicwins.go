@@ -200,7 +200,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, basicWins.Config.DefaultNextComponent)
+	basicWins.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

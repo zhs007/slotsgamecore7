@@ -99,6 +99,8 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, gameProp *GameProper
 		multiLevelMystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
+	multiLevelMystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 
@@ -162,7 +164,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		}
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, multiLevelMystery.Config.DefaultNextComponent)
+	multiLevelMystery.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

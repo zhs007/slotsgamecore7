@@ -39,7 +39,7 @@ func getchar(onchar FuncOnGetChar) error {
 
 type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult)
 
-func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int) error {
+func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int, isSkipGetChar bool) error {
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
@@ -54,7 +54,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	autotimes := autogametimes
 
 	for {
-		if autotimes <= 0 {
+		if autotimes <= 0 && !isSkipGetChar {
 			fmt.Printf("please press %v to start spin, or press %v to spin 100 times, or press %v to spin 1000 times, or press %v to quit.\n",
 				FormatColorString("S", ColorKey), FormatColorString("H", ColorKey), FormatColorString("K", ColorKey), FormatColorString("Q", ColorExitKey))
 
@@ -130,18 +130,36 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
+			autotimes = 0
+
 			fmt.Printf("balance %v , win %v \n",
 				FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 				FormatColorString(fmt.Sprintf("%v", pr.CashWin), ColorNumber))
 
-			if autotimes <= 0 {
-				fmt.Printf("step %v. please press %v to jump to the next step.\n",
+			if autotimes <= 0 && !isSkipGetChar {
+				fmt.Printf("step %v. please press %v to jump to the next step or press %v to quit.\n",
 					FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
-					FormatColorString("N", ColorKey))
+					FormatColorString("N", ColorKey),
+					FormatColorString("Q", ColorExitKey))
 
+				isend := false
 				getchar(func(c getch.KeyCode) bool {
-					return c == getch.KeyN
+					if c == getch.KeyN {
+						return true
+					}
+
+					if c == getch.KeyQ {
+						isend = true
+
+						return true
+					}
+
+					return false
 				})
+
+				if isend {
+					goto end
+				}
 			}
 
 			step++

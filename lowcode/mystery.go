@@ -153,7 +153,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		}
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, mystery.Config.DefaultNextComponent)
+	mystery.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

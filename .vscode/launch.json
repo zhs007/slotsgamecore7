@@ -27,7 +27,8 @@
             "env": {
                 "GAMECFG": "${workspaceFolder}/data/game001/rtp96.yaml",
                 "TERM": "xterm-256color",
-                "AUTOSPIN": "1000"
+                "AUTOSPIN": "1000",
+                "SKIPGETCHAR": "1",
             }
         },
     ]

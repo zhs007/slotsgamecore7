@@ -1,4 +1,4 @@
-defaultNextComponent: fg-spin
+defaultFGRespinComponent: fg-spin
 mainType: lines
 betType: bet
 targetScene: mystery-symbols
