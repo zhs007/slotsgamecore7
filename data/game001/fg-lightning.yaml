@@ -1,3 +1,6 @@
+defaultNextComponent: fg-collector
+tagScenes:
+  - mystery-symbols
 symbol: LIGHTNING
 weight: ../data/game001/bglightning.xlsx
 symbolVals:
@@ -10,4 +13,3 @@ symbolVals:
 symbolTriggerFeatures:
   - symbol: NEW_COLLECTOR
     feature: collector
-defaultNextComponent: fg-collector

@@ -97,6 +97,8 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
+	mystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 
@@ -136,7 +138,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 			sc2 := gs.Clone()
 			sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
 
-			mystery.AddScene(gameProp, curpr, sc2, fmt.Sprintf("%v.init", mystery.Name))
+			mystery.AddScene(gameProp, curpr, sc2)
 
 			v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 			if isok {

@@ -1,4 +1,6 @@
 defaultNextComponent: fg-mystery
+tagScenes:
+  - init-symbols
 levels: 
   - reel: fg0
     collector: fg-collector

@@ -1,7 +1,6 @@
 package lowcode
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -62,6 +61,8 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 		basicReels.ReelSetWeights = vw2
 	}
 
+	basicReels.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 
@@ -112,7 +113,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	basicReels.AddScene(gameProp, curpr, sc, fmt.Sprintf("%v.init", basicReels.Name))
+	basicReels.AddScene(gameProp, curpr, sc)
 
 	if basicReels.Config.IsFGMainSpin {
 		gameProp.OnFGSpin()

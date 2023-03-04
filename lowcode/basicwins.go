@@ -127,6 +127,8 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, gameProp.CurPaytables.MapSymbols[v])
 	}
 
+	basicWins.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 

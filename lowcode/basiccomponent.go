@@ -3,7 +3,9 @@ package lowcode
 import sgc7game "github.com/zhs007/slotsgamecore7/game"
 
 type BasicComponentConfig struct {
-	DefaultNextComponent string `yaml:"defaultNextComponent"` // next component, if no jump to other
+	DefaultNextComponent string   `yaml:"defaultNextComponent"` // next component, if it is empty jump to other
+	TagScenes            []string `yaml:"tagScenes"`            // tag scenes
+	TagOtherScenes       []string `yaml:"tagOtherScenes"`       // tag otherScenes
 }
 
 type BasicComponent struct {
@@ -11,6 +13,12 @@ type BasicComponent struct {
 	UsedScenes      []int
 	UsedOtherScenes []int
 	UsedResults     []int
+	Config          *BasicComponentConfig
+}
+
+// onInit -
+func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
+	basicComponent.Config = cfg
 }
 
 // OnNewStep -
@@ -21,26 +29,32 @@ func (basicComponent *BasicComponent) OnNewStep() {
 }
 
 // AddScene -
-func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, sc *sgc7game.GameScene, tag string) {
+func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	sc *sgc7game.GameScene) {
+
 	si := len(curpr.Scenes)
+	usi := len(basicComponent.UsedScenes)
 	basicComponent.UsedScenes = append(basicComponent.UsedScenes, si)
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
-	if tag != "" {
-		gameProp.TagScene(curpr, tag, si)
+	if usi < len(basicComponent.Config.TagScenes) {
+		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
 	}
 }
 
 // AddScene -
-func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, sc *sgc7game.GameScene, tag string) {
+func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	sc *sgc7game.GameScene) {
+
 	si := len(curpr.OtherScenes)
+	usi := len(basicComponent.UsedOtherScenes)
 	basicComponent.UsedOtherScenes = append(basicComponent.UsedOtherScenes, si)
 
 	curpr.OtherScenes = append(curpr.OtherScenes, sc)
 
-	if tag != "" {
-		gameProp.TagOtherScene(curpr, tag, si)
+	if usi < len(basicComponent.Config.TagOtherScenes) {
+		gameProp.TagOtherScene(curpr, basicComponent.Config.TagOtherScenes[usi], si)
 	}
 }
 

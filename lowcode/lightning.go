@@ -142,6 +142,8 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 		}
 	}
 
+	lightning.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 
@@ -246,8 +248,8 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	lightning.AddScene(gameProp, curpr, gs, "")
-	lightning.AddOtherScene(gameProp, curpr, os, "")
+	lightning.AddScene(gameProp, curpr, gs)
+	lightning.AddOtherScene(gameProp, curpr, os)
 
 	lightning.Collector = lastCollector
 	lightning.Val = val

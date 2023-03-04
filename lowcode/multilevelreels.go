@@ -1,7 +1,6 @@
 package lowcode
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -82,6 +81,8 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, gameProp *GameProperty) 
 		return ErrIvalidMultiLevelReelsConfig
 	}
 
+	multiLevelReels.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 
@@ -159,7 +160,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	multiLevelReels.AddScene(gameProp, curpr, sc, fmt.Sprintf("%v.init", multiLevelReels.Name))
+	multiLevelReels.AddScene(gameProp, curpr, sc)
 
 	if multiLevelReels.Config.IsFGMainSpin {
 		gameProp.OnFGSpin()

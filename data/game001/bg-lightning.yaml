@@ -1,3 +1,6 @@
+defaultNextComponent: bg-pay
+tagScenes:
+  - mystery-symbols
 symbol: LIGHTNING
 weight: ../data/game001/bglightning.xlsx
 symbolVals:
@@ -10,5 +13,3 @@ symbolVals:
 symbolTriggerFeatures:
   - symbol: NEW_COLLECTOR
     feature: collector
-# endingFirstComponent: bg-pay
-defaultNextComponent: bg-pay

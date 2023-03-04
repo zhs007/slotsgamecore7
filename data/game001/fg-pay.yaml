@@ -1,7 +1,7 @@
 defaultNextComponent: fg-spin
 mainType: lines
 betType: bet
-targetScene: 
+targetScene: mystery-symbols
 excludeSymbols:
   - SCATTER
   - MYSTERY

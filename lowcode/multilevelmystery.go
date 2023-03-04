@@ -148,7 +148,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		sc2 := gs.Clone()
 		sc2.ReplaceSymbol(multiLevelMystery.MysterySymbol, curm.Int())
 
-		multiLevelMystery.AddScene(gameProp, curpr, sc2, fmt.Sprintf("%v.init", multiLevelMystery.Name))
+		multiLevelMystery.AddScene(gameProp, curpr, sc2)
 
 		v, isok := multiLevelMystery.MapMysteryTriggerFeature[curmcode]
 		if isok {

@@ -1,5 +1,7 @@
 defaultNextComponent: fg-pay
-targetScene: fg-spin.init
+tagScenes:
+  - mystery-symbols
+targetScene: init-symbols
 mystery: MYSTERY
 levels: 
   - mysteryWeight: ../data/game001/fgmysteryweight0.xlsx
