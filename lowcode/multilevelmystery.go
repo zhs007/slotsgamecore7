@@ -8,6 +8,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -117,7 +118,7 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 
 	for i, v := range multiLevelMystery.Config.Levels {
 		if multiLevelMystery.CurLevel > i {
-			collecotr, isok := gameProp.MapCollector[v.Collector]
+			collecotr, isok := gameProp.MapCollectors[v.Collector]
 			if isok {
 				if collecotr.Val >= v.CollectorVal {
 					multiLevelMystery.CurLevel = i
@@ -177,6 +178,11 @@ func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, 
 	}
 
 	return nil
+}
+
+// OnStats
+func (multiLevelMystery *MultiLevelMystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
 }
 
 func NewMultiLevelMystery(name string) IComponent {

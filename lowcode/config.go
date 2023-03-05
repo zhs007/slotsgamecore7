@@ -5,9 +5,16 @@ import (
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	"github.com/zhs007/slotsgamecore7/mathtoolset"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
+
+type StatsConfig struct {
+	Name      string         `yaml:"name"`
+	Component string         `yaml:"component"`
+	Children  []*StatsConfig `yaml:"children"`
+}
 
 type ComponentConfig struct {
 	Name   string `yaml:"name"`
@@ -35,6 +42,27 @@ type Config struct {
 	DefaultLinedata  string                         `yaml:"defaultLinedata"`
 	Bets             []int                          `yaml:"bets"`
 	GameMods         []*GameModConfig               `yaml:"gamemods"`
+	StatsSymbols     []string                       `yaml:"statsSymbols"`
+	StatsSymbolCodes []mathtoolset.SymbolType       `yaml:"-"`
+	Stats            *StatsConfig                   `yaml:"stats"`
+}
+
+func (cfg *Config) BuildStatsSymbolCodes(paytables *sgc7game.PayTables) error {
+	cfg.StatsSymbolCodes = nil
+	for _, v := range cfg.StatsSymbols {
+		symbolCode, isok := paytables.MapSymbols[v]
+		if !isok {
+			goutils.Error("Config.BuildStatsSymbolCodes",
+				zap.String("symbol", v),
+				zap.Error(ErrIvalidStatsSymbolsInConfig))
+
+			return ErrIvalidStatsSymbolsInConfig
+		}
+
+		cfg.StatsSymbolCodes = append(cfg.StatsSymbolCodes, mathtoolset.SymbolType(symbolCode))
+	}
+
+	return nil
 }
 
 func LoadConfig(fn string) (*Config, error) {

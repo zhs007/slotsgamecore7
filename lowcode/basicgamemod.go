@@ -101,22 +101,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			pr.IsFinish = false
 		}
 
-		// if bgm.GameProp.GetVal(GamePropTriggerFG) > 0 {
-		// 	gameProp.SetVal(GamePropTriggerFG, 1)
-		// 	gameProp.SetVal(GamePropFGNum, val.Int())
-		// }
-
-		// for i, v := range bgm.Components.Components {
-		// 	err := v.OnPlayGame(bgm.GameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
-		// 	if err != nil {
-		// 		goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-		// 			zap.Int("i", i),
-		// 			zap.Error(err))
-
-		// 		return nil, err
-		// 	}
-		// }
-
 		return pr, nil
 	}
 
@@ -192,6 +176,14 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 
 		bgm.Components.AddComponent(v.Name, c)
 		bgm.GameProp.onAddComponent(v.Name, c)
+	}
+
+	err := bgm.GameProp.InitStats()
+	if err != nil {
+		goutils.Error("NewBasicGameMod:InitStats",
+			zap.Error(err))
+
+		return nil
 	}
 
 	return bgm

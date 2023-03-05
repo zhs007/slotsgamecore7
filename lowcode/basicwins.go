@@ -7,6 +7,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -212,6 +213,34 @@ func (basicWins *BasicWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	}, mapSymbolColor)
 
 	return nil
+}
+
+// OnStats
+func (basicWins *BasicWins) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	// wins := int64(0)
+	// totalwins := int64(0)
+
+	// // feature.Symbols.OnBet(stake.CashBet)
+	// for _, v := range lst[0].Results {
+	// 	if v.Type != sgc7game.RTScatter {
+	// 		feature.Symbols.OnWin(v)
+
+	// 		wins += int64(v.CashWin)
+	// 	}
+	// }
+
+	// for _, r := range lst {
+	// 	totalwins += r.CashWin
+	// }
+
+	// feature.Reels.OnScene(lst[0].Scenes[0])
+
+	// feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
+	// feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
+
+	// return true, stake.CashBet, wins
+
+	return false, 0, 0
 }
 
 func NewBasicWins(name string) IComponent {

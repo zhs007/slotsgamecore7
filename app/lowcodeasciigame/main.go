@@ -55,7 +55,7 @@ func main() {
 	}
 
 	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) {
-		game.OnAsciiGame(pr, lst)
+		game.OnAsciiGame(stake, pr, lst)
 		// gp := pr.CurGameModParams.(*dtgame.GameParams)
 		// if len(gp.ExpSyms) > 0 {
 		// 	fmt.Printf("ExpandingSymbols trigger! [ ")

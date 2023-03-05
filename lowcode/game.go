@@ -67,10 +67,16 @@ func (game *Game) ResetConfig(cfg interface{}) {
 }
 
 // OnAsciiGame - outpur to asciigame
-func (game *Game) OnAsciiGame(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
+func (game *Game) OnAsciiGame(stake *sgc7game.Stake, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
 	for _, v := range game.Prop.Config.GameMods {
 		gm := game.MapGameMods[v.Type].(*BasicGameMod)
 		gm.OnAsciiGame(game.Prop, pr, lst)
+	}
+
+	if pr.IsFinish {
+		if game.Prop.Stats != nil {
+			game.Prop.Stats.OnResults(stake, lst)
+		}
 	}
 
 	return nil
