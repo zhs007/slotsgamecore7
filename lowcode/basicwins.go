@@ -31,14 +31,15 @@ func GetBet(stake *sgc7game.Stake, bettype string) int {
 
 // TriggerFeatureConfig - configuration for trigger feature
 type TriggerFeatureConfig struct {
-	TargetScene string `yaml:"targetScene"` // basicReels.mstery
-	Symbol      string `yaml:"symbol"`      // like scatter
-	Type        string `yaml:"type"`        // like scatters
-	MinNum      int    `yaml:"minNum"`      // like 3
-	Scripts     string `yaml:"scripts"`     // scripts
-	FGNumWeight string `yaml:"FGNumWeight"` // FG number weight
-	IsTriggerFG bool   `yaml:"isTriggerFG"` // is trigger FG
-	BetType     string `yaml:"betType"`     // bet or totalBet
+	TargetScene          string `yaml:"targetScene"`          // basicReels.mstery
+	Symbol               string `yaml:"symbol"`               // like scatter
+	Type                 string `yaml:"type"`                 // like scatters
+	MinNum               int    `yaml:"minNum"`               // like 3
+	Scripts              string `yaml:"scripts"`              // scripts
+	FGNumWeight          string `yaml:"FGNumWeight"`          // FG number weight
+	IsTriggerFG          bool   `yaml:"isTriggerFG"`          // is trigger FG
+	BetType              string `yaml:"betType"`              // bet or totalBet
+	RespinFirstComponent string `yaml:"respinFirstComponent"` // like fg-spin
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -61,7 +62,7 @@ type BasicWins struct {
 }
 
 // AddResult -
-func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, plugin sgc7plugin.IPlugin,
+func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) {
 	gs := gameProp.GetScene(curpr, tf.TargetScene)
 
@@ -89,7 +90,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 	if isTrigger {
 		if tf.IsTriggerFG {
-			gameProp.TriggerFGWithWeights(tf.FGNumWeight)
+			gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
 		}
 	}
 }
@@ -126,6 +127,21 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, gameProp.CurPaytables.MapSymbols[v])
 	}
 
+	basicWins.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
+	return nil
+}
+
+// OnNewGame -
+func (basicWins *BasicWins) OnNewGame(gameProp *GameProperty) error {
+	return nil
+}
+
+// OnNewStep -
+func (basicWins *BasicWins) OnNewStep(gameProp *GameProperty) error {
+
+	basicWins.BasicComponent.OnNewStep()
+
 	return nil
 }
 
@@ -133,10 +149,8 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	basicWins.OnNewStep()
-
 	for _, v := range basicWins.Config.BeforMain {
-		basicWins.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
+		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 	}
 
 	gs := gameProp.GetScene(curpr, basicWins.Config.TargetScene)
@@ -183,10 +197,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	}
 
 	for _, v := range basicWins.Config.AfterMain {
-		basicWins.ProcTriggerFeature(v, gameProp, curpr, plugin, cmd, param, ps, stake, prs)
+		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, basicWins.Config.DefaultNextComponent)
+	basicWins.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

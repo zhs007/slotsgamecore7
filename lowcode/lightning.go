@@ -142,18 +142,32 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 		}
 	}
 
+	lightning.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
+	return nil
+}
+
+// OnNewGame -
+func (lightning *Lightning) OnNewGame(gameProp *GameProperty) error {
+	return nil
+}
+
+// OnNewStep -
+func (lightning *Lightning) OnNewStep(gameProp *GameProperty) error {
+
+	lightning.BasicComponent.OnNewStep()
+
+	lightning.Collector = 0
+	lightning.Val = 0
+	lightning.Mul = 0
+	lightning.NewConnector = 0
+
 	return nil
 }
 
 // playgame
 func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-	lightning.OnNewStep()
-	lightning.Collector = 0
-	lightning.Val = 0
-	lightning.Mul = 0
-	lightning.NewConnector = 0
 
 	if len(prs) <= 0 {
 		goutils.Error("Lightning:prs",
@@ -234,8 +248,8 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	lightning.AddScene(gameProp, curpr, gs, "")
-	lightning.AddOtherScene(gameProp, curpr, os, "")
+	lightning.AddScene(gameProp, curpr, gs)
+	lightning.AddOtherScene(gameProp, curpr, os)
 
 	lightning.Collector = lastCollector
 	lightning.Val = val

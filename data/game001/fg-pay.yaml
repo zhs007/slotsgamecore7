@@ -1,0 +1,13 @@
+defaultFGRespinComponent: fg-spin
+mainType: lines
+betType: bet
+targetScene: mystery-symbols
+excludeSymbols:
+  - SCATTER
+  - MYSTERY
+  - NEW_COLLECTOR
+  - COIN
+  - MULTIPLIER
+  - LIGHTNING
+wildSymbols:
+  - WILD

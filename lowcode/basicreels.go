@@ -1,7 +1,6 @@
 package lowcode
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -16,6 +15,7 @@ import (
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	ReelSetsWeight       string `yaml:"reelSetWeight"`
+	IsFGMainSpin         bool   `yaml:"isFGMainSpin"`
 }
 
 type BasicReels struct {
@@ -61,14 +61,27 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 		basicReels.ReelSetWeights = vw2
 	}
 
+	basicReels.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
+	return nil
+}
+
+// OnNewGame -
+func (basicReels *BasicReels) OnNewGame(gameProp *GameProperty) error {
+	return nil
+}
+
+// OnNewStep -
+func (basicReels *BasicReels) OnNewStep(gameProp *GameProperty) error {
+
+	basicReels.BasicComponent.OnNewStep()
+
 	return nil
 }
 
 // playgame
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-	basicReels.OnNewStep()
 
 	if basicReels.ReelSetWeights != nil {
 		val, err := basicReels.ReelSetWeights.RandVal(plugin)
@@ -100,9 +113,13 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	basicReels.AddScene(gameProp, curpr, sc, fmt.Sprintf("%v.init", basicReels.Name))
+	basicReels.AddScene(gameProp, curpr, sc)
 
-	gameProp.SetStrVal(GamePropNextComponent, basicReels.Config.DefaultNextComponent)
+	if basicReels.Config.IsFGMainSpin {
+		gameProp.OnFGSpin()
+	}
+
+	basicReels.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

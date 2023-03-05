@@ -1,4 +1,4 @@
-defaultNextComponent: bg-pay
+defaultNextComponent: fg-collector
 tagScenes:
   - mystery-symbols
 symbol: LIGHTNING

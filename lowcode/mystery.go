@@ -97,14 +97,28 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
+	mystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+
+	return nil
+}
+
+// OnNewGame -
+func (mystery *Mystery) OnNewGame(gameProp *GameProperty) error {
+
+	return nil
+}
+
+// OnNewStep -
+func (mystery *Mystery) OnNewStep(gameProp *GameProperty) error {
+
+	mystery.BasicComponent.OnNewStep()
+
 	return nil
 }
 
 // playgame
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-	mystery.OnNewStep()
 
 	if mystery.MysteryWeights != nil {
 		gs := gameProp.GetScene(curpr, mystery.Config.TargetScene)
@@ -124,7 +138,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 			sc2 := gs.Clone()
 			sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
 
-			mystery.AddScene(gameProp, curpr, sc2, fmt.Sprintf("%v.init", mystery.Name))
+			mystery.AddScene(gameProp, curpr, sc2)
 
 			v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 			if isok {
@@ -139,7 +153,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		}
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, mystery.Config.DefaultNextComponent)
+	mystery.onStepEnd(gameProp, curpr, gp)
 
 	return nil
 }

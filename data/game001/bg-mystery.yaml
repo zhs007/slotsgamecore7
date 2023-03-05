@@ -1,5 +1,7 @@
 defaultNextComponent: bg-pay
-targetScene: bg-spin.init
+tagScenes:
+  - mystery-symbols
+targetScene: init-symbols
 mystery: MYSTERY
 mysteryWeight: ../data/game001/bgmysteryweight.xlsx
 mysteryTriggerFeatures:

@@ -1,0 +1,24 @@
+defaultNextComponent: fg-pay
+tagScenes:
+  - mystery-symbols
+targetScene: init-symbols
+mystery: MYSTERY
+levels: 
+  - mysteryWeight: ../data/game001/fgmysteryweight0.xlsx
+    collector: fg-collector
+    collectorVal: 0
+  - mysteryWeight: ../data/game001/fgmysteryweight1.xlsx
+    collector: fg-collector
+    collectorVal: 4
+  - mysteryWeight: ../data/game001/fgmysteryweight2.xlsx
+    collector: fg-collector
+    collectorVal: 8
+  - mysteryWeight: ../data/game001/fgmysteryweight3.xlsx
+    collector: fg-collector
+    collectorVal: 12
+  - mysteryWeight: ../data/game001/fgmysteryweight4.xlsx
+    collector: fg-collector
+    collectorVal: 16
+mysteryTriggerFeatures:
+  - symbol: LIGHTNING
+    respinFirstComponent: fg-lightning

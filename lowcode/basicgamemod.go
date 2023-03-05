@@ -15,30 +15,6 @@ type BasicGameMod struct {
 	HistoryComponents []IComponent
 }
 
-// NewBasicGameMod - new BaseGame
-func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
-	bgm := &BasicGameMod{
-		BasicGameMod: sgc7game.NewBasicGameMod(cfgGameMod.Type, gameProp.Config.Width, gameProp.Config.Height),
-		GameProp:     gameProp,
-		Components:   NewComponentList(),
-	}
-
-	for _, v := range cfgGameMod.Components {
-		c := mgrComponent.NewComponent(v)
-		err := c.Init(v.Config, gameProp)
-		if err != nil {
-			goutils.Error("NewBasicGameMod:Init",
-				zap.Error(err))
-
-			return nil
-		}
-
-		bgm.Components.AddComponent(v.Name, c)
-	}
-
-	return bgm
-}
-
 // OnPlay - on play
 func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
 	gp := &GameParams{}
@@ -62,8 +38,11 @@ func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.Pl
 func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string,
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
 
-	bgm.HistoryComponents = nil
-	bgm.GameProp.OnNewStep()
+	if len(prs) == 0 {
+		bgm.OnNewGame()
+	}
+
+	bgm.OnNewStep()
 
 	if cmd == "SPIN" {
 		pr, gp := bgm.newPlayResult(prs)
@@ -118,6 +97,15 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			curComponent = c
 		}
 
+		if pr.IsFinish && bgm.GameProp.GetVal(GamePropFGNum) > 0 {
+			pr.IsFinish = false
+		}
+
+		// if bgm.GameProp.GetVal(GamePropTriggerFG) > 0 {
+		// 	gameProp.SetVal(GamePropTriggerFG, 1)
+		// 	gameProp.SetVal(GamePropFGNum, val.Int())
+		// }
+
 		// for i, v := range bgm.Components.Components {
 		// 	err := v.OnPlayGame(bgm.GameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 		// 	if err != nil {
@@ -147,4 +135,64 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 	}
 
 	return nil
+}
+
+// OnNewGame -
+func (bgm *BasicGameMod) OnNewGame() error {
+	for i, v := range bgm.Components.Components {
+		err := v.OnNewGame(bgm.GameProp)
+		if err != nil {
+			goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// OnNewStep -
+func (bgm *BasicGameMod) OnNewStep() error {
+	bgm.HistoryComponents = nil
+	bgm.GameProp.OnNewStep()
+
+	for i, v := range bgm.Components.Components {
+		err := v.OnNewStep(bgm.GameProp)
+		if err != nil {
+			goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// NewBasicGameMod - new BaseGame
+func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
+	bgm := &BasicGameMod{
+		BasicGameMod: sgc7game.NewBasicGameMod(cfgGameMod.Type, gameProp.Config.Width, gameProp.Config.Height),
+		GameProp:     gameProp,
+		Components:   NewComponentList(),
+	}
+
+	for _, v := range cfgGameMod.Components {
+		c := mgrComponent.NewComponent(v)
+		err := c.Init(v.Config, gameProp)
+		if err != nil {
+			goutils.Error("NewBasicGameMod:Init",
+				zap.Error(err))
+
+			return nil
+		}
+
+		bgm.Components.AddComponent(v.Name, c)
+		bgm.GameProp.onAddComponent(v.Name, c)
+	}
+
+	return bgm
 }
