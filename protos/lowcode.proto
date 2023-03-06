@@ -17,5 +17,5 @@ message ComponentData {
 message GameParam {
     string firstComponent = 1;
     string nextStepFirstComponent = 2;
-    repeated ComponentData components = 3;
+    map<string, ComponentData> mapComponents = 3;
 }

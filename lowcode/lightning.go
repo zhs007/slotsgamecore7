@@ -283,6 +283,8 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
+	lightning.BuildPBComponent(gp)
+
 	return nil
 }
 

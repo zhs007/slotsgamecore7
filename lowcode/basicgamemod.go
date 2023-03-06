@@ -4,6 +4,7 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 )
 
@@ -18,6 +19,8 @@ type BasicGameMod struct {
 // OnPlay - on play
 func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
 	gp := &GameParams{}
+	gp.MapComponents = make(map[string]*sgc7pb.ComponentData)
+
 	pr := &sgc7game.PlayResult{
 		IsFinish:         true,
 		NextGameMod:      "bg",

@@ -1,6 +1,9 @@
 package lowcode
 
-import sgc7game "github.com/zhs007/slotsgamecore7/game"
+import (
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+)
 
 type BasicComponentConfig struct {
 	DefaultNextComponent     string   `yaml:"defaultNextComponent"`     // next component, if it is empty jump to ending
@@ -14,7 +17,10 @@ type BasicComponent struct {
 	UsedScenes      []int
 	UsedOtherScenes []int
 	UsedResults     []int
+	UsedPrizeScenes []int
 	Config          *BasicComponentConfig
+	CashWin         int64
+	CoinWin         int
 }
 
 // onInit -
@@ -36,6 +42,9 @@ func (basicComponent *BasicComponent) OnNewStep() {
 	basicComponent.UsedScenes = nil
 	basicComponent.UsedOtherScenes = nil
 	basicComponent.UsedResults = nil
+	basicComponent.UsedPrizeScenes = nil
+	basicComponent.CashWin = 0
+	basicComponent.CoinWin = 0
 }
 
 // AddScene -
@@ -70,12 +79,42 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 
 // AddResult -
 func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret *sgc7game.Result) {
+	basicComponent.CoinWin += ret.CoinWin
+	basicComponent.CashWin += int64(ret.CashWin)
+
 	curpr.CashWin += int64(ret.CashWin)
 	curpr.CoinWin += ret.CoinWin
 
 	basicComponent.UsedResults = append(basicComponent.UsedResults, len(curpr.Results))
 
 	curpr.Results = append(curpr.Results, ret)
+}
+
+// BuildPBComponent -
+func (basicComponent *BasicComponent) BuildPBComponent(gp *GameParams) {
+	pb := &sgc7pb.ComponentData{}
+
+	pb.Name = basicComponent.Name
+	pb.CashWin = basicComponent.CashWin
+	pb.CoinWin = int32(basicComponent.CoinWin)
+
+	for _, v := range basicComponent.UsedOtherScenes {
+		pb.UsedOtherScenes = append(pb.UsedOtherScenes, int32(v))
+	}
+
+	for _, v := range basicComponent.UsedScenes {
+		pb.UsedScenes = append(pb.UsedScenes, int32(v))
+	}
+
+	for _, v := range basicComponent.UsedResults {
+		pb.UsedResults = append(pb.UsedResults, int32(v))
+	}
+
+	for _, v := range basicComponent.UsedPrizeScenes {
+		pb.UsedPrizeScenes = append(pb.UsedPrizeScenes, int32(v))
+	}
+
+	gp.MapComponents[pb.Name] = pb
 }
 
 func NewBasicComponent(name string) *BasicComponent {

@@ -169,6 +169,8 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	multiLevelReels.onStepEnd(gameProp, curpr, gp)
 
+	multiLevelReels.BuildPBComponent(gp)
+
 	return nil
 }
 

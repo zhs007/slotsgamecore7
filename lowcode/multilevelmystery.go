@@ -167,6 +167,8 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	multiLevelMystery.onStepEnd(gameProp, curpr, gp)
 
+	multiLevelMystery.BuildPBComponent(gp)
+
 	return nil
 }
 

@@ -122,6 +122,8 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	basicReels.onStepEnd(gameProp, curpr, gp)
 
+	basicReels.BuildPBComponent(gp)
+
 	return nil
 }
 

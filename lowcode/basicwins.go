@@ -203,6 +203,8 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	basicWins.onStepEnd(gameProp, curpr, gp)
 
+	basicWins.BuildPBComponent(gp)
+
 	return nil
 }
 

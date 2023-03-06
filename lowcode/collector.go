@@ -76,6 +76,10 @@ func (collector *Collecotr) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
+	collector.onStepEnd(gameProp, curpr, gp)
+
+	collector.BuildPBComponent(gp)
+
 	return nil
 }
 

@@ -156,6 +156,8 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	mystery.onStepEnd(gameProp, curpr, gp)
 
+	mystery.BuildPBComponent(gp)
+
 	return nil
 }
 
