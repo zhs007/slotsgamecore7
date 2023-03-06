@@ -82,7 +82,7 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, gameProp *GameProperty) 
 		return ErrIvalidMultiLevelReelsConfig
 	}
 
-	multiLevelReels.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	multiLevelReels.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }

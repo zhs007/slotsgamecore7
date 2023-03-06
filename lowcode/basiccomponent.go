@@ -3,6 +3,7 @@ package lowcode
 import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 )
 
 type BasicComponentConfig struct {
@@ -10,17 +11,19 @@ type BasicComponentConfig struct {
 	DefaultFGRespinComponent string   `yaml:"defaultFGRespinComponent"` // respin component, if it is not empty and in FG
 	TagScenes                []string `yaml:"tagScenes"`                // tag scenes
 	TagOtherScenes           []string `yaml:"tagOtherScenes"`           // tag otherScenes
+	TargetScene              string   `yaml:"targetScene"`              // target scenes
 }
 
 type BasicComponent struct {
-	Name            string
-	UsedScenes      []int
-	UsedOtherScenes []int
-	UsedResults     []int
-	UsedPrizeScenes []int
-	Config          *BasicComponentConfig
-	CashWin         int64
-	CoinWin         int
+	Config           *BasicComponentConfig
+	Name             string
+	UsedScenes       []int
+	UsedOtherScenes  []int
+	UsedResults      []int
+	UsedPrizeScenes  []int
+	CashWin          int64
+	CoinWin          int
+	TargetSceneIndex int
 }
 
 // onInit -
@@ -45,6 +48,7 @@ func (basicComponent *BasicComponent) OnNewStep() {
 	basicComponent.UsedPrizeScenes = nil
 	basicComponent.CashWin = 0
 	basicComponent.CoinWin = 0
+	basicComponent.TargetSceneIndex = -1
 }
 
 // AddScene -
@@ -97,6 +101,7 @@ func (basicComponent *BasicComponent) BuildPBComponent(gp *GameParams) {
 	pb.Name = basicComponent.Name
 	pb.CashWin = basicComponent.CashWin
 	pb.CoinWin = int32(basicComponent.CoinWin)
+	pb.TargetScene = int32(basicComponent.TargetSceneIndex)
 
 	for _, v := range basicComponent.UsedOtherScenes {
 		pb.UsedOtherScenes = append(pb.UsedOtherScenes, int32(v))
@@ -115,6 +120,34 @@ func (basicComponent *BasicComponent) BuildPBComponent(gp *GameParams) {
 	}
 
 	gp.MapComponents[pb.Name] = pb
+}
+
+// BuildPBComponent -
+func (basicComponent *BasicComponent) OnStatsWithComponent(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
+	wins := int64(0)
+
+	for _, v := range pbComponent.UsedResults {
+		ret := pr.Results[v]
+
+		feature.Symbols.OnWin(ret)
+
+		wins += int64(ret.CashWin)
+	}
+
+	if pbComponent.TargetScene >= 0 {
+		feature.Reels.OnScene(pr.Scenes[pbComponent.TargetScene])
+	}
+
+	return wins
+}
+
+// GetTargetScene -
+func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult) *sgc7game.GameScene {
+	gs, si := gameProp.GetScene(curpr, basicComponent.Config.TargetScene)
+
+	basicComponent.TargetSceneIndex = si
+
+	return gs
 }
 
 func NewBasicComponent(name string) *BasicComponent {

@@ -73,13 +73,13 @@ func (gameProp *GameProperty) TagScene(pr *sgc7game.PlayResult, tag string, scen
 	gameProp.MapScenes[tag] = sceneIndex
 }
 
-func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) *sgc7game.GameScene {
+func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) (*sgc7game.GameScene, int) {
 	si, isok := gameProp.MapScenes[tag]
 	if !isok {
-		return pr.Scenes[len(pr.Scenes)-1]
+		return pr.Scenes[len(pr.Scenes)-1], len(pr.Scenes) - 1
 	}
 
-	return pr.Scenes[si]
+	return pr.Scenes[si], si
 }
 
 func (gameProp *GameProperty) TagOtherScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {

@@ -48,7 +48,6 @@ type BasicWinsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	MainType             string                  `yaml:"mainType"`       // lines or ways
 	BetType              string                  `yaml:"betType"`        // bet or totalBet
-	TargetScene          string                  `yaml:"targetScene"`    // basicReels.mstery
 	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
 	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
 	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
@@ -65,7 +64,7 @@ type BasicWins struct {
 // AddResult -
 func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) {
-	gs := gameProp.GetScene(curpr, tf.TargetScene)
+	gs, _ := gameProp.GetScene(curpr, tf.TargetScene)
 
 	isTrigger := false
 	if tf.Type == WinTypeScatters {
@@ -128,7 +127,7 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, gameProp.CurPaytables.MapSymbols[v])
 	}
 
-	basicWins.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	basicWins.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }
@@ -154,7 +153,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 	}
 
-	gs := gameProp.GetScene(curpr, basicWins.Config.TargetScene)
+	gs := basicWins.GetTargetScene(gameProp, curpr)
 
 	if basicWins.Config.MainType == WinTypeWays {
 		rets := sgc7game.CalcFullLineEx2(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
@@ -219,30 +218,34 @@ func (basicWins *BasicWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 
 // OnStats
 func (basicWins *BasicWins) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	// wins := int64(0)
-	// totalwins := int64(0)
+	wins := int64(0)
+	isTrigger := false
 
-	// // feature.Symbols.OnBet(stake.CashBet)
-	// for _, v := range lst[0].Results {
-	// 	if v.Type != sgc7game.RTScatter {
-	// 		feature.Symbols.OnWin(v)
+	for _, v := range lst {
+		gp, isok := v.CurGameModParams.(*GameParams)
+		if isok {
+			curComponent, isok := gp.MapComponents[basicWins.Name]
+			if isok {
+				isTrigger = true
 
-	// 		wins += int64(v.CashWin)
-	// 	}
-	// }
+				wins += basicWins.OnStatsWithComponent(feature, curComponent, v)
+			}
+		}
+	}
 
-	// for _, r := range lst {
-	// 	totalwins += r.CashWin
-	// }
+	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
 
-	// feature.Reels.OnScene(lst[0].Scenes[0])
+	if feature.Parent != nil {
+		totalwins := int64(0)
 
-	// feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
-	// feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
+		for _, v := range lst {
+			totalwins += v.CashWin
+		}
 
-	// return true, stake.CashBet, wins
+		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
+	}
 
-	return false, 0, 0
+	return isTrigger, stake.CashBet, wins
 }
 
 func NewBasicWins(name string) IComponent {

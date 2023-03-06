@@ -22,7 +22,6 @@ type MysteryTriggerFeatureConfig struct {
 // MysteryConfig - configuration for Mystery
 type MysteryConfig struct {
 	BasicComponentConfig   `yaml:",inline"`
-	TargetScene            string                         `yaml:"targetScene"` // basicReels.init
 	MysteryWeight          string                         `yaml:"mysteryWeight"`
 	Mystery                string                         `yaml:"mystery"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
@@ -98,7 +97,7 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
-	mystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	mystery.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }
@@ -122,7 +121,8 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if mystery.MysteryWeights != nil {
-		gs := gameProp.GetScene(curpr, mystery.Config.TargetScene)
+		gs := mystery.GetTargetScene(gameProp, curpr)
+
 		if gs.HasSymbol(mystery.MysterySymbol) {
 			curm, err := mystery.MysteryWeights.RandVal(plugin)
 			if err != nil {

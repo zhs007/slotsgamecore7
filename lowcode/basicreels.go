@@ -62,7 +62,7 @@ func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
 		basicReels.ReelSetWeights = vw2
 	}
 
-	basicReels.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	basicReels.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }

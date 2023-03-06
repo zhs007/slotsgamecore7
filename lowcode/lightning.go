@@ -143,7 +143,7 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 		}
 	}
 
-	lightning.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	lightning.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }

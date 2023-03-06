@@ -50,6 +50,8 @@ func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
 
 	collector.Config = cfg
 
+	collector.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 

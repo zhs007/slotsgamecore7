@@ -23,7 +23,6 @@ type MultiLevelMysteryLevelConfig struct {
 // MultiLevelMysteryConfig - configuration for MultiLevelMystery
 type MultiLevelMysteryConfig struct {
 	BasicComponentConfig   `yaml:",inline"`
-	TargetScene            string                          `yaml:"targetScene"` // basicReels.init
 	Mystery                string                          `yaml:"mystery"`
 	Levels                 []*MultiLevelMysteryLevelConfig `yaml:"levels"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig  `yaml:"mysteryTriggerFeatures"`
@@ -100,7 +99,7 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, gameProp *GameProper
 		multiLevelMystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
-	multiLevelMystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	multiLevelMystery.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }
@@ -134,7 +133,8 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	gs := gameProp.GetScene(curpr, multiLevelMystery.Config.TargetScene)
+	gs := multiLevelMystery.GetTargetScene(gameProp, curpr)
+
 	if gs.HasSymbol(multiLevelMystery.MysterySymbol) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[multiLevelMystery.CurLevel].RandVal(plugin)
 		if err != nil {

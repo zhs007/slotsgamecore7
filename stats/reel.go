@@ -67,7 +67,10 @@ func (reel *Reel) OnScene(scene *sgc7game.GameScene) {
 	for y := 0; y < scene.Height; y++ {
 		s := scene.Arr[reel.Index][y]
 
-		reel.MapSymbols[mathtoolset.SymbolType(s)].TriggerTimes++
+		_, isok := reel.MapSymbols[mathtoolset.SymbolType(s)]
+		if isok {
+			reel.MapSymbols[mathtoolset.SymbolType(s)].TriggerTimes++
+		}
 	}
 }
 
@@ -75,7 +78,10 @@ func (reel *Reel) OnSymbols(lst []mathtoolset.SymbolType) {
 	reel.TotalTimes++
 
 	for _, s := range lst {
-		reel.MapSymbols[mathtoolset.SymbolType(s)].TriggerTimes++
+		_, isok := reel.MapSymbols[mathtoolset.SymbolType(s)]
+		if isok {
+			reel.MapSymbols[mathtoolset.SymbolType(s)].TriggerTimes++
+		}
 	}
 }
 
