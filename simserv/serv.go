@@ -107,6 +107,8 @@ func NewServ(service IService, cfg *Config) *Serv {
 				return
 			}
 
+			ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+
 			s.SetResponse(ctx, ret)
 		})
 
