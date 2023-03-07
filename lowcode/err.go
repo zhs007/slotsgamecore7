@@ -45,4 +45,9 @@ var (
 
 	// ErrIvalidMultiLevelReelsConfig - invalid MultiLevelReels config
 	ErrIvalidMultiLevelReelsConfig = errors.New("invalid MultiLevelReels config")
+
+	// ErrIvalidStatsSymbolsInConfig - invalid StatsSymbols in config
+	ErrIvalidStatsSymbolsInConfig = errors.New("invalid StatsSymbols in config")
+	// ErrIvalidStatsComponentInConfig - invalid Stats's component in config
+	ErrIvalidStatsComponentInConfig = errors.New("invalid Stats's component in config")
 )

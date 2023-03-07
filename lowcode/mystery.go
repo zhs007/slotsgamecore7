@@ -8,6 +8,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -21,7 +22,6 @@ type MysteryTriggerFeatureConfig struct {
 // MysteryConfig - configuration for Mystery
 type MysteryConfig struct {
 	BasicComponentConfig   `yaml:",inline"`
-	TargetScene            string                         `yaml:"targetScene"` // basicReels.init
 	MysteryWeight          string                         `yaml:"mysteryWeight"`
 	Mystery                string                         `yaml:"mystery"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
@@ -97,7 +97,7 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
-	mystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	mystery.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }
@@ -121,7 +121,8 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if mystery.MysteryWeights != nil {
-		gs := gameProp.GetScene(curpr, mystery.Config.TargetScene)
+		gs := mystery.GetTargetScene(gameProp, curpr)
+
 		if gs.HasSymbol(mystery.MysterySymbol) {
 			curm, err := mystery.MysteryWeights.RandVal(plugin)
 			if err != nil {
@@ -155,6 +156,8 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	mystery.onStepEnd(gameProp, curpr, gp)
 
+	mystery.BuildPBComponent(gp)
+
 	return nil
 }
 
@@ -168,6 +171,11 @@ func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRes
 	}
 
 	return nil
+}
+
+// OnStats
+func (mystery *Mystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
 }
 
 func NewMystery(name string) IComponent {

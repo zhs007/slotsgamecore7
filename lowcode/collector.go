@@ -8,6 +8,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -49,6 +50,8 @@ func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
 
 	collector.Config = cfg
 
+	collector.onInit(&cfg.BasicComponentConfig)
+
 	return nil
 }
 
@@ -75,6 +78,10 @@ func (collector *Collecotr) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
+	collector.onStepEnd(gameProp, curpr, gp)
+
+	collector.BuildPBComponent(gp)
+
 	return nil
 }
 
@@ -88,6 +95,11 @@ func (collector *Collecotr) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	}
 
 	return nil
+}
+
+// OnStats
+func (collector *Collecotr) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
 }
 
 func NewCollector(name string) IComponent {

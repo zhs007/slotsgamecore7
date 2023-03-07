@@ -6,6 +6,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 )
 
@@ -52,7 +53,10 @@ type GameProperty struct {
 	MapSymbolColor   *asciigame.SymbolColorMap
 	MapScenes        map[string]int
 	MapOtherScenes   map[string]int
-	MapCollector     map[string]*Collecotr
+	MapCollectors    map[string]*Collecotr
+	MapComponents    map[string]IComponent
+	Stats            *sgc7stats.Feature
+	MapStats         map[string]*sgc7stats.Feature
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
@@ -69,13 +73,13 @@ func (gameProp *GameProperty) TagScene(pr *sgc7game.PlayResult, tag string, scen
 	gameProp.MapScenes[tag] = sceneIndex
 }
 
-func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) *sgc7game.GameScene {
+func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) (*sgc7game.GameScene, int) {
 	si, isok := gameProp.MapScenes[tag]
 	if !isok {
-		return pr.Scenes[len(pr.Scenes)-1]
+		return pr.Scenes[len(pr.Scenes)-1], len(pr.Scenes) - 1
 	}
 
-	return pr.Scenes[si]
+	return pr.Scenes[si], si
 }
 
 func (gameProp *GameProperty) TagOtherScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
@@ -213,8 +217,61 @@ func (gameProp *GameProperty) GetStrVal(prop int) string {
 func (gameProp *GameProperty) onAddComponent(name string, component IComponent) {
 	collector, isok := component.(*Collecotr)
 	if isok {
-		gameProp.MapCollector[name] = collector
+		gameProp.MapCollectors[name] = collector
 	}
+
+	gameProp.MapComponents[name] = component
+}
+
+func (gameProp *GameProperty) NewStatsWithConfig(parent *sgc7stats.Feature, cfg *StatsConfig) (*sgc7stats.Feature, error) {
+	curComponent, isok := gameProp.MapComponents[cfg.Component]
+	if !isok {
+		goutils.Error("GameProperty.NewStatsWithConfig",
+			zap.Error(ErrIvalidStatsComponentInConfig))
+
+		return nil, ErrIvalidStatsComponentInConfig
+	}
+
+	feature := NewStats(parent, cfg.Name, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+		return curComponent.OnStats(f, s, lst)
+	}, gameProp.GetVal(GamePropWidth), gameProp.Config.StatsSymbolCodes)
+
+	for _, v := range cfg.Children {
+		_, err := gameProp.NewStatsWithConfig(feature, v)
+		if err != nil {
+			goutils.Error("GameProperty.NewStatsWithConfig:NewStatsWithConfig",
+				goutils.JSON("v", v),
+				zap.Error(err))
+
+			return nil, err
+		}
+	}
+
+	return feature, nil
+}
+
+func (gameProp *GameProperty) InitStats() error {
+	err := gameProp.Config.BuildStatsSymbolCodes(gameProp.CurPaytables)
+	if err != nil {
+		goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
+			zap.Error(err))
+
+		return err
+	}
+
+	if gameProp.Config.Stats != nil {
+		stats, err := gameProp.NewStatsWithConfig(nil, gameProp.Config.Stats)
+		if err != nil {
+			goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
+				zap.Error(err))
+
+			return err
+		}
+
+		gameProp.Stats = stats
+	}
+
+	return nil
 }
 
 func InitGameProperty(cfgfn string) (*GameProperty, error) {
@@ -232,7 +289,9 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 		MapVals:          make(map[int]int),
 		MapStrVals:       make(map[int]string),
 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
-		MapCollector:     make(map[string]*Collecotr),
+		MapCollectors:    make(map[string]*Collecotr),
+		MapComponents:    make(map[string]IComponent),
+		MapStats:         make(map[string]*sgc7stats.Feature),
 	}
 
 	gameProp.SetStrVal(GamePropCurPaytables, cfg.DefaultPaytables)
@@ -270,6 +329,18 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 	gameProp.MapSymbolColor.OnGetSymbolString = func(s int) string {
 		return gameProp.SymbolsViewer.MapSymbols[s].Output
 	}
+
+	// err = cfg.BuildStatsSymbolCodes(gameProp.CurPaytables)
+	// if err != nil {
+	// 	goutils.Error("InitGameProperty:BuildStatsSymbolCodes",
+	// 		zap.Error(err))
+
+	// 	return nil, err
+	// }
+
+	// if cfg.Stats != nil {
+	// 	gameProp.Stats = gameProp.NewStatsWithConfig(nil, cfg.Stats)
+	// }
 
 	return gameProp, nil
 }

@@ -1,0 +1,4 @@
+gamecode: game001
+bindaddr: 0.0.0.0:8080
+isdebugmode: true
+loglevel: debug

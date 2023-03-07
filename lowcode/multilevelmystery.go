@@ -8,6 +8,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -22,7 +23,6 @@ type MultiLevelMysteryLevelConfig struct {
 // MultiLevelMysteryConfig - configuration for MultiLevelMystery
 type MultiLevelMysteryConfig struct {
 	BasicComponentConfig   `yaml:",inline"`
-	TargetScene            string                          `yaml:"targetScene"` // basicReels.init
 	Mystery                string                          `yaml:"mystery"`
 	Levels                 []*MultiLevelMysteryLevelConfig `yaml:"levels"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig  `yaml:"mysteryTriggerFeatures"`
@@ -99,7 +99,7 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, gameProp *GameProper
 		multiLevelMystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
-	multiLevelMystery.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	multiLevelMystery.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }
@@ -117,7 +117,7 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 
 	for i, v := range multiLevelMystery.Config.Levels {
 		if multiLevelMystery.CurLevel > i {
-			collecotr, isok := gameProp.MapCollector[v.Collector]
+			collecotr, isok := gameProp.MapCollectors[v.Collector]
 			if isok {
 				if collecotr.Val >= v.CollectorVal {
 					multiLevelMystery.CurLevel = i
@@ -133,7 +133,8 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	gs := gameProp.GetScene(curpr, multiLevelMystery.Config.TargetScene)
+	gs := multiLevelMystery.GetTargetScene(gameProp, curpr)
+
 	if gs.HasSymbol(multiLevelMystery.MysterySymbol) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[multiLevelMystery.CurLevel].RandVal(plugin)
 		if err != nil {
@@ -166,6 +167,8 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	multiLevelMystery.onStepEnd(gameProp, curpr, gp)
 
+	multiLevelMystery.BuildPBComponent(gp)
+
 	return nil
 }
 
@@ -177,6 +180,11 @@ func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, 
 	}
 
 	return nil
+}
+
+// OnStats
+func (multiLevelMystery *MultiLevelMystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
 }
 
 func NewMultiLevelMystery(name string) IComponent {

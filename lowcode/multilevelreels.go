@@ -7,6 +7,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -81,7 +82,7 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, gameProp *GameProperty) 
 		return ErrIvalidMultiLevelReelsConfig
 	}
 
-	multiLevelReels.BasicComponent.onInit(&cfg.BasicComponentConfig)
+	multiLevelReels.onInit(&cfg.BasicComponentConfig)
 
 	return nil
 }
@@ -99,7 +100,7 @@ func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error 
 
 	for i, v := range multiLevelReels.Config.Levels {
 		if multiLevelReels.CurLevel > i {
-			collecotr, isok := gameProp.MapCollector[v.Collector]
+			collecotr, isok := gameProp.MapCollectors[v.Collector]
 			if isok {
 				if collecotr.Val >= v.CollectorVal {
 					multiLevelReels.CurLevel = i
@@ -168,6 +169,8 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	multiLevelReels.onStepEnd(gameProp, curpr, gp)
 
+	multiLevelReels.BuildPBComponent(gp)
+
 	return nil
 }
 
@@ -178,6 +181,11 @@ func (multiLevelReels *MultiLevelReels) OnAsciiGame(gameProp *GameProperty, pr *
 	}
 
 	return nil
+}
+
+// OnStats
+func (multiLevelReels *MultiLevelReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
 }
 
 func NewMultiLevelReels(name string) IComponent {

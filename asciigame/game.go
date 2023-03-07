@@ -39,7 +39,7 @@ func getchar(onchar FuncOnGetChar) error {
 
 type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult)
 
-func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int, isSkipGetChar bool) error {
+func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int, isSkipGetChar bool, isBreakAtFeature bool) error {
 	plugin := game.NewPlugin()
 	defer game.FreePlugin(plugin)
 
@@ -130,7 +130,9 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				break
 			}
 
-			autotimes = 0
+			if isBreakAtFeature {
+				autotimes = 0
+			}
 
 			fmt.Printf("balance %v , win %v \n",
 				FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),

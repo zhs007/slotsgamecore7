@@ -18,6 +18,7 @@ func main() {
 	gamecfg := os.Getenv("GAMECFG")
 	strAutoSpin := os.Getenv("AUTOSPIN")
 	strSkipGetChar := os.Getenv("SKIPGETCHAR")
+	strBreakAtFeature := os.Getenv("BREAKATFEATURE")
 	autospin, _ := goutils.String2Int64(strAutoSpin)
 
 	isSkipGetChar := false
@@ -25,6 +26,13 @@ func main() {
 		i64, _ := goutils.String2Int64(strSkipGetChar)
 
 		isSkipGetChar = i64 > 0
+	}
+
+	isBreakAtFeature := false
+	if strSkipGetChar != "" {
+		i64, _ := goutils.String2Int64(strBreakAtFeature)
+
+		isBreakAtFeature = i64 > 0
 	}
 
 	game, err := lowcode.NewGame(gamecfg)
@@ -55,7 +63,7 @@ func main() {
 	}
 
 	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) {
-		game.OnAsciiGame(pr, lst)
+		game.OnAsciiGame(stake, pr, lst)
 		// gp := pr.CurGameModParams.(*dtgame.GameParams)
 		// if len(gp.ExpSyms) > 0 {
 		// 	fmt.Printf("ExpandingSymbols trigger! [ ")
@@ -84,5 +92,7 @@ func main() {
 		// if pr.IsFinish {
 		// 	bgStats.OnResults(stake, lst)
 		// }
-	}, int(autospin), isSkipGetChar)
+	}, int(autospin), isSkipGetChar, isBreakAtFeature)
+
+	game.Prop.Stats.SaveExcel("stats.xlsx")
 }

@@ -11,11 +11,12 @@ message ComponentData {
     int32 coinWin = 5;
     int64 cashWin = 6;
     string name = 7;
+    int32 targetScene = 8;
 }
 
 // GameParam
 message GameParam {
     string firstComponent = 1;
     string nextStepFirstComponent = 2;
-    repeated ComponentData components = 3;
+    map<string, ComponentData> mapComponents = 3;
 }
