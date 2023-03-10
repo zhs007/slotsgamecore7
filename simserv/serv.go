@@ -111,7 +111,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 			ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie")
 
-			s.SetResponse(ctx, ret)
+			s.SetPBResponse(ctx, ret)
 		})
 
 	return s
