@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/golang/protobuf/ptypes/any"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/lowcode"
@@ -27,7 +26,7 @@ func NewSimService(game sgc7game.IGame) (simserv.IService, error) {
 }
 
 // BuildPBGameModParam - interface{} -> *any.Any
-func (sv *SimService) BuildPBGameModParam(gp interface{}) (*any.Any, error) {
+func (sv *SimService) BuildPBGameModParam(gp interface{}) (*anypb.Any, error) {
 	mygp, isok := gp.(*lowcode.GameParams)
 	if !isok {
 		return nil, ErrInvalidGameParams
@@ -37,7 +36,7 @@ func (sv *SimService) BuildPBGameModParam(gp interface{}) (*any.Any, error) {
 }
 
 // BuildPBGameModParamFromAny - interface{} -> *any.Any
-func (sv *SimService) BuildPBGameModParamFromAny(msg *any.Any) (interface{}, error) {
+func (sv *SimService) BuildPBGameModParamFromAny(msg *anypb.Any) (interface{}, error) {
 	mygp := &lowcode.GameParams{}
 
 	err := msg.UnmarshalTo(&mygp.GameParam)

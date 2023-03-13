@@ -1,9 +1,9 @@
 package dtserv
 
 import (
-	any "github.com/golang/protobuf/ptypes/any"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
+	any "google.golang.org/protobuf/types/known/anypb"
 )
 
 // IService - service
