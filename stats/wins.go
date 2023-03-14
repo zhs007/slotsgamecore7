@@ -2,6 +2,7 @@ package stats
 
 import (
 	"sort"
+	"sync"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
@@ -15,6 +16,9 @@ type winsdata struct {
 type Wins struct {
 	MapWins    map[int]int64
 	TotalTimes int64
+	//sync.map is map[interface{}]interface{}
+	//we not sure the front end send to us 
+	sync *sync.RWMutex
 }
 
 func (wins *Wins) Clone() *Wins {
@@ -22,9 +26,10 @@ func (wins *Wins) Clone() *Wins {
 		MapWins:    make(map[int]int64),
 		TotalTimes: wins.TotalTimes,
 	}
-
+	wins.sync.Lock()
+    defer wins.sync.Unlock()
 	for k, v := range wins.MapWins {
-		nw.MapWins[k] = v
+		wins.MapWins[k] = v
 	}
 
 	return nw
@@ -33,6 +38,8 @@ func (wins *Wins) Clone() *Wins {
 func (wins *Wins) Merge(src *Wins) {
 	wins.TotalTimes += src.TotalTimes
 
+	wins.sync.Lock()
+    defer wins.sync.Unlock()
 	for k, v := range src.MapWins {
 		_, isok := wins.MapWins[k]
 		if isok {
@@ -46,6 +53,8 @@ func (wins *Wins) Merge(src *Wins) {
 func (wins *Wins) genData() []*winsdata {
 	lst := []*winsdata{}
 
+	wins.sync.Lock()
+    defer wins.sync.Unlock()
 	for k, v := range wins.MapWins {
 		lst = append(lst, &winsdata{
 			win:   k,
@@ -59,6 +68,8 @@ func (wins *Wins) genData() []*winsdata {
 func (wins *Wins) AddWin(win int) {
 	wins.TotalTimes++
 
+	wins.sync.Lock()
+    defer wins.sync.Unlock()
 	_, isok := wins.MapWins[win]
 	if isok {
 		wins.MapWins[win]++
@@ -71,6 +82,9 @@ func (wins *Wins) SaveSheet(f *excelize.File, sheet string) error {
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "win")
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 0), "times")
 
+	wins.sync.Lock()
+    defer wins.sync.Unlock()
+	
 	lst := wins.genData()
 
 	sort.Slice(lst, func(i, j int) bool {
