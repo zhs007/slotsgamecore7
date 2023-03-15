@@ -38,4 +38,7 @@ var (
 
 	// ErrInvalidFunctionParams - invalid function params
 	ErrInvalidFunctionParams = errors.New("invalid function params")
+
+	// ErrInvalidTargetRTP - invalid targetRTP
+	ErrInvalidTargetRTP = errors.New("invalid targetRTP")
 )
