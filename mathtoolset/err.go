@@ -32,4 +32,13 @@ var (
 
 	// ErrInvalidReelsWithMinOff - invalid reels with minoff
 	ErrInvalidReelsWithMinOff = errors.New("invalid reels with minoff")
+
+	// ErrInvalidCode - invalid code
+	ErrInvalidCode = errors.New("invalid code")
+
+	// ErrInvalidFunctionParams - invalid function params
+	ErrInvalidFunctionParams = errors.New("invalid function params")
+
+	// ErrInvalidTargetRTP - invalid targetRTP
+	ErrInvalidTargetRTP = errors.New("invalid targetRTP")
 )

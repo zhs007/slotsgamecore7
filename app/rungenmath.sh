@@ -1,0 +1,1 @@
+CFG=../unittestdata/genmathcfg.yaml go run genmath/*.go
