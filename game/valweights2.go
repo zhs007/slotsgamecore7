@@ -145,6 +145,27 @@ func (vw *ValWeights2) CloneExcludeVal(val IVal) (*ValWeights2, error) {
 	return nil, ErrInvalidValWeightsVal
 }
 
+// RemoveVal - remove a val
+func (vw *ValWeights2) RemoveVal(val IVal) error {
+	for i, v := range vw.Vals {
+		if val.IsSame(v) {
+			weight := vw.Weights[i]
+
+			vw.Vals = append(vw.Vals[0:i], vw.Vals[i+1:]...)
+			vw.Weights = append(vw.Weights[0:i], vw.Weights[i+1:]...)
+
+			vw.MaxWeight -= weight
+
+			return nil
+		}
+	}
+
+	goutils.Error("ValWeights.RandVal:RemoveVal",
+		zap.Error(ErrInvalidValWeightsVal))
+
+	return ErrInvalidValWeightsVal
+}
+
 func NewValWeights2Ex() *ValWeights2 {
 	return &ValWeights2{}
 }

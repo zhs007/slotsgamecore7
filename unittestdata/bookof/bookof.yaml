@@ -1,0 +1,7 @@
+targetScene: init-symbols
+tagScenes: 
+  - bookof-1
+  - bookof-2
+  - bookof-3
+weightTrigger: ../unittestdata/bookof/trigger.xlsx
+weightSymbolNum: ../unittestdata/bookof/symbolnum.xlsx
