@@ -51,3 +51,9 @@ func IsFirstWild(lst []InReelSymbolType, num int) bool {
 
 	return true
 }
+
+func CloneSymbols(symbols []SymbolType) []SymbolType {
+	ns := make([]SymbolType, len(symbols))
+	copy(ns, symbols)
+	return ns
+}

@@ -88,6 +88,7 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 	nrs := rs.Clone()
 	reel := []int{}
 	excsym := []SymbolType{}
+	var cacheexcsym []SymbolType
 
 	// 这里需要注意的是，譬如35，切6份，余5
 	// 如果把5留到最后，就会出现间隔11，所以需要把5分摊到中间去
@@ -166,11 +167,25 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 
 		reel = append(reel, s)
 
+		if cacheexcsym != nil {
+			excsym = cacheexcsym
+
+			cacheexcsym = nil
+		}
+
 		if len(excsym) >= minoff {
 			excsym = excsym[1:]
 		}
 
 		excsym = append(excsym, SymbolType(s))
+
+		if nrs.TotalSymbolNum >= minoff {
+			cacheexcsym = CloneSymbols(excsym)
+
+			for tt := 0; tt < minoff-nrs.TotalSymbolNum-1; tt++ {
+				excsym = append(excsym, SymbolType(reel[tt]))
+			}
+		}
 	}
 
 	return reel, nil

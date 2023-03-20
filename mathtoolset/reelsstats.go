@@ -420,6 +420,20 @@ func (rss *ReelsStats) GetScatterNum(reelindex int, symbol SymbolType, irstype I
 	return -1
 }
 
+func (rss *ReelsStats) GetWaysNum(reelindex int, symbol SymbolType, irstype InReelSymbolType, height int) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	if irstype == IRSTypeSymbol {
+		return ss.Num * height
+	}
+
+	if irstype == IRSTypeNoSymbol {
+		return rss.Reels[reelindex].TotalSymbolNum - ss.Num*height
+	}
+
+	return -1
+}
+
 func (rss *ReelsStats) GetSymbolNum(reelindex int, symbol SymbolType, wilds []SymbolType) int {
 	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
 
