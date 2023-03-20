@@ -3,7 +3,7 @@ package gatiserv
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"io/ioutil"
+	"os"
 
 	jsoniter "github.com/json-iterator/go"
 	goutils "github.com/zhs007/goutils"
@@ -12,7 +12,7 @@ import (
 
 // Checksum - it's like sha1sum fn
 func Checksum(fn string) (string, error) {
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +57,7 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 
 // 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-// 	data, err := ioutil.ReadFile(fn)
+// 	data, err := os.ReadFile(fn)
 // 	if err != nil {
 // 		return nil, err
 // 	}
@@ -86,7 +86,7 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 // 		return err
 // 	}
 
-// 	ioutil.WriteFile(fn, b, 0640)
+// 	os.WriteFile(fn, b, 0640)
 
 // 	return nil
 // }
@@ -101,7 +101,7 @@ func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func SaveGATIGameInfo(gi *GATIGameInfo, fn string) error {
 		return err
 	}
 
-	ioutil.WriteFile(fn, b, 0640)
+	os.WriteFile(fn, b, 0640)
 
 	return nil
 }

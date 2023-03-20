@@ -2,7 +2,7 @@ package sgc7http
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	jsoniter "github.com/json-iterator/go"
@@ -19,10 +19,8 @@ func HTTPGet(url string, header map[string]string) (int, []byte, error) {
 		return -1, nil, err
 	}
 
-	if header != nil {
-		for k, v := range header {
-			req.Header.Set(k, v)
-		}
+	for k, v := range header {
+		req.Header.Set(k, v)
 	}
 
 	resp, err := client.Do(req)
@@ -30,7 +28,7 @@ func HTTPGet(url string, header map[string]string) (int, []byte, error) {
 		return -1, nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return resp.StatusCode, nil, err
 	}
@@ -66,10 +64,8 @@ func HTTPPost(url string, header map[string]string, bodyObj interface{}) (int, [
 		}
 	}
 
-	if header != nil {
-		for k, v := range header {
-			req.Header.Set(k, v)
-		}
+	for k, v := range header {
+		req.Header.Set(k, v)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -79,7 +75,7 @@ func HTTPPost(url string, header map[string]string, bodyObj interface{}) (int, [
 		return -1, nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return resp.StatusCode, nil, err
 	}
@@ -105,10 +101,8 @@ func HTTPPostEx(url string, header map[string]string, body []byte) (int, []byte,
 		}
 	}
 
-	if header != nil {
-		for k, v := range header {
-			req.Header.Set(k, v)
-		}
+	for k, v := range header {
+		req.Header.Set(k, v)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -118,7 +112,7 @@ func HTTPPostEx(url string, header map[string]string, body []byte) (int, []byte,
 		return -1, nil, err
 	}
 
-	rbody, err := ioutil.ReadAll(resp.Body)
+	rbody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return resp.StatusCode, nil, err
 	}

@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	"io/ioutil"
+	"os"
 
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
@@ -17,7 +17,7 @@ type BasicGameConfig struct {
 
 // LoadGameConfig - load configuration
 func LoadGameConfig(fn string, cfg interface{}) error {
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return err
 	}
