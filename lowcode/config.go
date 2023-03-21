@@ -34,6 +34,7 @@ type Config struct {
 	MapLinedate      map[string]*sgc7game.LineData  `yaml:"-"`
 	Paytables        map[string]string              `yaml:"paytables"`
 	MapPaytables     map[string]*sgc7game.PayTables `yaml:"-"`
+	IsIntReel        bool                           `yaml:"isIntReel"`
 	Reels            map[string]string              `yaml:"reels"`
 	MapReels         map[string]*sgc7game.ReelsData `yaml:"-"`
 	SymbolsViewer    string                         `yaml:"symbolsViewer"`
@@ -135,19 +136,36 @@ func LoadConfig(fn string) (*Config, error) {
 	if len(cfg.Reels) > 0 {
 		cfg.MapReels = make(map[string]*sgc7game.ReelsData)
 
-		for k, v := range cfg.Reels {
-			rd, err := sgc7game.LoadReelsFromExcel2(v, pt)
-			if err != nil {
-				goutils.Error("LoadConfig:LoadPaytablesFromExcel",
-					zap.String("key", k),
-					zap.String("paytablesfn", v),
-					zap.String("fn", fn),
-					zap.Error(err))
+		if cfg.IsIntReel {
+			for k, v := range cfg.Reels {
+				rd, err := sgc7game.LoadReelsFromExcel(v)
+				if err != nil {
+					goutils.Error("LoadConfig:LoadReelsFromExcel",
+						zap.String("key", k),
+						zap.String("paytablesfn", v),
+						zap.String("fn", fn),
+						zap.Error(err))
 
-				return nil, err
+					return nil, err
+				}
+
+				cfg.MapReels[k] = rd
 			}
+		} else {
+			for k, v := range cfg.Reels {
+				rd, err := sgc7game.LoadReelsFromExcel2(v, pt)
+				if err != nil {
+					goutils.Error("LoadConfig:LoadReelsFromExcel2",
+						zap.String("key", k),
+						zap.String("paytablesfn", v),
+						zap.String("fn", fn),
+						zap.Error(err))
 
-			cfg.MapReels[k] = rd
+					return nil, err
+				}
+
+				cfg.MapReels[k] = rd
+			}
 		}
 	}
 

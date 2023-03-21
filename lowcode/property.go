@@ -118,12 +118,24 @@ func (gameProp *GameProperty) OnFGSpin() error {
 
 func (gameProp *GameProperty) TriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int, respinFirstComponent string) error {
 	if fgnum > 0 {
-		gameProp.SetVal(GamePropTriggerFG, 1)
-		gameProp.SetVal(GamePropFGNum, fgnum)
+		if gameProp.GetVal(GamePropTriggerFG) > 0 {
+			gameProp.RetriggerFG(pr, gp, fgnum)
+		} else {
+			gameProp.SetVal(GamePropTriggerFG, 1)
+			gameProp.SetVal(GamePropFGNum, fgnum)
 
-		gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
+			gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
 
-		gp.NextStepFirstComponent = respinFirstComponent
+			gp.NextStepFirstComponent = respinFirstComponent
+		}
+	}
+
+	return nil
+}
+
+func (gameProp *GameProperty) RetriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int) error {
+	if fgnum > 0 {
+		gameProp.AddVal(GamePropFGNum, fgnum)
 	}
 
 	return nil
@@ -175,6 +187,12 @@ func (gameProp *GameProperty) SetVal(prop int, val int) error {
 	}
 
 	gameProp.MapVals[prop] = val
+
+	return nil
+}
+
+func (gameProp *GameProperty) AddVal(prop int, val int) error {
+	gameProp.MapVals[prop] += val
 
 	return nil
 }
