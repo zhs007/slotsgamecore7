@@ -214,7 +214,11 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			}
 		}
 
+		bookof.onStepEnd(gameProp, curpr, gp)
+
 		bookof.BuildPBComponent(gp)
+	} else {
+		bookof.onStepEnd(gameProp, curpr, gp)
 	}
 
 	return nil
