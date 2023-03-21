@@ -32,7 +32,7 @@ func GetBet(stake *sgc7game.Stake, bettype string) int {
 
 // TriggerFeatureConfig - configuration for trigger feature
 type TriggerFeatureConfig struct {
-	TargetScene          string `yaml:"targetScene"`          // basicReels.mstery
+	TargetScene          string `yaml:"targetScene"`          // like basicReels.mstery
 	Symbol               string `yaml:"symbol"`               // like scatter
 	Type                 string `yaml:"type"`                 // like scatters
 	MinNum               int    `yaml:"minNum"`               // like 3
@@ -193,6 +193,24 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 				basicWins.AddResult(curpr, ret)
 			}
+		}
+	}
+
+	if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
+		os := basicWins.GetTargetOtherScene(gameProp, curpr)
+
+		for _, v := range basicWins.UsedResults {
+			mul := 1
+
+			ret := curpr.Results[v]
+			for i := 0; i < len(ret.Pos)/2; i++ {
+				mul *= os.Arr[ret.Pos[i*2]][ret.Pos[i*2+1]]
+			}
+
+			ret.OtherMul = mul
+
+			ret.CashWin *= mul
+			ret.CoinWin *= mul
 		}
 	}
 

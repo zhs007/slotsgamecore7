@@ -34,6 +34,9 @@ type FuncCalcOtherMul func(scene *GameScene, result *Result) int
 // FuncCalcOtherMulEx - calc other multi
 type FuncCalcOtherMulEx func(scene *GameScene, symbol int, pos []int) int
 
+// FuncCalcMulti - calc multi
+type FuncCalcMulti func(symbol int, x, y int) int
+
 // FuncGetSymbol - get symbol
 type FuncGetSymbol func(cursymbol int) int
 
@@ -646,7 +649,8 @@ func CalcLineOtherMul(scene *GameScene, pt *PayTables, ld []int, bet int,
 }
 
 // CalcFullLineEx - calc fullline & no wild in reel0
-//		用数个数的方式来计算全线游戏，第一轴不能有wild
+//
+//	用数个数的方式来计算全线游戏，第一轴不能有wild
 func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 	isValidSymbolEx FuncIsValidSymbolEx,
 	isWild FuncIsWild,
@@ -723,7 +727,8 @@ func CalcFullLineEx(scene *GameScene, pt *PayTables, bet int,
 }
 
 // calcSymbolFullLineEx2 - calc fullline
-//		用数个数的方式来计算全线游戏
+//
+//	用数个数的方式来计算全线游戏
 func calcSymbolFullLineEx2(scene *GameScene, pt *PayTables, symbol int, bet int,
 	isValidSymbolEx FuncIsValidSymbolEx,
 	isWild FuncIsWild,
@@ -783,7 +788,8 @@ func calcSymbolFullLineEx2(scene *GameScene, pt *PayTables, symbol int, bet int,
 }
 
 // CalcFullLineEx2 - calc fullline
-//		用数个数的方式来计算全线游戏
+//
+//	用数个数的方式来计算全线游戏
 func CalcFullLineEx2(scene *GameScene, pt *PayTables, bet int,
 	isValidSymbolEx FuncIsValidSymbolEx,
 	isWild FuncIsWild,
@@ -965,8 +971,9 @@ func calcDeepFullLine(scene *GameScene, pt *PayTables, bet int, s0 int, arry []i
 }
 
 // CalcFullLine - calc fullline & no wild in reel0
-// 		还是用算线的方式来计算全线游戏，效率会低一些，数据量也会大一些，但某些特殊类型的游戏只能这样计算
-//		也没有考虑第一轴有wild的情况（后续可调整算法）
+//
+//	还是用算线的方式来计算全线游戏，效率会低一些，数据量也会大一些，但某些特殊类型的游戏只能这样计算
+//	也没有考虑第一轴有wild的情况（后续可调整算法）
 func CalcFullLine(scene *GameScene, pt *PayTables, bet int,
 	isValidSymbolEx FuncIsValidSymbolEx,
 	isWild FuncIsWild,
