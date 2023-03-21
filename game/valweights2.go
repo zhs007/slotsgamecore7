@@ -118,6 +118,22 @@ func (vw *ValWeights2) RandVal(plugin sgc7plugin.IPlugin) (IVal, error) {
 	return vw.Vals[ci], nil
 }
 
+func (vw *ValWeights2) RandValEx(plugin sgc7plugin.IPlugin) (IVal, int, error) {
+	if len(vw.Vals) == 1 {
+		return vw.Vals[0], 0, nil
+	}
+
+	ci, err := RandWithWeights(plugin, vw.MaxWeight, vw.Weights)
+	if err != nil {
+		goutils.Error("ValWeights2.RandVal:RandWithWeights",
+			zap.Error(err))
+
+		return nil, 0, err
+	}
+
+	return vw.Vals[ci], ci, nil
+}
+
 // CloneExcludeVal - clone & exclude a val
 func (vw *ValWeights2) CloneExcludeVal(val IVal) (*ValWeights2, error) {
 	if len(vw.Vals) <= 1 {

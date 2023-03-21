@@ -21,6 +21,7 @@ type BookOfConfig struct {
 	WeightSymbolNum      string `yaml:"weightSymbolNum"`
 	WeightSymbol         string `yaml:"weightSymbol"`
 	ForceSymbolNum       int    `yaml:"forceSymbolNum"`
+	SymbolRNG            string `yaml:"symbolRNG"` // 只在ForceSymbolNum为1时有效
 }
 
 type BookOf struct {
@@ -149,28 +150,11 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			symbolNum = iv.Int()
 		}
 
-		curWeight := bookof.WeightSymbol.Clone()
-
 		gs := bookof.GetTargetScene(gameProp, curpr)
 
-		for i := 0; i < symbolNum; i++ {
-			cs, err := curWeight.RandVal(plugin)
-			if err != nil {
-				goutils.Error("bookof.OnPlayGame:curWeight.RandVal",
-					zap.Error(err))
-
-				return err
-			}
-
-			bookof.Symbols = append(bookof.Symbols, cs.Int())
-
-			err = curWeight.RemoveVal(cs)
-			if err != nil {
-				goutils.Error("bookof.OnPlayGame:curWeight.RemoveVal",
-					zap.Error(err))
-
-				return err
-			}
+		if bookof.Config.ForceSymbolNum == 1 && bookof.Config.SymbolRNG != "" {
+			rng := gameProp.MapInt[bookof.Config.SymbolRNG]
+			cs := bookof.WeightSymbol.Vals[rng]
 
 			ngs, err := bookof.procBookOfScene(gs, cs.Int())
 			if err != nil {
@@ -187,6 +171,45 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			}, true)
 			if scr != nil {
 				bookof.AddResult(curpr, scr)
+			}
+		} else {
+			curWeight := bookof.WeightSymbol.Clone()
+
+			for i := 0; i < symbolNum; i++ {
+				cs, err := curWeight.RandVal(plugin)
+				if err != nil {
+					goutils.Error("bookof.OnPlayGame:curWeight.RandVal",
+						zap.Error(err))
+
+					return err
+				}
+
+				bookof.Symbols = append(bookof.Symbols, cs.Int())
+
+				err = curWeight.RemoveVal(cs)
+				if err != nil {
+					goutils.Error("bookof.OnPlayGame:curWeight.RemoveVal",
+						zap.Error(err))
+
+					return err
+				}
+
+				ngs, err := bookof.procBookOfScene(gs, cs.Int())
+				if err != nil {
+					goutils.Error("bookof.OnPlayGame:procBookOfScene",
+						zap.Error(err))
+
+					return err
+				}
+
+				bookof.AddScene(gameProp, curpr, ngs)
+
+				scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
+					return cursymbol == cs.Int()
+				}, true)
+				if scr != nil {
+					bookof.AddResult(curpr, scr)
+				}
 			}
 		}
 

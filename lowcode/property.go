@@ -57,6 +57,7 @@ type GameProperty struct {
 	MapComponents    map[string]IComponent
 	Stats            *sgc7stats.Feature
 	MapStats         map[string]*sgc7stats.Feature
+	MapInt           map[string]int
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
@@ -292,6 +293,7 @@ func InitGameProperty(cfgfn string) (*GameProperty, error) {
 		MapCollectors:    make(map[string]*Collecotr),
 		MapComponents:    make(map[string]IComponent),
 		MapStats:         make(map[string]*sgc7stats.Feature),
+		MapInt:           make(map[string]int),
 	}
 
 	gameProp.SetStrVal(GamePropCurPaytables, cfg.DefaultPaytables)

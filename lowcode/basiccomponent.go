@@ -12,6 +12,7 @@ type BasicComponentConfig struct {
 	TagScenes                []string `yaml:"tagScenes"`                // tag scenes
 	TagOtherScenes           []string `yaml:"tagOtherScenes"`           // tag otherScenes
 	TargetScene              string   `yaml:"targetScene"`              // target scenes
+	TagRNG                   []string `yaml:"tagRNG"`                   // tag RNG
 }
 
 type BasicComponent struct {
@@ -24,6 +25,7 @@ type BasicComponent struct {
 	CashWin          int64
 	CoinWin          int
 	TargetSceneIndex int
+	RNG              []int
 }
 
 // onInit -
@@ -92,6 +94,17 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 	basicComponent.UsedResults = append(basicComponent.UsedResults, len(curpr.Results))
 
 	curpr.Results = append(curpr.Results, ret)
+}
+
+// AddRNG -
+func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int) {
+	i := len(basicComponent.RNG)
+
+	basicComponent.RNG = append(basicComponent.RNG, rng)
+
+	if len(basicComponent.Config.TagRNG) > i {
+		gameProp.MapInt[basicComponent.Config.TagRNG[i]] = rng
+	}
 }
 
 // BuildPBComponent -

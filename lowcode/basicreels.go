@@ -85,13 +85,15 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if basicReels.ReelSetWeights != nil {
-		val, err := basicReels.ReelSetWeights.RandVal(plugin)
+		val, si, err := basicReels.ReelSetWeights.RandValEx(plugin)
 		if err != nil {
 			goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
 				zap.Error(err))
 
 			return err
 		}
+
+		basicReels.AddRNG(gameProp, si)
 
 		rd, isok := gameProp.Config.MapReels[val.String()]
 		if !isok {
