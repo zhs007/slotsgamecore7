@@ -17,6 +17,7 @@ import (
 type BookOfConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	BetType              string `yaml:"betType"` // bet or totalBet
+	ForceTrigger         bool   `yaml:"forceTrigger"`
 	WeightTrigger        string `yaml:"weightTrigger"`
 	WeightSymbolNum      string `yaml:"weightSymbolNum"`
 	WeightSymbol         string `yaml:"weightSymbol"`
@@ -119,9 +120,9 @@ func (bookof *BookOf) OnNewStep(gameProp *GameProperty) error {
 func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	isTrigger := false
+	isTrigger := bookof.Config.ForceTrigger
 
-	if bookof.WeightTrigger != nil {
+	if !isTrigger && bookof.WeightTrigger != nil {
 		iv, err := bookof.WeightTrigger.RandVal(plugin)
 		if err != nil {
 			goutils.Error("bookof.OnPlayGame:WeightTrigger.RandVal",

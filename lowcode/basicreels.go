@@ -16,6 +16,7 @@ import (
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	ReelSetsWeight       string `yaml:"reelSetWeight"`
+	ReelSet              string `yaml:"reelSet"`
 	IsFGMainSpin         bool   `yaml:"isFGMainSpin"`
 }
 
@@ -96,6 +97,16 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		basicReels.AddRNG(gameProp, si)
 
 		rd, isok := gameProp.Config.MapReels[val.String()]
+		if !isok {
+			goutils.Error("BasicReels.OnPlayGame:MapReels",
+				zap.Error(ErrInvalidReels))
+
+			return ErrInvalidReels
+		}
+
+		gameProp.CurReels = rd
+	} else {
+		rd, isok := gameProp.Config.MapReels[basicReels.Config.ReelSet]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
