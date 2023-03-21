@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -36,7 +35,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 	os.MkdirAll(gamename, os.ModePerm)
 
-	dir, err := ioutil.ReadDir(path.Join(gamename, "bins"))
+	dir, err := os.ReadDir(path.Join(gamename, "bins"))
 	if err == nil {
 		for _, d := range dir {
 			os.RemoveAll(path.Join(gamename, "bins", d.Name()))
@@ -56,7 +55,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		return
 	}
-	ioutil.WriteFile(path.Join(gamename, "backendBuildOutput.txt"), output, 0644)
+	os.WriteFile(path.Join(gamename, "backendBuildOutput.txt"), output, 0644)
 
 	copyFile(path.Join(gamename, "bins", "dtgatigame"), path.Join(pathRoot, "gatidocker/dtgatigame/dtgatigame"))
 
@@ -76,7 +75,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		strBin += fmt.Sprintf("%s\t%s\n", cs, path.Join("certificationBuildOutput", tsPath, "bins", v))
 	}
-	ioutil.WriteFile(path.Join(gamename, "shasumBins.txt"), []byte(strBin), 0644)
+	os.WriteFile(path.Join(gamename, "shasumBins.txt"), []byte(strBin), 0644)
 
 	strBin = ""
 	for _, v := range binFiles {
@@ -99,7 +98,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		strBin += fmt.Sprintf("Modify:\t%s\n", time.Unix(linuxFileAttr.Mtim.Sec, 0).Format("2006-01-02_15:04:05"))
 		strBin += fmt.Sprintf(" Birth:\t%s\n", time.Unix(linuxFileAttr.Ctim.Sec, 0).Format("2006-01-02_15:04:05"))
 	}
-	ioutil.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildBinData.txt"), []byte(strBin), 0644)
+	os.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildBinData.txt"), []byte(strBin), 0644)
 
 	strSrc := ""
 	for _, v := range srcFiles {
@@ -115,7 +114,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		strSrc += fmt.Sprintf("%s\t%s\n", cs, path.Join("certificationBuildOutput", tsPath, gamename, v))
 	}
-	ioutil.WriteFile(path.Join(gamename, "shasumSourceCode.txt"), []byte(strSrc), 0644)
+	os.WriteFile(path.Join(gamename, "shasumSourceCode.txt"), []byte(strSrc), 0644)
 
 	strSrc = ""
 	for _, v := range srcFiles {
@@ -134,7 +133,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		linuxFileAttr := finfo.Sys().(*syscall.Stat_t)
 		strSrc += fmt.Sprintf("%s\t%s\n", time.Unix(linuxFileAttr.Mtim.Sec, 0).Format("2006-01-02_15:04:05"), path.Join("certificationBuildOutput", tsPath, "bins", v))
 	}
-	ioutil.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildSrcData.txt"), []byte(strSrc), 0644)
+	os.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildSrcData.txt"), []byte(strSrc), 0644)
 
 	strCC := ""
 	ccid := 1
@@ -153,7 +152,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 
 		ccid++
 	}
-	ioutil.WriteFile(path.Join(gamename, "circleComponents.txt"), []byte(strCC), 0644)
+	os.WriteFile(path.Join(gamename, "circleComponents.txt"), []byte(strCC), 0644)
 
 	strBuild := "SBuild started.\n"
 	strBuild += starttime.Format("2006-01-02 15:04:05")
@@ -161,7 +160,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 	strBuild += "SBuild finished.\n"
 	strBuild += time.Now().Format("2006-01-02 15:04:05")
 	strBuild += "\n"
-	ioutil.WriteFile(path.Join(gamename, "executionTime.txt"), []byte(strBuild), 0644)
+	os.WriteFile(path.Join(gamename, "executionTime.txt"), []byte(strBuild), 0644)
 }
 
 func genLotsalines() {

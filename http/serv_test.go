@@ -123,11 +123,7 @@ func Test_Serv(t *testing.T) {
 	})
 
 	go func() {
-		err := serv.Start()
-		if err != nil {
-			t.Fatalf("Test_Serv Start error %v",
-				err)
-		}
+		serv.Start()
 	}()
 
 	time.Sleep(time.Second * 3)

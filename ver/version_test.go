@@ -1,12 +1,12 @@
 package sgc7ver
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func Test_Version(t *testing.T) {
-	data, err := ioutil.ReadFile("../VERSION")
+	data, err := os.ReadFile("../VERSION")
 	if err != nil {
 		t.Fatalf("Test_Version ReadFile error %+v",
 			err)

@@ -2,7 +2,7 @@ package sgc7game
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
@@ -51,9 +51,10 @@ func (rd *ReelsData) SetReel(ri int, reel []int) {
 }
 
 // DropDownIntoGameScene - 用轮子当前位置处理下落
-//		注意：
-//			1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
-//			2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
+//
+//	注意：
+//		1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
+//		2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
 func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]int, error) {
 	narr := []int{}
 	for x, arr := range scene.Arr {
@@ -78,9 +79,10 @@ func (rd *ReelsData) DropDownIntoGameScene(scene *GameScene, indexes []int) ([]i
 }
 
 // DropDownIntoGameScene2 - 用轮子当前位置处理下落
-//		注意：
-//			1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
-//			2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
+//
+//	注意：
+//		1. 这个接口需要特别注意，传入indexes是上一次用过的，所以实际用应该-1
+//		2. 这个接口按道理只会对index做减法操作，所以不会考虑向下越界问题，只处理向上的越界
 func (rd *ReelsData) DropDownIntoGameScene2(scene *GameScene, indexes []int) ([]int, error) {
 	narr := []int{}
 	for x, arr := range scene.Arr {
@@ -155,7 +157,7 @@ func LoadReels5JSON(fn string) (*ReelsData, error) {
 
 	w := 5
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +211,7 @@ func LoadReels3JSON(fn string) (*ReelsData, error) {
 
 	w := 3
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}

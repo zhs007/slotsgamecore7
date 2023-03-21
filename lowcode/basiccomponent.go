@@ -12,18 +12,22 @@ type BasicComponentConfig struct {
 	TagScenes                []string `yaml:"tagScenes"`                // tag scenes
 	TagOtherScenes           []string `yaml:"tagOtherScenes"`           // tag otherScenes
 	TargetScene              string   `yaml:"targetScene"`              // target scenes
+	TargetOtherScene         string   `yaml:"targetOtherScene"`         // target otherscenes
+	TagRNG                   []string `yaml:"tagRNG"`                   // tag RNG
 }
 
 type BasicComponent struct {
-	Config           *BasicComponentConfig
-	Name             string
-	UsedScenes       []int
-	UsedOtherScenes  []int
-	UsedResults      []int
-	UsedPrizeScenes  []int
-	CashWin          int64
-	CoinWin          int
-	TargetSceneIndex int
+	Config                *BasicComponentConfig
+	Name                  string
+	UsedScenes            []int
+	UsedOtherScenes       []int
+	UsedResults           []int
+	UsedPrizeScenes       []int
+	CashWin               int64
+	CoinWin               int
+	TargetSceneIndex      int
+	TargetOtherSceneIndex int
+	RNG                   []int
 }
 
 // onInit -
@@ -94,6 +98,17 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 	curpr.Results = append(curpr.Results, ret)
 }
 
+// AddRNG -
+func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int) {
+	i := len(basicComponent.RNG)
+
+	basicComponent.RNG = append(basicComponent.RNG, rng)
+
+	if len(basicComponent.Config.TagRNG) > i {
+		gameProp.MapInt[basicComponent.Config.TagRNG[i]] = rng
+	}
+}
+
 // BuildPBComponent -
 func (basicComponent *BasicComponent) BuildPBComponent(gp *GameParams) {
 	pb := &sgc7pb.ComponentData{}
@@ -146,6 +161,15 @@ func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, cur
 	gs, si := gameProp.GetScene(curpr, basicComponent.Config.TargetScene)
 
 	basicComponent.TargetSceneIndex = si
+
+	return gs
+}
+
+// GetTargetOtherScene -
+func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult) *sgc7game.GameScene {
+	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
+
+	basicComponent.TargetOtherSceneIndex = si
 
 	return gs
 }

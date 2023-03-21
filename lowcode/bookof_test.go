@@ -7,7 +7,7 @@ import (
 )
 
 func Test_BookOf(t *testing.T) {
-	bookof := NewBookOf("../unittestdata/bookof/bookof.yaml")
+	bookof := NewBookOf("bg-bookof")
 	assert.NotNil(t, bookof)
 
 	t.Logf("Test_BookOf OK")

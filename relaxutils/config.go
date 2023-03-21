@@ -2,7 +2,7 @@ package relaxutils
 
 import (
 	"encoding/xml"
-	"io/ioutil"
+	"os"
 
 	"github.com/zhs007/goutils"
 	"go.uber.org/zap"
@@ -118,7 +118,7 @@ func SaveConfig(fn string, cfg interface{}, procSelfCloseTags FuncOnSelfCloseTag
 		buf = []byte(procSelfCloseTags(string(buf)))
 	}
 
-	err = ioutil.WriteFile(fn, buf, 0644)
+	err = os.WriteFile(fn, buf, 0644)
 	if err != nil {
 		goutils.Error("SaveConfig:WriteFile",
 			zap.Error(err))

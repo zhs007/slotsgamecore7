@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	"io/ioutil"
+	"os"
 
 	jsoniter "github.com/json-iterator/go"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
@@ -45,7 +45,7 @@ type SymbolWeightReels struct {
 func LoadSymbolWeightReels5JSON(fn string) (*SymbolWeightReels, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}

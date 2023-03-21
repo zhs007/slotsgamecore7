@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 
 	jsoniter "github.com/json-iterator/go"
@@ -60,7 +60,7 @@ func (pt *PayTables) GetStringFromInt(s int) string {
 func LoadPayTables5JSON(fn string) (*PayTables, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func LoadPayTables5JSON(fn string) (*PayTables, error) {
 func LoadPayTables3JSON(fn string) (*PayTables, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func LoadPayTables3JSON(fn string) (*PayTables, error) {
 func LoadPayTables6JSON(fn string) (*PayTables, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func LoadPayTables6JSON(fn string) (*PayTables, error) {
 func LoadPayTables15JSON(fn string) (*PayTables, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +196,7 @@ func LoadPayTables15JSON(fn string) (*PayTables, error) {
 func LoadPayTables25JSON(fn string) (*PayTables, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}

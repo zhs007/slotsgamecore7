@@ -1,7 +1,7 @@
 package gatiserv
 
 import (
-	"io/ioutil"
+	"os"
 
 	jsoniter "github.com/json-iterator/go"
 	goutils "github.com/zhs007/goutils"
@@ -189,7 +189,7 @@ func LoadGATIGameConfig(fn string) (*GATIGameConfig, error) {
 
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}

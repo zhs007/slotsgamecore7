@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	"io/ioutil"
+	"os"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/xuri/excelize/v2"
@@ -46,7 +46,7 @@ func isValidLI5(li5s []lineInfo) bool {
 func LoadLine5JSON(fn string) (*LineData, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func LoadLine5JSON(fn string) (*LineData, error) {
 func LoadLine3JSON(fn string) (*LineData, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func LoadLine3JSON(fn string) (*LineData, error) {
 func LoadLine6JSON(fn string) (*LineData, error) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data, err := ioutil.ReadFile(fn)
+	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
