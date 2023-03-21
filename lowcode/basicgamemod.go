@@ -102,6 +102,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		if pr.IsFinish && bgm.GameProp.GetVal(GamePropFGNum) > 0 {
 			pr.IsFinish = false
+		} else if bgm.GameProp.GetVal(GamePropTriggerFG) > 0 && bgm.GameProp.GetVal(GamePropFGNum) <= 0 {
+			bgm.GameProp.SetVal(GamePropTriggerFG, 0)
 		}
 
 		return pr, nil
