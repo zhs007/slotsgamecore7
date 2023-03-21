@@ -37,6 +37,7 @@ type TriggerFeatureConfig struct {
 	Type                 string `yaml:"type"`                 // like scatters
 	MinNum               int    `yaml:"minNum"`               // like 3
 	Scripts              string `yaml:"scripts"`              // scripts
+	FGNum                int    `yaml:"FGNum"`                // FG number
 	FGNumWeight          string `yaml:"FGNumWeight"`          // FG number weight
 	IsTriggerFG          bool   `yaml:"isTriggerFG"`          // is trigger FG
 	BetType              string `yaml:"betType"`              // bet or totalBet
@@ -90,7 +91,11 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 	if isTrigger {
 		if tf.IsTriggerFG {
-			gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
+			if tf.FGNumWeight != "" {
+				gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
+			} else {
+				gameProp.TriggerFG(curpr, gp, tf.FGNum, tf.RespinFirstComponent)
+			}
 		}
 	}
 }
