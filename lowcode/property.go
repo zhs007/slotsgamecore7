@@ -116,6 +116,19 @@ func (gameProp *GameProperty) OnFGSpin() error {
 	return nil
 }
 
+func (gameProp *GameProperty) TriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int, respinFirstComponent string) error {
+	if fgnum > 0 {
+		gameProp.SetVal(GamePropTriggerFG, 1)
+		gameProp.SetVal(GamePropFGNum, fgnum)
+
+		gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
+
+		gp.NextStepFirstComponent = respinFirstComponent
+	}
+
+	return nil
+}
+
 func (gameProp *GameProperty) TriggerFGWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinFirstComponent string) error {
 	vw2, isok := gameProp.MapIntValWeights[fn]
 	if !isok {
