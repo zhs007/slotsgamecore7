@@ -27,6 +27,20 @@ func OutputScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolCo
 	}
 }
 
+func OutputOtherScene(str string, scene *sgc7game.GameScene) {
+	if len(str) > 0 {
+		fmt.Printf("%v:\n", str)
+	}
+
+	for y := 0; y < scene.Height; y++ {
+		for x := 0; x < scene.Width; x++ {
+			fmt.Printf("%v ", scene.Arr[x][y])
+		}
+
+		fmt.Print("\n")
+	}
+}
+
 type FuncIsResult func(int, *sgc7game.Result) bool
 
 func OutputResults(str string, result *sgc7game.PlayResult, isResult FuncIsResult, mapSymbolColor *SymbolColorMap) {

@@ -39,6 +39,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("collector", NewCollector)
 	mgr.Reg("multiLevelMystery", NewMultiLevelMystery)
 	mgr.Reg("bookof", NewBookOf)
+	mgr.Reg("symbolMulti", NewSymbolMulti)
 
 	return mgr
 }

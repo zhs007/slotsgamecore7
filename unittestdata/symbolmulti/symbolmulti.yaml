@@ -1,0 +1,5 @@
+targetScene: init-symbols
+tagOtherScenes: 
+  - multi
+symbol: M
+weightMulti: ../unittestdata/symbolmulti/multi.xlsx
