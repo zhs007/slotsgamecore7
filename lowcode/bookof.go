@@ -157,6 +157,8 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			rng := gameProp.MapInt[bookof.Config.SymbolRNG]
 			cs := bookof.WeightSymbol.Vals[rng]
 
+			bookof.Symbols = append(bookof.Symbols, cs.Int())
+
 			ngs, err := bookof.procBookOfScene(gs, cs.Int())
 			if err != nil {
 				goutils.Error("bookof.OnPlayGame:procBookOfScene",
