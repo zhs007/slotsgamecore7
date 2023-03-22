@@ -292,7 +292,17 @@ func (gameProp *GameProperty) InitStats() error {
 	}
 
 	if gameProp.Config.Stats != nil {
-		stats, err := gameProp.NewStatsWithConfig(nil, gameProp.Config.Stats)
+		statsTotal := sgc7stats.NewFeature("total", sgc7stats.FeatureBasic, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+			totalWin := int64(0)
+
+			for _, v := range lst {
+				totalWin += v.CashWin
+			}
+
+			return true, s.CashBet, totalWin
+		}, nil)
+
+		_, err := gameProp.NewStatsWithConfig(statsTotal, gameProp.Config.Stats)
 		if err != nil {
 			goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
 				zap.Error(err))
@@ -300,7 +310,7 @@ func (gameProp *GameProperty) InitStats() error {
 			return err
 		}
 
-		gameProp.Stats = stats
+		gameProp.Stats = statsTotal
 	}
 
 	return nil

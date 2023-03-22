@@ -1,12 +1,22 @@
+# 这是游戏的主配置文件，游戏只会读这一个配置文件，所有子配置文件都应该被这个文件引用，或被这个文件的子文件引用
+
+# 宽
 width: 5
+# 高
 height: 6
 
+# 线数据，如果是ways游戏，这里可以什么都不给
+# 因为游戏里可能会更新线，所以这里的是一个map映射，可以在不同的component里用不同的线数据
+# 使用的时候，直接用名字即可
 linedata:
   line50: ../data/game001/linedata.xlsx
 
+# paytable数据，也可以有多个，不同component可以用不一样的paytables
+# 也是用名字来使用
 paytables:
   main: ../data/game001/paytables.xlsx
 
+# 轮子数据，用名字来使用
 reels:
   bg0: ../data/game001/bg0.xlsx
   bg1: ../data/game001/bg1.xlsx
@@ -16,41 +26,25 @@ reels:
   fg3: ../data/game001/fg3.xlsx
   fg4: ../data/game001/fg4.xlsx
 
+# 模拟器用，符号颜色配置
 symbolsViewer: ../data/game001/symbolsviewer.xlsx
 
+# 初始局面，一般是一个二维数组，这里用string，记住要加引号
 defaultScene: "[[1,1,2,2,3,3],[2,2,3,3,4,4],[4,4,5,5,6,6],[7,7,8,8,9,9],[1,1,1,2,2,2]]"
+# 默认的paytables
 defaultPaytables: main
+# 默认的线
 defaultLinedata: line50
 
+# 下注
 bets: [10]
 
-statsSymbols:
-  - WILD
-  - SH1
-  - H1
-  - H2
-  - H3
-  - L1
-  - L2
-  - L3
-  - L4
-  - SCATTER
-
-stats:
-  name: bg
-  component: bg-pay
-  children:
-    - name: bg-lightning
-      component: bg-lightning
-    - name: fg
-      component: fg-pay
-      children:
-        - name: fg-lightning
-          component: fg-lightning
-
+# 游戏模块定义
+# 现在所有组件都应该附属于基础的spin模块，该模块为bg，也就是basegame
 gamemods:
   - type: bg
     components:
+      # 组件配置就是名字、类型 和 配置文件，其中一个游戏里可能会有多个同样的组件，譬如BG和FG里都有mystery组件，所以组件名字需要唯一
       - name: bg-spin
         type: basicReels
         config: ../data/game001/bg-spin.yaml
@@ -78,3 +72,33 @@ gamemods:
       - name: fg-pay
         type: basicWins
         config: ../data/game001/fg-pay.yaml        
+
+# 需要参与统计的符号，这个只影响统计数据
+statsSymbols:
+  - WILD
+  - SH1
+  - H1
+  - H2
+  - H3
+  - L1
+  - L2
+  - L3
+  - L4
+  - SCATTER
+
+# 统计模块配置
+# 一般来说，component都实现了统计接口，这里只需要决定component是否需要统计，以及父子关系即可
+stats:
+  # 名字，这个名字用于统计数据，可以和component名字不同
+  name: bg
+  # component，必须是定义好的组件名
+  component: bg-pay
+  # 统计子节点
+  children:
+    - name: bg-lightning
+      component: bg-lightning
+    - name: fg
+      component: fg-pay
+      children:
+        - name: fg-lightning
+          component: fg-lightning
