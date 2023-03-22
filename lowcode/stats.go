@@ -5,6 +5,12 @@ import (
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 )
 
+type StatsConfig struct {
+	Name      string         `yaml:"name"`
+	Component string         `yaml:"component"`
+	Children  []*StatsConfig `yaml:"children"`
+}
+
 func NewStats(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType) *sgc7stats.Feature {
 	var feature *sgc7stats.Feature
 

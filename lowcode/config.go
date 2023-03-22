@@ -10,12 +10,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type StatsConfig struct {
-	Name      string         `yaml:"name"`
-	Component string         `yaml:"component"`
-	Children  []*StatsConfig `yaml:"children"`
-}
-
 type ComponentConfig struct {
 	Name   string `yaml:"name"`
 	Type   string `yaml:"type"`
@@ -28,6 +22,7 @@ type GameModConfig struct {
 }
 
 type Config struct {
+	Name             string                         `yaml:"name"`
 	Width            int                            `yaml:"width"`
 	Height           int                            `yaml:"height"`
 	Linedata         map[string]string              `yaml:"linedata"`
@@ -46,6 +41,7 @@ type Config struct {
 	StatsSymbols     []string                       `yaml:"statsSymbols"`
 	StatsSymbolCodes []mathtoolset.SymbolType       `yaml:"-"`
 	Stats            *StatsConfig                   `yaml:"stats"`
+	RTP              *RTPConfig                     `yaml:"rtp"`
 }
 
 func (cfg *Config) BuildStatsSymbolCodes(paytables *sgc7game.PayTables) error {
