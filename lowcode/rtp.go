@@ -198,6 +198,7 @@ func newRTPGameModule(rtp *sgc7rtp.RTP, gameProp *GameProperty, cfgGameModule *R
 	for _, v := range cfgGameModule.Features {
 		feature := v
 
+		names = append(names, v.Name)
 		funcOnResults = append(funcOnResults, newFuncOnResult(gameProp, feature))
 		funcSymbolOnResults = append(funcSymbolOnResults, newFuncSymbolOnResult(gameProp, feature))
 		funcSymbolNumOnResults = append(funcSymbolNumOnResults, newFuncSymbolNumOnResult(gameProp, feature))
