@@ -53,6 +53,7 @@ func (basicComponent *BasicComponent) OnNewStep() {
 	basicComponent.CashWin = 0
 	basicComponent.CoinWin = 0
 	basicComponent.TargetSceneIndex = -1
+	basicComponent.RNG = nil
 }
 
 // AddScene -
