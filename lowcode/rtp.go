@@ -17,8 +17,9 @@ type RTPSymbolFeature struct {
 }
 
 type RTPSymbolModule struct {
-	Name     string              `yaml:"name"`
-	Features []*RTPSymbolFeature `yaml:"features"`
+	Name       string              `yaml:"name"`
+	Components []string            `yaml:"components"`
+	Features   []*RTPSymbolFeature `yaml:"features"`
 }
 
 type RTPHitRateFeature struct {
@@ -44,6 +45,26 @@ func buildRTPSymbolsData(gameProp *GameProperty) ([]int, []int) {
 	}
 
 	return symbols, nums
+}
+
+func newFuncOnGameMod(gameProp *GameProperty, cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult) bool {
+		if len(cfgGameMod.Components) == 0 {
+			return true
+		}
+
+		gp, isok := pr.CurGameModParams.(*GameParams)
+		if isok {
+			for _, v := range cfgGameMod.Components {
+				_, hasComponent := gp.MapComponents[v]
+				if hasComponent {
+					return true
+				}
+			}
+		}
+
+		return false
+	}
 }
 
 func newFuncOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
@@ -166,7 +187,7 @@ func newFuncSymbolNumOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbo
 // }
 
 func newRTPGameModule(rtp *sgc7rtp.RTP, gameProp *GameProperty, cfgGameModule *RTPSymbolModule) *sgc7rtp.RTPNode {
-	gm := sgc7rtp.NewRTPGameMod(cfgGameModule.Name)
+	gm := sgc7rtp.NewRTPGameModEx(cfgGameModule.Name, newFuncOnGameMod(gameProp, cfgGameModule))
 
 	symbols, nums := buildRTPSymbolsData(gameProp)
 	names := []string{}

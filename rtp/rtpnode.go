@@ -117,6 +117,18 @@ func NewRTPGameMod(gamemod string) *RTPNode {
 	}
 }
 
+// NewRTPGameModEx - new RTPNode
+func NewRTPGameModEx(gamemod string, onGameMod FuncOnResult) *RTPNode {
+	return &RTPNode{
+		NodeType:     RTPNodeGameMod,
+		MapChildren:  make(map[string]*RTPNode),
+		GameMod:      gamemod,
+		FuncOnResult: onGameMod,
+		Symbol:       -1,
+		SymbolNums:   -1,
+	}
+}
+
 // NewRTPGameModTag - new RTPNode
 func NewRTPGameModTag(gamemod string, tag string, funcTag FuncOnResult) *RTPNode {
 	return &RTPNode{
