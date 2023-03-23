@@ -8,10 +8,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type GenReelsConfig struct {
+	ReelsStatsFilename string   `yaml:"reelsStatsFilename"`
+	ReelsFilename      string   `yaml:"reelsFilename"`
+	MainSymbols        []string `yaml:"mainSymbols"`
+	Offset             int      `yaml:"offset"`
+}
+
 type Config struct {
-	Type      string  `yaml:"type"`
-	Code      string  `yaml:"code"`
-	TargetRTP float64 `yaml:"targetRTP"`
+	Type           string          `yaml:"type"`
+	Code           string          `yaml:"code"`
+	TargetRTP      float64         `yaml:"targetRTP"`
+	Paytables      string          `yaml:"paytables"`
+	GenReelsConfig *GenReelsConfig `yaml:"genReelsConfig"`
 }
 
 func LoadConfig(fn string) (*Config, error) {
