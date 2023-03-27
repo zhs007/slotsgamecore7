@@ -116,6 +116,8 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	symbolMulti.AddOtherScene(gameProp, curpr, os)
 
+	symbolMulti.onStepEnd(gameProp, curpr, gp)
+
 	symbolMulti.BuildPBComponent(gp)
 
 	return nil
