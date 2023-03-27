@@ -22,6 +22,7 @@ type MysteryTriggerFeatureConfig struct {
 // MysteryConfig - configuration for Mystery
 type MysteryConfig struct {
 	BasicComponentConfig   `yaml:",inline"`
+	MysteryRNG             string                         `yaml:"mysteryRNG"` // 强制用已经使用的随机数结果做 Mystery
 	MysteryWeight          string                         `yaml:"mysteryWeight"`
 	Mystery                string                         `yaml:"mystery"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
@@ -121,23 +122,18 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	if mystery.MysteryWeights != nil {
-		gs := mystery.GetTargetScene(gameProp, curpr)
+		if mystery.Config.MysteryRNG != "" {
+			gs := mystery.GetTargetScene(gameProp, curpr)
 
-		if gs.HasSymbol(mystery.MysterySymbol) {
-			curm, err := mystery.MysteryWeights.RandVal(plugin)
-			if err != nil {
-				goutils.Error("BasicReels.OnPlayGame:RandVal",
-					zap.Error(err))
+			rng := gameProp.MapInt[mystery.Config.MysteryRNG]
+			cs := mystery.MysteryWeights.Vals[rng]
 
-				return err
-			}
+			curmcode := cs.Int()
 
-			curmcode := curm.Int()
-
-			gameProp.SetVal(GamePropCurMystery, curm.Int())
+			gameProp.SetVal(GamePropCurMystery, curmcode)
 
 			sc2 := gs.Clone()
-			sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
+			sc2.ReplaceSymbol(mystery.MysterySymbol, curmcode)
 
 			mystery.AddScene(gameProp, curpr, sc2)
 
@@ -149,6 +145,38 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 					gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 
 					return nil
+				}
+			}
+		} else {
+			gs := mystery.GetTargetScene(gameProp, curpr)
+
+			if gs.HasSymbol(mystery.MysterySymbol) {
+				curm, err := mystery.MysteryWeights.RandVal(plugin)
+				if err != nil {
+					goutils.Error("BasicReels.OnPlayGame:RandVal",
+						zap.Error(err))
+
+					return err
+				}
+
+				curmcode := curm.Int()
+
+				gameProp.SetVal(GamePropCurMystery, curm.Int())
+
+				sc2 := gs.Clone()
+				sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
+
+				mystery.AddScene(gameProp, curpr, sc2)
+
+				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
+				if isok {
+					if v.RespinFirstComponent != "" {
+						os := mystery.maskOtherScene(sc2, curmcode)
+
+						gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
+
+						return nil
+					}
 				}
 			}
 		}
