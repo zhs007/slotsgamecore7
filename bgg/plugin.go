@@ -15,8 +15,8 @@ type PluginBGG struct {
 	RngClient *RngClient
 }
 
-// NewPluginBGG - new PluginDT (IPlugin)
-func NewPluginDT(rngServAddr string, gameCode string) *PluginBGG {
+// NewPluginBGG - new PluginBGG (IPlugin)
+func NewPluginBGG(rngServAddr string, gameCode string) *PluginBGG {
 	return &PluginBGG{
 		RngClient: NewRngClient(rngServAddr, gameCode),
 	}
