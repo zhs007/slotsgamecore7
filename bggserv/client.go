@@ -1,4 +1,4 @@
-package dtserv
+package bggserv
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Client - DTGameLogicClient
@@ -41,7 +40,7 @@ func (client *Client) reset() {
 // GetConfig - get config
 func (client *Client) GetConfig(ctx context.Context) (*sgc7pb.GameConfig, error) {
 	if client.conn == nil || client.client == nil {
-		conn, err := grpc.Dial(client.servAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
 			goutils.Error("Client.GetConfig:grpc.Dial",
 				zap.String("server address", client.servAddr),
@@ -71,7 +70,7 @@ func (client *Client) GetConfig(ctx context.Context) (*sgc7pb.GameConfig, error)
 // Initialize - initialize a player
 func (client *Client) Initialize(ctx context.Context) (*sgc7pb.PlayerState, error) {
 	if client.conn == nil || client.client == nil {
-		conn, err := grpc.Dial(client.servAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
 			goutils.Error("Client.Initialize:grpc.Dial",
 				zap.String("server address", client.servAddr),
@@ -106,7 +105,7 @@ func (client *Client) Play(ctx context.Context, ps *sgc7pb.PlayerState,
 	cmd string) (*sgc7pb.ReplyPlay, error) {
 
 	if client.conn == nil || client.client == nil {
-		conn, err := grpc.Dial(client.servAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
 			goutils.Error("Client.Play:grpc.Dial",
 				zap.String("server address", client.servAddr),

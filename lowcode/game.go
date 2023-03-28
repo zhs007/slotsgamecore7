@@ -98,3 +98,18 @@ func NewGame(cfgfn string) (*Game, error) {
 
 	return game, nil
 }
+
+// NewGame - new a Game
+func NewGameEx(cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	game := &Game{
+		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
+		MgrComponent: NewComponentMgr(),
+	}
+
+	err := game.Init(cfgfn)
+	if err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
