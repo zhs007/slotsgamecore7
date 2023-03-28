@@ -1,6 +1,6 @@
 syntax = "proto3";
-package dtrngpb;
-option go_package = "github.com/zhs007/slotsgamecore7/dtrngpb";
+package bggrngpb;
+option go_package = "github.com/zhs007/slotsgamecore7/bggrngpb";
 
 // RequestRngs - request some rngs
 message RequestRngs {
@@ -13,8 +13,8 @@ message ReplyRngs {
     repeated uint32 rngs = 1;
 }
 
-// DTRng - DTGameLogic
-service DTRng {
+// BGGRng - BGG RNG Service
+service BGGRng {
 	// getRngs - get rngs
     rpc getRngs(RequestRngs) returns (ReplyRngs) {}
 }

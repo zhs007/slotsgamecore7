@@ -5,6 +5,7 @@ go 1.19
 require (
 	devt.de/krotik/common v1.5.1
 	github.com/fatih/color v1.15.0
+	github.com/golang/protobuf v1.5.3
 	github.com/google/cel-go v0.13.0
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/json-iterator/go v1.1.12
@@ -17,7 +18,7 @@ require (
 	golang.org/x/net v0.8.0
 	gonum.org/v1/gonum v0.12.0
 	google.golang.org/grpc v1.53.0
-	google.golang.org/protobuf v1.29.0
+	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -29,7 +30,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-ole/go-ole v1.2.4 // indirect
 	github.com/golang/mock v1.6.0 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/klauspost/compress v1.16.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
