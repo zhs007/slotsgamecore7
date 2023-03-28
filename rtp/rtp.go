@@ -13,6 +13,8 @@ import (
 	"go.uber.org/zap"
 )
 
+type FuncOnRTPResults func(lst []*sgc7game.PlayResult, gameData interface{})
+
 type RTPReturnData struct {
 	Return     float64
 	TotalTimes int64
@@ -41,6 +43,7 @@ type RTP struct {
 	MapStats            map[string]*RTPStats
 	MaxCoincidingWin    float64
 	Stats2              *sgc7stats.Feature
+	FuncRTPResults      FuncOnRTPResults
 }
 
 // NewRTP - new RTP
@@ -70,6 +73,7 @@ func (rtp *RTP) Clone() *RTP {
 		MapReturn:           make(map[string]*RTPReturnDataList),
 		MapStats:            make(map[string]*RTPStats),
 		MaxCoincidingWin:    rtp.MaxCoincidingWin,
+		FuncRTPResults:      rtp.FuncRTPResults,
 	}
 
 	for k, v := range rtp.MapHR {
@@ -232,6 +236,10 @@ func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult, gameData interface{}) {
 
 	for _, v := range rtp.MapReturn {
 		v.onResults(v, lst)
+	}
+
+	if rtp.FuncRTPResults != nil {
+		rtp.FuncRTPResults(lst, gameData)
 	}
 }
 

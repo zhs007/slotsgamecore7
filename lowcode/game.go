@@ -86,7 +86,7 @@ func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr 
 			game.Pool.Stats.Push(stake, lst)
 		}
 
-		game.Pool.Pool.Put(gameProp)
+		// game.Pool.Pool.Put(gameProp)
 	}
 
 	return nil

@@ -231,7 +231,18 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 
 	rtp := sgc7rtp.NewRTP()
 
-	rtp.Stats2 = game.Pool.Stats.Root
+	bet := game.Pool.Config.Bets[0]
+	stake := &sgc7game.Stake{
+		CoinBet:  1,
+		CashBet:  int64(bet),
+		Currency: "EUR",
+	}
+
+	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData interface{}) {
+		game.Pool.Stats.Push(stake, lst)
+	}
+	// rtp.Stats2 = game.Pool.Stats.Root
+	// game.Pool.Stats = nil
 
 	for _, m := range game.Pool.Config.RTP.Modules {
 		newRTPGameModule(rtp, game.Pool, m)
@@ -256,13 +267,9 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 	// rtp.AddHitRateNode("fg", OnFGHitRate)
 	// rtp.AddHitRateNode("jackpot", OnJackpotHitRate)
 
-	bet := game.Pool.Config.Bets[0]
+	// bet := game.Pool.Config.Bets[0]
 
-	d := sgc7rtp.StartRTP(game, rtp, icore, ispinnums, &sgc7game.Stake{
-		CoinBet:  1,
-		CashBet:  int64(bet),
-		Currency: "EUR",
-	}, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
+	d := sgc7rtp.StartRTP(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
 		goutils.Info("processing...",
 			zap.Int64("total nums", totalnums),
 			zap.Int64("current nums", curnums),
@@ -277,7 +284,10 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 	curtime := time.Now()
 
 	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
-	rtp.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
+
+	game.Pool.Stats.Wait()
+
+	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
 
 	return nil
 }

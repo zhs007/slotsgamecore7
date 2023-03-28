@@ -138,7 +138,7 @@ func (basicComponent *BasicComponent) BuildPBComponent(gp *GameParams) {
 	gp.MapComponents[pb.Name] = pb
 }
 
-// BuildPBComponent -
+// OnStatsWithComponent -
 func (basicComponent *BasicComponent) OnStatsWithComponent(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
 	wins := int64(0)
 
