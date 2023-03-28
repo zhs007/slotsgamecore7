@@ -11,7 +11,7 @@ import (
 // BasicGameMod - basic gamemod
 type BasicGameMod struct {
 	*sgc7game.BasicGameMod
-	GameProp          *GameProperty
+	Pool              *GamePropertyPool
 	Components        *ComponentList
 	HistoryComponents []IComponent
 }
@@ -39,13 +39,21 @@ func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.Pl
 
 // OnPlay - on play
 func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, error) {
+	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, gameData interface{}) (*sgc7game.PlayResult, error) {
 
-	if len(prs) == 0 {
-		bgm.OnNewGame()
+	gameProp, isok := gameData.(*GameProperty)
+	if !isok {
+		goutils.Error("BasicGameMod.OnPlay",
+			zap.Error(ErrIvalidGameData))
+
+		return nil, ErrIvalidGameData
 	}
 
-	bgm.OnNewStep()
+	if len(prs) == 0 {
+		bgm.OnNewGame(gameProp)
+	}
+
+	bgm.OnNewStep(gameProp)
 
 	if cmd == "SPIN" {
 		pr, gp := bgm.newPlayResult(prs)
@@ -66,7 +74,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		for {
-			err := curComponent.OnPlayGame(bgm.GameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+			err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 			if err != nil {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 					zap.Error(err))
@@ -76,14 +84,14 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 			bgm.HistoryComponents = append(bgm.HistoryComponents, curComponent)
 
-			respinComponent := bgm.GameProp.GetStrVal(GamePropRespinComponent)
+			respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
 			if respinComponent != "" {
 				pr.IsFinish = false
 
 				break
 			}
 
-			nextComponentName := bgm.GameProp.GetStrVal(GamePropNextComponent)
+			nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
 			if nextComponentName == "" {
 				break
 			}
@@ -100,10 +108,10 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			curComponent = c
 		}
 
-		if pr.IsFinish && bgm.GameProp.GetVal(GamePropFGNum) > 0 {
+		if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
 			pr.IsFinish = false
-		} else if bgm.GameProp.GetVal(GamePropTriggerFG) > 0 && bgm.GameProp.GetVal(GamePropFGNum) <= 0 {
-			bgm.GameProp.SetVal(GamePropTriggerFG, 0)
+		} else if gameProp.GetVal(GamePropTriggerFG) > 0 && gameProp.GetVal(GamePropFGNum) <= 0 {
+			gameProp.SetVal(GamePropTriggerFG, 0)
 		}
 
 		return pr, nil
@@ -114,22 +122,22 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 // ResetConfig
 func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
-	bgm.GameProp.Config = cfg
+	bgm.Pool.Config = cfg
 }
 
 // OnAsciiGame - outpur to asciigame
 func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
 	for _, v := range bgm.HistoryComponents {
-		v.OnAsciiGame(bgm.GameProp, pr, lst, gameProp.MapSymbolColor)
+		v.OnAsciiGame(gameProp, pr, lst, gameProp.Pool.MapSymbolColor)
 	}
 
 	return nil
 }
 
 // OnNewGame -
-func (bgm *BasicGameMod) OnNewGame() error {
+func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty) error {
 	for i, v := range bgm.Components.Components {
-		err := v.OnNewGame(bgm.GameProp)
+		err := v.OnNewGame(gameProp)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
 				zap.Int("i", i),
@@ -143,12 +151,12 @@ func (bgm *BasicGameMod) OnNewGame() error {
 }
 
 // OnNewStep -
-func (bgm *BasicGameMod) OnNewStep() error {
+func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty) error {
 	bgm.HistoryComponents = nil
-	bgm.GameProp.OnNewStep()
+	gameProp.OnNewStep()
 
 	for i, v := range bgm.Components.Components {
-		err := v.OnNewStep(bgm.GameProp)
+		err := v.OnNewStep(gameProp)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
 				zap.Int("i", i),
@@ -162,16 +170,16 @@ func (bgm *BasicGameMod) OnNewStep() error {
 }
 
 // NewBasicGameMod - new BaseGame
-func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
+func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
 	bgm := &BasicGameMod{
-		BasicGameMod: sgc7game.NewBasicGameMod(cfgGameMod.Type, gameProp.Config.Width, gameProp.Config.Height),
-		GameProp:     gameProp,
+		BasicGameMod: sgc7game.NewBasicGameMod(cfgGameMod.Type, pool.Config.Width, pool.Config.Height),
+		Pool:         pool,
 		Components:   NewComponentList(),
 	}
 
 	for _, v := range cfgGameMod.Components {
 		c := mgrComponent.NewComponent(v)
-		err := c.Init(v.Config, gameProp)
+		err := c.Init(v.Config, pool)
 		if err != nil {
 			goutils.Error("NewBasicGameMod:Init",
 				zap.Error(err))
@@ -180,16 +188,16 @@ func NewBasicGameMod(gameProp *GameProperty, cfgGameMod *GameModConfig, mgrCompo
 		}
 
 		bgm.Components.AddComponent(v.Name, c)
-		bgm.GameProp.onAddComponent(v.Name, c)
+		pool.onAddComponent(v.Name, c)
 	}
 
-	err := bgm.GameProp.InitStats()
-	if err != nil {
-		goutils.Error("NewBasicGameMod:InitStats",
-			zap.Error(err))
+	// err := pool.InitStats()
+	// if err != nil {
+	// 	goutils.Error("NewBasicGameMod:InitStats",
+	// 		zap.Error(err))
 
-		return nil
-	}
+	// 	return nil
+	// }
 
 	return bgm
 }

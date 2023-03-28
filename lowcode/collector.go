@@ -13,21 +13,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// MultiLevelReelsConfig - configuration for Collecotr
-type CollecotrConfig struct {
+// CollectorConfig - configuration for Collector
+type CollectorConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	MaxVal               int `yaml:"maxVal"`
 }
 
-type Collecotr struct {
+type Collector struct {
 	*BasicComponent
-	Config       *CollecotrConfig
-	Val          int // 当前总值, Current total value
-	NewCollector int // 这一个step收集到的, The values collected in this step
+	Config *CollectorConfig
 }
 
 // Init -
-func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
+func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("BasicReels.Init:ReadFile",
@@ -37,7 +35,7 @@ func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
 		return err
 	}
 
-	cfg := &CollecotrConfig{}
+	cfg := &CollectorConfig{}
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
@@ -56,24 +54,29 @@ func (collector *Collecotr) Init(fn string, gameProp *GameProperty) error {
 }
 
 // OnNewGame -
-func (collector *Collecotr) OnNewGame(gameProp *GameProperty) error {
-	collector.Val = 0
+func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
+	cd, isok := gameProp.MapCollectors[collector.Name]
+	if isok {
+		cd.onNewGame()
+	}
 
 	return nil
 }
 
 // OnNewStep -
-func (collector *Collecotr) OnNewStep(gameProp *GameProperty) error {
-
+func (collector *Collector) OnNewStep(gameProp *GameProperty) error {
 	collector.BasicComponent.OnNewStep()
 
-	collector.NewCollector = 0
+	cd, isok := gameProp.MapCollectors[collector.Name]
+	if isok {
+		cd.onNewStep()
+	}
 
 	return nil
 }
 
 // playgame
-func (collector *Collecotr) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
@@ -86,24 +89,27 @@ func (collector *Collecotr) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 }
 
 // OnAsciiGame - outpur to asciigame
-func (collector *Collecotr) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
-	if collector.NewCollector <= 0 {
-		fmt.Printf("%v dose not collect new value, the collector value is %v", collector.Name, collector.Val)
-	} else {
-		fmt.Printf("%v collect %v. the collector value is %v", collector.Name, collector.NewCollector, collector.Val)
+	cd, isok := gameProp.MapCollectors[collector.Name]
+	if isok {
+		if cd.NewCollector <= 0 {
+			fmt.Printf("%v dose not collect new value, the collector value is %v", collector.Name, cd.Val)
+		} else {
+			fmt.Printf("%v collect %v. the collector value is %v", collector.Name, cd.NewCollector, cd.Val)
+		}
 	}
 
 	return nil
 }
 
 // OnStats
-func (collector *Collecotr) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
 }
 
 func NewCollector(name string) IComponent {
-	collector := &Collecotr{
+	collector := &Collector{
 		BasicComponent: NewBasicComponent(name),
 	}
 

@@ -46,13 +46,19 @@ func main() {
 
 	stake := &sgc7game.Stake{
 		CoinBet:  1,
-		CashBet:  int64(game.Prop.Config.Bets[0]),
+		CashBet:  int64(game.Pool.Config.Bets[0]),
 		Currency: "EUR",
 	}
 
-	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) {
-		game.OnAsciiGame(stake, pr, lst)
+	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, gameData interface{}) {
+		gameProp, isok := gameData.(*lowcode.GameProperty)
+		if !isok {
+			return
+		}
+
+		game.OnAsciiGame(gameProp, stake, pr, lst)
 	}, int(autospin), isSkipGetChar, isBreakAtFeature)
 
-	game.Prop.Stats.SaveExcel("stats.xlsx")
+	game.Pool.Stats.Wait()
+	game.Pool.Stats.Root.SaveExcel("stats.xlsx")
 }

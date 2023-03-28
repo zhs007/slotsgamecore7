@@ -7,7 +7,11 @@ import (
 )
 
 func Test_ScriptCore(t *testing.T) {
-	gameProp, err := InitGameProperty("../data/game001/rtp96.yaml")
+	pool, err := NewGamePropertyPool("../data/game001/rtp96.yaml")
+	assert.NoError(t, err)
+	assert.NotNil(t, pool)
+
+	gameProp, err := pool.NewGameProp()
 	assert.NoError(t, err)
 	assert.NotNil(t, gameProp)
 

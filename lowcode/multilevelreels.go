@@ -35,7 +35,7 @@ type MultiLevelReels struct {
 }
 
 // Init -
-func (multiLevelReels *MultiLevelReels) Init(fn string, gameProp *GameProperty) error {
+func (multiLevelReels *MultiLevelReels) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("MultiLevelReels.Init:ReadFile",
@@ -126,7 +126,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 			return err
 		}
 
-		rd, isok := gameProp.Config.MapReels[val.String()]
+		rd, isok := gameProp.Pool.Config.MapReels[val.String()]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
 				zap.Int("curLevel", multiLevelReels.CurLevel),
@@ -138,7 +138,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 		gameProp.CurReels = rd
 	} else {
-		rd, isok := gameProp.Config.MapReels[multiLevelReels.Config.Levels[multiLevelReels.CurLevel].Reel]
+		rd, isok := gameProp.Pool.Config.MapReels[multiLevelReels.Config.Levels[multiLevelReels.CurLevel].Reel]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
 				zap.Int("curLevel", multiLevelReels.CurLevel),

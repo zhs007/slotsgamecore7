@@ -10,3 +10,11 @@ type GameParams struct {
 	LastScene        *sgc7game.GameScene `json:"-"`
 	LastOtherScene   *sgc7game.GameScene `json:"-"`
 }
+
+// gIsForceDisableStats - disable stats
+var gIsForceDisableStats bool
+
+// SetForceDisableStats - disable stats
+func SetForceDisableStats() {
+	gIsForceDisableStats = true
+}

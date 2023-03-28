@@ -28,7 +28,7 @@ func (mod *BasicGameMod) GetName() string {
 }
 
 // OnPlay - on play
-func (mod *BasicGameMod) OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error) {
+func (mod *BasicGameMod) OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData interface{}) (*PlayResult, error) {
 	return nil, ErrInvalidCommand
 }
 

@@ -27,7 +27,7 @@ type BasicReels struct {
 }
 
 // Init -
-func (basicReels *BasicReels) Init(fn string, gameProp *GameProperty) error {
+func (basicReels *BasicReels) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("BasicReels.Init:ReadFile",
@@ -96,7 +96,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		basicReels.AddRNG(gameProp, si)
 
-		rd, isok := gameProp.Config.MapReels[val.String()]
+		rd, isok := gameProp.Pool.Config.MapReels[val.String()]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
@@ -106,7 +106,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		gameProp.CurReels = rd
 	} else {
-		rd, isok := gameProp.Config.MapReels[basicReels.Config.ReelSet]
+		rd, isok := gameProp.Pool.Config.MapReels[basicReels.Config.ReelSet]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))

@@ -50,4 +50,7 @@ var (
 	ErrIvalidStatsSymbolsInConfig = errors.New("invalid StatsSymbols in config")
 	// ErrIvalidStatsComponentInConfig - invalid Stats's component in config
 	ErrIvalidStatsComponentInConfig = errors.New("invalid Stats's component in config")
+
+	// ErrIvalidGameData - invalid gameData
+	ErrIvalidGameData = errors.New("invalid gameData")
 )

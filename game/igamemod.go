@@ -8,5 +8,5 @@ type IGameMod interface {
 	GetName() string
 
 	// OnPlay - on play
-	OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult) (*PlayResult, error)
+	OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData interface{}) (*PlayResult, error)
 }

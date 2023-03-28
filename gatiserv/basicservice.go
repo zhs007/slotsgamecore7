@@ -98,6 +98,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	}
 
 	results := []*sgc7game.PlayResult{}
+	gameData := sv.Game.NewGameData()
 
 	cmd := params.Cmd
 
@@ -106,7 +107,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 			cmd = "SPIN"
 		}
 
-		pr, err := sv.Game.Play(plugin, cmd, params.Params, ips, stake, results)
+		pr, err := sv.Game.Play(plugin, cmd, params.Params, ips, stake, results, gameData)
 		if err != nil {
 			goutils.Error("BasicService.Play:Play",
 				zap.Int("results", len(results)),

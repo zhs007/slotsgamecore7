@@ -193,8 +193,8 @@ func (rtp *RTP) Bet(bet int64) {
 }
 
 // OnResult -
-func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult) {
-	rtp.Root.OnResult(pr)
+func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult, gameData interface{}) {
+	rtp.Root.OnResult(pr, gameData)
 
 	for _, v := range rtp.MapHR {
 		v.FuncOnResult(rtp, v, pr)
@@ -211,7 +211,7 @@ func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult) {
 }
 
 // OnResults -
-func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult) {
+func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult, gameData interface{}) {
 	iswin := false
 
 	for _, v := range lst {
@@ -227,7 +227,7 @@ func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult) {
 	}
 
 	for _, v := range rtp.MapFeature {
-		v.FuncOnResults(v, lst)
+		v.FuncOnResults(v, lst, gameData)
 	}
 
 	for _, v := range rtp.MapReturn {

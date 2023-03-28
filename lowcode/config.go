@@ -62,6 +62,34 @@ func (cfg *Config) BuildStatsSymbolCodes(paytables *sgc7game.PayTables) error {
 	return nil
 }
 
+func (cfg *Config) GetDefaultPaytables() *sgc7game.PayTables {
+	name := cfg.DefaultPaytables
+	if name == "" {
+		name = "main"
+	}
+
+	pt, isok := cfg.MapPaytables[name]
+	if isok {
+		return pt
+	}
+
+	return nil
+}
+
+func (cfg *Config) GetDefaultLineData() *sgc7game.LineData {
+	name := cfg.DefaultLinedata
+	if name == "" {
+		name = "main"
+	}
+
+	ld, isok := cfg.MapLinedate[name]
+	if isok {
+		return ld
+	}
+
+	return nil
+}
+
 func LoadConfig(fn string) (*Config, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {

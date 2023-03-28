@@ -50,6 +50,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			ps := game.NewPlayerState()
 			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
+			gameData := game.NewGameData()
 			cmd := "SPIN"
 			off := 0
 
@@ -64,7 +65,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 				totalReturn := int64(0)
 				for {
-					pr, err := game.Play(plugin, cmd, "", ps, stake, results)
+					pr, err := game.Play(plugin, cmd, "", ps, stake, results, gameData)
 					if err != nil {
 						iserrturn = true
 
@@ -126,10 +127,10 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 						currtp.TotalWins += v.CashWin
 						totalReturn += v.CashWin
 
-						currtp.OnResult(stake, v)
+						currtp.OnResult(stake, v, gameData)
 					}
 
-					currtp.OnResults(results)
+					currtp.OnResults(results, gameData)
 
 					if needVariance {
 						currtp.AddReturns(float64(totalReturn / stake.CashBet))
@@ -212,6 +213,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 			ps := game.NewPlayerState()
 			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
+			gameData := game.NewGameData()
 			cmd := "SPIN"
 			off := 0
 
@@ -224,7 +226,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 
 				totalReturn := int64(0)
 				for {
-					pr, err := game.Play(plugin, cmd, "", ps, stake, results)
+					pr, err := game.Play(plugin, cmd, "", ps, stake, results, gameData)
 					if err != nil {
 						iserrturn = true
 
@@ -291,10 +293,10 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 						currtp.TotalWins += v.CashWin
 						totalReturn += v.CashWin
 
-						currtp.OnResult(stake, v)
+						currtp.OnResult(stake, v, gameData)
 					}
 
-					currtp.OnResults(results)
+					currtp.OnResults(results, gameData)
 
 					if needVariance {
 						rtp.AddReturns(float64(totalReturn / stake.CashBet))

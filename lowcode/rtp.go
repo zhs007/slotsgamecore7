@@ -32,23 +32,28 @@ type RTPConfig struct {
 	HitRateFeatures []*RTPHitRateFeature `yaml:"hitRateFeatures"`
 }
 
-func buildRTPSymbolsData(gameProp *GameProperty) ([]int, []int) {
+func buildRTPSymbolsData(pool *GamePropertyPool) ([]int, []int) {
 	symbols := []int{}
 	nums := []int{}
 
-	for _, v := range gameProp.Config.StatsSymbolCodes {
+	for _, v := range pool.Config.StatsSymbolCodes {
 		symbols = append(symbols, int(v))
 	}
 
-	for i := range gameProp.CurPaytables.MapPay[0] {
+	for i := range pool.DefaultPaytables.MapPay[0] {
 		nums = append(nums, i+1)
 	}
 
 	return symbols, nums
 }
 
-func newFuncOnGameMod(gameProp *GameProperty, cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult) bool {
+func newFuncOnGameMod(cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+		// gameProp, isok := gameData.(*GameProperty)
+		// if !isok {
+		// 	return false
+		// }
+
 		if len(cfgGameMod.Components) == 0 {
 			return true
 		}
@@ -67,8 +72,8 @@ func newFuncOnGameMod(gameProp *GameProperty, cfgGameMod *RTPSymbolModule) sgc7r
 	}
 }
 
-func newFuncOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult) bool {
+func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 		if len(cfgSymbolFeature.Components) == 0 {
 			return true
 		}
@@ -87,8 +92,8 @@ func newFuncOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbolFeature)
 	}
 }
 
-func newFuncSymbolOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult) bool {
+func newFuncSymbolOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 		if len(cfgSymbolFeature.Components) == 0 {
 
 			for _, v := range pr.Results {
@@ -126,8 +131,8 @@ func newFuncSymbolOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbolFe
 	}
 }
 
-func newFuncSymbolNumOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult) bool {
+func newFuncSymbolNumOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 		if len(cfgSymbolFeature.Components) == 0 {
 
 			for _, v := range pr.Results {
@@ -186,10 +191,10 @@ func newFuncSymbolNumOnResult(gameProp *GameProperty, cfgSymbolFeature *RTPSymbo
 // 	}
 // }
 
-func newRTPGameModule(rtp *sgc7rtp.RTP, gameProp *GameProperty, cfgGameModule *RTPSymbolModule) *sgc7rtp.RTPNode {
-	gm := sgc7rtp.NewRTPGameModEx(cfgGameModule.Name, newFuncOnGameMod(gameProp, cfgGameModule))
+func newRTPGameModule(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgGameModule *RTPSymbolModule) *sgc7rtp.RTPNode {
+	gm := sgc7rtp.NewRTPGameModEx(cfgGameModule.Name, newFuncOnGameMod(cfgGameModule))
 
-	symbols, nums := buildRTPSymbolsData(gameProp)
+	symbols, nums := buildRTPSymbolsData(pool)
 	names := []string{}
 	funcOnResults := []sgc7rtp.FuncOnResult{}
 	funcSymbolOnResults := []sgc7rtp.FuncOnResult{}
@@ -199,9 +204,9 @@ func newRTPGameModule(rtp *sgc7rtp.RTP, gameProp *GameProperty, cfgGameModule *R
 		feature := v
 
 		names = append(names, v.Name)
-		funcOnResults = append(funcOnResults, newFuncOnResult(gameProp, feature))
-		funcSymbolOnResults = append(funcSymbolOnResults, newFuncSymbolOnResult(gameProp, feature))
-		funcSymbolNumOnResults = append(funcSymbolNumOnResults, newFuncSymbolNumOnResult(gameProp, feature))
+		funcOnResults = append(funcOnResults, newFuncOnResult(feature))
+		funcSymbolOnResults = append(funcSymbolOnResults, newFuncSymbolOnResult(feature))
+		funcSymbolNumOnResults = append(funcSymbolNumOnResults, newFuncSymbolNumOnResult(feature))
 	}
 
 	sgc7rtp.InitGameMod3(gm, names, funcOnResults,
@@ -226,10 +231,10 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 
 	rtp := sgc7rtp.NewRTP()
 
-	rtp.Stats2 = game.Prop.Stats
+	rtp.Stats2 = game.Pool.Stats.Root
 
-	for _, m := range game.Prop.Config.RTP.Modules {
-		newRTPGameModule(rtp, game.Prop, m)
+	for _, m := range game.Pool.Config.RTP.Modules {
+		newRTPGameModule(rtp, game.Pool, m)
 	}
 
 	// symbols, nums := buildRTPSymbolsData(game.Prop)
@@ -251,7 +256,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 	// rtp.AddHitRateNode("fg", OnFGHitRate)
 	// rtp.AddHitRateNode("jackpot", OnJackpotHitRate)
 
-	bet := game.Prop.Config.Bets[0]
+	bet := game.Pool.Config.Bets[0]
 
 	d := sgc7rtp.StartRTP(game, rtp, icore, ispinnums, &sgc7game.Stake{
 		CoinBet:  1,
@@ -271,8 +276,8 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 
 	curtime := time.Now()
 
-	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Prop.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
-	rtp.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Prop.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
+	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
+	rtp.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
 
 	return nil
 }

@@ -35,7 +35,7 @@ type BookOf struct {
 }
 
 // Init -
-func (bookof *BookOf) Init(fn string, gameProp *GameProperty) error {
+func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("BookOf.Init:ReadFile",
@@ -85,7 +85,7 @@ func (bookof *BookOf) Init(fn string, gameProp *GameProperty) error {
 	}
 
 	if bookof.Config.WeightSymbol != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(bookof.Config.WeightSymbol, "val", "weight", gameProp.CurPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(bookof.Config.WeightSymbol, "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("BookOf.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("Weight", bookof.Config.WeightSymbol),

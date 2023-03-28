@@ -37,7 +37,7 @@ func getchar(onchar FuncOnGetChar) error {
 	}
 }
 
-type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult)
+type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult, interface{})
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int, isSkipGetChar bool, isBreakAtFeature bool) error {
 	plugin := game.NewPlugin()
@@ -101,13 +101,14 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 		balance -= int(stake.CashBet)
 		spinwins := 0
+		gameData := game.NewGameData()
 
 		fmt.Printf("bet %v, balance %v\n",
 			FormatColorString(fmt.Sprintf("%v", stake.CashBet), ColorNumber),
 			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber))
 
 		for {
-			pr, err := game.Play(plugin, cmd, "", ps, stake, results)
+			pr, err := game.Play(plugin, cmd, "", ps, stake, results, gameData)
 			if err != nil {
 				goutils.Error("StartGame.Play",
 					zap.Int("results", len(results)),
@@ -124,7 +125,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			spinwins += int(pr.CashWin)
 			results = append(results, pr)
 
-			onResult(pr, results)
+			onResult(pr, results, gameData)
 
 			if pr.IsFinish {
 				break
