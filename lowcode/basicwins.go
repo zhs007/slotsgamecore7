@@ -101,7 +101,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 }
 
 // Init -
-func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
+func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("BasicWins.Init:ReadFile",
@@ -125,11 +125,11 @@ func (basicWins *BasicWins) Init(fn string, gameProp *GameProperty) error {
 	basicWins.Config = cfg
 
 	for _, v := range cfg.ExcludeSymbols {
-		basicWins.ExcludeSymbols = append(basicWins.ExcludeSymbols, gameProp.CurPaytables.MapSymbols[v])
+		basicWins.ExcludeSymbols = append(basicWins.ExcludeSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
 	for _, v := range cfg.WildSymbols {
-		basicWins.WildSymbols = append(basicWins.WildSymbols, gameProp.CurPaytables.MapSymbols[v])
+		basicWins.WildSymbols = append(basicWins.WildSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
 	basicWins.onInit(&cfg.BasicComponentConfig)

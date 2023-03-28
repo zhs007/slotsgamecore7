@@ -11,30 +11,38 @@ import (
 // Game - game
 type Game struct {
 	*sgc7game.BasicGame
-	Prop         *GameProperty
+	Pool         *GamePropertyPool
 	MgrComponent *ComponentMgr
 }
 
 // Init - initial game
 func (game *Game) Init(cfgfn string) error {
-	prop, err := InitGameProperty(cfgfn)
+	pool, err := NewGamePropertyPool(cfgfn)
 	if err != nil {
-		goutils.Error("Game.Init:InitGameProperty",
+		goutils.Error("Game.Init:NewGamePropertyPool",
 			zap.String("fn", cfgfn),
 			zap.Error(err))
 
 		return err
 	}
 
-	game.Prop = prop
+	game.Pool = pool
 
-	game.Cfg.PayTables = prop.CurPaytables
+	game.Cfg.PayTables = pool.DefaultPaytables
 	game.SetVer(sgc7ver.Version)
 
-	game.Cfg.SetDefaultSceneString(game.Prop.Config.DefaultScene)
+	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
 
-	for _, v := range prop.Config.GameMods {
-		game.AddGameMod(NewBasicGameMod(prop, v, game.MgrComponent))
+	for _, v := range pool.Config.GameMods {
+		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
+	}
+
+	err = pool.InitStats()
+	if err != nil {
+		goutils.Error("Game.Init:InitStats",
+			zap.Error(err))
+
+		return nil
 	}
 
 	return nil
@@ -42,7 +50,7 @@ func (game *Game) Init(cfgfn string) error {
 
 // CheckStake - check stake
 func (game *Game) CheckStake(stake *sgc7game.Stake) error {
-	if goutils.IndexOfIntSlice(game.Prop.Config.Bets, int(stake.CashBet)/int(stake.CoinBet), 0) < 0 {
+	if goutils.IndexOfIntSlice(game.Pool.Config.Bets, int(stake.CashBet)/int(stake.CoinBet), 0) < 0 {
 		return sgc7game.ErrInvalidStake
 	}
 
@@ -60,26 +68,35 @@ func (game *Game) NewPlayerState() sgc7game.IPlayerState {
 func (game *Game) ResetConfig(cfg interface{}) {
 	ncfg := cfg.(*Config)
 
-	for _, v := range game.Prop.Config.GameMods {
+	for _, v := range game.Pool.Config.GameMods {
 		gm := game.MapGameMods[v.Type].(*BasicGameMod)
 		gm.ResetConfig(ncfg)
 	}
 }
 
 // OnAsciiGame - outpur to asciigame
-func (game *Game) OnAsciiGame(stake *sgc7game.Stake, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
-	for _, v := range game.Prop.Config.GameMods {
+func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
+	for _, v := range game.Pool.Config.GameMods {
 		gm := game.MapGameMods[v.Type].(*BasicGameMod)
-		gm.OnAsciiGame(game.Prop, pr, lst)
+		gm.OnAsciiGame(gameProp, pr, lst)
 	}
 
 	if pr.IsFinish {
-		if game.Prop.Stats != nil {
-			game.Prop.Stats.OnResults(stake, lst)
+		if game.Pool.Stats != nil {
+			game.Pool.Stats.Push(stake, lst)
 		}
+
+		game.Pool.Pool.Put(gameProp)
 	}
 
 	return nil
+}
+
+// NewGameData - new GameData
+func (game *Game) NewGameData() interface{} {
+	gameProp, _ := game.Pool.NewGameProp()
+
+	return gameProp
 }
 
 // NewGame - new a Game

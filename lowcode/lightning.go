@@ -67,7 +67,7 @@ type Lightning struct {
 }
 
 // Init -
-func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
+func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("Lightning.Init:ReadFile",
@@ -90,10 +90,10 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 
 	lightning.Config = cfg
 
-	lightning.SymbolCode = gameProp.CurPaytables.MapSymbols[cfg.Symbol]
+	lightning.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
 
 	if lightning.Config.Weight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(lightning.Config.Weight, "val", "weight", gameProp.CurPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(lightning.Config.Weight, "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("Lightning.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("Weight", lightning.Config.Weight),
@@ -106,7 +106,7 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 	}
 
 	for _, v := range lightning.Config.SymbolVals {
-		symbolCode := gameProp.CurPaytables.MapSymbols[v.Symbol]
+		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
 
 		sd := &LightningSymbolData{
 			SymbolCode: symbolCode,
@@ -134,7 +134,7 @@ func (lightning *Lightning) Init(fn string, gameProp *GameProperty) error {
 	}
 
 	for _, v := range cfg.SymbolTriggerFeatures {
-		symbolCode := gameProp.CurPaytables.MapSymbols[v.Symbol]
+		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
 
 		lightning.MapSymbolTriggerFeatures[symbolCode] = v
 

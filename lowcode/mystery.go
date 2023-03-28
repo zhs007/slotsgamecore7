@@ -54,7 +54,7 @@ func (mystery *Mystery) maskOtherScene(gs *sgc7game.GameScene, symbolCode int) *
 }
 
 // Init -
-func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
+func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("BasicReels.Init:ReadFile",
@@ -78,7 +78,7 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 	mystery.Config = cfg
 
 	if mystery.Config.MysteryWeight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(mystery.Config.MysteryWeight, "val", "weight", gameProp.CurPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(mystery.Config.MysteryWeight, "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("BasicReels.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", mystery.Config.MysteryWeight),
@@ -90,10 +90,10 @@ func (mystery *Mystery) Init(fn string, gameProp *GameProperty) error {
 		mystery.MysteryWeights = vw2
 	}
 
-	mystery.MysterySymbol = gameProp.CurPaytables.MapSymbols[mystery.Config.Mystery]
+	mystery.MysterySymbol = pool.DefaultPaytables.MapSymbols[mystery.Config.Mystery]
 
 	for _, v := range cfg.MysteryTriggerFeatures {
-		symbolCode := gameProp.CurPaytables.MapSymbols[v.Symbol]
+		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
 
 		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}

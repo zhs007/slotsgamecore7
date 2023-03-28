@@ -167,6 +167,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	}
 
 	results := []*sgc7game.PlayResult{}
+	gameData := serv.game.NewGameData()
 
 	cmd := req.Command
 
@@ -175,7 +176,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 			cmd = "SPIN"
 		}
 
-		pr, err := serv.game.Play(plugin, cmd, req.ClientParams, ips, stake, results)
+		pr, err := serv.game.Play(plugin, cmd, req.ClientParams, ips, stake, results, gameData)
 		if err != nil {
 			goutils.Error("Serv.onPlay:Play",
 				zap.Int("results", len(results)),

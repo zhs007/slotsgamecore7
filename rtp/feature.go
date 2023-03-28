@@ -7,8 +7,8 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
-// FuncFeatureOnResults - onResult(*FeatureNode, []*sgc7game.PlayResult)
-type FuncFeatureOnResults func(node *FeatureNode, lst []*sgc7game.PlayResult) bool
+// FuncFeatureOnResults - onResult(*FeatureNode, []*sgc7game.PlayResult, interface{})
+type FuncFeatureOnResults func(node *FeatureNode, lst []*sgc7game.PlayResult, gameData interface{}) bool
 
 // FeatureNode -
 type FeatureNode struct {

@@ -11,7 +11,7 @@ type FuncNewComponent func(name string) IComponent
 
 type IComponent interface {
 	// Init -
-	Init(fn string, gameProp *GameProperty) error
+	Init(fn string, pool *GamePropertyPool) error
 	// OnNewGame -
 	OnNewGame(gameProp *GameProperty) error
 	// OnNewStep -

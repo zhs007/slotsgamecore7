@@ -27,7 +27,7 @@ type SymbolMulti struct {
 }
 
 // Init -
-func (symbolMulti *SymbolMulti) Init(fn string, gameProp *GameProperty) error {
+func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolMulti.Init:ReadFile",
@@ -63,7 +63,7 @@ func (symbolMulti *SymbolMulti) Init(fn string, gameProp *GameProperty) error {
 		symbolMulti.WeightMulti = vw2
 	}
 
-	symbolMulti.SymbolCode = gameProp.CurPaytables.MapSymbols[cfg.Symbol]
+	symbolMulti.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
 
 	symbolMulti.onInit(&cfg.BasicComponentConfig)
 

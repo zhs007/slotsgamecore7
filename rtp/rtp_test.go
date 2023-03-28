@@ -55,7 +55,7 @@ func Test_RTP(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0)
+	rtp.OnResult(stake, pr0, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(1))
 	assert.Equal(t, rtp.TotalBet, int64(100))
@@ -102,7 +102,7 @@ func Test_RTP(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr1)
+	rtp.OnResult(stake, pr1, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(2))
 	assert.Equal(t, rtp.TotalBet, int64(200))
@@ -151,8 +151,8 @@ func Test_RTP(t *testing.T) {
 	pr0.IsFinish = false
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0)
-	rtp.OnResult(stake, pr2)
+	rtp.OnResult(stake, pr0, nil)
+	rtp.OnResult(stake, pr2, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(3))
 	assert.Equal(t, rtp.TotalBet, int64(300))
@@ -223,7 +223,7 @@ func Test_RTPTags(t *testing.T) {
 
 	bg := NewRTPGameMod("bg")
 	InitGameMod(bg, []string{"normal", "special"}, []FuncOnResult{
-		func(node *RTPNode, pr *sgc7game.PlayResult) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if !gp.isSpecial && node.TagName == "normal" {
@@ -236,7 +236,7 @@ func Test_RTPTags(t *testing.T) {
 
 			return false
 		},
-		func(node *RTPNode, pr *sgc7game.PlayResult) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if gp.isSpecial && node.TagName == "special" {
@@ -254,7 +254,7 @@ func Test_RTPTags(t *testing.T) {
 
 	fg := NewRTPGameMod("fg")
 	InitGameMod(fg, []string{"normal", "special"}, []FuncOnResult{
-		func(node *RTPNode, pr *sgc7game.PlayResult) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if !gp.isSpecial && node.TagName == "normal" {
@@ -267,7 +267,7 @@ func Test_RTPTags(t *testing.T) {
 
 			return false
 		},
-		func(node *RTPNode, pr *sgc7game.PlayResult) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if gp.isSpecial && node.TagName == "special" {
@@ -333,7 +333,7 @@ func Test_RTPTags(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0)
+	rtp.OnResult(stake, pr0, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(1))
 	assert.Equal(t, rtp.TotalBet, int64(100))
@@ -387,7 +387,7 @@ func Test_RTPTags(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr1)
+	rtp.OnResult(stake, pr1, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(2))
 	assert.Equal(t, rtp.TotalBet, int64(200))
@@ -443,8 +443,8 @@ func Test_RTPTags(t *testing.T) {
 	pr0.IsFinish = false
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0)
-	rtp.OnResult(stake, pr2)
+	rtp.OnResult(stake, pr0, nil)
+	rtp.OnResult(stake, pr2, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(3))
 	assert.Equal(t, rtp.TotalBet, int64(300))

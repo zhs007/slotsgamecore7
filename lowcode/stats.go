@@ -1,6 +1,10 @@
 package lowcode
 
 import (
+	"sync/atomic"
+	"time"
+
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/mathtoolset"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 )
@@ -11,7 +15,7 @@ type StatsConfig struct {
 	Children  []*StatsConfig `yaml:"children"`
 }
 
-func NewStats(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType) *sgc7stats.Feature {
+func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType) *sgc7stats.Feature {
 	var feature *sgc7stats.Feature
 
 	if parent != nil {
@@ -26,4 +30,57 @@ func NewStats(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAn
 	feature.CurWins = sgc7stats.NewWins()
 
 	return feature
+}
+
+type StatsParam struct {
+	Stake   *sgc7game.Stake
+	Results []*sgc7game.PlayResult
+}
+
+type Stats struct {
+	Root      *sgc7stats.Feature
+	chanStats chan *StatsParam
+	lastNum   int32
+}
+
+func (stats *Stats) StartWorker() {
+	for {
+		param := <-stats.chanStats
+
+		stats.Root.OnResults(param.Stake, param.Results)
+
+		atomic.AddInt32(&stats.lastNum, -1)
+	}
+}
+
+func (stats *Stats) Push(stake *sgc7game.Stake, results []*sgc7game.PlayResult) {
+	param := &StatsParam{
+		Stake:   stake,
+		Results: results,
+	}
+
+	atomic.AddInt32(&stats.lastNum, 1)
+
+	stats.chanStats <- param
+}
+
+func (stats *Stats) Wait() {
+	for {
+		v := atomic.LoadInt32(&stats.lastNum)
+		if v > 0 {
+			time.Sleep(time.Second)
+		} else {
+			break
+		}
+	}
+
+}
+
+func NewStats(root *sgc7stats.Feature) *Stats {
+	stats := &Stats{
+		Root:      root,
+		chanStats: make(chan *StatsParam, 1024),
+	}
+
+	return stats
 }

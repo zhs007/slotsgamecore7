@@ -55,7 +55,7 @@ func (multiLevelMystery *MultiLevelMystery) maskOtherScene(gs *sgc7game.GameScen
 }
 
 // Init -
-func (multiLevelMystery *MultiLevelMystery) Init(fn string, gameProp *GameProperty) error {
+func (multiLevelMystery *MultiLevelMystery) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("MultiLevelMystery.Init:ReadFile",
@@ -79,7 +79,7 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, gameProp *GameProper
 	multiLevelMystery.Config = cfg
 
 	for _, v := range cfg.Levels {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(v.MysteryWeight, "val", "weight", gameProp.CurPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(v.MysteryWeight, "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", v.MysteryWeight),
@@ -91,10 +91,10 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, gameProp *GameProper
 		multiLevelMystery.LevelMysteryWeights = append(multiLevelMystery.LevelMysteryWeights, vw2)
 	}
 
-	multiLevelMystery.MysterySymbol = gameProp.CurPaytables.MapSymbols[multiLevelMystery.Config.Mystery]
+	multiLevelMystery.MysterySymbol = pool.DefaultPaytables.MapSymbols[multiLevelMystery.Config.Mystery]
 
 	for _, v := range cfg.MysteryTriggerFeatures {
-		symbolCode := gameProp.CurPaytables.MapSymbols[v.Symbol]
+		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
 
 		multiLevelMystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
