@@ -8,10 +8,36 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
+
+type CollectorData struct {
+	Val          int // 当前总值, Current total value
+	NewCollector int // 这一个step收集到的, The values collected in this step
+}
+
+// OnNewGame -
+func (collectorData *CollectorData) OnNewGame() {
+	collectorData.Val = 0
+}
+
+// OnNewGame -
+func (collectorData *CollectorData) OnNewStep() {
+	collectorData.NewCollector = 0
+}
+
+// BuildPBComponentData
+func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
+	return &sgc7pb.CollectorData{
+		Val:          int32(collectorData.Val),
+		NewCollector: int32(collectorData.NewCollector),
+	}
+}
 
 // CollectorConfig - configuration for Collector
 type CollectorConfig struct {
@@ -53,24 +79,11 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
+// OnNewGame - 因为 BasicComponent 考虑到效率，没有执行ComponentData的OnNewGame，所以这里需要特殊处理
 func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
-	cd, isok := gameProp.MapCollectors[collector.Name]
-	if isok {
-		cd.onNewGame()
-	}
+	cd := gameProp.MapComponentData[collector.Name]
 
-	return nil
-}
-
-// OnNewStep -
-func (collector *Collector) OnNewStep(gameProp *GameProperty) error {
-	collector.BasicComponent.OnNewStep()
-
-	cd, isok := gameProp.MapCollectors[collector.Name]
-	if isok {
-		cd.onNewStep()
-	}
+	cd.OnNewGame()
 
 	return nil
 }
@@ -83,7 +96,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	collector.onStepEnd(gameProp, curpr, gp)
 
-	collector.BuildPBComponent(gp)
+	gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
 
 	return nil
 }
@@ -91,13 +104,12 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 // OnAsciiGame - outpur to asciigame
 func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
-	cd, isok := gameProp.MapCollectors[collector.Name]
-	if isok {
-		if cd.NewCollector <= 0 {
-			fmt.Printf("%v dose not collect new value, the collector value is %v", collector.Name, cd.Val)
-		} else {
-			fmt.Printf("%v collect %v. the collector value is %v", collector.Name, cd.NewCollector, cd.Val)
-		}
+	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
+
+	if cd.NewCollector <= 0 {
+		fmt.Printf("%v dose not collect new value, the collector value is %v", collector.Name, cd.Val)
+	} else {
+		fmt.Printf("%v collect %v. the collector value is %v", collector.Name, cd.NewCollector, cd.Val)
 	}
 
 	return nil
@@ -106,6 +118,30 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 // OnStats
 func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// OnStatsWithPB -
+func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.CollectorData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return 0, err
+	}
+
+	return 0, nil
+}
+
+// NewComponentData -
+func (collector *Collector) NewComponentData() IComponentData {
+	return &CollectorData{}
+}
+
+// EachUsedResults -
+func (collector *Collector) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
 }
 
 func NewCollector(name string) IComponent {

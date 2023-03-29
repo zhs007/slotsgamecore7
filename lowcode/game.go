@@ -65,7 +65,7 @@ func (game *Game) NewPlayerState() sgc7game.IPlayerState {
 }
 
 // ResetConfig
-func (game *Game) ResetConfig(cfg interface{}) {
+func (game *Game) ResetConfig(cfg any) {
 	ncfg := cfg.(*Config)
 
 	for _, v := range game.Pool.Config.GameMods {
@@ -93,7 +93,7 @@ func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr 
 }
 
 // NewGameData - new GameData
-func (game *Game) NewGameData() interface{} {
+func (game *Game) NewGameData() any {
 	gameProp, _ := game.Pool.NewGameProp()
 
 	return gameProp

@@ -16,6 +16,6 @@ beforMain:
     type: countscatter
     minNum: 3
     FGNumWeight: ../data/game001/fgnumweight.xlsx
-    isTriggerFG: true
+    # isTriggerFG: true
     betType: totalBet
-    respinFirstComponent: fg-spin
+    # respinFirstComponent: fg-spin

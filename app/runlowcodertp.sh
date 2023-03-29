@@ -1,0 +1,1 @@
+GAMECFG=../data/game001/rtp96.yaml OUTPUTPATH=../output SPINNUMS=1000000 CORE=8 go run lowcodertp/*.go

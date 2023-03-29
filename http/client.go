@@ -37,7 +37,7 @@ func HTTPGet(url string, header map[string]string) (int, []byte, error) {
 }
 
 // HTTPPost - post
-func HTTPPost(url string, header map[string]string, bodyObj interface{}) (int, []byte, error) {
+func HTTPPost(url string, header map[string]string, bodyObj any) (int, []byte, error) {
 	var req *http.Request
 	var err error
 	client := &http.Client{}

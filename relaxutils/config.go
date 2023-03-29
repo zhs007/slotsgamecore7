@@ -101,7 +101,7 @@ func NewConfig() *Config {
 
 type FuncOnSelfCloseTags func(string) string
 
-func SaveConfig(fn string, cfg interface{}, procSelfCloseTags FuncOnSelfCloseTags) error {
+func SaveConfig(fn string, cfg any, procSelfCloseTags FuncOnSelfCloseTags) error {
 	output, err := xml.MarshalIndent(cfg, "  ", "    ")
 	if err != nil {
 		goutils.Error("SaveConfig:MarshalIndent",

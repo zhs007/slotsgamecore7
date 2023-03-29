@@ -42,7 +42,7 @@
             "env": {
                 "GAMECFG": "${workspaceFolder}/data/game001/rtp96.yaml",
                 "OUTPUTPATH": "${workspaceFolder}/output",
-                "SPINNUMS": "1000",
+                "SPINNUMS": "10000",
                 "CORE":"2",
             }
         }

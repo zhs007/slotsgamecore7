@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type FuncOnRTPResults func(lst []*sgc7game.PlayResult, gameData interface{})
+type FuncOnRTPResults func(lst []*sgc7game.PlayResult, gameData any)
 
 type RTPReturnData struct {
 	Return     float64
@@ -197,7 +197,7 @@ func (rtp *RTP) Bet(bet int64) {
 }
 
 // OnResult -
-func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult, gameData interface{}) {
+func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult, gameData any) {
 	rtp.Root.OnResult(pr, gameData)
 
 	for _, v := range rtp.MapHR {
@@ -215,7 +215,7 @@ func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult, gameDat
 }
 
 // OnResults -
-func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult, gameData interface{}) {
+func (rtp *RTP) OnResults(lst []*sgc7game.PlayResult, gameData any) {
 	iswin := false
 
 	for _, v := range lst {

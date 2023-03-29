@@ -223,7 +223,7 @@ func Test_RTPTags(t *testing.T) {
 
 	bg := NewRTPGameMod("bg")
 	InitGameMod(bg, []string{"normal", "special"}, []FuncOnResult{
-		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if !gp.isSpecial && node.TagName == "normal" {
@@ -236,7 +236,7 @@ func Test_RTPTags(t *testing.T) {
 
 			return false
 		},
-		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if gp.isSpecial && node.TagName == "special" {
@@ -254,7 +254,7 @@ func Test_RTPTags(t *testing.T) {
 
 	fg := NewRTPGameMod("fg")
 	InitGameMod(fg, []string{"normal", "special"}, []FuncOnResult{
-		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if !gp.isSpecial && node.TagName == "normal" {
@@ -267,7 +267,7 @@ func Test_RTPTags(t *testing.T) {
 
 			return false
 		},
-		func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+		func(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 			gp, isok := pr.CurGameModParams.(*gameparams)
 			if isok && gp != nil {
 				if gp.isSpecial && node.TagName == "special" {

@@ -8,10 +8,43 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
+
+type BookOdData struct {
+	BasicComponentData
+	Symbols []int
+}
+
+// OnNewGame -
+func (bookOfData *BookOdData) OnNewGame() {
+	bookOfData.BasicComponentData.OnNewGame()
+}
+
+// OnNewGame -
+func (bookOfData *BookOdData) OnNewStep() {
+	bookOfData.BasicComponentData.OnNewStep()
+
+	bookOfData.Symbols = nil
+}
+
+// BuildPBComponentData
+func (bookOfData *BookOdData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.BookOfData{
+		BasicComponentData: bookOfData.BuildPBBasicComponentData(),
+	}
+
+	for _, v := range bookOfData.Symbols {
+		pbcd.Symbols = append(pbcd.Symbols, int32(v))
+	}
+
+	return pbcd
+}
 
 // BookOfConfig - configuration for BookOf feature
 type BookOfConfig struct {
@@ -28,7 +61,6 @@ type BookOfConfig struct {
 type BookOf struct {
 	*BasicComponent
 	Config          *BookOfConfig
-	Symbols         []int
 	WeightTrigger   *sgc7game.ValWeights2
 	WeightSymbolNum *sgc7game.ValWeights2
 	WeightSymbol    *sgc7game.ValWeights2
@@ -102,23 +134,11 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
-func (bookof *BookOf) OnNewGame(gameProp *GameProperty) error {
-	return nil
-}
-
-// OnNewStep -
-func (bookof *BookOf) OnNewStep(gameProp *GameProperty) error {
-	bookof.BasicComponent.OnNewStep()
-
-	bookof.Symbols = nil
-
-	return nil
-}
-
 // playgame
 func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	cd := gameProp.MapComponentData[bookof.Name].(*BookOdData)
 
 	isTrigger := bookof.Config.ForceTrigger
 
@@ -151,13 +171,13 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			symbolNum = iv.Int()
 		}
 
-		gs := bookof.GetTargetScene(gameProp, curpr)
+		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
 		if bookof.Config.ForceSymbolNum == 1 && bookof.Config.SymbolRNG != "" {
 			rng := gameProp.MapInt[bookof.Config.SymbolRNG]
 			cs := bookof.WeightSymbol.Vals[rng]
 
-			bookof.Symbols = append(bookof.Symbols, cs.Int())
+			cd.Symbols = append(cd.Symbols, cs.Int())
 
 			ngs, err := bookof.procBookOfScene(gs, cs.Int())
 			if err != nil {
@@ -167,13 +187,13 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 				return err
 			}
 
-			bookof.AddScene(gameProp, curpr, ngs)
+			bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
 			scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
 				return cursymbol == cs.Int()
 			}, true)
 			if scr != nil {
-				bookof.AddResult(curpr, scr)
+				bookof.AddResult(curpr, scr, &cd.BasicComponentData)
 			}
 		} else {
 			curWeight := bookof.WeightSymbol.Clone()
@@ -187,7 +207,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 					return err
 				}
 
-				bookof.Symbols = append(bookof.Symbols, cs.Int())
+				cd.Symbols = append(cd.Symbols, cs.Int())
 
 				err = curWeight.RemoveVal(cs)
 				if err != nil {
@@ -205,20 +225,20 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 					return err
 				}
 
-				bookof.AddScene(gameProp, curpr, ngs)
+				bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
 				scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
 					return cursymbol == cs.Int()
 				}, true)
 				if scr != nil {
-					bookof.AddResult(curpr, scr)
+					bookof.AddResult(curpr, scr, &cd.BasicComponentData)
 				}
 			}
 		}
 
 		bookof.onStepEnd(gameProp, curpr, gp)
 
-		bookof.BuildPBComponent(gp)
+		gp.AddComponentData(bookof.Name, cd)
 	} else {
 		bookof.onStepEnd(gameProp, curpr, gp)
 	}
@@ -252,9 +272,12 @@ func (bookof *BookOf) procBookOfScene(gs *sgc7game.GameScene, symbol int) (*sgc7
 
 // OnAsciiGame - outpur to asciigame
 func (bookof *BookOf) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(bookof.Symbols) > 0 {
+
+	cd := gameProp.MapComponentData[bookof.Name].(*BookOdData)
+
+	if len(cd.Symbols) > 0 {
 		strsymbols := ""
-		for i, v := range bookof.Symbols {
+		for i, v := range cd.Symbols {
 			if i > 0 {
 				strsymbols += ", "
 			}
@@ -264,12 +287,12 @@ func (bookof *BookOf) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 
 		fmt.Printf("The BookOf Symbols is %v\n", strsymbols)
 
-		for i, si := range bookof.UsedScenes {
+		for i, si := range cd.UsedScenes {
 			asciigame.OutputScene(fmt.Sprintf("The symbols for BookOf - %v ", i+1), pr.Scenes[si], mapSymbolColor)
 		}
 
 		asciigame.OutputResults(fmt.Sprintf("%v wins", bookof.Name), pr, func(i int, ret *sgc7game.Result) bool {
-			return goutils.IndexOfIntSlice(bookof.UsedResults, i, 0) >= 0
+			return goutils.IndexOfIntSlice(cd.UsedResults, i, 0) >= 0
 		}, mapSymbolColor)
 	}
 
@@ -286,9 +309,16 @@ func (bookof *BookOf) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 		if isok {
 			curComponent, isok := gp.MapComponents[bookof.Name]
 			if isok {
-				isTrigger = true
+				curwins, err := bookof.OnStatsWithPB(feature, curComponent, v)
+				if err != nil {
+					goutils.Error("BookOf.OnStats",
+						zap.Error(err))
 
-				wins += bookof.OnStatsWithComponent(feature, curComponent, v)
+					continue
+				}
+
+				isTrigger = true
+				wins += curwins
 			}
 		}
 	}
@@ -306,6 +336,43 @@ func (bookof *BookOf) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 	}
 
 	return isTrigger, stake.CashBet, wins
+}
+
+// OnStatsWithPB -
+func (bookof *BookOf) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.BookOfData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return 0, err
+	}
+
+	return bookof.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+}
+
+// NewComponentData -
+func (bookof *BookOf) NewComponentData() IComponentData {
+	return &BasicComponentData{}
+}
+
+// EachUsedResults -
+func (bookof *BookOf) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+	pbcd := &sgc7pb.BookOfData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+			zap.Error(err))
+
+		return
+	}
+
+	for _, v := range pbcd.BasicComponentData.UsedResults {
+		oneach(pr.Results[v])
+	}
 }
 
 func NewBookOf(name string) IComponent {

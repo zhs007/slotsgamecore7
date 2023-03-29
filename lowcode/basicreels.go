@@ -68,22 +68,11 @@ func (basicReels *BasicReels) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
-func (basicReels *BasicReels) OnNewGame(gameProp *GameProperty) error {
-	return nil
-}
-
-// OnNewStep -
-func (basicReels *BasicReels) OnNewStep(gameProp *GameProperty) error {
-
-	basicReels.BasicComponent.OnNewStep()
-
-	return nil
-}
-
 // playgame
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	cd := gameProp.MapComponentData[basicReels.Name].(*BasicComponentData)
 
 	if basicReels.ReelSetWeights != nil {
 		val, si, err := basicReels.ReelSetWeights.RandValEx(plugin)
@@ -94,7 +83,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			return err
 		}
 
-		basicReels.AddRNG(gameProp, si)
+		basicReels.AddRNG(gameProp, si, cd)
 
 		rd, isok := gameProp.Pool.Config.MapReels[val.String()]
 		if !isok {
@@ -127,7 +116,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	basicReels.AddScene(gameProp, curpr, sc)
+	basicReels.AddScene(gameProp, curpr, sc, cd)
 
 	if basicReels.Config.IsFGMainSpin {
 		gameProp.OnFGSpin()
@@ -135,15 +124,17 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	basicReels.onStepEnd(gameProp, curpr, gp)
 
-	basicReels.BuildPBComponent(gp)
+	gp.AddComponentData(basicReels.Name, cd)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (basicReels *BasicReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(basicReels.UsedScenes) > 0 {
-		asciigame.OutputScene("initial symbols", pr.Scenes[basicReels.UsedScenes[0]], mapSymbolColor)
+	cd := gameProp.MapComponentData[basicReels.Name].(*BasicComponentData)
+
+	if len(cd.UsedScenes) > 0 {
+		asciigame.OutputScene("initial symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

@@ -3,9 +3,9 @@ package sgc7game
 // IPlayerState - player state
 type IPlayerState interface {
 	// SetPublic - set player public state
-	SetPublic(pub interface{}) error
+	SetPublic(pub any) error
 	// SetPrivate - set player private state
-	SetPrivate(pri interface{}) error
+	SetPrivate(pri any) error
 
 	// SetPublicJson - set player public state
 	SetPublicJson(pub string) error
@@ -13,9 +13,9 @@ type IPlayerState interface {
 	SetPrivateJson(pri string) error
 
 	// GetPublic - get player public state
-	GetPublic() interface{}
+	GetPublic() any
 	// GetPrivate - get player private state
-	GetPrivate() interface{}
+	GetPrivate() any
 
 	// GetPublicJson - set player public state
 	GetPublicJson() string

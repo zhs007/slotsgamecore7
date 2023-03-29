@@ -233,7 +233,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 // Play - play game
 func (serv *Serv) LogReplyPlay(str string, reply *sgc7pb.ReplyPlay, logLevel zapcore.Level) {
-	arr := []interface{}{}
+	arr := []any{}
 	for _, v := range reply.Results {
 		msg, err := serv.service.BuildPBGameModParamFromAny(v.ClientData.CurGameModParam)
 		if err != nil {

@@ -70,23 +70,25 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
-func (symbolMulti *SymbolMulti) OnNewGame(gameProp *GameProperty) error {
-	return nil
-}
+// // OnNewGame -
+// func (symbolMulti *SymbolMulti) OnNewGame(gameProp *GameProperty) error {
+// 	return nil
+// }
 
-// OnNewStep -
-func (symbolMulti *SymbolMulti) OnNewStep(gameProp *GameProperty) error {
-	symbolMulti.BasicComponent.OnNewStep()
+// // OnNewStep -
+// func (symbolMulti *SymbolMulti) OnNewStep(gameProp *GameProperty) error {
+// 	symbolMulti.BasicComponent.OnNewStep()
 
-	return nil
-}
+// 	return nil
+// }
 
 // playgame
 func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	gs := symbolMulti.GetTargetScene(gameProp, curpr)
+	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
+
+	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd)
 
 	os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
 	if err != nil {
@@ -114,19 +116,23 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 	}
 
-	symbolMulti.AddOtherScene(gameProp, curpr, os)
+	symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
 
 	symbolMulti.onStepEnd(gameProp, curpr, gp)
 
-	symbolMulti.BuildPBComponent(gp)
+	gp.AddComponentData(symbolMulti.Name, cd)
+	// symbolMulti.BuildPBComponent(gp)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (symbolMulti *SymbolMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(symbolMulti.UsedOtherScenes) > 0 {
-		asciigame.OutputOtherScene("The multi of the symbols", pr.OtherScenes[symbolMulti.UsedOtherScenes[0]])
+
+	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
+
+	if len(cd.UsedOtherScenes) > 0 {
+		asciigame.OutputOtherScene("The multi of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil

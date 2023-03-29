@@ -18,9 +18,9 @@ type GamePropertyPool struct {
 	DefaultLineData  *sgc7game.LineData
 	SymbolsViewer    *SymbolsViewer
 	MapSymbolColor   *asciigame.SymbolColorMap
-	MapCollectors    map[string]*Collector
-	MapComponents    map[string]IComponent
-	Stats            *Stats
+	// MapCollectors    map[string]*Collector
+	MapComponents map[string]IComponent
+	Stats         *Stats
 }
 
 func (pool *GamePropertyPool) newGameProp() *GameProperty {
@@ -29,15 +29,20 @@ func (pool *GamePropertyPool) newGameProp() *GameProperty {
 		MapVals:          make(map[int]int),
 		MapStrVals:       make(map[int]string),
 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
-		MapCollectors:    make(map[string]*CollectorData),
+		// MapCollectors:    make(map[string]*CollectorData),
 		MapStats:         make(map[string]*sgc7stats.Feature),
 		MapInt:           make(map[string]int),
 		CurPaytables:     pool.DefaultPaytables,
 		CurLineData:      pool.DefaultLineData,
+		MapComponentData: make(map[string]IComponentData),
 	}
 
-	for k, _ := range pool.MapCollectors {
-		gameProp.addCollectorData(k)
+	// for k := range pool.MapCollectors {
+	// 	gameProp.addCollectorData(k)
+	// }
+
+	for k, v := range pool.MapComponents {
+		gameProp.MapComponentData[k] = v.NewComponentData()
 	}
 
 	return gameProp
@@ -53,10 +58,10 @@ func (pool *GamePropertyPool) NewGameProp() (*GameProperty, error) {
 }
 
 func (pool *GamePropertyPool) onAddComponent(name string, component IComponent) {
-	collector, isok := component.(*Collector)
-	if isok {
-		pool.MapCollectors[name] = collector
-	}
+	// collector, isok := component.(*Collector)
+	// if isok {
+	// 	pool.MapCollectors[name] = collector
+	// }
 
 	pool.MapComponents[name] = component
 }
@@ -146,8 +151,8 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 		Config:           cfg,
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
-		MapCollectors:    make(map[string]*Collector),
-		MapComponents:    make(map[string]IComponent),
+		// MapCollectors:    make(map[string]*Collector),
+		MapComponents: make(map[string]IComponent),
 	}
 
 	sv, err := LoadSymbolsViewer(cfg.SymbolsViewer)

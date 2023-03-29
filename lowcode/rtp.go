@@ -48,7 +48,7 @@ func buildRTPSymbolsData(pool *GamePropertyPool) ([]int, []int) {
 }
 
 func newFuncOnGameMod(cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 		// gameProp, isok := gameData.(*GameProperty)
 		// if !isok {
 		// 	return false
@@ -73,7 +73,7 @@ func newFuncOnGameMod(cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
 }
 
 func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 		if len(cfgSymbolFeature.Components) == 0 {
 			return true
 		}
@@ -92,8 +92,8 @@ func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
 	}
 }
 
-func newFuncSymbolOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+func newFuncSymbolOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 		if len(cfgSymbolFeature.Components) == 0 {
 
 			for _, v := range pr.Results {
@@ -113,14 +113,23 @@ func newFuncSymbolOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnRes
 			for _, componentName := range cfgSymbolFeature.Components {
 				c, hasComponent := gp.MapComponents[componentName]
 				if hasComponent {
-					for _, ri := range c.UsedResults {
-						ret := pr.Results[ri]
+					component := pool.MapComponents[componentName]
 
+					component.EachUsedResults(pr, c, func(ret *sgc7game.Result) {
 						if ret.Symbol == node.Symbol {
 							node.TriggerNums++
 							node.TotalWin += int64(ret.CashWin)
 						}
-					}
+					})
+
+					// for _, ri := range c.UsedResults {
+					// 	ret := pr.Results[ri]
+
+					// 	if ret.Symbol == node.Symbol {
+					// 		node.TriggerNums++
+					// 		node.TotalWin += int64(ret.CashWin)
+					// 	}
+					// }
 
 					ismine = true
 				}
@@ -131,8 +140,8 @@ func newFuncSymbolOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnRes
 	}
 }
 
-func newFuncSymbolNumOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+func newFuncSymbolNumOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
+	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 		if len(cfgSymbolFeature.Components) == 0 {
 
 			for _, v := range pr.Results {
@@ -152,14 +161,23 @@ func newFuncSymbolNumOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOn
 			for _, componentName := range cfgSymbolFeature.Components {
 				c, hasComponent := gp.MapComponents[componentName]
 				if hasComponent {
-					for _, ri := range c.UsedResults {
-						ret := pr.Results[ri]
+					component := pool.MapComponents[componentName]
 
+					component.EachUsedResults(pr, c, func(ret *sgc7game.Result) {
 						if ret.Symbol == node.Symbol && ret.SymbolNums == node.SymbolNums {
 							node.TriggerNums++
 							node.TotalWin += int64(ret.CashWin)
 						}
-					}
+					})
+
+					// for _, ri := range c.UsedResults {
+					// 	ret := pr.Results[ri]
+
+					// 	if ret.Symbol == node.Symbol && ret.SymbolNums == node.SymbolNums {
+					// 		node.TriggerNums++
+					// 		node.TotalWin += int64(ret.CashWin)
+					// 	}
+					// }
 
 					ismine = true
 				}
@@ -205,8 +223,8 @@ func newRTPGameModule(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgGameModule *R
 
 		names = append(names, v.Name)
 		funcOnResults = append(funcOnResults, newFuncOnResult(feature))
-		funcSymbolOnResults = append(funcSymbolOnResults, newFuncSymbolOnResult(feature))
-		funcSymbolNumOnResults = append(funcSymbolNumOnResults, newFuncSymbolNumOnResult(feature))
+		funcSymbolOnResults = append(funcSymbolOnResults, newFuncSymbolOnResult(pool, feature))
+		funcSymbolNumOnResults = append(funcSymbolNumOnResults, newFuncSymbolNumOnResult(pool, feature))
 	}
 
 	sgc7rtp.InitGameMod3(gm, names, funcOnResults,
@@ -238,7 +256,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 		Currency: "EUR",
 	}
 
-	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData interface{}) {
+	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData any) {
 		game.Pool.Stats.Push(stake, lst)
 	}
 	// rtp.Stats2 = game.Pool.Stats.Root

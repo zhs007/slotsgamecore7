@@ -28,7 +28,7 @@ func (mod *BasicGameMod) GetName() string {
 }
 
 // OnPlay - on play
-func (mod *BasicGameMod) OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData interface{}) (*PlayResult, error) {
+func (mod *BasicGameMod) OnPlay(game IGame, plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData any) (*PlayResult, error) {
 	return nil, ErrInvalidCommand
 }
 
@@ -61,7 +61,7 @@ func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, reel
 }
 
 // NewPlayResult - new a PlayResult
-func (mod *BasicGameMod) NewPlayResult(gamemodparams interface{}) *PlayResult {
+func (mod *BasicGameMod) NewPlayResult(gamemodparams any) *PlayResult {
 	return &PlayResult{
 		CurGameMod:       mod.Name,
 		CurGameModParams: gamemodparams,
@@ -69,7 +69,7 @@ func (mod *BasicGameMod) NewPlayResult(gamemodparams interface{}) *PlayResult {
 }
 
 // NewPlayResult2 - new a PlayResult
-func (mod *BasicGameMod) NewPlayResult2(gamemodparams interface{}, prs []*PlayResult, parentIndex int, modType string) *PlayResult {
+func (mod *BasicGameMod) NewPlayResult2(gamemodparams any, prs []*PlayResult, parentIndex int, modType string) *PlayResult {
 	ci := GetPlayResultCurIndex(prs)
 	pr := NewPlayResult(mod.Name, ci, parentIndex, modType)
 	pr.CurGameModParams = gamemodparams

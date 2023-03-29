@@ -7,10 +7,40 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
+
+type MultiLevelReelsData struct {
+	BasicComponentData
+	CurLevel int
+}
+
+// OnNewGame -
+func (multiLevelReelsData *MultiLevelReelsData) OnNewGame() {
+	multiLevelReelsData.BasicComponentData.OnNewGame()
+
+	multiLevelReelsData.CurLevel = 0
+}
+
+// OnNewGame -
+func (multiLevelReelsData *MultiLevelReelsData) OnNewStep() {
+	multiLevelReelsData.BasicComponentData.OnNewStep()
+}
+
+// BuildPBComponentData
+func (multiLevelReelsData *MultiLevelReelsData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.MultiLevelReelsData{
+		BasicComponentData: multiLevelReelsData.BuildPBBasicComponentData(),
+		CurLevel:           int32(multiLevelReelsData.CurLevel),
+	}
+
+	return pbcd
+}
 
 // MultiLevelReelsLevelConfig - configuration for MultiLevelReels's Level
 type MultiLevelReelsLevelConfig struct {
@@ -31,7 +61,6 @@ type MultiLevelReels struct {
 	*BasicComponent
 	Config              *MultiLevelReelsConfig
 	LevelReelSetWeights []*sgc7game.ValWeights2
-	CurLevel            int
 }
 
 // Init -
@@ -89,22 +118,26 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, pool *GamePropertyPool) 
 
 // OnNewGame -
 func (multiLevelReels *MultiLevelReels) OnNewGame(gameProp *GameProperty) error {
-	multiLevelReels.CurLevel = 0
+	cd := gameProp.MapComponentData[multiLevelReels.Name]
+
+	cd.OnNewGame()
 
 	return nil
 }
 
 // OnNewStep -
 func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error {
-	multiLevelReels.BasicComponent.OnNewStep()
+	multiLevelReels.BasicComponent.OnNewStep(gameProp)
+
+	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
 
 	for i, v := range multiLevelReels.Config.Levels {
-		if multiLevelReels.CurLevel > i {
-			collecotr, isok := gameProp.MapCollectors[v.Collector]
+		if cd.CurLevel > i {
+			_, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
 			if isok {
-				if collecotr.Val >= v.CollectorVal {
-					multiLevelReels.CurLevel = i
-				}
+				// if collectorData.Val >= v.CollectorVal {
+				// 	multiLevelMystery.CurLevel = i
+				// }
 			}
 		}
 	}
@@ -116,11 +149,13 @@ func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error 
 func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
+
 	if multiLevelReels.LevelReelSetWeights != nil {
-		val, err := multiLevelReels.LevelReelSetWeights[multiLevelReels.CurLevel].RandVal(plugin)
+		val, err := multiLevelReels.LevelReelSetWeights[cd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelReels.OnPlayGame:ReelSetWeights.RandVal",
-				zap.Int("curLevel", multiLevelReels.CurLevel),
+				zap.Int("curLevel", cd.CurLevel),
 				zap.Error(err))
 
 			return err
@@ -129,7 +164,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		rd, isok := gameProp.Pool.Config.MapReels[val.String()]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
-				zap.Int("curLevel", multiLevelReels.CurLevel),
+				zap.Int("curLevel", cd.CurLevel),
 				zap.String("reelset", val.String()),
 				zap.Error(ErrInvalidReels))
 
@@ -138,11 +173,11 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 		gameProp.CurReels = rd
 	} else {
-		rd, isok := gameProp.Pool.Config.MapReels[multiLevelReels.Config.Levels[multiLevelReels.CurLevel].Reel]
+		rd, isok := gameProp.Pool.Config.MapReels[multiLevelReels.Config.Levels[cd.CurLevel].Reel]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
-				zap.Int("curLevel", multiLevelReels.CurLevel),
-				zap.String("reelset", multiLevelReels.Config.Levels[multiLevelReels.CurLevel].Reel),
+				zap.Int("curLevel", cd.CurLevel),
+				zap.String("reelset", multiLevelReels.Config.Levels[cd.CurLevel].Reel),
 				zap.Error(ErrInvalidReels))
 
 			return ErrInvalidReels
@@ -161,7 +196,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	multiLevelReels.AddScene(gameProp, curpr, sc)
+	multiLevelReels.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
 
 	if multiLevelReels.Config.IsFGMainSpin {
 		gameProp.OnFGSpin()
@@ -169,15 +204,19 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	multiLevelReels.onStepEnd(gameProp, curpr, gp)
 
-	multiLevelReels.BuildPBComponent(gp)
+	gp.AddComponentData(multiLevelReels.Name, cd)
+	// multiLevelReels.BuildPBComponent(gp)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (multiLevelReels *MultiLevelReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(multiLevelReels.UsedScenes) > 0 {
-		asciigame.OutputScene("initial symbols", pr.Scenes[multiLevelReels.UsedScenes[0]], mapSymbolColor)
+
+	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
+
+	if len(cd.UsedScenes) > 0 {
+		asciigame.OutputScene("initial symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
@@ -186,6 +225,43 @@ func (multiLevelReels *MultiLevelReels) OnAsciiGame(gameProp *GameProperty, pr *
 // OnStats
 func (multiLevelReels *MultiLevelReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// OnStatsWithPB -
+func (multiLevelReels *MultiLevelReels) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.BookOfData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("MultiLevelReels.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return 0, err
+	}
+
+	return multiLevelReels.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+}
+
+// NewComponentData -
+func (multiLevelReels *MultiLevelReels) NewComponentData() IComponentData {
+	return &MultiLevelReelsData{}
+}
+
+// EachUsedResults -
+func (multiLevelReels *MultiLevelReels) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+	pbcd := &sgc7pb.MultiLevelReelsData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+			zap.Error(err))
+
+		return
+	}
+
+	for _, v := range pbcd.BasicComponentData.UsedResults {
+		oneach(pr.Results[v])
+	}
 }
 
 func NewMultiLevelReels(name string) IComponent {

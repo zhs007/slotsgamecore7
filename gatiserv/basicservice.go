@@ -208,17 +208,17 @@ func (sv *BasicService) Version() *VersionInfo {
 }
 
 // // NewBoostData - new a BoostData
-// func (sv *BasicService) NewBoostData() interface{} {
+// func (sv *BasicService) NewBoostData() any {
 // 	return nil
 // }
 
 // // NewBoostDataList - new a list for BoostData
-// func (sv *BasicService) NewBoostDataList() []interface{} {
+// func (sv *BasicService) NewBoostDataList() []any {
 // 	return []*BasicMissionBoostDataMap{}
 // }
 
 // // NewPlayerBoostData - new a PlayerBoostData
-// func (sv *BasicService) NewPlayerBoostData() interface{} {
+// func (sv *BasicService) NewPlayerBoostData() any {
 // 	return nil
 // }
 

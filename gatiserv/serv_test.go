@@ -20,12 +20,12 @@ type testPlayerState struct {
 }
 
 // SetPublic - set player public state
-func (ps *testPlayerState) SetPublic(pub interface{}) error {
+func (ps *testPlayerState) SetPublic(pub any) error {
 	return nil
 }
 
 // SetPrivate - set player private state
-func (ps *testPlayerState) SetPrivate(pri interface{}) error {
+func (ps *testPlayerState) SetPrivate(pri any) error {
 	return nil
 }
 
@@ -40,14 +40,14 @@ func (ps *testPlayerState) SetPrivate(pri interface{}) error {
 // }
 
 // GetPublic - get player public state
-func (ps *testPlayerState) GetPublic() interface{} {
+func (ps *testPlayerState) GetPublic() any {
 	return sgc7game.BasicPlayerPublicState{
 		CurGameMod: "BG",
 	}
 }
 
 // GetPrivate - get player private state
-func (ps *testPlayerState) GetPrivate() interface{} {
+func (ps *testPlayerState) GetPrivate() any {
 	return sgc7game.BasicPlayerPrivateState{}
 }
 
@@ -100,17 +100,17 @@ func (sv *testService) Version() *VersionInfo {
 }
 
 // // NewBoostData - new a BoostData
-// func (sv *testService) NewBoostData() interface{} {
+// func (sv *testService) NewBoostData() any {
 // 	return nil
 // }
 
 // // NewBoostDataList - new a list for BoostData
-// func (sv *testService) NewBoostDataList() []interface{} {
+// func (sv *testService) NewBoostDataList() []any {
 // 	return nil
 // }
 
 // // NewPlayerBoostData - new a PlayerBoostData
-// func (sv *testService) NewPlayerBoostData() interface{} {
+// func (sv *testService) NewPlayerBoostData() any {
 // 	return nil
 // }
 

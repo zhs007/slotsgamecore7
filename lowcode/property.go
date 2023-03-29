@@ -49,11 +49,11 @@ type GameProperty struct {
 	MapIntValWeights map[string]*sgc7game.ValWeights2
 	MapScenes        map[string]int
 	MapOtherScenes   map[string]int
-	MapCollectors    map[string]*CollectorData
-	// MapComponents    map[string]IComponent
-	// Stats            *sgc7stats.Feature
-	MapStats map[string]*sgc7stats.Feature
-	MapInt   map[string]int
+	// MapCollectors    map[string]*CollectorData
+	MapStats          map[string]*sgc7stats.Feature
+	MapInt            map[string]int
+	MapComponentData  map[string]IComponentData
+	HistoryComponents []IComponent
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
@@ -62,6 +62,8 @@ func (gameProp *GameProperty) OnNewStep() error {
 
 	gameProp.SetStrVal(GamePropNextComponent, "")
 	gameProp.SetStrVal(GamePropRespinComponent, "")
+
+	gameProp.HistoryComponents = nil
 
 	return nil
 }
@@ -242,9 +244,9 @@ func (gameProp *GameProperty) GetStrVal(prop int) string {
 	return gameProp.MapStrVals[prop]
 }
 
-func (gameProp *GameProperty) addCollectorData(name string) {
-	gameProp.MapCollectors[name] = NewCollectorData()
-}
+// func (gameProp *GameProperty) addCollectorData(name string) {
+// 	gameProp.MapCollectors[name] = NewCollectorData()
+// }
 
 // func (gameProp *GameProperty) onAddComponent(name string, component IComponent) {
 // 	collector, isok := component.(*Collecotr)

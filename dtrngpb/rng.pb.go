@@ -157,7 +157,7 @@ func file_rng_proto_rawDescGZIP() []byte {
 }
 
 var file_rng_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_rng_proto_goTypes = []interface{}{
+var file_rng_proto_goTypes = []any{
 	(*RequestRngs)(nil), // 0: dtrngpb.RequestRngs
 	(*ReplyRngs)(nil),   // 1: dtrngpb.ReplyRngs
 }
@@ -177,7 +177,7 @@ func file_rng_proto_init() {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_rng_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_rng_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*RequestRngs); i {
 			case 0:
 				return &v.state
@@ -189,7 +189,7 @@ func file_rng_proto_init() {
 				return nil
 			}
 		}
-		file_rng_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_rng_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*ReplyRngs); i {
 			case 0:
 				return &v.state
