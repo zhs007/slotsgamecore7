@@ -14,8 +14,8 @@ type IService interface {
 	BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *sgc7pb.PlayerState) error
 	// BuildPBPlayerState - sgc7game.IPlayerState -> *sgc7pb.PlayerState
 	BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.PlayerState, error)
-	// BuildPBGameModParam - interface{} -> *any.Any
-	BuildPBGameModParam(gp interface{}) (*anypb.Any, error)
-	// BuildPBGameModParamFromAny - interface{} -> *any.Any
-	BuildPBGameModParamFromAny(msg *anypb.Any) (interface{}, error)
+	// BuildPBGameModParam - any -> *any.Any
+	BuildPBGameModParam(gp any) (*anypb.Any, error)
+	// BuildPBGameModParamFromAny - any -> *any.Any
+	BuildPBGameModParamFromAny(msg *anypb.Any) (any, error)
 }

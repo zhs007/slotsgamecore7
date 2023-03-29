@@ -4,22 +4,21 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // BasicGameMod - basic gamemod
 type BasicGameMod struct {
 	*sgc7game.BasicGameMod
-	Pool              *GamePropertyPool
-	Components        *ComponentList
-	HistoryComponents []IComponent
+	Pool       *GamePropertyPool
+	Components *ComponentList
 }
 
 // OnPlay - on play
 func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
 	gp := &GameParams{}
-	gp.MapComponents = make(map[string]*sgc7pb.ComponentData)
+	gp.MapComponents = make(map[string]*anypb.Any)
 
 	pr := &sgc7game.PlayResult{
 		IsFinish:         true,
@@ -39,7 +38,7 @@ func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.Pl
 
 // OnPlay - on play
 func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, cmd string, param string,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, gameData interface{}) (*sgc7game.PlayResult, error) {
+	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, gameData any) (*sgc7game.PlayResult, error) {
 
 	gameProp, isok := gameData.(*GameProperty)
 	if !isok {
@@ -82,7 +81,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				return nil, err
 			}
 
-			bgm.HistoryComponents = append(bgm.HistoryComponents, curComponent)
+			gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
 
 			respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
 			if respinComponent != "" {
@@ -127,7 +126,7 @@ func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
 
 // OnAsciiGame - outpur to asciigame
 func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
-	for _, v := range bgm.HistoryComponents {
+	for _, v := range gameProp.HistoryComponents {
 		v.OnAsciiGame(gameProp, pr, lst, gameProp.Pool.MapSymbolColor)
 	}
 
@@ -152,7 +151,7 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty) error {
 
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty) error {
-	bgm.HistoryComponents = nil
+	// bgm.HistoryComponents = nil
 	gameProp.OnNewStep()
 
 	for i, v := range bgm.Components.Components {

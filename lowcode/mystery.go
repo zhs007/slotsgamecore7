@@ -8,10 +8,40 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
+
+type MysteryData struct {
+	BasicComponentData
+	CurMysteryCode int
+}
+
+// OnNewGame -
+func (mysteryData *MysteryData) OnNewGame() {
+	mysteryData.BasicComponentData.OnNewGame()
+}
+
+// OnNewGame -
+func (mysteryData *MysteryData) OnNewStep() {
+	mysteryData.BasicComponentData.OnNewStep()
+
+	mysteryData.CurMysteryCode = -1
+}
+
+// BuildPBComponentData
+func (mysteryData *MysteryData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.MysteryData{
+		BasicComponentData: mysteryData.BuildPBBasicComponentData(),
+		CurMysteryCode:     int32(mysteryData.CurMysteryCode),
+	}
+
+	return pbcd
+}
 
 // MysteryTriggerFeatureConfig - configuration for mystery trigger feature
 type MysteryTriggerFeatureConfig struct {
@@ -103,39 +133,28 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
-func (mystery *Mystery) OnNewGame(gameProp *GameProperty) error {
-
-	return nil
-}
-
-// OnNewStep -
-func (mystery *Mystery) OnNewStep(gameProp *GameProperty) error {
-
-	mystery.BasicComponent.OnNewStep()
-
-	return nil
-}
-
 // playgame
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
+
 	if mystery.MysteryWeights != nil {
 		if mystery.Config.MysteryRNG != "" {
-			gs := mystery.GetTargetScene(gameProp, curpr)
+			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
 			rng := gameProp.MapInt[mystery.Config.MysteryRNG]
 			cs := mystery.MysteryWeights.Vals[rng]
 
 			curmcode := cs.Int()
+			cd.CurMysteryCode = curmcode
 
 			gameProp.SetVal(GamePropCurMystery, curmcode)
 
 			sc2 := gs.Clone()
 			sc2.ReplaceSymbol(mystery.MysterySymbol, curmcode)
 
-			mystery.AddScene(gameProp, curpr, sc2)
+			mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
 			v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 			if isok {
@@ -148,7 +167,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				}
 			}
 		} else {
-			gs := mystery.GetTargetScene(gameProp, curpr)
+			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
 			if gs.HasSymbol(mystery.MysterySymbol) {
 				curm, err := mystery.MysteryWeights.RandVal(plugin)
@@ -166,7 +185,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				sc2 := gs.Clone()
 				sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
 
-				mystery.AddScene(gameProp, curpr, sc2)
+				mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
 				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 				if isok {
@@ -184,17 +203,20 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	mystery.onStepEnd(gameProp, curpr, gp)
 
-	mystery.BuildPBComponent(gp)
+	gp.AddComponentData(mystery.Name, cd)
+	// mystery.BuildPBComponent(gp)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(mystery.UsedScenes) > 0 {
+	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
+
+	if len(cd.UsedScenes) > 0 {
 		if mystery.MysteryWeights != nil {
 			fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
-			asciigame.OutputScene("after symbols", pr.Scenes[mystery.UsedScenes[0]], mapSymbolColor)
+			asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 		}
 	}
 
@@ -204,6 +226,43 @@ func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRes
 // OnStats
 func (mystery *Mystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// OnStatsWithPB -
+func (mystery *Mystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.BookOfData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("MultiLevelReels.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return 0, err
+	}
+
+	return mystery.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+}
+
+// NewComponentData -
+func (mystery *Mystery) NewComponentData() IComponentData {
+	return &MysteryData{}
+}
+
+// EachUsedResults -
+func (mystery *Mystery) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+	pbcd := &sgc7pb.MysteryData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+			zap.Error(err))
+
+		return
+	}
+
+	for _, v := range pbcd.BasicComponentData.UsedResults {
+		oneach(pr.Results[v])
+	}
 }
 
 func NewMystery(name string) IComponent {

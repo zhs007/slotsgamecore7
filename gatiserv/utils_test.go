@@ -14,13 +14,13 @@ type ErrPlayerState struct {
 }
 
 // SetPublic - set player public state
-func (eps *ErrPlayerState) SetPublic(pub interface{}) error {
+func (eps *ErrPlayerState) SetPublic(pub any) error {
 	return nil
 
 }
 
 // SetPrivate - set player private state
-func (eps *ErrPlayerState) SetPrivate(pri interface{}) error {
+func (eps *ErrPlayerState) SetPrivate(pri any) error {
 	return nil
 }
 
@@ -35,12 +35,12 @@ func (eps *ErrPlayerState) SetPrivate(pri interface{}) error {
 // }
 
 // GetPublic - get player public state
-func (eps *ErrPlayerState) GetPublic() interface{} {
+func (eps *ErrPlayerState) GetPublic() any {
 	return nil
 }
 
 // GetPrivate - get player private state
-func (eps *ErrPlayerState) GetPrivate() interface{} {
+func (eps *ErrPlayerState) GetPrivate() any {
 	return nil
 }
 

@@ -59,5 +59,6 @@ func main() {
 		return
 	}
 
+	// lowcode.SetForceDisableStats()
 	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath)
 }

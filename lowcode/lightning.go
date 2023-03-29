@@ -8,8 +8,11 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,6 +22,42 @@ const (
 
 	LightningFeatureCollector = "collector"
 )
+
+type LightningData struct {
+	BasicComponentData
+	Collector    int
+	Val          int
+	Mul          int
+	NewConnector int
+}
+
+// OnNewGame -
+func (lightningData *LightningData) OnNewGame() {
+	lightningData.BasicComponentData.OnNewGame()
+}
+
+// OnNewGame -
+func (lightningData *LightningData) OnNewStep() {
+	lightningData.BasicComponentData.OnNewStep()
+
+	lightningData.Collector = 0
+	lightningData.Val = 0
+	lightningData.Mul = 0
+	lightningData.NewConnector = 0
+}
+
+// BuildPBComponentData
+func (lightningData *LightningData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.LightningData{
+		BasicComponentData: lightningData.BuildPBBasicComponentData(),
+		Collector:          int32(lightningData.Collector),
+		Val:                int32(lightningData.Val),
+		Mul:                int32(lightningData.Mul),
+		NewConnector:       int32(lightningData.NewConnector),
+	}
+
+	return pbcd
+}
 
 // LightningTriggerFeatureConfig - configuration for lightning trigger feature
 type LightningTriggerFeatureConfig struct {
@@ -60,10 +99,6 @@ type Lightning struct {
 	ValSymbolCode            int
 	MulSymbolCode            int
 	CollectorSymbolCode      int
-	Collector                int
-	Val                      int
-	Mul                      int
-	NewConnector             int
 }
 
 // Init -
@@ -148,27 +183,11 @@ func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
-func (lightning *Lightning) OnNewGame(gameProp *GameProperty) error {
-	return nil
-}
-
-// OnNewStep -
-func (lightning *Lightning) OnNewStep(gameProp *GameProperty) error {
-
-	lightning.BasicComponent.OnNewStep()
-
-	lightning.Collector = 0
-	lightning.Val = 0
-	lightning.Mul = 0
-	lightning.NewConnector = 0
-
-	return nil
-}
-
 // playgame
 func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	cd := gameProp.MapComponentData[lightning.Name].(*LightningData)
 
 	if len(prs) <= 0 {
 		goutils.Error("Lightning:prs",
@@ -249,17 +268,17 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	lightning.AddScene(gameProp, curpr, gs)
-	lightning.AddOtherScene(gameProp, curpr, os)
+	lightning.AddScene(gameProp, curpr, gs, &cd.BasicComponentData)
+	lightning.AddOtherScene(gameProp, curpr, os, &cd.BasicComponentData)
 
-	lightning.Collector = lastCollector
-	lightning.Val = val
-	lightning.Mul = mul
+	cd.Collector = lastCollector
+	cd.Val = val
+	cd.Mul = mul
 
 	if isCollector {
-		lightning.NewConnector = lastCollector + val*mul
+		cd.NewConnector = lastCollector + val*mul
 
-		os.Arr[collectorX][collectorY] = lightning.NewConnector
+		os.Arr[collectorX][collectorY] = cd.NewConnector
 
 		gameProp.Respin(curpr, gp, lightning.Name, gs, os)
 	} else {
@@ -274,7 +293,7 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			SymbolNums: len(arrpos) / 2,
 		}
 
-		lightning.AddResult(curpr, ret)
+		lightning.AddResult(curpr, ret, &cd.BasicComponentData)
 
 		if lightning.Config.EndingFirstComponent != "" {
 			gameProp.Respin(curpr, gp, lightning.Config.EndingFirstComponent, gs, os)
@@ -283,25 +302,27 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	lightning.BuildPBComponent(gp)
+	gp.AddComponentData(lightning.Name, cd)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (lightning *Lightning) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(lightning.UsedScenes) > 0 {
-		// fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
-		asciigame.OutputScene("respin symbols", pr.Scenes[lightning.UsedScenes[0]], mapSymbolColor)
 
-		fmt.Printf("ligntning val-%v mul-%v lastCollector-%v\n", lightning.Val, lightning.Mul, lightning.Collector)
+	cd := gameProp.MapComponentData[lightning.Name].(*LightningData)
 
-		if lightning.NewConnector > 0 {
-			fmt.Printf("new collect is %v\n", lightning.NewConnector)
+	if len(cd.UsedScenes) > 0 {
+		asciigame.OutputScene("respin symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+
+		fmt.Printf("ligntning val-%v mul-%v lastCollector-%v\n", cd.Val, cd.Mul, cd.Collector)
+
+		if cd.NewConnector > 0 {
+			fmt.Printf("new collect is %v\n", cd.NewConnector)
 		}
 
 		asciigame.OutputResults(fmt.Sprintf("%v wins", lightning.Name), pr, func(i int, ret *sgc7game.Result) bool {
-			return goutils.IndexOfIntSlice(lightning.UsedResults, i, 0) >= 0
+			return goutils.IndexOfIntSlice(cd.UsedResults, i, 0) >= 0
 		}, mapSymbolColor)
 	}
 
@@ -311,6 +332,43 @@ func (lightning *Lightning) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 // OnStats
 func (lightning *Lightning) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// OnStatsWithPB -
+func (lightning *Lightning) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.BookOfData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return 0, err
+	}
+
+	return lightning.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+}
+
+// NewComponentData -
+func (lightning *Lightning) NewComponentData() IComponentData {
+	return &LightningData{}
+}
+
+// EachUsedResults -
+func (lightning *Lightning) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+	pbcd := &sgc7pb.LightningData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+			zap.Error(err))
+
+		return
+	}
+
+	for _, v := range pbcd.BasicComponentData.UsedResults {
+		oneach(pr.Results[v])
+	}
 }
 
 func NewLightning(name string) IComponent {

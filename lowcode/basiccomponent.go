@@ -1,10 +1,75 @@
 package lowcode
 
 import (
+	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
+
+type BasicComponentData struct {
+	UsedScenes            []int
+	UsedOtherScenes       []int
+	UsedResults           []int
+	UsedPrizeScenes       []int
+	CashWin               int64
+	CoinWin               int
+	TargetSceneIndex      int
+	TargetOtherSceneIndex int
+	RNG                   []int
+}
+
+// OnNewGame -
+func (basicComponentData *BasicComponentData) OnNewGame() {
+}
+
+// OnNewGame -
+func (basicComponentData *BasicComponentData) OnNewStep() {
+	basicComponentData.UsedScenes = nil
+	basicComponentData.UsedOtherScenes = nil
+	basicComponentData.UsedResults = nil
+	basicComponentData.UsedPrizeScenes = nil
+	basicComponentData.CashWin = 0
+	basicComponentData.CoinWin = 0
+	basicComponentData.TargetSceneIndex = -1
+	basicComponentData.TargetOtherSceneIndex = -1
+	basicComponentData.RNG = nil
+}
+
+// BuildPBComponentData
+func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Message {
+	return basicComponentData.BuildPBBasicComponentData()
+}
+
+// BuildPBBasicComponentData
+func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7pb.ComponentData {
+	pbcd := &sgc7pb.ComponentData{}
+
+	pbcd.CashWin = basicComponentData.CashWin
+	pbcd.CoinWin = int32(basicComponentData.CoinWin)
+	pbcd.TargetScene = int32(basicComponentData.TargetSceneIndex)
+
+	for _, v := range basicComponentData.UsedOtherScenes {
+		pbcd.UsedOtherScenes = append(pbcd.UsedOtherScenes, int32(v))
+	}
+
+	for _, v := range basicComponentData.UsedScenes {
+		pbcd.UsedScenes = append(pbcd.UsedScenes, int32(v))
+	}
+
+	for _, v := range basicComponentData.UsedResults {
+		pbcd.UsedResults = append(pbcd.UsedResults, int32(v))
+	}
+
+	for _, v := range basicComponentData.UsedPrizeScenes {
+		pbcd.UsedPrizeScenes = append(pbcd.UsedPrizeScenes, int32(v))
+	}
+
+	return pbcd
+}
 
 type BasicComponentConfig struct {
 	DefaultNextComponent     string   `yaml:"defaultNextComponent"`     // next component, if it is empty jump to ending
@@ -17,17 +82,8 @@ type BasicComponentConfig struct {
 }
 
 type BasicComponent struct {
-	Config                *BasicComponentConfig
-	Name                  string
-	UsedScenes            []int
-	UsedOtherScenes       []int
-	UsedResults           []int
-	UsedPrizeScenes       []int
-	CashWin               int64
-	CoinWin               int
-	TargetSceneIndex      int
-	TargetOtherSceneIndex int
-	RNG                   []int
+	Config *BasicComponentConfig
+	Name   string
 }
 
 // onInit -
@@ -44,25 +100,27 @@ func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *s
 	}
 }
 
+// OnNewGame -
+func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
+	return nil
+}
+
 // OnNewStep -
-func (basicComponent *BasicComponent) OnNewStep() {
-	basicComponent.UsedScenes = nil
-	basicComponent.UsedOtherScenes = nil
-	basicComponent.UsedResults = nil
-	basicComponent.UsedPrizeScenes = nil
-	basicComponent.CashWin = 0
-	basicComponent.CoinWin = 0
-	basicComponent.TargetSceneIndex = -1
-	basicComponent.RNG = nil
+func (basicComponent *BasicComponent) OnNewStep(gameProp *GameProperty) error {
+	cd := gameProp.MapComponentData[basicComponent.Name]
+
+	cd.OnNewStep()
+
+	return nil
 }
 
 // AddScene -
 func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
-	sc *sgc7game.GameScene) {
+	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
 
 	si := len(curpr.Scenes)
-	usi := len(basicComponent.UsedScenes)
-	basicComponent.UsedScenes = append(basicComponent.UsedScenes, si)
+	usi := len(basicCD.UsedScenes)
+	basicCD.UsedScenes = append(basicCD.UsedScenes, si)
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
@@ -73,11 +131,11 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 // AddScene -
 func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
-	sc *sgc7game.GameScene) {
+	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
 
 	si := len(curpr.OtherScenes)
-	usi := len(basicComponent.UsedOtherScenes)
-	basicComponent.UsedOtherScenes = append(basicComponent.UsedOtherScenes, si)
+	usi := len(basicCD.UsedOtherScenes)
+	basicCD.UsedOtherScenes = append(basicCD.UsedOtherScenes, si)
 
 	curpr.OtherScenes = append(curpr.OtherScenes, sc)
 
@@ -87,59 +145,46 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 }
 
 // AddResult -
-func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret *sgc7game.Result) {
-	basicComponent.CoinWin += ret.CoinWin
-	basicComponent.CashWin += int64(ret.CashWin)
+func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret *sgc7game.Result, basicCD *BasicComponentData) {
+	basicCD.CoinWin += ret.CoinWin
+	basicCD.CashWin += int64(ret.CashWin)
 
 	curpr.CashWin += int64(ret.CashWin)
 	curpr.CoinWin += ret.CoinWin
 
-	basicComponent.UsedResults = append(basicComponent.UsedResults, len(curpr.Results))
+	basicCD.UsedResults = append(basicCD.UsedResults, len(curpr.Results))
 
 	curpr.Results = append(curpr.Results, ret)
 }
 
 // AddRNG -
-func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int) {
-	i := len(basicComponent.RNG)
+func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, basicCD *BasicComponentData) {
+	i := len(basicCD.RNG)
 
-	basicComponent.RNG = append(basicComponent.RNG, rng)
+	basicCD.RNG = append(basicCD.RNG, rng)
 
 	if len(basicComponent.Config.TagRNG) > i {
 		gameProp.MapInt[basicComponent.Config.TagRNG[i]] = rng
 	}
 }
 
-// BuildPBComponent -
-func (basicComponent *BasicComponent) BuildPBComponent(gp *GameParams) {
-	pb := &sgc7pb.ComponentData{}
+// OnStatsWithPB -
+func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.ComponentData{}
 
-	pb.Name = basicComponent.Name
-	pb.CashWin = basicComponent.CashWin
-	pb.CoinWin = int32(basicComponent.CoinWin)
-	pb.TargetScene = int32(basicComponent.TargetSceneIndex)
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
 
-	for _, v := range basicComponent.UsedOtherScenes {
-		pb.UsedOtherScenes = append(pb.UsedOtherScenes, int32(v))
+		return 0, err
 	}
 
-	for _, v := range basicComponent.UsedScenes {
-		pb.UsedScenes = append(pb.UsedScenes, int32(v))
-	}
-
-	for _, v := range basicComponent.UsedResults {
-		pb.UsedResults = append(pb.UsedResults, int32(v))
-	}
-
-	for _, v := range basicComponent.UsedPrizeScenes {
-		pb.UsedPrizeScenes = append(pb.UsedPrizeScenes, int32(v))
-	}
-
-	gp.MapComponents[pb.Name] = pb
+	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd, pr), nil
 }
 
-// BuildPBComponent -
-func (basicComponent *BasicComponent) OnStatsWithComponent(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
+// OnStatsWithComponent -
+func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
 	wins := int64(0)
 
 	for _, v := range pbComponent.UsedResults {
@@ -158,21 +203,43 @@ func (basicComponent *BasicComponent) OnStatsWithComponent(feature *sgc7stats.Fe
 }
 
 // GetTargetScene -
-func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult) *sgc7game.GameScene {
+func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
 	gs, si := gameProp.GetScene(curpr, basicComponent.Config.TargetScene)
 
-	basicComponent.TargetSceneIndex = si
+	basicCD.TargetSceneIndex = si
 
 	return gs
 }
 
 // GetTargetOtherScene -
-func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult) *sgc7game.GameScene {
+func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
 	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
 
-	basicComponent.TargetOtherSceneIndex = si
+	basicCD.TargetOtherSceneIndex = si
 
 	return gs
+}
+
+// NewComponentData -
+func (basicComponent *BasicComponent) NewComponentData() IComponentData {
+	return &BasicComponentData{}
+}
+
+// EachUsedResults -
+func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+	pbcd := &sgc7pb.ComponentData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+			zap.Error(err))
+
+		return
+	}
+
+	for _, v := range pbcd.UsedResults {
+		oneach(pr.Results[v])
+	}
 }
 
 func NewBasicComponent(name string) *BasicComponent {

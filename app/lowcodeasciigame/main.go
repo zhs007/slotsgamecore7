@@ -50,7 +50,7 @@ func main() {
 		Currency: "EUR",
 	}
 
-	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, gameData interface{}) {
+	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, gameData any) {
 		gameProp, isok := gameData.(*lowcode.GameProperty)
 		if !isok {
 			return

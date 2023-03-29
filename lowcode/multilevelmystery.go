@@ -8,10 +8,42 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
+
+type MultiLevelMysteryData struct {
+	BasicComponentData
+	CurLevel       int
+	CurMysteryCode int
+}
+
+// OnNewGame -
+func (multiLevelMysteryData *MultiLevelMysteryData) OnNewGame() {
+	multiLevelMysteryData.BasicComponentData.OnNewGame()
+
+	multiLevelMysteryData.CurLevel = 0
+}
+
+// OnNewGame -
+func (multiLevelMysteryData *MultiLevelMysteryData) OnNewStep() {
+	multiLevelMysteryData.BasicComponentData.OnNewStep()
+}
+
+// BuildPBComponentData
+func (multiLevelMysteryData *MultiLevelMysteryData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.MultiLevelMysteryData{
+		BasicComponentData: multiLevelMysteryData.BuildPBBasicComponentData(),
+		CurLevel:           int32(multiLevelMysteryData.CurLevel),
+		CurMysteryCode:     int32(multiLevelMysteryData.CurMysteryCode),
+	}
+
+	return pbcd
+}
 
 // MultiLevelMysteryLevelConfig - configuration for MultiLevelMystery's Level
 type MultiLevelMysteryLevelConfig struct {
@@ -31,10 +63,9 @@ type MultiLevelMysteryConfig struct {
 type MultiLevelMystery struct {
 	*BasicComponent
 	Config                   *MultiLevelMysteryConfig
-	MysterySymbol            int
 	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
 	LevelMysteryWeights      []*sgc7game.ValWeights2
-	CurLevel                 int
+	MysterySymbol            int
 }
 
 // maskOtherScene -
@@ -106,22 +137,26 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, pool *GamePropertyPo
 
 // OnNewGame -
 func (multiLevelMystery *MultiLevelMystery) OnNewGame(gameProp *GameProperty) error {
-	multiLevelMystery.CurLevel = 0
+	cd := gameProp.MapComponentData[multiLevelMystery.Name]
+
+	cd.OnNewGame()
 
 	return nil
 }
 
 // OnNewStep -
 func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) error {
-	multiLevelMystery.BasicComponent.OnNewStep()
+	multiLevelMystery.BasicComponent.OnNewStep(gameProp)
+
+	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
 
 	for i, v := range multiLevelMystery.Config.Levels {
-		if multiLevelMystery.CurLevel > i {
-			collecotr, isok := gameProp.MapCollectors[v.Collector]
+		if cd.CurLevel > i {
+			_, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
 			if isok {
-				if collecotr.Val >= v.CollectorVal {
-					multiLevelMystery.CurLevel = i
-				}
+				// if collectorData.Val >= v.CollectorVal {
+				// 	multiLevelMystery.CurLevel = i
+				// }
 			}
 		}
 	}
@@ -133,10 +168,12 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	gs := multiLevelMystery.GetTargetScene(gameProp, curpr)
+	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
+
+	gs := multiLevelMystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
 	if gs.HasSymbol(multiLevelMystery.MysterySymbol) {
-		curm, err := multiLevelMystery.LevelMysteryWeights[multiLevelMystery.CurLevel].RandVal(plugin)
+		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.OnPlayGame:RandVal",
 				zap.Error(err))
@@ -145,13 +182,14 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		}
 
 		curmcode := curm.Int()
+		cd.CurMysteryCode = curmcode
 
 		gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 		sc2 := gs.Clone()
 		sc2.ReplaceSymbol(multiLevelMystery.MysterySymbol, curm.Int())
 
-		multiLevelMystery.AddScene(gameProp, curpr, sc2)
+		multiLevelMystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
 		v, isok := multiLevelMystery.MapMysteryTriggerFeature[curmcode]
 		if isok {
@@ -167,16 +205,20 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	multiLevelMystery.onStepEnd(gameProp, curpr, gp)
 
-	multiLevelMystery.BuildPBComponent(gp)
+	gp.AddComponentData(multiLevelMystery.Name, cd)
+	// multiLevelMystery.BuildPBComponent(gp)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	if len(multiLevelMystery.UsedScenes) > 0 {
+
+	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
+
+	if len(cd.UsedScenes) > 0 {
 		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
-		asciigame.OutputScene("after symbols", pr.Scenes[multiLevelMystery.UsedScenes[0]], mapSymbolColor)
+		asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
@@ -185,6 +227,43 @@ func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, 
 // OnStats
 func (multiLevelMystery *MultiLevelMystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// OnStatsWithPB -
+func (multiLevelMystery *MultiLevelMystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd := &sgc7pb.BookOfData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return 0, err
+	}
+
+	return multiLevelMystery.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+}
+
+// NewComponentData -
+func (multiLevelMystery *MultiLevelMystery) NewComponentData() IComponentData {
+	return &MultiLevelMysteryData{}
+}
+
+// EachUsedResults -
+func (multiLevelMystery *MultiLevelMystery) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+	pbcd := &sgc7pb.MultiLevelMysteryData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+			zap.Error(err))
+
+		return
+	}
+
+	for _, v := range pbcd.BasicComponentData.UsedResults {
+		oneach(pr.Results[v])
+	}
 }
 
 func NewMultiLevelMystery(name string) IComponent {

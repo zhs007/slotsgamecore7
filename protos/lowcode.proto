@@ -1,6 +1,7 @@
 syntax = "proto3";
 package sgc7pb;
 option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
+import "google/protobuf/any.proto";
 
 // ComponentData
 message ComponentData {
@@ -10,14 +11,53 @@ message ComponentData {
     repeated int32 usedPrizeScenes = 4;
     int32 coinWin = 5;
     int64 cashWin = 6;
-    string name = 7;
     int32 targetScene = 8;
     int32 runIndex = 9;
+}
+
+// BookOfData
+message BookOfData {
+    ComponentData basicComponentData = 1;
+    repeated int32 symbols = 2;
+}
+
+// CollectorData
+message CollectorData {
+    int32 val = 1;
+    int32 newCollector = 2;
+}
+
+// LightningData
+message LightningData {
+    ComponentData basicComponentData = 1;
+	int32 collector = 2;
+	int32 val = 3;
+	int32 mul = 4;
+	int32 newConnector = 5;
+}
+
+// MultiLevelMysteryData
+message MultiLevelMysteryData {
+    ComponentData basicComponentData = 1;
+	int32 curLevel = 3;
+    int32 curMysteryCode = 4;
+}
+
+// MultiLevelReelsData
+message MultiLevelReelsData {
+    ComponentData basicComponentData = 1;
+	int32 curLevel = 3;
+}
+
+// MysteryData
+message MysteryData {
+    ComponentData basicComponentData = 1;
+    int32 curMysteryCode = 2;
 }
 
 // GameParam
 message GameParam {
     string firstComponent = 1;
     string nextStepFirstComponent = 2;
-    map<string, ComponentData> mapComponents = 3;
+    map<string, google.protobuf.Any> mapComponents = 3;
 }

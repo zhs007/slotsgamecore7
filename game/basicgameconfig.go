@@ -16,7 +16,7 @@ type BasicGameConfig struct {
 }
 
 // LoadGameConfig - load configuration
-func LoadGameConfig(fn string, cfg interface{}) error {
+func LoadGameConfig(fn string, cfg any) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return err

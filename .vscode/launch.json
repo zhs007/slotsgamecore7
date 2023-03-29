@@ -31,5 +31,20 @@
                 "SKIPGETCHAR": "1",
             }
         },
+        {
+            "name": "lowcodertp",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/lowcodertp/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/app",
+            "env": {
+                "GAMECFG": "${workspaceFolder}/data/game001/rtp96.yaml",
+                "OUTPUTPATH": "${workspaceFolder}/output",
+                "SPINNUMS": "10000",
+                "CORE":"2",
+            }
+        }
     ]
 }

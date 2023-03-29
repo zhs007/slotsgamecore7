@@ -22,13 +22,13 @@ type IGame interface {
 	// CheckStake - check stake
 	CheckStake(stake *Stake) error
 	// Play - play
-	Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData interface{}) (*PlayResult, error)
+	Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData any) (*PlayResult, error)
 	// NewGameData - new GameData
-	NewGameData() interface{}
+	NewGameData() any
 
 	// AddGameMod - add a gamemod
 	AddGameMod(gmod IGameMod) error
 
 	// ResetConfig
-	ResetConfig(cfg interface{})
+	ResetConfig(cfg any)
 }

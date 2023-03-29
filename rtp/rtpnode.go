@@ -20,11 +20,11 @@ const (
 	RTPNodeSymbolNums = 4
 )
 
-// FuncOnResult - onResult(*RTPNode, *sgc7game.PlayResult, interface{})
-type FuncOnResult func(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool
+// FuncOnResult - onResult(*RTPNode, *sgc7game.PlayResult, any)
+type FuncOnResult func(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool
 
 // OnRootResult - on root
-func OnRootResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+func OnRootResult(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 	if pr.CashWin > 0 {
 		if pr.IsFinish {
 			node.TriggerNums++
@@ -37,7 +37,7 @@ func OnRootResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) 
 }
 
 // OnGameModResult - on gamemod
-func OnGameModResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+func OnGameModResult(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 	if pr.CurGameMod == node.GameMod {
 		if pr.CashWin > 0 {
 			node.TriggerNums++
@@ -51,7 +51,7 @@ func OnGameModResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{
 }
 
 // OnSymbolResult - on symbol
-func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 	// if pr.CurGameMod == node.GameMod {
 	if pr.CashWin > 0 {
 		for _, v := range pr.Results {
@@ -69,7 +69,7 @@ func OnSymbolResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}
 }
 
 // OnSymbolNumsResult - on symbol nums
-func OnSymbolNumsResult(node *RTPNode, pr *sgc7game.PlayResult, gameData interface{}) bool {
+func OnSymbolNumsResult(node *RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
 	if pr.CurGameMod == node.GameMod && pr.CashWin > 0 {
 		for _, v := range pr.Results {
 			if v.Symbol == node.Symbol && v.SymbolNums == node.SymbolNums {
@@ -288,7 +288,7 @@ func (node *RTPNode) AddChild(name string, c *RTPNode) {
 }
 
 // OnResult -
-func (node *RTPNode) OnResult(pr *sgc7game.PlayResult, gameData interface{}) {
+func (node *RTPNode) OnResult(pr *sgc7game.PlayResult, gameData any) {
 	ismine := node.FuncOnResult(node, pr, gameData)
 	if !ismine {
 		return

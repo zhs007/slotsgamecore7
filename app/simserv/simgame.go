@@ -25,8 +25,8 @@ func NewSimService(game sgc7game.IGame) (simserv.IService, error) {
 	return &SimService{bs}, nil
 }
 
-// BuildPBGameModParam - interface{} -> *any.Any
-func (sv *SimService) BuildPBGameModParam(gp interface{}) (*anypb.Any, error) {
+// BuildPBGameModParam - any -> *any.Any
+func (sv *SimService) BuildPBGameModParam(gp any) (*anypb.Any, error) {
 	mygp, isok := gp.(*lowcode.GameParams)
 	if !isok {
 		return nil, ErrInvalidGameParams
@@ -35,8 +35,8 @@ func (sv *SimService) BuildPBGameModParam(gp interface{}) (*anypb.Any, error) {
 	return anypb.New(&mygp.GameParam)
 }
 
-// BuildPBGameModParamFromAny - interface{} -> *any.Any
-func (sv *SimService) BuildPBGameModParamFromAny(msg *anypb.Any) (interface{}, error) {
+// BuildPBGameModParamFromAny - any -> *any.Any
+func (sv *SimService) BuildPBGameModParamFromAny(msg *anypb.Any) (any, error) {
 	mygp := &lowcode.GameParams{}
 
 	err := msg.UnmarshalTo(&mygp.GameParam)

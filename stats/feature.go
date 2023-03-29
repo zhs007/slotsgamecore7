@@ -38,7 +38,7 @@ type Feature struct {
 	Symbols        *SymbolsRTP
 	CurWins        *Wins
 	AllWins        *Wins
-	Obj            interface{}
+	Obj            any
 }
 
 func (feature *Feature) CloneIncludeChildren() *Feature {

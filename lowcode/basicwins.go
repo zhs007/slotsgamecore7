@@ -64,7 +64,7 @@ type BasicWins struct {
 
 // AddResult -
 func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, basicCD *BasicComponentData) {
 	gs, _ := gameProp.GetScene(curpr, tf.TargetScene)
 
 	isTrigger := false
@@ -75,7 +75,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			}, true)
 
 		if ret != nil {
-			basicWins.AddResult(curpr, ret)
+			basicWins.AddResult(curpr, ret, basicCD)
 			isTrigger = true
 		}
 	} else if tf.Type == WinTypeCountScatter {
@@ -84,7 +84,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		})
 
 		if ret != nil {
-			basicWins.AddResult(curpr, ret)
+			basicWins.AddResult(curpr, ret, basicCD)
 			isTrigger = true
 		}
 	}
@@ -137,28 +137,17 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame -
-func (basicWins *BasicWins) OnNewGame(gameProp *GameProperty) error {
-	return nil
-}
-
-// OnNewStep -
-func (basicWins *BasicWins) OnNewStep(gameProp *GameProperty) error {
-
-	basicWins.BasicComponent.OnNewStep()
-
-	return nil
-}
-
 // playgame
 func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	cd := gameProp.MapComponentData[basicWins.Name].(*BasicComponentData)
+
 	for _, v := range basicWins.Config.BeforMain {
-		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, cd)
 	}
 
-	gs := basicWins.GetTargetScene(gameProp, curpr)
+	gs := basicWins.GetTargetScene(gameProp, curpr, cd)
 
 	if basicWins.Config.MainType == WinTypeWays {
 		rets := sgc7game.CalcFullLineEx2(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
@@ -174,7 +163,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		})
 
 		for _, v := range rets {
-			basicWins.AddResult(curpr, v)
+			basicWins.AddResult(curpr, v, cd)
 		}
 	} else if basicWins.Config.MainType == WinTypeLines {
 		for i, v := range gameProp.CurLineData.Lines {
@@ -196,15 +185,15 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			if ret != nil {
 				ret.LineIndex = i
 
-				basicWins.AddResult(curpr, ret)
+				basicWins.AddResult(curpr, ret, cd)
 			}
 		}
 	}
 
 	if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
-		os := basicWins.GetTargetOtherScene(gameProp, curpr)
+		os := basicWins.GetTargetOtherScene(gameProp, curpr, cd)
 
-		for _, v := range basicWins.UsedResults {
+		for _, v := range cd.UsedResults {
 			mul := 1
 
 			ret := curpr.Results[v]
@@ -220,20 +209,22 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	}
 
 	for _, v := range basicWins.Config.AfterMain {
-		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, cd)
 	}
 
 	basicWins.onStepEnd(gameProp, curpr, gp)
 
-	basicWins.BuildPBComponent(gp)
+	gp.AddComponentData(basicWins.Name, cd)
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (basicWins *BasicWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+	cd := gameProp.MapComponentData[basicWins.Name].(*BasicComponentData)
+
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
-		return goutils.IndexOfIntSlice(basicWins.UsedResults, i, 0) >= 0
+		return goutils.IndexOfIntSlice(cd.UsedResults, i, 0) >= 0
 	}, mapSymbolColor)
 
 	return nil
@@ -249,9 +240,16 @@ func (basicWins *BasicWins) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 		if isok {
 			curComponent, isok := gp.MapComponents[basicWins.Name]
 			if isok {
-				isTrigger = true
+				curwins, err := basicWins.OnStatsWithPB(feature, curComponent, v)
+				if err != nil {
+					goutils.Error("BasicWins.OnStats",
+						zap.Error(err))
 
-				wins += basicWins.OnStatsWithComponent(feature, curComponent, v)
+					continue
+				}
+
+				isTrigger = true
+				wins += curwins
 			}
 		}
 	}

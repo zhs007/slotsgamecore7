@@ -37,7 +37,7 @@ func getchar(onchar FuncOnGetChar) error {
 	}
 }
 
-type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult, interface{})
+type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult, any)
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int, isSkipGetChar bool, isBreakAtFeature bool) error {
 	plugin := game.NewPlugin()

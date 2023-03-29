@@ -7,8 +7,8 @@ import (
 
 // PlayerState - player state
 type PlayerState struct {
-	Public  interface{} `json:"playerStatePublic"`
-	Private interface{} `json:"playerStatePrivate"`
+	Public  any `json:"playerStatePublic"`
+	Private any `json:"playerStatePrivate"`
 }
 
 // Stake - stake

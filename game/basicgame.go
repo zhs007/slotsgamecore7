@@ -67,7 +67,7 @@ func (game *BasicGame) AddGameMod(gmod IGameMod) error {
 }
 
 // Play - play
-func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData interface{}) (*PlayResult, error) {
+func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData any) (*PlayResult, error) {
 	// bps, isok := ps.(*BasicPlayerState)
 	// if !isok {
 	// 	return nil, ErrInvalidBasicPlayerState
@@ -99,11 +99,11 @@ func (game *BasicGame) CheckStake(stake *Stake) error {
 }
 
 // ResetConfig
-func (game *BasicGame) ResetConfig(cfg interface{}) {
+func (game *BasicGame) ResetConfig(cfg any) {
 
 }
 
 // NewGameData - new GameData
-func (game *BasicGame) NewGameData() interface{} {
+func (game *BasicGame) NewGameData() any {
 	return nil
 }

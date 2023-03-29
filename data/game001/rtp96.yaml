@@ -102,3 +102,19 @@ stats:
       children:
         - name: fg-lightning
           component: fg-lightning
+
+rtp:
+  modules:
+    - name: bg
+      components: ['bg-pay']
+      features:
+        - name: base
+          components: ['bg-pay']
+        - name: lightning
+          components: ['bg-lightning']
+    - name: fg
+      features:
+        - name: base
+          components: ['fg-pay']
+        - name: lightning
+          components: ['fg-lightning']          

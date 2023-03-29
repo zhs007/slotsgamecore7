@@ -72,7 +72,7 @@ func RegisterDTRngServer(s grpc.ServiceRegistrar, srv DTRngServer) {
 	s.RegisterService(&DTRng_ServiceDesc, srv)
 }
 
-func _DTRng_GetRngs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DTRng_GetRngs_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(RequestRngs)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func _DTRng_GetRngs_Handler(srv interface{}, ctx context.Context, dec func(inter
 		Server:     srv,
 		FullMethod: "/dtrngpb.DTRng/getRngs",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(DTRngServer).GetRngs(ctx, req.(*RequestRngs))
 	}
 	return interceptor(ctx, in, info, handler)

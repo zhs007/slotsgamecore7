@@ -9,7 +9,7 @@ import (
 // PlayResult - result for play
 type PlayResult struct {
 	CurGameMod       string       `json:"curgamemod"`
-	CurGameModParams interface{}  `json:"curgamemodparams"`
+	CurGameModParams any          `json:"curgamemodparams"`
 	NextGameMod      string       `json:"nextgamemod"`
 	Scenes           []*GameScene `json:"scenes"`
 	OtherScenes      []*GameScene `json:"otherscenes"`
