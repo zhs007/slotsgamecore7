@@ -355,7 +355,7 @@ func (bookof *BookOf) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 
 // NewComponentData -
 func (bookof *BookOf) NewComponentData() IComponentData {
-	return &BasicComponentData{}
+	return &BookOdData{}
 }
 
 // EachUsedResults -
