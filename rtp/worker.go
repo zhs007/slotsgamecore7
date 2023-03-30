@@ -105,7 +105,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					ps.SetPublicJson(pbsjson)
 					ps.SetPrivateJson(ppsjson)
 
-					results = results[:0]
+					results = nil //results[:0]
 
 					i--
 				} else {
@@ -136,7 +136,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 						currtp.AddReturns(float64(totalReturn / stake.CashBet))
 					}
 
-					results = results[:0]
+					results = nil //results[:0]
 
 					off++
 					if off >= numsTimer {
@@ -261,7 +261,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					ps.SetPublicJson(pbsjson)
 					ps.SetPrivateJson(ppsjson)
 
-					results = results[:0]
+					results = nil //results[:0]
 				} else {
 					iswin := false
 					for _, v := range results {
@@ -281,7 +281,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 						}
 
 						if cr > val {
-							results = results[:0]
+							results = nil //results[:0]
 
 							continue
 						}
@@ -303,7 +303,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 						// rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
 					}
 
-					results = results[:0]
+					results = nil //results[:0]
 
 					off++
 					if off >= numsTimer {
