@@ -20,6 +20,8 @@ const (
 	RTCluster = 6
 	// RTScatterOnReels - scatter只统计列数
 	RTScatterOnReels = 7
+	// RTSymbolVal - 直接赔付
+	RTSymbolVal = 8
 )
 
 // Result - result for slots game
