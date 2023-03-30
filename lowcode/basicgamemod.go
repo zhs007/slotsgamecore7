@@ -190,13 +190,5 @@ func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrCompo
 		pool.onAddComponent(v.Name, c)
 	}
 
-	// err := pool.InitStats()
-	// if err != nil {
-	// 	goutils.Error("NewBasicGameMod:InitStats",
-	// 		zap.Error(err))
-
-	// 	return nil
-	// }
-
 	return bgm
 }
