@@ -233,26 +233,11 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 // Play - play game
 func (serv *Serv) LogReplyPlay(str string, reply *sgc7pb.ReplyPlay, logLevel zapcore.Level) {
-	arr := []any{}
-	for _, v := range reply.Results {
-		msg, err := serv.service.BuildPBGameModParamFromAny(v.ClientData.CurGameModParam)
-		if err != nil {
-			goutils.Warn("Serv.LogReplyPlay",
-				zap.Error(err))
-		}
-
-		if msg != nil {
-			arr = append(arr, msg)
-		}
-	}
-
 	if logLevel == zapcore.DebugLevel {
 		goutils.Debug(str,
-			goutils.JSON("reply", reply),
-			goutils.JSON("curgamemodparam", arr))
+			sgc7pbutils.JSON("reply", reply))
 	} else if logLevel == zapcore.InfoLevel {
 		goutils.Info(str,
-			goutils.JSON("reply", reply),
-			goutils.JSON("curgamemodparam", arr))
+			sgc7pbutils.JSON("reply", reply))
 	}
 }
