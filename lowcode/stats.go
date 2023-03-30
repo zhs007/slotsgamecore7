@@ -41,6 +41,7 @@ type Stats struct {
 	Root      *sgc7stats.Feature
 	chanStats chan *StatsParam
 	lastNum   int32
+	TotalNum  int64
 }
 
 func (stats *Stats) StartWorker() {
@@ -60,6 +61,7 @@ func (stats *Stats) Push(stake *sgc7game.Stake, results []*sgc7game.PlayResult) 
 	}
 
 	atomic.AddInt32(&stats.lastNum, 1)
+	atomic.AddInt64(&stats.TotalNum, 1)
 
 	stats.chanStats <- param
 }

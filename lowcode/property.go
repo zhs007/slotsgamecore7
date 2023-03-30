@@ -40,16 +40,15 @@ func String2Property(str string) (int, error) {
 }
 
 type GameProperty struct {
-	Pool             *GamePropertyPool
-	MapVals          map[int]int
-	MapStrVals       map[int]string
-	CurPaytables     *sgc7game.PayTables
-	CurLineData      *sgc7game.LineData
-	CurReels         *sgc7game.ReelsData
-	MapIntValWeights map[string]*sgc7game.ValWeights2
-	MapScenes        map[string]int
-	MapOtherScenes   map[string]int
-	// MapCollectors    map[string]*CollectorData
+	Pool              *GamePropertyPool
+	MapVals           map[int]int
+	MapStrVals        map[int]string
+	CurPaytables      *sgc7game.PayTables
+	CurLineData       *sgc7game.LineData
+	CurReels          *sgc7game.ReelsData
+	MapIntValWeights  map[string]*sgc7game.ValWeights2
+	MapScenes         map[string]int
+	MapOtherScenes    map[string]int
 	MapStats          map[string]*sgc7stats.Feature
 	MapInt            map[string]int
 	MapComponentData  map[string]IComponentData
@@ -243,151 +242,6 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 func (gameProp *GameProperty) GetStrVal(prop int) string {
 	return gameProp.MapStrVals[prop]
 }
-
-// func (gameProp *GameProperty) addCollectorData(name string) {
-// 	gameProp.MapCollectors[name] = NewCollectorData()
-// }
-
-// func (gameProp *GameProperty) onAddComponent(name string, component IComponent) {
-// 	collector, isok := component.(*Collecotr)
-// 	if isok {
-// 		gameProp.MapCollectors[name] = collector
-// 	}
-
-// 	gameProp.MapComponents[name] = component
-// }
-
-// func (gameProp *GameProperty) NewStatsWithConfig(parent *sgc7stats.Feature, cfg *StatsConfig) (*sgc7stats.Feature, error) {
-// 	curComponent, isok := gameProp.MapComponents[cfg.Component]
-// 	if !isok {
-// 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			zap.Error(ErrIvalidStatsComponentInConfig))
-
-// 		return nil, ErrIvalidStatsComponentInConfig
-// 	}
-
-// 	feature := NewStats(parent, cfg.Name, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 		return curComponent.OnStats(f, s, lst)
-// 	}, gameProp.GetVal(GamePropWidth), gameProp.Pool.Config.StatsSymbolCodes)
-
-// 	for _, v := range cfg.Children {
-// 		_, err := gameProp.NewStatsWithConfig(feature, v)
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:NewStatsWithConfig",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	return feature, nil
-// }
-
-// func (gameProp *GameProperty) InitStats() error {
-// 	err := gameProp.Pool.Config.BuildStatsSymbolCodes(gameProp.CurPaytables)
-// 	if err != nil {
-// 		goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
-// 			zap.Error(err))
-
-// 		return err
-// 	}
-
-// 	if gameProp.Pool.Config.Stats != nil {
-// 		statsTotal := sgc7stats.NewFeature("total", sgc7stats.FeatureBasic, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 			totalWin := int64(0)
-
-// 			for _, v := range lst {
-// 				totalWin += v.CashWin
-// 			}
-
-// 			return true, s.CashBet, totalWin
-// 		}, nil)
-
-// 		_, err := gameProp.NewStatsWithConfig(statsTotal, gameProp.Pool.Config.Stats)
-// 		if err != nil {
-// 			goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
-// 				zap.Error(err))
-
-// 			return err
-// 		}
-
-// 		gameProp.Stats = statsTotal
-// 	}
-
-// 	return nil
-// }
-
-// func InitGameProperty(cfgfn string) (*GameProperty, error) {
-// 	cfg, err := LoadConfig(cfgfn)
-// 	if err != nil {
-// 		goutils.Error("InitGameProperty:LoadConfig",
-// 			zap.String("cfgfn", cfgfn),
-// 			zap.Error(err))
-
-// 		return nil, err
-// 	}
-
-// 	gameProp := &GameProperty{
-// 		MapVals:          make(map[int]int),
-// 		MapStrVals:       make(map[int]string),
-// 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
-// 		// MapCollectors:    make(map[string]*Collecotr),
-// 		// MapComponents:    make(map[string]IComponent),
-// 		MapStats: make(map[string]*sgc7stats.Feature),
-// 		MapInt:   make(map[string]int),
-// 	}
-
-// 	gameProp.SetStrVal(GamePropCurPaytables, cfg.DefaultPaytables)
-// 	gameProp.SetStrVal(GamePropCurLineData, cfg.DefaultLinedata)
-// 	gameProp.SetVal(GamePropWidth, cfg.Width)
-// 	gameProp.SetVal(GamePropHeight, cfg.Height)
-
-// 	// sv, err := LoadSymbolsViewer(cfg.SymbolsViewer)
-// 	// if err != nil {
-// 	// 	goutils.Error("InitGameProperty:LoadSymbolsViewer",
-// 	// 		zap.String("fn", cfg.SymbolsViewer),
-// 	// 		zap.Error(err))
-
-// 	// 	return nil, err
-// 	// }
-
-// 	// gameProp.SymbolsViewer = sv
-// 	// gameProp.MapSymbolColor = asciigame.NewSymbolColorMap(gameProp.CurPaytables)
-// 	// wColor := color.New(color.BgRed, color.FgHiWhite)
-// 	// hColor := color.New(color.BgBlue, color.FgHiWhite)
-// 	// mColor := color.New(color.BgGreen, color.FgHiWhite)
-// 	// sColor := color.New(color.BgMagenta, color.FgHiWhite)
-// 	// for k, v := range sv.MapSymbols {
-// 	// 	if v.Color == "wild" {
-// 	// 		gameProp.MapSymbolColor.AddSymbolColor(k, wColor)
-// 	// 	} else if v.Color == "high" {
-// 	// 		gameProp.MapSymbolColor.AddSymbolColor(k, hColor)
-// 	// 	} else if v.Color == "medium" {
-// 	// 		gameProp.MapSymbolColor.AddSymbolColor(k, mColor)
-// 	// 	} else if v.Color == "scatter" {
-// 	// 		gameProp.MapSymbolColor.AddSymbolColor(k, sColor)
-// 	// 	}
-// 	// }
-
-// 	// gameProp.MapSymbolColor.OnGetSymbolString = func(s int) string {
-// 	// 	return gameProp.SymbolsViewer.MapSymbols[s].Output
-// 	// }
-
-// 	// err = cfg.BuildStatsSymbolCodes(gameProp.CurPaytables)
-// 	// if err != nil {
-// 	// 	goutils.Error("InitGameProperty:BuildStatsSymbolCodes",
-// 	// 		zap.Error(err))
-
-// 	// 	return nil, err
-// 	// }
-
-// 	// if cfg.Stats != nil {
-// 	// 	gameProp.Stats = gameProp.NewStatsWithConfig(nil, cfg.Stats)
-// 	// }
-
-// 	return gameProp, nil
-// }
 
 func init() {
 	MapProperty = make(map[string]int)
