@@ -414,21 +414,37 @@ func (rss *ReelsStats) GetScatterNum(reelindex int, symbol SymbolType, irstype I
 	}
 
 	if irstype == IRSTypeNoSymbol {
+		if rss.Reels[reelindex].TotalSymbolNum < ss.Num*height {
+			return 0
+		}
+
 		return rss.Reels[reelindex].TotalSymbolNum - ss.Num*height
 	}
 
 	return -1
 }
 
-func (rss *ReelsStats) GetWaysNum(reelindex int, symbol SymbolType, irstype InReelSymbolType, height int) int {
+func (rss *ReelsStats) GetWaysNum(reelindex int, symbol SymbolType, wilds []SymbolType, irstype InReelSymbolType, height int) int {
 	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
 
+	wildnum := 0
+	for _, w := range wilds {
+		if w == symbol {
+			continue
+		}
+
+		ws := rss.Reels[reelindex].GetSymbolStats(w)
+		if ws.Num > 0 {
+			wildnum += ws.Num
+		}
+	}
+
 	if irstype == IRSTypeSymbol {
-		return ss.Num * height
+		return (wildnum + ss.Num) * height
 	}
 
 	if irstype == IRSTypeNoSymbol {
-		return rss.Reels[reelindex].TotalSymbolNum - ss.Num*height
+		return rss.Reels[reelindex].TotalSymbolNum - (wildnum+ss.Num)*height
 	}
 
 	return -1
