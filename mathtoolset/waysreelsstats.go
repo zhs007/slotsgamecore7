@@ -1,6 +1,12 @@
 package mathtoolset
 
-import sgc7game "github.com/zhs007/slotsgamecore7/game"
+import (
+	"fmt"
+
+	"github.com/xuri/excelize/v2"
+	"github.com/zhs007/goutils"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
+)
 
 func buildWaysSymbolStatsKey(symbol SymbolType, numInWindow int) int {
 	return int(symbol)*100 + numInWindow
@@ -9,6 +15,8 @@ func buildWaysSymbolStatsKey(symbol SymbolType, numInWindow int) int {
 func unpackWaysSymbolStatsKey(key int) (SymbolType, int) {
 	return SymbolType(key / 100), key % 100
 }
+
+type FuncOnWaysSymbolStats func(*WaysSymbolStats)
 
 type WaysSymbolStats struct {
 	Symbol      SymbolType
@@ -27,6 +35,31 @@ func newWaysSymbolStats(s SymbolType, numInWindow int, num int) *WaysSymbolStats
 type WaysReelStats struct {
 	MapSymbols     map[int]*WaysSymbolStats
 	TotalSymbolNum int
+}
+
+// func (wrs *WaysReelStats) AddKey(key int, num int) {
+// 	s, n := unpackWaysSymbolStatsKey(key)
+
+// }
+
+func (wrs *WaysReelStats) GetSymbolKeys(symbol SymbolType) []int {
+	arr := []int{}
+
+	for k := range wrs.MapSymbols {
+		if k >= int(symbol)*100 && k < (int(symbol)+1)*100 {
+			arr = append(arr, k)
+		}
+	}
+
+	return arr
+}
+
+func (wrs *WaysReelStats) EachSymbol(symbol SymbolType, onEach FuncOnWaysSymbolStats) {
+	for k, v := range wrs.MapSymbols {
+		if k >= int(symbol)*100 && k < (int(symbol)+1)*100 {
+			onEach(v)
+		}
+	}
 }
 
 func (wrs *WaysReelStats) GetNumWithSymbolNumInWindow(symbol SymbolType, numInWindow int) int {
@@ -73,12 +106,15 @@ func newWaysReelStatsWithReel(reel []int, height int) *WaysReelStats {
 		}
 	}
 
+	wrs.TotalSymbolNum = len(reel)
+
 	return wrs
 }
 
 type WaysReelsStats struct {
 	Reels   []*WaysReelStats
 	Symbols []SymbolType
+	Keys    []int
 	Height  int
 }
 
@@ -94,6 +130,50 @@ func (wrss *WaysReelsStats) rebuildSymbols() {
 			}
 		}
 	}
+
+	wrss.Keys = nil
+
+	for _, wrs := range wrss.Reels {
+		for k := range wrs.MapSymbols {
+			if goutils.IndexOfIntSlice(wrss.Keys, k, 0) < 0 {
+				wrss.Keys = append(wrss.Keys, k)
+			}
+		}
+	}
+}
+
+func (wrss *WaysReelsStats) SaveExcel(fn string) error {
+	f := excelize.NewFile()
+
+	sheet := f.GetSheetName(0)
+
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "symbol")
+	for i := range wrss.Reels {
+		f.SetCellStr(sheet, goutils.Pos2Cell(i+1, 0), fmt.Sprintf("reel%v", i+1))
+	}
+
+	y := 1
+
+	for _, k := range wrss.Keys {
+		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), k)
+
+		for i, reel := range wrss.Reels {
+			statsSymbol, isok := reel.MapSymbols[k]
+			if isok {
+				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), statsSymbol.Num)
+			} else {
+				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), 0)
+			}
+		}
+
+		y++
+	}
+
+	for i, rs := range wrss.Reels {
+		f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
+	}
+
+	return f.SaveAs(fn)
 }
 
 func BuildWaysReelsStats(rd *sgc7game.ReelsData, height int) *WaysReelsStats {

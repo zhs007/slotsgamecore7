@@ -22,5 +22,7 @@ func Test_BuildWaysReelsStats(t *testing.T) {
 	assert.Equal(t, wrss.Reels[0].GetNumWithSymbolNumInWindow(12, 2), 2)
 	assert.Equal(t, wrss.Reels[0].GetNumWithSymbolNumInWindow(12, 3), 3)
 
+	wrss.SaveExcel("../unittestdata/wrss.xlsx")
+
 	t.Logf("Test_BuildWaysReelsStats OK")
 }
