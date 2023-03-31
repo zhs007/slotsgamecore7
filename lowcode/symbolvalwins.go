@@ -71,6 +71,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	gs := symbolValWins.GetTargetScene(gameProp, curpr, cd)
 	isTrigger := true
+	symbolnum := 0
 
 	if symbolValWins.TriggerSymbolCode >= 0 {
 		isTrigger = false
@@ -82,6 +83,8 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 			if ret != nil {
 				isTrigger = true
+
+				symbolnum = ret.SymbolNums
 			}
 		}
 	}
@@ -108,6 +111,16 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 				LineIndex:  -1,
 				Pos:        pos,
 				SymbolNums: len(pos) / 2,
+			}
+
+			bet := GetBet(stake, symbolValWins.Config.BetType)
+
+			if symbolValWins.Config.IsTriggerSymbolNumMulti {
+				ret.CoinWin = totalvals * symbolnum
+				ret.CashWin = ret.CoinWin * bet
+			} else {
+				ret.CoinWin = totalvals
+				ret.CashWin = ret.CoinWin * bet
 			}
 
 			symbolValWins.AddResult(curpr, ret, cd)
