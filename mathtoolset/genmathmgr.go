@@ -1,6 +1,8 @@
 package mathtoolset
 
 import (
+	"fmt"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
@@ -12,6 +14,7 @@ type GenMathMgr struct {
 	MapReelsStats map[string]*ReelsStats
 	RTP           float32
 	RSS           *ReelsStats
+	RetStats      []*SymbolsWinsStats
 }
 
 func (mgr *GenMathMgr) LoadPaytables(fn string) error {
@@ -52,6 +55,14 @@ func (mgr *GenMathMgr) LoadReelsState(fn string) error {
 	}
 
 	mgr.RSS = rss
+
+	return nil
+}
+
+func (mgr *GenMathMgr) Save() error {
+	for i, v := range mgr.RetStats {
+		v.SaveExcel(fmt.Sprintf("ssws-%v.xlsx", i), []SymbolsWinsFileMode{SWFModeRTP, SWFModeWins, SWFModeWinsNum})
+	}
 
 	return nil
 }

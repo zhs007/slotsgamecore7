@@ -146,6 +146,8 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 						return types.Double(0)
 					}
 
+					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
+
 					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
 				},
 				),
@@ -188,6 +190,8 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 						return types.Double(0)
 					}
+
+					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
 				},
@@ -232,6 +236,8 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 						return types.Double(0)
 					}
+
+					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
 				},
