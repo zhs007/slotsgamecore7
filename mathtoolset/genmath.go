@@ -59,6 +59,8 @@ func GenMath(fn string) error {
 
 			return err
 		}
+
+		mgrGenMath.Save()
 	} else if cfg.Type == "calcRTPWithReelsState" {
 		mgrGenMath := NewGamMathMgr()
 
@@ -86,7 +88,9 @@ func GenMath(fn string) error {
 			return err
 		}
 
-		fmt.Printf("The RTP is %v", out.Value().(float64))
+		mgrGenMath.Save()
+
+		fmt.Printf("The RTP is %v\n", out.Value().(float64))
 	} else if cfg.Type == "genReels" {
 		rss, err := LoadReelsStats(cfg.GenReelsConfig.ReelsStatsFilename)
 		if err != nil {
