@@ -73,7 +73,10 @@ func (ssrtp *SymbolsRTP) GenSymbols() []mathtoolset.SymbolType {
 }
 
 func (ssrtp *SymbolsRTP) OnWin(win *sgc7game.Result) {
-	ssrtp.MapSymbols[mathtoolset.SymbolType(win.Symbol)].OnWin(win)
+	srtp, isok := ssrtp.MapSymbols[mathtoolset.SymbolType(win.Symbol)]
+	if isok {
+		srtp.OnWin(win)
+	}
 }
 
 func (ssrtp *SymbolsRTP) Merge(src *SymbolsRTP) {
