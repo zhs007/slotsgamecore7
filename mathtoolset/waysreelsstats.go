@@ -37,11 +37,6 @@ type WaysReelStats struct {
 	TotalSymbolNum int
 }
 
-// func (wrs *WaysReelStats) AddKey(key int, num int) {
-// 	s, n := unpackWaysSymbolStatsKey(key)
-
-// }
-
 func (wrs *WaysReelStats) GetSymbolKeys(symbol SymbolType) []int {
 	arr := []int{}
 
@@ -69,6 +64,18 @@ func (wrs *WaysReelStats) GetNumWithSymbolNumInWindow(symbol SymbolType, numInWi
 	}
 
 	return 0
+}
+
+func (wrs *WaysReelStats) GetSymbolStats(symbol SymbolType, numInWindow int) *WaysSymbolStats {
+	k := buildWaysSymbolStatsKey(symbol, numInWindow)
+	v, isok := wrs.MapSymbols[k]
+	if isok {
+		return v
+	}
+
+	wrs.MapSymbols[k] = newWaysSymbolStats(symbol, numInWindow, 0)
+
+	return wrs.MapSymbols[k]
 }
 
 func newWaysReelStats() *WaysReelStats {
@@ -111,11 +118,73 @@ func newWaysReelStatsWithReel(reel []int, height int) *WaysReelStats {
 	return wrs
 }
 
+func newWaysReelStatsWithReelEx(reel []int, height int, symbols []SymbolType, wilds []SymbolType) *WaysReelStats {
+	wrs := newWaysReelStats()
+
+	for _, s := range symbols {
+		for y := range reel {
+			num := CountSymbolInReelEx(s, reel, y, height, wilds)
+
+			if num > 0 {
+				key := buildWaysSymbolStatsKey(s, num)
+				wss, isok := wrs.MapSymbols[key]
+				if !isok {
+					wss = newWaysSymbolStats(s, num, 1)
+
+					wrs.MapSymbols[key] = wss
+				} else {
+					wss.Num++
+				}
+			}
+		}
+	}
+
+	wrs.TotalSymbolNum = len(reel)
+
+	return wrs
+}
+
 type WaysReelsStats struct {
 	Reels   []*WaysReelStats
 	Symbols []SymbolType
 	Keys    []int
 	Height  int
+}
+
+// func (wrss *WaysReelsStats) GetWaysNum(reelindex int, symbol SymbolType, numInWindow int, wilds []SymbolType, wildNumInWindow int, irstype InReelSymbolType, height int) int {
+// 	ss := wrss.Reels[reelindex].GetSymbolStats(symbol, numInWindow)
+
+// 	wildnum := 0
+// 	for _, w := range wilds {
+// 		if w == symbol {
+// 			continue
+// 		}
+
+// 		ws := wrss.Reels[reelindex].GetSymbolStats(w, wildNumInWindow)
+// 		if ws.Num > 0 {
+// 			wildnum += ws.Num
+// 		}
+// 	}
+
+// 	if irstype == IRSTypeSymbol {
+// 		return (wildnum + ss.Num) * height
+// 	}
+
+// 	if irstype == IRSTypeNoSymbol {
+// 		return wrss.Reels[reelindex].TotalSymbolNum - (wildnum+ss.Num)*height
+// 	}
+
+// 	return -1
+// }
+
+func (wrss *WaysReelsStats) GetNonWaysNum(reelindex int, symbol SymbolType) int {
+	num := 0
+
+	wrss.Reels[reelindex].EachSymbol(symbol, func(wss *WaysSymbolStats) {
+		num += wss.Num
+	})
+
+	return wrss.Reels[reelindex].TotalSymbolNum - num
 }
 
 func (wrss *WaysReelsStats) rebuildSymbols() {
@@ -177,6 +246,21 @@ func (wrss *WaysReelsStats) SaveExcel(fn string) error {
 }
 
 func BuildWaysReelsStats(rd *sgc7game.ReelsData, height int) *WaysReelsStats {
+	wrss := NewWaysReelsStats(height)
+
+	for _, r := range rd.Reels {
+		wrs := newWaysReelStatsWithReel(r, height)
+
+		wrss.Reels = append(wrss.Reels, wrs)
+	}
+
+	wrss.rebuildSymbols()
+
+	return wrss
+}
+
+// BuildWaysReelsStatsEx - 只计算symbols里的symbol，且把wild直接计算进去
+func BuildWaysReelsStatsEx(rd *sgc7game.ReelsData, height int, symbols []SymbolType, wilds []SymbolType) *WaysReelsStats {
 	wrss := NewWaysReelsStats(height)
 
 	for _, r := range rd.Reels {

@@ -42,6 +42,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("symbolMulti", NewSymbolMulti)
 	mgr.Reg("symbolVal", NewSymbolVal)
 	mgr.Reg("symbolValWins", NewSymbolValWins)
+	mgr.Reg("symbolVal2", NewSymbolVal2)
 
 	return mgr
 }
