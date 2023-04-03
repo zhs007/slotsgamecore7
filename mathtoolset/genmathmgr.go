@@ -12,6 +12,7 @@ type GenMathMgr struct {
 	Paytables     *sgc7game.PayTables
 	MapPaytables  map[string]*sgc7game.PayTables
 	MapReelsStats map[string]*ReelsStats
+	MapReelsData  map[string]*sgc7game.ReelsData
 	RTP           float32
 	RSS           *ReelsStats
 	RetStats      []*SymbolsWinsStats
@@ -36,6 +37,27 @@ func (mgr *GenMathMgr) LoadPaytables(fn string) error {
 	mgr.Paytables = paytables
 
 	return nil
+}
+
+func (mgr *GenMathMgr) LoadReelsData2(paytablesfn string, fn string) (*sgc7game.ReelsData, error) {
+	mgr.LoadPaytables(paytablesfn)
+
+	rd, isok := mgr.MapReelsData[fn]
+	if !isok {
+		paytables1, err := sgc7game.LoadReelsFromExcel2(fn, mgr.Paytables)
+		if err != nil {
+			goutils.Error("GenMathMgr.LoadReelsData2:LoadReelsFromExcel2",
+				zap.String("fn", fn),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		mgr.MapReelsData[fn] = paytables1
+		rd = paytables1
+	}
+
+	return rd, nil
 }
 
 func (mgr *GenMathMgr) LoadReelsState(fn string) error {
