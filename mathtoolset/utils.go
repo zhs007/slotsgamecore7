@@ -52,3 +52,45 @@ func CountSymbolInReel(symbol SymbolType, reel []int, stop int, height int) int 
 
 	return num
 }
+
+// CountSymbolInReelEx - count symbol number in reel，[stop, stop + height)
+func CountSymbolInReelEx(symbol SymbolType, reel []int, stop int, height int, wilds []SymbolType) int {
+	if stop < 0 {
+		for {
+			stop += len(reel)
+
+			if stop >= 0 {
+				break
+			}
+		}
+	}
+
+	if stop >= len(reel) {
+		for {
+			stop -= len(reel)
+
+			if stop < len(reel) {
+				break
+			}
+		}
+	}
+
+	num := 0
+
+	for i := 0; i < height; i++ {
+		if reel[stop] == int(symbol) {
+			num++
+		} else {
+			if HasSymbol(wilds, SymbolType(reel[stop])) {
+				num++
+			}
+		}
+
+		stop++
+		if stop >= len(reel) {
+			stop -= len(reel)
+		}
+	}
+
+	return num
+}
