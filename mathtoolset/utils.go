@@ -54,7 +54,7 @@ func CountSymbolInReel(symbol SymbolType, reel []int, stop int, height int) int 
 }
 
 // CountSymbolInReelEx - count symbol number in reel，[stop, stop + height)
-func CountSymbolInReelEx(symbol SymbolType, reel []int, stop int, height int, wilds []SymbolType) int {
+func CountSymbolInReelEx(symbol SymbolType, reel []int, stop int, height int, wilds []SymbolType, symbolMapping *SymbolMapping) int {
 	if stop < 0 {
 		for {
 			stop += len(reel)
@@ -82,6 +82,8 @@ func CountSymbolInReelEx(symbol SymbolType, reel []int, stop int, height int, wi
 			num++
 		} else {
 			if HasSymbol(wilds, SymbolType(reel[stop])) {
+				num++
+			} else if symbolMapping != nil && symbolMapping.Has(symbol, SymbolType(reel[stop])) {
 				num++
 			}
 		}

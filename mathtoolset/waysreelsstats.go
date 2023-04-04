@@ -118,12 +118,12 @@ func newWaysReelStatsWithReel(reel []int, height int) *WaysReelStats {
 	return wrs
 }
 
-func newWaysReelStatsWithReelEx(reel []int, height int, symbols []SymbolType, wilds []SymbolType) *WaysReelStats {
+func newWaysReelStatsWithReelEx(reel []int, height int, symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping) *WaysReelStats {
 	wrs := newWaysReelStats()
 
 	for _, s := range symbols {
 		for y := range reel {
-			num := CountSymbolInReelEx(s, reel, y, height, wilds)
+			num := CountSymbolInReelEx(s, reel, y, height, wilds, symbolMapping)
 
 			if num > 0 {
 				key := buildWaysSymbolStatsKey(s, num)
@@ -260,11 +260,11 @@ func BuildWaysReelsStats(rd *sgc7game.ReelsData, height int) *WaysReelsStats {
 }
 
 // BuildWaysReelsStatsEx - 只计算symbols里的symbol，且把wild直接计算进去
-func BuildWaysReelsStatsEx(rd *sgc7game.ReelsData, height int, symbols []SymbolType, wilds []SymbolType) *WaysReelsStats {
+func BuildWaysReelsStatsEx(rd *sgc7game.ReelsData, height int, symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping) *WaysReelsStats {
 	wrss := NewWaysReelsStats(height)
 
 	for _, r := range rd.Reels {
-		wrs := newWaysReelStatsWithReelEx(r, height, symbols, wilds)
+		wrs := newWaysReelStatsWithReelEx(r, height, symbols, wilds, symbolMapping)
 
 		wrss.Reels = append(wrss.Reels, wrs)
 	}

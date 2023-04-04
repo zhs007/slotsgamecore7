@@ -450,6 +450,44 @@ func (rss *ReelsStats) GetWaysNum(reelindex int, symbol SymbolType, wilds []Symb
 	return -1
 }
 
+func (rss *ReelsStats) GetWaysNumEx(reelindex int, symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, irstype InReelSymbolType, height int) int {
+	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
+
+	wildnum := 0
+	for _, w := range wilds {
+		if w == symbol {
+			continue
+		}
+
+		ws := rss.Reels[reelindex].GetSymbolStats(w)
+		if ws.Num > 0 {
+			wildnum += ws.Num
+		}
+	}
+
+	mapnum := 0
+	if symbolMapping != nil {
+		for k, v := range symbolMapping.MapSymbols {
+			if v == symbol {
+				ms := rss.Reels[reelindex].GetSymbolStats(k)
+				if ms.Num > 0 {
+					mapnum += ms.Num
+				}
+			}
+		}
+	}
+
+	if irstype == IRSTypeSymbol {
+		return (wildnum + ss.Num + mapnum) * height
+	}
+
+	if irstype == IRSTypeNoSymbol {
+		return rss.Reels[reelindex].TotalSymbolNum - (wildnum+ss.Num+mapnum)*height
+	}
+
+	return -1
+}
+
 func (rss *ReelsStats) GetSymbolNum(reelindex int, symbol SymbolType, wilds []SymbolType) int {
 	ss := rss.Reels[reelindex].GetSymbolStats(symbol)
 

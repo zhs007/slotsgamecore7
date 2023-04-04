@@ -7,22 +7,27 @@ import (
 )
 
 // CalcWaysWinsInReels -
-func CalcWaysWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, wilds []SymbolType, num int, height int) (int64, error) {
+func CalcWaysWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, num int, height int) (int64, error) {
 	curwins := int64(1)
 
 	for i := 0; i < num; i++ {
-		curwins *= int64(rss.GetWaysNum(i, symbol, wilds, IRSTypeSymbol, height))
+		curwins *= int64(rss.GetWaysNumEx(i, symbol, wilds, symbolMapping, IRSTypeSymbol, height))
 	}
 
-	for i := num; i < len(rss.Reels); i++ {
-		curwins *= int64(rss.GetWaysNum(i, symbol, wilds, IRSTypeNoSymbol, height))
+	if num < len(rss.Reels) {
+		curwins *= int64(rss.GetWaysNumEx(num, symbol, wilds, symbolMapping, IRSTypeNoSymbol, height))
+
+		for i := num + 1; i < len(rss.Reels); i++ {
+			curwins *= int64(rss.Reels[i].TotalSymbolNum)
+		}
 	}
 
 	return curwins, nil
 }
 
+// AnalyzeReelsWaysEx - totalbet = reels length x mul, wins = symbol wins x mul
 func AnalyzeReelsWaysEx(paytables *sgc7game.PayTables, rss *ReelsStats,
-	symbols []SymbolType, wilds []SymbolType, height int, bet int, mul int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, height int, bet int, mul int) (*SymbolsWinsStats, error) {
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
@@ -41,7 +46,7 @@ func AnalyzeReelsWaysEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 		if isok {
 			for i := 0; i < len(arrPay); i++ {
 				if arrPay[i] > 0 {
-					cw, err := CalcWaysWinsInReels(paytables, rss, s, wilds, i+1, height)
+					cw, err := CalcWaysWinsInReels(paytables, rss, s, wilds, symbolMapping, i+1, height)
 					if err != nil {
 						goutils.Error("AnalyzeReelsWaysEx:CalcWaysWinsInReels",
 							zap.Error(err))
@@ -50,9 +55,9 @@ func AnalyzeReelsWaysEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 					}
 
 					sws.WinsNum[i] = cw
-					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i]
+					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
 
-					ssws.TotalWins += int64(arrPay[i]) * sws.WinsNum[i]
+					ssws.TotalWins += sws.Wins[i]
 				}
 			}
 		}
