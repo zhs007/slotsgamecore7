@@ -57,7 +57,7 @@ func eachCWWIRReel(cwwirr *cwwirReel, oneach funcOnEachCWWIRReel) {
 }
 
 // CalcWaysWinsInReels2 -
-func CalcWaysWinsInReels2(paytables *sgc7game.PayTables, wrss *WaysReelsStats, symbol SymbolType, num int, height int) (int64, error) {
+func CalcWaysWinsInReels2(wrss *WaysReelsStats, symbol SymbolType, num int, height int) (int64, error) {
 	curwins := int64(0)
 
 	cwwirr := buildCalcWaysWinsInReels2Data(wrss, symbol, num)
@@ -72,7 +72,7 @@ func CalcWaysWinsInReels2(paytables *sgc7game.PayTables, wrss *WaysReelsStats, s
 	}
 
 	eachCWWIRReel(cwwirr, func(mul int) {
-		curwins += int64(paytables.MapPay[int(symbol)][num-1]) * (int64(mul) * lastnum)
+		curwins += (int64(mul) * lastnum)
 	})
 
 	return curwins, nil
@@ -98,7 +98,7 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, wrss *WaysReelsStats,
 		if isok {
 			for i := 0; i < len(arrPay); i++ {
 				if arrPay[i] > 0 {
-					cw, err := CalcWaysWinsInReels2(paytables, wrss, s, i+1, height)
+					cw, err := CalcWaysWinsInReels2(wrss, s, i+1, height)
 					if err != nil {
 						goutils.Error("AnalyzeReelsWaysEx2:CalcWaysWinsInReels",
 							zap.Error(err))
