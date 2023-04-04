@@ -63,8 +63,12 @@ func CalcWaysWinsInReels2(paytables *sgc7game.PayTables, wrss *WaysReelsStats, s
 	cwwirr := buildCalcWaysWinsInReels2Data(wrss, symbol, num)
 
 	lastnum := int64(1)
-	for i := num; i < len(wrss.Reels); i++ {
-		lastnum *= int64(wrss.GetNonWaysNum(i, symbol))
+	if num < len(wrss.Reels) {
+		lastnum = int64(wrss.GetNonWaysNum(num, symbol))
+
+		for i := num + 1; i < len(wrss.Reels); i++ {
+			lastnum *= int64(wrss.Reels[i].TotalSymbolNum)
+		}
 	}
 
 	eachCWWIRReel(cwwirr, func(mul int) {
