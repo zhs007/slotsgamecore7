@@ -68,6 +68,7 @@ type BasicWins struct {
 // AddResult -
 func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.Result {
+
 	gs, _ := gameProp.GetScene(curpr, tf.TargetScene)
 
 	isTrigger := false
@@ -80,7 +81,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			}, true)
 
 		if ret != nil {
-			// basicWins.AddResult(curpr, ret, basicCD)
+			basicWins.AddResult(curpr, ret, basicCD)
 			isTrigger = true
 		}
 	} else if tf.Type == WinTypeCountScatter {
@@ -89,7 +90,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		})
 
 		if ret != nil {
-			// basicWins.AddResult(curpr, ret, basicCD)
+			basicWins.AddResult(curpr, ret, basicCD)
 			isTrigger = true
 		}
 	}
