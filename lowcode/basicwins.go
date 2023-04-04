@@ -67,31 +67,29 @@ type BasicWins struct {
 
 // AddResult -
 func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, basicCD *BasicComponentData) {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.Result {
 	gs, _ := gameProp.GetScene(curpr, tf.TargetScene)
 
-	symbolnum := 0
 	isTrigger := false
+	var ret *sgc7game.Result
 
 	if tf.Type == WinTypeScatters {
-		ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], GetBet(stake, tf.BetType),
+		ret = sgc7game.CalcScatter4(gs, gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], GetBet(stake, tf.BetType),
 			func(scatter int, cursymbol int) bool {
 				return cursymbol == scatter
 			}, true)
 
 		if ret != nil {
-			basicWins.AddResult(curpr, ret, basicCD)
-			symbolnum = ret.SymbolNums
+			// basicWins.AddResult(curpr, ret, basicCD)
 			isTrigger = true
 		}
 	} else if tf.Type == WinTypeCountScatter {
-		ret := sgc7game.CalcScatterEx(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum, func(scatter int, cursymbol int) bool {
+		ret = sgc7game.CalcScatterEx(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum, func(scatter int, cursymbol int) bool {
 			return cursymbol == scatter
 		})
 
 		if ret != nil {
-			basicWins.AddResult(curpr, ret, basicCD)
-			symbolnum = ret.SymbolNums
+			// basicWins.AddResult(curpr, ret, basicCD)
 			isTrigger = true
 		}
 	}
@@ -100,9 +98,9 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		if tf.IsTriggerFG {
 			if tf.IsUseScatterNum {
 				if tf.FGNumWeightWithScatterNum != nil {
-					gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeightWithScatterNum[symbolnum], tf.RespinFirstComponent)
+					gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeightWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
 				} else {
-					gameProp.TriggerFG(curpr, gp, tf.FGNumWithScatterNum[symbolnum], tf.RespinFirstComponent)
+					gameProp.TriggerFG(curpr, gp, tf.FGNumWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
 				}
 			} else {
 				if tf.FGNumWeight != "" {
@@ -113,6 +111,8 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			}
 		}
 	}
+
+	return ret
 }
 
 // Init -
@@ -158,6 +158,8 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[basicWins.Name].(*BasicComponentData)
 
+	rets := []*sgc7game.Result{}
+
 	for _, v := range basicWins.Config.BeforMain {
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, cd)
 	}
@@ -165,7 +167,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	gs := basicWins.GetTargetScene(gameProp, curpr, cd)
 
 	if basicWins.Config.MainType == WinTypeWays {
-		rets := sgc7game.CalcFullLineEx2(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+		currets := sgc7game.CalcFullLineEx2(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
 			return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
 		}, func(cursymbol int) bool {
 			return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
@@ -177,9 +179,12 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
 		})
 
-		for _, v := range rets {
-			basicWins.AddResult(curpr, v, cd)
-		}
+		rets = append(rets, currets...)
+
+		// for _, v := range currets {
+		// 	rets = append(rets, v)
+		// 	// basicWins.AddResult(curpr, v, cd)
+		// }
 	} else if basicWins.Config.MainType == WinTypeLines {
 		for i, v := range gameProp.CurLineData.Lines {
 			ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, GetBet(stake, basicWins.Config.BetType), func(cursymbol int) bool {
@@ -200,7 +205,9 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			if ret != nil {
 				ret.LineIndex = i
 
-				basicWins.AddResult(curpr, ret, cd)
+				rets = append(rets, ret)
+
+				// basicWins.AddResult(curpr, ret, cd)
 			}
 		}
 	}
@@ -208,23 +215,26 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
 		os := basicWins.GetTargetOtherScene(gameProp, curpr, cd)
 
-		for _, v := range cd.UsedResults {
+		for _, v := range rets {
 			mul := 1
 
-			ret := curpr.Results[v]
-			for i := 0; i < len(ret.Pos)/2; i++ {
-				mul *= os.Arr[ret.Pos[i*2]][ret.Pos[i*2+1]]
+			for i := 0; i < len(v.Pos)/2; i++ {
+				mul *= os.Arr[v.Pos[i*2]][v.Pos[i*2+1]]
 			}
 
-			ret.OtherMul = mul
+			v.OtherMul = mul
 
-			ret.CashWin *= mul
-			ret.CoinWin *= mul
+			v.CashWin *= mul
+			v.CoinWin *= mul
 		}
 	}
 
 	for _, v := range basicWins.Config.AfterMain {
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, cd)
+	}
+
+	for _, v := range rets {
+		basicWins.AddResult(curpr, v, cd)
 	}
 
 	basicWins.onStepEnd(gameProp, curpr, gp)
