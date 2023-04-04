@@ -32,16 +32,19 @@ func GetBet(stake *sgc7game.Stake, bettype string) int {
 
 // TriggerFeatureConfig - configuration for trigger feature
 type TriggerFeatureConfig struct {
-	TargetScene          string `yaml:"targetScene"`          // like basicReels.mstery
-	Symbol               string `yaml:"symbol"`               // like scatter
-	Type                 string `yaml:"type"`                 // like scatters
-	MinNum               int    `yaml:"minNum"`               // like 3
-	Scripts              string `yaml:"scripts"`              // scripts
-	FGNum                int    `yaml:"FGNum"`                // FG number
-	FGNumWeight          string `yaml:"FGNumWeight"`          // FG number weight
-	IsTriggerFG          bool   `yaml:"isTriggerFG"`          // is trigger FG
-	BetType              string `yaml:"betType"`              // bet or totalBet
-	RespinFirstComponent string `yaml:"respinFirstComponent"` // like fg-spin
+	TargetScene               string         `yaml:"targetScene"`               // like basicReels.mstery
+	Symbol                    string         `yaml:"symbol"`                    // like scatter
+	Type                      string         `yaml:"type"`                      // like scatters
+	MinNum                    int            `yaml:"minNum"`                    // like 3
+	Scripts                   string         `yaml:"scripts"`                   // scripts
+	FGNum                     int            `yaml:"FGNum"`                     // FG number
+	FGNumWeight               string         `yaml:"FGNumWeight"`               // FG number weight
+	FGNumWithScatterNum       map[int]int    `yaml:"FGNumWithScatterNum"`       // FG number with scatter number
+	FGNumWeightWithScatterNum map[int]string `yaml:"FGNumWeightWithScatterNum"` // FG number weight with scatter number
+	IsTriggerFG               bool           `yaml:"isTriggerFG"`               // is trigger FG
+	IsUseScatterNum           bool           `yaml:"isUseScatterNum"`           // if IsUseScatterNum == true, then we will use FGNumWithScatterNum or FGNumWeightWithScatterNum
+	BetType                   string         `yaml:"betType"`                   // bet or totalBet
+	RespinFirstComponent      string         `yaml:"respinFirstComponent"`      // like fg-spin
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -67,7 +70,9 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, basicCD *BasicComponentData) {
 	gs, _ := gameProp.GetScene(curpr, tf.TargetScene)
 
+	symbolnum := 0
 	isTrigger := false
+
 	if tf.Type == WinTypeScatters {
 		ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], GetBet(stake, tf.BetType),
 			func(scatter int, cursymbol int) bool {
@@ -76,6 +81,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 		if ret != nil {
 			basicWins.AddResult(curpr, ret, basicCD)
+			symbolnum = ret.SymbolNums
 			isTrigger = true
 		}
 	} else if tf.Type == WinTypeCountScatter {
@@ -85,16 +91,25 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 		if ret != nil {
 			basicWins.AddResult(curpr, ret, basicCD)
+			symbolnum = ret.SymbolNums
 			isTrigger = true
 		}
 	}
 
 	if isTrigger {
 		if tf.IsTriggerFG {
-			if tf.FGNumWeight != "" {
-				gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
+			if tf.IsUseScatterNum {
+				if tf.FGNumWeightWithScatterNum != nil {
+					gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeightWithScatterNum[symbolnum], tf.RespinFirstComponent)
+				} else {
+					gameProp.TriggerFG(curpr, gp, tf.FGNumWithScatterNum[symbolnum], tf.RespinFirstComponent)
+				}
 			} else {
-				gameProp.TriggerFG(curpr, gp, tf.FGNum, tf.RespinFirstComponent)
+				if tf.FGNumWeight != "" {
+					gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
+				} else {
+					gameProp.TriggerFG(curpr, gp, tf.FGNum, tf.RespinFirstComponent)
+				}
 			}
 		}
 	}

@@ -244,6 +244,57 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				),
 			),
 		),
+		cel.Function("calcWaysRTP2",
+			cel.Overload("calcWaysRTP2_string_string_list_list_int_int_int",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.IntType, cel.IntType, cel.IntType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 7 {
+						goutils.Error("calcWaysRTP",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					err := mgrGenMath.LoadPaytables(params[0].Value().(string))
+					if err != nil {
+						goutils.Error("calcWaysRTP:LoadPaytables",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					rd, err := mgrGenMath.LoadReelsData2(params[0].Value().(string), params[1].Value().(string))
+					if err != nil {
+						goutils.Error("calcWaysRTP:LoadReelsData2",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					height := int(params[4].Value().(int64))
+					bet := int(params[5].Value().(int64))
+					mul := int(params[6].Value().(int64))
+					syms := array2SymbolTypeSlice(params[2])
+					wilds := array2SymbolTypeSlice(params[3])
+
+					wrss := BuildWaysReelsStatsEx(rd, height, syms, wilds)
+
+					ssws, err := AnalyzeReelsWaysEx2(mgrGenMath.Paytables, wrss, syms, height, bet, mul)
+					if err != nil {
+						goutils.Error("calcWaysRTP:AnalyzeReelsWaysEx2",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
+
+					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+				},
+				),
+			),
+		),
 	}
 }
 
