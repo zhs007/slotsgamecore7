@@ -245,18 +245,21 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 			),
 		),
 		cel.Function("calcWaysRTP2",
-			cel.Overload("calcWaysRTP2_string_string_list_list_int_int_int",
-				[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.IntType, cel.IntType, cel.IntType},
+			cel.Overload("calcWaysRTP2_string_string_bool_list_list_int_int_int",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.BoolType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.IntType, cel.IntType, cel.IntType},
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
-					if len(params) != 7 {
+					if len(params) != 8 {
 						goutils.Error("calcWaysRTP2",
 							zap.Error(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
 
-					err := mgrGenMath.LoadPaytables(params[0].Value().(string))
+					paytablefn := params[0].Value().(string)
+					reelfn := params[1].Value().(string)
+
+					err := mgrGenMath.LoadPaytables(paytablefn)
 					if err != nil {
 						goutils.Error("calcWaysRTP2:LoadPaytables",
 							zap.Error(err))
@@ -264,19 +267,21 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 						return types.Double(0)
 					}
 
-					rd, err := mgrGenMath.LoadReelsData2(params[0].Value().(string), params[1].Value().(string))
+					isStrReel := params[2].Value().(bool)
+
+					rd, err := mgrGenMath.LoadReelsData(paytablefn, reelfn, isStrReel)
 					if err != nil {
-						goutils.Error("calcWaysRTP2:LoadReelsData2",
+						goutils.Error("calcWaysRTP2:LoadReelsData",
 							zap.Error(err))
 
 						return types.Double(0)
 					}
 
-					syms := array2SymbolTypeSlice(params[2])
-					wilds := array2SymbolTypeSlice(params[3])
-					height := int(params[4].Value().(int64))
-					bet := int(params[5].Value().(int64))
-					mul := int(params[6].Value().(int64))
+					syms := array2SymbolTypeSlice(params[3])
+					wilds := array2SymbolTypeSlice(params[4])
+					height := int(params[5].Value().(int64))
+					bet := int(params[6].Value().(int64))
+					mul := int(params[7].Value().(int64))
 
 					wrss := BuildWaysReelsStatsEx(rd, height, syms, wilds)
 
