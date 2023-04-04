@@ -264,7 +264,7 @@ func BuildWaysReelsStatsEx(rd *sgc7game.ReelsData, height int, symbols []SymbolT
 	wrss := NewWaysReelsStats(height)
 
 	for _, r := range rd.Reels {
-		wrs := newWaysReelStatsWithReel(r, height)
+		wrs := newWaysReelStatsWithReelEx(r, height, symbols, wilds)
 
 		wrss.Reels = append(wrss.Reels, wrs)
 	}
