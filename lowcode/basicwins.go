@@ -168,24 +168,39 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	gs := basicWins.GetTargetScene(gameProp, curpr, cd)
 
 	if basicWins.Config.MainType == WinTypeWays {
-		currets := sgc7game.CalcFullLineEx2(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-			return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
-		}, func(cursymbol int) bool {
-			return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
-		}, func(cursymbol int, startsymbol int) bool {
-			if cursymbol == startsymbol {
-				return true
-			}
+		if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
+			os := basicWins.GetTargetOtherScene(gameProp, curpr, cd)
 
-			return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
-		})
+			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+				return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+			}, func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+			}, func(cursymbol int, startsymbol int) bool {
+				if cursymbol == startsymbol {
+					return true
+				}
 
-		rets = append(rets, currets...)
+				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+			}, func(x, y int) int {
+				return os.Arr[x][y]
+			})
 
-		// for _, v := range currets {
-		// 	rets = append(rets, v)
-		// 	// basicWins.AddResult(curpr, v, cd)
-		// }
+			rets = append(rets, currets...)
+		} else {
+			currets := sgc7game.CalcFullLineEx(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+				return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+			}, func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+			}, func(cursymbol int, startsymbol int) bool {
+				if cursymbol == startsymbol {
+					return true
+				}
+
+				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+			})
+
+			rets = append(rets, currets...)
+		}
 	} else if basicWins.Config.MainType == WinTypeLines {
 		for i, v := range gameProp.CurLineData.Lines {
 			ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, GetBet(stake, basicWins.Config.BetType), func(cursymbol int) bool {
@@ -213,7 +228,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
+	if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" && basicWins.Config.MainType == WinTypeLines {
 		os := basicWins.GetTargetOtherScene(gameProp, curpr, cd)
 
 		for _, v := range rets {
