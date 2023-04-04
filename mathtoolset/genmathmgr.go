@@ -93,5 +93,6 @@ func NewGamMathMgr() *GenMathMgr {
 	return &GenMathMgr{
 		MapPaytables:  make(map[string]*sgc7game.PayTables),
 		MapReelsStats: make(map[string]*ReelsStats),
+		MapReelsData:  make(map[string]*sgc7game.ReelsData),
 	}
 }

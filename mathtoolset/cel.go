@@ -250,7 +250,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 7 {
-						goutils.Error("calcWaysRTP",
+						goutils.Error("calcWaysRTP2",
 							zap.Error(ErrInvalidFunctionParams))
 
 						return types.Double(0)
@@ -258,7 +258,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					err := mgrGenMath.LoadPaytables(params[0].Value().(string))
 					if err != nil {
-						goutils.Error("calcWaysRTP:LoadPaytables",
+						goutils.Error("calcWaysRTP2:LoadPaytables",
 							zap.Error(err))
 
 						return types.Double(0)
@@ -266,23 +266,23 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					rd, err := mgrGenMath.LoadReelsData2(params[0].Value().(string), params[1].Value().(string))
 					if err != nil {
-						goutils.Error("calcWaysRTP:LoadReelsData2",
+						goutils.Error("calcWaysRTP2:LoadReelsData2",
 							zap.Error(err))
 
 						return types.Double(0)
 					}
 
+					syms := array2SymbolTypeSlice(params[2])
+					wilds := array2SymbolTypeSlice(params[3])
 					height := int(params[4].Value().(int64))
 					bet := int(params[5].Value().(int64))
 					mul := int(params[6].Value().(int64))
-					syms := array2SymbolTypeSlice(params[2])
-					wilds := array2SymbolTypeSlice(params[3])
 
 					wrss := BuildWaysReelsStatsEx(rd, height, syms, wilds)
 
 					ssws, err := AnalyzeReelsWaysEx2(mgrGenMath.Paytables, wrss, syms, height, bet, mul)
 					if err != nil {
-						goutils.Error("calcWaysRTP:AnalyzeReelsWaysEx2",
+						goutils.Error("calcWaysRTP2:AnalyzeReelsWaysEx2",
 							zap.Error(err))
 
 						return types.Double(0)
