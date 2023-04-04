@@ -39,22 +39,36 @@ func (mgr *GenMathMgr) LoadPaytables(fn string) error {
 	return nil
 }
 
-func (mgr *GenMathMgr) LoadReelsData2(paytablesfn string, fn string) (*sgc7game.ReelsData, error) {
+func (mgr *GenMathMgr) LoadReelsData(paytablesfn string, fn string, isStrReel bool) (*sgc7game.ReelsData, error) {
 	mgr.LoadPaytables(paytablesfn)
 
 	rd, isok := mgr.MapReelsData[fn]
 	if !isok {
-		paytables1, err := sgc7game.LoadReelsFromExcel2(fn, mgr.Paytables)
-		if err != nil {
-			goutils.Error("GenMathMgr.LoadReelsData2:LoadReelsFromExcel2",
-				zap.String("fn", fn),
-				zap.Error(err))
+		if isStrReel {
+			rd1, err := sgc7game.LoadReelsFromExcel2(fn, mgr.Paytables)
+			if err != nil {
+				goutils.Error("GenMathMgr.LoadReelsData:LoadReelsFromExcel2",
+					zap.String("fn", fn),
+					zap.Error(err))
 
-			return nil, err
+				return nil, err
+			}
+
+			rd = rd1
+		} else {
+			rd1, err := sgc7game.LoadReelsFromExcel(fn)
+			if err != nil {
+				goutils.Error("GenMathMgr.LoadReelsData:LoadReelsFromExcel",
+					zap.String("fn", fn),
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			rd = rd1
 		}
 
-		mgr.MapReelsData[fn] = paytables1
-		rd = paytables1
+		mgr.MapReelsData[fn] = rd
 	}
 
 	return rd, nil
