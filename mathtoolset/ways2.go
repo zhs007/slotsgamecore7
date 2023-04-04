@@ -107,9 +107,9 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, wrss *WaysReelsStats,
 					}
 
 					sws.WinsNum[i] = cw
-					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i]
+					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
 
-					ssws.TotalWins += int64(arrPay[i]) * sws.WinsNum[i]
+					ssws.TotalWins += sws.Wins[i]
 				}
 			}
 		}
