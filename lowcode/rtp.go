@@ -252,11 +252,11 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 
 	curtime := time.Now()
 
-	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
+	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
 	game.Pool.Stats.Wait()
 
-	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02 15:04:05"))))
+	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
 	goutils.Info("finish.",
 		zap.Int64("total nums", game.Pool.Stats.TotalNum))
