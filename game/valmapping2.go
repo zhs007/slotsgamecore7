@@ -12,6 +12,10 @@ type ValMapping2 struct {
 	MapVals map[int]IVal `json:"mapVals"`
 }
 
+func (vm *ValMapping2) IsEmpty() bool {
+	return len(vm.MapVals) == 0
+}
+
 func (vm *ValMapping2) Keys() []int {
 	lst := []int{}
 
