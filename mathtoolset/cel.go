@@ -5,6 +5,7 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/zhs007/goutils"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
 )
 
@@ -107,6 +108,26 @@ func array2SymbolMapping(val ref.Val) *SymbolMapping {
 				} else {
 					k = int(v1)
 				}
+			}
+		}
+
+		return sm
+	}
+
+	return nil
+}
+
+func array2SymbolMulti(val0 ref.Val, val1 ref.Val) *sgc7game.ValMapping2 {
+	lst0, isok0 := val0.Value().([]ref.Val)
+	lst1, isok1 := val1.Value().([]ref.Val)
+
+	if isok0 && isok1 && len(lst0) == len(lst1) {
+		sm := sgc7game.NewValMappingEx2()
+		for i, v := range lst0 {
+			k, isok0 := v.Value().(int64)
+			v, isok1 := lst1[i].Value().(float64)
+			if isok0 && isok1 {
+				sm.MapVals[int(k)] = sgc7game.NewFloatValEx(v)
 			}
 		}
 
@@ -262,6 +283,61 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ssws, err := AnalyzeReelsWaysEx(mgrGenMath.Paytables, mgrGenMath.RSS, syms, wilds, sm, height, bet, mul)
 					if err != nil {
 						goutils.Error("calcWaysRTP:AnalyzeReelsWaysEx",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
+
+					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+				},
+				),
+			),
+		),
+		cel.Function("calcWaysRTPWithSymbolMulti",
+			cel.Overload("calcWaysRTPWithSymbolMulti_string_string_list_list_list_list_list_int_int_int",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.ListType(cel.IntType),
+					cel.ListType(cel.IntType), cel.ListType(cel.DoubleType), cel.IntType, cel.IntType, cel.IntType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 10 {
+						goutils.Error("calcWaysRTPWithSymbolMulti",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					ptfn := params[0].Value().(string)
+					rssfn := params[1].Value().(string)
+
+					err := mgrGenMath.LoadPaytables(ptfn)
+					if err != nil {
+						goutils.Error("calcWaysRTPWithSymbolMulti:LoadPaytables",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					err = mgrGenMath.LoadReelsState(rssfn)
+					if err != nil {
+						goutils.Error("calcWaysRTPWithSymbolMulti:LoadReelsState",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					syms := array2SymbolTypeSlice(params[2])
+					wilds := array2SymbolTypeSlice(params[3])
+					sm := array2SymbolMapping(params[4])
+					symMul := array2SymbolMulti(params[5], params[6])
+					height := int(params[7].Value().(int64))
+					bet := int(params[8].Value().(int64))
+					mul := int(params[9].Value().(int64))
+
+					ssws, err := AnalyzeReelsWaysSymbolMulti(mgrGenMath.Paytables, mgrGenMath.RSS, syms, wilds, sm, symMul, height, bet, mul)
+					if err != nil {
+						goutils.Error("calcWaysRTPWithSymbolMulti:AnalyzeReelsWaysSymbolMulti",
 							zap.Error(err))
 
 						return types.Double(0)

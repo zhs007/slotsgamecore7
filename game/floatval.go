@@ -13,6 +13,12 @@ func NewFloatVal[T float32 | float64]() IVal {
 	return &FloatVal[T]{}
 }
 
+func NewFloatValEx[T float32 | float64](v T) IVal {
+	return &FloatVal[T]{
+		Val: v,
+	}
+}
+
 // FloatVal
 type FloatVal[T float32 | float64] struct {
 	Val T `json:"val"`

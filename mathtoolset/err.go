@@ -41,4 +41,7 @@ var (
 
 	// ErrInvalidTargetRTP - invalid targetRTP
 	ErrInvalidTargetRTP = errors.New("invalid targetRTP")
+
+	// ErrUnimplementedCode - unimplemented code
+	ErrUnimplementedCode = errors.New("unimplemented code")
 )
