@@ -295,14 +295,14 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				),
 			),
 		),
-		cel.Function("calcWaysRTPWithSymbolMulyi",
-			cel.Overload("calcWaysRTPWithSymbolMulyi_string_string_list_list_list_list_list_int_int_int",
+		cel.Function("calcWaysRTPWithSymbolMulti",
+			cel.Overload("calcWaysRTPWithSymbolMulti_string_string_list_list_list_list_list_int_int_int",
 				[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.ListType(cel.IntType),
 					cel.ListType(cel.IntType), cel.ListType(cel.DoubleType), cel.IntType, cel.IntType, cel.IntType},
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 10 {
-						goutils.Error("calcWaysRTPWithSymbolMulyi",
+						goutils.Error("calcWaysRTPWithSymbolMulti",
 							zap.Error(ErrInvalidFunctionParams))
 
 						return types.Double(0)
@@ -313,7 +313,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					err := mgrGenMath.LoadPaytables(ptfn)
 					if err != nil {
-						goutils.Error("calcWaysRTPWithSymbolMulyi:LoadPaytables",
+						goutils.Error("calcWaysRTPWithSymbolMulti:LoadPaytables",
 							zap.Error(err))
 
 						return types.Double(0)
@@ -321,7 +321,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					err = mgrGenMath.LoadReelsState(rssfn)
 					if err != nil {
-						goutils.Error("calcWaysRTPWithSymbolMulyi:LoadReelsState",
+						goutils.Error("calcWaysRTPWithSymbolMulti:LoadReelsState",
 							zap.Error(err))
 
 						return types.Double(0)
@@ -337,7 +337,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					ssws, err := AnalyzeReelsWaysSymbolMulti(mgrGenMath.Paytables, mgrGenMath.RSS, syms, wilds, sm, symMul, height, bet, mul)
 					if err != nil {
-						goutils.Error("calcWaysRTPWithSymbolMulyi:AnalyzeReelsWaysSymbolMulti",
+						goutils.Error("calcWaysRTPWithSymbolMulti:AnalyzeReelsWaysSymbolMulti",
 							zap.Error(err))
 
 						return types.Double(0)
