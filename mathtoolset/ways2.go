@@ -4,7 +4,37 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
-// CalcWaysWinsInReels2 -
+// calcNonWaysWinsInReels2 -
+func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
+	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, height int) int64 {
+
+	num := int64(0)
+
+	for y := 0; y < len(rd.Reels[x]); y++ {
+		curmul := 0
+
+		for ty := 0; ty < height; ty++ {
+			if rd.Reels[x][y+ty] == int(symbol) {
+				curmul++
+			} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+				curmul++
+			} else if symbolMapping != nil {
+				ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+				if isok && ts == symbol {
+					curmul++
+				}
+			}
+		}
+
+		if curmul <= 0 {
+			num++
+		}
+	}
+
+	return num
+}
+
+// calcWaysWinsInReels2 -
 func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, num int, height int) int64 {
 
@@ -36,7 +66,9 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 	} else {
 		lastnum := int64(1)
 		if num < len(rd.Reels) {
-			for i := num; i < len(rd.Reels); i++ {
+			lastnum = calcNonWaysWinsInReels2(rd, symbol, wilds, symbolMapping, num, height)
+
+			for i := num + 1; i < len(rd.Reels); i++ {
 				lastnum *= int64(len(rd.Reels[i]))
 			}
 		}
