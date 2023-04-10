@@ -41,13 +41,13 @@ func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
 
 // calcWaysWinsInReels2 -
 func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
-	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, num int, height int) int64 {
+	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, x int, num int, height int) float64 {
 
-	curwins := int64(0)
+	curwins := float64(0)
 
 	if x < num-1 {
 		for y := 0; y < len(rd.Reels[x]); y++ {
-			curmul := 0
+			curmul := float64(0)
 
 			for ty := 0; ty < height; ty++ {
 				off := y + ty
@@ -55,36 +55,44 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 					off -= len(rd.Reels[x])
 				}
 
+				csm := float64(1.0)
+				if symMul != nil {
+					cm, isok := symMul.MapVals[rd.Reels[x][off]]
+					if isok {
+						csm = cm.Float64()
+					}
+				}
+
 				if rd.Reels[x][off] == int(symbol) {
-					curmul++
+					curmul += csm
 				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
-					curmul++
+					curmul += csm
 				} else if symbolMapping != nil {
 					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
 					if isok && ts == symbol {
-						curmul++
+						curmul += csm
 					}
 				}
 			}
 
 			if curmul > 0 {
-				curwin := calcWaysWinsInReels2(rd, symbol, wilds, symbolMapping, x+1, num, height)
+				curwin := calcWaysWinsInReels2(rd, symbol, wilds, symbolMapping, symMul, x+1, num, height)
 
-				curwins += int64(curmul) * curwin
+				curwins += curmul * curwin
 			}
 		}
 	} else {
-		lastnum := int64(1)
+		lastnum := float64(1)
 		if num < len(rd.Reels) {
-			lastnum = calcNonWaysWinsInReels2(rd, symbol, wilds, symbolMapping, num, height)
+			lastnum = float64(calcNonWaysWinsInReels2(rd, symbol, wilds, symbolMapping, num, height))
 
 			for i := num + 1; i < len(rd.Reels); i++ {
-				lastnum *= int64(len(rd.Reels[i]))
+				lastnum *= float64(len(rd.Reels[i]))
 			}
 		}
 
 		for y := 0; y < len(rd.Reels[x]); y++ {
-			curmul := 0
+			curmul := float64(0)
 
 			for ty := 0; ty < height; ty++ {
 				off := y + ty
@@ -92,20 +100,28 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 					off -= len(rd.Reels[x])
 				}
 
+				csm := float64(1.0)
+				if symMul != nil {
+					cm, isok := symMul.MapVals[rd.Reels[x][off]]
+					if isok {
+						csm = cm.Float64()
+					}
+				}
+
 				if rd.Reels[x][off] == int(symbol) {
-					curmul++
+					curmul += csm
 				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
-					curmul++
+					curmul += csm
 				} else if symbolMapping != nil {
 					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
 					if isok && ts == symbol {
-						curmul++
+						curmul += csm
 					}
 				}
 			}
 
 			if curmul > 0 {
-				curwins += int64(curmul) * lastnum
+				curwins += curmul * lastnum
 			}
 		}
 	}
@@ -114,7 +130,7 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 }
 
 func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
-	symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, height int, bet int, mul int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, height int, bet int, mul int) (*SymbolsWinsStats, error) {
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
@@ -134,9 +150,9 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
 			if isok {
 				for i := 0; i < len(arrPay); i++ {
 					if arrPay[i] > 0 {
-						cw := calcWaysWinsInReels2(rd, s, wilds, symbolMapping, 0, i+1, height)
+						cw := calcWaysWinsInReels2(rd, s, wilds, symbolMapping, symMul, 0, i+1, height)
 
-						sws.WinsNum[i] = cw
+						sws.WinsNum[i] = int64(cw)
 						sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
 
 						ssws.TotalWins += sws.Wins[i]
@@ -148,9 +164,9 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
 			if isok {
 				for i := 0; i < len(arrPay); i++ {
 					if arrPay[i] > 0 {
-						cw := calcWaysWinsInReels2(rd, s, wilds, nil, 0, i+1, height)
+						cw := calcWaysWinsInReels2(rd, s, wilds, nil, symMul, 0, i+1, height)
 
-						sws.WinsNum[i] = cw
+						sws.WinsNum[i] = int64(cw)
 						sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
 
 						ssws.TotalWins += sws.Wins[i]
