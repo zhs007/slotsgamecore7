@@ -14,12 +14,17 @@ func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
 		curmul := 0
 
 		for ty := 0; ty < height; ty++ {
-			if rd.Reels[x][y+ty] == int(symbol) {
+			off := y + ty
+			if off >= len(rd.Reels[x]) {
+				off -= len(rd.Reels[x])
+			}
+
+			if rd.Reels[x][off] == int(symbol) {
 				curmul++
-			} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+			} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
 				curmul++
 			} else if symbolMapping != nil {
-				ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+				ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
 				if isok && ts == symbol {
 					curmul++
 				}
@@ -45,12 +50,17 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 			curmul := 0
 
 			for ty := 0; ty < height; ty++ {
-				if rd.Reels[x][y+ty] == int(symbol) {
+				off := y + ty
+				if off >= len(rd.Reels[x]) {
+					off -= len(rd.Reels[x])
+				}
+
+				if rd.Reels[x][off] == int(symbol) {
 					curmul++
-				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
 					curmul++
 				} else if symbolMapping != nil {
-					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
 					if isok && ts == symbol {
 						curmul++
 					}
@@ -77,12 +87,17 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 			curmul := 0
 
 			for ty := 0; ty < height; ty++ {
-				if rd.Reels[x][y+ty] == int(symbol) {
+				off := y + ty
+				if off >= len(rd.Reels[x]) {
+					off -= len(rd.Reels[x])
+				}
+
+				if rd.Reels[x][off] == int(symbol) {
 					curmul++
-				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
 					curmul++
 				} else if symbolMapping != nil {
-					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
 					if isok && ts == symbol {
 						curmul++
 					}
