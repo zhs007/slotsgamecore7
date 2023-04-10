@@ -13,7 +13,7 @@ func Test_CheckReels(t *testing.T) {
 	assert.NotNil(t, rd)
 
 	x, y, err := CheckReels(rd, 2)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 
 	assert.Equal(t, x, 1)
 	assert.Equal(t, y, 1)
