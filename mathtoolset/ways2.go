@@ -1,91 +1,111 @@
 package mathtoolset
 
 import (
-	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
-type cwwirNode struct {
-	Symbol      SymbolType
-	NumInWindow int
-	Num         int
-}
+// calcNonWaysWinsInReels2 -
+func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
+	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, height int) int64 {
 
-type cwwirReel struct {
-	SymbolNodes [][]*cwwirNode
-}
+	num := int64(0)
 
-func buildCalcWaysWinsInReels2Data(wrss *WaysReelsStats, symbol SymbolType, num int) *cwwirReel {
-	cwwirr := &cwwirReel{}
+	for y := 0; y < len(rd.Reels[x]); y++ {
+		curmul := 0
 
-	for i := 0; i < num; i++ {
-		nodes := []*cwwirNode{}
-
-		wrss.Reels[i].EachSymbol(symbol, func(wss *WaysSymbolStats) {
-			if wss.Num > 0 {
-				nodes = append(nodes, &cwwirNode{
-					Symbol:      symbol,
-					NumInWindow: wss.NumInWindow,
-					Num:         wss.Num,
-				})
+		for ty := 0; ty < height; ty++ {
+			if rd.Reels[x][y+ty] == int(symbol) {
+				curmul++
+			} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+				curmul++
+			} else if symbolMapping != nil {
+				ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+				if isok && ts == symbol {
+					curmul++
+				}
 			}
-		})
-
-		cwwirr.SymbolNodes = append(cwwirr.SymbolNodes, nodes)
-	}
-
-	return cwwirr
-}
-
-type funcOnEachCWWIRReel func(int)
-
-func deepEachCWWIRReel(cwwirr *cwwirReel, i int, curmul int, oneach funcOnEachCWWIRReel) {
-	if i < len(cwwirr.SymbolNodes)-1 {
-		for _, v := range cwwirr.SymbolNodes[i] {
-			deepEachCWWIRReel(cwwirr, i+1, curmul*v.NumInWindow*v.Num, oneach)
 		}
-	} else {
-		for _, v := range cwwirr.SymbolNodes[i] {
-			oneach(curmul * v.NumInWindow * v.Num)
+
+		if curmul <= 0 {
+			num++
 		}
 	}
+
+	return num
 }
 
-func eachCWWIRReel(cwwirr *cwwirReel, oneach funcOnEachCWWIRReel) {
-	deepEachCWWIRReel(cwwirr, 0, 1, oneach)
-}
+// calcWaysWinsInReels2 -
+func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
+	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, num int, height int) int64 {
 
-// CalcWaysWinsInReels2 -
-func CalcWaysWinsInReels2(wrss *WaysReelsStats, symbol SymbolType, num int, height int) (int64, error) {
 	curwins := int64(0)
 
-	cwwirr := buildCalcWaysWinsInReels2Data(wrss, symbol, num)
+	if x < num-1 {
+		for y := 0; y < len(rd.Reels[x]); y++ {
+			curmul := 0
 
-	lastnum := int64(1)
-	if num < len(wrss.Reels) {
-		lastnum = int64(wrss.GetNonWaysNum(num, symbol))
+			for ty := 0; ty < height; ty++ {
+				if rd.Reels[x][y+ty] == int(symbol) {
+					curmul++
+				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+					curmul++
+				} else if symbolMapping != nil {
+					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+					if isok && ts == symbol {
+						curmul++
+					}
+				}
+			}
 
-		for i := num + 1; i < len(wrss.Reels); i++ {
-			lastnum *= int64(wrss.Reels[i].TotalSymbolNum)
+			if curmul > 0 {
+				curwin := calcWaysWinsInReels2(rd, symbol, wilds, symbolMapping, x+1, num, height)
+
+				curwins += int64(curmul) * curwin
+			}
+		}
+	} else {
+		lastnum := int64(1)
+		if num < len(rd.Reels) {
+			lastnum = calcNonWaysWinsInReels2(rd, symbol, wilds, symbolMapping, num, height)
+
+			for i := num + 1; i < len(rd.Reels); i++ {
+				lastnum *= int64(len(rd.Reels[i]))
+			}
+		}
+
+		for y := 0; y < len(rd.Reels[x]); y++ {
+			curmul := 0
+
+			for ty := 0; ty < height; ty++ {
+				if rd.Reels[x][y+ty] == int(symbol) {
+					curmul++
+				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][y+ty])) {
+					curmul++
+				} else if symbolMapping != nil {
+					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][y+ty])]
+					if isok && ts == symbol {
+						curmul++
+					}
+				}
+			}
+
+			if curmul > 0 {
+				curwins += int64(curmul) * lastnum
+			}
 		}
 	}
 
-	eachCWWIRReel(cwwirr, func(mul int) {
-		curwins += (int64(mul) * lastnum)
-	})
-
-	return curwins, nil
+	return curwins
 }
 
-func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, wrss *WaysReelsStats,
-	symbols []SymbolType, height int, bet int, mul int) (*SymbolsWinsStats, error) {
+func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
+	symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, height int, bet int, mul int) (*SymbolsWinsStats, error) {
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
 	ssws.TotalBet = 1
-	for _, rs := range wrss.Reels {
-		ssws.TotalBet *= int64(rs.TotalSymbolNum)
+	for _, rs := range rd.Reels {
+		ssws.TotalBet *= int64(len(rs))
 	}
 
 	ssws.TotalBet *= int64(mul)
@@ -94,22 +114,32 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, wrss *WaysReelsStats,
 	for _, s := range symbols {
 		sws := ssws.GetSymbolWinsStats(s)
 
-		arrPay, isok := paytables.MapPay[int(s)]
-		if isok {
-			for i := 0; i < len(arrPay); i++ {
-				if arrPay[i] > 0 {
-					cw, err := CalcWaysWinsInReels2(wrss, s, i+1, height)
-					if err != nil {
-						goutils.Error("AnalyzeReelsWaysEx2:CalcWaysWinsInReels",
-							zap.Error(err))
+		if symbolMapping.HasTarget(s) {
+			arrPay, isok := paytables.MapPay[int(s)]
+			if isok {
+				for i := 0; i < len(arrPay); i++ {
+					if arrPay[i] > 0 {
+						cw := calcWaysWinsInReels2(rd, s, wilds, symbolMapping, 0, i+1, height)
 
-						return nil, err
+						sws.WinsNum[i] = cw
+						sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
+
+						ssws.TotalWins += sws.Wins[i]
 					}
+				}
+			}
+		} else {
+			arrPay, isok := paytables.MapPay[int(s)]
+			if isok {
+				for i := 0; i < len(arrPay); i++ {
+					if arrPay[i] > 0 {
+						cw := calcWaysWinsInReels2(rd, s, wilds, nil, 0, i+1, height)
 
-					sws.WinsNum[i] = cw
-					sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
+						sws.WinsNum[i] = cw
+						sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
 
-					ssws.TotalWins += sws.Wins[i]
+						ssws.TotalWins += sws.Wins[i]
+					}
 				}
 			}
 		}
