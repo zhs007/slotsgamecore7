@@ -42,9 +42,11 @@ func (sc *ScriptCore) Compile(code string) error {
 	return nil
 }
 
-func (sc *ScriptCore) Eval() (ref.Val, error) {
+func (sc *ScriptCore) Eval(mgr *GenMathMgr) (ref.Val, error) {
 	if sc.Prg != nil {
-		out, _, err := (*sc.Prg).Eval(map[string]any{})
+		out, _, err := (*sc.Prg).Eval(map[string]any{
+			"rets": float64s2list(mgr.Rets),
+		})
 		if err != nil {
 			goutils.Error("ScriptCore.Eval:Eval",
 				zap.Error(err))
@@ -117,6 +119,10 @@ func array2SymbolMapping(val ref.Val) *SymbolMapping {
 	return nil
 }
 
+func float64s2list(arr []float64) ref.Val {
+	return types.NewDynamicList(types.DefaultTypeAdapter, arr)
+}
+
 func array2SymbolMulti(val0 ref.Val, val1 ref.Val) *sgc7game.ValMapping2 {
 	lst0, isok0 := val0.Value().([]ref.Val)
 	lst1, isok1 := val1.Value().([]ref.Val)
@@ -151,6 +157,7 @@ func newScriptVariables(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 	return []cel.EnvOption{
+		cel.Variable("rets", cel.ListType(cel.DoubleType)),
 		cel.Function("calcLineRTP",
 			cel.Overload("calcLineRTP_string_string_list_list_int_int",
 				[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.IntType, cel.IntType},
@@ -192,7 +199,10 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
-					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
+					mgrGenMath.pushRet(ret)
+
+					return types.Double(ret)
 				},
 				),
 			),
@@ -237,7 +247,10 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
-					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
+					mgrGenMath.pushRet(ret)
+
+					return types.Double(ret)
 				},
 				),
 			),
@@ -290,7 +303,10 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
-					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
+					mgrGenMath.pushRet(ret)
+
+					return types.Double(ret)
 				},
 				),
 			),
@@ -345,7 +361,10 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
-					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
+					mgrGenMath.pushRet(ret)
+
+					return types.Double(ret)
 				},
 				),
 			),
@@ -402,7 +421,44 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
-					return types.Double(float64(ssws.TotalWins) / float64(ssws.TotalBet))
+					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
+					mgrGenMath.pushRet(ret)
+
+					return types.Double(ret)
+				},
+				),
+			),
+		),
+		cel.Function("calcScatterProbability",
+			cel.Overload("calcScatterProbability_string_int_int_int",
+				[]*cel.Type{cel.StringType, cel.IntType, cel.IntType, cel.IntType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 11 {
+						goutils.Error("calcScatterProbability",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					rssfn := params[0].Value().(string)
+
+					err := mgrGenMath.LoadReelsState(rssfn)
+					if err != nil {
+						goutils.Error("calcScatterProbability:LoadReelsState",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					sym := params[1].Value().(int64)
+					num := params[2].Value().(int64)
+					height := params[3].Value().(int64)
+
+					prob := CalcScatterProbability(mgrGenMath.RSS, SymbolType(sym), int(num), int(height))
+					mgrGenMath.pushRet(prob)
+
+					return types.Double(prob)
 				},
 				),
 			),
