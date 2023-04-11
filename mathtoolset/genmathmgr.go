@@ -16,6 +16,11 @@ type GenMathMgr struct {
 	RTP           float32
 	RSS           *ReelsStats
 	RetStats      []*SymbolsWinsStats
+	Rets          []float64
+}
+
+func (mgr *GenMathMgr) pushRet(ret float64) {
+	mgr.Rets = append(mgr.Rets, ret)
 }
 
 func (mgr *GenMathMgr) LoadPaytables(fn string) error {
