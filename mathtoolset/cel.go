@@ -496,7 +496,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					vwfn := params[0].Value().(string)
 
-					vw, err := sgc7game.LoadValWeights2FromExcel(vwfn, "index", "values", sgc7game.NewStrVal)
+					vw, err := sgc7game.LoadValWeights2FromExcel(vwfn, "val", "weight", sgc7game.NewStrVal)
 					if err != nil {
 						goutils.Error("calcProbWithWeights:LoadValMapping2FromExcel",
 							zap.Error(err))
