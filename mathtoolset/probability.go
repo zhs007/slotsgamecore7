@@ -1,5 +1,7 @@
 package mathtoolset
 
+import sgc7game "github.com/zhs007/slotsgamecore7/game"
+
 // countScatterNumTimes -
 func countScatterNumTimes(rss *ReelsStats, symbol SymbolType, num int, ci int, height int) int64 {
 	if ci == len(rss.Reels)-1 {
@@ -50,4 +52,14 @@ func CalcScatterProbability(rss *ReelsStats, symbol SymbolType, num int, height 
 	symbolnum := countScatterNumTimes(rss, symbol, num, 0, height)
 
 	return float64(symbolnum) / float64(totalnum)
+}
+
+func CalcProbWithWeights(vw *sgc7game.ValWeights2, probs []float64) float64 {
+	ret := float64(0)
+
+	for i, v := range probs {
+		ret += v * float64(vw.Weights[i]) / float64(vw.MaxWeight)
+	}
+
+	return ret
 }
