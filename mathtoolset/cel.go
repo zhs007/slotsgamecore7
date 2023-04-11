@@ -407,6 +407,39 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				),
 			),
 		),
+		cel.Function("calcScatterProbability",
+			cel.Overload("calcScatterProbability_string_int_int_int",
+				[]*cel.Type{cel.StringType, cel.IntType, cel.IntType, cel.IntType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 11 {
+						goutils.Error("calcScatterProbability",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					rssfn := params[0].Value().(string)
+
+					err := mgrGenMath.LoadReelsState(rssfn)
+					if err != nil {
+						goutils.Error("calcScatterProbability:LoadReelsState",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					sym := params[1].Value().(int64)
+					num := params[2].Value().(int64)
+					height := params[3].Value().(int64)
+
+					prob := CalcScatterProbability(mgrGenMath.RSS, SymbolType(sym), int(num), int(height))
+
+					return types.Double(prob)
+				},
+				),
+			),
+		),
 	}
 }
 

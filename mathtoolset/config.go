@@ -18,6 +18,7 @@ type GenReelsConfig struct {
 type Config struct {
 	Type           string          `yaml:"type"`
 	Code           string          `yaml:"code"`
+	Codes          []string        `yaml:"codes"`
 	TargetRTP      float64         `yaml:"targetRTP"`
 	Paytables      string          `yaml:"paytables"`
 	GenReelsConfig *GenReelsConfig `yaml:"genReelsConfig"`
