@@ -143,6 +143,25 @@ func array2SymbolMulti(val0 ref.Val, val1 ref.Val) *sgc7game.ValMapping2 {
 	return nil
 }
 
+func getFloat64Slice(val ref.Val) []float64 {
+	lst, isok := val.Value().([]ref.Val)
+
+	if isok {
+		arr := []float64{}
+
+		for _, v := range lst {
+			v1, isok1 := v.Value().(float64)
+			if isok1 {
+				arr = append(arr, v1)
+			}
+		}
+
+		return arr
+	}
+
+	return nil
+}
+
 func appendEnvOptions(dst []cel.EnvOption, src []cel.EnvOption) []cel.EnvOption {
 	if len(src) > 0 {
 		dst = append(dst, src...)
@@ -456,6 +475,38 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					height := params[3].Value().(int64)
 
 					prob := CalcScatterProbability(mgrGenMath.RSS, SymbolType(sym), int(num), int(height))
+					mgrGenMath.pushRet(prob)
+
+					return types.Double(prob)
+				},
+				),
+			),
+		),
+		cel.Function("calcProbWithWeights",
+			cel.Overload("calcProbWithWeights_string_list",
+				[]*cel.Type{cel.StringType, cel.ListType(cel.DoubleType)},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 2 {
+						goutils.Error("calcProbWithWeights",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					vwfn := params[0].Value().(string)
+
+					vw, err := sgc7game.LoadValWeights2FromExcel(vwfn, "index", "values", sgc7game.NewStrVal)
+					if err != nil {
+						goutils.Error("calcProbWithWeights:LoadValMapping2FromExcel",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					arr := getFloat64Slice(params[1])
+
+					prob := CalcProbWithWeights(vw, arr)
 					mgrGenMath.pushRet(prob)
 
 					return types.Double(prob)
