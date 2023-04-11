@@ -434,7 +434,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				[]*cel.Type{cel.StringType, cel.IntType, cel.IntType, cel.IntType},
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
-					if len(params) != 11 {
+					if len(params) != 4 {
 						goutils.Error("calcScatterProbability",
 							zap.Error(ErrInvalidFunctionParams))
 
