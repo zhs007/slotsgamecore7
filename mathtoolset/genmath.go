@@ -26,7 +26,7 @@ func GenMath(fn string) error {
 	}
 
 	if cfg.Type == "genReelsState" {
-		mgrGenMath := NewGamMathMgr()
+		mgrGenMath := NewGamMathMgr(cfg)
 
 		script, err := NewScriptCore(mgrGenMath)
 		if err != nil {
@@ -62,7 +62,7 @@ func GenMath(fn string) error {
 
 		mgrGenMath.Save()
 	} else if cfg.Type == "calcRTPWithReelsState" {
-		mgrGenMath := NewGamMathMgr()
+		mgrGenMath := NewGamMathMgr(cfg)
 
 		script, err := NewScriptCore(mgrGenMath)
 		if err != nil {
@@ -92,34 +92,12 @@ func GenMath(fn string) error {
 
 		fmt.Printf("The RTP is %v\n", out.Value().(float64))
 	} else if cfg.Type == "runCodes" {
-		mgrGenMath := NewGamMathMgr()
+		mgrGenMath := NewGamMathMgr(cfg)
 
-		script, err := NewScriptCore(mgrGenMath)
-		if err != nil {
-			goutils.Error("GenMath:NewScriptCore",
-				zap.Error(err))
-
-			return err
-		}
-
-		for _, v := range cfg.Codes {
-			err = script.Compile(v)
-			if err != nil {
-				goutils.Error("GenMath:Compile",
-					zap.Error(err))
-
-				return err
+		for i, v := range cfg.Codes {
+			if !v.DisableAutoRun {
+				mgrGenMath.RunCode(i)
 			}
-
-			out, err := script.Eval(mgrGenMath)
-			if err != nil {
-				goutils.Error("GenMath:Eval",
-					zap.Error(err))
-
-				return err
-			}
-
-			fmt.Printf("The result is %v\n", out.Value().(float64))
 		}
 
 		mgrGenMath.Save()

@@ -7,7 +7,7 @@ import (
 )
 
 func Test_ScriptCore(t *testing.T) {
-	mgrGenMath := NewGamMathMgr()
+	mgrGenMath := NewGamMathMgr(nil)
 	assert.NotNil(t, mgrGenMath)
 
 	script, err := NewScriptCore(mgrGenMath)

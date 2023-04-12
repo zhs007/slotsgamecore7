@@ -3,6 +3,8 @@ package mathtoolset
 import (
 	"fmt"
 
+	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/ref"
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -18,10 +20,8 @@ type GenMathMgr struct {
 	RSS           *ReelsStats
 	RetStats      []*SymbolsWinsStats
 	Rets          []float64
-}
-
-func (mgr *GenMathMgr) pushRet(ret float64) {
-	mgr.Rets = append(mgr.Rets, ret)
+	MapRets       map[string]float64
+	Config        *Config
 }
 
 func (mgr *GenMathMgr) LoadPaytables(fn string) error {
@@ -128,10 +128,83 @@ func (mgr *GenMathMgr) saveResults(fn string) error {
 	return f.SaveAs(fn)
 }
 
-func NewGamMathMgr() *GenMathMgr {
+func (mgr *GenMathMgr) RunCode(i int) error {
+	script, err := NewScriptCore(mgr)
+	if err != nil {
+		goutils.Error("GenMathMgr.RunCode:NewScriptCore",
+			zap.Error(err))
+
+		return err
+	}
+
+	err = script.Compile(mgr.Config.Codes[i].Code)
+	if err != nil {
+		goutils.Error("GenMathMgr.RunCode:Compile",
+			zap.Error(err))
+
+		return err
+	}
+
+	out, err := script.Eval(mgr)
+	if err != nil {
+		goutils.Error("GenMathMgr.RunCode:Eval",
+			zap.Error(err))
+
+		return err
+	}
+
+	mgr.Rets = append(mgr.Rets, out.Value().(float64))
+
+	fmt.Printf("RunCode %v is %v\n", i, out.Value().(float64))
+
+	return nil
+}
+
+func (mgr *GenMathMgr) RunCodeEx(name string) (ref.Val, error) {
+	for _, v := range mgr.Config.Codes {
+		if v.Name == name {
+			script, err := NewScriptCore(mgr)
+			if err != nil {
+				goutils.Error("GenMathMgr.RunCode:NewScriptCore",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			err = script.Compile(v.Code)
+			if err != nil {
+				goutils.Error("GenMathMgr.RunCode:Compile",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			out, err := script.Eval(mgr)
+			if err != nil {
+				goutils.Error("GenMathMgr.RunCode:Eval",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			mgr.Rets = append(mgr.Rets, out.Value().(float64))
+			mgr.MapRets[name] = out.Value().(float64)
+
+			fmt.Printf("RunCode %v is %v\n", name, out.Value().(float64))
+
+			return out, nil
+		}
+	}
+
+	return types.Double(0), nil
+}
+
+func NewGamMathMgr(cfg *Config) *GenMathMgr {
 	return &GenMathMgr{
 		MapPaytables:  make(map[string]*sgc7game.PayTables),
 		MapReelsStats: make(map[string]*ReelsStats),
 		MapReelsData:  make(map[string]*sgc7game.ReelsData),
+		MapRets:       make(map[string]float64),
+		Config:        cfg,
 	}
 }
