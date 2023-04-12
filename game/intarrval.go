@@ -183,3 +183,8 @@ func (val *IntArrVal[T]) StringArr() []string {
 
 	return arr
 }
+
+// GetInt - return val[index]
+func (val *IntArrVal[T]) GetInt(index int) int {
+	return int(val.Vals[index])
+}

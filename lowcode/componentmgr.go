@@ -43,6 +43,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("symbolVal", NewSymbolVal)
 	mgr.Reg("symbolValWins", NewSymbolValWins)
 	mgr.Reg("symbolVal2", NewSymbolVal2)
+	mgr.Reg("overlaySymbol", NewOverlaySymbol)
 
 	return mgr
 }

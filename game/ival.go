@@ -37,4 +37,7 @@ type IVal interface {
 	Float64Arr() []float64
 	// StringArr - return a []string
 	StringArr() []string
+
+	// GetInt - return val[index]
+	GetInt(index int) int
 }
