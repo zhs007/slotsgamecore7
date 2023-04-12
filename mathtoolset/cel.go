@@ -540,7 +540,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 		),
 		cel.Function("genReelsMainSymbolsDistance",
 			cel.Overload("genReelsMainSymbolsDistance_string_string_string_list_int",
-				[]*cel.Type{cel.StringType, cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.IntType},
+				[]*cel.Type{cel.StringType, cel.StringType, cel.StringType, cel.ListType(cel.StringType), cel.IntType},
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 
