@@ -94,9 +94,9 @@ func GenMath(fn string) error {
 	} else if cfg.Type == "runCodes" {
 		mgrGenMath := NewGamMathMgr(cfg)
 
-		for i, v := range cfg.Codes {
+		for _, v := range cfg.Codes {
 			if !v.DisableAutoRun {
-				mgrGenMath.RunCode(i)
+				mgrGenMath.RunCodeEx(v.Name)
 			}
 		}
 
