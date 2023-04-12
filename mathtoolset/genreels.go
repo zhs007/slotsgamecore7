@@ -129,10 +129,10 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 			if err != nil || syms.MaxWeight <= 0 {
 				syms, err = nrs.BuildSymbolsWithWeights2(excsym, mainSymbols)
 				if err != nil || syms.MaxWeight <= 0 {
-					goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
-						goutils.JSON("excludeSymbols", excsym),
-						zap.Int("lastnum", nrs.TotalSymbolNum),
-						zap.Error(ErrNoValidSymbols))
+					// goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
+					// 	goutils.JSON("excludeSymbols", excsym),
+					// 	zap.Int("lastnum", nrs.TotalSymbolNum),
+					// 	zap.Error(ErrNoValidSymbols))
 
 					return nil, ErrNoValidSymbols
 				}
@@ -140,10 +140,10 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 		} else {
 			syms, err = nrs.BuildSymbolsWithWeights2(excsym, mainSymbols)
 			if err != nil || syms.MaxWeight <= 0 {
-				goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
-					goutils.JSON("excludeSymbols", excsym),
-					zap.Int("lastnum", nrs.TotalSymbolNum),
-					zap.Error(ErrNoValidSymbols))
+				// goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
+				// 	goutils.JSON("excludeSymbols", excsym),
+				// 	zap.Int("lastnum", nrs.TotalSymbolNum),
+				// 	zap.Error(ErrNoValidSymbols))
 
 				return nil, ErrNoValidSymbols
 			}
@@ -198,16 +198,26 @@ func GenReelsMainSymbolsDistance(rss *ReelsStats, mainSymbols []SymbolType, mino
 	plugin := sgc7plugin.NewBasicPlugin()
 
 	for i, rs := range rss.Reels {
+		isok := false
 		for j := 0; j < trytimes; j++ {
 			reel, err := genReelsMainSymbolsDistance(plugin, rs, mainSymbols, minoff)
 			if err != nil {
-				goutils.Error("GenReelsMainSymbolsDistance:genReelsMainSymbolsDistance",
-					zap.Error(err))
+				// goutils.Error("GenReelsMainSymbolsDistance:genReelsMainSymbolsDistance",
+				// 	zap.Error(err))
 			} else {
+				isok = true
+
 				reels.SetReel(i, reel)
 
 				break
 			}
+		}
+
+		if !isok {
+			goutils.Error("GenReelsMainSymbolsDistance:genReelsMainSymbolsDistance",
+				zap.Error(ErrNoValidSymbols))
+
+			return nil, ErrNoValidSymbols
 		}
 	}
 
