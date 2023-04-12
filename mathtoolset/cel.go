@@ -572,7 +572,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					}
 
 					mainSymbolsWithStr := array2StrSlice(params[3])
-					offset := params[4].Value().(int)
+					offset := int(params[4].Value().(int64))
 
 					mainSymbols := GetSymbols(mainSymbolsWithStr, mgrGenMath.Paytables)
 
