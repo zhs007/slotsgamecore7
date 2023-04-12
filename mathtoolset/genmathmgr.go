@@ -116,13 +116,16 @@ func (mgr *GenMathMgr) saveResults(fn string) error {
 
 	sheet := f.GetSheetList()[0]
 
-	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "index")
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "name")
 	f.SetCellStr(sheet, goutils.Pos2Cell(1, 0), "retsult")
 
 	si := 1
 
-	for i, v := range mgr.Rets {
-		f.SetCellStr(sheet, goutils.Pos2Cell(i+si, 0), fmt.Sprintf("%v", v))
+	for k, v := range mgr.MapRets {
+		f.SetCellStr(sheet, goutils.Pos2Cell(0, si), k)
+		f.SetCellStr(sheet, goutils.Pos2Cell(1, si), fmt.Sprintf("%v", v))
+
+		si++
 	}
 
 	return f.SaveAs(fn)
