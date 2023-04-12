@@ -3,6 +3,7 @@ package mathtoolset
 import (
 	"fmt"
 
+	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
@@ -101,11 +102,30 @@ func (mgr *GenMathMgr) LoadReelsState(fn string) error {
 }
 
 func (mgr *GenMathMgr) Save() error {
+	mgr.saveResults("genmath.xlsx")
+
 	for i, v := range mgr.RetStats {
 		v.SaveExcel(fmt.Sprintf("ssws-%v.xlsx", i), []SymbolsWinsFileMode{SWFModeRTP, SWFModeWins, SWFModeWinsNum})
 	}
 
 	return nil
+}
+
+func (mgr *GenMathMgr) saveResults(fn string) error {
+	f := excelize.NewFile()
+
+	sheet := f.GetSheetList()[0]
+
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "index")
+	f.SetCellStr(sheet, goutils.Pos2Cell(1, 0), "retsult")
+
+	si := 1
+
+	for i, v := range mgr.Rets {
+		f.SetCellStr(sheet, goutils.Pos2Cell(i+si, 0), fmt.Sprintf("%v", v))
+	}
+
+	return f.SaveAs(fn)
 }
 
 func NewGamMathMgr() *GenMathMgr {

@@ -60,6 +60,24 @@ func (sc *ScriptCore) Eval(mgr *GenMathMgr) (ref.Val, error) {
 	return types.Null(0), nil
 }
 
+func array2StrSlice(val ref.Val) []string {
+	lst0, isok := val.Value().([]ref.Val)
+	if isok {
+		lst := []string{}
+
+		for _, v := range lst0 {
+			v1, isok := v.Value().(string)
+			if isok {
+				lst = append(lst, v1)
+			}
+		}
+
+		return lst
+	}
+
+	return nil
+}
+
 func array2IntSlice(val ref.Val) []int {
 	lst0, isok := val.Value().([]ref.Val)
 	if isok {
@@ -510,6 +528,65 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					mgrGenMath.pushRet(prob)
 
 					return types.Double(prob)
+				},
+				),
+			),
+		),
+		cel.Function("genReelsMainSymbolsDistance",
+			cel.Overload("genReelsMainSymbolsDistance_string_string_string_list_int",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.IntType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+
+					if len(params) != 5 {
+						goutils.Error("genReelsMainSymbolsDistance",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					targetfn := params[0].Value().(string)
+					paytablefn := params[1].Value().(string)
+					rssfn := params[2].Value().(string)
+
+					err := mgrGenMath.LoadPaytables(paytablefn)
+					if err != nil {
+						goutils.Error("calcWaysRTP2:LoadPaytables",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					rss, err := LoadReelsStats(rssfn)
+					if err != nil {
+						goutils.Error("genReelsMainSymbolsDistance:LoadReelsStats",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					mainSymbolsWithStr := array2StrSlice(params[3])
+					offset := params[4].Value().(int)
+
+					mainSymbols := GetSymbols(mainSymbolsWithStr, mgrGenMath.Paytables)
+
+					reels, err := GenReelsMainSymbolsDistance(rss, mainSymbols, offset, 100)
+					if err != nil {
+						goutils.Error("genReelsMainSymbolsDistance:GenReelsMainSymbolsDistance",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					err = reels.SaveExcelEx(targetfn, mgrGenMath.Paytables)
+					if err != nil {
+						goutils.Error("genReelsMainSymbolsDistance:SaveExcelEx",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					return types.Double(1)
 				},
 				),
 			),
