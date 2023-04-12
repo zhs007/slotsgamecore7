@@ -112,6 +112,10 @@ func (mgr *GenMathMgr) Save() error {
 }
 
 func (mgr *GenMathMgr) saveResults(fn string) error {
+	if mgr.Config == nil {
+		return nil
+	}
+
 	f := excelize.NewFile()
 
 	sheet := f.GetSheetList()[0]
@@ -121,9 +125,9 @@ func (mgr *GenMathMgr) saveResults(fn string) error {
 
 	si := 1
 
-	for k, v := range mgr.MapRets {
-		f.SetCellStr(sheet, goutils.Pos2Cell(0, si), k)
-		f.SetCellStr(sheet, goutils.Pos2Cell(1, si), fmt.Sprintf("%v", v))
+	for _, v := range mgr.Config.Codes {
+		f.SetCellStr(sheet, goutils.Pos2Cell(0, si), fmt.Sprintf("%v", v.Name))
+		f.SetCellStr(sheet, goutils.Pos2Cell(1, si), fmt.Sprintf("%v", mgr.MapRets[v.Name]))
 
 		si++
 	}
