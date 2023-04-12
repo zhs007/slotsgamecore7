@@ -104,3 +104,12 @@ func (val *IntVal[T]) Float64Arr() []float64 {
 func (val *IntVal[T]) StringArr() []string {
 	return []string{val.String()}
 }
+
+// GetInt - return val[index]
+func (val *IntVal[T]) GetInt(index int) int {
+	if index == 0 {
+		return int(val.Val)
+	}
+
+	return 0
+}

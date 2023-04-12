@@ -70,18 +70,6 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-// // OnNewGame -
-// func (symbolMulti *SymbolMulti) OnNewGame(gameProp *GameProperty) error {
-// 	return nil
-// }
-
-// // OnNewStep -
-// func (symbolMulti *SymbolMulti) OnNewStep(gameProp *GameProperty) error {
-// 	symbolMulti.BasicComponent.OnNewStep()
-
-// 	return nil
-// }
-
 // playgame
 func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {

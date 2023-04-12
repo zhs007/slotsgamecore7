@@ -55,6 +55,12 @@ message MysteryData {
     int32 curMysteryCode = 2;
 }
 
+// OverlaySymbolData
+message OverlaySymbolData {
+    ComponentData basicComponentData = 1;
+	int32 curLevel = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
