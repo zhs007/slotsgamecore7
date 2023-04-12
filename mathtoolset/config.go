@@ -15,10 +15,16 @@ type GenReelsConfig struct {
 	Offset             int      `yaml:"offset"`
 }
 
+type CodeConfig struct {
+	Name           string `yaml:"name"`
+	Code           string `yaml:"code"`
+	DisableAutoRun bool   `yaml:"disableAutoRun"`
+}
+
 type Config struct {
 	Type           string          `yaml:"type"`
 	Code           string          `yaml:"code"`
-	Codes          []string        `yaml:"codes"`
+	Codes          []*CodeConfig   `yaml:"codes"`
 	TargetRTP      float64         `yaml:"targetRTP"`
 	Paytables      string          `yaml:"paytables"`
 	GenReelsConfig *GenReelsConfig `yaml:"genReelsConfig"`

@@ -45,7 +45,8 @@ func (sc *ScriptCore) Compile(code string) error {
 func (sc *ScriptCore) Eval(mgr *GenMathMgr) (ref.Val, error) {
 	if sc.Prg != nil {
 		out, _, err := (*sc.Prg).Eval(map[string]any{
-			"rets": float64s2list(mgr.Rets),
+			"rets":    float64s2list(mgr.Rets),
+			"mapRets": mapSF2mapSF(mgr.MapRets),
 		})
 		if err != nil {
 			goutils.Error("ScriptCore.Eval:Eval",
@@ -141,6 +142,10 @@ func float64s2list(arr []float64) ref.Val {
 	return types.NewDynamicList(types.DefaultTypeAdapter, arr)
 }
 
+func mapSF2mapSF(mapSF map[string]float64) ref.Val {
+	return types.NewDynamicMap(types.DefaultTypeAdapter, mapSF)
+}
+
 func array2SymbolMulti(val0 ref.Val, val1 ref.Val) *sgc7game.ValMapping2 {
 	lst0, isok0 := val0.Value().([]ref.Val)
 	lst1, isok1 := val1.Value().([]ref.Val)
@@ -195,6 +200,7 @@ func newScriptVariables(mgrGenMath *GenMathMgr) []cel.EnvOption {
 func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Variable("rets", cel.ListType(cel.DoubleType)),
+		cel.Variable("mapRets", cel.MapType(cel.StringType, cel.DoubleType)),
 		cel.Function("calcLineRTP",
 			cel.Overload("calcLineRTP_string_string_list_list_int_int",
 				[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.IntType, cel.IntType},
@@ -237,7 +243,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
-					mgrGenMath.pushRet(ret)
+					// mgrGenMath.pushRet(ret)
 
 					return types.Double(ret)
 				},
@@ -285,7 +291,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
-					mgrGenMath.pushRet(ret)
+					// mgrGenMath.pushRet(ret)
 
 					return types.Double(ret)
 				},
@@ -341,7 +347,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
-					mgrGenMath.pushRet(ret)
+					// mgrGenMath.pushRet(ret)
 
 					return types.Double(ret)
 				},
@@ -399,7 +405,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
-					mgrGenMath.pushRet(ret)
+					// mgrGenMath.pushRet(ret)
 
 					return types.Double(ret)
 				},
@@ -459,7 +465,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					mgrGenMath.RetStats = append(mgrGenMath.RetStats, ssws)
 
 					ret := float64(ssws.TotalWins) / float64(ssws.TotalBet)
-					mgrGenMath.pushRet(ret)
+					// mgrGenMath.pushRet(ret)
 
 					return types.Double(ret)
 				},
@@ -493,7 +499,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					height := params[3].Value().(int64)
 
 					prob := CalcScatterProbability(mgrGenMath.RSS, SymbolType(sym), int(num), int(height))
-					mgrGenMath.pushRet(prob)
+					// mgrGenMath.pushRet(prob)
 
 					return types.Double(prob)
 				},
@@ -525,7 +531,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					arr := getFloat64Slice(params[1])
 
 					prob := CalcProbWithWeights(vw, arr)
-					mgrGenMath.pushRet(prob)
+					// mgrGenMath.pushRet(prob)
 
 					return types.Double(prob)
 				},
@@ -587,6 +593,34 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					}
 
 					return types.Double(1)
+				},
+				),
+			),
+		),
+		cel.Function("runCode",
+			cel.Overload("runCode_string",
+				[]*cel.Type{cel.StringType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+
+					if len(params) != 1 {
+						goutils.Error("runCode",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					codeName := params[0].Value().(string)
+
+					ret, err := mgrGenMath.RunCodeEx(codeName)
+					if err != nil {
+						goutils.Error("runCode:RunCodeEx",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					return ret
 				},
 				),
 			),
