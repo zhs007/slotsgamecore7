@@ -166,6 +166,27 @@ func array2SymbolMulti(val0 ref.Val, val1 ref.Val) *sgc7game.ValMapping2 {
 	return nil
 }
 
+func array2OverlaySyms(val ref.Val) *sgc7game.ValMapping2 {
+	lst, isok := val.Value().([]ref.Val)
+
+	if isok && len(lst)%3 == 0 {
+		sm := sgc7game.NewValMappingEx2()
+		for i := 0; i < len(lst)/3; i++ {
+			x, isok0 := lst[i*3].Value().(int64)
+			y, isok1 := lst[i*3+1].Value().(int64)
+			s, isok2 := lst[i*3+2].Value().(int64)
+
+			if isok0 && isok1 && isok2 {
+				sm.MapVals[pos2int(int(x), int(y))] = sgc7game.NewIntValEx(int(s))
+			}
+		}
+
+		return sm
+	}
+
+	return nil
+}
+
 func getFloat64Slice(val ref.Val) []float64 {
 	lst, isok := val.Value().([]ref.Val)
 
@@ -413,12 +434,12 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 			),
 		),
 		cel.Function("calcWaysRTP2",
-			cel.Overload("calcWaysRTP2_string_string_bool_list_list_list_list_list_int_int_int",
+			cel.Overload("calcWaysRTP2_string_string_bool_list_list_list_list_list_list_int_int_int",
 				[]*cel.Type{cel.StringType, cel.StringType, cel.BoolType, cel.ListType(cel.IntType), cel.ListType(cel.IntType), cel.ListType(cel.IntType),
-					cel.ListType(cel.IntType), cel.ListType(cel.DoubleType), cel.IntType, cel.IntType, cel.IntType},
+					cel.ListType(cel.IntType), cel.ListType(cel.DoubleType), cel.ListType(cel.IntType), cel.IntType, cel.IntType, cel.IntType},
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
-					if len(params) != 11 {
+					if len(params) != 12 {
 						goutils.Error("calcWaysRTP2",
 							zap.Error(ErrInvalidFunctionParams))
 
@@ -450,11 +471,12 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					wilds := array2SymbolTypeSlice(params[4])
 					sm := array2SymbolMapping(params[5])
 					symMul := array2SymbolMulti(params[6], params[7])
-					height := int(params[8].Value().(int64))
-					bet := int(params[9].Value().(int64))
-					mul := int(params[10].Value().(int64))
+					overlaySyms := array2OverlaySyms(params[8])
+					height := int(params[9].Value().(int64))
+					bet := int(params[10].Value().(int64))
+					mul := int(params[11].Value().(int64))
 
-					ssws, err := AnalyzeReelsWaysEx2(mgrGenMath.Paytables, rd, syms, wilds, sm, symMul, height, bet, mul)
+					ssws, err := AnalyzeReelsWaysEx2(mgrGenMath.Paytables, rd, syms, wilds, sm, symMul, overlaySyms, height, bet, mul)
 					if err != nil {
 						goutils.Error("calcWaysRTP2:AnalyzeReelsWaysEx2",
 							zap.Error(err))

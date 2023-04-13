@@ -30,21 +30,32 @@ func GetBet(stake *sgc7game.Stake, bettype string) int {
 	return int(stake.CoinBet)
 }
 
-// TriggerFeatureConfig - configuration for trigger feature
-type TriggerFeatureConfig struct {
-	TargetScene               string         `yaml:"targetScene"`               // like basicReels.mstery
-	Symbol                    string         `yaml:"symbol"`                    // like scatter
-	Type                      string         `yaml:"type"`                      // like scatters
-	MinNum                    int            `yaml:"minNum"`                    // like 3
-	Scripts                   string         `yaml:"scripts"`                   // scripts
+// TriggerFeatureDataConfig - configuration for trigger feature
+type TriggerFeatureDataConfig struct {
 	FGNum                     int            `yaml:"FGNum"`                     // FG number
 	FGNumWeight               string         `yaml:"FGNumWeight"`               // FG number weight
 	FGNumWithScatterNum       map[int]int    `yaml:"FGNumWithScatterNum"`       // FG number with scatter number
 	FGNumWeightWithScatterNum map[int]string `yaml:"FGNumWeightWithScatterNum"` // FG number weight with scatter number
-	IsTriggerFG               bool           `yaml:"isTriggerFG"`               // is trigger FG
 	IsUseScatterNum           bool           `yaml:"isUseScatterNum"`           // if IsUseScatterNum == true, then we will use FGNumWithScatterNum or FGNumWeightWithScatterNum
-	BetType                   string         `yaml:"betType"`                   // bet or totalBet
 	RespinFirstComponent      string         `yaml:"respinFirstComponent"`      // like fg-spin
+}
+
+// TriggerFeatureConfig - configuration for trigger feature
+type TriggerFeatureConfig struct {
+	TargetScene               string                      `yaml:"targetScene"`               // like basicReels.mstery
+	Symbol                    string                      `yaml:"symbol"`                    // like scatter
+	Type                      string                      `yaml:"type"`                      // like scatters
+	MinNum                    int                         `yaml:"minNum"`                    // like 3
+	Scripts                   string                      `yaml:"scripts"`                   // scripts
+	FGNum                     int                         `yaml:"FGNum"`                     // FG number
+	FGNumWeight               string                      `yaml:"FGNumWeight"`               // FG number weight
+	FGNumWithScatterNum       map[int]int                 `yaml:"FGNumWithScatterNum"`       // FG number with scatter number
+	FGNumWeightWithScatterNum map[int]string              `yaml:"FGNumWeightWithScatterNum"` // FG number weight with scatter number
+	IsTriggerFG               bool                        `yaml:"isTriggerFG"`               // is trigger FG
+	IsUseScatterNum           bool                        `yaml:"isUseScatterNum"`           // if IsUseScatterNum == true, then we will use FGNumWithScatterNum or FGNumWeightWithScatterNum
+	BetType                   string                      `yaml:"betType"`                   // bet or totalBet
+	RespinFirstComponent      string                      `yaml:"respinFirstComponent"`      // like fg-spin
+	FeatureData               []*TriggerFeatureDataConfig `yaml:"featureData"`               // wait player select
 }
 
 // BasicWinsConfig - configuration for BasicWins
