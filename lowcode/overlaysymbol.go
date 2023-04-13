@@ -48,6 +48,7 @@ type OverlaySymbolConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	Symbol               string `yaml:"symbol"`
 	MapPosition          string `yaml:"mapPosition"`
+	DefaultLevel         int    `yaml:"defaultLevel"`
 }
 
 type OverlaySymbol struct {
@@ -55,6 +56,17 @@ type OverlaySymbol struct {
 	Config      *OverlaySymbolConfig
 	SymbolCode  int
 	MapPosition *sgc7game.ValMapping2
+}
+
+// OnNewGame -
+func (overlaySymbol *OverlaySymbol) OnNewGame(gameProp *GameProperty) error {
+	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
+
+	osd.OnNewGame()
+
+	osd.CurLevel = overlaySymbol.Config.DefaultLevel
+
+	return nil
 }
 
 // Init -
