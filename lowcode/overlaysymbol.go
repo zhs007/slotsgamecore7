@@ -123,11 +123,10 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cgs := gs.Clone()
 
-	for i, pos := range overlaySymbol.MapPosition.MapVals {
-		if i < osd.CurLevel {
+	for i := 0; i <= osd.CurLevel; i++ {
+		pos, isok := overlaySymbol.MapPosition.MapVals[i]
+		if isok {
 			cgs.Arr[pos.GetInt(0)][pos.GetInt(1)] = overlaySymbol.SymbolCode
-		} else {
-			break
 		}
 	}
 
