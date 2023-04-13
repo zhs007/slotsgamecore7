@@ -55,6 +55,7 @@ type MysteryConfig struct {
 	MysteryRNG             string                         `yaml:"mysteryRNG"` // 强制用已经使用的随机数结果做 Mystery
 	MysteryWeight          string                         `yaml:"mysteryWeight"`
 	Mystery                string                         `yaml:"mystery"`
+	Mysterys               []string                       `yaml:"mysterys"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
 }
 
@@ -62,7 +63,7 @@ type Mystery struct {
 	*BasicComponent
 	Config                   *MysteryConfig
 	MysteryWeights           *sgc7game.ValWeights2
-	MysterySymbol            int
+	MysterySymbols           []int
 	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
 }
 
@@ -120,7 +121,13 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 		mystery.MysteryWeights = vw2
 	}
 
-	mystery.MysterySymbol = pool.DefaultPaytables.MapSymbols[mystery.Config.Mystery]
+	if len(mystery.Config.Mysterys) > 0 {
+		for _, v := range mystery.Config.Mysterys {
+			mystery.MysterySymbols = append(mystery.MysterySymbols, pool.DefaultPaytables.MapSymbols[v])
+		}
+	} else {
+		mystery.MysterySymbols = append(mystery.MysterySymbols, pool.DefaultPaytables.MapSymbols[mystery.Config.Mystery])
+	}
 
 	for _, v := range cfg.MysteryTriggerFeatures {
 		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
@@ -131,6 +138,16 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	mystery.onInit(&cfg.BasicComponentConfig)
 
 	return nil
+}
+
+func (mystery *Mystery) hasMystery(gs *sgc7game.GameScene) bool {
+	for _, v := range mystery.MysterySymbols {
+		if gs.HasSymbol(v) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // playgame
@@ -152,7 +169,9 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 			gameProp.SetVal(GamePropCurMystery, curmcode)
 
 			sc2 := gs.Clone()
-			sc2.ReplaceSymbol(mystery.MysterySymbol, curmcode)
+			for _, v := range mystery.MysterySymbols {
+				sc2.ReplaceSymbol(v, curmcode)
+			}
 
 			mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
@@ -169,7 +188,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		} else {
 			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-			if gs.HasSymbol(mystery.MysterySymbol) {
+			if mystery.hasMystery(gs) {
 				curm, err := mystery.MysteryWeights.RandVal(plugin)
 				if err != nil {
 					goutils.Error("BasicReels.OnPlayGame:RandVal",
@@ -183,7 +202,9 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 				sc2 := gs.Clone()
-				sc2.ReplaceSymbol(mystery.MysterySymbol, curm.Int())
+				for _, v := range mystery.MysterySymbols {
+					sc2.ReplaceSymbol(v, curm.Int())
+				}
 
 				mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
