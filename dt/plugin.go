@@ -33,13 +33,34 @@ func (plugin *PluginDT) Random(ctx context.Context, r int) (int, error) {
 		plugin.Rngs = rngs
 	}
 
-	cv := int(plugin.Rngs[0])
-	plugin.Rngs = plugin.Rngs[1:]
+	maxval := int64(r)
 
-	v := cv % r
+	cr := 0
+	MAX_RANGE := int64(1) << 32
+	limit := MAX_RANGE - (MAX_RANGE % maxval)
+
+	for {
+		if len(plugin.Rngs) == 0 {
+			rngs, err := plugin.RngClient.GetRngs(ctx, 0)
+			if err != nil {
+				return -1, err
+			}
+
+			plugin.Rngs = rngs
+		}
+
+		cr = int(plugin.Rngs[0])
+		plugin.Rngs = plugin.Rngs[1:]
+
+		if int64(cr) < limit {
+			break
+		}
+	}
+
+	v := cr % r
 
 	plugin.AddRngUsed(&sgc7utils.RngInfo{
-		Bits:  cv,
+		Bits:  cr,
 		Range: r,
 		Value: v,
 	})

@@ -4,6 +4,14 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
+func pos2int(x, y int) int {
+	return y*10 + x
+}
+
+func int2pos(k int) (int, int) {
+	return k % 10, k / 10
+}
+
 // calcNonWaysWinsInReels2 -
 func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
 	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, height int) int64 {
@@ -39,9 +47,21 @@ func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
 	return num
 }
 
+func getSymbolWithPos(overlaySyms *sgc7game.ValMapping2, x, y int) int {
+	for k, v := range overlaySyms.MapVals {
+		cx, cy := int2pos(k)
+
+		if cx == x && cy == y {
+			return v.Int()
+		}
+	}
+
+	return -1
+}
+
 // calcWaysWinsInReels2 -
 func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
-	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, x int, num int, height int) float64 {
+	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, overlaySyms *sgc7game.ValMapping2, x int, num int, height int) float64 {
 
 	curwins := float64(0)
 
@@ -55,20 +75,29 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 					off -= len(rd.Reels[x])
 				}
 
+				cs := rd.Reels[x][off]
+
+				if overlaySyms != nil {
+					ocs := getSymbolWithPos(overlaySyms, x, off)
+					if ocs >= 0 {
+						cs = ocs
+					}
+				}
+
 				csm := float64(1.0)
 				if symMul != nil {
-					cm, isok := symMul.MapVals[rd.Reels[x][off]]
+					cm, isok := symMul.MapVals[cs]
 					if isok {
 						csm = cm.Float64()
 					}
 				}
 
-				if rd.Reels[x][off] == int(symbol) {
+				if cs == int(symbol) {
 					curmul += csm
-				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
+				} else if HasSymbol(wilds, SymbolType(cs)) {
 					curmul += csm
 				} else if symbolMapping != nil {
-					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
+					ts, isok := symbolMapping.MapSymbols[SymbolType(cs)]
 					if isok && ts == symbol {
 						curmul += csm
 					}
@@ -76,7 +105,7 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 			}
 
 			if curmul > 0 {
-				curwin := calcWaysWinsInReels2(rd, symbol, wilds, symbolMapping, symMul, x+1, num, height)
+				curwin := calcWaysWinsInReels2(rd, symbol, wilds, symbolMapping, symMul, overlaySyms, x+1, num, height)
 
 				curwins += curmul * curwin
 			}
@@ -100,20 +129,29 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 					off -= len(rd.Reels[x])
 				}
 
+				cs := rd.Reels[x][off]
+
+				if overlaySyms != nil {
+					ocs := getSymbolWithPos(overlaySyms, x, off)
+					if ocs >= 0 {
+						cs = ocs
+					}
+				}
+
 				csm := float64(1.0)
 				if symMul != nil {
-					cm, isok := symMul.MapVals[rd.Reels[x][off]]
+					cm, isok := symMul.MapVals[cs]
 					if isok {
 						csm = cm.Float64()
 					}
 				}
 
-				if rd.Reels[x][off] == int(symbol) {
+				if cs == int(symbol) {
 					curmul += csm
-				} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
+				} else if HasSymbol(wilds, SymbolType(cs)) {
 					curmul += csm
 				} else if symbolMapping != nil {
-					ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
+					ts, isok := symbolMapping.MapSymbols[SymbolType(cs)]
 					if isok && ts == symbol {
 						curmul += csm
 					}
@@ -130,7 +168,8 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 }
 
 func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
-	symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, height int, bet int, mul int) (*SymbolsWinsStats, error) {
+	symbols []SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, overlaySyms *sgc7game.ValMapping2,
+	height int, bet int, mul int) (*SymbolsWinsStats, error) {
 
 	ssws := newSymbolsWinsStatsWithPaytables(paytables, symbols)
 
@@ -150,7 +189,7 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
 			if isok {
 				for i := 0; i < len(arrPay); i++ {
 					if arrPay[i] > 0 {
-						cw := calcWaysWinsInReels2(rd, s, wilds, symbolMapping, symMul, 0, i+1, height)
+						cw := calcWaysWinsInReels2(rd, s, wilds, symbolMapping, symMul, overlaySyms, 0, i+1, height)
 
 						sws.WinsNum[i] = int64(cw)
 						sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
@@ -164,7 +203,7 @@ func AnalyzeReelsWaysEx2(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
 			if isok {
 				for i := 0; i < len(arrPay); i++ {
 					if arrPay[i] > 0 {
-						cw := calcWaysWinsInReels2(rd, s, wilds, nil, symMul, 0, i+1, height)
+						cw := calcWaysWinsInReels2(rd, s, wilds, nil, symMul, overlaySyms, 0, i+1, height)
 
 						sws.WinsNum[i] = int64(cw)
 						sws.Wins[i] = int64(arrPay[i]) * sws.WinsNum[i] * int64(bet)
