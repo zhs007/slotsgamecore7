@@ -15,14 +15,15 @@ import (
 // SymbolMultiConfig - configuration for SymbolMulti feature
 type SymbolMultiConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string `yaml:"symbol"`
-	WeightMulti          string `yaml:"weightMulti"`
+	Symbol               string   `yaml:"symbol"`
+	Symbols              []string `yaml:"symbols"`
+	WeightMulti          string   `yaml:"weightMulti"`
 }
 
 type SymbolMulti struct {
 	*BasicComponent
 	Config      *SymbolMultiConfig
-	SymbolCode  int
+	SymbolCodes []int
 	WeightMulti *sgc7game.ValWeights2
 }
 
@@ -63,7 +64,13 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 		symbolMulti.WeightMulti = vw2
 	}
 
-	symbolMulti.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+	if len(cfg.Symbols) > 0 {
+		for _, v := range cfg.Symbols {
+			symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+		}
+	} else {
+		symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[cfg.Symbol])
+	}
 
 	symbolMulti.onInit(&cfg.BasicComponentConfig)
 
@@ -88,7 +95,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	for x, arr := range gs.Arr {
 		for y, s := range arr {
-			if s == symbolMulti.SymbolCode {
+			if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
 				cv, err := symbolMulti.WeightMulti.RandVal(plugin)
 				if err != nil {
 					goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
