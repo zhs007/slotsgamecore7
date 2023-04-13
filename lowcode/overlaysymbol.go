@@ -23,13 +23,13 @@ type OverlaySymbolData struct {
 // OnNewGame -
 func (overlaySymbolData *OverlaySymbolData) OnNewGame() {
 	overlaySymbolData.BasicComponentData.OnNewGame()
+
+	overlaySymbolData.CurLevel = 0
 }
 
 // OnNewGame -
 func (overlaySymbolData *OverlaySymbolData) OnNewStep() {
 	overlaySymbolData.BasicComponentData.OnNewStep()
-
-	overlaySymbolData.CurLevel = 0
 }
 
 // BuildPBComponentData
