@@ -146,7 +146,7 @@ func (overlaySymbol *OverlaySymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
 
 	if len(osd.UsedScenes) > 0 {
-		asciigame.OutputScene("The symbols after the symbol overlay", pr.OtherScenes[osd.UsedScenes[0]], mapSymbolColor)
+		asciigame.OutputScene("The symbols after the symbol overlay", pr.Scenes[osd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
