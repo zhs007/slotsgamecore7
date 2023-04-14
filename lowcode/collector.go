@@ -17,17 +17,22 @@ import (
 )
 
 type CollectorData struct {
+	BasicComponentData
 	Val          int // 当前总值, Current total value
 	NewCollector int // 这一个step收集到的, The values collected in this step
 }
 
 // OnNewGame -
 func (collectorData *CollectorData) OnNewGame() {
+	collectorData.BasicComponentData.OnNewGame()
+
 	collectorData.Val = 0
 }
 
 // OnNewGame -
 func (collectorData *CollectorData) OnNewStep() {
+	collectorData.BasicComponentData.OnNewStep()
+
 	collectorData.NewCollector = 0
 }
 
@@ -42,12 +47,14 @@ func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 // CollectorConfig - configuration for Collector
 type CollectorConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	MaxVal               int `yaml:"maxVal"`
+	Symbol               string `yaml:"symbol"`
+	MaxVal               int    `yaml:"maxVal"`
 }
 
 type Collector struct {
 	*BasicComponent
-	Config *CollectorConfig
+	Config     *CollectorConfig
+	SymbolCode int
 }
 
 // Init -
@@ -74,6 +81,8 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 
 	collector.Config = cfg
 
+	collector.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+
 	collector.onInit(&cfg.BasicComponentConfig)
 
 	return nil
@@ -91,6 +100,22 @@ func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
 // playgame
 func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
+
+	gs := collector.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
+
+	nn := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
+		return cursymbol == collector.SymbolCode
+	})
+
+	cd.NewCollector = nn
+	cd.Val += nn
+	if collector.Config.MaxVal > 0 {
+		if cd.Val > collector.Config.MaxVal {
+			cd.Val = collector.Config.MaxVal
+		}
+	}
 
 	gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 

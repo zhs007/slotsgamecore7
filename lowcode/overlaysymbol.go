@@ -49,6 +49,7 @@ type OverlaySymbolConfig struct {
 	Symbol               string `yaml:"symbol"`
 	MapPosition          string `yaml:"mapPosition"`
 	DefaultLevel         int    `yaml:"defaultLevel"`
+	Collector            string `yaml:"collector"`
 }
 
 type OverlaySymbol struct {
@@ -65,6 +66,22 @@ func (overlaySymbol *OverlaySymbol) OnNewGame(gameProp *GameProperty) error {
 	osd.OnNewGame()
 
 	osd.CurLevel = overlaySymbol.Config.DefaultLevel
+
+	return nil
+}
+
+// OnNewStep -
+func (overlaySymbol *OverlaySymbol) OnNewStep(gameProp *GameProperty) error {
+	overlaySymbol.BasicComponent.OnNewStep(gameProp)
+
+	cd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
+
+	if overlaySymbol.Config.Collector != "" {
+		collectorData, isok := gameProp.MapComponentData[overlaySymbol.Config.Collector].(*CollectorData)
+		if isok {
+			cd.CurLevel = collectorData.Val
+		}
+	}
 
 	return nil
 }
