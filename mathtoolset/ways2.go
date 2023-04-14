@@ -132,7 +132,7 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 				cs := rd.Reels[x][off]
 
 				if overlaySyms != nil {
-					ocs := getSymbolWithPos(overlaySyms, x, off)
+					ocs := getSymbolWithPos(overlaySyms, x, ty)
 					if ocs >= 0 {
 						cs = ocs
 					}
