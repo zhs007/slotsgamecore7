@@ -14,7 +14,7 @@ func int2pos(k int) (int, int) {
 
 // calcNonWaysWinsInReels2 -
 func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
-	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, x int, height int) int64 {
+	symbol SymbolType, wilds []SymbolType, symbolMapping *SymbolMapping, overlaySyms *sgc7game.ValMapping2, x int, height int) int64 {
 
 	num := int64(0)
 
@@ -27,12 +27,21 @@ func calcNonWaysWinsInReels2(rd *sgc7game.ReelsData,
 				off -= len(rd.Reels[x])
 			}
 
-			if rd.Reels[x][off] == int(symbol) {
+			cs := rd.Reels[x][off]
+
+			if overlaySyms != nil {
+				ocs := getSymbolWithPos(overlaySyms, x, ty)
+				if ocs >= 0 {
+					cs = ocs
+				}
+			}
+
+			if cs == int(symbol) {
 				curmul++
-			} else if HasSymbol(wilds, SymbolType(rd.Reels[x][off])) {
+			} else if HasSymbol(wilds, SymbolType(cs)) {
 				curmul++
 			} else if symbolMapping != nil {
-				ts, isok := symbolMapping.MapSymbols[SymbolType(rd.Reels[x][off])]
+				ts, isok := symbolMapping.MapSymbols[SymbolType(cs)]
 				if isok && ts == symbol {
 					curmul++
 				}
@@ -78,7 +87,7 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 				cs := rd.Reels[x][off]
 
 				if overlaySyms != nil {
-					ocs := getSymbolWithPos(overlaySyms, x, off)
+					ocs := getSymbolWithPos(overlaySyms, x, ty)
 					if ocs >= 0 {
 						cs = ocs
 					}
@@ -113,7 +122,7 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 	} else {
 		lastnum := float64(1)
 		if num < len(rd.Reels) {
-			lastnum = float64(calcNonWaysWinsInReels2(rd, symbol, wilds, symbolMapping, num, height))
+			lastnum = float64(calcNonWaysWinsInReels2(rd, symbol, wilds, symbolMapping, overlaySyms, num, height))
 
 			for i := num + 1; i < len(rd.Reels); i++ {
 				lastnum *= float64(len(rd.Reels[i]))
