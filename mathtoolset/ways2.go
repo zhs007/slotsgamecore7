@@ -117,6 +117,8 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 				curwin := calcWaysWinsInReels2(rd, symbol, wilds, symbolMapping, symMul, overlaySyms, x+1, num, height)
 
 				curwins += curmul * curwin
+			} else {
+				return 0
 			}
 		}
 	} else {
@@ -169,6 +171,8 @@ func calcWaysWinsInReels2(rd *sgc7game.ReelsData,
 
 			if curmul > 0 {
 				curwins += curmul * lastnum
+			} else {
+				return 0
 			}
 		}
 	}
