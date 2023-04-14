@@ -152,11 +152,11 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 
 	for i, v := range multiLevelMystery.Config.Levels {
 		if cd.CurLevel > i {
-			_, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
+			collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
 			if isok {
-				// if collectorData.Val >= v.CollectorVal {
-				// 	multiLevelMystery.CurLevel = i
-				// }
+				if collectorData.Val >= v.CollectorVal {
+					cd.CurLevel = i
+				}
 			}
 		}
 	}
