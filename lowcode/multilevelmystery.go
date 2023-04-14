@@ -56,6 +56,7 @@ type MultiLevelMysteryLevelConfig struct {
 type MultiLevelMysteryConfig struct {
 	BasicComponentConfig   `yaml:",inline"`
 	Mystery                string                          `yaml:"mystery"`
+	Mysterys               []string                        `yaml:"mysterys"`
 	Levels                 []*MultiLevelMysteryLevelConfig `yaml:"levels"`
 	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig  `yaml:"mysteryTriggerFeatures"`
 }
@@ -65,7 +66,7 @@ type MultiLevelMystery struct {
 	Config                   *MultiLevelMysteryConfig
 	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
 	LevelMysteryWeights      []*sgc7game.ValWeights2
-	MysterySymbol            int
+	MysterySymbols           []int
 }
 
 // maskOtherScene -
@@ -122,7 +123,13 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, pool *GamePropertyPo
 		multiLevelMystery.LevelMysteryWeights = append(multiLevelMystery.LevelMysteryWeights, vw2)
 	}
 
-	multiLevelMystery.MysterySymbol = pool.DefaultPaytables.MapSymbols[multiLevelMystery.Config.Mystery]
+	if len(multiLevelMystery.Config.Mysterys) > 0 {
+		for _, v := range multiLevelMystery.Config.Mysterys {
+			multiLevelMystery.MysterySymbols = append(multiLevelMystery.MysterySymbols, pool.DefaultPaytables.MapSymbols[v])
+		}
+	} else {
+		multiLevelMystery.MysterySymbols = append(multiLevelMystery.MysterySymbols, pool.DefaultPaytables.MapSymbols[multiLevelMystery.Config.Mystery])
+	}
 
 	for _, v := range cfg.MysteryTriggerFeatures {
 		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
@@ -164,6 +171,16 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 	return nil
 }
 
+func (multiLevelMystery *MultiLevelMystery) hasMystery(gs *sgc7game.GameScene) bool {
+	for _, v := range multiLevelMystery.MysterySymbols {
+		if gs.HasSymbol(v) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // playgame
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -172,7 +189,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	gs := multiLevelMystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-	if gs.HasSymbol(multiLevelMystery.MysterySymbol) {
+	if multiLevelMystery.hasMystery(gs) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.OnPlayGame:RandVal",
@@ -187,7 +204,9 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 		sc2 := gs.Clone()
-		sc2.ReplaceSymbol(multiLevelMystery.MysterySymbol, curm.Int())
+		for _, v := range multiLevelMystery.MysterySymbols {
+			sc2.ReplaceSymbol(v, curm.Int())
+		}
 
 		multiLevelMystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
