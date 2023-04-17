@@ -109,7 +109,7 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	mystery.Config = cfg
 
 	if mystery.Config.MysteryWeight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(mystery.Config.MysteryWeight, "val", "weight", pool.DefaultPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(mystery.Config.MysteryWeight), "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("BasicReels.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", mystery.Config.MysteryWeight),

@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"os"
+	"path"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -42,6 +43,15 @@ type Config struct {
 	StatsSymbolCodes []mathtoolset.SymbolType       `yaml:"-"`
 	Stats            *StatsConfig                   `yaml:"stats"`
 	RTP              *RTPConfig                     `yaml:"rtp"`
+	MainPath         string                         `yaml:"mainPath"`
+}
+
+func (cfg *Config) GetPath(fn string) string {
+	if cfg.MainPath != "" {
+		return path.Join(cfg.MainPath, fn)
+	}
+
+	return fn
 }
 
 func (cfg *Config) BuildStatsSymbolCodes(paytables *sgc7game.PayTables) error {
@@ -114,7 +124,7 @@ func LoadConfig(fn string) (*Config, error) {
 		cfg.MapLinedate = make(map[string]*sgc7game.LineData)
 
 		for k, v := range cfg.Linedata {
-			ld, err := sgc7game.LoadLineDataFromExcel(v)
+			ld, err := sgc7game.LoadLineDataFromExcel(cfg.GetPath(v))
 			if err != nil {
 				goutils.Error("LoadConfig:LoadLineDataFromExcel",
 					zap.String("key", k),
@@ -132,7 +142,7 @@ func LoadConfig(fn string) (*Config, error) {
 	cfg.MapPaytables = make(map[string]*sgc7game.PayTables)
 
 	for k, v := range cfg.Paytables {
-		pt, err := sgc7game.LoadPaytablesFromExcel(v)
+		pt, err := sgc7game.LoadPaytablesFromExcel(cfg.GetPath(v))
 		if err != nil {
 			goutils.Error("LoadConfig:LoadPaytablesFromExcel",
 				zap.String("key", k),
@@ -162,7 +172,7 @@ func LoadConfig(fn string) (*Config, error) {
 
 		if cfg.IsIntReel {
 			for k, v := range cfg.Reels {
-				rd, err := sgc7game.LoadReelsFromExcel(v)
+				rd, err := sgc7game.LoadReelsFromExcel(cfg.GetPath(v))
 				if err != nil {
 					goutils.Error("LoadConfig:LoadReelsFromExcel",
 						zap.String("key", k),
@@ -177,7 +187,7 @@ func LoadConfig(fn string) (*Config, error) {
 			}
 		} else {
 			for k, v := range cfg.Reels {
-				rd, err := sgc7game.LoadReelsFromExcel2(v, pt)
+				rd, err := sgc7game.LoadReelsFromExcel2(cfg.GetPath(v), pt)
 				if err != nil {
 					goutils.Error("LoadConfig:LoadReelsFromExcel2",
 						zap.String("key", k),

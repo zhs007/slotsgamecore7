@@ -111,7 +111,7 @@ func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) erro
 	overlaySymbol.Config = cfg
 
 	if overlaySymbol.Config.MapPosition != "" {
-		vm2, err := sgc7game.LoadValMapping2FromExcel(overlaySymbol.Config.MapPosition, "index", "value", sgc7game.NewIntArrVal[int])
+		vm2, err := sgc7game.LoadValMapping2FromExcel(pool.Config.GetPath(overlaySymbol.Config.MapPosition), "index", "value", sgc7game.NewIntArrVal[int])
 		if err != nil {
 			goutils.Error("OverlaySymbol.Init:LoadValMapping2FromExcel",
 				zap.String("valmapping", overlaySymbol.Config.MapPosition),

@@ -55,7 +55,7 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 	symbolVal2.Config = cfg
 
 	if cfg.WeightSet != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(cfg.WeightSet, "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(cfg.WeightSet), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolVal2.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", cfg.WeightSet),

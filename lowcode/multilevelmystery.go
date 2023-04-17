@@ -111,7 +111,7 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, pool *GamePropertyPo
 	multiLevelMystery.Config = cfg
 
 	for _, v := range cfg.Levels {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(v.MysteryWeight, "val", "weight", pool.DefaultPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(v.MysteryWeight), "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", v.MysteryWeight),
