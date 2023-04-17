@@ -95,7 +95,19 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					// }
 
 					if len(pr.NextCmds) > 0 {
-						cmd = pr.NextCmds[0]
+						if len(pr.NextCmds) > 1 {
+							cr, err := plugin.Random(context.Background(), len(pr.NextCmds))
+							if err != nil {
+								goutils.Error("StartRTP.Random",
+									zap.Error(err))
+
+								break
+							}
+
+							cmd = pr.NextCmds[cr]
+						} else {
+							cmd = pr.NextCmds[0]
+						}
 					} else {
 						cmd = "SPIN"
 					}
@@ -251,7 +263,19 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					// }
 
 					if len(pr.NextCmds) > 0 {
-						cmd = pr.NextCmds[0]
+						if len(pr.NextCmds) > 1 {
+							cr, err := plugin.Random(context.Background(), len(pr.NextCmds))
+							if err != nil {
+								goutils.Error("StartScaleRTPDown.Random",
+									zap.Error(err))
+
+								break
+							}
+
+							cmd = pr.NextCmds[cr]
+						} else {
+							cmd = pr.NextCmds[0]
+						}
 					} else {
 						cmd = "SPIN"
 					}
