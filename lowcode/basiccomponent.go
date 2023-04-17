@@ -92,9 +92,11 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 }
 
 // onStepEnd -
-func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams) {
+func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) {
 	if gameProp.GetVal(GamePropFGNum) > 0 && basicComponent.Config.DefaultFGRespinComponent != "" {
 		gameProp.Respin(curpr, gp, basicComponent.Config.DefaultFGRespinComponent, nil, nil)
+	} else if nextComponent != "" {
+		gameProp.SetStrVal(GamePropNextComponent, nextComponent)
 	} else {
 		gameProp.SetStrVal(GamePropNextComponent, basicComponent.Config.DefaultNextComponent)
 	}
@@ -164,7 +166,7 @@ func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, ba
 	basicCD.RNG = append(basicCD.RNG, rng)
 
 	if len(basicComponent.Config.TagRNG) > i {
-		gameProp.MapInt[basicComponent.Config.TagRNG[i]] = rng
+		gameProp.TagInt(basicComponent.Config.TagRNG[i], rng)
 	}
 }
 

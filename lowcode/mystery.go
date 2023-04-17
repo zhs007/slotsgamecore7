@@ -109,7 +109,7 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	mystery.Config = cfg
 
 	if mystery.Config.MysteryWeight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(mystery.Config.MysteryWeight, "val", "weight", pool.DefaultPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(mystery.Config.MysteryWeight), "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("BasicReels.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", mystery.Config.MysteryWeight),
@@ -160,7 +160,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		if mystery.Config.MysteryRNG != "" {
 			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-			rng := gameProp.MapInt[mystery.Config.MysteryRNG]
+			rng := gameProp.GetTagInt(mystery.Config.MysteryRNG)
 			cs := mystery.MysteryWeights.Vals[rng]
 
 			curmcode := cs.Int()
@@ -222,7 +222,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		}
 	}
 
-	mystery.onStepEnd(gameProp, curpr, gp)
+	mystery.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(mystery.Name, cd)
 	// mystery.BuildPBComponent(gp)

@@ -54,67 +54,67 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	bgm.OnNewStep(gameProp)
 
-	if cmd == "SPIN" {
-		pr, gp := bgm.newPlayResult(prs)
+	// if cmd == "SPIN" {
+	pr, gp := bgm.newPlayResult(prs)
 
-		curComponent := bgm.Components.Components[0]
+	curComponent := bgm.Components.Components[0]
 
-		if gp.FirstComponent != "" {
-			c, isok := bgm.Components.MapComponents[gp.FirstComponent]
-			if !isok {
-				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-					zap.String("FirstComponent", gp.FirstComponent),
-					zap.Error(ErrIvalidComponentName))
+	if gp.FirstComponent != "" {
+		c, isok := bgm.Components.MapComponents[gp.FirstComponent]
+		if !isok {
+			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+				zap.String("FirstComponent", gp.FirstComponent),
+				zap.Error(ErrIvalidComponentName))
 
-				return nil, ErrIvalidComponentName
-			}
-
-			curComponent = c
+			return nil, ErrIvalidComponentName
 		}
 
-		for {
-			err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
-			if err != nil {
-				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
-
-			respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
-			if respinComponent != "" {
-				pr.IsFinish = false
-
-				break
-			}
-
-			nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
-			if nextComponentName == "" {
-				break
-			}
-
-			c, isok := bgm.Components.MapComponents[nextComponentName]
-			if !isok {
-				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-					zap.String("nextComponentName", nextComponentName),
-					zap.Error(ErrIvalidComponentName))
-
-				return nil, ErrIvalidComponentName
-			}
-
-			curComponent = c
-		}
-
-		if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
-			pr.IsFinish = false
-		} else if gameProp.GetVal(GamePropTriggerFG) > 0 && gameProp.GetVal(GamePropFGNum) <= 0 {
-			gameProp.SetVal(GamePropTriggerFG, 0)
-		}
-
-		return pr, nil
+		curComponent = c
 	}
+
+	for {
+		err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+		if err != nil {
+			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
+
+		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
+		if respinComponent != "" {
+			pr.IsFinish = false
+
+			break
+		}
+
+		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
+		if nextComponentName == "" {
+			break
+		}
+
+		c, isok := bgm.Components.MapComponents[nextComponentName]
+		if !isok {
+			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+				zap.String("nextComponentName", nextComponentName),
+				zap.Error(ErrIvalidComponentName))
+
+			return nil, ErrIvalidComponentName
+		}
+
+		curComponent = c
+	}
+
+	if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
+		pr.IsFinish = false
+	} else if gameProp.GetVal(GamePropTriggerFG) > 0 && gameProp.GetVal(GamePropFGNum) <= 0 {
+		gameProp.SetVal(GamePropTriggerFG, 0)
+	}
+
+	return pr, nil
+	// }
 
 	return nil, sgc7game.ErrInvalidCommand
 }

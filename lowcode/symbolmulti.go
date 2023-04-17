@@ -52,7 +52,7 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 	symbolMulti.Config = cfg
 
 	if symbolMulti.Config.WeightMulti != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(symbolMulti.Config.WeightMulti, "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolMulti.Config.WeightMulti), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolMulti.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", symbolMulti.Config.WeightMulti),
@@ -113,7 +113,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
 
-	symbolMulti.onStepEnd(gameProp, curpr, gp)
+	symbolMulti.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(symbolMulti.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)

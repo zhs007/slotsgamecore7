@@ -55,7 +55,7 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 	symbolVal2.Config = cfg
 
 	if cfg.WeightSet != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(cfg.WeightSet, "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(cfg.WeightSet), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolVal2.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", cfg.WeightSet),
@@ -105,7 +105,7 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	setIndex := -1
 	if symbolVal2.Config.RNGSet != "" {
-		rng := gameProp.MapInt[symbolVal2.Config.RNGSet]
+		rng := gameProp.GetTagInt(symbolVal2.Config.RNGSet)
 		setIndex = rng
 	} else {
 		rv, err := symbolVal2.WeightSet.RandVal(plugin)
@@ -141,7 +141,7 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
 
-	symbolVal2.onStepEnd(gameProp, curpr, gp)
+	symbolVal2.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(symbolVal2.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)

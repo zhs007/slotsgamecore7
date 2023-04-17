@@ -119,7 +119,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
-	collector.onStepEnd(gameProp, curpr, gp)
+	collector.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
 

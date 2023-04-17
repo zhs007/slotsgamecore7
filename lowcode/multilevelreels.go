@@ -89,7 +89,7 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, pool *GamePropertyPool) 
 
 	for _, v := range cfg.Levels {
 		if v.ReelSetsWeight != "" {
-			vw2, err := sgc7game.LoadValWeights2FromExcel(v.ReelSetsWeight, "val", "weight", sgc7game.NewStrVal)
+			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v.ReelSetsWeight), "val", "weight", sgc7game.NewStrVal)
 			if err != nil {
 				goutils.Error("MultiLevelReels.Init:LoadValWeights2FromExcel",
 					zap.String("ReelSetsWeight", v.ReelSetsWeight),
@@ -202,7 +202,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		gameProp.OnFGSpin()
 	}
 
-	multiLevelReels.onStepEnd(gameProp, curpr, gp)
+	multiLevelReels.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(multiLevelReels.Name, cd)
 	// multiLevelReels.BuildPBComponent(gp)

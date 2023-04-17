@@ -91,7 +91,7 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 	bookof.Config = cfg
 
 	if bookof.Config.WeightTrigger != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(bookof.Config.WeightTrigger, "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(bookof.Config.WeightTrigger), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("BookOf.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", bookof.Config.WeightTrigger),
@@ -104,7 +104,7 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 	}
 
 	if bookof.Config.WeightSymbolNum != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(bookof.Config.WeightSymbolNum, "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(bookof.Config.WeightSymbolNum), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("BookOf.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", bookof.Config.WeightSymbolNum),
@@ -117,7 +117,7 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 	}
 
 	if bookof.Config.WeightSymbol != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(bookof.Config.WeightSymbol, "val", "weight", pool.DefaultPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(bookof.Config.WeightSymbol), "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("BookOf.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("Weight", bookof.Config.WeightSymbol),
@@ -174,7 +174,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
 		if bookof.Config.ForceSymbolNum == 1 && bookof.Config.SymbolRNG != "" {
-			rng := gameProp.MapInt[bookof.Config.SymbolRNG]
+			rng := gameProp.GetTagInt(bookof.Config.SymbolRNG)
 			cs := bookof.WeightSymbol.Vals[rng]
 
 			cd.Symbols = append(cd.Symbols, cs.Int())
@@ -236,11 +236,11 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			}
 		}
 
-		bookof.onStepEnd(gameProp, curpr, gp)
+		bookof.onStepEnd(gameProp, curpr, gp, "")
 
 		gp.AddComponentData(bookof.Name, cd)
 	} else {
-		bookof.onStepEnd(gameProp, curpr, gp)
+		bookof.onStepEnd(gameProp, curpr, gp, "")
 	}
 
 	return nil
