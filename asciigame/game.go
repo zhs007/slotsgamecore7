@@ -46,6 +46,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 	defer game.FreePlugin(plugin)
 
 	cmd := "SPIN"
+	cmdparam := ""
 	ps := game.NewPlayerState()
 	results := []*sgc7game.PlayResult{}
 
@@ -110,7 +111,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber))
 
 		for {
-			pr, err := game.Play(plugin, cmd, "", ps, stake, results, gameData)
+			pr, err := game.Play(plugin, cmd, cmdparam, ps, stake, results, gameData)
 			if err != nil {
 				goutils.Error("StartGame.Play",
 					zap.Int("results", len(results)),
@@ -216,8 +217,10 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 			if len(pr.NextCmds) > 0 {
 				cmd = pr.NextCmds[curSelected]
+				cmdparam = pr.NextCmdParams[curSelected]
 			} else {
 				cmd = "SPIN"
+				cmdparam = ""
 			}
 		}
 

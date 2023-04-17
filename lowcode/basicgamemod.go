@@ -69,6 +69,23 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		curComponent = c
+	} else {
+		if cmd != DefaultCmd {
+			cn, isok := bgm.Pool.Config.MapCmdComponent[cmd]
+			if isok {
+				c, isok1 := bgm.Components.MapComponents[cn]
+				if !isok1 {
+					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+						zap.String("cmd", cmd),
+						zap.String("MapCmdComponent", cn),
+						zap.Error(ErrIvalidComponentName))
+
+					return nil, ErrIvalidComponentName
+				}
+
+				curComponent = c
+			}
+		}
 	}
 
 	for {

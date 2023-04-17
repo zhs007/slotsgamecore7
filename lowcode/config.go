@@ -44,6 +44,7 @@ type Config struct {
 	Stats            *StatsConfig                   `yaml:"stats"`
 	RTP              *RTPConfig                     `yaml:"rtp"`
 	MainPath         string                         `yaml:"mainPath"`
+	MapCmdComponent  map[string]string              `yaml:"mapCmdComponent"`
 }
 
 func (cfg *Config) GetPath(fn string) string {
