@@ -54,7 +54,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	bgm.OnNewStep(gameProp)
 
-	// if cmd == "SPIN" {
 	pr, gp := bgm.newPlayResult(prs)
 
 	curComponent := bgm.Components.Components[0]
@@ -114,9 +113,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	}
 
 	return pr, nil
-	// }
-
-	return nil, sgc7game.ErrInvalidCommand
 }
 
 // ResetConfig
