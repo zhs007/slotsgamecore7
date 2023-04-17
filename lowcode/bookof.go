@@ -344,7 +344,7 @@ func (bookof *BookOf) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+		goutils.Error("BookOf.OnStatsWithPB:UnmarshalTo",
 			zap.Error(err))
 
 		return 0, err
