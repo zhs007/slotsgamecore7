@@ -8,6 +8,8 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
+const DefaultCmd = "SPIN"
+
 type GameParams struct {
 	sgc7pb.GameParam `json:",inline"`
 	LastScene        *sgc7game.GameScene `json:"-"`

@@ -50,7 +50,7 @@ type GameProperty struct {
 	MapScenes         map[string]int
 	MapOtherScenes    map[string]int
 	MapStats          map[string]*sgc7stats.Feature
-	MapInt            map[string]int
+	mapInt            map[string]int
 	MapComponentData  map[string]IComponentData
 	HistoryComponents []IComponent
 }
@@ -138,21 +138,34 @@ func (gameProp *GameProperty) RetriggerFG(pr *sgc7game.PlayResult, gp *GameParam
 	return nil
 }
 
-func (gameProp *GameProperty) TriggerFGWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinFirstComponent string) error {
+func (gameProp *GameProperty) GetIntValWeights(fn string) (*sgc7game.ValWeights2, error) {
 	vw2, isok := gameProp.MapIntValWeights[fn]
 	if !isok {
-		curvw2, err := sgc7game.LoadValWeights2FromExcel(fn, "val", "weight", sgc7game.NewIntVal[int])
+		curvw2, err := sgc7game.LoadValWeights2FromExcel(gameProp.Pool.Config.GetPath(fn), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
-			goutils.Error("GameProperty.TriggerFGWithWeights:LoadValWeights2FromExcel",
+			goutils.Error("GameProperty.GetIntValWeights:LoadValWeights2FromExcel",
 				zap.String("fn", fn),
 				zap.Error(err))
 
-			return err
+			return nil, err
 		}
 
 		gameProp.MapIntValWeights[fn] = curvw2
 
 		vw2 = curvw2
+	}
+
+	return vw2, nil
+}
+
+func (gameProp *GameProperty) TriggerFGWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinFirstComponent string) error {
+	vw2, err := gameProp.GetIntValWeights(fn)
+	if err != nil {
+		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return err
 	}
 
 	val, err := vw2.RandVal(plugin)
@@ -241,6 +254,14 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 
 func (gameProp *GameProperty) GetStrVal(prop int) string {
 	return gameProp.MapStrVals[prop]
+}
+
+func (gameProp *GameProperty) TagInt(tag string, val int) {
+	gameProp.mapInt[tag] = val
+}
+
+func (gameProp *GameProperty) GetTagInt(tag string) int {
+	return gameProp.mapInt[tag]
 }
 
 func init() {

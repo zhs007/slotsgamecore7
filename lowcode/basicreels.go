@@ -122,7 +122,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.OnFGSpin()
 	}
 
-	basicReels.onStepEnd(gameProp, curpr, gp)
+	basicReels.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(basicReels.Name, cd)
 

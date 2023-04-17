@@ -105,7 +105,7 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	setIndex := -1
 	if symbolVal2.Config.RNGSet != "" {
-		rng := gameProp.MapInt[symbolVal2.Config.RNGSet]
+		rng := gameProp.GetTagInt(symbolVal2.Config.RNGSet)
 		setIndex = rng
 	} else {
 		rv, err := symbolVal2.WeightSet.RandVal(plugin)
@@ -141,7 +141,7 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
 
-	symbolVal2.onStepEnd(gameProp, curpr, gp)
+	symbolVal2.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(symbolVal2.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)

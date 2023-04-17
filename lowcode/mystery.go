@@ -160,7 +160,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		if mystery.Config.MysteryRNG != "" {
 			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-			rng := gameProp.MapInt[mystery.Config.MysteryRNG]
+			rng := gameProp.GetTagInt(mystery.Config.MysteryRNG)
 			cs := mystery.MysteryWeights.Vals[rng]
 
 			curmcode := cs.Int()
@@ -222,7 +222,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		}
 	}
 
-	mystery.onStepEnd(gameProp, curpr, gp)
+	mystery.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(mystery.Name, cd)
 	// mystery.BuildPBComponent(gp)

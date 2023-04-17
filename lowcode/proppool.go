@@ -29,7 +29,7 @@ func (pool *GamePropertyPool) newGameProp() *GameProperty {
 		MapStrVals:       make(map[int]string),
 		MapIntValWeights: make(map[string]*sgc7game.ValWeights2),
 		MapStats:         make(map[string]*sgc7stats.Feature),
-		MapInt:           make(map[string]int),
+		mapInt:           make(map[string]int),
 		CurPaytables:     pool.DefaultPaytables,
 		CurLineData:      pool.DefaultLineData,
 		MapComponentData: make(map[string]IComponentData),

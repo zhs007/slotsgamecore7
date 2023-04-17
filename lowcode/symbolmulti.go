@@ -113,7 +113,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
 
-	symbolMulti.onStepEnd(gameProp, curpr, gp)
+	symbolMulti.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(symbolMulti.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)

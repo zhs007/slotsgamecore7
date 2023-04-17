@@ -53,4 +53,9 @@ var (
 
 	// ErrIvalidGameData - invalid gameData
 	ErrIvalidGameData = errors.New("invalid gameData")
+
+	// ErrIvalidCmd - invalid cmd
+	ErrIvalidCmd = errors.New("invalid cmd")
+	// ErrIvalidCmdParam - invalid cmdparam
+	ErrIvalidCmdParam = errors.New("invalid cmdparam")
 )

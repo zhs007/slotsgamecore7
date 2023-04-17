@@ -174,7 +174,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
 		if bookof.Config.ForceSymbolNum == 1 && bookof.Config.SymbolRNG != "" {
-			rng := gameProp.MapInt[bookof.Config.SymbolRNG]
+			rng := gameProp.GetTagInt(bookof.Config.SymbolRNG)
 			cs := bookof.WeightSymbol.Vals[rng]
 
 			cd.Symbols = append(cd.Symbols, cs.Int())
@@ -236,11 +236,11 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			}
 		}
 
-		bookof.onStepEnd(gameProp, curpr, gp)
+		bookof.onStepEnd(gameProp, curpr, gp, "")
 
 		gp.AddComponentData(bookof.Name, cd)
 	} else {
-		bookof.onStepEnd(gameProp, curpr, gp)
+		bookof.onStepEnd(gameProp, curpr, gp, "")
 	}
 
 	return nil

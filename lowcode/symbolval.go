@@ -107,7 +107,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	symbolVal.AddOtherScene(gameProp, curpr, os, cd)
 
-	symbolVal.onStepEnd(gameProp, curpr, gp)
+	symbolVal.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(symbolVal.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)

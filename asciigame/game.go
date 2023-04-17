@@ -9,6 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
+var gKeys []getch.KeyCode
+
 // if return true, then break
 type FuncOnGetChar func(k getch.KeyCode) bool
 
@@ -139,40 +141,81 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 				FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 				FormatColorString(fmt.Sprintf("%v", pr.CashWin), ColorNumber))
 
+			curSelected := 0
+
 			if autotimes <= 0 && !isSkipGetChar {
-				fmt.Printf("step %v. please press %v to jump to the next step or press %v to quit.\n",
-					FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
-					FormatColorString("N", ColorKey),
-					FormatColorString("Q", ColorExitKey))
+				if len(pr.NextCmds) > 1 {
+					keys := []getch.KeyCode{}
 
-				isend := false
-				getchar(func(c getch.KeyCode) bool {
-					if c == getch.KeyN {
-						return true
+					fmt.Printf("step %v. please press the Number to select the feature or press %v to quit.\n",
+						FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
+						FormatColorString("Q", ColorExitKey))
+
+					for i, cmd := range pr.NextCmds {
+						fmt.Printf("%v. %v\n",
+							FormatColorString(fmt.Sprintf("%v", i+1), ColorKey),
+							FormatColorString(cmd, ColorKey))
+
+						keys = append(keys, gKeys[i])
 					}
 
-					if c == getch.KeyQ {
-						isend = true
+					isend := false
+					getchar(func(c getch.KeyCode) bool {
+						if c == getch.KeyQ {
+							isend = true
 
-						return true
+							return true
+						}
+
+						for i, ck := range keys {
+							if c == ck {
+								curSelected = i
+
+								return true
+							}
+						}
+
+						return false
+					})
+
+					if isend {
+						goto end
 					}
+				} else {
+					fmt.Printf("step %v. please press %v to jump to the next step or press %v to quit.\n",
+						FormatColorString(fmt.Sprintf("%v", step), ColorNumber),
+						FormatColorString("N", ColorKey),
+						FormatColorString("Q", ColorExitKey))
 
-					return false
-				})
+					isend := false
+					getchar(func(c getch.KeyCode) bool {
+						if c == getch.KeyN {
+							return true
+						}
 
-				if isend {
-					goto end
+						if c == getch.KeyQ {
+							isend = true
+
+							return true
+						}
+
+						return false
+					})
+
+					if isend {
+						goto end
+					}
 				}
 			}
 
 			step++
 
-			if pr.IsWait {
-				break
-			}
+			// if pr.IsWait {
+			// 	break
+			// }
 
 			if len(pr.NextCmds) > 0 {
-				cmd = pr.NextCmds[0]
+				cmd = pr.NextCmds[curSelected]
 			} else {
 				cmd = "SPIN"
 			}
@@ -201,4 +244,8 @@ end:
 		}, ColorWin, ColorLose)))
 
 	return nil
+}
+
+func init() {
+	gKeys = []getch.KeyCode{getch.Key1, getch.Key2, getch.Key3, getch.Key4, getch.Key5, getch.Key6, getch.Key7, getch.Key8, getch.Key9}
 }

@@ -202,7 +202,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		gameProp.OnFGSpin()
 	}
 
-	multiLevelReels.onStepEnd(gameProp, curpr, gp)
+	multiLevelReels.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(multiLevelReels.Name, cd)
 	// multiLevelReels.BuildPBComponent(gp)

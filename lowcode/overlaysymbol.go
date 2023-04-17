@@ -149,7 +149,7 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	overlaySymbol.AddScene(gameProp, curpr, cgs, &osd.BasicComponentData)
 
-	overlaySymbol.onStepEnd(gameProp, curpr, gp)
+	overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(overlaySymbol.Name, &osd.BasicComponentData)
 

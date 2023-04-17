@@ -90,9 +90,9 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 						break
 					}
 
-					if pr.IsWait {
-						break
-					}
+					// if pr.IsWait {
+					// 	break
+					// }
 
 					if len(pr.NextCmds) > 0 {
 						cmd = pr.NextCmds[0]
@@ -246,9 +246,9 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 						break
 					}
 
-					if pr.IsWait {
-						break
-					}
+					// if pr.IsWait {
+					// 	break
+					// }
 
 					if len(pr.NextCmds) > 0 {
 						cmd = pr.NextCmds[0]

@@ -61,6 +61,12 @@ message OverlaySymbolData {
 	int32 curLevel = 2;
 }
 
+// BasicWinsData
+message BasicWinsData {
+    ComponentData basicComponentData = 1;
+	string nextComponent = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
