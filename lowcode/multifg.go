@@ -25,7 +25,7 @@ type FGDataConfig struct {
 	FGNumWithScatterNum       map[int]int    `yaml:"FGNumWithScatterNum"`       // FG number with scatter number
 	FGNumWeightWithScatterNum map[int]string `yaml:"FGNumWeightWithScatterNum"` // FG number weight with scatter number
 	RespinFirstComponent      string         `yaml:"respinFirstComponent"`      // like fg-spin
-	Cmd                       string         `yaml:"respinFirstComponent"`      // cmd
+	Cmd                       string         `yaml:"cmd"`                       // cmd
 }
 
 // BasicWinsConfig - configuration for BasicWins
