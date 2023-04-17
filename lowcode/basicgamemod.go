@@ -174,7 +174,7 @@ func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrCompo
 
 	for _, v := range cfgGameMod.Components {
 		c := mgrComponent.NewComponent(v)
-		err := c.Init(v.Config, pool)
+		err := c.Init(pool.Config.GetPath(v.Config), pool)
 		if err != nil {
 			goutils.Error("NewBasicGameMod:Init",
 				zap.Error(err))

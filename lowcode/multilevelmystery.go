@@ -254,7 +254,7 @@ func (multiLevelMystery *MultiLevelMystery) OnStatsWithPB(feature *sgc7stats.Fea
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+		goutils.Error("MultiLevelMystery.OnStatsWithPB:UnmarshalTo",
 			zap.Error(err))
 
 		return 0, err

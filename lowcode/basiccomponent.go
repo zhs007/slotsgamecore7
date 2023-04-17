@@ -131,7 +131,7 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 	}
 }
 
-// AddScene -
+// AddOtherScene -
 func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
 

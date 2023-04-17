@@ -151,7 +151,7 @@ func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponen
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
+		goutils.Error("Collector.OnStatsWithPB:UnmarshalTo",
 			zap.Error(err))
 
 		return 0, err
