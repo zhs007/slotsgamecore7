@@ -52,6 +52,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			results := []*sgc7game.PlayResult{}
 			gameData := game.NewGameData()
 			cmd := "SPIN"
+			cmdparam := ""
 			off := 0
 
 			for i := int64(0); i < spinnums/int64(worknums); i++ {
@@ -65,7 +66,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 				totalReturn := int64(0)
 				for {
-					pr, err := game.Play(plugin, cmd, "", ps, stake, results, gameData)
+					pr, err := game.Play(plugin, cmd, cmdparam, ps, stake, results, gameData)
 					if err != nil {
 						iserrturn = true
 
@@ -105,11 +106,14 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 							}
 
 							cmd = pr.NextCmds[cr]
+							cmdparam = pr.NextCmdParams[cr]
 						} else {
 							cmd = pr.NextCmds[0]
+							cmdparam = pr.NextCmdParams[0]
 						}
 					} else {
 						cmd = "SPIN"
+						cmdparam = ""
 					}
 				}
 
@@ -228,6 +232,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 			gameData := game.NewGameData()
 			cmd := "SPIN"
 			off := 0
+			cmdparam := ""
 
 			for i := int64(0); i < spinnums/int64(worknums); {
 				pbsjson := ps.GetPublicJson()
@@ -238,7 +243,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 
 				totalReturn := int64(0)
 				for {
-					pr, err := game.Play(plugin, cmd, "", ps, stake, results, gameData)
+					pr, err := game.Play(plugin, cmd, cmdparam, ps, stake, results, gameData)
 					if err != nil {
 						iserrturn = true
 
@@ -273,11 +278,14 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 							}
 
 							cmd = pr.NextCmds[cr]
+							cmdparam = pr.NextCmdParams[cr]
 						} else {
 							cmd = pr.NextCmds[0]
+							cmdparam = pr.NextCmdParams[0]
 						}
 					} else {
 						cmd = "SPIN"
+						cmdparam = ""
 					}
 				}
 
