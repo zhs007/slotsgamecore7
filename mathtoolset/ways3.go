@@ -129,7 +129,7 @@ func (ways3rd *ways3ReelData) calcWins(rd *sgc7game.ReelsData,
 		}
 	}
 
-	ways3rd.waitGenData = true
+	ways3rd.waitGenData = false
 }
 
 func newWays3ReelDataList(num int) []*ways3ReelData {
@@ -215,7 +215,7 @@ func calcWaysWinsInReels3(ways3data []*ways3ReelData, rd *sgc7game.ReelsData, sy
 
 	lastnum := float64(1)
 	if num < len(rd.Reels) {
-		lastnum = float64(ways3data[num-1].getNoWinData(rd, symbol, wilds, symbolMapping, overlaySyms, num, height))
+		lastnum = float64(ways3data[num].getNoWinData(rd, symbol, wilds, symbolMapping, overlaySyms, num, height))
 
 		for i := num + 1; i < len(rd.Reels); i++ {
 			lastnum *= float64(len(rd.Reels[i]))
