@@ -44,4 +44,7 @@ var (
 
 	// ErrUnimplementedCode - unimplemented code
 	ErrUnimplementedCode = errors.New("unimplemented code")
+
+	// ErrInvalidScatterNumber - invalid scatter number
+	ErrInvalidScatterNumber = errors.New("invalid scatter number")
 )

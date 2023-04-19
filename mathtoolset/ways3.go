@@ -156,8 +156,6 @@ func clearWay3ReelDataList(lst []*ways3ReelData) {
 func calcWaysWinsInReels3(ways3data []*ways3ReelData, rd *sgc7game.ReelsData, symbol SymbolType, wilds []SymbolType,
 	symbolMapping *SymbolMapping, symMul *sgc7game.ValMapping2, overlaySyms *sgc7game.ValMapping2, x int, num int, height int) float64 {
 
-	// curwins := float64(0)
-
 	ways3data[x].calcWins(rd, symbol, wilds, symbolMapping, symMul, overlaySyms, x, height)
 
 	if x < num-1 {
@@ -166,51 +164,6 @@ func calcWaysWinsInReels3(ways3data []*ways3ReelData, rd *sgc7game.ReelsData, sy
 
 			return mul * float64(times) * curwin
 		})
-
-		// for y := 0; y < len(rd.Reels[x]); y++ {
-		// 	curmul := float64(0)
-
-		// 	for ty := 0; ty < height; ty++ {
-		// 		off := y + ty
-		// 		if off >= len(rd.Reels[x]) {
-		// 			off -= len(rd.Reels[x])
-		// 		}
-
-		// 		cs := rd.Reels[x][off]
-
-		// 		if overlaySyms != nil {
-		// 			ocs := getSymbolWithPos(overlaySyms, x, ty)
-		// 			if ocs >= 0 {
-		// 				cs = ocs
-		// 			}
-		// 		}
-
-		// 		csm := float64(1.0)
-		// 		if symMul != nil {
-		// 			cm, isok := symMul.MapVals[cs]
-		// 			if isok {
-		// 				csm = cm.Float64()
-		// 			}
-		// 		}
-
-		// 		if cs == int(symbol) {
-		// 			curmul += csm
-		// 		} else if HasSymbol(wilds, SymbolType(cs)) {
-		// 			curmul += csm
-		// 		} else if symbolMapping != nil {
-		// 			ts, isok := symbolMapping.MapSymbols[SymbolType(cs)]
-		// 			if isok && ts == symbol {
-		// 				curmul += csm
-		// 			}
-		// 		}
-		// 	}
-
-		// 	if curmul > 0 {
-		// 		curwin := calcWaysWinsInReels3(ways3data, rd, symbol, wilds, symbolMapping, symMul, overlaySyms, x+1, num, height)
-
-		// 		curwins += curmul * curwin
-		// 	}
-		// }
 	}
 
 	lastnum := float64(1)
@@ -223,56 +176,8 @@ func calcWaysWinsInReels3(ways3data []*ways3ReelData, rd *sgc7game.ReelsData, sy
 	}
 
 	return ways3data[x].eachMul(func(mul float64, times int) float64 {
-		// curwin := calcWaysWinsInReels3(ways3data, rd, symbol, wilds, symbolMapping, symMul, overlaySyms, x+1, num, height)
-
 		return mul * float64(times) * lastnum
 	})
-
-	// for y := 0; y < len(rd.Reels[x]); y++ {
-	// 	curmul := float64(0)
-
-	// 	for ty := 0; ty < height; ty++ {
-	// 		off := y + ty
-	// 		if off >= len(rd.Reels[x]) {
-	// 			off -= len(rd.Reels[x])
-	// 		}
-
-	// 		cs := rd.Reels[x][off]
-
-	// 		if overlaySyms != nil {
-	// 			ocs := getSymbolWithPos(overlaySyms, x, ty)
-	// 			if ocs >= 0 {
-	// 				cs = ocs
-	// 			}
-	// 		}
-
-	// 		csm := float64(1.0)
-	// 		if symMul != nil {
-	// 			cm, isok := symMul.MapVals[cs]
-	// 			if isok {
-	// 				csm = cm.Float64()
-	// 			}
-	// 		}
-
-	// 		if cs == int(symbol) {
-	// 			curmul += csm
-	// 		} else if HasSymbol(wilds, SymbolType(cs)) {
-	// 			curmul += csm
-	// 		} else if symbolMapping != nil {
-	// 			ts, isok := symbolMapping.MapSymbols[SymbolType(cs)]
-	// 			if isok && ts == symbol {
-	// 				curmul += csm
-	// 			}
-	// 		}
-	// 	}
-
-	// 	if curmul > 0 {
-	// 		curwins += curmul * lastnum
-	// 	}
-	// }
-	// }
-
-	// return curwins
 }
 
 func AnalyzeReelsWaysEx3(paytables *sgc7game.PayTables, rd *sgc7game.ReelsData,
