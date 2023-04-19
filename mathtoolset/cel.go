@@ -647,6 +647,59 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				),
 			),
 		),
+		cel.Function("calcScatterProbabilitWithReels",
+			cel.Overload("calcScatterProbabilitWithReels_string_string_bool_string_list_list_int_int",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.BoolType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.IntType),
+					cel.IntType, cel.IntType},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 8 {
+						goutils.Error("calcScatterProbabilitWithReels",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					paytablefn := params[0].Value().(string)
+					reelfn := params[1].Value().(string)
+
+					err := mgrGenMath.LoadPaytables(paytablefn)
+					if err != nil {
+						goutils.Error("calcScatterProbabilitWithReels:LoadPaytables",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					isStrReel := params[2].Value().(bool)
+
+					rd, err := mgrGenMath.LoadReelsData(paytablefn, reelfn, isStrReel)
+					if err != nil {
+						goutils.Error("calcScatterProbabilitWithReels:LoadReelsData",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					sym := mgrGenMath.Paytables.MapSymbols[params[3].Value().(string)]
+					sm := array2SymbolMapping(params[4])
+					overlaySyms := array2OverlaySyms(params[5])
+					num := int(params[6].Value().(int64))
+					height := int(params[7].Value().(int64))
+
+					ret := CalcScatterProbabilitWithReels(rd, SymbolType(sym), sm, overlaySyms, num, height)
+					if err != nil {
+						goutils.Error("CalcScatterProbabilitWithReels:CalcScatterProbabilitWithReels",
+							zap.Error(err))
+
+						return types.Double(0)
+					}
+
+					return types.Double(ret)
+				},
+				),
+			),
+		),
 	}
 }
 
