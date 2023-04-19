@@ -476,9 +476,9 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					bet := int(params[10].Value().(int64))
 					mul := int(params[11].Value().(int64))
 
-					ssws, err := AnalyzeReelsWaysEx2(mgrGenMath.Paytables, rd, syms, wilds, sm, symMul, overlaySyms, height, bet, mul)
+					ssws, err := AnalyzeReelsWaysEx3(mgrGenMath.Paytables, rd, syms, wilds, sm, symMul, overlaySyms, height, bet, mul)
 					if err != nil {
-						goutils.Error("calcWaysRTP2:AnalyzeReelsWaysEx2",
+						goutils.Error("calcWaysRTP2:AnalyzeReelsWaysEx3",
 							zap.Error(err))
 
 						return types.Double(0)
