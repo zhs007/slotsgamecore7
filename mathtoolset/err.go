@@ -47,4 +47,6 @@ var (
 
 	// ErrInvalidScatterNumber - invalid scatter number
 	ErrInvalidScatterNumber = errors.New("invalid scatter number")
+
+	ErrCannotBeConverged = errors.New("cannot be converged")
 )
