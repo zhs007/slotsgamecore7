@@ -28,5 +28,11 @@ func Test_ScriptCore(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, out1.Value().(float64) > out.Value().(float64))
 
+	err = script.Compile(`calcMulLevelRTP([1.0,2.0], [{1:0.1,2:0.05},{1:0.1,2:0.05}], 6, [1, 1])`)
+	assert.NoError(t, err)
+
+	_, err = script.Eval(mgrGenMath)
+	assert.NoError(t, err)
+
 	t.Logf("Test_ScriptCore OK")
 }
