@@ -85,9 +85,9 @@ func array2IntSlice(val ref.Val) []int {
 		lst := []int{}
 
 		for _, v := range lst0 {
-			v1, isok := v.Value().(int)
+			v1, isok := v.Value().(int64)
 			if isok {
-				lst = append(lst, v1)
+				lst = append(lst, int(v1))
 			}
 		}
 
