@@ -700,7 +700,30 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				),
 			),
 		),
-	}
+		cel.Function("calcMulLevelRTP",
+			cel.Overload("calcMulLevelRTP_list_list_int_list",
+				[]*cel.Type{cel.ListType(cel.DoubleType), cel.ListType(cel.DoubleType), cel.IntType, cel.ListType(cel.IntType)},
+				cel.DoubleType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 4 {
+						goutils.Error("calcMulLevelRTP",
+							zap.Error(ErrInvalidFunctionParams))
+
+						return types.Double(0)
+					}
+
+					levelRTPs := getFloat64Slice(params[0])
+					levelUpProbs := getFloat64Slice(params[1])
+					spinNum := int(params[2].Value().(int64))
+					levelUpAddSpinNum := array2IntSlice(params[3])
+
+					ret := CalcMulLevelRTP(levelRTPs, levelUpProbs, spinNum, levelUpAddSpinNum)
+
+					return types.Double(ret)
+				},
+				),
+			),
+		)}
 }
 
 func NewScriptCore(mgrGenMath *GenMathMgr) (*ScriptCore, error) {
