@@ -99,7 +99,12 @@ func calcMulLevelRTP2(prelevel int, levelRTPs []float64, levelUpProbs []map[int]
 	for k, v := range mapProbs {
 		addnum := 0
 		for i := 0; i < k; i++ {
-			addnum += levelUpAddSpinNum[prelevel+i]
+			cl := prelevel + i
+			if cl >= len(levelRTPs) {
+				cl = len(levelRTPs) - 1
+			}
+
+			addnum += levelUpAddSpinNum[cl]
 		}
 
 		// 考虑升级的情况
