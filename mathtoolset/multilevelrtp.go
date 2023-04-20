@@ -35,10 +35,10 @@ func calcMulLevelRTP(prelevel int, levelRTPs []float64, levelUpProbs []float64, 
 	currtp := float64(0)
 
 	// 先便利本次不能升级的情况
-	currtp += calcMulLevelRTP(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum)
+	currtp += calcMulLevelRTP(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum) * (1 - levelUpProbs[prelevel])
 
 	// 再考虑升级的情况
-	currtp += calcMulLevelRTP(prelevel+1, levelRTPs, levelUpProbs, spinNum-1+levelUpAddSpinNum[prelevel], levelUpAddSpinNum)
+	currtp += calcMulLevelRTP(prelevel+1, levelRTPs, levelUpProbs, spinNum-1+levelUpAddSpinNum[prelevel], levelUpAddSpinNum) * levelUpProbs[prelevel]
 
 	return currtp
 }
