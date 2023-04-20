@@ -58,4 +58,7 @@ var (
 	ErrIvalidCmd = errors.New("invalid cmd")
 	// ErrIvalidCmdParam - invalid cmdparam
 	ErrIvalidCmdParam = errors.New("invalid cmdparam")
+
+	// ErrIvalidTagCurReels - invalid TagCurReels
+	ErrIvalidTagCurReels = errors.New("invalid TagCurReels")
 )

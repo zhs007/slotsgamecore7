@@ -161,7 +161,10 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 			return err
 		}
 
-		rd, isok := gameProp.Pool.Config.MapReels[val.String()]
+		curreels := val.String()
+		gameProp.TagStr(TagCurReels, curreels)
+
+		rd, isok := gameProp.Pool.Config.MapReels[curreels]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
 				zap.Int("curLevel", cd.CurLevel),
@@ -182,6 +185,8 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 			return ErrInvalidReels
 		}
+
+		gameProp.TagStr(TagCurReels, multiLevelReels.Config.Levels[cd.CurLevel].Reel)
 
 		gameProp.CurReels = rd
 	}

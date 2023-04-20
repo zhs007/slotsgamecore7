@@ -131,6 +131,18 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 	}
 }
 
+// ReTagScene -
+func (basicComponent *BasicComponent) ReTagScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	si int, basicCD *BasicComponentData) {
+
+	usi := len(basicCD.UsedScenes)
+	basicCD.UsedScenes = append(basicCD.UsedScenes, si)
+
+	if usi < len(basicComponent.Config.TagScenes) {
+		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
+	}
+}
+
 // AddOtherScene -
 func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 	sc *sgc7game.GameScene, basicCD *BasicComponentData) {

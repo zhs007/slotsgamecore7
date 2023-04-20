@@ -8,6 +8,10 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
+const (
+	TagCurReels = "reels"
+)
+
 const DefaultCmd = "SPIN"
 
 type GameParams struct {

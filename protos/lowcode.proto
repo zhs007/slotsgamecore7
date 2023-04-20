@@ -67,6 +67,12 @@ message BasicWinsData {
 	string nextComponent = 2;
 }
 
+// ReelSetMysteryData
+message ReelSetMysteryData {
+    ComponentData basicComponentData = 1;
+    int32 curMysteryCode = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
