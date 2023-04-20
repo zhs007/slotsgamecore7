@@ -85,7 +85,10 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		basicReels.AddRNG(gameProp, si, cd)
 
-		rd, isok := gameProp.Pool.Config.MapReels[val.String()]
+		curreels := val.String()
+		gameProp.TagStr(TagCurReels, curreels)
+
+		rd, isok := gameProp.Pool.Config.MapReels[curreels]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
@@ -102,6 +105,8 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			return ErrInvalidReels
 		}
+
+		gameProp.TagStr(TagCurReels, basicReels.Config.ReelSet)
 
 		gameProp.CurReels = rd
 	}

@@ -45,6 +45,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("symbolVal2", NewSymbolVal2)
 	mgr.Reg("overlaySymbol", NewOverlaySymbol)
 	mgr.Reg("multiFG", NewMultiFG)
+	mgr.Reg("reelSetMystery", NewReelSetMystery)
 
 	return mgr
 }

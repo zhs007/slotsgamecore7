@@ -88,7 +88,7 @@ func (mystery *Mystery) maskOtherScene(gs *sgc7game.GameScene, symbolCode int) *
 func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
-		goutils.Error("BasicReels.Init:ReadFile",
+		goutils.Error("Mystery.Init:ReadFile",
 			zap.String("fn", fn),
 			zap.Error(err))
 
@@ -99,7 +99,7 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
-		goutils.Error("BasicReels.Init:Unmarshal",
+		goutils.Error("Mystery.Init:Unmarshal",
 			zap.String("fn", fn),
 			zap.Error(err))
 
@@ -111,7 +111,7 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	if mystery.Config.MysteryWeight != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(mystery.Config.MysteryWeight), "val", "weight", pool.DefaultPaytables)
 		if err != nil {
-			goutils.Error("BasicReels.Init:LoadValWeights2FromExcelWithSymbols",
+			goutils.Error("Mystery.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", mystery.Config.MysteryWeight),
 				zap.Error(err))
 
@@ -156,42 +156,41 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
 
-	if mystery.MysteryWeights != nil {
-		if mystery.Config.MysteryRNG != "" {
-			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
+	gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
+	if !mystery.hasMystery(gs) {
+		mystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
+	} else {
+		if mystery.MysteryWeights != nil {
+			if mystery.Config.MysteryRNG != "" {
+				rng := gameProp.GetTagInt(mystery.Config.MysteryRNG)
+				cs := mystery.MysteryWeights.Vals[rng]
 
-			rng := gameProp.GetTagInt(mystery.Config.MysteryRNG)
-			cs := mystery.MysteryWeights.Vals[rng]
+				curmcode := cs.Int()
+				cd.CurMysteryCode = curmcode
 
-			curmcode := cs.Int()
-			cd.CurMysteryCode = curmcode
+				gameProp.SetVal(GamePropCurMystery, curmcode)
 
-			gameProp.SetVal(GamePropCurMystery, curmcode)
-
-			sc2 := gs.Clone()
-			for _, v := range mystery.MysterySymbols {
-				sc2.ReplaceSymbol(v, curmcode)
-			}
-
-			mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
-
-			v, isok := mystery.MapMysteryTriggerFeature[curmcode]
-			if isok {
-				if v.RespinFirstComponent != "" {
-					os := mystery.maskOtherScene(sc2, curmcode)
-
-					gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
-
-					return nil
+				sc2 := gs.Clone()
+				for _, v := range mystery.MysterySymbols {
+					sc2.ReplaceSymbol(v, curmcode)
 				}
-			}
-		} else {
-			gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-			if mystery.hasMystery(gs) {
+				mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+
+				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
+				if isok {
+					if v.RespinFirstComponent != "" {
+						os := mystery.maskOtherScene(sc2, curmcode)
+
+						gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
+
+						return nil
+					}
+				}
+			} else {
 				curm, err := mystery.MysteryWeights.RandVal(plugin)
 				if err != nil {
-					goutils.Error("BasicReels.OnPlayGame:RandVal",
+					goutils.Error("Mystery.OnPlayGame:RandVal",
 						zap.Error(err))
 
 					return err
@@ -225,7 +224,6 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 	mystery.onStepEnd(gameProp, curpr, gp, "")
 
 	gp.AddComponentData(mystery.Name, cd)
-	// mystery.BuildPBComponent(gp)
 
 	return nil
 }
@@ -236,7 +234,7 @@ func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRes
 
 	if len(cd.UsedScenes) > 0 {
 		if mystery.MysteryWeights != nil {
-			fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
+			fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(cd.CurMysteryCode))
 			asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 		}
 	}
@@ -251,11 +249,11 @@ func (mystery *Mystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stak
 
 // OnStatsWithPB -
 func (mystery *Mystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.BookOfData{}
+	pbcd := &sgc7pb.MysteryData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("MultiLevelReels.OnStatsWithPB:UnmarshalTo",
+		goutils.Error("Mystery.OnStatsWithPB:UnmarshalTo",
 			zap.Error(err))
 
 		return 0, err
@@ -275,7 +273,7 @@ func (mystery *Mystery) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+		goutils.Error("Mystery.EachUsedResults:UnmarshalTo",
 			zap.Error(err))
 
 		return

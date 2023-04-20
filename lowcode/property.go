@@ -47,17 +47,16 @@ type GameProperty struct {
 	CurLineData       *sgc7game.LineData
 	CurReels          *sgc7game.ReelsData
 	MapIntValWeights  map[string]*sgc7game.ValWeights2
-	MapScenes         map[string]int
-	MapOtherScenes    map[string]int
 	MapStats          map[string]*sgc7stats.Feature
 	mapInt            map[string]int
+	mapStr            map[string]string
 	MapComponentData  map[string]IComponentData
 	HistoryComponents []IComponent
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
-	gameProp.MapScenes = make(map[string]int)
-	gameProp.MapOtherScenes = make(map[string]int)
+	gameProp.mapInt = make(map[string]int)
+	gameProp.mapStr = make(map[string]string)
 
 	gameProp.SetStrVal(GamePropNextComponent, "")
 	gameProp.SetStrVal(GamePropRespinComponent, "")
@@ -68,11 +67,11 @@ func (gameProp *GameProperty) OnNewStep() error {
 }
 
 func (gameProp *GameProperty) TagScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
-	gameProp.MapScenes[tag] = sceneIndex
+	gameProp.mapInt[tag] = sceneIndex
 }
 
 func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) (*sgc7game.GameScene, int) {
-	si, isok := gameProp.MapScenes[tag]
+	si, isok := gameProp.mapInt[tag]
 	if !isok {
 		return pr.Scenes[len(pr.Scenes)-1], len(pr.Scenes) - 1
 	}
@@ -81,11 +80,11 @@ func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) (*sg
 }
 
 func (gameProp *GameProperty) TagOtherScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
-	gameProp.MapOtherScenes[tag] = sceneIndex
+	gameProp.mapInt[tag] = sceneIndex
 }
 
 func (gameProp *GameProperty) GetOtherScene(pr *sgc7game.PlayResult, tag string) (*sgc7game.GameScene, int) {
-	si, isok := gameProp.MapOtherScenes[tag]
+	si, isok := gameProp.mapInt[tag]
 	if !isok {
 		return pr.OtherScenes[len(pr.OtherScenes)-1], len(pr.OtherScenes) - 1
 	}
@@ -262,6 +261,14 @@ func (gameProp *GameProperty) TagInt(tag string, val int) {
 
 func (gameProp *GameProperty) GetTagInt(tag string) int {
 	return gameProp.mapInt[tag]
+}
+
+func (gameProp *GameProperty) TagStr(tag string, val string) {
+	gameProp.mapStr[tag] = val
+}
+
+func (gameProp *GameProperty) GetTagStr(tag string) string {
+	return gameProp.mapStr[tag]
 }
 
 func init() {
