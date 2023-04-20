@@ -1,6 +1,11 @@
 package mathtoolset
 
-import "math"
+import (
+	"math"
+
+	"github.com/zhs007/goutils"
+	"go.uber.org/zap"
+)
 
 func calcMulLevelRTP(prelevel int, levelRTPs []float64, levelUpProbs []float64, spinNum int, levelUpAddSpinNum []int) float64 {
 	// 如果最后一次spin了
@@ -15,8 +20,16 @@ func calcMulLevelRTP(prelevel int, levelRTPs []float64, levelUpProbs []float64, 
 			return levelRTPs[prelevel] * float64(spinNum)
 		}
 
+		x := float64(levelUpAddSpinNum[prelevel]) * levelUpProbs[prelevel]
+		if x >= 1 {
+			goutils.Error("calcMulLevelRTP",
+				zap.Error(ErrCannotBeConverged))
+
+			return math.NaN()
+		}
+
 		// 否则需要返回无穷级数求和
-		return levelRTPs[prelevel] * float64(spinNum) * levelUpProbs[prelevel] / math.Pow(1-levelUpProbs[prelevel], 2) * float64(levelUpAddSpinNum[prelevel])
+		return levelRTPs[prelevel] * float64(spinNum) / (1 - x)
 	}
 
 	currtp := float64(0)
