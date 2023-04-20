@@ -97,6 +97,30 @@ func array2IntSlice(val ref.Val) []int {
 	return nil
 }
 
+func list2listmapintfloat(val ref.Val) []map[int]float64 {
+	lst0, isok := val.Value().([]ref.Val)
+	if isok {
+		lst := []map[int]float64{}
+
+		for _, n := range lst0 {
+			curmap := make(map[int]float64)
+
+			cm, isok := n.Value().(map[ref.Val]ref.Val)
+			if isok {
+				for k, v := range cm {
+					curmap[int(k.Value().(int64))] = v.Value().(float64)
+				}
+			}
+
+			lst = append(lst, curmap)
+		}
+
+		return lst
+	}
+
+	return nil
+}
+
 func array2SymbolTypeSlice(val ref.Val) []SymbolType {
 	lst0, isok := val.Value().([]ref.Val)
 	if isok {
@@ -702,7 +726,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 		),
 		cel.Function("calcMulLevelRTP",
 			cel.Overload("calcMulLevelRTP_list_list_int_list",
-				[]*cel.Type{cel.ListType(cel.DoubleType), cel.ListType(cel.DoubleType), cel.IntType, cel.ListType(cel.IntType)},
+				[]*cel.Type{cel.ListType(cel.DoubleType), cel.ListType(cel.MapType(cel.IntType, cel.DoubleType)), cel.IntType, cel.ListType(cel.IntType)},
 				cel.DoubleType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 4 {
@@ -713,11 +737,11 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					}
 
 					levelRTPs := getFloat64Slice(params[0])
-					levelUpProbs := getFloat64Slice(params[1])
+					levelUpProbs := list2listmapintfloat(params[1])
 					spinNum := int(params[2].Value().(int64))
 					levelUpAddSpinNum := array2IntSlice(params[3])
 
-					ret := CalcMulLevelRTP(levelRTPs, levelUpProbs, spinNum, levelUpAddSpinNum)
+					ret := CalcMulLevelRTP2(levelRTPs, levelUpProbs, spinNum, levelUpAddSpinNum)
 
 					return types.Double(ret)
 				},
