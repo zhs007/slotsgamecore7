@@ -271,6 +271,18 @@ func (gameProp *GameProperty) GetTagStr(tag string) string {
 	return gameProp.mapStr[tag]
 }
 
+func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult) {
+	if award.AwardType == AwardRespinTimes {
+		component, isok := gameProp.Pool.MapComponents[award.Config.StrParam]
+		if isok {
+			respin, isok := component.(*Respin)
+			if isok {
+				respin.AddRespinTimes(gameProp, award.Config.Val)
+			}
+		}
+	}
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 

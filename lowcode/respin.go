@@ -71,6 +71,15 @@ type Respin struct {
 	Config *RespinConfig
 }
 
+// OnPlayGame - on playgame
+func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) error {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	cd.CurAddRespinNum += num
+
+	return nil
+}
+
 // Init -
 func (respin *Respin) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
