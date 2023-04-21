@@ -129,6 +129,16 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		gameProp.SetVal(GamePropTriggerFG, 0)
 	}
 
+	for _, v := range gameProp.HistoryComponents {
+		err := v.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+		if err != nil {
+			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
+				zap.Error(err))
+
+			return nil, err
+		}
+	}
+
 	return pr, nil
 }
 

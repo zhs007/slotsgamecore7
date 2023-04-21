@@ -16,25 +16,25 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type BookOdData struct {
+type BookOfData struct {
 	BasicComponentData
 	Symbols []int
 }
 
 // OnNewGame -
-func (bookOfData *BookOdData) OnNewGame() {
+func (bookOfData *BookOfData) OnNewGame() {
 	bookOfData.BasicComponentData.OnNewGame()
 }
 
 // OnNewGame -
-func (bookOfData *BookOdData) OnNewStep() {
+func (bookOfData *BookOfData) OnNewStep() {
 	bookOfData.BasicComponentData.OnNewStep()
 
 	bookOfData.Symbols = nil
 }
 
 // BuildPBComponentData
-func (bookOfData *BookOdData) BuildPBComponentData() proto.Message {
+func (bookOfData *BookOfData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.BookOfData{
 		BasicComponentData: bookOfData.BuildPBBasicComponentData(),
 	}
@@ -138,7 +138,7 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	cd := gameProp.MapComponentData[bookof.Name].(*BookOdData)
+	cd := gameProp.MapComponentData[bookof.Name].(*BookOfData)
 
 	isTrigger := bookof.Config.ForceTrigger
 
@@ -273,7 +273,7 @@ func (bookof *BookOf) procBookOfScene(gs *sgc7game.GameScene, symbol int) (*sgc7
 // OnAsciiGame - outpur to asciigame
 func (bookof *BookOf) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
-	cd := gameProp.MapComponentData[bookof.Name].(*BookOdData)
+	cd := gameProp.MapComponentData[bookof.Name].(*BookOfData)
 
 	if len(cd.Symbols) > 0 {
 		strsymbols := ""
@@ -355,7 +355,7 @@ func (bookof *BookOf) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 
 // NewComponentData -
 func (bookof *BookOf) NewComponentData() IComponentData {
-	return &BookOdData{}
+	return &BookOfData{}
 }
 
 // EachUsedResults -
