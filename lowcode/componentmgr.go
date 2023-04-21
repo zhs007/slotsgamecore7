@@ -47,6 +47,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("multiFG", NewMultiFG)
 	mgr.Reg("reelSetMystery", NewReelSetMystery)
 	mgr.Reg("weightTrigger", NewWeightTrigger)
+	mgr.Reg("chgSymbol", NewChgSymbol)
 
 	return mgr
 }
