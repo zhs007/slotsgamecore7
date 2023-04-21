@@ -268,6 +268,30 @@ func (gs *GameScene) RandReelsWithReelData(reels *ReelsData, plugin sgc7plugin.I
 	return nil
 }
 
+// RandExpandReelsWithReelData - random with reels
+func (gs *GameScene) RandExpandReelsWithReelData(reels *ReelsData, plugin sgc7plugin.IPlugin) error {
+	if gs.Indexes == nil {
+		gs.Indexes = make([]int, 0, gs.Width)
+	} else {
+		gs.Indexes = gs.Indexes[0:0:cap(gs.Indexes)]
+	}
+
+	for x, arr := range gs.Arr {
+		cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
+		if err != nil {
+			return err
+		}
+
+		gs.Indexes = append(gs.Indexes, cn)
+
+		for y := range arr {
+			gs.Arr[x][y] = reels.Reels[x][cn]
+		}
+	}
+
+	return nil
+}
+
 // RandReelsEx - random with reels
 func (gs *GameScene) RandReelsEx(game IGame, plugin sgc7plugin.IPlugin, reelsName string, rpd *ReelsPosData, nums int) error {
 	if nums < 0 {
@@ -466,7 +490,8 @@ func (gs *GameScene) RandReelsEx3(game IGame, plugin sgc7plugin.IPlugin, reelsNa
 }
 
 // ResetReelIndex - reset reel with index
-// 	某些游戏里，可能会出现重新移动某一轴，这个就是移动某一轴的接口
+//
+//	某些游戏里，可能会出现重新移动某一轴，这个就是移动某一轴的接口
 func (gs *GameScene) ResetReelIndex(game IGame, reelsName string, x int, index int) error {
 	if x < 0 || x >= gs.Width {
 		return ErrInvalidSceneX

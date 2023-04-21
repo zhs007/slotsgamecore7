@@ -18,6 +18,7 @@ type BasicReelsConfig struct {
 	ReelSetsWeight       string `yaml:"reelSetWeight"`
 	ReelSet              string `yaml:"reelSet"`
 	IsFGMainSpin         bool   `yaml:"isFGMainSpin"`
+	IsExpandReel         bool   `yaml:"isExpandReel"`
 }
 
 type BasicReels struct {
@@ -119,7 +120,11 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		return err
 	}
 
-	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
+	if basicReels.Config.IsExpandReel {
+		sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)
+	} else {
+		sc.RandReelsWithReelData(gameProp.CurReels, plugin)
+	}
 
 	basicReels.AddScene(gameProp, curpr, sc, cd)
 

@@ -46,6 +46,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("overlaySymbol", NewOverlaySymbol)
 	mgr.Reg("multiFG", NewMultiFG)
 	mgr.Reg("reelSetMystery", NewReelSetMystery)
+	mgr.Reg("weightTrigger", NewWeightTrigger)
 
 	return mgr
 }
