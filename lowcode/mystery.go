@@ -158,7 +158,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				curmcode := cs.Int()
 				cd.CurMysteryCode = curmcode
 
-				gameProp.SetVal(GamePropCurMystery, curmcode)
+				// gameProp.SetVal(GamePropCurMystery, curmcode)
 
 				sc2 := gs.Clone()
 				for _, v := range mystery.MysterySymbols {
@@ -188,7 +188,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 				curmcode := curm.Int()
 
-				gameProp.SetVal(GamePropCurMystery, curm.Int())
+				// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 				sc2 := gs.Clone()
 				for _, v := range mystery.MysterySymbols {

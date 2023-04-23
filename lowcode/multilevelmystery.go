@@ -32,6 +32,8 @@ func (multiLevelMysteryData *MultiLevelMysteryData) OnNewGame() {
 // OnNewGame -
 func (multiLevelMysteryData *MultiLevelMysteryData) OnNewStep() {
 	multiLevelMysteryData.BasicComponentData.OnNewStep()
+
+	multiLevelMysteryData.CurMysteryCode = -1
 }
 
 // BuildPBComponentData
@@ -191,7 +193,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		curmcode := curm.Int()
 		cd.CurMysteryCode = curmcode
 
-		gameProp.SetVal(GamePropCurMystery, curm.Int())
+		// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 		sc2 := gs.Clone()
 		for _, v := range multiLevelMystery.MysterySymbols {
@@ -226,7 +228,7 @@ func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, 
 	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
 
 	if len(cd.UsedScenes) > 0 {
-		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
+		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(cd.CurMysteryCode))
 		asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 

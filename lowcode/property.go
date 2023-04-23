@@ -15,13 +15,13 @@ const (
 	GamePropCurReels     = 4
 	GamePropCurLineData  = 5
 
-	GamePropTriggerFG = 100
-	GamePropFGNum     = 101
+	// GamePropTriggerFG = 100
+	// GamePropFGNum = 101
 
 	GamePropNextComponent   = 200
 	GamePropRespinComponent = 201
 
-	GamePropCurMystery = 1000
+	// GamePropCurMystery = 1000
 )
 
 var MapProperty map[string]int
@@ -107,28 +107,28 @@ func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, re
 	gp.NextStepFirstComponent = respinComponent
 }
 
-func (gameProp *GameProperty) OnFGSpin() error {
-	gameProp.SetVal(GamePropFGNum, gameProp.GetVal(GamePropFGNum)-1)
+// func (gameProp *GameProperty) OnFGSpin() error {
+// 	gameProp.SetVal(GamePropFGNum, gameProp.GetVal(GamePropFGNum)-1)
 
-	return nil
-}
+// 	return nil
+// }
 
-func (gameProp *GameProperty) TriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int, respinFirstComponent string) error {
-	if fgnum > 0 {
-		if gameProp.GetVal(GamePropTriggerFG) > 0 {
-			gameProp.RetriggerFG(pr, gp, fgnum)
-		} else {
-			gameProp.SetVal(GamePropTriggerFG, 1)
-			gameProp.SetVal(GamePropFGNum, fgnum)
+// func (gameProp *GameProperty) TriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int, respinFirstComponent string) error {
+// 	if fgnum > 0 {
+// 		if gameProp.GetVal(GamePropTriggerFG) > 0 {
+// 			gameProp.RetriggerFG(pr, gp, fgnum)
+// 		} else {
+// 			gameProp.SetVal(GamePropTriggerFG, 1)
+// 			gameProp.SetVal(GamePropFGNum, fgnum)
 
-			gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
+// 			gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
 
-			gp.NextStepFirstComponent = respinFirstComponent
-		}
-	}
+// 			gp.NextStepFirstComponent = respinFirstComponent
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
 	gameProp.RespinComponents = append(gameProp.RespinComponents, respinComponent)
@@ -199,13 +199,13 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 	return nil
 }
 
-func (gameProp *GameProperty) RetriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int) error {
-	if fgnum > 0 {
-		gameProp.AddVal(GamePropFGNum, fgnum)
-	}
+// func (gameProp *GameProperty) RetriggerFG(pr *sgc7game.PlayResult, gp *GameParams, fgnum int) error {
+// 	if fgnum > 0 {
+// 		gameProp.AddVal(GamePropFGNum, fgnum)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (gameProp *GameProperty) GetIntValWeights(fn string) (*sgc7game.ValWeights2, error) {
 	vw2, isok := gameProp.MapIntValWeights[fn]
@@ -227,43 +227,43 @@ func (gameProp *GameProperty) GetIntValWeights(fn string) (*sgc7game.ValWeights2
 	return vw2, nil
 }
 
-func (gameProp *GameProperty) TriggerFGWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinFirstComponent string) error {
-	vw2, err := gameProp.GetIntValWeights(fn)
-	if err != nil {
-		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
-			zap.String("fn", fn),
-			zap.Error(err))
+// func (gameProp *GameProperty) TriggerFGWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinFirstComponent string) error {
+// 	vw2, err := gameProp.GetIntValWeights(fn)
+// 	if err != nil {
+// 		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
+// 			zap.String("fn", fn),
+// 			zap.Error(err))
 
-		return err
-	}
+// 		return err
+// 	}
 
-	val, err := vw2.RandVal(plugin)
-	if err != nil {
-		goutils.Error("GameProperty.TriggerFGWithWeights:RandVal",
-			zap.String("fn", fn),
-			zap.Error(err))
+// 	val, err := vw2.RandVal(plugin)
+// 	if err != nil {
+// 		goutils.Error("GameProperty.TriggerFGWithWeights:RandVal",
+// 			zap.String("fn", fn),
+// 			zap.Error(err))
 
-		return err
-	}
+// 		return err
+// 	}
 
-	if val.Int() > 0 {
-		gameProp.SetVal(GamePropTriggerFG, 1)
-		gameProp.SetVal(GamePropFGNum, val.Int())
+// 	if val.Int() > 0 {
+// 		gameProp.SetVal(GamePropTriggerFG, 1)
+// 		gameProp.SetVal(GamePropFGNum, val.Int())
 
-		gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
+// 		gameProp.SetStrVal(GamePropRespinComponent, respinFirstComponent)
 
-		gp.NextStepFirstComponent = respinFirstComponent
-	}
+// 		gp.NextStepFirstComponent = respinFirstComponent
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (gameProp *GameProperty) SetVal(prop int, val int) error {
-	if prop == GamePropCurMystery {
-		str := gameProp.CurPaytables.GetStringFromInt(val)
+	// if prop == GamePropCurMystery {
+	// 	str := gameProp.CurPaytables.GetStringFromInt(val)
 
-		gameProp.MapStrVals[prop] = str
-	}
+	// 	gameProp.MapStrVals[prop] = str
+	// }
 
 	gameProp.MapVals[prop] = val
 
@@ -281,18 +281,19 @@ func (gameProp *GameProperty) GetVal(prop int) int {
 }
 
 func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
-	if prop == GamePropCurMystery {
-		v, isok := gameProp.CurPaytables.MapSymbols[val]
-		if !isok {
-			goutils.Error("GameProperty.SetStrVal:GamePropCurMystery",
-				zap.String("val", val),
-				zap.Error(ErrInvalidSymbol))
+	// if prop == GamePropCurMystery {
+	// 	v, isok := gameProp.CurPaytables.MapSymbols[val]
+	// 	if !isok {
+	// 		goutils.Error("GameProperty.SetStrVal:GamePropCurMystery",
+	// 			zap.String("val", val),
+	// 			zap.Error(ErrInvalidSymbol))
 
-			return ErrInvalidSymbol
-		}
+	// 		return ErrInvalidSymbol
+	// 	}
 
-		gameProp.MapVals[prop] = v
-	} else if prop == GamePropCurPaytables {
+	// 	gameProp.MapVals[prop] = v
+	// } else
+	if prop == GamePropCurPaytables {
 		v, isok := gameProp.Pool.Config.MapPaytables[val]
 		if !isok {
 			goutils.Error("GameProperty.SetStrVal:GamePropCurPaytables",
@@ -362,8 +363,8 @@ func init() {
 	MapProperty["reels"] = GamePropCurReels
 	MapProperty["linedata"] = GamePropCurLineData
 
-	MapProperty["triggerFG"] = GamePropTriggerFG
-	MapProperty["FGNum"] = GamePropFGNum
+	// MapProperty["triggerFG"] = GamePropTriggerFG
+	// MapProperty["FGNum"] = GamePropFGNum
 
-	MapProperty["curMystery"] = GamePropCurMystery
+	// MapProperty["curMystery"] = GamePropCurMystery
 }
