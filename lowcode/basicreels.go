@@ -17,7 +17,6 @@ type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	ReelSetsWeight       string `yaml:"reelSetWeight"`
 	ReelSet              string `yaml:"reelSet"`
-	IsFGMainSpin         bool   `yaml:"isFGMainSpin"`
 	IsExpandReel         bool   `yaml:"isExpandReel"`
 }
 
@@ -127,10 +126,6 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	}
 
 	basicReels.AddScene(gameProp, curpr, sc, cd)
-
-	if basicReels.Config.IsFGMainSpin {
-		gameProp.OnFGSpin()
-	}
 
 	basicReels.onStepEnd(gameProp, curpr, gp, "")
 
