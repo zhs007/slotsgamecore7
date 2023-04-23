@@ -101,6 +101,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
 		if respinComponent != "" {
+			// 一般来说，第一次触发respin才走这个分支
 			pr.IsFinish = false
 
 			break
@@ -123,11 +124,17 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		curComponent = c
 	}
 
-	if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
+	if gameProp.HasRespin() {
 		pr.IsFinish = false
-	} else if gameProp.GetVal(GamePropTriggerFG) > 0 && gameProp.GetVal(GamePropFGNum) <= 0 {
-		gameProp.SetVal(GamePropTriggerFG, 0)
+	} else {
+		pr.IsFinish = true
 	}
+
+	// if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
+	// 	pr.IsFinish = false
+	// } else if gameProp.GetVal(GamePropTriggerFG) > 0 && gameProp.GetVal(GamePropFGNum) <= 0 {
+	// 	gameProp.SetVal(GamePropTriggerFG, 0)
+	// }
 
 	for _, v := range gameProp.HistoryComponents {
 		err := v.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)

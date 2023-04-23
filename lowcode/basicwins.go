@@ -62,20 +62,19 @@ func (basicWinsData *BasicWinsData) BuildPBComponentData() proto.Message {
 
 // TriggerFeatureConfig - configuration for trigger feature
 type TriggerFeatureConfig struct {
-	TargetScene               string         `yaml:"targetScene"`               // like basicReels.mstery
-	Symbol                    string         `yaml:"symbol"`                    // like scatter
-	Type                      string         `yaml:"type"`                      // like scatters
-	MinNum                    int            `yaml:"minNum"`                    // like 3
-	Scripts                   string         `yaml:"scripts"`                   // scripts
-	FGNum                     int            `yaml:"FGNum"`                     // FG number
-	FGNumWeight               string         `yaml:"FGNumWeight"`               // FG number weight
-	FGNumWithScatterNum       map[int]int    `yaml:"FGNumWithScatterNum"`       // FG number with scatter number
-	FGNumWeightWithScatterNum map[int]string `yaml:"FGNumWeightWithScatterNum"` // FG number weight with scatter number
-	IsTriggerFG               bool           `yaml:"isTriggerFG"`               // is trigger FG
-	BetType                   string         `yaml:"betType"`                   // bet or totalBet
-	RespinFirstComponent      string         `yaml:"respinFirstComponent"`      // like fg-spin
-	NextComponent             string         `yaml:"nextComponent"`             // next component
-	TagSymbolNum              string         `yaml:"tagSymbolNum"`              // 这里可以将symbol数量记下来，别的地方能获取到
+	TargetScene                   string         `yaml:"targetScene"`                   // like basicReels.mstery
+	Symbol                        string         `yaml:"symbol"`                        // like scatter
+	Type                          string         `yaml:"type"`                          // like scatters
+	MinNum                        int            `yaml:"minNum"`                        // like 3
+	Scripts                       string         `yaml:"scripts"`                       // scripts
+	RespinNum                     int            `yaml:"respinNum"`                     // respin number
+	RespinNumWeight               string         `yaml:"respinNumWeight"`               // respin number weight
+	RespinNumWithScatterNum       map[int]int    `yaml:"respinNumWithScatterNum"`       // respin number with scatter number
+	RespinNumWeightWithScatterNum map[int]string `yaml:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
+	BetType                       string         `yaml:"betType"`                       // bet or totalBet
+	RespinComponent               string         `yaml:"respinComponent"`               // like fg-spin
+	NextComponent                 string         `yaml:"nextComponent"`                 // next component
+	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -135,19 +134,33 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			gameProp.TagInt(tf.TagSymbolNum, ret.SymbolNums)
 		}
 
-		if tf.IsTriggerFG {
-			if tf.FGNumWeightWithScatterNum != nil {
-				gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeightWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
-			} else if len(tf.FGNumWithScatterNum) > 0 {
-				gameProp.TriggerFG(curpr, gp, tf.FGNumWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
-			} else if tf.FGNumWeight != "" {
-				gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
+		if tf.RespinComponent != "" {
+			if tf.RespinNumWeightWithScatterNum != nil {
+				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], tf.RespinComponent)
+			} else if len(tf.RespinNumWithScatterNum) > 0 {
+				gameProp.TriggerRespin(curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent)
+			} else if tf.RespinNumWeight != "" {
+				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, tf.RespinComponent)
 			} else {
-				gameProp.TriggerFG(curpr, gp, tf.FGNum, tf.RespinFirstComponent)
+				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent)
 			}
 		} else if tf.NextComponent != "" {
 			bwd.NextComponent = tf.NextComponent
 		}
+
+		// if tf.IsTriggerFG {
+		// 	if tf.FGNumWeightWithScatterNum != nil {
+		// 		gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeightWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
+		// 	} else if len(tf.FGNumWithScatterNum) > 0 {
+		// 		gameProp.TriggerFG(curpr, gp, tf.FGNumWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
+		// 	} else if tf.FGNumWeight != "" {
+		// 		gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
+		// 	} else {
+		// 		gameProp.TriggerFG(curpr, gp, tf.FGNum, tf.RespinFirstComponent)
+		// 	}
+		// } else if tf.NextComponent != "" {
+		// 	bwd.NextComponent = tf.NextComponent
+		// }
 	}
 
 	return ret
