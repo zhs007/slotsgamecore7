@@ -54,7 +54,6 @@ type MultiLevelReelsLevelConfig struct {
 type MultiLevelReelsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	Levels               []*MultiLevelReelsLevelConfig `yaml:"levels"`
-	IsFGMainSpin         bool                          `yaml:"isFGMainSpin"`
 }
 
 type MultiLevelReels struct {
@@ -202,10 +201,6 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
 	multiLevelReels.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
-
-	if multiLevelReels.Config.IsFGMainSpin {
-		gameProp.OnFGSpin()
-	}
 
 	multiLevelReels.onStepEnd(gameProp, curpr, gp, "")
 

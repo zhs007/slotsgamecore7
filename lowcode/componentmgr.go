@@ -49,6 +49,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("weightTrigger", NewWeightTrigger)
 	mgr.Reg("chgSymbol", NewChgSymbol)
 	mgr.Reg("respin", NewRespin)
+	mgr.Reg("multiRespin", NewMultiRespin)
 
 	return mgr
 }
