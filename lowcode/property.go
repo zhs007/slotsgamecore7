@@ -149,7 +149,7 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 		gp.NextStepFirstComponent = gameProp.RespinComponents[len(gameProp.RespinComponents)-1]
 
 		pr.IsFinish = false
-	} else {
+	} else if !pr.IsWait {
 		pr.IsFinish = true
 	}
 }
