@@ -144,8 +144,14 @@ func (gameProp *GameProperty) onRespinEnding(respinComponent string) error {
 	return nil
 }
 
-func (gameProp *GameProperty) HasRespin() bool {
-	return len(gameProp.RespinComponents) > 0
+func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams) {
+	if len(gameProp.RespinComponents) > 0 {
+		gp.NextStepFirstComponent = gameProp.RespinComponents[len(gameProp.RespinComponents)-1]
+
+		pr.IsFinish = false
+	} else {
+		pr.IsFinish = true
+	}
 }
 
 func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string) error {
