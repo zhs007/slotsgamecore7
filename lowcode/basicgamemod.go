@@ -124,11 +124,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		curComponent = c
 	}
 
-	if gameProp.HasRespin() {
-		pr.IsFinish = false
-	} else {
-		pr.IsFinish = true
-	}
+	gameProp.ProcRespin(pr, gp)
 
 	// if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
 	// 	pr.IsFinish = false
