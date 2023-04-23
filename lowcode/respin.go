@@ -75,7 +75,7 @@ type Respin struct {
 func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) error {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	cd.CurAddRespinNum += num
+	cd.LastRespinNum += num
 
 	return nil
 }
