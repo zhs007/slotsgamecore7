@@ -221,7 +221,9 @@ func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *s
 func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
 	gs, si := gameProp.GetScene(curpr, basicComponent.Config.TargetScene)
 
-	basicCD.TargetSceneIndex = si
+	if si >= 0 {
+		basicCD.TargetSceneIndex = si
+	}
 
 	return gs
 }
@@ -230,7 +232,9 @@ func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, cur
 func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
 	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
 
-	basicCD.TargetOtherSceneIndex = si
+	if si >= 0 {
+		basicCD.TargetOtherSceneIndex = si
+	}
 
 	return gs
 }

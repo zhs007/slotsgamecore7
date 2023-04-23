@@ -664,6 +664,19 @@ func (gs *GameScene) HasSymbol(s int) bool {
 	return false
 }
 
+// HasSymbols - has symbols
+func (gs *GameScene) HasSymbols(symbols []int) bool {
+	for _, l := range gs.Arr {
+		for _, v := range l {
+			if goutils.IndexOfIntSlice(symbols, v, 0) >= 0 {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 // SetReels - set reels
 func (gs *GameScene) SetReels(game IGame, reelsName string, pos []int) error {
 	cfg := game.GetConfig()

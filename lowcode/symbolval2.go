@@ -95,51 +95,53 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := symbolVal2.GetTargetScene(gameProp, curpr, cd)
 
-	os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-	if err != nil {
-		goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
-			zap.Error(err))
-
-		return err
-	}
-
-	setIndex := -1
-	if symbolVal2.Config.RNGSet != "" {
-		rng := gameProp.GetTagInt(symbolVal2.Config.RNGSet)
-		setIndex = rng
-	} else {
-		rv, err := symbolVal2.WeightSet.RandVal(plugin)
+	if gs.HasSymbol(symbolVal2.SymbolCode) {
+		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
 		if err != nil {
-			goutils.Error("SymbolVal2.OnPlayGame:RandVal",
+			goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
 				zap.Error(err))
 
 			return err
 		}
 
-		setIndex = rv.Int()
-	}
+		setIndex := -1
+		if symbolVal2.Config.RNGSet != "" {
+			rng := gameProp.GetTagInt(symbolVal2.Config.RNGSet)
+			setIndex = rng
+		} else {
+			rv, err := symbolVal2.WeightSet.RandVal(plugin)
+			if err != nil {
+				goutils.Error("SymbolVal2.OnPlayGame:RandVal",
+					zap.Error(err))
 
-	vw2 := symbolVal2.WeightsVal[setIndex]
+				return err
+			}
 
-	for x, arr := range gs.Arr {
-		for y, s := range arr {
-			if s == symbolVal2.SymbolCode {
-				cv, err := vw2.RandVal(plugin)
-				if err != nil {
-					goutils.Error("SymbolVal2.OnPlayGame:WeightVal.RandVal",
-						zap.Error(err))
+			setIndex = rv.Int()
+		}
 
-					return err
+		vw2 := symbolVal2.WeightsVal[setIndex]
+
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				if s == symbolVal2.SymbolCode {
+					cv, err := vw2.RandVal(plugin)
+					if err != nil {
+						goutils.Error("SymbolVal2.OnPlayGame:WeightVal.RandVal",
+							zap.Error(err))
+
+						return err
+					}
+
+					os.Arr[x][y] = cv.Int()
+				} else {
+					os.Arr[x][y] = symbolVal2.Config.DefaultVal
 				}
-
-				os.Arr[x][y] = cv.Int()
-			} else {
-				os.Arr[x][y] = symbolVal2.Config.DefaultVal
 			}
 		}
-	}
 
-	symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
+		symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
+	}
 
 	symbolVal2.onStepEnd(gameProp, curpr, gp, "")
 

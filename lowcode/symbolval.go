@@ -79,33 +79,35 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	gs := symbolVal.GetTargetScene(gameProp, curpr, cd)
 
-	os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-	if err != nil {
-		goutils.Error("SymbolVal.OnPlayGame:NewGameScene",
-			zap.Error(err))
+	if gs.HasSymbol(symbolVal.SymbolCode) {
+		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
+		if err != nil {
+			goutils.Error("SymbolVal.OnPlayGame:NewGameScene",
+				zap.Error(err))
 
-		return err
-	}
+			return err
+		}
 
-	for x, arr := range gs.Arr {
-		for y, s := range arr {
-			if s == symbolVal.SymbolCode {
-				cv, err := symbolVal.WeightVal.RandVal(plugin)
-				if err != nil {
-					goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
-						zap.Error(err))
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				if s == symbolVal.SymbolCode {
+					cv, err := symbolVal.WeightVal.RandVal(plugin)
+					if err != nil {
+						goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
+							zap.Error(err))
 
-					return err
+						return err
+					}
+
+					os.Arr[x][y] = cv.Int()
+				} else {
+					os.Arr[x][y] = symbolVal.Config.DefaultVal
 				}
-
-				os.Arr[x][y] = cv.Int()
-			} else {
-				os.Arr[x][y] = symbolVal.Config.DefaultVal
 			}
 		}
-	}
 
-	symbolVal.AddOtherScene(gameProp, curpr, os, cd)
+		symbolVal.AddOtherScene(gameProp, curpr, os, cd)
+	}
 
 	symbolVal.onStepEnd(gameProp, curpr, gp, "")
 

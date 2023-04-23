@@ -171,16 +171,6 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 	return nil
 }
 
-func (multiLevelMystery *MultiLevelMystery) hasMystery(gs *sgc7game.GameScene) bool {
-	for _, v := range multiLevelMystery.MysterySymbols {
-		if gs.HasSymbol(v) {
-			return true
-		}
-	}
-
-	return false
-}
-
 // playgame
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -189,7 +179,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	gs := multiLevelMystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-	if multiLevelMystery.hasMystery(gs) {
+	if gs.HasSymbols(multiLevelMystery.MysterySymbols) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.OnPlayGame:RandVal",

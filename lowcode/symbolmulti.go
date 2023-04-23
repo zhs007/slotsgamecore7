@@ -85,33 +85,35 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd)
 
-	os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-	if err != nil {
-		goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
-			zap.Error(err))
+	if gs.HasSymbols(symbolMulti.SymbolCodes) {
+		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
+		if err != nil {
+			goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
+				zap.Error(err))
 
-		return err
-	}
+			return err
+		}
 
-	for x, arr := range gs.Arr {
-		for y, s := range arr {
-			if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
-				cv, err := symbolMulti.WeightMulti.RandVal(plugin)
-				if err != nil {
-					goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
-						zap.Error(err))
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
+					cv, err := symbolMulti.WeightMulti.RandVal(plugin)
+					if err != nil {
+						goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
+							zap.Error(err))
 
-					return err
+						return err
+					}
+
+					os.Arr[x][y] = cv.Int()
+				} else {
+					os.Arr[x][y] = 1
 				}
-
-				os.Arr[x][y] = cv.Int()
-			} else {
-				os.Arr[x][y] = 1
 			}
 		}
-	}
 
-	symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
+		symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
+	}
 
 	symbolMulti.onStepEnd(gameProp, curpr, gp, "")
 
