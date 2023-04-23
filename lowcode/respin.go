@@ -192,6 +192,10 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 	cd.TotalCashWin += curpr.CashWin
 	cd.TotalCoinWin += int64(curpr.CoinWin)
 
+	if cd.LastRespinNum == 0 {
+		gameProp.onRespinEnding(respin.Name)
+	}
+
 	return nil
 }
 

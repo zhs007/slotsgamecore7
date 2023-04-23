@@ -52,6 +52,7 @@ type GameProperty struct {
 	mapStr            map[string]string
 	MapComponentData  map[string]IComponentData
 	HistoryComponents []IComponent
+	RespinComponents  []string
 }
 
 func (gameProp *GameProperty) OnNewStep() error {
@@ -124,6 +125,69 @@ func (gameProp *GameProperty) TriggerFG(pr *sgc7game.PlayResult, gp *GameParams,
 
 			gp.NextStepFirstComponent = respinFirstComponent
 		}
+	}
+
+	return nil
+}
+
+func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
+	gameProp.RespinComponents = append(gameProp.RespinComponents, respinComponent)
+
+	return nil
+}
+
+func (gameProp *GameProperty) onRespinEnding(respinComponent string) error {
+	if len(gameProp.RespinComponents) > 0 && gameProp.RespinComponents[len(gameProp.RespinComponents)-1] == respinComponent {
+		gameProp.RespinComponents = gameProp.RespinComponents[0 : len(gameProp.RespinComponents)-1]
+	}
+
+	return nil
+}
+
+func (gameProp *GameProperty) HasRespin() bool {
+	return len(gameProp.RespinComponents) > 0
+}
+
+func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string) error {
+	if respinNum > 0 {
+		component, isok := gameProp.Pool.MapComponents[respinComponent]
+		if isok {
+			respin, isok := component.(*Respin)
+			if isok {
+				respin.AddRespinTimes(gameProp, respinNum)
+
+				gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
+				gameProp.onTriggerRespin(respinComponent)
+
+				gp.NextStepFirstComponent = respinComponent
+			}
+		}
+	}
+
+	return nil
+}
+
+func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinComponent string) error {
+	vw2, err := gameProp.GetIntValWeights(fn)
+	if err != nil {
+		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return err
+	}
+
+	val, err := vw2.RandVal(plugin)
+	if err != nil {
+		goutils.Error("GameProperty.TriggerFGWithWeights:RandVal",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return err
+	}
+
+	if val.Int() > 0 {
+		gameProp.TriggerRespin(pr, gp, val.Int(), respinComponent)
 	}
 
 	return nil
