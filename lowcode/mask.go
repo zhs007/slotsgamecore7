@@ -51,7 +51,7 @@ func (maskData *MaskData) OnNewStep() {
 	maskData.BasicComponentData.OnNewStep()
 
 	if maskData.NewChged > 0 {
-		maskData.Vals = make([]bool, maskData.Num)
+		maskData.NewVals = make([]bool, maskData.Num)
 		maskData.NewChged = 0
 	}
 }
