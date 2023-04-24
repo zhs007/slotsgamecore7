@@ -17,6 +17,7 @@ type ReplaceSymbolConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	Symbols              []string `yaml:"symbols"`
 	Chg2SymbolInReels    []string `yaml:"chg2SymbolInReels"`
+	Mask                 string   `yaml:"mask"`
 }
 
 type ReplaceSymbol struct {
@@ -76,10 +77,25 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 	} else {
 		sc2 := gs.Clone()
 
-		for x, arr := range sc2.Arr {
-			for y, s := range arr {
-				if goutils.IndexOfIntSlice(replaceSymbol.SymbolCodes, s, 0) >= 0 {
-					sc2.Arr[x][y] = replaceSymbol.Chg2SymbolCodeInReels[x]
+		if replaceSymbol.Config.Mask != "" {
+			md := gameProp.MapComponentData[replaceSymbol.Config.Mask].(*MaskData)
+			if md != nil {
+				for x, arr := range sc2.Arr {
+					if md.Vals[x] {
+						for y, s := range arr {
+							if goutils.IndexOfIntSlice(replaceSymbol.SymbolCodes, s, 0) >= 0 {
+								sc2.Arr[x][y] = replaceSymbol.Chg2SymbolCodeInReels[x]
+							}
+						}
+					}
+				}
+			}
+		} else {
+			for x, arr := range sc2.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(replaceSymbol.SymbolCodes, s, 0) >= 0 {
+						sc2.Arr[x][y] = replaceSymbol.Chg2SymbolCodeInReels[x]
+					}
 				}
 			}
 		}

@@ -138,20 +138,16 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	gs := overlaySymbol.GetTargetScene(gameProp, curpr, &osd.BasicComponentData)
 
-	if gs.HasSymbol(overlaySymbol.SymbolCode) {
-		cgs := gs.Clone()
+	cgs := gs.Clone()
 
-		for i := 0; i <= osd.CurLevel; i++ {
-			pos, isok := overlaySymbol.MapPosition.MapVals[i]
-			if isok {
-				cgs.Arr[pos.GetInt(0)][pos.GetInt(1)] = overlaySymbol.SymbolCode
-			}
+	for i := 0; i <= osd.CurLevel; i++ {
+		pos, isok := overlaySymbol.MapPosition.MapVals[i]
+		if isok {
+			cgs.Arr[pos.GetInt(0)][pos.GetInt(1)] = overlaySymbol.SymbolCode
 		}
-
-		overlaySymbol.AddScene(gameProp, curpr, cgs, &osd.BasicComponentData)
-	} else {
-		overlaySymbol.ReTagScene(gameProp, curpr, osd.TargetSceneIndex, &osd.BasicComponentData)
 	}
+
+	overlaySymbol.AddScene(gameProp, curpr, cgs, &osd.BasicComponentData)
 
 	overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
 
