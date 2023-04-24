@@ -50,6 +50,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("respin", NewRespin)
 	mgr.Reg("multiRespin", NewMultiRespin)
 	mgr.Reg("replaceSymbol", NewReplaceSymbol)
+	mgr.Reg("mask", NewMask)
 
 	return mgr
 }
