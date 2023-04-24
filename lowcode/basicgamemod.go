@@ -98,6 +98,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
+		gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
 
 		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
 		if respinComponent != "" {
@@ -132,6 +133,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	// 	gameProp.SetVal(GamePropTriggerFG, 0)
 	// }
 
+	gameProp.BuildGameParam(gp)
+
 	for _, v := range gameProp.HistoryComponents {
 		err := v.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 		if err != nil {
@@ -163,6 +166,8 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 
 // OnNewGame -
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty) error {
+	gameProp.OnNewGame()
+
 	for i, v := range bgm.Components.Components {
 		err := v.OnNewGame(gameProp)
 		if err != nil {
@@ -179,7 +184,6 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty) error {
 
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty) error {
-	// bgm.HistoryComponents = nil
 	gameProp.OnNewStep()
 
 	for i, v := range bgm.Components.Components {

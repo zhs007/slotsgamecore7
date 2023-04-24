@@ -92,38 +92,40 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	if isTrigger {
 		os := symbolValWins.GetTargetOtherScene(gameProp, curpr, cd)
 
-		totalvals := 0
-		pos := make([]int, 0, len(os.Arr)*len(os.Arr[0])*2)
+		if os != nil {
+			totalvals := 0
+			pos := make([]int, 0, len(os.Arr)*len(os.Arr[0])*2)
 
-		for x := 0; x < len(os.Arr); x++ {
-			for y := 0; y < len(os.Arr[x]); y++ {
-				if os.Arr[x][y] > 0 {
-					totalvals += os.Arr[x][y]
-					pos = append(pos, x, y)
+			for x := 0; x < len(os.Arr); x++ {
+				for y := 0; y < len(os.Arr[x]); y++ {
+					if os.Arr[x][y] > 0 {
+						totalvals += os.Arr[x][y]
+						pos = append(pos, x, y)
+					}
 				}
 			}
-		}
 
-		if totalvals > 0 {
-			ret := &sgc7game.Result{
-				Symbol:     gs.Arr[pos[0]][pos[1]],
-				Type:       sgc7game.RTSymbolVal,
-				LineIndex:  -1,
-				Pos:        pos,
-				SymbolNums: len(pos) / 2,
+			if totalvals > 0 {
+				ret := &sgc7game.Result{
+					Symbol:     gs.Arr[pos[0]][pos[1]],
+					Type:       sgc7game.RTSymbolVal,
+					LineIndex:  -1,
+					Pos:        pos,
+					SymbolNums: len(pos) / 2,
+				}
+
+				bet := GetBet(stake, symbolValWins.Config.BetType)
+
+				if symbolValWins.Config.IsTriggerSymbolNumMulti {
+					ret.CoinWin = totalvals * symbolnum
+					ret.CashWin = ret.CoinWin * bet
+				} else {
+					ret.CoinWin = totalvals
+					ret.CashWin = ret.CoinWin * bet
+				}
+
+				symbolValWins.AddResult(curpr, ret, cd)
 			}
-
-			bet := GetBet(stake, symbolValWins.Config.BetType)
-
-			if symbolValWins.Config.IsTriggerSymbolNumMulti {
-				ret.CoinWin = totalvals * symbolnum
-				ret.CashWin = ret.CoinWin * bet
-			} else {
-				ret.CoinWin = totalvals
-				ret.CashWin = ret.CoinWin * bet
-			}
-
-			symbolValWins.AddResult(curpr, ret, cd)
 		}
 	}
 

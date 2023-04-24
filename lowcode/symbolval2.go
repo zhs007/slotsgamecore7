@@ -15,19 +15,21 @@ import (
 // SymbolVal2Config - configuration for SymbolVal2 feature
 type SymbolVal2Config struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string   `yaml:"symbol"`
-	WeightSet            string   `yaml:"weightSet"`
-	WeightsVal           []string `yaml:"weightsVal"`
-	DefaultVal           int      `yaml:"defaultVal"`
-	RNGSet               string   `yaml:"RNGSet"`
+	Symbol               string                   `yaml:"symbol"`
+	WeightSet            string                   `yaml:"weightSet"`
+	WeightsVal           []string                 `yaml:"weightsVal"`
+	DefaultVal           int                      `yaml:"defaultVal"`
+	RNGSet               string                   `yaml:"RNGSet"`
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
 }
 
 type SymbolVal2 struct {
 	*BasicComponent
-	Config     *SymbolVal2Config
-	SymbolCode int
-	WeightsVal []*sgc7game.ValWeights2
-	WeightSet  *sgc7game.ValWeights2
+	Config            *SymbolVal2Config
+	SymbolCode        int
+	WeightsVal        []*sgc7game.ValWeights2
+	WeightSet         *sgc7game.ValWeights2
+	OtherSceneFeature *OtherSceneFeature
 }
 
 // Init -
@@ -82,6 +84,10 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 
 	symbolVal2.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
 
+	if cfg.OtherSceneFeature != nil {
+		symbolVal2.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	}
+
 	symbolVal2.onInit(&cfg.BasicComponentConfig)
 
 	return nil
@@ -95,51 +101,57 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := symbolVal2.GetTargetScene(gameProp, curpr, cd)
 
-	os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-	if err != nil {
-		goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
-			zap.Error(err))
-
-		return err
-	}
-
-	setIndex := -1
-	if symbolVal2.Config.RNGSet != "" {
-		rng := gameProp.GetTagInt(symbolVal2.Config.RNGSet)
-		setIndex = rng
-	} else {
-		rv, err := symbolVal2.WeightSet.RandVal(plugin)
+	if gs.HasSymbol(symbolVal2.SymbolCode) {
+		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
 		if err != nil {
-			goutils.Error("SymbolVal2.OnPlayGame:RandVal",
+			goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
 				zap.Error(err))
 
 			return err
 		}
 
-		setIndex = rv.Int()
-	}
+		setIndex := -1
+		if symbolVal2.Config.RNGSet != "" {
+			rng := gameProp.GetTagInt(symbolVal2.Config.RNGSet)
+			setIndex = rng
+		} else {
+			rv, err := symbolVal2.WeightSet.RandVal(plugin)
+			if err != nil {
+				goutils.Error("SymbolVal2.OnPlayGame:RandVal",
+					zap.Error(err))
 
-	vw2 := symbolVal2.WeightsVal[setIndex]
+				return err
+			}
 
-	for x, arr := range gs.Arr {
-		for y, s := range arr {
-			if s == symbolVal2.SymbolCode {
-				cv, err := vw2.RandVal(plugin)
-				if err != nil {
-					goutils.Error("SymbolVal2.OnPlayGame:WeightVal.RandVal",
-						zap.Error(err))
+			setIndex = rv.Int()
+		}
 
-					return err
+		vw2 := symbolVal2.WeightsVal[setIndex]
+
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				if s == symbolVal2.SymbolCode {
+					cv, err := vw2.RandVal(plugin)
+					if err != nil {
+						goutils.Error("SymbolVal2.OnPlayGame:WeightVal.RandVal",
+							zap.Error(err))
+
+						return err
+					}
+
+					os.Arr[x][y] = cv.Int()
+				} else {
+					os.Arr[x][y] = symbolVal2.Config.DefaultVal
 				}
-
-				os.Arr[x][y] = cv.Int()
-			} else {
-				os.Arr[x][y] = symbolVal2.Config.DefaultVal
 			}
 		}
-	}
 
-	symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
+		symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
+
+		if symbolVal2.OtherSceneFeature != nil {
+			gameProp.procOtherSceneFeature(symbolVal2.OtherSceneFeature, curpr, os)
+		}
+	}
 
 	symbolVal2.onStepEnd(gameProp, curpr, gp, "")
 

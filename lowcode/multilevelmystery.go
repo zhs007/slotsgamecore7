@@ -32,6 +32,8 @@ func (multiLevelMysteryData *MultiLevelMysteryData) OnNewGame() {
 // OnNewGame -
 func (multiLevelMysteryData *MultiLevelMysteryData) OnNewStep() {
 	multiLevelMysteryData.BasicComponentData.OnNewStep()
+
+	multiLevelMysteryData.CurMysteryCode = -1
 }
 
 // BuildPBComponentData
@@ -171,16 +173,6 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 	return nil
 }
 
-func (multiLevelMystery *MultiLevelMystery) hasMystery(gs *sgc7game.GameScene) bool {
-	for _, v := range multiLevelMystery.MysterySymbols {
-		if gs.HasSymbol(v) {
-			return true
-		}
-	}
-
-	return false
-}
-
 // playgame
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -189,7 +181,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	gs := multiLevelMystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
 
-	if multiLevelMystery.hasMystery(gs) {
+	if gs.HasSymbols(multiLevelMystery.MysterySymbols) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.OnPlayGame:RandVal",
@@ -201,7 +193,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		curmcode := curm.Int()
 		cd.CurMysteryCode = curmcode
 
-		gameProp.SetVal(GamePropCurMystery, curm.Int())
+		// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 		sc2 := gs.Clone()
 		for _, v := range multiLevelMystery.MysterySymbols {
@@ -236,7 +228,7 @@ func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, 
 	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
 
 	if len(cd.UsedScenes) > 0 {
-		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(GamePropCurMystery))
+		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(cd.CurMysteryCode))
 		asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 

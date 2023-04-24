@@ -94,9 +94,10 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 
 // onStepEnd -
 func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) {
-	if gameProp.GetVal(GamePropFGNum) > 0 && basicComponent.Config.DefaultFGRespinComponent != "" {
-		gameProp.Respin(curpr, gp, basicComponent.Config.DefaultFGRespinComponent, nil, nil)
-	} else if nextComponent != "" {
+	// if gameProp.GetVal(GamePropFGNum) > 0 && basicComponent.Config.DefaultFGRespinComponent != "" {
+	// 	gameProp.Respin(curpr, gp, basicComponent.Config.DefaultFGRespinComponent, nil, nil)
+	// } else
+	if nextComponent != "" {
 		gameProp.SetStrVal(GamePropNextComponent, nextComponent)
 	} else {
 		gameProp.SetStrVal(GamePropNextComponent, basicComponent.Config.DefaultNextComponent)
@@ -221,7 +222,9 @@ func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *s
 func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
 	gs, si := gameProp.GetScene(curpr, basicComponent.Config.TargetScene)
 
-	basicCD.TargetSceneIndex = si
+	if si >= 0 {
+		basicCD.TargetSceneIndex = si
+	}
 
 	return gs
 }
@@ -230,7 +233,9 @@ func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, cur
 func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
 	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
 
-	basicCD.TargetOtherSceneIndex = si
+	if si >= 0 {
+		basicCD.TargetOtherSceneIndex = si
+	}
 
 	return gs
 }
@@ -261,6 +266,11 @@ func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, p
 func (basicComponent *BasicComponent) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 	return nil
+}
+
+// GetName -
+func (basicComponent *BasicComponent) GetName() string {
+	return basicComponent.Name
 }
 
 func NewBasicComponent(name string) *BasicComponent {

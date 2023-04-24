@@ -15,16 +15,18 @@ import (
 // SymbolMultiConfig - configuration for SymbolMulti feature
 type SymbolMultiConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string   `yaml:"symbol"`
-	Symbols              []string `yaml:"symbols"`
-	WeightMulti          string   `yaml:"weightMulti"`
+	Symbol               string                   `yaml:"symbol"`
+	Symbols              []string                 `yaml:"symbols"`
+	WeightMulti          string                   `yaml:"weightMulti"`
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
 }
 
 type SymbolMulti struct {
 	*BasicComponent
-	Config      *SymbolMultiConfig
-	SymbolCodes []int
-	WeightMulti *sgc7game.ValWeights2
+	Config            *SymbolMultiConfig
+	SymbolCodes       []int
+	WeightMulti       *sgc7game.ValWeights2
+	OtherSceneFeature *OtherSceneFeature
 }
 
 // Init -
@@ -72,6 +74,10 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 		symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[cfg.Symbol])
 	}
 
+	if cfg.OtherSceneFeature != nil {
+		symbolMulti.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	}
+
 	symbolMulti.onInit(&cfg.BasicComponentConfig)
 
 	return nil
@@ -85,33 +91,39 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd)
 
-	os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-	if err != nil {
-		goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
-			zap.Error(err))
+	if gs.HasSymbols(symbolMulti.SymbolCodes) {
+		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
+		if err != nil {
+			goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
+				zap.Error(err))
 
-		return err
-	}
+			return err
+		}
 
-	for x, arr := range gs.Arr {
-		for y, s := range arr {
-			if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
-				cv, err := symbolMulti.WeightMulti.RandVal(plugin)
-				if err != nil {
-					goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
-						zap.Error(err))
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
+					cv, err := symbolMulti.WeightMulti.RandVal(plugin)
+					if err != nil {
+						goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
+							zap.Error(err))
 
-					return err
+						return err
+					}
+
+					os.Arr[x][y] = cv.Int()
+				} else {
+					os.Arr[x][y] = 1
 				}
-
-				os.Arr[x][y] = cv.Int()
-			} else {
-				os.Arr[x][y] = 1
 			}
 		}
-	}
 
-	symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
+		symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
+
+		if symbolMulti.OtherSceneFeature != nil {
+			gameProp.procOtherSceneFeature(symbolMulti.OtherSceneFeature, curpr, os)
+		}
+	}
 
 	symbolMulti.onStepEnd(gameProp, curpr, gp, "")
 

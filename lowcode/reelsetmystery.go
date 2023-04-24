@@ -140,7 +140,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 			curmcode := cs.Int()
 			cd.CurMysteryCode = curmcode
 
-			gameProp.SetVal(GamePropCurMystery, curmcode)
+			// gameProp.SetVal(GamePropCurMystery, curmcode)
 
 			sc2 := gs.Clone()
 			for _, v := range reelSetMystery.MysterySymbolCodes {
@@ -158,8 +158,9 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 			}
 
 			curmcode := curm.Int()
+			cd.CurMysteryCode = curmcode
 
-			gameProp.SetVal(GamePropCurMystery, curmcode)
+			// gameProp.SetVal(GamePropCurMystery, curmcode)
 
 			sc2 := gs.Clone()
 			for _, v := range reelSetMystery.MysterySymbolCodes {

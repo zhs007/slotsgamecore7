@@ -140,16 +140,6 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (mystery *Mystery) hasMystery(gs *sgc7game.GameScene) bool {
-	for _, v := range mystery.MysterySymbols {
-		if gs.HasSymbol(v) {
-			return true
-		}
-	}
-
-	return false
-}
-
 // playgame
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -157,7 +147,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
 
 	gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
-	if !mystery.hasMystery(gs) {
+	if !gs.HasSymbols(mystery.MysterySymbols) {
 		mystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	} else {
 		if mystery.MysteryWeights != nil {
@@ -168,7 +158,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				curmcode := cs.Int()
 				cd.CurMysteryCode = curmcode
 
-				gameProp.SetVal(GamePropCurMystery, curmcode)
+				// gameProp.SetVal(GamePropCurMystery, curmcode)
 
 				sc2 := gs.Clone()
 				for _, v := range mystery.MysterySymbols {
@@ -198,7 +188,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 				curmcode := curm.Int()
 
-				gameProp.SetVal(GamePropCurMystery, curm.Int())
+				// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
 				sc2 := gs.Clone()
 				for _, v := range mystery.MysterySymbols {
