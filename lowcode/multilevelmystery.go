@@ -212,6 +212,8 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 				return nil
 			}
 		}
+	} else {
+		multiLevelMystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	}
 
 	multiLevelMystery.onStepEnd(gameProp, curpr, gp, "")
