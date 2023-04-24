@@ -126,11 +126,6 @@ func (replaceSymbol *ReplaceSymbol) OnStats(feature *sgc7stats.Feature, stake *s
 	return false, 0, 0
 }
 
-// NewComponentData -
-func (replaceSymbol *ReplaceSymbol) NewComponentData() IComponentData {
-	return &MysteryData{}
-}
-
 func NewReplaceSymbol(name string) IComponent {
 	replaceSymbol := &ReplaceSymbol{
 		BasicComponent: NewBasicComponent(name),
