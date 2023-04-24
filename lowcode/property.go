@@ -120,7 +120,9 @@ func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, re
 }
 
 func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
-	gameProp.RespinComponents = append(gameProp.RespinComponents, respinComponent)
+	if len(gameProp.RespinComponents) > 0 && gameProp.RespinComponents[len(gameProp.RespinComponents)-1] != respinComponent {
+		gameProp.RespinComponents = append(gameProp.RespinComponents, respinComponent)
+	}
 
 	return nil
 }
