@@ -73,13 +73,12 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 }
 
 type BasicComponentConfig struct {
-	DefaultNextComponent     string   `yaml:"defaultNextComponent"`     // next component, if it is empty jump to ending
-	DefaultFGRespinComponent string   `yaml:"defaultFGRespinComponent"` // respin component, if it is not empty and in FG
-	TagScenes                []string `yaml:"tagScenes"`                // tag scenes
-	TagOtherScenes           []string `yaml:"tagOtherScenes"`           // tag otherScenes
-	TargetScene              string   `yaml:"targetScene"`              // target scenes
-	TargetOtherScene         string   `yaml:"targetOtherScene"`         // target otherscenes
-	TagRNG                   []string `yaml:"tagRNG"`                   // tag RNG
+	DefaultNextComponent string   `yaml:"defaultNextComponent"` // next component, if it is empty jump to ending
+	TagScenes            []string `yaml:"tagScenes"`            // tag scenes
+	TagOtherScenes       []string `yaml:"tagOtherScenes"`       // tag otherScenes
+	TargetScene          string   `yaml:"targetScene"`          // target scenes
+	TargetOtherScene     string   `yaml:"targetOtherScene"`     // target otherscenes
+	TagRNG               []string `yaml:"tagRNG"`               // tag RNG
 }
 
 type BasicComponent struct {
