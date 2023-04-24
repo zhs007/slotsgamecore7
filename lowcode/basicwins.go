@@ -115,6 +115,8 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			}, true)
 
 		if ret != nil {
+			gameProp.ProcMulti(ret)
+
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
 			isTrigger = true
 		}
@@ -124,6 +126,8 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		})
 
 		if ret != nil {
+			gameProp.ProcMulti(ret)
+
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
 			isTrigger = true
 		}
@@ -147,20 +151,6 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		} else if tf.NextComponent != "" {
 			bwd.NextComponent = tf.NextComponent
 		}
-
-		// if tf.IsTriggerFG {
-		// 	if tf.FGNumWeightWithScatterNum != nil {
-		// 		gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeightWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
-		// 	} else if len(tf.FGNumWithScatterNum) > 0 {
-		// 		gameProp.TriggerFG(curpr, gp, tf.FGNumWithScatterNum[ret.SymbolNums], tf.RespinFirstComponent)
-		// 	} else if tf.FGNumWeight != "" {
-		// 		gameProp.TriggerFGWithWeights(curpr, gp, plugin, tf.FGNumWeight, tf.RespinFirstComponent)
-		// 	} else {
-		// 		gameProp.TriggerFG(curpr, gp, tf.FGNum, tf.RespinFirstComponent)
-		// 	}
-		// } else if tf.NextComponent != "" {
-		// 	bwd.NextComponent = tf.NextComponent
-		// }
 	}
 
 	return ret
@@ -236,6 +226,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 					return os.Arr[x][y]
 				})
 
+				for _, v := range currets {
+					gameProp.ProcMulti(v)
+				}
+
 				rets = append(rets, currets...)
 			} else {
 				currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, GetBet(stake, basicWins.Config.BetType), func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
@@ -252,6 +246,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 					return 1
 				})
 
+				for _, v := range currets {
+					gameProp.ProcMulti(v)
+				}
+
 				rets = append(rets, currets...)
 			}
 		} else {
@@ -266,6 +264,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
 			})
+
+			for _, v := range currets {
+				gameProp.ProcMulti(v)
+			}
 
 			rets = append(rets, currets...)
 		}
@@ -288,6 +290,8 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			})
 			if ret != nil {
 				ret.LineIndex = i
+
+				gameProp.ProcMulti(ret)
 
 				rets = append(rets, ret)
 

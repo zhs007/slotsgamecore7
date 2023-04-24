@@ -334,6 +334,12 @@ func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherScen
 	}
 }
 
+func (gameProp *GameProperty) ProcMulti(ret *sgc7game.Result) {
+	mul := gameProp.GetVal(GamePropStepMulti) * gameProp.GetVal(GamePropGameMulti)
+	ret.CoinWin *= mul
+	ret.CashWin *= mul
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 
