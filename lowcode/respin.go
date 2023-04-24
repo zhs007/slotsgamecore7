@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -134,6 +135,14 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 
 // OnAsciiGame - outpur to asciigame
 func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	if cd.CurAddRespinNum > 0 {
+		fmt.Printf("%v last %v, current %v, retrigger %v", respin.Name, cd.LastRespinNum, cd.CurRespinNum, cd.CurAddRespinNum)
+	} else {
+		fmt.Printf("%v last %v, current %v", respin.Name, cd.LastRespinNum, cd.CurRespinNum)
+	}
+
 	return nil
 }
 
