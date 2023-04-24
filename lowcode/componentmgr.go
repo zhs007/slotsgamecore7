@@ -49,6 +49,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("chgSymbol", NewChgSymbol)
 	mgr.Reg("respin", NewRespin)
 	mgr.Reg("multiRespin", NewMultiRespin)
+	mgr.Reg("replaceSymbol", NewReplaceSymbol)
 
 	return mgr
 }

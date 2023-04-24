@@ -277,6 +277,7 @@ func (mask *Mask) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anyp
 func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	// 因为respin一定在最前面触发，所以可以在这里判断是否结束
 	if mask.Config.EndingSPAward != "" {
 		icd := gameProp.MapComponentData[mask.Config.EndingSPAward]
 		if icd != nil {

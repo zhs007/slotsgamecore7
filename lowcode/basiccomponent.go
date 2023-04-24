@@ -268,6 +268,11 @@ func (basicComponent *BasicComponent) OnPlayGameEnd(gameProp *GameProperty, curp
 	return nil
 }
 
+// GetName -
+func (basicComponent *BasicComponent) GetName() string {
+	return basicComponent.Name
+}
+
 func NewBasicComponent(name string) *BasicComponent {
 	return &BasicComponent{
 		Name: name,

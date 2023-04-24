@@ -15,16 +15,18 @@ import (
 // SymbolMultiConfig - configuration for SymbolMulti feature
 type SymbolMultiConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string   `yaml:"symbol"`
-	Symbols              []string `yaml:"symbols"`
-	WeightMulti          string   `yaml:"weightMulti"`
+	Symbol               string                   `yaml:"symbol"`
+	Symbols              []string                 `yaml:"symbols"`
+	WeightMulti          string                   `yaml:"weightMulti"`
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
 }
 
 type SymbolMulti struct {
 	*BasicComponent
-	Config      *SymbolMultiConfig
-	SymbolCodes []int
-	WeightMulti *sgc7game.ValWeights2
+	Config            *SymbolMultiConfig
+	SymbolCodes       []int
+	WeightMulti       *sgc7game.ValWeights2
+	OtherSceneFeature *OtherSceneFeature
 }
 
 // Init -
@@ -72,6 +74,10 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 		symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[cfg.Symbol])
 	}
 
+	if cfg.OtherSceneFeature != nil {
+		symbolMulti.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	}
+
 	symbolMulti.onInit(&cfg.BasicComponentConfig)
 
 	return nil
@@ -113,6 +119,10 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 
 		symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
+
+		if symbolMulti.OtherSceneFeature != nil {
+			gameProp.procOtherSceneFeature(symbolMulti.OtherSceneFeature, curpr, os)
+		}
 	}
 
 	symbolMulti.onStepEnd(gameProp, curpr, gp, "")

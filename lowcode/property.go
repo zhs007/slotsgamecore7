@@ -15,6 +15,9 @@ const (
 	GamePropCurReels     = 4
 	GamePropCurLineData  = 5
 
+	GamePropStepMulti = 100
+	GamePropGameMulti = 101
+
 	GamePropNextComponent   = 200
 	GamePropRespinComponent = 201
 )
@@ -50,12 +53,26 @@ type GameProperty struct {
 	RespinComponents  []string
 }
 
+func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
+	for _, v := range gameProp.RespinComponents {
+		gp.RespinComponents = append(gp.RespinComponents, v)
+	}
+}
+
+func (gameProp *GameProperty) OnNewGame() error {
+	gameProp.SetVal(GamePropGameMulti, 1)
+
+	return nil
+}
+
 func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.mapInt = make(map[string]int)
 	gameProp.mapStr = make(map[string]string)
 
 	gameProp.SetStrVal(GamePropNextComponent, "")
 	gameProp.SetStrVal(GamePropRespinComponent, "")
+
+	gameProp.SetVal(GamePropStepMulti, 1)
 
 	gameProp.HistoryComponents = nil
 
@@ -266,6 +283,54 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 				respin.AddRespinTimes(gameProp, award.Config.Val)
 			}
 		}
+	} else if award.AwardType == AwardGameMulti {
+		gameProp.SetVal(GamePropGameMulti, award.Config.Val)
+	} else if award.AwardType == AwardStepMulti {
+		gameProp.SetVal(GamePropStepMulti, award.Config.Val)
+	}
+}
+
+func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherSceneFeature, curpr *sgc7game.PlayResult, os *sgc7game.GameScene) {
+	if otherSceneFeature.Type == OtherSceneFeatureGameMulti {
+		mul := 1
+
+		for _, arr := range os.Arr {
+			for _, v := range arr {
+				mul *= v
+			}
+		}
+
+		gameProp.SetVal(GamePropGameMulti, mul)
+	} else if otherSceneFeature.Type == OtherSceneFeatureGameMultiSum {
+		mul := 0
+
+		for _, arr := range os.Arr {
+			for _, v := range arr {
+				mul += v
+			}
+		}
+
+		gameProp.SetVal(GamePropGameMulti, mul)
+	} else if otherSceneFeature.Type == OtherSceneFeatureStepMultiSum {
+		mul := 0
+
+		for _, arr := range os.Arr {
+			for _, v := range arr {
+				mul += v
+			}
+		}
+
+		gameProp.SetVal(GamePropStepMulti, mul)
+	} else if otherSceneFeature.Type == OtherSceneFeatureStepMulti {
+		mul := 1
+
+		for _, arr := range os.Arr {
+			for _, v := range arr {
+				mul *= v
+			}
+		}
+
+		gameProp.SetVal(GamePropStepMulti, mul)
 	}
 }
 

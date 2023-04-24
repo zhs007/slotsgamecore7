@@ -15,19 +15,21 @@ import (
 // SymbolVal2Config - configuration for SymbolVal2 feature
 type SymbolVal2Config struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string   `yaml:"symbol"`
-	WeightSet            string   `yaml:"weightSet"`
-	WeightsVal           []string `yaml:"weightsVal"`
-	DefaultVal           int      `yaml:"defaultVal"`
-	RNGSet               string   `yaml:"RNGSet"`
+	Symbol               string                   `yaml:"symbol"`
+	WeightSet            string                   `yaml:"weightSet"`
+	WeightsVal           []string                 `yaml:"weightsVal"`
+	DefaultVal           int                      `yaml:"defaultVal"`
+	RNGSet               string                   `yaml:"RNGSet"`
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
 }
 
 type SymbolVal2 struct {
 	*BasicComponent
-	Config     *SymbolVal2Config
-	SymbolCode int
-	WeightsVal []*sgc7game.ValWeights2
-	WeightSet  *sgc7game.ValWeights2
+	Config            *SymbolVal2Config
+	SymbolCode        int
+	WeightsVal        []*sgc7game.ValWeights2
+	WeightSet         *sgc7game.ValWeights2
+	OtherSceneFeature *OtherSceneFeature
 }
 
 // Init -
@@ -81,6 +83,10 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 	}
 
 	symbolVal2.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+
+	if cfg.OtherSceneFeature != nil {
+		symbolVal2.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	}
 
 	symbolVal2.onInit(&cfg.BasicComponentConfig)
 
@@ -141,6 +147,10 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		}
 
 		symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
+
+		if symbolVal2.OtherSceneFeature != nil {
+			gameProp.procOtherSceneFeature(symbolVal2.OtherSceneFeature, curpr, os)
+		}
 	}
 
 	symbolVal2.onStepEnd(gameProp, curpr, gp, "")
