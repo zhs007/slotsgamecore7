@@ -138,9 +138,9 @@ func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
 	if cd.CurAddRespinNum > 0 {
-		fmt.Printf("%v last %v, current %v, retrigger %v", respin.Name, cd.LastRespinNum, cd.CurRespinNum, cd.CurAddRespinNum)
+		fmt.Printf("%v last %v, current %v, retrigger %v\n", respin.Name, cd.LastRespinNum, cd.CurRespinNum, cd.CurAddRespinNum)
 	} else {
-		fmt.Printf("%v last %v, current %v", respin.Name, cd.LastRespinNum, cd.CurRespinNum)
+		fmt.Printf("%v last %v, current %v\n", respin.Name, cd.LastRespinNum, cd.CurRespinNum)
 	}
 
 	return nil
