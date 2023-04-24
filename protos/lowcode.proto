@@ -84,9 +84,20 @@ message RespinData {
 	int64 totalCashWin = 7;
 }
 
+// MaskData
+message MaskData {
+    ComponentData basicComponentData = 1;
+    int32 num = 2;
+    repeated bool vals = 3;
+    int32 newChged = 4;
+    repeated bool newVals = 5;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
     string nextStepFirstComponent = 2;
     map<string, google.protobuf.Any> mapComponents = 3;
+    repeated string historyComponents = 4;
+    repeated string respinComponents = 5;
 }

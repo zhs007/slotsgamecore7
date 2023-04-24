@@ -65,7 +65,7 @@ type Collector struct {
 func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
-		goutils.Error("BasicReels.Init:ReadFile",
+		goutils.Error("Collector.Init:ReadFile",
 			zap.String("fn", fn),
 			zap.Error(err))
 
@@ -76,7 +76,7 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
-		goutils.Error("BasicReels.Init:Unmarshal",
+		goutils.Error("Collector.Init:Unmarshal",
 			zap.String("fn", fn),
 			zap.Error(err))
 
@@ -174,7 +174,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
+	// gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
 	collector.onStepEnd(gameProp, curpr, gp, "")
 
