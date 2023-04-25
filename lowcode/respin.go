@@ -195,10 +195,6 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	if cd.CurAddRespinNum > 0 {
-		cd.LastRespinNum += cd.CurAddRespinNum
-	}
-
 	cd.TotalCashWin += curpr.CashWin
 	cd.TotalCoinWin += int64(curpr.CoinWin)
 
