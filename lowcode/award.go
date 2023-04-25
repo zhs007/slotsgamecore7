@@ -1,9 +1,11 @@
 package lowcode
 
 type AwardConfig struct {
-	AwardType string `yaml:"awardType"`
-	Val       int    `yaml:"val"`
-	StrParam  string `yaml:"strParam"`
+	AwardType string   `yaml:"awardType"`
+	Val       int      `yaml:"val"`
+	StrParam  string   `yaml:"strParam"`
+	Vals      []int    `yaml:"vals"`
+	StrParams []string `yaml:"strParams"`
 }
 
 func (cfg *AwardConfig) GetType() int {
