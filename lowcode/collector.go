@@ -155,6 +155,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		return cursymbol == collector.SymbolCode
 	})
 
+	oldval := cd.Val
 	cd.NewCollector = nn
 	cd.Val += nn
 	if collector.Config.MaxVal > 0 {
@@ -165,7 +166,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	if nn > 0 {
 		for i := 1; i <= nn; i++ {
-			cl := cd.Val + i
+			cl := oldval + i
 			if cl > collector.Config.MaxVal {
 				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
 			} else {
