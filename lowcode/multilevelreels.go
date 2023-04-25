@@ -130,15 +130,18 @@ func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error 
 
 	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
 
-	for i, v := range multiLevelReels.Config.Levels {
-		if cd.CurLevel > i {
-			collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
-			if isok {
-				if collectorData.Val >= v.CollectorVal {
-					cd.CurLevel = i
-				}
+	for i := cd.CurLevel + 1; i < len(multiLevelReels.Config.Levels); i++ {
+		v := multiLevelReels.Config.Levels[i]
+		// if cd.CurLevel < i {
+		collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
+		if isok {
+			if collectorData.Val >= v.CollectorVal {
+				cd.CurLevel = i
+			} else {
+				break
 			}
 		}
+		// }
 	}
 
 	return nil
