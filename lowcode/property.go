@@ -140,6 +140,10 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 		gp.NextStepFirstComponent = gameProp.RespinComponents[len(gameProp.RespinComponents)-1]
 
 		pr.IsFinish = false
+
+		if goutils.IndexOfStringSlice(gp.HistoryComponents, gp.NextStepFirstComponent, 0) < 0 {
+			gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
+		}
 	} else if !pr.IsWait {
 		pr.IsFinish = true
 	}
