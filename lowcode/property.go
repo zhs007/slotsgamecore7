@@ -322,7 +322,9 @@ func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherScen
 
 		for _, arr := range os.Arr {
 			for _, v := range arr {
-				mul += v
+				if v > 1 {
+					mul += v
+				}
 			}
 		}
 
@@ -332,7 +334,9 @@ func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherScen
 
 		for _, arr := range os.Arr {
 			for _, v := range arr {
-				mul += v
+				if v > 1 {
+					mul += v
+				}
 			}
 		}
 
