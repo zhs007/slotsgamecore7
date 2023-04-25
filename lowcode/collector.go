@@ -167,9 +167,9 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		for i := 1; i <= nn; i++ {
 			cl := cd.Val + i
 			if cl > collector.Config.MaxVal {
-				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, false)
+				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
 			} else {
-				collector.onLevelUp(gameProp, curpr, gp, cl, true)
+				collector.onLevelUp(gameProp, curpr, gp, cl, false)
 			}
 		}
 	}
