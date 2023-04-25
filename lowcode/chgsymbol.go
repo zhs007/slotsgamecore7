@@ -70,7 +70,7 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[chgSymbol.Name].(*BasicComponentData)
 
-	gs := chgSymbol.GetTargetScene(gameProp, curpr, cd)
+	gs := chgSymbol.GetTargetScene(gameProp, curpr, cd, "")
 
 	cgs := gs.Clone()
 

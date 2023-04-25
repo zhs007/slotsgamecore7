@@ -83,7 +83,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[symbolVal.Name].(*BasicComponentData)
 
-	gs := symbolVal.GetTargetScene(gameProp, curpr, cd)
+	gs := symbolVal.GetTargetScene(gameProp, curpr, cd, "")
 
 	if gs.HasSymbol(symbolVal.SymbolCode) {
 		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)

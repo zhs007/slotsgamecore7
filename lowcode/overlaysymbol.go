@@ -136,7 +136,7 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
 
-	gs := overlaySymbol.GetTargetScene(gameProp, curpr, &osd.BasicComponentData)
+	gs := overlaySymbol.GetTargetScene(gameProp, curpr, &osd.BasicComponentData, "")
 
 	cgs := gs.Clone()
 

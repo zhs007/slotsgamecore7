@@ -218,8 +218,12 @@ func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *s
 }
 
 // GetTargetScene -
-func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
-	gs, si := gameProp.GetScene(curpr, basicComponent.Config.TargetScene)
+func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, targetScene string) *sgc7game.GameScene {
+	if targetScene == "" {
+		targetScene = basicComponent.Config.TargetScene
+	}
+
+	gs, si := gameProp.GetScene(curpr, targetScene)
 
 	if si >= 0 {
 		basicCD.TargetSceneIndex = si
