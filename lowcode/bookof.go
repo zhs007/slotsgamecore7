@@ -171,7 +171,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			symbolNum = iv.Int()
 		}
 
-		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData)
+		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
 
 		if bookof.Config.ForceSymbolNum == 1 && bookof.Config.SymbolRNG != "" {
 			rng := gameProp.GetTagInt(bookof.Config.SymbolRNG)

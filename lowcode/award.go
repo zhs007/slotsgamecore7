@@ -17,6 +17,8 @@ func (cfg *AwardConfig) GetType() int {
 		return AwardGameMulti
 	} else if cfg.AwardType == "stepMulti" {
 		return AwardStepMulti
+	} else if cfg.AwardType == "initMask" {
+		return AwardInitMask
 	}
 
 	return AwardUnknow
@@ -29,6 +31,7 @@ const (
 	AwardRespinTimes int = 3
 	AwardGameMulti   int = 4
 	AwardStepMulti   int = 5
+	AwardInitMask    int = 6
 )
 
 type Award struct {

@@ -89,7 +89,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
 
-	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd)
+	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd, "")
 
 	if gs.HasSymbols(symbolMulti.SymbolCodes) {
 		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)

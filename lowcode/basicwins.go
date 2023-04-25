@@ -75,6 +75,8 @@ type TriggerFeatureConfig struct {
 	RespinComponent               string         `yaml:"respinComponent"`               // like fg-spin
 	NextComponent                 string         `yaml:"nextComponent"`                 // next component
 	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
+	AwardsCfg                     []*AwardConfig `yaml:"awards"`                        // 新的奖励系统
+	Awards                        []*Award       `yaml:"-"`                             // 新的奖励系统
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -138,6 +140,10 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			gameProp.TagInt(tf.TagSymbolNum, ret.SymbolNums)
 		}
 
+		for _, award := range tf.Awards {
+			gameProp.procAward(award, curpr)
+		}
+
 		if tf.RespinComponent != "" {
 			if tf.RespinNumWeightWithScatterNum != nil {
 				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], tf.RespinComponent)
@@ -188,6 +194,18 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
+	for _, v := range cfg.BeforMain {
+		for _, award := range v.AwardsCfg {
+			v.Awards = append(v.Awards, NewArard(award))
+		}
+	}
+
+	for _, v := range cfg.AfterMain {
+		for _, award := range v.AwardsCfg {
+			v.Awards = append(v.Awards, NewArard(award))
+		}
+	}
+
 	basicWins.onInit(&cfg.BasicComponentConfig)
 
 	return nil
@@ -205,7 +223,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, bwd)
 	}
 
-	gs := basicWins.GetTargetScene(gameProp, curpr, &bwd.BasicComponentData)
+	gs := basicWins.GetTargetScene(gameProp, curpr, &bwd.BasicComponentData, "")
 
 	if basicWins.Config.MainType == WinTypeWays {
 		if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {

@@ -70,7 +70,7 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd := gameProp.MapComponentData[replaceSymbol.Name].(*BasicComponentData)
 
-	gs := replaceSymbol.GetTargetScene(gameProp, curpr, cd)
+	gs := replaceSymbol.GetTargetScene(gameProp, curpr, cd, "")
 
 	if !gs.HasSymbols(replaceSymbol.SymbolCodes) {
 		replaceSymbol.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)

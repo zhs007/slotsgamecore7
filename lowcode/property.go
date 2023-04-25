@@ -289,6 +289,14 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 		gameProp.SetVal(GamePropGameMulti, award.Config.Val)
 	} else if award.AwardType == AwardStepMulti {
 		gameProp.SetVal(GamePropStepMulti, award.Config.Val)
+	} else if award.AwardType == AwardInitMask {
+		component, isok := gameProp.Pool.MapComponents[award.Config.StrParam]
+		if isok {
+			mask, isok := component.(*Mask)
+			if isok {
+				mask.ProcMask(gameProp, curpr, award.Config.StrParam)
+			}
+		}
 	}
 }
 
