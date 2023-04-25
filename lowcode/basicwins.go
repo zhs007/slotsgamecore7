@@ -141,7 +141,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		}
 
 		for _, award := range tf.Awards {
-			gameProp.procAward(award, curpr)
+			gameProp.procAward(award, curpr, gp)
 		}
 
 		if tf.RespinComponent != "" {

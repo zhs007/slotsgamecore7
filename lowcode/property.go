@@ -280,7 +280,7 @@ func (gameProp *GameProperty) GetTagStr(tag string) string {
 	return gameProp.mapStr[tag]
 }
 
-func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult) {
+func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult, gp *GameParams) {
 	if award.AwardType == AwardRespinTimes {
 		component, isok := gameProp.Pool.MapComponents[award.Config.StrParam]
 		if isok {
@@ -298,9 +298,11 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 		if isok {
 			mask, isok := component.(*Mask)
 			if isok {
-				mask.ProcMask(gameProp, curpr, award.Config.StrParams[1])
+				mask.ProcMask(gameProp, curpr, gp, award.Config.StrParams[1])
 			}
 		}
+	} else if award.AwardType == AwardTriggerRespin {
+		gameProp.TriggerRespin(curpr, gp, award.Config.Val, award.Config.StrParam)
 	}
 }
 

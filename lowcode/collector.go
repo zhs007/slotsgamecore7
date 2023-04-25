@@ -122,10 +122,10 @@ func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
 }
 
 // onLevelUp -
-func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.PlayResult, newLevel int, noProcSPLevel bool) error {
+func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, newLevel int, noProcSPLevel bool) error {
 	if collector.PerLevelAwards != nil {
 		for _, v := range collector.PerLevelAwards {
-			gameProp.procAward(v, curpr)
+			gameProp.procAward(v, curpr, gp)
 		}
 	}
 
@@ -136,7 +136,7 @@ func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.Pl
 	sp, isok := collector.MapSPLevelAwards[newLevel]
 	if isok {
 		for _, v := range sp {
-			gameProp.procAward(v, curpr)
+			gameProp.procAward(v, curpr, gp)
 		}
 	}
 
@@ -167,9 +167,9 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		for i := 1; i <= nn; i++ {
 			cl := cd.Val + i
 			if cl > collector.Config.MaxVal {
-				collector.onLevelUp(gameProp, curpr, collector.Config.MaxVal, false)
+				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, false)
 			} else {
-				collector.onLevelUp(gameProp, curpr, cl, true)
+				collector.onLevelUp(gameProp, curpr, gp, cl, true)
 			}
 		}
 	}
