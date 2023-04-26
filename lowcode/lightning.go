@@ -336,7 +336,7 @@ func (lightning *Lightning) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 
 // OnStatsWithPB -
 func (lightning *Lightning) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.BookOfData{}
+	pbcd := &sgc7pb.LightningData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
@@ -360,7 +360,7 @@ func (lightning *Lightning) EachUsedResults(pr *sgc7game.PlayResult, pbComponent
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+		goutils.Error("Lightning.EachUsedResults:UnmarshalTo",
 			zap.Error(err))
 
 		return
