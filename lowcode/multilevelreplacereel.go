@@ -197,12 +197,12 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStatsWithPB(feature *sgc7s
 
 // NewComponentData -
 func (multiLevelReplaceReel *MultiLevelReplaceReel) NewComponentData() IComponentData {
-	return &MultiLevelReelsData{}
+	return &MultiLevelReplaceReelData{}
 }
 
 // EachUsedResults -
 func (multiLevelReplaceReel *MultiLevelReplaceReel) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
-	pbcd := &sgc7pb.MultiLevelReelsData{}
+	pbcd := &sgc7pb.MultiLevelReplaceReelData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
