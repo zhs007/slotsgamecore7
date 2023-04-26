@@ -154,6 +154,8 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 		}
 
 		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
+	} else {
+		multiLevelReplaceReel.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	}
 
 	multiLevelReplaceReel.onStepEnd(gameProp, curpr, gp, "")
