@@ -159,13 +159,15 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 
 	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
 
-	for i, v := range multiLevelMystery.Config.Levels {
-		if cd.CurLevel > i {
-			collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
-			if isok {
-				if collectorData.Val >= v.CollectorVal {
-					cd.CurLevel = i
-				}
+	for i := cd.CurLevel + 1; i < len(multiLevelMystery.Config.Levels); i++ {
+		v := multiLevelMystery.Config.Levels[i]
+
+		collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
+		if isok {
+			if collectorData.Val >= v.CollectorVal {
+				cd.CurLevel = i
+			} else {
+				break
 			}
 		}
 	}
@@ -244,7 +246,7 @@ func (multiLevelMystery *MultiLevelMystery) OnStats(feature *sgc7stats.Feature, 
 
 // OnStatsWithPB -
 func (multiLevelMystery *MultiLevelMystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.BookOfData{}
+	pbcd := &sgc7pb.MultiLevelMysteryData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
@@ -268,7 +270,7 @@ func (multiLevelMystery *MultiLevelMystery) EachUsedResults(pr *sgc7game.PlayRes
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+		goutils.Error("MultiLevelMystery.EachUsedResults:UnmarshalTo",
 			zap.Error(err))
 
 		return

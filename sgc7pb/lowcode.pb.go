@@ -661,6 +661,62 @@ func (x *ReelSetMysteryData) GetCurMysteryCode() int32 {
 	return 0
 }
 
+// MultiLevelReplaceReelData
+type MultiLevelReplaceReelData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BasicComponentData *ComponentData `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
+	CurLevel           int32          `protobuf:"varint,3,opt,name=curLevel,proto3" json:"curLevel,omitempty"`
+}
+
+func (x *MultiLevelReplaceReelData) Reset() {
+	*x = MultiLevelReplaceReelData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lowcode_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MultiLevelReplaceReelData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MultiLevelReplaceReelData) ProtoMessage() {}
+
+func (x *MultiLevelReplaceReelData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MultiLevelReplaceReelData.ProtoReflect.Descriptor instead.
+func (*MultiLevelReplaceReelData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *MultiLevelReplaceReelData) GetBasicComponentData() *ComponentData {
+	if x != nil {
+		return x.BasicComponentData
+	}
+	return nil
+}
+
+func (x *MultiLevelReplaceReelData) GetCurLevel() int32 {
+	if x != nil {
+		return x.CurLevel
+	}
+	return 0
+}
+
 // RespinData
 type RespinData struct {
 	state         protoimpl.MessageState
@@ -679,7 +735,7 @@ type RespinData struct {
 func (x *RespinData) Reset() {
 	*x = RespinData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lowcode_proto_msgTypes[10]
+		mi := &file_lowcode_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -692,7 +748,7 @@ func (x *RespinData) String() string {
 func (*RespinData) ProtoMessage() {}
 
 func (x *RespinData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[10]
+	mi := &file_lowcode_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -705,7 +761,7 @@ func (x *RespinData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RespinData.ProtoReflect.Descriptor instead.
 func (*RespinData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{10}
+	return file_lowcode_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *RespinData) GetBasicComponentData() *ComponentData {
@@ -773,7 +829,7 @@ type MaskData struct {
 func (x *MaskData) Reset() {
 	*x = MaskData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lowcode_proto_msgTypes[11]
+		mi := &file_lowcode_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -786,7 +842,7 @@ func (x *MaskData) String() string {
 func (*MaskData) ProtoMessage() {}
 
 func (x *MaskData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[11]
+	mi := &file_lowcode_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -799,7 +855,7 @@ func (x *MaskData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MaskData.ProtoReflect.Descriptor instead.
 func (*MaskData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{11}
+	return file_lowcode_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MaskData) GetBasicComponentData() *ComponentData {
@@ -853,7 +909,7 @@ type GameParam struct {
 func (x *GameParam) Reset() {
 	*x = GameParam{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lowcode_proto_msgTypes[12]
+		mi := &file_lowcode_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -866,7 +922,7 @@ func (x *GameParam) String() string {
 func (*GameParam) ProtoMessage() {}
 
 func (x *GameParam) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[12]
+	mi := &file_lowcode_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -879,7 +935,7 @@ func (x *GameParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameParam.ProtoReflect.Descriptor instead.
 func (*GameParam) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{12}
+	return file_lowcode_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GameParam) GetFirstComponent() string {
@@ -1013,7 +1069,15 @@ var file_lowcode_proto_rawDesc = []byte{
 	0x62, 0x61, 0x73, 0x69, 0x63, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61,
 	0x74, 0x61, 0x12, 0x26, 0x0a, 0x0e, 0x43, 0x75, 0x72, 0x4d, 0x79, 0x73, 0x74, 0x65, 0x72, 0x79,
 	0x43, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0e, 0x43, 0x75, 0x72, 0x4d,
-	0x79, 0x73, 0x74, 0x65, 0x72, 0x79, 0x43, 0x6f, 0x64, 0x65, 0x22, 0xb7, 0x02, 0x0a, 0x0a, 0x52,
+	0x79, 0x73, 0x74, 0x65, 0x72, 0x79, 0x43, 0x6f, 0x64, 0x65, 0x22, 0x7e, 0x0a, 0x19, 0x4d, 0x75,
+	0x6c, 0x74, 0x69, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x52, 0x65, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x52,
+	0x65, 0x65, 0x6c, 0x44, 0x61, 0x74, 0x61, 0x12, 0x45, 0x0a, 0x12, 0x62, 0x61, 0x73, 0x69, 0x63,
+	0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x73, 0x67, 0x63, 0x37, 0x70, 0x62, 0x2e, 0x43, 0x6f, 0x6d,
+	0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x12, 0x62, 0x61, 0x73, 0x69,
+	0x63, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1a,
+	0x0a, 0x08, 0x63, 0x75, 0x72, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05,
+	0x52, 0x08, 0x63, 0x75, 0x72, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x22, 0xb7, 0x02, 0x0a, 0x0a, 0x52,
 	0x65, 0x73, 0x70, 0x69, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x12, 0x45, 0x0a, 0x12, 0x62, 0x61, 0x73,
 	0x69, 0x63, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x73, 0x67, 0x63, 0x37, 0x70, 0x62, 0x2e, 0x43,
@@ -1085,23 +1149,24 @@ func file_lowcode_proto_rawDescGZIP() []byte {
 	return file_lowcode_proto_rawDescData
 }
 
-var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_lowcode_proto_goTypes = []interface{}{
-	(*ComponentData)(nil),         // 0: sgc7pb.ComponentData
-	(*BookOfData)(nil),            // 1: sgc7pb.BookOfData
-	(*CollectorData)(nil),         // 2: sgc7pb.CollectorData
-	(*LightningData)(nil),         // 3: sgc7pb.LightningData
-	(*MultiLevelMysteryData)(nil), // 4: sgc7pb.MultiLevelMysteryData
-	(*MultiLevelReelsData)(nil),   // 5: sgc7pb.MultiLevelReelsData
-	(*MysteryData)(nil),           // 6: sgc7pb.MysteryData
-	(*OverlaySymbolData)(nil),     // 7: sgc7pb.OverlaySymbolData
-	(*BasicWinsData)(nil),         // 8: sgc7pb.BasicWinsData
-	(*ReelSetMysteryData)(nil),    // 9: sgc7pb.ReelSetMysteryData
-	(*RespinData)(nil),            // 10: sgc7pb.RespinData
-	(*MaskData)(nil),              // 11: sgc7pb.MaskData
-	(*GameParam)(nil),             // 12: sgc7pb.GameParam
-	nil,                           // 13: sgc7pb.GameParam.MapComponentsEntry
-	(*any1.Any)(nil),              // 14: google.protobuf.Any
+	(*ComponentData)(nil),             // 0: sgc7pb.ComponentData
+	(*BookOfData)(nil),                // 1: sgc7pb.BookOfData
+	(*CollectorData)(nil),             // 2: sgc7pb.CollectorData
+	(*LightningData)(nil),             // 3: sgc7pb.LightningData
+	(*MultiLevelMysteryData)(nil),     // 4: sgc7pb.MultiLevelMysteryData
+	(*MultiLevelReelsData)(nil),       // 5: sgc7pb.MultiLevelReelsData
+	(*MysteryData)(nil),               // 6: sgc7pb.MysteryData
+	(*OverlaySymbolData)(nil),         // 7: sgc7pb.OverlaySymbolData
+	(*BasicWinsData)(nil),             // 8: sgc7pb.BasicWinsData
+	(*ReelSetMysteryData)(nil),        // 9: sgc7pb.ReelSetMysteryData
+	(*MultiLevelReplaceReelData)(nil), // 10: sgc7pb.MultiLevelReplaceReelData
+	(*RespinData)(nil),                // 11: sgc7pb.RespinData
+	(*MaskData)(nil),                  // 12: sgc7pb.MaskData
+	(*GameParam)(nil),                 // 13: sgc7pb.GameParam
+	nil,                               // 14: sgc7pb.GameParam.MapComponentsEntry
+	(*any1.Any)(nil),                  // 15: google.protobuf.Any
 }
 var file_lowcode_proto_depIdxs = []int32{
 	0,  // 0: sgc7pb.BookOfData.basicComponentData:type_name -> sgc7pb.ComponentData
@@ -1112,15 +1177,16 @@ var file_lowcode_proto_depIdxs = []int32{
 	0,  // 5: sgc7pb.OverlaySymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 6: sgc7pb.BasicWinsData.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 7: sgc7pb.ReelSetMysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 8: sgc7pb.RespinData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 9: sgc7pb.MaskData.basicComponentData:type_name -> sgc7pb.ComponentData
-	13, // 10: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
-	14, // 11: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	0,  // 8: sgc7pb.MultiLevelReplaceReelData.basicComponentData:type_name -> sgc7pb.ComponentData
+	0,  // 9: sgc7pb.RespinData.basicComponentData:type_name -> sgc7pb.ComponentData
+	0,  // 10: sgc7pb.MaskData.basicComponentData:type_name -> sgc7pb.ComponentData
+	14, // 11: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
+	15, // 12: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_lowcode_proto_init() }
@@ -1250,7 +1316,7 @@ func file_lowcode_proto_init() {
 			}
 		}
 		file_lowcode_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RespinData); i {
+			switch v := v.(*MultiLevelReplaceReelData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1262,7 +1328,7 @@ func file_lowcode_proto_init() {
 			}
 		}
 		file_lowcode_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MaskData); i {
+			switch v := v.(*RespinData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1274,6 +1340,18 @@ func file_lowcode_proto_init() {
 			}
 		}
 		file_lowcode_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MaskData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lowcode_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GameParam); i {
 			case 0:
 				return &v.state
@@ -1292,7 +1370,7 @@ func file_lowcode_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_lowcode_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

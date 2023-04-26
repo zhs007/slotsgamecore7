@@ -364,7 +364,7 @@ func (bookof *BookOf) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+		goutils.Error("BookOf.EachUsedResults:UnmarshalTo",
 			zap.Error(err))
 
 		return

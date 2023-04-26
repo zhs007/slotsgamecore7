@@ -73,6 +73,12 @@ message ReelSetMysteryData {
     int32 CurMysteryCode = 2;
 }
 
+// MultiLevelReplaceReelData
+message MultiLevelReplaceReelData {
+    ComponentData basicComponentData = 1;
+	int32 curLevel = 3;
+}
+
 // RespinData
 message RespinData {
     ComponentData basicComponentData = 1;

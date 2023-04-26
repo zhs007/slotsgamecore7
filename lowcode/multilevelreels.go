@@ -132,7 +132,7 @@ func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error 
 
 	for i := cd.CurLevel + 1; i < len(multiLevelReels.Config.Levels); i++ {
 		v := multiLevelReels.Config.Levels[i]
-		// if cd.CurLevel < i {
+
 		collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
 		if isok {
 			if collectorData.Val >= v.CollectorVal {
@@ -141,7 +141,6 @@ func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error 
 				break
 			}
 		}
-		// }
 	}
 
 	return nil
@@ -232,7 +231,7 @@ func (multiLevelReels *MultiLevelReels) OnStats(feature *sgc7stats.Feature, stak
 
 // OnStatsWithPB -
 func (multiLevelReels *MultiLevelReels) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.BookOfData{}
+	pbcd := &sgc7pb.MultiLevelReelsData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
@@ -256,7 +255,7 @@ func (multiLevelReels *MultiLevelReels) EachUsedResults(pr *sgc7game.PlayResult,
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
-		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
+		goutils.Error("MultiLevelReels.EachUsedResults:UnmarshalTo",
 			zap.Error(err))
 
 		return
