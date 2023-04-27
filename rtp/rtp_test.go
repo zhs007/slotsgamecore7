@@ -55,7 +55,7 @@ func Test_RTP(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr0}, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(1))
 	assert.Equal(t, rtp.TotalBet, int64(100))
@@ -102,7 +102,7 @@ func Test_RTP(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr1, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr1}, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(2))
 	assert.Equal(t, rtp.TotalBet, int64(200))
@@ -151,8 +151,8 @@ func Test_RTP(t *testing.T) {
 	pr0.IsFinish = false
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0, nil)
-	rtp.OnResult(stake, pr2, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr0}, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr2}, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(3))
 	assert.Equal(t, rtp.TotalBet, int64(300))
@@ -283,13 +283,13 @@ func Test_RTPTags(t *testing.T) {
 	}, []int{0, 1, 2, 3, 4, 5, 6, 7}, []int{1, 2, 3, 4, 5})
 	rtp.Root.AddChild("fg", fg)
 
-	rtp.AddHitRateNode("special", func(rtp *RTP, node *HitRateNode, pr *sgc7game.PlayResult) bool {
-		gp, isok := pr.CurGameModParams.(*gameparams)
+	rtp.AddHitRateNode("special", func(rtp *RTP, node *HitRateNode, i int, prs []*sgc7game.PlayResult) bool {
+		gp, isok := prs[i].CurGameModParams.(*gameparams)
 		if isok && gp != nil {
 			if gp.isSpecial && node.TagName == "special" {
 				node.TriggerNums++
 
-				for range pr.Results {
+				for range prs[i].Results {
 					node.TotalNums++
 				}
 
@@ -333,7 +333,7 @@ func Test_RTPTags(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr0}, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(1))
 	assert.Equal(t, rtp.TotalBet, int64(100))
@@ -387,7 +387,7 @@ func Test_RTPTags(t *testing.T) {
 	})
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr1, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr1}, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(2))
 	assert.Equal(t, rtp.TotalBet, int64(200))
@@ -443,8 +443,8 @@ func Test_RTPTags(t *testing.T) {
 	pr0.IsFinish = false
 
 	rtp.Bet(100)
-	rtp.OnResult(stake, pr0, nil)
-	rtp.OnResult(stake, pr2, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr0}, nil)
+	rtp.OnResult(stake, 0, []*sgc7game.PlayResult{pr2}, nil)
 
 	assert.Equal(t, rtp.BetNums, int64(3))
 	assert.Equal(t, rtp.TotalBet, int64(300))
