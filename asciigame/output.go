@@ -13,6 +13,20 @@ var ColorExitKey *color.Color
 var ColorWin *color.Color
 var ColorLose *color.Color
 
+func OutputReverseScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolColorMap) {
+	if len(str) > 0 {
+		fmt.Printf("%v:\n", str)
+	}
+
+	for y := 0; y < scene.Height; y++ {
+		for x := 0; x < scene.Width; x++ {
+			fmt.Printf("%v ", mapSymbolColor.GetSymbolString(scene.Arr[x][scene.Height-1-y]))
+		}
+
+		fmt.Print("\n")
+	}
+}
+
 func OutputScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolColorMap) {
 	if len(str) > 0 {
 		fmt.Printf("%v:\n", str)
@@ -77,24 +91,6 @@ func FormatColorString(str string, c *color.Color) string {
 	}
 
 	return c.SprintFunc()(str)
-
-	// if color == Red {
-	// 	return fmt.Sprint(ColorRed, str, ColorReset)
-	// } else if color == Green {
-	// 	return fmt.Sprint(ColorGreen, str, ColorReset)
-	// } else if color == Yellow {
-	// 	return fmt.Sprint(ColorYellow, str, ColorReset)
-	// } else if color == Blue {
-	// 	return fmt.Sprint(ColorBlue, str, ColorReset)
-	// } else if color == Purple {
-	// 	return fmt.Sprint(ColorPurple, str, ColorReset)
-	// } else if color == Cyan {
-	// 	return fmt.Sprint(ColorCyan, str, ColorReset)
-	// } else if color == White {
-	// 	return fmt.Sprint(ColorWhite, str, ColorReset)
-	// }
-
-	// return str
 }
 
 func init() {
