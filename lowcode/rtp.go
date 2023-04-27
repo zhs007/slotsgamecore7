@@ -211,6 +211,56 @@ func newRTPGameModule(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgGameModule *R
 	return gm
 }
 
+func hasComponent(i int, prs []*sgc7game.PlayResult, component string) bool {
+	gp, isok := prs[i].CurGameModParams.(*GameParams)
+	if isok {
+		_, hasComponent := gp.MapComponents[component]
+		if hasComponent {
+			return true
+		}
+	}
+
+	return false
+}
+
+func hasComponentEx(i int, prs []*sgc7game.PlayResult, components []string) bool {
+	gp, isok := prs[i].CurGameModParams.(*GameParams)
+	if isok {
+		for _, v := range components {
+			_, hasComponent := gp.MapComponents[v]
+			if hasComponent {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func newFuncHitRate(cfgHitRateFeature *RTPHitRateFeature) sgc7rtp.FuncHROnResult {
+	return func(rtp *sgc7rtp.RTP, node *sgc7rtp.HitRateNode, i int, prs []*sgc7game.PlayResult) bool {
+		if len(cfgHitRateFeature.Components) == 0 {
+			return true
+		}
+
+		if hasComponentEx(i, prs, cfgHitRateFeature.Components) {
+			node.TotalNums++
+		} else {
+			if i < len(prs)-1 && hasComponentEx(i+1, prs, cfgHitRateFeature.Components) {
+				node.TriggerNums++
+
+				return true
+			}
+		}
+
+		return false
+	}
+}
+
+func procHitRate(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgHitRateFeature *RTPHitRateFeature) {
+	rtp.AddHitRateNode(cfgHitRateFeature.Name, newFuncHitRate(cfgHitRateFeature))
+}
+
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) error {
 	game, err := NewGame(gamecfg)
 	if err != nil {
@@ -236,6 +286,10 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 
 	for _, m := range game.Pool.Config.RTP.Modules {
 		newRTPGameModule(rtp, game.Pool, m)
+	}
+
+	for _, hr := range game.Pool.Config.RTP.HitRateFeatures {
+		procHitRate(rtp, game.Pool, hr)
 	}
 
 	d := sgc7rtp.StartRTP(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {

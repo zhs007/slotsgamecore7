@@ -8,7 +8,7 @@ import (
 )
 
 // FuncHROnResult - onResult(*RTP, *HitRateNode, *sgc7game.PlayResult)
-type FuncHROnResult func(rtp *RTP, node *HitRateNode, pr *sgc7game.PlayResult) bool
+type FuncHROnResult func(rtp *RTP, node *HitRateNode, i int, prs []*sgc7game.PlayResult) bool
 
 // HitRateNode -
 type HitRateNode struct {

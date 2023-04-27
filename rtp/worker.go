@@ -115,7 +115,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 						} else {
 							cmd = pr.NextCmds[0]
 
-							if len(pr.NextCmdParams) >= 0{
+							if len(pr.NextCmdParams) >= 0 {
 								cmdparam = pr.NextCmdParams[0]
 							} else {
 								cmdparam = ""
@@ -149,11 +149,11 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 
 					currtp.Bet(stake.CashBet)
 
-					for _, v := range results {
+					for i, v := range results {
 						currtp.TotalWins += v.CashWin
 						totalReturn += v.CashWin
 
-						currtp.OnResult(stake, v, gameData)
+						currtp.OnResult(stake, i, results, gameData)
 					}
 
 					currtp.OnResults(results, gameData)
@@ -296,8 +296,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 							}
 						} else {
 							cmd = pr.NextCmds[0]
-							
-							if len(pr.NextCmdParams) >= 0{
+
+							if len(pr.NextCmdParams) >= 0 {
 								cmdparam = pr.NextCmdParams[0]
 							} else {
 								cmdparam = ""
@@ -341,11 +341,11 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 
 					currtp.Bet(stake.CashBet)
 
-					for _, v := range results {
+					for i, v := range results {
 						currtp.TotalWins += v.CashWin
 						totalReturn += v.CashWin
 
-						currtp.OnResult(stake, v, gameData)
+						currtp.OnResult(stake, i, results, gameData)
 					}
 
 					currtp.OnResults(results, gameData)

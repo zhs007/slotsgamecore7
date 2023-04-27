@@ -197,18 +197,18 @@ func (rtp *RTP) Bet(bet int64) {
 }
 
 // OnResult -
-func (rtp *RTP) OnResult(stake *sgc7game.Stake, pr *sgc7game.PlayResult, gameData any) {
-	rtp.Root.OnResult(pr, gameData)
+func (rtp *RTP) OnResult(stake *sgc7game.Stake, i int, prs []*sgc7game.PlayResult, gameData any) {
+	rtp.Root.OnResult(prs[i], gameData)
 
 	for _, v := range rtp.MapHR {
-		v.FuncOnResult(rtp, v, pr)
+		v.FuncOnResult(rtp, v, i, prs)
 	}
 
 	for _, v := range rtp.MapHitFrequencyData {
-		v.OnHitFrequencyResult(v, pr)
+		v.OnHitFrequencyResult(v, prs[i])
 	}
 
-	curwin := float64(pr.CashWin) / float64(stake.CashBet)
+	curwin := float64(prs[i].CashWin) / float64(stake.CashBet)
 	if curwin > rtp.MaxCoincidingWin {
 		rtp.MaxCoincidingWin = curwin
 	}
