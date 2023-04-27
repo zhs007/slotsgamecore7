@@ -106,10 +106,20 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 							}
 
 							cmd = pr.NextCmds[cr]
-							cmdparam = pr.NextCmdParams[cr]
+
+							if len(pr.NextCmdParams) >= cr {
+								cmdparam = pr.NextCmdParams[cr]
+							} else {
+								cmdparam = ""
+							}
 						} else {
 							cmd = pr.NextCmds[0]
-							cmdparam = pr.NextCmdParams[0]
+
+							if len(pr.NextCmdParams) >= 0{
+								cmdparam = pr.NextCmdParams[0]
+							} else {
+								cmdparam = ""
+							}
 						}
 					} else {
 						cmd = "SPIN"
@@ -278,10 +288,20 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 							}
 
 							cmd = pr.NextCmds[cr]
-							cmdparam = pr.NextCmdParams[cr]
+
+							if len(pr.NextCmdParams) >= cr {
+								cmdparam = pr.NextCmdParams[cr]
+							} else {
+								cmdparam = ""
+							}
 						} else {
 							cmd = pr.NextCmds[0]
-							cmdparam = pr.NextCmdParams[0]
+							
+							if len(pr.NextCmdParams) >= 0{
+								cmdparam = pr.NextCmdParams[0]
+							} else {
+								cmdparam = ""
+							}
 						}
 					} else {
 						cmd = "SPIN"

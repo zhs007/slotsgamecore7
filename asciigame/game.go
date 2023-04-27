@@ -217,7 +217,12 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 			if len(pr.NextCmds) > 0 {
 				cmd = pr.NextCmds[curSelected]
-				cmdparam = pr.NextCmdParams[curSelected]
+				
+				if len(pr.NextCmdParams) > 0 {
+					cmdparam = pr.NextCmdParams[curSelected]
+				} else{
+					cmdparam = ""	
+				}
 			} else {
 				cmd = "SPIN"
 				cmdparam = ""
