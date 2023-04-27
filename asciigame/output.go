@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
@@ -21,6 +22,34 @@ func OutputReverseScene(str string, scene *sgc7game.GameScene, mapSymbolColor *S
 	for y := 0; y < scene.Height; y++ {
 		for x := 0; x < scene.Width; x++ {
 			fmt.Printf("%v ", mapSymbolColor.GetSymbolString(scene.Arr[x][scene.Height-1-y]))
+		}
+
+		fmt.Print("\n")
+	}
+}
+
+func IsPosInResult(x, y int, result *sgc7game.PlayResult) bool {
+	for _, v := range result.Results {
+		if goutils.IndexOfInt2Slice(v.Pos, x, y, 0) >= 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
+func OutputReverseSceneEx(str string, scene *sgc7game.GameScene, result *sgc7game.PlayResult, c *color.Color, mapSymbolColor *SymbolColorMap) {
+	if len(str) > 0 {
+		fmt.Printf("%v:\n", str)
+	}
+
+	for y := 0; y < scene.Height; y++ {
+		for x := 0; x < scene.Width; x++ {
+			if IsPosInResult(x, scene.Height-1-y, result) {
+				fmt.Printf("%v ", FormatColorString(mapSymbolColor.PayTables.GetStringFromInt(scene.Arr[x][scene.Height-1-y]), c))
+			} else {
+				fmt.Printf("%v ", mapSymbolColor.PayTables.GetStringFromInt(scene.Arr[x][scene.Height-1-y]))
+			}
 		}
 
 		fmt.Print("\n")
