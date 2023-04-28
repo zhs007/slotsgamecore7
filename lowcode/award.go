@@ -24,6 +24,8 @@ func (cfg *Award) getType() int {
 		return AwardInitMask
 	} else if cfg.AwardType == "triggerRespin" {
 		return AwardTriggerRespin
+	} else if cfg.AwardType == "noLevelUpCollector" {
+		return AwardNoLevelUpCollector
 	}
 
 	return AwardUnknow
@@ -42,14 +44,15 @@ func (cfg *Award) Init() {
 }
 
 const (
-	AwardUnknow        int = 0
-	AwardCash          int = 1
-	AwardCollector     int = 2
-	AwardRespinTimes   int = 3
-	AwardGameMulti     int = 4
-	AwardStepMulti     int = 5
-	AwardInitMask      int = 6
-	AwardTriggerRespin int = 7
+	AwardUnknow             int = 0
+	AwardCash               int = 1
+	AwardCollector          int = 2
+	AwardRespinTimes        int = 3
+	AwardGameMulti          int = 4
+	AwardStepMulti          int = 5
+	AwardInitMask           int = 6
+	AwardTriggerRespin      int = 7
+	AwardNoLevelUpCollector int = 8
 )
 
 // type Award struct {

@@ -54,9 +54,7 @@ type GameProperty struct {
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
-	for _, v := range gameProp.RespinComponents {
-		gp.RespinComponents = append(gp.RespinComponents, v)
-	}
+	copy(gp.RespinComponents, gameProp.RespinComponents)
 }
 
 func (gameProp *GameProperty) OnNewGame() error {
@@ -280,6 +278,12 @@ func (gameProp *GameProperty) GetTagStr(tag string) string {
 	return gameProp.mapStr[tag]
 }
 
+func (gameProp *GameProperty) procAwards(awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {
+	for _, v := range awards {
+		gameProp.procAward(v, curpr, gp)
+	}
+}
+
 func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult, gp *GameParams) {
 	if award.Type == AwardRespinTimes {
 		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
@@ -303,6 +307,34 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 		}
 	} else if award.Type == AwardTriggerRespin {
 		gameProp.TriggerRespin(curpr, gp, award.Vals[0], award.StrParams[0])
+	} else if award.Type == AwardCollector {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			collector, isok := component.(*Collector)
+			if isok {
+				err := collector.Add(award.Vals[0], nil, gameProp, curpr, gp, false)
+				if err != nil {
+					goutils.Error("GameProperty.procAward",
+						zap.Error(err))
+
+					return
+				}
+			}
+		}
+	} else if award.Type == AwardNoLevelUpCollector {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			collector, isok := component.(*Collector)
+			if isok {
+				err := collector.Add(award.Vals[0], nil, gameProp, curpr, gp, true)
+				if err != nil {
+					goutils.Error("GameProperty.procAward",
+						zap.Error(err))
+
+					return
+				}
+			}
+		}
 	}
 }
 

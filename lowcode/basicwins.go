@@ -76,6 +76,7 @@ type TriggerFeatureConfig struct {
 	NextComponent                 string         `yaml:"nextComponent"`                 // next component
 	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
 	Awards                        []*Award       `yaml:"awards"`                        // 新的奖励系统
+	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights"`           // 每个中奖符号随机一组奖励
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -139,8 +140,20 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			gameProp.TagInt(tf.TagSymbolNum, ret.SymbolNums)
 		}
 
-		for _, award := range tf.Awards {
-			gameProp.procAward(award, curpr, gp)
+		if len(tf.Awards) > 0 {
+			gameProp.procAwards(tf.Awards, curpr, gp)
+		}
+
+		if tf.SymbolAwardsWeights != nil {
+			node, err := tf.SymbolAwardsWeights.RandVal(plugin)
+			if err != nil {
+				goutils.Error("BasicWins.ProcTriggerFeature:SymbolAwardsWeights.RandVal",
+					zap.Error(err))
+
+				return nil
+			}
+
+			gameProp.procAwards(node.Awards, curpr, gp)
 		}
 
 		if tf.RespinComponent != "" {
@@ -197,11 +210,19 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		for _, award := range v.Awards {
 			award.Init()
 		}
+
+		if v.SymbolAwardsWeights != nil {
+			v.SymbolAwardsWeights.Init()
+		}
 	}
 
 	for _, v := range cfg.AfterMain {
 		for _, award := range v.Awards {
 			award.Init()
+		}
+
+		if v.SymbolAwardsWeights != nil {
+			v.SymbolAwardsWeights.Init()
 		}
 	}
 
