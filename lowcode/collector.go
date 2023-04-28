@@ -47,18 +47,16 @@ func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 // CollectorConfig - configuration for Collector
 type CollectorConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string                 `yaml:"symbol"`
-	MaxVal               int                    `yaml:"maxVal"`
-	PerLevelAwards       []*AwardConfig         `yaml:"perLevelAwards"`
-	MapSPLevelAwards     map[int][]*AwardConfig `yaml:"mapSPLevelAwards"`
+	Symbol               string           `yaml:"symbol"`
+	MaxVal               int              `yaml:"maxVal"`
+	PerLevelAwards       []*Award         `yaml:"perLevelAwards"`
+	MapSPLevelAwards     map[int][]*Award `yaml:"mapSPLevelAwards"`
 }
 
 type Collector struct {
 	*BasicComponent
-	Config           *CollectorConfig
-	SymbolCode       int
-	PerLevelAwards   []*Award
-	MapSPLevelAwards map[int][]*Award
+	Config     *CollectorConfig
+	SymbolCode int
 }
 
 // Init -
@@ -89,21 +87,15 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 
 	if cfg.PerLevelAwards != nil {
 		for _, v := range cfg.PerLevelAwards {
-			collector.PerLevelAwards = append(collector.PerLevelAwards, NewArard(v))
+			v.Init()
 		}
 	}
 
 	if cfg.MapSPLevelAwards != nil {
-		collector.MapSPLevelAwards = make(map[int][]*Award)
-
-		for k, lst := range cfg.MapSPLevelAwards {
-			awards := []*Award{}
-
+		for _, lst := range cfg.MapSPLevelAwards {
 			for _, v := range lst {
-				awards = append(awards, NewArard(v))
+				v.Init()
 			}
-
-			collector.MapSPLevelAwards[k] = awards
 		}
 	}
 
@@ -121,10 +113,43 @@ func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
 	return nil
 }
 
+// Add -
+func (collector *Collector) Add(num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
+	if num <= 0 {
+		return nil
+	}
+
+	if cd == nil {
+		cd = gameProp.MapComponentData[collector.Name].(*CollectorData)
+	}
+
+	cd.NewCollector += num
+	oldval := cd.Val
+	cd.Val += num
+	if collector.Config.MaxVal > 0 {
+		if cd.Val > collector.Config.MaxVal {
+			cd.Val = collector.Config.MaxVal
+		}
+	}
+
+	if num > 0 && !noProcLevelUp {
+		for i := 1; i <= num; i++ {
+			cl := oldval + i
+			if cl > collector.Config.MaxVal {
+				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
+			} else {
+				collector.onLevelUp(gameProp, curpr, gp, cl, false)
+			}
+		}
+	}
+
+	return nil
+}
+
 // onLevelUp -
 func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, newLevel int, noProcSPLevel bool) error {
-	if collector.PerLevelAwards != nil {
-		for _, v := range collector.PerLevelAwards {
+	if collector.Config.PerLevelAwards != nil {
+		for _, v := range collector.Config.PerLevelAwards {
 			gameProp.procAward(v, curpr, gp)
 		}
 	}
@@ -133,7 +158,7 @@ func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.Pl
 		return nil
 	}
 
-	sp, isok := collector.MapSPLevelAwards[newLevel]
+	sp, isok := collector.Config.MapSPLevelAwards[newLevel]
 	if isok {
 		for _, v := range sp {
 			gameProp.procAward(v, curpr, gp)
@@ -155,25 +180,27 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		return cursymbol == collector.SymbolCode
 	})
 
-	oldval := cd.Val
-	cd.NewCollector = nn
-	cd.Val += nn
-	if collector.Config.MaxVal > 0 {
-		if cd.Val > collector.Config.MaxVal {
-			cd.Val = collector.Config.MaxVal
-		}
-	}
+	// oldval := cd.Val
+	// cd.NewCollector = nn
 
-	if nn > 0 {
-		for i := 1; i <= nn; i++ {
-			cl := oldval + i
-			if cl > collector.Config.MaxVal {
-				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
-			} else {
-				collector.onLevelUp(gameProp, curpr, gp, cl, false)
-			}
-		}
-	}
+	collector.Add(nn, cd, gameProp, curpr, gp, false)
+	// cd.Val += nn
+	// if collector.Config.MaxVal > 0 {
+	// 	if cd.Val > collector.Config.MaxVal {
+	// 		cd.Val = collector.Config.MaxVal
+	// 	}
+	// }
+
+	// if nn > 0 {
+	// 	for i := 1; i <= nn; i++ {
+	// 		cl := oldval + i
+	// 		if cl > collector.Config.MaxVal {
+	// 			collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
+	// 		} else {
+	// 			collector.onLevelUp(gameProp, curpr, gp, cl, false)
+	// 		}
+	// 	}
+	// }
 
 	// gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 

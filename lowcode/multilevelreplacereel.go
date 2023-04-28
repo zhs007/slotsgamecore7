@@ -148,9 +148,10 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 		sc := gs.Clone()
 
 		for x, reel := range multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels {
-			for y, s := range reel {
-				sc.Arr[x][y] = s
-			}
+			copy(sc.Arr[x], reel)
+			// for y, s := range reel {
+			// 	sc.Arr[x][y] = s
+			// }
 		}
 
 		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)

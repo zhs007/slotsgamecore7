@@ -60,16 +60,34 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
+// RespinLevelConfig - configuration for Respin Level
+type RespinLevelConfig struct {
+	BasicComponentConfig `yaml:",inline"`
+	LastRespinNum        int    `yaml:"lastRespinNum"` // 倒数第几局开始
+	MaxCoinWins          int    `yaml:"maxCoinWins"`   // 如果最大获奖低于这个
+	JumpComponent        string `yaml:"jumpComponent"` // 跳转到这个component
+}
+
 // RespinConfig - configuration for Respin
 type RespinConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	DefaultRespinNum     int    `yaml:"defaultRespinNum"`
-	MainComponent        string `yaml:"mainComponent"`
+	DefaultRespinNum     int                  `yaml:"defaultRespinNum"`
+	MainComponent        string               `yaml:"mainComponent"`
+	Levels               []*RespinLevelConfig `yaml:"levels"`
 }
 
 type Respin struct {
 	*BasicComponent
 	Config *RespinConfig
+}
+
+// OnPlayGame - on playgame
+func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData, gameProp *GameProperty) bool {
+	if respinData.LastRespinNum <= level.LastRespinNum && respinData.CoinWin < level.MaxCoinWins {
+		return true
+	}
+
+	return false
 }
 
 // OnPlayGame - on playgame
@@ -120,13 +138,23 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 	if cd.LastRespinNum == 0 {
 		respin.onStepEnd(gameProp, curpr, gp, respin.Config.DefaultNextComponent)
 	} else {
+		nextComponent := respin.Config.MainComponent
+
+		for _, v := range respin.Config.Levels {
+			if respin.procLevel(v, cd, gameProp) {
+				nextComponent = v.JumpComponent
+
+				break
+			}
+		}
+
 		if cd.LastRespinNum > 0 {
 			cd.LastRespinNum--
 		}
 
 		cd.CurRespinNum++
 
-		respin.onStepEnd(gameProp, curpr, gp, respin.Config.MainComponent)
+		respin.onStepEnd(gameProp, curpr, gp, nextComponent)
 	}
 
 	gp.AddComponentData(respin.Name, cd)

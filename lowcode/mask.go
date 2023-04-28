@@ -92,21 +92,19 @@ func newMaskData(num int) *MaskData {
 // MaskConfig - configuration for Mask
 type MaskConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	MaskType             string                 `yaml:"maskType"`
-	Symbol               string                 `yaml:"symbol"`
-	Num                  int                    `yaml:"num"`
-	PerMaskAwards        []*AwardConfig         `yaml:"perMaskAwards"`
-	MapSPMaskAwards      map[int][]*AwardConfig `yaml:"mapSPMaskAwards"` // -1表示全满的奖励
-	EndingSPAward        string                 `yaml:"endingSPAward"`
+	MaskType             string           `yaml:"maskType"`
+	Symbol               string           `yaml:"symbol"`
+	Num                  int              `yaml:"num"`
+	PerMaskAwards        []*Award         `yaml:"perMaskAwards"`
+	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards"` // -1表示全满的奖励
+	EndingSPAward        string           `yaml:"endingSPAward"`
 }
 
 type Mask struct {
 	*BasicComponent
-	Config          *MaskConfig
-	MaskType        int
-	SymbolCode      int
-	PerMaskAwards   []*Award
-	MapSPMaskAwards map[int][]*Award
+	Config     *MaskConfig
+	MaskType   int
+	SymbolCode int
 }
 
 // Init -
@@ -138,21 +136,15 @@ func (mask *Mask) Init(fn string, pool *GamePropertyPool) error {
 
 	if cfg.PerMaskAwards != nil {
 		for _, v := range cfg.PerMaskAwards {
-			mask.PerMaskAwards = append(mask.PerMaskAwards, NewArard(v))
+			v.Init()
 		}
 	}
 
 	if cfg.MapSPMaskAwards != nil {
-		mask.MapSPMaskAwards = make(map[int][]*Award)
-
-		for k, lst := range cfg.MapSPMaskAwards {
-			awards := []*Award{}
-
+		for _, lst := range cfg.MapSPMaskAwards {
 			for _, v := range lst {
-				awards = append(awards, NewArard(v))
+				v.Init()
 			}
-
-			mask.MapSPMaskAwards[k] = awards
 		}
 	}
 
@@ -183,8 +175,8 @@ func (mask *Mask) ChgMask(gameProp *GameProperty, md *MaskData, curpr *sgc7game.
 
 // onMaskChg -
 func (mask *Mask) onMaskChg(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, noProcSPLevel bool) {
-	if mask.PerMaskAwards != nil {
-		for _, v := range mask.PerMaskAwards {
+	if mask.Config.PerMaskAwards != nil {
+		for _, v := range mask.Config.PerMaskAwards {
 			gameProp.procAward(v, curpr, gp)
 		}
 	}
@@ -193,7 +185,7 @@ func (mask *Mask) onMaskChg(gameProp *GameProperty, curpr *sgc7game.PlayResult, 
 		return
 	}
 
-	sp, isok := mask.MapSPMaskAwards[curMask-1]
+	sp, isok := mask.Config.MapSPMaskAwards[curMask-1]
 	if isok {
 		for _, v := range sp {
 			gameProp.procAward(v, curpr, gp)
@@ -290,7 +282,7 @@ func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResu
 			if cd.LastRespinNum == 0 {
 				md := gameProp.MapComponentData[mask.Name].(*MaskData)
 
-				fullAward := mask.MapSPMaskAwards[-1]
+				fullAward := mask.Config.MapSPMaskAwards[-1]
 				if fullAward != nil {
 					if md.IsFull() {
 						for _, v := range fullAward {
