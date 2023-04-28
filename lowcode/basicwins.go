@@ -75,8 +75,7 @@ type TriggerFeatureConfig struct {
 	RespinComponent               string         `yaml:"respinComponent"`               // like fg-spin
 	NextComponent                 string         `yaml:"nextComponent"`                 // next component
 	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
-	AwardsCfg                     []*AwardConfig `yaml:"awards"`                        // 新的奖励系统
-	Awards                        []*Award       `yaml:"-"`                             // 新的奖励系统
+	Awards                        []*Award       `yaml:"awards"`                        // 新的奖励系统
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -195,14 +194,14 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 	}
 
 	for _, v := range cfg.BeforMain {
-		for _, award := range v.AwardsCfg {
-			v.Awards = append(v.Awards, NewArard(award))
+		for _, award := range v.Awards {
+			award.Init()
 		}
 	}
 
 	for _, v := range cfg.AfterMain {
-		for _, award := range v.AwardsCfg {
-			v.Awards = append(v.Awards, NewArard(award))
+		for _, award := range v.Awards {
+			award.Init()
 		}
 	}
 

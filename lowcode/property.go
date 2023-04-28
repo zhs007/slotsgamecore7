@@ -281,28 +281,28 @@ func (gameProp *GameProperty) GetTagStr(tag string) string {
 }
 
 func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult, gp *GameParams) {
-	if award.AwardType == AwardRespinTimes {
-		component, isok := gameProp.Pool.MapComponents[award.Config.StrParam]
+	if award.Type == AwardRespinTimes {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
 			respin, isok := component.(*Respin)
 			if isok {
-				respin.AddRespinTimes(gameProp, award.Config.Val)
+				respin.AddRespinTimes(gameProp, award.Vals[0])
 			}
 		}
-	} else if award.AwardType == AwardGameMulti {
-		gameProp.SetVal(GamePropGameMulti, award.Config.Val)
-	} else if award.AwardType == AwardStepMulti {
-		gameProp.SetVal(GamePropStepMulti, award.Config.Val)
-	} else if award.AwardType == AwardInitMask {
-		component, isok := gameProp.Pool.MapComponents[award.Config.StrParams[0]]
+	} else if award.Type == AwardGameMulti {
+		gameProp.SetVal(GamePropGameMulti, award.Vals[0])
+	} else if award.Type == AwardStepMulti {
+		gameProp.SetVal(GamePropStepMulti, award.Vals[0])
+	} else if award.Type == AwardInitMask {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
 			mask, isok := component.(*Mask)
 			if isok {
-				mask.ProcMask(gameProp, curpr, gp, award.Config.StrParams[1])
+				mask.ProcMask(gameProp, curpr, gp, award.StrParams[1])
 			}
 		}
-	} else if award.AwardType == AwardTriggerRespin {
-		gameProp.TriggerRespin(curpr, gp, award.Config.Val, award.Config.StrParam)
+	} else if award.Type == AwardTriggerRespin {
+		gameProp.TriggerRespin(curpr, gp, award.Vals[0], award.StrParams[0])
 	}
 }
 
