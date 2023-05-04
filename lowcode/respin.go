@@ -153,6 +153,7 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 		}
 
 		cd.CurRespinNum++
+		cd.TotalRespinNum++
 
 		respin.onStepEnd(gameProp, curpr, gp, nextComponent)
 	}
@@ -204,7 +205,7 @@ func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 		return 0, err
 	}
 
-	feature.Status.AddStatus(int(pbcd.CurRespinNum))
+	feature.Status.AddStatus(int(pbcd.TotalRespinNum))
 
 	return respin.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
 }
