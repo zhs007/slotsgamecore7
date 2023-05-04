@@ -29,7 +29,7 @@ func (collectorData *CollectorData) OnNewGame() {
 	collectorData.Val = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (collectorData *CollectorData) OnNewStep() {
 	collectorData.BasicComponentData.OnNewStep()
 

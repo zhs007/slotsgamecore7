@@ -38,7 +38,7 @@ func (respinData *RespinData) OnNewGame() {
 	respinData.TotalCashWin = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (respinData *RespinData) OnNewStep() {
 	respinData.BasicComponentData.OnNewStep()
 
@@ -79,6 +79,15 @@ type RespinConfig struct {
 type Respin struct {
 	*BasicComponent
 	Config *RespinConfig
+}
+
+// OnNewGame -
+func (respin *Respin) OnNewGame(gameProp *GameProperty) error {
+	cd := gameProp.MapComponentData[respin.Name]
+
+	cd.OnNewGame()
+
+	return nil
 }
 
 // OnPlayGame - on playgame

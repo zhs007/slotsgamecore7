@@ -29,7 +29,7 @@ func (multiLevelMysteryData *MultiLevelMysteryData) OnNewGame() {
 	multiLevelMysteryData.CurLevel = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (multiLevelMysteryData *MultiLevelMysteryData) OnNewStep() {
 	multiLevelMysteryData.BasicComponentData.OnNewStep()
 

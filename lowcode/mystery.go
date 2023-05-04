@@ -26,7 +26,7 @@ func (mysteryData *MysteryData) OnNewGame() {
 	mysteryData.BasicComponentData.OnNewGame()
 }
 
-// OnNewGame -
+// OnNewStep -
 func (mysteryData *MysteryData) OnNewStep() {
 	mysteryData.BasicComponentData.OnNewStep()
 

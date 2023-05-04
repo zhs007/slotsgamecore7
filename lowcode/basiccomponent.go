@@ -27,7 +27,7 @@ type BasicComponentData struct {
 func (basicComponentData *BasicComponentData) OnNewGame() {
 }
 
-// OnNewGame -
+// OnNewStep -
 func (basicComponentData *BasicComponentData) OnNewStep() {
 	basicComponentData.UsedScenes = nil
 	basicComponentData.UsedOtherScenes = nil

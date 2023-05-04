@@ -27,7 +27,7 @@ func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewGame() {
 	multiLevelReplaceReelData.CurLevel = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewStep() {
 	multiLevelReplaceReelData.BasicComponentData.OnNewStep()
 }

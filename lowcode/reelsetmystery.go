@@ -26,7 +26,7 @@ func (reelSetMysteryData *ReelSetMysteryData) OnNewGame() {
 	reelSetMysteryData.BasicComponentData.OnNewGame()
 }
 
-// OnNewGame -
+// OnNewStep -
 func (reelSetMysteryData *ReelSetMysteryData) OnNewStep() {
 	reelSetMysteryData.BasicComponentData.OnNewStep()
 
