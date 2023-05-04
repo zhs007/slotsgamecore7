@@ -12,10 +12,11 @@ import (
 type StatsConfig struct {
 	Name      string         `yaml:"name"`
 	Component string         `yaml:"component"`
+	Status    []string       `yaml:"status"` // component -> status
 	Children  []*StatsConfig `yaml:"children"`
 }
 
-func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType) *sgc7stats.Feature {
+func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType, isStatus bool) *sgc7stats.Feature {
 	var feature *sgc7stats.Feature
 
 	if parent != nil {
@@ -28,6 +29,14 @@ func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats
 	feature.Symbols = sgc7stats.NewSymbolsRTP(width, symbols)
 	feature.AllWins = sgc7stats.NewWins()
 	feature.CurWins = sgc7stats.NewWins()
+
+	if isStatus {
+		feature.Status = sgc7stats.NewStatus()
+	}
+
+	// for _, v := range cfg.Status {
+	// 	feature.MapStatus[v] = sgc7stats.NewStatus()
+	// }
 
 	return feature
 }

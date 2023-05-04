@@ -38,7 +38,7 @@ type Feature struct {
 	Symbols        *SymbolsRTP
 	CurWins        *Wins
 	AllWins        *Wins
-	MapStatus      map[string]*Status
+	Status         *Status
 	Obj            any
 }
 
@@ -56,7 +56,6 @@ func (feature *Feature) CloneIncludeChildren() *Feature {
 		Parent:         feature.Parent,
 		Children:       make([]*Feature, 0, len(feature.Children)),
 		OnAnalyze:      feature.OnAnalyze,
-		MapStatus:      make(map[string]*Status),
 		Obj:            feature.Obj,
 	}
 
@@ -74,6 +73,10 @@ func (feature *Feature) CloneIncludeChildren() *Feature {
 
 	if feature.AllWins != nil {
 		nf.AllWins = feature.AllWins.Clone()
+	}
+
+	if feature.Status != nil {
+		nf.Status = feature.Status.Clone()
 	}
 
 	for _, v := range feature.Children {
@@ -97,7 +100,6 @@ func (feature *Feature) Clone() *Feature {
 		Parent:         feature.Parent,
 		Children:       make([]*Feature, len(feature.Children)),
 		OnAnalyze:      feature.OnAnalyze,
-		MapStatus:      make(map[string]*Status),
 		Obj:            feature.Obj,
 	}
 
@@ -115,6 +117,10 @@ func (feature *Feature) Clone() *Feature {
 
 	if feature.AllWins != nil {
 		nf.AllWins = feature.AllWins.Clone()
+	}
+
+	if feature.Status != nil {
+		nf.Status = feature.Status.Clone()
 	}
 
 	return nf
@@ -149,8 +155,8 @@ func (feature *Feature) Merge(src *Feature) {
 		v.Merge(src.Children[i])
 	}
 
-	for k, v := range feature.MapStatus {
-		v.Merge(src.MapStatus[k])
+	if feature.Status != nil && src.Status != nil {
+		feature.Status.Merge(src.Status)
 	}
 }
 
@@ -228,10 +234,10 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 		feature.CurWins.SaveSheet(f, csheet)
 	}
 
-	for k, v := range feature.MapStatus {
-		csheet := fmt.Sprintf("%v - %v", k, feature.Name)
+	if feature.Status != nil {
+		csheet := fmt.Sprintf("status - %v", feature.Name)
 		f.NewSheet(csheet)
-		v.SaveSheet(f, csheet)
+		feature.Status.SaveSheet(f, csheet)
 	}
 
 	for _, v := range feature.Children {

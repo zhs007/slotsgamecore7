@@ -55,10 +55,10 @@ func (status *Status) genData() []*statusdata {
 	return lst
 }
 
-func (status *Status) AddStatus(win int) {
+func (status *Status) AddStatus(val int) {
 	status.TotalTimes++
 
-	status.MapStatus[win]++
+	status.MapStatus[val]++
 }
 
 func (status *Status) SaveSheet(f *excelize.File, sheet string) error {

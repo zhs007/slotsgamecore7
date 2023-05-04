@@ -227,6 +227,16 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 
 // OnStats
 func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	if feature != nil && feature.Status != nil && len(lst) > 0 {
+		lastpr := lst[len(lst)-1]
+		gp := lastpr.CurGameModParams.(*GameParams)
+		if gp != nil {
+			pbcd := gp.MapComponents[collector.Name]
+
+			collector.OnStatsWithPB(feature, pbcd, lastpr)
+		}
+	}
+
 	return false, 0, 0
 }
 
@@ -241,6 +251,8 @@ func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponen
 
 		return 0, err
 	}
+
+	feature.Status.AddStatus(int(pbcd.Val))
 
 	return 0, nil
 }

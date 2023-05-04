@@ -177,6 +177,16 @@ func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 
 // OnStats
 func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	if feature != nil && feature.Status != nil && len(lst) > 0 {
+		lastpr := lst[len(lst)-1]
+		gp := lastpr.CurGameModParams.(*GameParams)
+		if gp != nil {
+			pbcd := gp.MapComponents[respin.Name]
+
+			respin.OnStatsWithPB(feature, pbcd, lastpr)
+		}
+	}
+
 	return false, 0, 0
 }
 
@@ -191,6 +201,8 @@ func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 
 		return 0, err
 	}
+
+	feature.Status.AddStatus(int(pbcd.TotalCashWin))
 
 	return respin.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
 }
