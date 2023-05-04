@@ -261,7 +261,9 @@ func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst
 		if gp != nil {
 			pbcd := gp.MapComponents[mask.Name]
 
-			mask.OnStatsWithPB(feature, pbcd, lastpr)
+			if pbcd != nil {
+				mask.OnStatsWithPB(feature, pbcd, lastpr)
+			}
 		}
 	}
 

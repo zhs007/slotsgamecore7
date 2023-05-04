@@ -183,7 +183,9 @@ func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 		if gp != nil {
 			pbcd := gp.MapComponents[respin.Name]
 
-			respin.OnStatsWithPB(feature, pbcd, lastpr)
+			if pbcd != nil {
+				respin.OnStatsWithPB(feature, pbcd, lastpr)
+			}
 		}
 	}
 
