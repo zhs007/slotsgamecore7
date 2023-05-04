@@ -66,7 +66,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 
 	feature := NewStatsFeature(parent, cfg.Name, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 		return curComponent.OnStats(f, s, lst)
-	}, pool.Config.Width, pool.Config.StatsSymbolCodes)
+	}, pool.Config.Width, pool.Config.StatsSymbolCodes, false)
 
 	for _, v := range cfg.Children {
 		_, err := pool.NewStatsWithConfig(feature, v)
@@ -78,6 +78,34 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 			return nil, err
 		}
 	}
+
+	for _, v := range cfg.Status {
+		_, err := pool.newStatusStats(feature, v)
+		if err != nil {
+			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
+				goutils.JSON("v", v),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+	}
+
+	return feature, nil
+}
+
+func (pool *GamePropertyPool) newStatusStats(parent *sgc7stats.Feature, componentName string) (*sgc7stats.Feature, error) {
+	curComponent, isok := pool.MapComponents[componentName]
+	if !isok {
+		goutils.Error("GameProperty.NewStatsWithConfig",
+			zap.Error(ErrIvalidStatsComponentInConfig))
+
+		return nil, ErrIvalidStatsComponentInConfig
+	}
+
+	feature := NewStatsFeature(parent, componentName, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+		return curComponent.OnStats(f, s, lst)
+	}, pool.Config.Width, pool.Config.StatsSymbolCodes, true)
 
 	return feature, nil
 }

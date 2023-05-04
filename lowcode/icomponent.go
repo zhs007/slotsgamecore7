@@ -26,8 +26,6 @@ type IComponent interface {
 	OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64)
 	// NewComponentData -
 	NewComponentData() IComponentData
-	// OnStatsWithPB -
-	OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error)
 	// EachUsedResults -
 	EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult)
 	// OnPlayGame - on playgame

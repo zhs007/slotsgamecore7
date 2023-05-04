@@ -36,6 +36,7 @@ func (wins *Wins) Merge(src *Wins) {
 	for k, v := range src.MapWins {
 		_, isok := wins.MapWins[k]
 		if isok {
+
 			wins.MapWins[k] += v
 		} else {
 			wins.MapWins[k] = v
