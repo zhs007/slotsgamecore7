@@ -54,7 +54,11 @@ type GameProperty struct {
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
-	copy(gp.RespinComponents, gameProp.RespinComponents)
+	if len(gameProp.RespinComponents) > 0 {
+		gp.RespinComponents = make([]string, len(gameProp.RespinComponents))
+
+		copy(gp.RespinComponents, gameProp.RespinComponents)
+	}
 }
 
 func (gameProp *GameProperty) OnNewGame() error {
