@@ -204,7 +204,7 @@ func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 		return 0, err
 	}
 
-	feature.Status.AddStatus(int(pbcd.TotalCashWin))
+	feature.Status.AddStatus(int(pbcd.CurRespinNum))
 
 	return respin.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
 }
