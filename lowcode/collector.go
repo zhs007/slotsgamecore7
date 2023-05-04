@@ -233,7 +233,9 @@ func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 		if gp != nil {
 			pbcd := gp.MapComponents[collector.Name]
 
-			collector.OnStatsWithPB(feature, pbcd, lastpr)
+			if pbcd != nil {
+				collector.OnStatsWithPB(feature, pbcd, lastpr)
+			}
 		}
 	}
 
