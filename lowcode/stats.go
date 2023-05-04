@@ -25,18 +25,14 @@ func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats
 		feature = sgc7stats.NewFeature(name, sgc7stats.FeatureBasic, onAnalyze, nil)
 	}
 
-	feature.Reels = sgc7stats.NewReels(width, symbols)
-	feature.Symbols = sgc7stats.NewSymbolsRTP(width, symbols)
-	feature.AllWins = sgc7stats.NewWins()
-	feature.CurWins = sgc7stats.NewWins()
-
 	if isStatus {
 		feature.Status = sgc7stats.NewStatus()
+	} else {
+		feature.Reels = sgc7stats.NewReels(width, symbols)
+		feature.Symbols = sgc7stats.NewSymbolsRTP(width, symbols)
+		feature.AllWins = sgc7stats.NewWins()
+		feature.CurWins = sgc7stats.NewWins()
 	}
-
-	// for _, v := range cfg.Status {
-	// 	feature.MapStatus[v] = sgc7stats.NewStatus()
-	// }
 
 	return feature
 }
