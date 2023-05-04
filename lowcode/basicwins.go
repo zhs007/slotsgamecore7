@@ -43,7 +43,7 @@ func (basicWinsData *BasicWinsData) OnNewGame() {
 	basicWinsData.BasicComponentData.OnNewGame()
 }
 
-// OnNewGame -
+// OnNewStep -
 func (basicWinsData *BasicWinsData) OnNewStep() {
 	basicWinsData.BasicComponentData.OnNewStep()
 

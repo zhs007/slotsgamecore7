@@ -58,7 +58,7 @@ func (maskData *MaskData) OnNewGame() {
 	maskData.NewChged = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (maskData *MaskData) OnNewStep() {
 	maskData.BasicComponentData.OnNewStep()
 
@@ -81,7 +81,7 @@ func (maskData *MaskData) BuildPBComponentData() proto.Message {
 	return pb
 }
 
-// OnNewGame -
+// IsFull -
 func (maskData *MaskData) IsFull() bool {
 	for _, v := range maskData.Vals {
 		if !v {

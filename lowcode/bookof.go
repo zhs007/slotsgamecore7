@@ -26,7 +26,7 @@ func (bookOfData *BookOfData) OnNewGame() {
 	bookOfData.BasicComponentData.OnNewGame()
 }
 
-// OnNewGame -
+// OnNewStep -
 func (bookOfData *BookOfData) OnNewStep() {
 	bookOfData.BasicComponentData.OnNewStep()
 

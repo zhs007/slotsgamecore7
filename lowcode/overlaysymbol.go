@@ -27,7 +27,7 @@ func (overlaySymbolData *OverlaySymbolData) OnNewGame() {
 	overlaySymbolData.CurLevel = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (overlaySymbolData *OverlaySymbolData) OnNewStep() {
 	overlaySymbolData.BasicComponentData.OnNewStep()
 }

@@ -27,7 +27,7 @@ func (multiLevelReelsData *MultiLevelReelsData) OnNewGame() {
 	multiLevelReelsData.CurLevel = 0
 }
 
-// OnNewGame -
+// OnNewStep -
 func (multiLevelReelsData *MultiLevelReelsData) OnNewStep() {
 	multiLevelReelsData.BasicComponentData.OnNewStep()
 }
