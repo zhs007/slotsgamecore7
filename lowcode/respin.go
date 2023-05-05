@@ -19,7 +19,6 @@ import (
 type RespinData struct {
 	BasicComponentData
 	LastRespinNum   int
-	TotalRespinNum  int
 	CurRespinNum    int
 	CurAddRespinNum int
 	TotalCoinWin    int64
@@ -31,7 +30,6 @@ func (respinData *RespinData) OnNewGame() {
 	respinData.BasicComponentData.OnNewGame()
 
 	respinData.LastRespinNum = 0
-	respinData.TotalRespinNum = 0
 	respinData.CurRespinNum = 0
 	respinData.CurAddRespinNum = 0
 	respinData.TotalCoinWin = 0
@@ -50,7 +48,6 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RespinData{
 		BasicComponentData: respinData.BuildPBBasicComponentData(),
 		LastRespinNum:      int32(respinData.LastRespinNum),
-		TotalRespinNum:     int32(respinData.TotalRespinNum),
 		CurRespinNum:       int32(respinData.CurRespinNum),
 		CurAddRespinNum:    int32(respinData.CurAddRespinNum),
 		TotalCoinWin:       respinData.TotalCoinWin,
@@ -162,7 +159,6 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 		}
 
 		cd.CurRespinNum++
-		cd.TotalRespinNum++
 
 		respin.onStepEnd(gameProp, curpr, gp, nextComponent)
 	}
@@ -187,14 +183,20 @@ func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 
 // OnStats
 func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	if feature != nil && feature.Status != nil && len(lst) > 0 {
-		lastpr := lst[len(lst)-1]
-		gp := lastpr.CurGameModParams.(*GameParams)
-		if gp != nil {
-			pbcd := gp.MapComponents[respin.Name]
+	if feature != nil && len(lst) > 0 {
 
+		if feature.RespinNumStatus != nil ||
+			feature.RespinWinStatus != nil {
+			pbcd, lastpr := findLastPBComponentData(lst, respin.Name)
 			if pbcd != nil {
-				respin.OnStatsWithPB(feature, pbcd, lastpr)
+				respin.onStatsWithPBEnding(feature, pbcd, lastpr)
+			}
+		}
+
+		if feature.RespinStartNumStatus != nil {
+			pbcd, firstpr := findFirstPBComponentData(lst, respin.Name)
+			if pbcd != nil {
+				respin.onStatsWithPBStart(feature, pbcd, firstpr)
 			}
 		}
 	}
@@ -202,8 +204,8 @@ func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 	return false, 0, 0
 }
 
-// OnStatsWithPB -
-func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+// onStatsWithPBEnding -
+func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) error {
 	pbcd := &sgc7pb.RespinData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
@@ -211,12 +213,37 @@ func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 		goutils.Error("Respin.OnStatsWithPB:UnmarshalTo",
 			zap.Error(err))
 
-		return 0, err
+		return err
 	}
 
-	feature.Status.AddStatus(int(pbcd.TotalRespinNum))
+	if feature.RespinNumStatus != nil {
+		feature.RespinNumStatus.AddStatus(int(pbcd.CurRespinNum))
+	}
 
-	return respin.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+	if feature.RespinWinStatus != nil {
+		feature.RespinWinStatus.AddStatus(int(pbcd.TotalCoinWin))
+	}
+
+	return nil
+}
+
+// onStatsWithPBEnding -
+func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) error {
+	pbcd := &sgc7pb.RespinData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("Respin.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return err
+	}
+
+	if feature.RespinStartNumStatus != nil {
+		feature.RespinStartNumStatus.AddStatus(int(pbcd.LastRespinNum))
+	}
+
+	return nil
 }
 
 // NewComponentData -
