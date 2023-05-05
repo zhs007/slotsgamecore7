@@ -288,7 +288,13 @@ func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *any
 		return 0, err
 	}
 
-	feature.RespinEndingStatus.AddStatus(boolArr2Int(pbcd.Vals))
+	if feature.RespinEndingStatus != nil {
+		feature.RespinEndingStatus.AddStatus(boolArr2Int(pbcd.Vals))
+	}
+
+	if feature.RespinStartStatus != nil {
+		feature.RespinStartStatus.AddStatus(boolArr2Int(pbcd.Vals))
+	}
 
 	return 0, nil
 }
