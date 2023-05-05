@@ -15,12 +15,14 @@ const (
 	StatusTypeRespinNum      int = 2
 	StatusTypeRespinWin      int = 3
 	StatusTypeRespinStartNum int = 4
+	StatusTypeRespinStart    int = 5
 )
 
 type StatsConfig struct {
 	Name                 string            `yaml:"name"`
 	Component            string            `yaml:"component"`
 	RespinEndingStatus   map[string]string `yaml:"respinEndingStatus"`   // component -> status
+	RespinStartStatus    map[string]string `yaml:"respinStartStatus"`    // component -> status
 	RespinNumStatus      []string          `yaml:"respinNumStatus"`      // component -> status
 	RespinStartNumStatus []string          `yaml:"respinStartNumStatus"` // component -> status
 	RespinWinStatus      []string          `yaml:"respinWinStatus"`      // component -> status
@@ -39,6 +41,9 @@ func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats
 	if statusType == StatusTypeRespinEnding {
 		feature.RespinEndingStatus = sgc7stats.NewStatus()
 		feature.RespinEndingName = respinName
+	} else if statusType == StatusTypeRespinStart {
+		feature.RespinStartStatus = sgc7stats.NewStatus()
+		feature.RespinStartName = respinName
 	} else if statusType == StatusTypeRespinNum {
 		feature.RespinNumStatus = sgc7stats.NewStatus()
 	} else if statusType == StatusTypeRespinWin {

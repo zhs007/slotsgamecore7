@@ -183,23 +183,29 @@ func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 
 // OnStats
 func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	if feature != nil &&
-		(feature.RespinNumStatus != nil ||
-			feature.RespinWinStatus != nil ||
-			feature.RespinStartNumStatus != nil) &&
-		len(lst) > 0 {
+	if feature != nil && len(lst) > 0 {
 
-		pbcd, lastpr := findLastPBComponentData(lst, respin.Name)
-		if pbcd != nil {
-			respin.OnStatsWithPB(feature, pbcd, lastpr)
+		if feature.RespinNumStatus != nil ||
+			feature.RespinWinStatus != nil {
+			pbcd, lastpr := findLastPBComponentData(lst, respin.Name)
+			if pbcd != nil {
+				respin.onStatsWithPBEnding(feature, pbcd, lastpr)
+			}
+		}
+
+		if feature.RespinStartNumStatus != nil {
+			pbcd, firstpr := findFirstPBComponentData(lst, respin.Name)
+			if pbcd != nil {
+				respin.onStatsWithPBStart(feature, pbcd, firstpr)
+			}
 		}
 	}
 
 	return false, 0, 0
 }
 
-// OnStatsWithPB -
-func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
+// onStatsWithPBEnding -
+func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) error {
 	pbcd := &sgc7pb.RespinData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
@@ -207,7 +213,7 @@ func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 		goutils.Error("Respin.OnStatsWithPB:UnmarshalTo",
 			zap.Error(err))
 
-		return 0, err
+		return err
 	}
 
 	if feature.RespinNumStatus != nil {
@@ -218,11 +224,26 @@ func (respin *Respin) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData 
 		feature.RespinWinStatus.AddStatus(int(pbcd.TotalCoinWin))
 	}
 
+	return nil
+}
+
+// onStatsWithPBEnding -
+func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) error {
+	pbcd := &sgc7pb.RespinData{}
+
+	err := pbComponentData.UnmarshalTo(pbcd)
+	if err != nil {
+		goutils.Error("Respin.OnStatsWithPB:UnmarshalTo",
+			zap.Error(err))
+
+		return err
+	}
+
 	if feature.RespinStartNumStatus != nil {
 		feature.RespinStartNumStatus.AddStatus(int(pbcd.LastRespinNum))
 	}
 
-	return respin.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+	return nil
 }
 
 // NewComponentData -

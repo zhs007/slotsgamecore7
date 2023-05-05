@@ -36,3 +36,19 @@ func findFirstPBComponentData(lst []*sgc7game.PlayResult, componentName string) 
 
 	return nil, nil
 }
+
+// findFirstPBComponentDataEx
+func findFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) (*anypb.Any, *sgc7game.PlayResult) {
+	for _, pr := range lst {
+		gp := pr.CurGameModParams.(*GameParams)
+		if gp != nil {
+			pbRespin := gp.MapComponents[respinComponentName]
+			pbcd := gp.MapComponents[componentName]
+			if pbRespin != nil && pbcd != nil {
+				return pbcd, pr
+			}
+		}
+	}
+
+	return nil, nil
+}

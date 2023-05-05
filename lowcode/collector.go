@@ -227,11 +227,21 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 
 // OnStats
 func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	if feature != nil && feature.RespinEndingStatus != nil && len(lst) > 0 {
-		pbcd, lastpr := findLastPBComponentData(lst, feature.RespinEndingName)
+	if feature != nil && len(lst) > 0 {
+		if feature.RespinEndingStatus != nil {
+			pbcd, lastpr := findLastPBComponentData(lst, feature.RespinEndingName)
 
-		if pbcd != nil {
-			collector.OnStatsWithPB(feature, pbcd, lastpr)
+			if pbcd != nil {
+				collector.OnStatsWithPB(feature, pbcd, lastpr)
+			}
+		}
+
+		if feature.RespinStartStatus != nil {
+			pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, collector.Name)
+
+			if pbcd != nil {
+				collector.OnStatsWithPB(feature, pbcd, lastpr)
+			}
 		}
 	}
 

@@ -85,6 +85,10 @@ func (feature *Feature) CloneIncludeChildren() *Feature {
 		nf.RespinEndingStatus = feature.RespinEndingStatus.Clone()
 	}
 
+	if feature.RespinStartStatus != nil {
+		nf.RespinStartStatus = feature.RespinStartStatus.Clone()
+	}
+
 	if feature.RespinNumStatus != nil {
 		nf.RespinNumStatus = feature.RespinNumStatus.Clone()
 	}
@@ -141,6 +145,10 @@ func (feature *Feature) Clone() *Feature {
 		nf.RespinEndingStatus = feature.RespinEndingStatus.Clone()
 	}
 
+	if feature.RespinStartStatus != nil {
+		nf.RespinStartStatus = feature.RespinStartStatus.Clone()
+	}
+
 	if feature.RespinNumStatus != nil {
 		nf.RespinNumStatus = feature.RespinNumStatus.Clone()
 	}
@@ -187,6 +195,10 @@ func (feature *Feature) Merge(src *Feature) {
 
 	if feature.RespinEndingStatus != nil && src.RespinEndingStatus != nil {
 		feature.RespinEndingStatus.Merge(src.RespinEndingStatus)
+	}
+
+	if feature.RespinStartStatus != nil && src.RespinStartStatus != nil {
+		feature.RespinStartStatus.Merge(src.RespinStartStatus)
 	}
 
 	if feature.RespinNumStatus != nil && src.RespinNumStatus != nil {
@@ -280,6 +292,12 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 		csheet := fmt.Sprintf("respinEndingStatus - %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinEndingStatus.SaveSheet(f, csheet)
+	}
+
+	if feature.RespinStartStatus != nil {
+		csheet := fmt.Sprintf("respinStartStatus - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.RespinStartStatus.SaveSheet(f, csheet)
 	}
 
 	if feature.RespinNumStatus != nil {
