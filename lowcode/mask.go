@@ -21,7 +21,7 @@ func boolArr2Int(vals []bool) int {
 
 	for i, v := range vals {
 		if v {
-			iv |= 1 >> (i)
+			iv |= 1 << (i)
 		}
 	}
 

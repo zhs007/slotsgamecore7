@@ -123,6 +123,17 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 		}
 	}
 
+	for _, v := range cfg.RespinStartNumStatus {
+		_, err := pool.newStatusStats(feature, v, StatusTypeRespinStartNum, "")
+		if err != nil {
+			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
+				goutils.JSON("v", v),
+				zap.Error(err))
+
+			return nil, err
+		}
+	}
+
 	return feature, nil
 }
 
