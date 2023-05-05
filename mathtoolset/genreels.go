@@ -41,11 +41,13 @@ func genReel(plugin sgc7plugin.IPlugin, rs *ReelStats, minoff int) ([]int, error
 
 		reel = append(reel, s)
 
-		if len(excsym) >= minoff {
-			excsym = excsym[1:]
-		}
+		if minoff > 0 {
+			if len(excsym) >= minoff {
+				excsym = excsym[1:]
+			}
 
-		excsym = append(excsym, SymbolType(s))
+			excsym = append(excsym, SymbolType(s))
+		}
 	}
 
 	return reel, nil
