@@ -22,6 +22,24 @@ func findLastPBComponentData(lst []*sgc7game.PlayResult, componentName string) (
 	return nil, nil
 }
 
+// findLastPBComponentDataEx
+func findLastPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) (*anypb.Any, *sgc7game.PlayResult) {
+	for i := len(lst) - 1; i >= 0; i-- {
+		pr := lst[i]
+
+		gp := pr.CurGameModParams.(*GameParams)
+		if gp != nil {
+			pbRespin := gp.MapComponents[respinComponentName]
+			pbcd := gp.MapComponents[componentName]
+			if pbRespin != nil && pbcd != nil {
+				return pbcd, pr
+			}
+		}
+	}
+
+	return nil, nil
+}
+
 // findFirstPBComponentData
 func findFirstPBComponentData(lst []*sgc7game.PlayResult, componentName string) (*anypb.Any, *sgc7game.PlayResult) {
 	for _, pr := range lst {
