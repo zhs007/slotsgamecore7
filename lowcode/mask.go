@@ -257,7 +257,7 @@ func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, l
 func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	if feature != nil && len(lst) > 0 {
 		if feature.RespinEndingStatus != nil {
-			pbcd, lastpr := findLastPBComponentData(lst, feature.RespinEndingName)
+			pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, mask.Name)
 
 			if pbcd != nil {
 				mask.OnStatsWithPB(feature, pbcd, lastpr)
