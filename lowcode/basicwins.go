@@ -145,15 +145,17 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		}
 
 		if tf.SymbolAwardsWeights != nil {
-			node, err := tf.SymbolAwardsWeights.RandVal(plugin)
-			if err != nil {
-				goutils.Error("BasicWins.ProcTriggerFeature:SymbolAwardsWeights.RandVal",
-					zap.Error(err))
+			for i := 0; i < ret.SymbolNums; i++ {
+				node, err := tf.SymbolAwardsWeights.RandVal(plugin)
+				if err != nil {
+					goutils.Error("BasicWins.ProcTriggerFeature:SymbolAwardsWeights.RandVal",
+						zap.Error(err))
 
-				return nil
+					return nil
+				}
+
+				gameProp.procAwards(node.Awards, curpr, gp)
 			}
-
-			gameProp.procAwards(node.Awards, curpr, gp)
 		}
 
 		if tf.RespinComponent != "" {
