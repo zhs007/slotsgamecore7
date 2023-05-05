@@ -22,24 +22,24 @@ const (
 type FuncAnalyzeFeature func(*Feature, *sgc7game.Stake, []*sgc7game.PlayResult) (bool, int64, int64)
 
 type Feature struct {
-	Name           string
-	Type           FeatureType
-	PlayTimes      int64
-	TotalBets      int64
-	TotalWins      int64
-	TriggerTimes   int64
-	RetriggerTimes int64
-	FreeSpinTimes  int64
-	RoundTimes     int64
-	Parent         *Feature
-	Children       []*Feature
-	OnAnalyze      FuncAnalyzeFeature
-	Reels          *Reels
-	Symbols        *SymbolsRTP
-	CurWins        *Wins
-	AllWins        *Wins
-	Status         *Status
-	Obj            any
+	Name               string
+	Type               FeatureType
+	PlayTimes          int64
+	TotalBets          int64
+	TotalWins          int64
+	TriggerTimes       int64
+	RetriggerTimes     int64
+	FreeSpinTimes      int64
+	RoundTimes         int64
+	Parent             *Feature
+	Children           []*Feature
+	OnAnalyze          FuncAnalyzeFeature
+	Reels              *Reels
+	Symbols            *SymbolsRTP
+	CurWins            *Wins
+	AllWins            *Wins
+	RespinEndingStatus *Status
+	Obj                any
 }
 
 func (feature *Feature) CloneIncludeChildren() *Feature {
@@ -75,8 +75,8 @@ func (feature *Feature) CloneIncludeChildren() *Feature {
 		nf.AllWins = feature.AllWins.Clone()
 	}
 
-	if feature.Status != nil {
-		nf.Status = feature.Status.Clone()
+	if feature.RespinEndingStatus != nil {
+		nf.RespinEndingStatus = feature.RespinEndingStatus.Clone()
 	}
 
 	for _, v := range feature.Children {
@@ -119,8 +119,8 @@ func (feature *Feature) Clone() *Feature {
 		nf.AllWins = feature.AllWins.Clone()
 	}
 
-	if feature.Status != nil {
-		nf.Status = feature.Status.Clone()
+	if feature.RespinEndingStatus != nil {
+		nf.RespinEndingStatus = feature.RespinEndingStatus.Clone()
 	}
 
 	return nf
@@ -155,8 +155,8 @@ func (feature *Feature) Merge(src *Feature) {
 		v.Merge(src.Children[i])
 	}
 
-	if feature.Status != nil && src.Status != nil {
-		feature.Status.Merge(src.Status)
+	if feature.RespinEndingStatus != nil && src.RespinEndingStatus != nil {
+		feature.RespinEndingStatus.Merge(src.RespinEndingStatus)
 	}
 }
 
@@ -234,10 +234,10 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 		feature.CurWins.SaveSheet(f, csheet)
 	}
 
-	if feature.Status != nil {
-		csheet := fmt.Sprintf("status - %v", feature.Name)
+	if feature.RespinEndingStatus != nil {
+		csheet := fmt.Sprintf("respinEndingStatus - %v", feature.Name)
 		f.NewSheet(csheet)
-		feature.Status.SaveSheet(f, csheet)
+		feature.RespinEndingStatus.SaveSheet(f, csheet)
 	}
 
 	for _, v := range feature.Children {

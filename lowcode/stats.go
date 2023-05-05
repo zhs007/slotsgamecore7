@@ -9,14 +9,19 @@ import (
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 )
 
+const (
+	StatusTypeUnknow       int = 0
+	StatusTypeRespinEnding int = 1
+)
+
 type StatsConfig struct {
-	Name      string         `yaml:"name"`
-	Component string         `yaml:"component"`
-	Status    []string       `yaml:"status"` // component -> status
-	Children  []*StatsConfig `yaml:"children"`
+	Name               string         `yaml:"name"`
+	Component          string         `yaml:"component"`
+	RespinEndingStatus []string       `yaml:"respinEndingStatus"` // component -> status
+	Children           []*StatsConfig `yaml:"children"`
 }
 
-func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType, isStatus bool) *sgc7stats.Feature {
+func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType, statusType int) *sgc7stats.Feature {
 	var feature *sgc7stats.Feature
 
 	if parent != nil {
@@ -25,8 +30,8 @@ func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats
 		feature = sgc7stats.NewFeature(name, sgc7stats.FeatureBasic, onAnalyze, nil)
 	}
 
-	if isStatus {
-		feature.Status = sgc7stats.NewStatus()
+	if statusType == StatusTypeRespinEnding {
+		feature.RespinEndingStatus = sgc7stats.NewStatus()
 	} else {
 		feature.Reels = sgc7stats.NewReels(width, symbols)
 		feature.Symbols = sgc7stats.NewSymbolsRTP(width, symbols)
