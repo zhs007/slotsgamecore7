@@ -22,24 +22,30 @@ const (
 type FuncAnalyzeFeature func(*Feature, *sgc7game.Stake, []*sgc7game.PlayResult) (bool, int64, int64)
 
 type Feature struct {
-	Name               string
-	Type               FeatureType
-	PlayTimes          int64
-	TotalBets          int64
-	TotalWins          int64
-	TriggerTimes       int64
-	RetriggerTimes     int64
-	FreeSpinTimes      int64
-	RoundTimes         int64
-	Parent             *Feature
-	Children           []*Feature
-	OnAnalyze          FuncAnalyzeFeature
-	Reels              *Reels
-	Symbols            *SymbolsRTP
-	CurWins            *Wins
-	AllWins            *Wins
-	RespinEndingStatus *Status
-	Obj                any
+	Name                 string
+	Type                 FeatureType
+	PlayTimes            int64
+	TotalBets            int64
+	TotalWins            int64
+	TriggerTimes         int64
+	RetriggerTimes       int64
+	FreeSpinTimes        int64
+	RoundTimes           int64
+	Parent               *Feature
+	Children             []*Feature
+	OnAnalyze            FuncAnalyzeFeature
+	Reels                *Reels
+	Symbols              *SymbolsRTP
+	CurWins              *Wins
+	AllWins              *Wins
+	RespinEndingStatus   *Status
+	RespinEndingName     string
+	RespinStartStatus    *Status
+	RespinStartName      string
+	RespinNumStatus      *Status
+	RespinWinStatus      *Status
+	RespinStartNumStatus *Status
+	Obj                  any
 }
 
 func (feature *Feature) CloneIncludeChildren() *Feature {
@@ -77,6 +83,18 @@ func (feature *Feature) CloneIncludeChildren() *Feature {
 
 	if feature.RespinEndingStatus != nil {
 		nf.RespinEndingStatus = feature.RespinEndingStatus.Clone()
+	}
+
+	if feature.RespinNumStatus != nil {
+		nf.RespinNumStatus = feature.RespinNumStatus.Clone()
+	}
+
+	if feature.RespinWinStatus != nil {
+		nf.RespinWinStatus = feature.RespinWinStatus.Clone()
+	}
+
+	if feature.RespinStartNumStatus != nil {
+		nf.RespinStartNumStatus = feature.RespinStartNumStatus.Clone()
 	}
 
 	for _, v := range feature.Children {
@@ -123,6 +141,18 @@ func (feature *Feature) Clone() *Feature {
 		nf.RespinEndingStatus = feature.RespinEndingStatus.Clone()
 	}
 
+	if feature.RespinNumStatus != nil {
+		nf.RespinNumStatus = feature.RespinNumStatus.Clone()
+	}
+
+	if feature.RespinWinStatus != nil {
+		nf.RespinWinStatus = feature.RespinWinStatus.Clone()
+	}
+
+	if feature.RespinStartNumStatus != nil {
+		nf.RespinStartNumStatus = feature.RespinStartNumStatus.Clone()
+	}
+
 	return nf
 }
 
@@ -157,6 +187,18 @@ func (feature *Feature) Merge(src *Feature) {
 
 	if feature.RespinEndingStatus != nil && src.RespinEndingStatus != nil {
 		feature.RespinEndingStatus.Merge(src.RespinEndingStatus)
+	}
+
+	if feature.RespinNumStatus != nil && src.RespinNumStatus != nil {
+		feature.RespinNumStatus.Merge(src.RespinNumStatus)
+	}
+
+	if feature.RespinWinStatus != nil && src.RespinWinStatus != nil {
+		feature.RespinWinStatus.Merge(src.RespinWinStatus)
+	}
+
+	if feature.RespinStartNumStatus != nil && src.RespinStartNumStatus != nil {
+		feature.RespinStartNumStatus.Merge(src.RespinStartNumStatus)
 	}
 }
 
@@ -238,6 +280,24 @@ func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 		csheet := fmt.Sprintf("respinEndingStatus - %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinEndingStatus.SaveSheet(f, csheet)
+	}
+
+	if feature.RespinNumStatus != nil {
+		csheet := fmt.Sprintf("respinNumStatus - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.RespinNumStatus.SaveSheet(f, csheet)
+	}
+
+	if feature.RespinWinStatus != nil {
+		csheet := fmt.Sprintf("respinWinStatus - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.RespinWinStatus.SaveSheet(f, csheet)
+	}
+
+	if feature.RespinStartNumStatus != nil {
+		csheet := fmt.Sprintf("respinStartNumStatus - %v", feature.Name)
+		f.NewSheet(csheet)
+		feature.RespinStartNumStatus.SaveSheet(f, csheet)
 	}
 
 	for _, v := range feature.Children {

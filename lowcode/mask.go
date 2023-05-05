@@ -256,14 +256,10 @@ func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, l
 // OnStats
 func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	if feature != nil && feature.RespinEndingStatus != nil && len(lst) > 0 {
-		lastpr := lst[len(lst)-1]
-		gp := lastpr.CurGameModParams.(*GameParams)
-		if gp != nil {
-			pbcd := gp.MapComponents[mask.Name]
+		pbcd, lastpr := findLastPBComponentData(lst, feature.RespinEndingName)
 
-			if pbcd != nil {
-				mask.OnStatsWithPB(feature, pbcd, lastpr)
-			}
+		if pbcd != nil {
+			mask.OnStatsWithPB(feature, pbcd, lastpr)
 		}
 	}
 
