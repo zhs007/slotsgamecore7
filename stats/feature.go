@@ -265,55 +265,55 @@ func (feature *Feature) onTrigger(stake *sgc7game.Stake, lst []*sgc7game.PlayRes
 
 func (feature *Feature) saveOtherSheet(f *excelize.File) error {
 	if feature.Reels != nil {
-		csheet := fmt.Sprintf("symbol in window - %v", feature.Name)
+		csheet := fmt.Sprintf("symbol in window %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.Reels.SaveSheet(f, csheet)
 	}
 
 	if feature.Symbols != nil {
-		csheet := fmt.Sprintf("symbol rtp - %v", feature.Name)
+		csheet := fmt.Sprintf("symbol rtp %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.Symbols.SaveSheet(f, csheet, feature.GetTotalBets())
 	}
 
 	if feature.AllWins != nil {
-		csheet := fmt.Sprintf("total wins - %v", feature.Name)
+		csheet := fmt.Sprintf("total wins %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.AllWins.SaveSheet(f, csheet)
 	}
 
 	if feature.CurWins != nil {
-		csheet := fmt.Sprintf("wins - %v", feature.Name)
+		csheet := fmt.Sprintf("wins %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.CurWins.SaveSheet(f, csheet)
 	}
 
 	if feature.RespinEndingStatus != nil {
-		csheet := fmt.Sprintf("respinEndingStatus - %v", feature.Name)
+		csheet := fmt.Sprintf("End %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinEndingStatus.SaveSheet(f, csheet)
 	}
 
 	if feature.RespinStartStatus != nil {
-		csheet := fmt.Sprintf("respinStartStatus - %v", feature.Name)
+		csheet := fmt.Sprintf("Start %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinStartStatus.SaveSheet(f, csheet)
 	}
 
 	if feature.RespinNumStatus != nil {
-		csheet := fmt.Sprintf("respinNumStatus - %v", feature.Name)
+		csheet := fmt.Sprintf("Num %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinNumStatus.SaveSheet(f, csheet)
 	}
 
 	if feature.RespinWinStatus != nil {
-		csheet := fmt.Sprintf("respinWinStatus - %v", feature.Name)
+		csheet := fmt.Sprintf("respinWin %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinWinStatus.SaveSheet(f, csheet)
 	}
 
 	if feature.RespinStartNumStatus != nil {
-		csheet := fmt.Sprintf("respinStartNumStatus - %v", feature.Name)
+		csheet := fmt.Sprintf("StartNum %v", feature.Name)
 		f.NewSheet(csheet)
 		feature.RespinStartNumStatus.SaveSheet(f, csheet)
 	}
