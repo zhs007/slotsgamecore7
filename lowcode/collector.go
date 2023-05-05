@@ -260,7 +260,13 @@ func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponen
 		return 0, err
 	}
 
-	feature.RespinEndingStatus.AddStatus(int(pbcd.Val))
+	if feature.RespinEndingStatus != nil {
+		feature.RespinEndingStatus.AddStatus(int(pbcd.Val))
+	}
+
+	if feature.RespinStartStatus != nil {
+		feature.RespinStartStatus.AddStatus(int(pbcd.Val))
+	}
 
 	return 0, nil
 }
