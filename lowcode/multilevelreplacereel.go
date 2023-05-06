@@ -163,7 +163,7 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 
 	multiLevelReplaceReel.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(multiLevelReplaceReel.Name, cd)
+	// gp.AddComponentData(multiLevelReplaceReel.Name, cd)
 
 	return nil
 }

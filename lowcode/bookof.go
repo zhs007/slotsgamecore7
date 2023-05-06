@@ -238,7 +238,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 
 		bookof.onStepEnd(gameProp, curpr, gp, "")
 
-		gp.AddComponentData(bookof.Name, cd)
+		// gp.AddComponentData(bookof.Name, cd)
 	} else {
 		bookof.onStepEnd(gameProp, curpr, gp, "")
 	}

@@ -236,7 +236,7 @@ func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 
 	mask.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(mask.Name, gameProp.MapComponentData[mask.Name])
+	// gp.AddComponentData(mask.Name, gameProp.MapComponentData[mask.Name])
 
 	return nil
 }

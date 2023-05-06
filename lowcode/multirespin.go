@@ -165,7 +165,7 @@ func (multiRespin *MultiRespin) Init(fn string, pool *GamePropertyPool) error {
 func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	cd := gameProp.MapComponentData[multiRespin.Name].(*BasicComponentData)
+	// cd := gameProp.MapComponentData[multiRespin.Name].(*BasicComponentData)
 
 	if cmd == DefaultCmd {
 		lstcmd := []string{}
@@ -214,7 +214,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	multiRespin.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(multiRespin.Name, cd)
+	// gp.AddComponentData(multiRespin.Name, cd)
 
 	return nil
 }
