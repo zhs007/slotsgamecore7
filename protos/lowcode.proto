@@ -83,7 +83,7 @@ message MultiLevelReplaceReelData {
 message RespinData {
     ComponentData basicComponentData = 1;
     int32 lastRespinNum = 2;
-//	int32 totalRespinNum = 3;
+    int32 totalRespinNum = 3 [deprecated = true];
 	int32 curRespinNum = 4;
 	int32 curAddRespinNum = 5;
 	int64 totalCoinWin = 6;
