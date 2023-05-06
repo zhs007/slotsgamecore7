@@ -101,14 +101,16 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
 
 		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
+		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
 		if respinComponent != "" {
 			// 一般来说，第一次触发respin才走这个分支
 			pr.IsFinish = false
 
-			break
+			if nextComponentName == "" {
+				break
+			}
 		}
 
-		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
 		if nextComponentName == "" {
 			break
 		}
