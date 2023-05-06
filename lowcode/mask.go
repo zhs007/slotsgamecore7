@@ -19,9 +19,11 @@ import (
 func boolArr2Int(vals []bool) int {
 	iv := 0
 
-	for i, v := range vals {
+	for _, v := range vals {
 		if v {
-			iv |= 1 << (i)
+			iv = iv*10 + 1
+		} else {
+			iv *= 10
 		}
 	}
 
@@ -245,9 +247,9 @@ func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, l
 	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
 
 	if cd.NewChged <= 0 {
-		fmt.Printf("%v dose not collect new value, the mask value is %v", mask.Name, cd.Vals)
+		fmt.Printf("%v dose not collect new value, the mask value is %v\n", mask.Name, cd.Vals)
 	} else {
-		fmt.Printf("%v collect %v. the mask value is %v", mask.Name, cd.NewChged, cd.Vals)
+		fmt.Printf("%v collect %v. the mask value is %v\n", mask.Name, cd.NewChged, cd.Vals)
 	}
 
 	return nil

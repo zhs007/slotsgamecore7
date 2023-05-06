@@ -217,9 +217,9 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
 
 	if cd.NewCollector <= 0 {
-		fmt.Printf("%v dose not collect new value, the collector value is %v", collector.Name, cd.Val)
+		fmt.Printf("%v dose not collect new value, the collector value is %v\n", collector.Name, cd.Val)
 	} else {
-		fmt.Printf("%v collect %v. the collector value is %v", collector.Name, cd.NewCollector, cd.Val)
+		fmt.Printf("%v collect %v. the collector value is %v\n", collector.Name, cd.NewCollector, cd.Val)
 	}
 
 	return nil
