@@ -226,6 +226,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 		pr.Finished = lastr.IsFinish
 		pr.NextCommands = lastr.NextCmds
+		pr.NextCommandParams = lastr.NextCmdParams
 	}
 
 	return pr, nil
