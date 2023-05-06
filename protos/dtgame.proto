@@ -152,6 +152,7 @@ message ReplyPlay {
     repeated GameResult results = 4;
     repeated string nextCommands = 5;
     Stake stake = 6 [deprecated = true];
+    repeated string nextCommandParams = 7;
 }
 
 // DTGameLogic - DTGameLogic

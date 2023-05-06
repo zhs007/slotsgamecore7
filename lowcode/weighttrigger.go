@@ -16,6 +16,7 @@ import (
 type WeightTriggerConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	NextComponents       []string `yaml:"nextComponents"`
+	RespinNums           []int    `yaml:"respinNums"`
 	WeightSet            string   `yaml:"weightSet"`
 }
 
@@ -83,7 +84,15 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	setIndex := rv.Int()
 
-	weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
+	if len(weightTrigger.Config.RespinNums) == len(weightTrigger.Config.NextComponents) {
+		if weightTrigger.Config.RespinNums[setIndex] > 0 {
+			gameProp.TriggerRespin(curpr, gp, weightTrigger.Config.RespinNums[setIndex], weightTrigger.Config.NextComponents[setIndex])
+
+			weightTrigger.onStepEnd(gameProp, curpr, gp, "")
+		} else {
+			weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
+		}
+	}
 
 	gp.AddComponentData(weightTrigger.Name, cd)
 
