@@ -206,7 +206,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	collector.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
+	// gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
 
 	return nil
 }

@@ -220,7 +220,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	multiLevelMystery.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(multiLevelMystery.Name, cd)
+	// gp.AddComponentData(multiLevelMystery.Name, cd)
 	// multiLevelMystery.BuildPBComponent(gp)
 
 	return nil

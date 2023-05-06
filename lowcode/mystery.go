@@ -213,7 +213,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	mystery.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(mystery.Name, cd)
+	// gp.AddComponentData(mystery.Name, cd)
 
 	return nil
 }

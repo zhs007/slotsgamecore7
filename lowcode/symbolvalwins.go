@@ -131,7 +131,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	symbolValWins.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(symbolValWins.Name, cd)
+	// gp.AddComponentData(symbolValWins.Name, cd)
 
 	return nil
 }

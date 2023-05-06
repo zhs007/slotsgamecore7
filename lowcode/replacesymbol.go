@@ -105,7 +105,7 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	replaceSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(replaceSymbol.Name, cd)
+	// gp.AddComponentData(replaceSymbol.Name, cd)
 
 	return nil
 }

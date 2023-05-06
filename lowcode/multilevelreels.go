@@ -206,7 +206,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	multiLevelReels.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(multiLevelReels.Name, cd)
+	// gp.AddComponentData(multiLevelReels.Name, cd)
 	// multiLevelReels.BuildPBComponent(gp)
 
 	return nil

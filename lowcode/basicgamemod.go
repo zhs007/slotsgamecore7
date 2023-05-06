@@ -145,6 +145,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 			return nil, err
 		}
+
+		cn := v.GetName()
+		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
 	}
 
 	gameProp.ProcRespin(pr, gp)

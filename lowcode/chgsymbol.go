@@ -82,7 +82,7 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	chgSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(chgSymbol.Name, cd)
+	// gp.AddComponentData(chgSymbol.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)
 
 	return nil

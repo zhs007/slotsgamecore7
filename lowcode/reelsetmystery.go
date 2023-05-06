@@ -173,7 +173,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 
 	reelSetMystery.onStepEnd(gameProp, curpr, gp, "")
 
-	gp.AddComponentData(reelSetMystery.Name, cd)
+	// gp.AddComponentData(reelSetMystery.Name, cd)
 
 	return nil
 }

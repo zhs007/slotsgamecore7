@@ -302,7 +302,7 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	gp.AddComponentData(lightning.Name, cd)
+	// gp.AddComponentData(lightning.Name, cd)
 
 	return nil
 }

@@ -168,7 +168,7 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 		respin.onStepEnd(gameProp, curpr, gp, nextComponent)
 	}
 
-	gp.AddComponentData(respin.Name, cd)
+	// gp.AddComponentData(respin.Name, cd)
 
 	return nil
 }
