@@ -68,8 +68,9 @@ type RespinLevelConfig struct {
 // RespinConfig - configuration for Respin
 type RespinConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	DefaultRespinNum     int                  `yaml:"defaultRespinNum"`
+	InitRespinNum        int                  `yaml:"initRespinNum"`
 	MainComponent        string               `yaml:"mainComponent"`
+	IsWinBreak           bool                 `yaml:"isWinBreak"`
 	Levels               []*RespinLevelConfig `yaml:"levels"`
 }
 
@@ -140,6 +141,10 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	if cd.CurRespinNum == 0 && cd.LastRespinNum == 0 && respin.Config.InitRespinNum > 0 {
+		cd.LastRespinNum = respin.Config.InitRespinNum
+	}
 
 	if cd.LastRespinNum == 0 {
 		respin.onStepEnd(gameProp, curpr, gp, respin.Config.DefaultNextComponent)
@@ -276,6 +281,10 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 
 	cd.TotalCashWin += curpr.CashWin
 	cd.TotalCoinWin += int64(curpr.CoinWin)
+
+	if respin.Config.IsWinBreak && cd.TotalCoinWin > 0 {
+		cd.LastRespinNum = 0
+	}
 
 	if cd.LastRespinNum == 0 {
 		gameProp.onRespinEnding(respin.Name)
