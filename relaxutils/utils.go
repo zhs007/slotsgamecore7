@@ -285,3 +285,25 @@ func BuildWeightsArrEx3(vws []*sgc7game.ValWeights) *WeightsArr {
 
 	return ret
 }
+
+func BuildIntValWeights2Arr(vws []*sgc7game.ValWeights2) *WeightsArr {
+	ret := &WeightsArr{}
+
+	for _, vw := range vws {
+		w := &Weights{}
+
+		for j, v := range vw.Weights {
+			if v > 0 {
+				lst := &IntList{
+					Vals: []int{vw.Vals[j].Int(), v},
+				}
+
+				w.Entries = append(w.Entries, lst)
+			}
+		}
+
+		ret.Weights = append(ret.Weights, w)
+	}
+
+	return ret
+}
