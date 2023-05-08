@@ -198,6 +198,8 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		curpr.NextCmdParams = lstparam
 		curpr.IsFinish = false
 		curpr.IsWait = true
+
+		multiRespin.onStepEnd(gameProp, curpr, gp, "")
 	} else {
 		cmdparam, err := multiRespin.parseCmdParam(cmd, param)
 		if err != nil {
@@ -210,11 +212,9 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 
 		gameProp.TriggerRespin(curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent)
+
+		multiRespin.onStepEnd(gameProp, curpr, gp, cmdparam.RespinComponent)
 	}
-
-	multiRespin.onStepEnd(gameProp, curpr, gp, "")
-
-	// gp.AddComponentData(multiRespin.Name, cd)
 
 	return nil
 }
