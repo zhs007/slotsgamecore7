@@ -156,7 +156,7 @@ func (fixSymbols *FixSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	cd := gameProp.MapComponentData[fixSymbols.Name].(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("The value of the symbols", pr.OtherScenes[cd.UsedScenes[0]], mapSymbolColor)
+		asciigame.OutputScene("The value of the symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
