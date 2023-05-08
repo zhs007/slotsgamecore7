@@ -323,3 +323,18 @@ func BuildIntValWeights2Arr(vws []*sgc7game.ValWeights2) *WeightsArr {
 
 	return ret
 }
+
+func BuildIntArrValMapping(avw *sgc7game.ValMapping2) *Int2DArray {
+	arr2d := &Int2DArray{}
+
+	for _, v0 := range avw.MapVals {
+		iarr := v0.IntArr()
+		arr1d := &IntList{Vals: make([]int, len(iarr))}
+
+		copy(arr1d.Vals, iarr)
+
+		arr2d.Rows = append(arr2d.Rows, arr1d)
+	}
+
+	return arr2d
+}
