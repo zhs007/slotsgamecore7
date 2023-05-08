@@ -86,7 +86,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				curComponent = c
 			}
 		} else {
-			startComponent, isok := gameProp.Pool.Config.StartComponents[int(stake.CoinBet)]
+			startComponent, isok := gameProp.Pool.Config.StartComponents[int(stake.CashBet/stake.CoinBet)]
 			if isok {
 				c, isok := bgm.Components.MapComponents[startComponent]
 				if !isok {
