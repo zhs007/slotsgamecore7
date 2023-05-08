@@ -136,6 +136,8 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			fixSymbols.AddScene(gameProp, curpr, ngs, cd)
 		}
+	} else {
+		fixSymbols.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)
 	}
 
 	fixSymbols.onStepEnd(gameProp, curpr, gp, "")

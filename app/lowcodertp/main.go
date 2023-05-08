@@ -39,6 +39,7 @@ func main() {
 
 	gamecfg := os.Getenv("GAMECFG")
 	outputPath := os.Getenv("OUTPUTPATH")
+	strBet := os.Getenv("BET")
 
 	goutils.InitLogger("lowcodertp", sgc7ver.Version,
 		"info", true, "./logs")
@@ -59,6 +60,13 @@ func main() {
 		return
 	}
 
+	bet := int64(0)
+	if strBet != "" {
+		i64, _ := goutils.String2Int64(strBet)
+
+		bet = i64
+	}
+
 	// lowcode.SetForceDisableStats()
-	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath)
+	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet)
 }

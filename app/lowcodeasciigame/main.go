@@ -19,6 +19,7 @@ func main() {
 	strAutoSpin := os.Getenv("AUTOSPIN")
 	strSkipGetChar := os.Getenv("SKIPGETCHAR")
 	strBreakAtFeature := os.Getenv("BREAKATFEATURE")
+	strBet := os.Getenv("BET")
 	autospin, _ := goutils.String2Int64(strAutoSpin)
 
 	isSkipGetChar := false
@@ -44,9 +45,16 @@ func main() {
 		return
 	}
 
+	bet := int64(game.Pool.Config.Bets[0])
+	if strBet != "" {
+		i64, _ := goutils.String2Int64(strBet)
+
+		bet = i64
+	}
+
 	stake := &sgc7game.Stake{
 		CoinBet:  1,
-		CashBet:  int64(game.Pool.Config.Bets[0]),
+		CashBet:  bet,
 		Currency: "EUR",
 	}
 

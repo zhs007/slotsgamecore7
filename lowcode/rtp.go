@@ -261,7 +261,7 @@ func procHitRate(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgHitRateFeature *RT
 	rtp.AddHitRateNode(cfgHitRateFeature.Name, newFuncHitRate(cfgHitRateFeature))
 }
 
-func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) error {
+func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64) error {
 	game, err := NewGame(gamecfg)
 	if err != nil {
 		goutils.Error("StartRTP:NewGame",
@@ -273,7 +273,10 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string) err
 
 	rtp := sgc7rtp.NewRTP()
 
-	bet := game.Pool.Config.Bets[0]
+	if bet <= 0 {
+		bet = int64(game.Pool.Config.Bets[0])
+	}
+
 	stake := &sgc7game.Stake{
 		CoinBet:  1,
 		CashBet:  int64(bet),
