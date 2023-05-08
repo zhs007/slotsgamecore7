@@ -85,6 +85,20 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 				curComponent = c
 			}
+		} else {
+			startComponent, isok := gameProp.Pool.Config.StartComponents[int(stake.CoinBet)]
+			if isok {
+				c, isok := bgm.Components.MapComponents[startComponent]
+				if !isok {
+					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+						zap.String("FirstComponent", startComponent),
+						zap.Error(ErrIvalidComponentName))
+
+					return nil, ErrIvalidComponentName
+				}
+
+				curComponent = c
+			}
 		}
 	}
 
@@ -126,14 +140,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		curComponent = c
 	}
-
-	// gameProp.ProcRespin(pr, gp)
-
-	// if pr.IsFinish && gameProp.GetVal(GamePropFGNum) > 0 {
-	// 	pr.IsFinish = false
-	// } else if gameProp.GetVal(GamePropTriggerFG) > 0 && gameProp.GetVal(GamePropFGNum) <= 0 {
-	// 	gameProp.SetVal(GamePropTriggerFG, 0)
-	// }
 
 	gameProp.BuildGameParam(gp)
 
