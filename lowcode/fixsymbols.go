@@ -121,6 +121,7 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := fixSymbols.GetTargetScene(gameProp, curpr, cd, "")
 
+	needReTag := true
 	if fixSymbols.Type == FixSymbolsTypeMergeDown {
 		xarr, _ := fixSymbols.isNeedMergeDown(gs)
 		if len(xarr) > 0 {
@@ -135,8 +136,12 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			fixSymbols.AddScene(gameProp, curpr, ngs, cd)
+
+			needReTag = false
 		}
-	} else {
+	}
+
+	if needReTag {
 		fixSymbols.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)
 	}
 
