@@ -187,6 +187,8 @@ func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	lightning.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[lightning.Name].(*LightningData)
 
 	if len(prs) <= 0 {

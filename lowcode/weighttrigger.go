@@ -72,6 +72,8 @@ func (weightTrigger *WeightTrigger) Init(fn string, pool *GamePropertyPool) erro
 func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	weightTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	// cd := gameProp.MapComponentData[weightTrigger.Name].(*BasicComponentData)
 
 	rv, err := weightTrigger.WeightSet.RandVal(plugin)

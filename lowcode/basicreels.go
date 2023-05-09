@@ -72,6 +72,8 @@ func (basicReels *BasicReels) Init(fn string, pool *GamePropertyPool) error {
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	basicReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[basicReels.Name].(*BasicComponentData)
 
 	if basicReels.ReelSetWeights != nil {

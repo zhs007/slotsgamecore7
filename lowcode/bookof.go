@@ -138,6 +138,8 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	bookof.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[bookof.Name].(*BookOfData)
 
 	isTrigger := bookof.Config.ForceTrigger

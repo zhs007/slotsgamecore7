@@ -117,6 +117,8 @@ func (fixSymbols *FixSymbols) Init(fn string, pool *GamePropertyPool) error {
 func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	fixSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[fixSymbols.Name].(*BasicComponentData)
 
 	gs := fixSymbols.GetTargetScene(gameProp, curpr, cd, "")

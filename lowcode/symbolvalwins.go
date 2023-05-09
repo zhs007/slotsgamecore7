@@ -67,6 +67,8 @@ func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) erro
 func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	symbolValWins.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[symbolValWins.Name].(*BasicComponentData)
 
 	gs := symbolValWins.GetTargetScene(gameProp, curpr, cd, "")
