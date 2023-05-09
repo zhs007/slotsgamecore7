@@ -48,6 +48,7 @@ type GameProperty struct {
 	MapStats          map[string]*sgc7stats.Feature
 	mapInt            map[string]int
 	mapStr            map[string]string
+	mapGlobalStr      map[string]string
 	MapComponentData  map[string]IComponentData
 	HistoryComponents []IComponent
 	RespinComponents  []string
@@ -63,6 +64,8 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 
 func (gameProp *GameProperty) OnNewGame() error {
 	gameProp.SetVal(GamePropGameMulti, 1)
+
+	gameProp.mapGlobalStr = make(map[string]string)
 
 	return nil
 }
@@ -280,6 +283,14 @@ func (gameProp *GameProperty) TagStr(tag string, val string) {
 
 func (gameProp *GameProperty) GetTagStr(tag string) string {
 	return gameProp.mapStr[tag]
+}
+
+func (gameProp *GameProperty) TagGlobalStr(tag string, val string) {
+	gameProp.mapGlobalStr[tag] = val
+}
+
+func (gameProp *GameProperty) GetTagGlobalStr(tag string) string {
+	return gameProp.mapGlobalStr[tag]
 }
 
 func (gameProp *GameProperty) procAwards(awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {

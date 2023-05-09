@@ -92,7 +92,7 @@ func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	for k, v := range basicComponent.Config.InitStrVals {
-		gameProp.TagStr(k, v)
+		gameProp.TagGlobalStr(k, v)
 	}
 
 	return nil
