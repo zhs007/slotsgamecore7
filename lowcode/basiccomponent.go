@@ -73,17 +73,29 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 }
 
 type BasicComponentConfig struct {
-	DefaultNextComponent string   `yaml:"defaultNextComponent"` // next component, if it is empty jump to ending
-	TagScenes            []string `yaml:"tagScenes"`            // tag scenes
-	TagOtherScenes       []string `yaml:"tagOtherScenes"`       // tag otherScenes
-	TargetScene          string   `yaml:"targetScene"`          // target scenes
-	TargetOtherScene     string   `yaml:"targetOtherScene"`     // target otherscenes
-	TagRNG               []string `yaml:"tagRNG"`               // tag RNG
+	DefaultNextComponent string            `yaml:"defaultNextComponent"` // next component, if it is empty jump to ending
+	TagScenes            []string          `yaml:"tagScenes"`            // tag scenes
+	TagOtherScenes       []string          `yaml:"tagOtherScenes"`       // tag otherScenes
+	TargetScene          string            `yaml:"targetScene"`          // target scenes
+	TargetOtherScene     string            `yaml:"targetOtherScene"`     // target otherscenes
+	TagRNG               []string          `yaml:"tagRNG"`               // tag RNG
+	InitStrVals          map[string]string `yaml:"initStrVals"`          // 只要这个组件被执行，就会初始化这些strvals
 }
 
 type BasicComponent struct {
 	Config *BasicComponentConfig
 	Name   string
+}
+
+// onInit -
+func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	for k, v := range basicComponent.Config.InitStrVals {
+		gameProp.TagStr(k, v)
+	}
+
+	return nil
 }
 
 // onInit -
@@ -93,9 +105,6 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 
 // onStepEnd -
 func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) {
-	// if gameProp.GetVal(GamePropFGNum) > 0 && basicComponent.Config.DefaultFGRespinComponent != "" {
-	// 	gameProp.Respin(curpr, gp, basicComponent.Config.DefaultFGRespinComponent, nil, nil)
-	// } else
 	if nextComponent != "" {
 		gameProp.SetStrVal(GamePropNextComponent, nextComponent)
 	} else {

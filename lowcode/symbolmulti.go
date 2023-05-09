@@ -18,6 +18,8 @@ type SymbolMultiConfig struct {
 	Symbol               string                   `yaml:"symbol"`
 	Symbols              []string                 `yaml:"symbols"`
 	WeightMulti          string                   `yaml:"weightMulti"`
+	MapWeightMulti       map[string]string        `yaml:"mapWeightMulti"` // 可以配置多套权重
+	ValUsed              string                   `yaml:"valUsed"`        // 用这个值来确定使用的权重
 	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
 }
 
@@ -26,6 +28,7 @@ type SymbolMulti struct {
 	Config            *SymbolMultiConfig
 	SymbolCodes       []int
 	WeightMulti       *sgc7game.ValWeights2
+	MapWeightMulti    map[string]*sgc7game.ValWeights2
 	OtherSceneFeature *OtherSceneFeature
 }
 
@@ -53,7 +56,22 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 
 	symbolMulti.Config = cfg
 
-	if symbolMulti.Config.WeightMulti != "" {
+	if len(cfg.MapWeightMulti) > 0 {
+		symbolMulti.MapWeightMulti = make(map[string]*sgc7game.ValWeights2, 0)
+
+		for k, v := range cfg.MapWeightMulti {
+			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v), "val", "weight", sgc7game.NewIntVal[int])
+			if err != nil {
+				goutils.Error("SymbolMulti.Init:LoadValWeights2FromExcel",
+					zap.String("Weight", v),
+					zap.Error(err))
+
+				return err
+			}
+
+			symbolMulti.MapWeightMulti[k] = vw2
+		}
+	} else if symbolMulti.Config.WeightMulti != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolMulti.Config.WeightMulti), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolMulti.Init:LoadValWeights2FromExcel",
@@ -87,6 +105,8 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	symbolMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
 
 	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd, "")
@@ -100,10 +120,16 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			return err
 		}
 
+		vw2 := symbolMulti.WeightMulti
+		if len(symbolMulti.MapWeightMulti) > 0 && symbolMulti.Config.ValUsed != "" {
+			val := gameProp.GetTagStr(symbolMulti.Config.ValUsed)
+			vw2 = symbolMulti.MapWeightMulti[val]
+		}
+
 		for x, arr := range gs.Arr {
 			for y, s := range arr {
 				if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
-					cv, err := symbolMulti.WeightMulti.RandVal(plugin)
+					cv, err := vw2.RandVal(plugin)
 					if err != nil {
 						goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
 							zap.Error(err))

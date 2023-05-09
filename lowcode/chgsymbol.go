@@ -68,6 +68,8 @@ func (chgSymbol *ChgSymbol) Init(fn string, pool *GamePropertyPool) error {
 func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	chgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[chgSymbol.Name].(*BasicComponentData)
 
 	gs := chgSymbol.GetTargetScene(gameProp, curpr, cd, "")

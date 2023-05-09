@@ -97,6 +97,8 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[symbolVal2.Name].(*BasicComponentData)
 
 	gs := symbolVal2.GetTargetScene(gameProp, curpr, cd, "")

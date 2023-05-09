@@ -172,6 +172,8 @@ func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.Pl
 func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
 
 	gs := collector.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")

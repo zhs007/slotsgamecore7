@@ -237,6 +237,8 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
+	basicWins.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
 	bwd := gameProp.MapComponentData[basicWins.Name].(*BasicWinsData)
 
 	rets := []*sgc7game.Result{}
