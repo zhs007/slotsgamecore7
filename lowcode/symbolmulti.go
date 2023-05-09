@@ -122,7 +122,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 		vw2 := symbolMulti.WeightMulti
 		if len(symbolMulti.MapWeightMulti) > 0 && symbolMulti.Config.ValUsed != "" {
-			val := gameProp.GetTagStr(symbolMulti.Config.ValUsed)
+			val := gameProp.GetTagGlobalStr(symbolMulti.Config.ValUsed)
 			vw2 = symbolMulti.MapWeightMulti[val]
 		}
 
