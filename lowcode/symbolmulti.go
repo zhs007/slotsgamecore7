@@ -60,7 +60,7 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 		symbolMulti.MapWeightMulti = make(map[string]*sgc7game.ValWeights2, 0)
 
 		for k, v := range cfg.MapWeightMulti {
-			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v), "val", "weight", sgc7game.NewIntVal[int])
+			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v, symbolMulti.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 			if err != nil {
 				goutils.Error("SymbolMulti.Init:LoadValWeights2FromExcel",
 					zap.String("Weight", v),
@@ -72,7 +72,7 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 			symbolMulti.MapWeightMulti[k] = vw2
 		}
 	} else if symbolMulti.Config.WeightMulti != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolMulti.Config.WeightMulti), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolMulti.Config.WeightMulti, symbolMulti.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolMulti.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", symbolMulti.Config.WeightMulti),

@@ -206,7 +206,7 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 		MapComponents:    make(map[string]IComponent),
 	}
 
-	sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer))
+	sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer, false))
 	if err != nil {
 		goutils.Error("NewGamePropertyPool:LoadSymbolsViewer",
 			zap.String("fn", cfg.SymbolsViewer),

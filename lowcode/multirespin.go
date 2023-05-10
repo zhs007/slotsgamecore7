@@ -75,7 +75,7 @@ func (multiRespin *MultiRespin) genCmdParam(gameProp *GameProperty, fgdata *Resp
 	if fgdata.RespinNumWeightWithScatterNum != nil {
 		sn := gameProp.GetTagInt(multiRespin.Config.TargetSymbolNum)
 
-		vw2, err := gameProp.GetIntValWeights(fgdata.RespinNumWeightWithScatterNum[sn])
+		vw2, err := gameProp.GetIntValWeights(fgdata.RespinNumWeightWithScatterNum[sn], multiRespin.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("MultiRespin.genCmdParam:GetIntValWeights",
 				zap.Int("symbolNum", sn),
@@ -104,7 +104,7 @@ func (multiRespin *MultiRespin) genCmdParam(gameProp *GameProperty, fgdata *Resp
 			RespinComponent: fgdata.RespinComponent,
 		}, nil
 	} else if fgdata.RespinNumWeight != "" {
-		vw2, err := gameProp.GetIntValWeights(fgdata.RespinNumWeight)
+		vw2, err := gameProp.GetIntValWeights(fgdata.RespinNumWeight, multiRespin.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("MultiRespin.genCmdParam:GetIntValWeights",
 				zap.Error(err))

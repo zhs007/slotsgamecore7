@@ -173,8 +173,8 @@ func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GamePar
 	return nil
 }
 
-func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, respinComponent string) error {
-	vw2, err := gameProp.GetIntValWeights(fn)
+func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, useFileMapping bool, respinComponent string) error {
+	vw2, err := gameProp.GetIntValWeights(fn, useFileMapping)
 	if err != nil {
 		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
 			zap.String("fn", fn),
@@ -199,10 +199,10 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 	return nil
 }
 
-func (gameProp *GameProperty) GetIntValWeights(fn string) (*sgc7game.ValWeights2, error) {
+func (gameProp *GameProperty) GetIntValWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
 	vw2, isok := gameProp.MapIntValWeights[fn]
 	if !isok {
-		curvw2, err := sgc7game.LoadValWeights2FromExcel(gameProp.Pool.Config.GetPath(fn), "val", "weight", sgc7game.NewIntVal[int])
+		curvw2, err := sgc7game.LoadValWeights2FromExcel(gameProp.Pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("GameProperty.GetIntValWeights:LoadValWeights2FromExcel",
 				zap.String("fn", fn),

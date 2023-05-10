@@ -83,7 +83,7 @@ func (reelSetMystery *ReelSetMystery) Init(fn string, pool *GamePropertyPool) er
 	reelSetMystery.Config = cfg
 
 	for k, v := range reelSetMystery.Config.MapMysteryWeight {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(v), "val", "weight", pool.DefaultPaytables)
+		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(v, reelSetMystery.Config.UseFileMapping), "val", "weight", pool.DefaultPaytables)
 		if err != nil {
 			goutils.Error("ReelSetMystery.Init:LoadValWeights2FromExcelWithSymbols",
 				zap.String("MysteryWeight", v),
