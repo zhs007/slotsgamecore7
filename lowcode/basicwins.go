@@ -160,11 +160,11 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 		if tf.RespinComponent != "" {
 			if tf.RespinNumWeightWithScatterNum != nil {
-				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], tf.RespinComponent)
+				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], basicWins.Config.UseFileMapping, tf.RespinComponent)
 			} else if len(tf.RespinNumWithScatterNum) > 0 {
 				gameProp.TriggerRespin(curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent)
 			} else if tf.RespinNumWeight != "" {
-				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, tf.RespinComponent)
+				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, basicWins.Config.UseFileMapping, tf.RespinComponent)
 			} else {
 				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent)
 			}
