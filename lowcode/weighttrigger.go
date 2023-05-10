@@ -51,7 +51,7 @@ func (weightTrigger *WeightTrigger) Init(fn string, pool *GamePropertyPool) erro
 	weightTrigger.Config = cfg
 
 	if cfg.WeightSet != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(cfg.WeightSet), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(cfg.WeightSet, weightTrigger.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("WeightTrigger.Init:LoadValWeights2FromExcel",
 				zap.String("Weight", cfg.WeightSet),

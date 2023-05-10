@@ -33,6 +33,7 @@ type Config struct {
 	IsIntReel        bool                           `yaml:"isIntReel"`
 	Reels            map[string]string              `yaml:"reels"`
 	MapReels         map[string]*sgc7game.ReelsData `yaml:"-"`
+	FileMapping      map[string]string              `yaml:"fileMapping"`
 	SymbolsViewer    string                         `yaml:"symbolsViewer"`
 	DefaultScene     string                         `yaml:"defaultScene"`
 	DefaultPaytables string                         `yaml:"defaultPaytables"`
@@ -48,7 +49,14 @@ type Config struct {
 	MapCmdComponent  map[string]string              `yaml:"mapCmdComponent"`
 }
 
-func (cfg *Config) GetPath(fn string) string {
+func (cfg *Config) GetPath(fn string, useFileMapping bool) string {
+	if useFileMapping {
+		curfn, isok := cfg.FileMapping[fn]
+		if isok {
+			fn = curfn
+		}
+	}
+
 	if cfg.MainPath != "" {
 		return path.Join(cfg.MainPath, fn)
 	}
@@ -126,7 +134,7 @@ func LoadConfig(fn string) (*Config, error) {
 		cfg.MapLinedate = make(map[string]*sgc7game.LineData)
 
 		for k, v := range cfg.Linedata {
-			ld, err := sgc7game.LoadLineDataFromExcel(cfg.GetPath(v))
+			ld, err := sgc7game.LoadLineDataFromExcel(cfg.GetPath(v, false))
 			if err != nil {
 				goutils.Error("LoadConfig:LoadLineDataFromExcel",
 					zap.String("key", k),
@@ -144,7 +152,7 @@ func LoadConfig(fn string) (*Config, error) {
 	cfg.MapPaytables = make(map[string]*sgc7game.PayTables)
 
 	for k, v := range cfg.Paytables {
-		pt, err := sgc7game.LoadPaytablesFromExcel(cfg.GetPath(v))
+		pt, err := sgc7game.LoadPaytablesFromExcel(cfg.GetPath(v, false))
 		if err != nil {
 			goutils.Error("LoadConfig:LoadPaytablesFromExcel",
 				zap.String("key", k),
@@ -174,7 +182,7 @@ func LoadConfig(fn string) (*Config, error) {
 
 		if cfg.IsIntReel {
 			for k, v := range cfg.Reels {
-				rd, err := sgc7game.LoadReelsFromExcel(cfg.GetPath(v))
+				rd, err := sgc7game.LoadReelsFromExcel(cfg.GetPath(v, false))
 				if err != nil {
 					goutils.Error("LoadConfig:LoadReelsFromExcel",
 						zap.String("key", k),
@@ -189,7 +197,7 @@ func LoadConfig(fn string) (*Config, error) {
 			}
 		} else {
 			for k, v := range cfg.Reels {
-				rd, err := sgc7game.LoadReelsFromExcel2(cfg.GetPath(v), pt)
+				rd, err := sgc7game.LoadReelsFromExcel2(cfg.GetPath(v, false), pt)
 				if err != nil {
 					goutils.Error("LoadConfig:LoadReelsFromExcel2",
 						zap.String("key", k),

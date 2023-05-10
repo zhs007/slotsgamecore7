@@ -80,6 +80,7 @@ type BasicComponentConfig struct {
 	TargetOtherScene     string            `yaml:"targetOtherScene"`     // target otherscenes
 	TagRNG               []string          `yaml:"tagRNG"`               // tag RNG
 	InitStrVals          map[string]string `yaml:"initStrVals"`          // 只要这个组件被执行，就会初始化这些strvals
+	UseFileMapping       bool              `yaml:"useFileMapping"`       // 兼容性配置，新配置应该一定用filemapping
 }
 
 type BasicComponent struct {
