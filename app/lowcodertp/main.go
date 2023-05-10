@@ -23,6 +23,8 @@ func main() {
 			// 1、http://localhost:8081/ui
 			// 2、http://localhost:6060/debug/charts
 			// 3、http://localhost:6060/debug/pprof
+			// cpu:
+			// go tool pprof -http=:8081 http://localhost:6060/debug/pprof/profile?seconds=30
 			http.ListenAndServe("0.0.0.0:6060", nil)
 		}()
 	}
