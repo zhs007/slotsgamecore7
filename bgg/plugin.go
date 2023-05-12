@@ -16,9 +16,9 @@ type PluginBGG struct {
 }
 
 // NewPluginBGG - new PluginBGG (IPlugin)
-func NewPluginBGG(rngServAddr string, gameCode string) *PluginBGG {
+func NewPluginBGG(rngServAddr string, gameCode string, useOpenTelemetry bool) *PluginBGG {
 	return &PluginBGG{
-		RngClient: NewRngClient(rngServAddr, gameCode),
+		RngClient: NewRngClient(rngServAddr, gameCode, useOpenTelemetry),
 	}
 }
 
