@@ -70,3 +70,13 @@ func findFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName 
 
 	return nil, nil
 }
+
+func calcTotalCashWins(lst []*sgc7game.PlayResult) int64 {
+	wins := int64(0)
+
+	for _, v := range lst {
+		wins += v.CashWin
+	}
+
+	return wins
+}

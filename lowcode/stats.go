@@ -27,6 +27,7 @@ type StatsConfig struct {
 	RespinStartNumStatus []string          `yaml:"respinStartNumStatus"` // component -> status
 	RespinWinStatus      []string          `yaml:"respinWinStatus"`      // component -> status
 	Children             []*StatsConfig    `yaml:"children"`
+	IsNeedForceStats     bool              `yaml:"isNeedForceStats"`
 }
 
 func NewStatsFeature(parent *sgc7stats.Feature, name string, onAnalyze sgc7stats.FuncAnalyzeFeature, width int, symbols []mathtoolset.SymbolType, statusType int, respinName string) *sgc7stats.Feature {
