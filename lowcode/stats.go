@@ -70,6 +70,7 @@ type Stats struct {
 	chanStats chan *StatsParam
 	lastNum   int32
 	TotalNum  int64
+	Pool      *GamePropertyPool
 }
 
 func (stats *Stats) StartWorker() {
@@ -77,6 +78,20 @@ func (stats *Stats) StartWorker() {
 		param := <-stats.chanStats
 
 		stats.Root.OnResults(param.Stake, param.Results)
+
+		for _, v := range param.Results {
+			for _, gs := range v.Scenes {
+				stats.Pool.PoolGameScene.Put(gs)
+			}
+
+			for _, gs := range v.OtherScenes {
+				stats.Pool.PoolGameScene.Put(gs)
+			}
+
+			for _, gs := range v.PrizeScenes {
+				stats.Pool.PoolGameScene.Put(gs)
+			}
+		}
 
 		atomic.AddInt32(&stats.lastNum, -1)
 	}
@@ -106,10 +121,11 @@ func (stats *Stats) Wait() {
 
 }
 
-func NewStats(root *sgc7stats.Feature) *Stats {
+func NewStats(root *sgc7stats.Feature, pool *GamePropertyPool) *Stats {
 	stats := &Stats{
 		Root:      root,
 		chanStats: make(chan *StatsParam, 1024),
+		Pool:      pool,
 	}
 
 	return stats

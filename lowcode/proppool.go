@@ -182,7 +182,7 @@ func (pool *GamePropertyPool) InitStats() error {
 			return err
 		}
 
-		pool.Stats = NewStats(statsTotal)
+		pool.Stats = NewStats(statsTotal, pool)
 
 		go pool.Stats.StartWorker()
 	}
