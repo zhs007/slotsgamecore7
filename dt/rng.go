@@ -5,23 +5,27 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	dtrngpb "github.com/zhs007/slotsgamecore7/dtrngpb"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // RngClient - DTRngClient
 type RngClient struct {
-	servAddr string
-	gameCode string
-	conn     *grpc.ClientConn
-	client   dtrngpb.DTRngClient
+	servAddr         string
+	gameCode         string
+	conn             *grpc.ClientConn
+	client           dtrngpb.DTRngClient
+	useOpenTelemetry bool
 }
 
 // NewRngClient - new RngClient
-func NewRngClient(servAddr string, gameCode string) *RngClient {
+func NewRngClient(servAddr string, gameCode string, useOpenTelemetry bool) *RngClient {
 	client := &RngClient{
-		servAddr: servAddr,
-		gameCode: gameCode,
+		servAddr:         servAddr,
+		gameCode:         gameCode,
+		useOpenTelemetry: useOpenTelemetry,
 	}
 
 	return client
@@ -40,13 +44,30 @@ func (client *RngClient) reset() {
 // GetRngs - get rngs
 func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error) {
 	if client.conn == nil || client.client == nil {
-		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
-		if err != nil {
-			goutils.Error("RngClient.GetRngs:grpc.Dial",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+		var conn *grpc.ClientConn
+		var err error
 
-			return nil, err
+		if client.useOpenTelemetry {
+			conn, err = grpc.Dial(client.servAddr,
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+				grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+			if err != nil {
+				goutils.Error("RngClient.GetRngs:grpc.Dial",
+					zap.String("server address", client.servAddr),
+					zap.Error(err))
+
+				return nil, err
+			}
+		} else {
+			conn, err = grpc.Dial(client.servAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			if err != nil {
+				goutils.Error("RngClient.GetRngs:grpc.Dial",
+					zap.String("server address", client.servAddr),
+					zap.Error(err))
+
+				return nil, err
+			}
 		}
 
 		client.conn = conn

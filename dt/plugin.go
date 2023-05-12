@@ -16,9 +16,9 @@ type PluginDT struct {
 }
 
 // NewPluginDT - new PluginDT (IPlugin)
-func NewPluginDT(rngServAddr string, gameCode string) *PluginDT {
+func NewPluginDT(rngServAddr string, gameCode string, useOpenTelemetry bool) *PluginDT {
 	return &PluginDT{
-		RngClient: NewRngClient(rngServAddr, gameCode),
+		RngClient: NewRngClient(rngServAddr, gameCode, useOpenTelemetry),
 	}
 }
 
