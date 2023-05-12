@@ -11,6 +11,7 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -26,7 +27,7 @@ type Serv struct {
 }
 
 // NewServ -
-func NewServ(service IService, game sgc7game.IGame, bindaddr string, version string) (*Serv, error) {
+func NewServ(service IService, game sgc7game.IGame, bindaddr string, version string, useOpenTelemetry bool) (*Serv, error) {
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
 		goutils.Error("NewServ.Listen",
@@ -35,7 +36,16 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 		return nil, err
 	}
 
-	grpcServ := grpc.NewServer()
+	var grpcServ *grpc.Server
+
+	if useOpenTelemetry {
+		grpcServ = grpc.NewServer(
+			grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+			grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+		)
+	} else {
+		grpcServ = grpc.NewServer()
+	}
 
 	serv := &Serv{
 		lis:      lis,
