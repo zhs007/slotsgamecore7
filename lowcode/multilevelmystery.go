@@ -72,8 +72,8 @@ type MultiLevelMystery struct {
 }
 
 // maskOtherScene -
-func (multiLevelMystery *MultiLevelMystery) maskOtherScene(gs *sgc7game.GameScene, symbolCode int) *sgc7game.GameScene {
-	cgs := gs.Clone()
+func (multiLevelMystery *MultiLevelMystery) maskOtherScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbolCode int) *sgc7game.GameScene {
+	cgs := gs.CloneEx(gameProp.Pool.PoolGameScene)
 
 	for x, arr := range cgs.Arr {
 		for y, v := range arr {
@@ -199,7 +199,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 		// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
-		sc2 := gs.Clone()
+		sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
 		for _, v := range multiLevelMystery.MysterySymbols {
 			sc2.ReplaceSymbol(v, curm.Int())
 		}
@@ -209,7 +209,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		v, isok := multiLevelMystery.MapMysteryTriggerFeature[curmcode]
 		if isok {
 			if v.RespinFirstComponent != "" {
-				os := multiLevelMystery.maskOtherScene(sc2, curmcode)
+				os := multiLevelMystery.maskOtherScene(gameProp, sc2, curmcode)
 
 				gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 

@@ -623,6 +623,23 @@ func (gs *GameScene) Clone() *GameScene {
 	return ngs
 }
 
+// Clone - clone
+func (gs *GameScene) CloneEx(pool *GameScenePoolEx) *GameScene {
+	ngs := pool.New(gs.Width, gs.Height, false)
+
+	for i := 0; i < gs.Width; i++ {
+		ngs.Arr[i] = make([]int, len(gs.Arr[i]))
+		copy(ngs.Arr[i], gs.Arr[i])
+	}
+
+	if len(gs.HeightEx) > 0 {
+		ngs.HeightEx = make([]int, len(gs.HeightEx))
+		copy(ngs.HeightEx, gs.HeightEx)
+	}
+
+	return ngs
+}
+
 // Fill - fill with reels and indexs
 func (gs *GameScene) Fill(reels *ReelsData, arr []int) {
 	for x, v := range arr {
@@ -712,4 +729,13 @@ func (gs *GameScene) SetReels(game IGame, reelsName string, pos []int) error {
 	}
 
 	return nil
+}
+
+// Clear - reset a symbol
+func (gs *GameScene) Clear(s int) {
+	for x, arr := range gs.Arr {
+		for y := range arr {
+			gs.Arr[x][y] = s
+		}
+	}
 }
