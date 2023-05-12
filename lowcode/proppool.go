@@ -20,6 +20,7 @@ type GamePropertyPool struct {
 	MapSymbolColor   *asciigame.SymbolColorMap
 	MapComponents    map[string]IComponent
 	Stats            *Stats
+	PoolGameScene    *sgc7game.GameScenePoolEx
 }
 
 func (pool *GamePropertyPool) newGameProp() *GameProperty {
@@ -204,6 +205,7 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
 		MapComponents:    make(map[string]IComponent),
+		PoolGameScene:    sgc7game.NewGameScenePoolEx(),
 	}
 
 	sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer, false))

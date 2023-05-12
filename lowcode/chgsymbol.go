@@ -74,7 +74,7 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	gs := chgSymbol.GetTargetScene(gameProp, curpr, cd, "")
 
-	cgs := gs.Clone()
+	cgs := gs.CloneEx(gameProp.Pool.PoolGameScene)
 
 	for _, v := range chgSymbol.Config.Nodes {
 		cgs.Arr[v.X][v.Y] = v.SymbolCode

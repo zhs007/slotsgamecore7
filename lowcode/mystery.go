@@ -68,8 +68,8 @@ type Mystery struct {
 }
 
 // maskOtherScene -
-func (mystery *Mystery) maskOtherScene(gs *sgc7game.GameScene, symbolCode int) *sgc7game.GameScene {
-	cgs := gs.Clone()
+func (mystery *Mystery) maskOtherScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbolCode int) *sgc7game.GameScene {
+	cgs := gs.CloneEx(gameProp.Pool.PoolGameScene)
 
 	for x, arr := range cgs.Arr {
 		for y, v := range arr {
@@ -162,7 +162,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 				// gameProp.SetVal(GamePropCurMystery, curmcode)
 
-				sc2 := gs.Clone()
+				sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
 				for _, v := range mystery.MysterySymbols {
 					sc2.ReplaceSymbol(v, curmcode)
 				}
@@ -172,7 +172,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 				if isok {
 					if v.RespinFirstComponent != "" {
-						os := mystery.maskOtherScene(sc2, curmcode)
+						os := mystery.maskOtherScene(gameProp, sc2, curmcode)
 
 						gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 
@@ -192,7 +192,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 				// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
-				sc2 := gs.Clone()
+				sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
 				for _, v := range mystery.MysterySymbols {
 					sc2.ReplaceSymbol(v, curm.Int())
 				}
@@ -202,7 +202,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 				if isok {
 					if v.RespinFirstComponent != "" {
-						os := mystery.maskOtherScene(sc2, curmcode)
+						os := mystery.maskOtherScene(gameProp, sc2, curmcode)
 
 						gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 

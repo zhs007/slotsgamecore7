@@ -71,11 +71,11 @@ func BuildPBGameScene(gs *sgc7game.GameScene) *sgc7pb.GameScene {
 		pbgs.Values = append(pbgs.Values, pbl)
 	}
 
-	if len(gs.Indexes) > 0 {
-		for _, v := range gs.Indexes {
-			pbgs.Indexes = append(pbgs.Indexes, int32(v))
-		}
-	}
+	// if len(gs.Indexes) > 0 {
+	// 	for _, v := range gs.Indexes {
+	// 		pbgs.Indexes = append(pbgs.Indexes, int32(v))
+	// 	}
+	// }
 
 	if len(gs.ValidRow) > 0 {
 		for _, v := range gs.ValidRow {

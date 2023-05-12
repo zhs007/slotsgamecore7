@@ -181,7 +181,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 
 			cd.Symbols = append(cd.Symbols, cs.Int())
 
-			ngs, err := bookof.procBookOfScene(gs, cs.Int())
+			ngs, err := bookof.procBookOfScene(gameProp, gs, cs.Int())
 			if err != nil {
 				goutils.Error("bookof.OnPlayGame:procBookOfScene",
 					zap.Error(err))
@@ -219,7 +219,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 					return err
 				}
 
-				ngs, err := bookof.procBookOfScene(gs, cs.Int())
+				ngs, err := bookof.procBookOfScene(gameProp, gs, cs.Int())
 				if err != nil {
 					goutils.Error("bookof.OnPlayGame:procBookOfScene",
 						zap.Error(err))
@@ -249,8 +249,8 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 }
 
 // procBookOfScene - outpur to asciigame
-func (bookof *BookOf) procBookOfScene(gs *sgc7game.GameScene, symbol int) (*sgc7game.GameScene, error) {
-	ngs := gs.Clone()
+func (bookof *BookOf) procBookOfScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbol int) (*sgc7game.GameScene, error) {
+	ngs := gs.CloneEx(gameProp.Pool.PoolGameScene)
 
 	for x, arr := range gs.Arr {
 		hass := false
