@@ -147,7 +147,8 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 	if multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels != nil {
 		gs := multiLevelReplaceReel.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
 
-		sc := gs.CloneEx(gameProp.Pool.PoolGameScene)
+		sc := gs.Clone()
+		// sc := gs.CloneEx(gameProp.Pool.PoolGameScene)
 
 		for x, reel := range multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels {
 			copy(sc.Arr[x], reel)

@@ -207,8 +207,10 @@ func (lightning *Lightning) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		return ErrIvalidCurGameModParams
 	}
 
-	gs := pregp.LastScene.CloneEx(gameProp.Pool.PoolGameScene)
-	os := pregp.LastOtherScene.CloneEx(gameProp.Pool.PoolGameScene)
+	gs := pregp.LastScene.Clone()
+	os := pregp.LastOtherScene.Clone()
+	// gs := pregp.LastScene.CloneEx(gameProp.Pool.PoolGameScene)
+	// os := pregp.LastOtherScene.CloneEx(gameProp.Pool.PoolGameScene)
 
 	isCollector := false
 	collectorX := 0

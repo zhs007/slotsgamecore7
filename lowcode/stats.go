@@ -79,19 +79,19 @@ func (stats *Stats) StartWorker() {
 
 		stats.Root.OnResults(param.Stake, param.Results)
 
-		for _, v := range param.Results {
-			for _, gs := range v.Scenes {
-				stats.Pool.PoolGameScene.Put(gs)
-			}
+		// for _, v := range param.Results {
+		// 	for _, gs := range v.Scenes {
+		// 		stats.Pool.PoolGameScene.Put(gs)
+		// 	}
 
-			for _, gs := range v.OtherScenes {
-				stats.Pool.PoolGameScene.Put(gs)
-			}
+		// 	for _, gs := range v.OtherScenes {
+		// 		stats.Pool.PoolGameScene.Put(gs)
+		// 	}
 
-			for _, gs := range v.PrizeScenes {
-				stats.Pool.PoolGameScene.Put(gs)
-			}
-		}
+		// 	for _, gs := range v.PrizeScenes {
+		// 		stats.Pool.PoolGameScene.Put(gs)
+		// 	}
+		// }
 
 		atomic.AddInt32(&stats.lastNum, -1)
 	}
