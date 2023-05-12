@@ -27,7 +27,7 @@ type Serv struct {
 }
 
 // NewServ -
-func NewServ(service IService, game sgc7game.IGame, bindaddr string, version string) (*Serv, error) {
+func NewServ(service IService, game sgc7game.IGame, bindaddr string, version string, useOpenTelemetry bool) (*Serv, error) {
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
 		goutils.Error("NewServ.Listen",
@@ -36,10 +36,16 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 		return nil, err
 	}
 
-	grpcServ := grpc.NewServer(
-		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
-	)
+	var grpcServ *grpc.Server
+
+	if useOpenTelemetry {
+		grpcServ = grpc.NewServer(
+			grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+			grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+		)
+	} else {
+		grpcServ = grpc.NewServer()
+	}
 
 	serv := &Serv{
 		lis:      lis,
