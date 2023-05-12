@@ -20,7 +20,7 @@ type GamePropertyPool struct {
 	MapSymbolColor   *asciigame.SymbolColorMap
 	MapComponents    map[string]IComponent
 	Stats            *Stats
-	PoolGameScene    *sgc7game.GameScenePoolEx
+	// PoolGameScene    *sgc7game.GameScenePoolEx
 }
 
 func (pool *GamePropertyPool) newGameProp() *GameProperty {
@@ -66,6 +66,10 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	feature := NewStatsFeature(parent, cfg.Name, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+		if cfg.IsNeedForceStats {
+			return true, s.CashBet, calcTotalCashWins(lst)
+		}
+
 		return curComponent.OnStats(f, s, lst)
 	}, pool.Config.Width, pool.Config.StatsSymbolCodes, StatusTypeUnknow, "")
 
@@ -205,7 +209,7 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
 		MapComponents:    make(map[string]IComponent),
-		PoolGameScene:    sgc7game.NewGameScenePoolEx(),
+		// PoolGameScene:    sgc7game.NewGameScenePoolEx(),
 	}
 
 	sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer, false))

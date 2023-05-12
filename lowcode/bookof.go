@@ -250,7 +250,8 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 
 // procBookOfScene - outpur to asciigame
 func (bookof *BookOf) procBookOfScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbol int) (*sgc7game.GameScene, error) {
-	ngs := gs.CloneEx(gameProp.Pool.PoolGameScene)
+	// ngs := gs.CloneEx(gameProp.Pool.PoolGameScene)
+	ngs := gs.Clone()
 
 	for x, arr := range gs.Arr {
 		hass := false

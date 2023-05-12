@@ -112,11 +112,13 @@ func (gameProp *GameProperty) GetOtherScene(pr *sgc7game.PlayResult, tag string)
 
 func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, respinComponent string, gs *sgc7game.GameScene, os *sgc7game.GameScene) {
 	if gs != nil {
-		gp.LastScene = gs.CloneEx(gameProp.Pool.PoolGameScene)
+		gp.LastScene = gs.Clone()
+		// gp.LastScene = gs.CloneEx(gameProp.Pool.PoolGameScene)
 	}
 
 	if os != nil {
-		gp.LastOtherScene = os.CloneEx(gameProp.Pool.PoolGameScene)
+		gp.LastOtherScene = os.Clone()
+		// gp.LastOtherScene = os.CloneEx(gameProp.Pool.PoolGameScene)
 	}
 
 	gameProp.SetStrVal(GamePropRespinComponent, respinComponent)

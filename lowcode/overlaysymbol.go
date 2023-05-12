@@ -142,7 +142,8 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 	if hasVal {
 		gs := overlaySymbol.GetTargetScene(gameProp, curpr, &osd.BasicComponentData, "")
 
-		cgs := gs.CloneEx(gameProp.Pool.PoolGameScene)
+		cgs := gs.Clone()
+		// cgs := gs.CloneEx(gameProp.Pool.PoolGameScene)
 
 		for i := 0; i <= osd.CurLevel; i++ {
 			pos, isok := overlaySymbol.MapPosition.MapVals[i]

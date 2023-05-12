@@ -144,7 +144,8 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 
 			// gameProp.SetVal(GamePropCurMystery, curmcode)
 
-			sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
+			sc2 := gs.Clone()
+			// sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
 			for _, v := range reelSetMystery.MysterySymbolCodes {
 				sc2.ReplaceSymbol(v, curmcode)
 			}
@@ -164,7 +165,8 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 
 			// gameProp.SetVal(GamePropCurMystery, curmcode)
 
-			sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
+			sc2 := gs.Clone()
+			// sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
 			for _, v := range reelSetMystery.MysterySymbolCodes {
 				sc2.ReplaceSymbol(v, curmcode)
 			}

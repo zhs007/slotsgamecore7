@@ -104,14 +104,14 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	gs := symbolVal2.GetTargetScene(gameProp, curpr, cd, "")
 
 	if gs.HasSymbol(symbolVal2.SymbolCode) {
-		os := gameProp.Pool.PoolGameScene.New(gs.Width, gs.Height, false)
-		// os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-		// if err != nil {
-		// 	goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
-		// 		zap.Error(err))
+		// os := gameProp.Pool.PoolGameScene.New(gs.Width, gs.Height, false)
+		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
+		if err != nil {
+			goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
+				zap.Error(err))
 
-		// 	return err
-		// }
+			return err
+		}
 
 		setIndex := -1
 		if symbolVal2.Config.RNGSet != "" {
