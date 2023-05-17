@@ -162,5 +162,7 @@ service DTGameLogic {
     // initialize - initialize a player
     rpc initialize(RequestInitialize) returns (PlayerState) {}
     // play - play game
-    rpc play(RequestPlay) returns (stream ReplyPlay) {}    
+    rpc play(RequestPlay) returns (stream ReplyPlay) {}
+    // play2 - play game v2
+    rpc play2(RequestPlay) returns (ReplyPlay) {}
 }

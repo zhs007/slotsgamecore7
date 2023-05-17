@@ -22,6 +22,7 @@ const (
 	DTGameLogic_GetConfig_FullMethodName  = "/sgc7pb.DTGameLogic/getConfig"
 	DTGameLogic_Initialize_FullMethodName = "/sgc7pb.DTGameLogic/initialize"
 	DTGameLogic_Play_FullMethodName       = "/sgc7pb.DTGameLogic/play"
+	DTGameLogic_Play2_FullMethodName      = "/sgc7pb.DTGameLogic/play2"
 )
 
 // DTGameLogicClient is the client API for DTGameLogic service.
@@ -34,6 +35,8 @@ type DTGameLogicClient interface {
 	Initialize(ctx context.Context, in *RequestInitialize, opts ...grpc.CallOption) (*PlayerState, error)
 	// play - play game
 	Play(ctx context.Context, in *RequestPlay, opts ...grpc.CallOption) (DTGameLogic_PlayClient, error)
+	// play2 - play game v2
+	Play2(ctx context.Context, in *RequestPlay, opts ...grpc.CallOption) (*ReplyPlay, error)
 }
 
 type dTGameLogicClient struct {
@@ -94,6 +97,15 @@ func (x *dTGameLogicPlayClient) Recv() (*ReplyPlay, error) {
 	return m, nil
 }
 
+func (c *dTGameLogicClient) Play2(ctx context.Context, in *RequestPlay, opts ...grpc.CallOption) (*ReplyPlay, error) {
+	out := new(ReplyPlay)
+	err := c.cc.Invoke(ctx, DTGameLogic_Play2_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DTGameLogicServer is the server API for DTGameLogic service.
 // All implementations must embed UnimplementedDTGameLogicServer
 // for forward compatibility
@@ -104,6 +116,8 @@ type DTGameLogicServer interface {
 	Initialize(context.Context, *RequestInitialize) (*PlayerState, error)
 	// play - play game
 	Play(*RequestPlay, DTGameLogic_PlayServer) error
+	// play2 - play game v2
+	Play2(context.Context, *RequestPlay) (*ReplyPlay, error)
 	mustEmbedUnimplementedDTGameLogicServer()
 }
 
@@ -119,6 +133,9 @@ func (UnimplementedDTGameLogicServer) Initialize(context.Context, *RequestInitia
 }
 func (UnimplementedDTGameLogicServer) Play(*RequestPlay, DTGameLogic_PlayServer) error {
 	return status.Errorf(codes.Unimplemented, "method Play not implemented")
+}
+func (UnimplementedDTGameLogicServer) Play2(context.Context, *RequestPlay) (*ReplyPlay, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Play2 not implemented")
 }
 func (UnimplementedDTGameLogicServer) mustEmbedUnimplementedDTGameLogicServer() {}
 
@@ -190,6 +207,24 @@ func (x *dTGameLogicPlayServer) Send(m *ReplyPlay) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _DTGameLogic_Play2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestPlay)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DTGameLogicServer).Play2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DTGameLogic_Play2_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DTGameLogicServer).Play2(ctx, req.(*RequestPlay))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DTGameLogic_ServiceDesc is the grpc.ServiceDesc for DTGameLogic service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +239,10 @@ var DTGameLogic_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "initialize",
 			Handler:    _DTGameLogic_Initialize_Handler,
+		},
+		{
+			MethodName: "play2",
+			Handler:    _DTGameLogic_Play2_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
