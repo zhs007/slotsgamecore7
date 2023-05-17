@@ -75,8 +75,8 @@ func (maskData *MaskData) BuildPBComponentData() proto.Message {
 	pb := &sgc7pb.MaskData{
 		Num:      int32(maskData.Num),
 		NewChged: int32(maskData.NewChged),
-		Vals:     make([]bool, 0, len(maskData.Vals)),
-		NewVals:  make([]bool, 0, len(maskData.NewVals)),
+		Vals:     make([]bool, len(maskData.Vals)),
+		NewVals:  make([]bool, len(maskData.NewVals)),
 	}
 
 	copy(pb.Vals, maskData.Vals)
