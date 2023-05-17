@@ -129,6 +129,26 @@ func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlaySe
 	return stream.Send(res)
 }
 
+// Play2 - play game
+func (serv *Serv) Play2(ctx context.Context, req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
+	goutils.Debug("Serv.Play",
+		goutils.JSON("req", req))
+
+	res, err := serv.onPlay(req)
+	if err != nil {
+		goutils.Error("Serv.Play:onPlay",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	// goutils.Debug("Serv.Play",
+	// 	goutils.JSON("reply", res))
+	serv.LogReplyPlay("Serv.Play", res, zapcore.DebugLevel)
+
+	return res, nil
+}
+
 // ProcCheat - process cheat
 func (serv *Serv) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
 	if cheat != "" {
