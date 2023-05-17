@@ -2,16 +2,15 @@
   <config>
       <!--General game information-->
       <sd>1.56</sd>
-      <rtp>0.9607</rtp>
       <id>123</id>
       <name>game001</name>
       <configVersion>1.0</configVersion>
       <!--RTP infomation-->
-      <rtps>
+      <rtp>
           <item>0.9607</item>
           <item>0.9608</item>
           <item>0.9609</item>
-      </rtps>
+      </rtp>
       <!--Configuration-->
       <symbols>
           <symbol name="A" value="1"/>
