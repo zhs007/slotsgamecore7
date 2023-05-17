@@ -78,12 +78,11 @@ type Config struct {
 	XMLName        xml.Name    `xml:"config"`
 	GeneralComment string      `xml:",comment"`
 	SD             float32     `xml:"sd"`
-	RTP            float32     `xml:"rtp"`
 	ID             int         `xml:"id"`
 	Name           string      `xml:"name"`
 	ConfigVersion  string      `xml:"configVersion"`
 	RTPsComment    string      `xml:",comment"`
-	RTPs           *FloatList  `xml:"rtps"`
+	RTPs           *FloatList  `xml:"rtp"`
 	ConfigComment  string      `xml:",comment"`
 	Symbols        *Symbols    `xml:"symbols"`
 	Wilds          *StringList `xml:"wilds"`

@@ -20,7 +20,6 @@ func Test_Config(t *testing.T) {
 	cfg := Config{
 		GeneralComment: "General game information",
 		SD:             1.56,
-		RTP:            0.9607,
 		ID:             123,
 		Name:           "game001",
 		ConfigVersion:  "1.0",
