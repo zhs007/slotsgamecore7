@@ -245,6 +245,16 @@ func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 				collector.OnStatsWithPB(feature, pbcd, lastpr)
 			}
 		}
+
+		if feature.RespinStartStatusEx != nil {
+			pbs, prs := findAllFirstPBComponentDataEx(lst, feature.RespinStartName, collector.Name)
+
+			if len(pbs) > 0 {
+				for i, v := range pbs {
+					collector.OnStatsWithPB(feature, v, prs[i])
+				}
+			}
+		}
 	}
 
 	return false, 0, 0
@@ -268,6 +278,10 @@ func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponen
 
 	if feature.RespinStartStatus != nil {
 		feature.RespinStartStatus.AddStatus(int(pbcd.Val))
+	}
+
+	if feature.RespinStartStatusEx != nil {
+		feature.RespinStartStatusEx.AddStatus(int(pbcd.Val))
 	}
 
 	return 0, nil
