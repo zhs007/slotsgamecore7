@@ -42,6 +42,8 @@ type Feature struct {
 	RespinEndingName     string
 	RespinStartStatus    *Status
 	RespinStartName      string
+	RespinStartStatusEx  *Status
+	RespinStartNameEx    string
 	RespinNumStatus      *Status
 	RespinWinStatus      *Status
 	RespinStartNumStatus *Status

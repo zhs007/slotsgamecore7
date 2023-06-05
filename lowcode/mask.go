@@ -277,6 +277,16 @@ func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst
 				mask.OnStatsWithPB(feature, pbcd, lastpr)
 			}
 		}
+
+		if feature.RespinStartStatusEx != nil {
+			pbs, prs := findAllFirstPBComponentDataEx(lst, feature.RespinStartName, mask.Name)
+
+			if len(pbs) > 0 {
+				for i, v := range pbs {
+					mask.OnStatsWithPB(feature, v, prs[i])
+				}
+			}
+		}
 	}
 
 	return false, 0, 0
@@ -300,6 +310,10 @@ func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *any
 
 	if feature.RespinStartStatus != nil {
 		feature.RespinStartStatus.AddStatus(boolArr2Int(pbcd.Vals))
+	}
+
+	if feature.RespinStartStatusEx != nil {
+		feature.RespinStartStatusEx.AddStatus(boolArr2Int(pbcd.Vals))
 	}
 
 	return 0, nil

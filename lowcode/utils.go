@@ -71,6 +71,30 @@ func findFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName 
 	return nil, nil
 }
 
+// findAllFirstPBComponentDataEx
+func findAllFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) ([]*anypb.Any, []*sgc7game.PlayResult) {
+	pbs := []*anypb.Any{}
+	prs := []*sgc7game.PlayResult{}
+
+	for _, pr := range lst {
+		gp := pr.CurGameModParams.(*GameParams)
+		if gp != nil {
+			pbRespin := gp.MapComponents[respinComponentName]
+			pbcd := gp.MapComponents[componentName]
+			if pbRespin != nil && pbcd != nil {
+				pbs = append(pbs, pbRespin)
+				prs = append(prs, pr)
+			}
+		}
+	}
+
+	if len(pbs) == 0 {
+		return nil, nil
+	}
+
+	return pbs, prs
+}
+
 func calcTotalCashWins(lst []*sgc7game.PlayResult) int64 {
 	wins := int64(0)
 
