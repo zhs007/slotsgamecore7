@@ -71,8 +71,8 @@ func findFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName 
 	return nil, nil
 }
 
-// findAllFirstPBComponentDataEx
-func findAllFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) ([]*anypb.Any, []*sgc7game.PlayResult) {
+// findAllPBComponentDataEx
+func findAllPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) ([]*anypb.Any, []*sgc7game.PlayResult) {
 	pbs := []*anypb.Any{}
 	prs := []*sgc7game.PlayResult{}
 
@@ -82,7 +82,7 @@ func findAllFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentNa
 			pbRespin := gp.MapComponents[respinComponentName]
 			pbcd := gp.MapComponents[componentName]
 			if pbRespin != nil && pbcd != nil {
-				pbs = append(pbs, pbRespin)
+				pbs = append(pbs, pbcd)
 				prs = append(prs, pr)
 			}
 		}
