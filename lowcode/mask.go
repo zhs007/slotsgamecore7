@@ -279,7 +279,7 @@ func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst
 		}
 
 		if feature.RespinStartStatusEx != nil {
-			pbs, prs := findAllFirstPBComponentDataEx(lst, feature.RespinStartName, mask.Name)
+			pbs, prs := findAllFirstPBComponentDataEx(lst, feature.RespinStartNameEx, mask.Name)
 
 			if len(pbs) > 0 {
 				for i, v := range pbs {
