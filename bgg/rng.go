@@ -4,7 +4,7 @@ import (
 	"context"
 
 	goutils "github.com/zhs007/goutils"
-	"github.com/zhs007/slotsgamecore7/bggrngpb"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -16,7 +16,7 @@ type RngClient struct {
 	servAddr         string
 	gameCode         string
 	conn             *grpc.ClientConn
-	client           bggrngpb.BGGRngClient
+	client           sgc7pb.RngClient
 	useOpenTelemetry bool
 }
 
@@ -71,10 +71,10 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 		}
 
 		client.conn = conn
-		client.client = bggrngpb.NewBGGRngClient(conn)
+		client.client = sgc7pb.NewRngClient(conn)
 	}
 
-	res, err := client.client.GetRngs(ctx, &bggrngpb.RequestRngs{
+	res, err := client.client.GetRngs(ctx, &sgc7pb.RequestRngs{
 		Nums: int32(nums),
 	})
 	if err != nil {

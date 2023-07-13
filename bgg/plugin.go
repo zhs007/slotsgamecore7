@@ -7,23 +7,23 @@ import (
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
-// PluginBGG - plugin for BGG
-type PluginBGG struct {
+// Plugin - plugin for BGG
+type Plugin struct {
 	sgc7plugin.BasicPlugin
 
 	Rngs      []uint32
 	RngClient *RngClient
 }
 
-// NewPluginBGG - new PluginBGG (IPlugin)
-func NewPluginBGG(rngServAddr string, gameCode string, useOpenTelemetry bool) *PluginBGG {
-	return &PluginBGG{
+// NewPlugin - new Plugin (IPlugin)
+func NewPlugin(rngServAddr string, gameCode string, useOpenTelemetry bool) *Plugin {
+	return &Plugin{
 		RngClient: NewRngClient(rngServAddr, gameCode, useOpenTelemetry),
 	}
 }
 
 // Random - return [0, r)
-func (plugin *PluginBGG) Random(ctx context.Context, r int) (int, error) {
+func (plugin *Plugin) Random(ctx context.Context, r int) (int, error) {
 	if len(plugin.Rngs) == 0 {
 		rngs, err := plugin.RngClient.GetRngs(ctx, 0)
 		if err != nil {
@@ -69,7 +69,7 @@ func (plugin *PluginBGG) Random(ctx context.Context, r int) (int, error) {
 }
 
 // SetCache - set cache
-func (plugin *PluginBGG) SetCache(arr []int) {
+func (plugin *Plugin) SetCache(arr []int) {
 	plugin.Rngs = nil
 
 	for _, v := range arr {
@@ -78,10 +78,10 @@ func (plugin *PluginBGG) SetCache(arr []int) {
 }
 
 // ClearCache - clear cached rngs
-func (plugin *PluginBGG) ClearCache() {
+func (plugin *Plugin) ClearCache() {
 	plugin.Rngs = nil
 }
 
 // Init - initial
-func (plugin *PluginBGG) Init() {
+func (plugin *Plugin) Init() {
 }

@@ -1,6 +1,6 @@
 syntax = "proto3";
-package bggrngpb;
-option go_package = "github.com/zhs007/slotsgamecore7/bggrngpb";
+package sgc7pb;
+option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
 
 // RequestRngs - request some rngs
 message RequestRngs {
@@ -13,8 +13,8 @@ message ReplyRngs {
     repeated uint32 rngs = 1;
 }
 
-// BGGRng - BGG RNG Service
-service BGGRng {
+// Rng - RNG Service
+service Rng {
 	// getRngs - get rngs
     rpc getRngs(RequestRngs) returns (ReplyRngs) {}
 }
