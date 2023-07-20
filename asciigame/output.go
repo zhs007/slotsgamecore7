@@ -45,7 +45,7 @@ func OutputReverseSceneEx(str string, scene *sgc7game.GameScene, result *sgc7gam
 
 	for y := 0; y < scene.Height; y++ {
 		for x := 0; x < scene.Width; x++ {
-			if IsPosInResult(x, scene.Height-1-y, result) {
+			if result != nil && IsPosInResult(x, scene.Height-1-y, result) {
 				fmt.Printf("%v ", FormatColorString(mapSymbolColor.PayTables.GetStringFromInt(scene.Arr[x][scene.Height-1-y]), c))
 			} else {
 				fmt.Printf("%v ", mapSymbolColor.PayTables.GetStringFromInt(scene.Arr[x][scene.Height-1-y]))
