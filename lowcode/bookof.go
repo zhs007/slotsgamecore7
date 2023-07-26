@@ -49,13 +49,15 @@ func (bookOfData *BookOfData) BuildPBComponentData() proto.Message {
 // BookOfConfig - configuration for BookOf feature
 type BookOfConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	BetType              string `yaml:"betType"` // bet or totalBet
-	ForceTrigger         bool   `yaml:"forceTrigger"`
-	WeightTrigger        string `yaml:"weightTrigger"`
-	WeightSymbolNum      string `yaml:"weightSymbolNum"`
-	WeightSymbol         string `yaml:"weightSymbol"`
-	ForceSymbolNum       int    `yaml:"forceSymbolNum"`
-	SymbolRNG            string `yaml:"symbolRNG"` // 只在ForceSymbolNum为1时有效
+	BetType              string   `yaml:"betType"`     // bet or totalBet
+	WildSymbols          []string `yaml:"wildSymbols"` // 可以不要wild
+	WildSymbolCodes      []int    `yaml:"-"`
+	ForceTrigger         bool     `yaml:"forceTrigger"`
+	WeightTrigger        string   `yaml:"weightTrigger"`
+	WeightSymbolNum      string   `yaml:"weightSymbolNum"`
+	WeightSymbol         string   `yaml:"weightSymbol"`
+	ForceSymbolNum       int      `yaml:"forceSymbolNum"`
+	SymbolRNG            string   `yaml:"symbolRNG"` // 只在ForceSymbolNum为1时有效
 }
 
 type BookOf struct {
@@ -129,6 +131,10 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 		bookof.WeightSymbol = vw2
 	}
 
+	for _, v := range bookof.Config.WildSymbols {
+		bookof.Config.WildSymbolCodes = append(bookof.Config.WildSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
 	bookof.onInit(&cfg.BasicComponentConfig)
 
 	return nil
@@ -192,7 +198,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
 			scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
-				return cursymbol == cs.Int()
+				return cursymbol == cs.Int() || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			}, true)
 			if scr != nil {
 				bookof.AddResult(curpr, scr, &cd.BasicComponentData)
@@ -230,7 +236,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 				bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
 				scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
-					return cursymbol == cs.Int()
+					return cursymbol == cs.Int() || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
 				}, true)
 				if scr != nil {
 					bookof.AddResult(curpr, scr, &cd.BasicComponentData)

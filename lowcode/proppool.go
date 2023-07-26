@@ -20,7 +20,6 @@ type GamePropertyPool struct {
 	MapSymbolColor   *asciigame.SymbolColorMap
 	MapComponents    map[string]IComponent
 	Stats            *Stats
-	// PoolGameScene    *sgc7game.GameScenePoolEx
 }
 
 func (pool *GamePropertyPool) newGameProp() *GameProperty {

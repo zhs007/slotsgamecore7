@@ -23,6 +23,7 @@ const (
 
 	BetTypeNormal   = "bet"
 	BetTypeTotalBet = "totalBet"
+	BetTypeNoPay    = "noPay"
 )
 
 func GetBet(stake *sgc7game.Stake, bettype string) int {
@@ -119,6 +120,11 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		if ret != nil {
 			gameProp.ProcMulti(ret)
 
+			if tf.BetType == BetTypeNoPay {
+				ret.CoinWin = 0
+				ret.CashWin = 0
+			}
+
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
 			isTrigger = true
 		}
@@ -129,6 +135,11 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 		if ret != nil {
 			gameProp.ProcMulti(ret)
+
+			if tf.BetType == BetTypeNoPay {
+				ret.CoinWin = 0
+				ret.CashWin = 0
+			}
 
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
 			isTrigger = true
@@ -141,7 +152,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		}
 
 		if len(tf.Awards) > 0 {
-			gameProp.procAwards(tf.Awards, curpr, gp)
+			gameProp.procAwards(plugin, tf.Awards, curpr, gp)
 		}
 
 		if tf.SymbolAwardsWeights != nil {
@@ -154,7 +165,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 					return nil
 				}
 
-				gameProp.procAwards(node.Awards, curpr, gp)
+				gameProp.procAwards(plugin, node.Awards, curpr, gp)
 			}
 		}
 

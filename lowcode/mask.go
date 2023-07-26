@@ -179,21 +179,21 @@ func (mask *Mask) OnNewGame(gameProp *GameProperty) error {
 }
 
 // onMaskChg -
-func (mask *Mask) ChgMask(gameProp *GameProperty, md *MaskData, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, val bool, noProcSPLevel bool) {
+func (mask *Mask) ChgMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, md *MaskData, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, val bool, noProcSPLevel bool) {
 	if md.Vals[curMask] != val {
 		md.Vals[curMask] = val
 		md.NewVals[curMask] = val
 		md.NewChged++
 
-		mask.onMaskChg(gameProp, curpr, gp, curMask, noProcSPLevel)
+		mask.onMaskChg(plugin, gameProp, curpr, gp, curMask, noProcSPLevel)
 	}
 }
 
 // onMaskChg -
-func (mask *Mask) onMaskChg(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, noProcSPLevel bool) {
+func (mask *Mask) onMaskChg(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, noProcSPLevel bool) {
 	if mask.Config.PerMaskAwards != nil {
 		for _, v := range mask.Config.PerMaskAwards {
-			gameProp.procAward(v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp)
 		}
 	}
 
@@ -204,13 +204,13 @@ func (mask *Mask) onMaskChg(gameProp *GameProperty, curpr *sgc7game.PlayResult, 
 	sp, isok := mask.Config.MapSPMaskAwards[curMask-1]
 	if isok {
 		for _, v := range sp {
-			gameProp.procAward(v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp)
 		}
 	}
 }
 
 // onMaskChg -
-func (mask *Mask) ProcMask(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, targetScene string) {
+func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, targetScene string) {
 	if mask.MaskType == MaskTypeSymbolInReel {
 		cd := gameProp.MapComponentData[mask.Name].(*MaskData)
 
@@ -220,7 +220,7 @@ func (mask *Mask) ProcMask(gameProp *GameProperty, curpr *sgc7game.PlayResult, g
 			if !v {
 				for _, s := range gs.Arr[x] {
 					if s == mask.SymbolCode {
-						mask.ChgMask(gameProp, cd, curpr, gp, x, true, mask.Config.EndingSPAward != "")
+						mask.ChgMask(plugin, gameProp, cd, curpr, gp, x, true, mask.Config.EndingSPAward != "")
 
 						break
 					}
@@ -236,7 +236,7 @@ func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 
 	mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	mask.ProcMask(gameProp, curpr, gp, "")
+	mask.ProcMask(plugin, gameProp, curpr, gp, "")
 
 	mask.onStepEnd(gameProp, curpr, gp, "")
 
@@ -344,7 +344,7 @@ func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResu
 				if fullAward != nil {
 					if md.IsFull() {
 						for _, v := range fullAward {
-							gameProp.procAward(v, curpr, gp)
+							gameProp.procAward(plugin, v, curpr, gp)
 						}
 					}
 				}

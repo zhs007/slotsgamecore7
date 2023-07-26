@@ -295,13 +295,13 @@ func (gameProp *GameProperty) GetTagGlobalStr(tag string) string {
 	return gameProp.mapGlobalStr[tag]
 }
 
-func (gameProp *GameProperty) procAwards(awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {
+func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {
 	for _, v := range awards {
-		gameProp.procAward(v, curpr, gp)
+		gameProp.procAward(plugin, v, curpr, gp)
 	}
 }
 
-func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult, gp *GameParams) {
+func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award, curpr *sgc7game.PlayResult, gp *GameParams) {
 	if award.Type == AwardRespinTimes {
 		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
@@ -319,7 +319,7 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 		if isok {
 			mask, isok := component.(*Mask)
 			if isok {
-				mask.ProcMask(gameProp, curpr, gp, award.StrParams[1])
+				mask.ProcMask(plugin, gameProp, curpr, gp, award.StrParams[1])
 			}
 		}
 	} else if award.Type == AwardTriggerRespin {
@@ -329,7 +329,7 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 		if isok {
 			collector, isok := component.(*Collector)
 			if isok {
-				err := collector.Add(award.Vals[0], nil, gameProp, curpr, gp, false)
+				err := collector.Add(plugin, award.Vals[0], nil, gameProp, curpr, gp, false)
 				if err != nil {
 					goutils.Error("GameProperty.procAward",
 						zap.Error(err))
@@ -343,7 +343,7 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 		if isok {
 			collector, isok := component.(*Collector)
 			if isok {
-				err := collector.Add(award.Vals[0], nil, gameProp, curpr, gp, true)
+				err := collector.Add(plugin, award.Vals[0], nil, gameProp, curpr, gp, true)
 				if err != nil {
 					goutils.Error("GameProperty.procAward",
 						zap.Error(err))
@@ -352,6 +352,39 @@ func (gameProp *GameProperty) procAward(award *Award, curpr *sgc7game.PlayResult
 				}
 			}
 		}
+	} else if award.Type == AwardWeightGameRNG {
+		vw, err := gameProp.GetIntValWeights(award.StrParams[0], true)
+		if err != nil {
+			goutils.Error("GameProperty.procAward:AwardWeightGameRNG:GetIntValWeights",
+				zap.Error(err))
+
+			return
+		}
+
+		cr, err := vw.RandVal(plugin)
+		if err != nil {
+			goutils.Error("GameProperty.procAward:AwardWeightGameRNG:RandVal",
+				zap.Error(err))
+
+			return
+		}
+
+		gameProp.TagInt(award.StrParams[1], cr.Int())
+
+		// gameProp.Pool.Config.FileMapping[award.StrParams[0]]
+		// component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		// if isok {
+		// 	collector, isok := component.(*Collector)
+		// 	if isok {
+		// 		err := collector.Add(award.Vals[0], nil, gameProp, curpr, gp, true)
+		// 		if err != nil {
+		// 			goutils.Error("GameProperty.procAward",
+		// 				zap.Error(err))
+
+		// 			return
+		// 		}
+		// 	}
+		// }
 	}
 }
 

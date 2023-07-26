@@ -114,7 +114,7 @@ func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
 }
 
 // Add -
-func (collector *Collector) Add(num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
+func (collector *Collector) Add(plugin sgc7plugin.IPlugin, num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
 	if num <= 0 {
 		return nil
 	}
@@ -136,9 +136,9 @@ func (collector *Collector) Add(num int, cd *CollectorData, gameProp *GameProper
 		for i := 1; i <= num; i++ {
 			cl := oldval + i
 			if cl > collector.Config.MaxVal {
-				collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
+				collector.onLevelUp(plugin, gameProp, curpr, gp, collector.Config.MaxVal, true)
 			} else {
-				collector.onLevelUp(gameProp, curpr, gp, cl, false)
+				collector.onLevelUp(plugin, gameProp, curpr, gp, cl, false)
 			}
 		}
 	}
@@ -147,10 +147,10 @@ func (collector *Collector) Add(num int, cd *CollectorData, gameProp *GameProper
 }
 
 // onLevelUp -
-func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, newLevel int, noProcSPLevel bool) error {
+func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, newLevel int, noProcSPLevel bool) error {
 	if collector.Config.PerLevelAwards != nil {
 		for _, v := range collector.Config.PerLevelAwards {
-			gameProp.procAward(v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp)
 		}
 	}
 
@@ -161,7 +161,7 @@ func (collector *Collector) onLevelUp(gameProp *GameProperty, curpr *sgc7game.Pl
 	sp, isok := collector.Config.MapSPLevelAwards[newLevel]
 	if isok {
 		for _, v := range sp {
-			gameProp.procAward(v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp)
 		}
 	}
 
@@ -185,7 +185,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	// oldval := cd.Val
 	// cd.NewCollector = nn
 
-	collector.Add(nn, cd, gameProp, curpr, gp, false)
+	collector.Add(plugin, nn, cd, gameProp, curpr, gp, false)
 	// cd.Val += nn
 	// if collector.Config.MaxVal > 0 {
 	// 	if cd.Val > collector.Config.MaxVal {
