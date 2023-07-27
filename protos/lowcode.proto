@@ -99,6 +99,12 @@ message MaskData {
     repeated bool newVals = 5;
 }
 
+// SymbolCollectionData
+message SymbolCollectionData {
+    ComponentData basicComponentData = 1;
+    repeated int32 symbolCodes = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

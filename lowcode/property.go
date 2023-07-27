@@ -156,6 +156,17 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 	}
 }
 
+func (gameProp *GameProperty) AddComponent2History(component IComponent, gp *GameParams) {
+	for _, c := range gameProp.HistoryComponents {
+		if c.GetName() == component.GetName() {
+			return
+		}
+	}
+
+	gameProp.HistoryComponents = append(gameProp.HistoryComponents, component)
+	gp.HistoryComponents = append(gp.HistoryComponents, component.GetName())
+}
+
 func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string) error {
 	// if respinNum > 0 {
 	component, isok := gameProp.Pool.MapComponents[respinComponent]
@@ -370,21 +381,24 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		}
 
 		gameProp.TagInt(award.StrParams[1], cr.Int())
+	} else if award.Type == AwardPushSymbolCollection {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			symbolCollection, isok := component.(*SymbolCollection)
+			if isok {
+				for i := 0; i < award.Vals[0]; i++ {
+					err := symbolCollection.Push(plugin, gameProp, gp)
+					if err != nil {
+						goutils.Error("GameProperty.procAward:AwardPushSymbolCollection:Push",
+							zap.Error(err))
 
-		// gameProp.Pool.Config.FileMapping[award.StrParams[0]]
-		// component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
-		// if isok {
-		// 	collector, isok := component.(*Collector)
-		// 	if isok {
-		// 		err := collector.Add(award.Vals[0], nil, gameProp, curpr, gp, true)
-		// 		if err != nil {
-		// 			goutils.Error("GameProperty.procAward",
-		// 				zap.Error(err))
+						return
+					}
+				}
 
-		// 			return
-		// 		}
-		// 	}
-		// }
+				gameProp.AddComponent2History(component, gp)
+			}
+		}
 	}
 }
 

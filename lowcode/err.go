@@ -61,4 +61,7 @@ var (
 
 	// ErrIvalidTagCurReels - invalid TagCurReels
 	ErrIvalidTagCurReels = errors.New("invalid TagCurReels")
+
+	// ErrIvalidSymbolCollection - invalid SymbolColletion
+	ErrIvalidSymbolCollection = errors.New("invalid SymbolColletion")
 )
