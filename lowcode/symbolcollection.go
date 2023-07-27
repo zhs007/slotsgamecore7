@@ -24,13 +24,13 @@ type SymbolCollectionData struct {
 // OnNewGame -
 func (symbolCollectionData *SymbolCollectionData) OnNewGame() {
 	symbolCollectionData.BasicComponentData.OnNewGame()
+
+	symbolCollectionData.SymbolCodes = nil
 }
 
 // OnNewStep -
 func (symbolCollectionData *SymbolCollectionData) OnNewStep() {
 	symbolCollectionData.BasicComponentData.OnNewStep()
-
-	symbolCollectionData.SymbolCodes = nil
 }
 
 // BuildPBComponentData
