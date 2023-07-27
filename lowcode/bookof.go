@@ -197,30 +197,11 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 				symbolNum = iv.Int()
 			}
 
-			gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
-
 			if bookof.Config.ForceSymbolNum == 1 && bookof.Config.SymbolRNG != "" {
 				rng := gameProp.GetTagInt(bookof.Config.SymbolRNG)
 				cs := bookof.WeightSymbol.Vals[rng]
 
 				cd.Symbols = append(cd.Symbols, cs.Int())
-
-				ngs, err := bookof.procBookOfScene(gameProp, gs, cs.Int())
-				if err != nil {
-					goutils.Error("bookof.OnPlayGame:procBookOfScene",
-						zap.Error(err))
-
-					return err
-				}
-
-				bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-
-				scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
-					return cursymbol == cs.Int() || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, true)
-				if scr != nil {
-					bookof.AddResult(curpr, scr, &cd.BasicComponentData)
-				}
 			} else {
 				curWeight := bookof.WeightSymbol.Clone()
 
@@ -242,24 +223,28 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 
 						return err
 					}
-
-					ngs, err := bookof.procBookOfScene(gameProp, gs, cs.Int())
-					if err != nil {
-						goutils.Error("bookof.OnPlayGame:procBookOfScene",
-							zap.Error(err))
-
-						return err
-					}
-
-					bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-
-					scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, cs.Int(), GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
-						return cursymbol == cs.Int() || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, true)
-					if scr != nil {
-						bookof.AddResult(curpr, scr, &cd.BasicComponentData)
-					}
 				}
+			}
+		}
+
+		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+
+		for _, s := range cd.Symbols {
+			ngs, err := bookof.procBookOfScene(gameProp, gs, s)
+			if err != nil {
+				goutils.Error("bookof.OnPlayGame:procBookOfScene",
+					zap.Error(err))
+
+				return err
+			}
+
+			bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+			scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, s, GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
+				return cursymbol == s || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, true)
+			if scr != nil {
+				bookof.AddResult(curpr, scr, &cd.BasicComponentData)
 			}
 		}
 
@@ -279,7 +264,7 @@ func (bookof *BookOf) procBookOfScene(gameProp *GameProperty, gs *sgc7game.GameS
 	for x, arr := range gs.Arr {
 		hass := false
 		for _, s := range arr {
-			if s == symbol {
+			if s == symbol || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, s, 0) >= 0 {
 				hass = true
 
 				break
