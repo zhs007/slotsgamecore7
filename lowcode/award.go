@@ -28,6 +28,8 @@ func (cfg *Award) getType() int {
 		return AwardNoLevelUpCollector
 	} else if cfg.AwardType == "weightGameRNG" {
 		return AwardWeightGameRNG
+	} else if cfg.AwardType == "pushSymbolCollection" {
+		return AwardPushSymbolCollection
 	}
 
 	return AwardUnknow
