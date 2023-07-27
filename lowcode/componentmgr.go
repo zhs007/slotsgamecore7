@@ -53,6 +53,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg("mask", NewMask)
 	mgr.Reg("multiLevelReplaceReel", NewMultiLevelReplaceReel)
 	mgr.Reg("fixSymbols", NewFixSymbols)
+	mgr.Reg("symbolCollection", NewSymbolCollection)
 
 	return mgr
 }
