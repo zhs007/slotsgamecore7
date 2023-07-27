@@ -4,6 +4,10 @@ This is a golang project for slots game.
 
 ### Update log
 
+##### v0.12
+
+- added lowcode
+
 ##### v0.10
 
 - add math toolset
