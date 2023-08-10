@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v3.12.4
-// source: dtgame.proto
+// source: game.proto
 
 package sgc7pb
 
@@ -252,5 +252,5 @@ var DTGameLogic_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "dtgame.proto",
+	Metadata: "game.proto",
 }
