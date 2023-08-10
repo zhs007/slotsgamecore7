@@ -171,13 +171,37 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 		if tf.RespinComponent != "" {
 			if tf.RespinNumWeightWithScatterNum != nil {
-				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], basicWins.Config.UseFileMapping, tf.RespinComponent)
+				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], basicWins.Config.UseFileMapping, tf.RespinComponent)
+				if err != nil {
+					goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
+						zap.Error(err))
+
+					return nil
+				}
+
+				ret.Type = sgc7game.RTFreeGame
+				ret.Value = v
 			} else if len(tf.RespinNumWithScatterNum) > 0 {
 				gameProp.TriggerRespin(curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent)
+
+				ret.Type = sgc7game.RTFreeGame
+				ret.Value = tf.RespinNumWithScatterNum[ret.SymbolNums]
 			} else if tf.RespinNumWeight != "" {
-				gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, basicWins.Config.UseFileMapping, tf.RespinComponent)
+				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, basicWins.Config.UseFileMapping, tf.RespinComponent)
+				if err != nil {
+					goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
+						zap.Error(err))
+
+					return nil
+				}
+
+				ret.Type = sgc7game.RTFreeGame
+				ret.Value = v
 			} else {
 				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent)
+
+				ret.Type = sgc7game.RTFreeGame
+				ret.Value = tf.RespinNum
 			}
 		} else if tf.NextComponent != "" {
 			bwd.NextComponent = tf.NextComponent

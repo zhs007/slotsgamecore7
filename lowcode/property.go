@@ -186,14 +186,14 @@ func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GamePar
 	return nil
 }
 
-func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, useFileMapping bool, respinComponent string) error {
+func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, useFileMapping bool, respinComponent string) (int, error) {
 	vw2, err := gameProp.GetIntValWeights(fn, useFileMapping)
 	if err != nil {
 		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
 			zap.String("fn", fn),
 			zap.Error(err))
 
-		return err
+		return 0, err
 	}
 
 	val, err := vw2.RandVal(plugin)
@@ -202,14 +202,16 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 			zap.String("fn", fn),
 			zap.Error(err))
 
-		return err
+		return 0, err
 	}
 
 	if val.Int() > 0 {
 		gameProp.TriggerRespin(pr, gp, val.Int(), respinComponent)
+
+		return val.Int(), nil
 	}
 
-	return nil
+	return 0, nil
 }
 
 func (gameProp *GameProperty) GetIntValWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
