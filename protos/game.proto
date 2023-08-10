@@ -114,6 +114,7 @@ message GameScenePlayResult {
     int32 otherMul = 8;     // 其它的赔付倍数，譬如一些规则会有其它的翻倍赔付等
     int32 wilds = 9;        // wilds的数量，某些情况下用来特殊赔付
     int32 symbolNums = 10;  // 赔付的符号数量
+    int32 value = 11;       // 如果是奖励FreeSpin，这里是次数
 }
 
 // PlayResult - result for play

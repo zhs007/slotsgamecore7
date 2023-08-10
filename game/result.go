@@ -22,6 +22,8 @@ const (
 	RTScatterOnReels = 7
 	// RTSymbolVal - 直接赔付
 	RTSymbolVal = 8
+	// RTFreeGame - 奖励FreeGame
+	RTFreeGame = 9
 )
 
 // Result - result for slots game
@@ -36,4 +38,5 @@ type Result struct {
 	OtherMul   int        `json:"othermul"`
 	Wilds      int        `json:"wilds"`
 	SymbolNums int        `json:"symbolnums"`
+	Value      int        `json:"value"`
 }
