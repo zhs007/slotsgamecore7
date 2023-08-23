@@ -11,8 +11,8 @@ import (
 // BasicGameMod - basic gamemod
 type BasicGameMod struct {
 	*sgc7game.BasicGameMod
-	Pool       *GamePropertyPool
-	Components *ComponentList
+	Pool          *GamePropertyPool
+	MapComponents map[int]*ComponentList
 }
 
 // OnPlay - on play
@@ -49,17 +49,19 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	}
 
 	if len(prs) == 0 {
-		bgm.OnNewGame(gameProp)
+		bgm.OnNewGame(gameProp, stake)
 	}
 
-	bgm.OnNewStep(gameProp)
+	bgm.OnNewStep(gameProp, stake)
 
 	pr, gp := bgm.newPlayResult(prs)
 
-	curComponent := bgm.Components.Components[0]
+	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+
+	curComponent := components.Components[0]
 
 	if gp.FirstComponent != "" {
-		c, isok := bgm.Components.MapComponents[gp.FirstComponent]
+		c, isok := components.MapComponents[gp.FirstComponent]
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 				zap.String("FirstComponent", gp.FirstComponent),
@@ -73,7 +75,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		if cmd != DefaultCmd {
 			cn, isok := bgm.Pool.Config.MapCmdComponent[cmd]
 			if isok {
-				c, isok1 := bgm.Components.MapComponents[cn]
+				c, isok1 := components.MapComponents[cn]
 				if !isok1 {
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 						zap.String("cmd", cmd),
@@ -88,7 +90,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		} else {
 			startComponent, isok := gameProp.Pool.Config.StartComponents[int(stake.CashBet/stake.CoinBet)]
 			if isok {
-				c, isok := bgm.Components.MapComponents[startComponent]
+				c, isok := components.MapComponents[startComponent]
 				if !isok {
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 						zap.String("FirstComponent", startComponent),
@@ -129,7 +131,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			break
 		}
 
-		c, isok := bgm.Components.MapComponents[nextComponentName]
+		c, isok := components.MapComponents[nextComponentName]
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 				zap.String("nextComponentName", nextComponentName),
@@ -176,10 +178,12 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 }
 
 // OnNewGame -
-func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty) error {
+func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	gameProp.OnNewGame()
 
-	for i, v := range bgm.Components.Components {
+	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+
+	for i, v := range components.Components {
 		err := v.OnNewGame(gameProp)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
@@ -194,10 +198,12 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty) error {
 }
 
 // OnNewStep -
-func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty) error {
+func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	gameProp.OnNewStep()
 
-	for i, v := range bgm.Components.Components {
+	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+
+	for i, v := range components.Components {
 		err := v.OnNewStep(gameProp)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
@@ -214,23 +220,38 @@ func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty) error {
 // NewBasicGameMod - new BaseGame
 func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
 	bgm := &BasicGameMod{
-		BasicGameMod: sgc7game.NewBasicGameMod(cfgGameMod.Type, pool.Config.Width, pool.Config.Height),
-		Pool:         pool,
-		Components:   NewComponentList(),
+		BasicGameMod:  sgc7game.NewBasicGameMod(cfgGameMod.Type, pool.Config.Width, pool.Config.Height),
+		Pool:          pool,
+		MapComponents: make(map[int]*ComponentList),
 	}
 
-	for _, v := range cfgGameMod.Components {
-		c := mgrComponent.NewComponent(v)
-		err := c.Init(pool.Config.GetPath(v.Config, false), pool)
-		if err != nil {
-			goutils.Error("NewBasicGameMod:Init",
-				zap.Error(err))
+	for _, bet := range pool.Config.Bets {
+		components := NewComponentList()
+		mapComponentMapping := pool.Config.ComponentsMapping[bet]
 
-			return nil
+		for _, v := range cfgGameMod.Components {
+			c := mgrComponent.NewComponent(v)
+			configfn := v.Config
+			if mapComponentMapping != nil {
+				mappingfn, isok := mapComponentMapping[v.Name]
+				if isok {
+					configfn = mappingfn
+				}
+			}
+
+			err := c.Init(pool.Config.GetPath(configfn, false), pool)
+			if err != nil {
+				goutils.Error("NewBasicGameMod:Init",
+					zap.Error(err))
+
+				return nil
+			}
+
+			components.AddComponent(v.Name, c)
+			pool.onAddComponent(v.Name, c)
 		}
 
-		bgm.Components.AddComponent(v.Name, c)
-		pool.onAddComponent(v.Name, c)
+		bgm.MapComponents[bet] = components
 	}
 
 	return bgm
