@@ -43,3 +43,37 @@ var gIsForceDisableStats bool
 func SetForceDisableStats() {
 	gIsForceDisableStats = true
 }
+
+type CheckWinType int
+
+const (
+	// CheckWinTypeLeftRight - left -> right
+	CheckWinTypeLeftRight CheckWinType = 0
+	// CheckWinTypeRightLeft - right -> left
+	CheckWinTypeRightLeft CheckWinType = 1
+	// CheckWinTypeAll - left -> right & right -> left
+	CheckWinTypeAll CheckWinType = 2
+)
+
+var strCheckWinType map[string]CheckWinType
+
+func ParseCheckWinType(str string) CheckWinType {
+	v, isok := strCheckWinType[str]
+	if isok {
+		return CheckWinType(v)
+	}
+
+	return CheckWinTypeLeftRight
+}
+
+func initCheckWinType() {
+	strCheckWinType = make(map[string]CheckWinType)
+
+	strCheckWinType["left2right"] = CheckWinTypeLeftRight
+	strCheckWinType["right2left"] = CheckWinTypeRightLeft
+	strCheckWinType["all"] = CheckWinTypeAll
+}
+
+func init() {
+	initCheckWinType()
+}
