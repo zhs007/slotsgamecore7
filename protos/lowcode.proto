@@ -112,4 +112,6 @@ message GameParam {
     map<string, google.protobuf.Any> mapComponents = 3;
     repeated string historyComponents = 4;
     repeated string respinComponents = 5;
+    map<int32, int32> mapVals = 6;
+    map<string, int32> mapStrVals = 7;
 }

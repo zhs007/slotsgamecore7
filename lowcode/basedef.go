@@ -36,6 +36,18 @@ func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
 	return nil
 }
 
+func (gp *GameParams) SetGameProp(gameProp *GameProperty) error {
+	if len(gameProp.MapVals) > 0 {
+		gp.MapVals = make(map[int32]int32)
+
+		for k, v := range gameProp.MapVals {
+			gp.MapVals[int32(k)] = int32(v)
+		}
+	}
+
+	return nil
+}
+
 // gIsForceDisableStats - disable stats
 var gIsForceDisableStats bool
 
