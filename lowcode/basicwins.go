@@ -85,6 +85,8 @@ type BasicWinsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
 	MainType             string                  `yaml:"mainType"`       // lines or ways
 	BetType              string                  `yaml:"betType"`        // bet or totalBet
+	StrCheckWinType      string                  `yaml:"checkWinType"`   // left2right or right2left or all
+	CheckWinType         CheckWinType            `yaml:"-"`              //
 	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
 	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
 	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
@@ -233,6 +235,8 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
+	cfg.CheckWinType = ParseCheckWinType(cfg.StrCheckWinType)
+
 	basicWins.Config = cfg
 
 	for _, v := range cfg.ExcludeSymbols {
@@ -349,30 +353,57 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			rets = append(rets, currets...)
 		}
 	} else if basicWins.Config.MainType == WinTypeLines {
-		for i, v := range gameProp.CurLineData.Lines {
-			ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, GetBet(stake, basicWins.Config.BetType), func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
-			}, func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
-			}, func(cursymbol int, startsymbol int) bool {
-				if cursymbol == startsymbol {
-					return true
+		if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
+			for i, v := range gameProp.CurLineData.Lines {
+				if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
+					ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, GetBet(stake, basicWins.Config.BetType), func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+					}, func(scene *sgc7game.GameScene, result *sgc7game.Result) int {
+						return 1
+					}, func(cursymbol int) int {
+						return cursymbol
+					})
+					if ret != nil {
+						ret.LineIndex = i
+
+						gameProp.ProcMulti(ret)
+
+						rets = append(rets, ret)
+					}
 				}
 
-				return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
-			}, func(scene *sgc7game.GameScene, result *sgc7game.Result) int {
-				return 1
-			}, func(cursymbol int) int {
-				return cursymbol
-			})
-			if ret != nil {
-				ret.LineIndex = i
+				if basicWins.Config.CheckWinType != CheckWinTypeLeftRight {
+					ret := sgc7game.CalcLineRLEx(gs, gameProp.CurPaytables, v, GetBet(stake, basicWins.Config.BetType), func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
 
-				gameProp.ProcMulti(ret)
+						return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+					}, func(scene *sgc7game.GameScene, result *sgc7game.Result) int {
+						return 1
+					}, func(cursymbol int) int {
+						return cursymbol
+					})
+					if ret != nil {
+						ret.LineIndex = i
 
-				rets = append(rets, ret)
+						gameProp.ProcMulti(ret)
 
-				// basicWins.AddResult(curpr, ret, cd)
+						rets = append(rets, ret)
+					}
+				}
 			}
 		}
 	}
@@ -405,8 +436,6 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	}
 
 	basicWins.onStepEnd(gameProp, curpr, gp, bwd.NextComponent)
-
-	// gp.AddComponentData(basicWins.Name, bwd)
 
 	return nil
 }

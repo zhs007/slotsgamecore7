@@ -295,7 +295,9 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	isSameSymbol FuncIsSameSymbol,
 	getSymbol FuncGetSymbol) *Result {
 
-	s0 := getSymbol(scene.Arr[0][ld[0]])
+	sx := 0
+
+	s0 := getSymbol(scene.Arr[sx][ld[sx]])
 	if !isValidSymbol(s0) {
 		return nil
 	}
@@ -303,7 +305,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 	nums := 1
 	pos := make([]int, 0, len(ld)*2)
 
-	pos = append(pos, 0, ld[0])
+	pos = append(pos, 0, ld[sx])
 
 	if isWild(s0) {
 		wilds := 1
@@ -311,10 +313,10 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 		wnums := 1
 		wpos := make([]int, 0, len(ld)*2)
 
-		wpos = append(wpos, 0, ld[0])
+		wpos = append(wpos, sx, ld[sx])
 
 		for x := 1; x < len(ld); x++ {
-			cs := scene.Arr[x][ld[x]]
+			cs := scene.Arr[sx+x][ld[sx+x]]
 
 			if !isValidSymbol(cs) {
 				break
@@ -327,13 +329,13 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 					wnums++
 					nums++
 
-					pos = append(pos, x, ld[x])
-					wpos = append(wpos, x, ld[x])
+					pos = append(pos, sx+x, ld[sx+x])
+					wpos = append(wpos, sx+x, ld[sx+x])
 				} else {
 					ws = cs
 
 					nums++
-					pos = append(pos, x, ld[x])
+					pos = append(pos, sx+x, ld[sx+x])
 				}
 			} else {
 				if isWild(cs) {
@@ -343,7 +345,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 				if isSameSymbol(cs, ws) {
 					nums++
 
-					pos = append(pos, x, ld[x])
+					pos = append(pos, sx+x, ld[sx+x])
 				} else {
 					break
 				}
@@ -415,7 +417,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 	wilds := 0
 	for x := 1; x < len(ld); x++ {
-		cs := scene.Arr[x][ld[x]]
+		cs := scene.Arr[sx+x][ld[sx+x]]
 
 		if !isValidSymbol(cs) {
 			break
@@ -428,7 +430,7 @@ func CalcLine(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 			nums++
 
-			pos = append(pos, x, ld[x])
+			pos = append(pos, sx+x, ld[sx+x])
 		} else {
 			break
 		}
@@ -460,6 +462,192 @@ func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
 	calcOtherMul FuncCalcOtherMul,
 	getSymbol FuncGetSymbol) *Result {
 	r := CalcLine(scene, pt, ld, bet, isValidSymbol, isWild, isSameSymbol, getSymbol)
+	if r != nil {
+		r.OtherMul = calcOtherMul(scene, r)
+
+		if r.OtherMul > 1 {
+			r.CoinWin = r.CoinWin * r.OtherMul
+			r.CashWin = r.CashWin * r.OtherMul
+		}
+	}
+
+	return r
+}
+
+// CalcLineRL - calc line with right->left
+func CalcLineRL(scene *GameScene, pt *PayTables, ld []int, bet int,
+	isValidSymbol FuncIsValidSymbol,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol,
+	getSymbol FuncGetSymbol) *Result {
+
+	sx := len(scene.Arr) - 1
+
+	s0 := getSymbol(scene.Arr[sx][ld[sx]])
+	if !isValidSymbol(s0) {
+		return nil
+	}
+
+	nums := 1
+	pos := make([]int, 0, len(ld)*2)
+
+	pos = append(pos, sx, ld[sx])
+
+	if isWild(s0) {
+		wilds := 1
+		ws := -1
+		wnums := 1
+		wpos := make([]int, 0, len(ld)*2)
+
+		wpos = append(wpos, sx, ld[sx])
+
+		for x := 1; x < len(ld); x++ {
+			cs := scene.Arr[sx-x][ld[sx-x]]
+
+			if !isValidSymbol(cs) {
+				break
+			}
+
+			if ws == -1 {
+				if isWild(cs) {
+					wilds++
+
+					wnums++
+					nums++
+
+					pos = append(pos, sx-x, ld[sx-x])
+					wpos = append(wpos, sx-x, ld[sx-x])
+				} else {
+					ws = cs
+
+					nums++
+					pos = append(pos, sx-x, ld[sx-x])
+				}
+			} else {
+				if isWild(cs) {
+					wilds++
+				}
+
+				if isSameSymbol(cs, ws) {
+					nums++
+
+					pos = append(pos, sx-x, ld[sx-x])
+				} else {
+					break
+				}
+			}
+		}
+
+		if ws == -1 {
+			if wnums > 0 && pt.MapPay[s0][wnums-1] > 0 {
+				r := &Result{
+					Symbol:     s0,
+					Type:       RTLine,
+					Mul:        pt.MapPay[s0][wnums-1],
+					CoinWin:    pt.MapPay[s0][wnums-1],
+					CashWin:    pt.MapPay[s0][wnums-1] * bet,
+					Pos:        wpos,
+					Wilds:      wilds,
+					SymbolNums: wnums,
+				}
+
+				return r
+			}
+
+			return nil
+		}
+
+		wmul := 0
+		mul := 0
+
+		if wnums > 0 {
+			wmul = pt.MapPay[s0][wnums-1]
+		}
+
+		if nums > 0 {
+			mul = pt.MapPay[ws][nums-1]
+		}
+
+		if wmul == 0 && mul == 0 {
+			return nil
+		}
+
+		if wmul >= mul {
+			r := &Result{
+				Symbol:     s0,
+				Type:       RTLine,
+				Mul:        pt.MapPay[s0][wnums-1],
+				CoinWin:    pt.MapPay[s0][wnums-1],
+				CashWin:    pt.MapPay[s0][wnums-1] * bet,
+				Pos:        wpos,
+				Wilds:      wilds,
+				SymbolNums: wnums,
+			}
+
+			return r
+		}
+
+		r := &Result{
+			Symbol:     ws,
+			Type:       RTLine,
+			Mul:        pt.MapPay[ws][nums-1],
+			CoinWin:    pt.MapPay[ws][nums-1],
+			CashWin:    pt.MapPay[ws][nums-1] * bet,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	wilds := 0
+	for x := 1; x < len(ld); x++ {
+		cs := scene.Arr[sx-x][ld[sx-x]]
+
+		if !isValidSymbol(cs) {
+			break
+		}
+
+		if isSameSymbol(cs, s0) {
+			if isWild(cs) {
+				wilds++
+			}
+
+			nums++
+
+			pos = append(pos, sx-x, ld[sx-x])
+		} else {
+			break
+		}
+	}
+
+	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {
+		r := &Result{
+			Symbol:     s0,
+			Type:       RTLine,
+			Mul:        pt.MapPay[s0][nums-1],
+			CoinWin:    pt.MapPay[s0][nums-1],
+			CashWin:    pt.MapPay[s0][nums-1] * bet,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
+// CalcLineRLEx - calc line with right->left
+func CalcLineRLEx(scene *GameScene, pt *PayTables, ld []int, bet int,
+	isValidSymbol FuncIsValidSymbol,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol,
+	calcOtherMul FuncCalcOtherMul,
+	getSymbol FuncGetSymbol) *Result {
+	r := CalcLineRL(scene, pt, ld, bet, isValidSymbol, isWild, isSameSymbol, getSymbol)
 	if r != nil {
 		r.OtherMul = calcOtherMul(scene, r)
 

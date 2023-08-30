@@ -60,6 +60,8 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 
 		copy(gp.RespinComponents, gameProp.RespinComponents)
 	}
+
+	gp.SetGameProp(gameProp)
 }
 
 func (gameProp *GameProperty) OnNewGame() error {
