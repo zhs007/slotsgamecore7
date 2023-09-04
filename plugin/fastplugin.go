@@ -88,3 +88,7 @@ func (fp *FastPlugin) RollbackUsedRngs() error {
 
 	return ErrInvalidTag
 }
+
+// Init - initial
+func (fp *FastPlugin) Init() {
+}

@@ -103,7 +103,7 @@ func (game *Game) NewGameData() any {
 func NewGame(cfgfn string) (*Game, error) {
 	game := &Game{
 		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
-			return sgc7plugin.NewBasicPlugin()
+			return sgc7plugin.NewFastPlugin()
 		}),
 		MgrComponent: NewComponentMgr(),
 	}
