@@ -57,8 +57,7 @@ func Test_BasicPlugin(t *testing.T) {
 	bp.ClearCache()
 	assert.Equal(t, len(bp.Cache), 0, "Test_BasicPlugin Random ClearCache")
 
-	var ip IPlugin
-	ip = bp
+	ip := IPlugin(bp)
 	assert.NotNil(t, ip, "Test_BasicPlugin IPlugin")
 
 	t.Logf("Test_BasicPlugin OK")
