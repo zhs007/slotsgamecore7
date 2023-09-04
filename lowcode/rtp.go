@@ -57,7 +57,7 @@ func newFuncOnGameMod(cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
 		gp, isok := pr.CurGameModParams.(*GameParams)
 		if isok {
 			for _, v := range cfgGameMod.Components {
-				_, hasComponent := gp.MapComponents[v]
+				_, hasComponent := gp.MapComponentMsgs[v]
 				if hasComponent {
 					return true
 				}
@@ -77,7 +77,7 @@ func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
 		gp, isok := pr.CurGameModParams.(*GameParams)
 		if isok {
 			for _, v := range cfgSymbolFeature.Components {
-				_, hasComponent := gp.MapComponents[v]
+				_, hasComponent := gp.MapComponentMsgs[v]
 				if hasComponent {
 					return true
 				}
@@ -215,7 +215,7 @@ func newRTPGameModule(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgGameModule *R
 func hasComponent(i int, prs []*sgc7game.PlayResult, component string) bool {
 	gp, isok := prs[i].CurGameModParams.(*GameParams)
 	if isok {
-		_, hasComponent := gp.MapComponents[component]
+		_, hasComponent := gp.MapComponentMsgs[component]
 		if hasComponent {
 			return true
 		}
@@ -228,7 +228,7 @@ func hasComponentEx(i int, prs []*sgc7game.PlayResult, components []string) bool
 	gp, isok := prs[i].CurGameModParams.(*GameParams)
 	if isok {
 		for _, v := range components {
-			_, hasComponent := gp.MapComponents[v]
+			_, hasComponent := gp.MapComponentMsgs[v]
 			if hasComponent {
 				return true
 			}

@@ -5,6 +5,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -18,12 +19,17 @@ const DefaultCmd = "SPIN"
 
 type GameParams struct {
 	sgc7pb.GameParam `json:",inline"`
-	LastScene        *sgc7game.GameScene `json:"-"`
-	LastOtherScene   *sgc7game.GameScene `json:"-"`
+	LastScene        *sgc7game.GameScene      `json:"-"`
+	LastOtherScene   *sgc7game.GameScene      `json:"-"`
+	MapComponentMsgs map[string]proto.Message `json:"-"`
 }
 
 func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
 	if IsRTPMode {
+		pbmsg := cd.BuildPBComponentData()
+
+		gp.MapComponentMsgs[name] = pbmsg
+
 		return nil
 	}
 
@@ -52,6 +58,12 @@ func (gp *GameParams) SetGameProp(gameProp *GameProperty) error {
 	}
 
 	return nil
+}
+
+func NewGameParam() *GameParams {
+	return &GameParams{
+		MapComponentMsgs: make(map[string]proto.Message),
+	}
 }
 
 // gIsForceDisableStats - disable stats

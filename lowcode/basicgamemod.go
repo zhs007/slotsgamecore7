@@ -17,7 +17,7 @@ type BasicGameMod struct {
 
 // OnPlay - on play
 func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
-	gp := &GameParams{}
+	gp := NewGameParam()
 	gp.MapComponents = make(map[string]*anypb.Any)
 
 	pr := &sgc7game.PlayResult{
