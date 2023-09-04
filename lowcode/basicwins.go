@@ -73,6 +73,8 @@ type TriggerFeatureConfig struct {
 	RespinNumWithScatterNum       map[int]int    `yaml:"respinNumWithScatterNum"`       // respin number with scatter number
 	RespinNumWeightWithScatterNum map[int]string `yaml:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	BetType                       string         `yaml:"betType"`                       // bet or totalBet
+	CountScatterPayAs             string         `yaml:"countScatterPayAs"`             // countscatter时，按什么符号赔付
+	SymbolCodeCountScatterPayAs   int            `yaml:"-"`                             // countscatter时，按什么符号赔付
 	RespinComponent               string         `yaml:"respinComponent"`               // like fg-spin
 	NextComponent                 string         `yaml:"nextComponent"`                 // next component
 	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
@@ -141,6 +143,10 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			if tf.BetType == BetTypeNoPay {
 				ret.CoinWin = 0
 				ret.CashWin = 0
+			} else if tf.SymbolCodeCountScatterPayAs > 0 {
+				ret.Mul = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+				ret.CoinWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+				ret.CashWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * GetBet(stake, tf.BetType)
 			}
 
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
@@ -255,6 +261,12 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		if v.SymbolAwardsWeights != nil {
 			v.SymbolAwardsWeights.Init()
 		}
+
+		if v.CountScatterPayAs != "" {
+			v.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[v.CountScatterPayAs]
+		} else {
+			v.SymbolCodeCountScatterPayAs = -1
+		}
 	}
 
 	for _, v := range cfg.AfterMain {
@@ -264,6 +276,12 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 
 		if v.SymbolAwardsWeights != nil {
 			v.SymbolAwardsWeights.Init()
+		}
+
+		if v.CountScatterPayAs != "" {
+			v.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[v.CountScatterPayAs]
+		} else {
+			v.SymbolCodeCountScatterPayAs = -1
 		}
 	}
 
