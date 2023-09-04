@@ -77,6 +77,7 @@ type Stats struct {
 	lastNum   int32
 	TotalNum  int64
 	Pool      *GamePropertyPool
+	NoStats   bool
 }
 
 func (stats *Stats) StartWorker() {
@@ -104,6 +105,10 @@ func (stats *Stats) StartWorker() {
 }
 
 func (stats *Stats) Push(stake *sgc7game.Stake, results []*sgc7game.PlayResult) {
+	if stats.NoStats {
+		return
+	}
+
 	param := &StatsParam{
 		Stake:   stake,
 		Results: results,

@@ -283,8 +283,10 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		Currency: "EUR",
 	}
 
-	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData any) {
-		game.Pool.Stats.Push(stake, lst)
+	if game.Pool.Stats != nil {
+		rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData any) {
+			game.Pool.Stats.Push(stake, lst)
+		}
 	}
 
 	for _, m := range game.Pool.Config.RTP.Modules {
@@ -311,12 +313,14 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 
 	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
-	game.Pool.Stats.Wait()
+	if game.Pool.Stats != nil {
+		game.Pool.Stats.Wait()
 
-	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
+		game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
-	goutils.Info("finish.",
-		zap.Int64("total nums", game.Pool.Stats.TotalNum))
+		goutils.Info("finish.",
+			zap.Int64("total nums", game.Pool.Stats.TotalNum))
+	}
 
 	return nil
 }
