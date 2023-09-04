@@ -77,8 +77,8 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 	if !gs.HasSymbols(replaceSymbol.SymbolCodes) {
 		replaceSymbol.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)
 	} else {
-		sc2 := gs.Clone()
-		// sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
+		// sc2 := gs.Clone()
+		sc2 := gs.CloneEx(gameProp.PoolScene)
 
 		if replaceSymbol.Config.Mask != "" {
 			md := gameProp.MapComponentData[replaceSymbol.Config.Mask].(*MaskData)

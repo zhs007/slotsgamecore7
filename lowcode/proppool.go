@@ -33,6 +33,7 @@ func (pool *GamePropertyPool) newGameProp() *GameProperty {
 		CurPaytables:     pool.DefaultPaytables,
 		CurLineData:      pool.DefaultLineData,
 		MapComponentData: make(map[string]IComponentData),
+		PoolScene:        sgc7game.NewGameScenePoolEx(),
 	}
 
 	for k, v := range pool.MapComponents {

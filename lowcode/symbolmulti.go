@@ -112,14 +112,14 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd, "")
 
 	if gs.HasSymbols(symbolMulti.SymbolCodes) {
-		// os := gameProp.Pool.PoolGameScene.New(gs.Width, gs.Height, false)
-		os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-		if err != nil {
-			goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
-				zap.Error(err))
+		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
+		// os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
+		// if err != nil {
+		// 	goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
+		// 		zap.Error(err))
 
-			return err
-		}
+		// 	return err
+		// }
 
 		vw2 := symbolMulti.WeightMulti
 		if len(symbolMulti.MapWeightMulti) > 0 && symbolMulti.Config.ValUsed != "" {

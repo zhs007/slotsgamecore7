@@ -113,14 +113,14 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.CurReels = rd
 	}
 
-	// sc := gameProp.Pool.PoolGameScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
-	sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
-	if err != nil {
-		goutils.Error("BasicReels.OnPlayGame:NewGameScene",
-			zap.Error(err))
+	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
+	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
+	// if err != nil {
+	// 	goutils.Error("BasicReels.OnPlayGame:NewGameScene",
+	// 		zap.Error(err))
 
-		return err
-	}
+	// 	return err
+	// }
 
 	if basicReels.Config.IsExpandReel {
 		sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)

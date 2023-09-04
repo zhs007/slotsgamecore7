@@ -1,8 +1,6 @@
 package sgc7game
 
 import (
-	"sync"
-
 	"github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
@@ -36,7 +34,7 @@ func newGameScenePool() *gameScenePool {
 }
 
 type GameScenePoolEx struct {
-	Lock     sync.Mutex
+	// Lock     sync.Mutex
 	MapPools map[int]map[int]*gameScenePool
 }
 
@@ -53,15 +51,15 @@ func (pool *GameScenePoolEx) new(w, h int) *GameScene {
 }
 
 func (pool *GameScenePoolEx) Put(scene *GameScene) {
-	pool.Lock.Lock()
-	defer pool.Lock.Unlock()
+	// pool.Lock.Lock()
+	// defer pool.Lock.Unlock()
 
 	pool.MapPools[scene.Width][scene.Height].put(scene)
 }
 
 func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
-	pool.Lock.Lock()
-	defer pool.Lock.Unlock()
+	// pool.Lock.Lock()
+	// defer pool.Lock.Unlock()
 
 	mps, isok := pool.MapPools[w]
 	if !isok {

@@ -52,6 +52,7 @@ type GameProperty struct {
 	MapComponentData  map[string]IComponentData
 	HistoryComponents []IComponent
 	RespinComponents  []string
+	PoolScene         *sgc7game.GameScenePoolEx
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
@@ -114,13 +115,13 @@ func (gameProp *GameProperty) GetOtherScene(pr *sgc7game.PlayResult, tag string)
 
 func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, respinComponent string, gs *sgc7game.GameScene, os *sgc7game.GameScene) {
 	if gs != nil {
-		gp.LastScene = gs.Clone()
-		// gp.LastScene = gs.CloneEx(gameProp.Pool.PoolGameScene)
+		// gp.LastScene = gs.Clone()
+		gp.LastScene = gs.CloneEx(gameProp.PoolScene)
 	}
 
 	if os != nil {
-		gp.LastOtherScene = os.Clone()
-		// gp.LastOtherScene = os.CloneEx(gameProp.Pool.PoolGameScene)
+		// gp.LastOtherScene = os.Clone()
+		gp.LastOtherScene = os.CloneEx(gameProp.PoolScene)
 	}
 
 	gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
