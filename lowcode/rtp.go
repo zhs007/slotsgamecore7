@@ -7,6 +7,7 @@ import (
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7rtp "github.com/zhs007/slotsgamecore7/rtp"
 	"go.uber.org/zap"
 )
@@ -263,6 +264,7 @@ func procHitRate(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgHitRateFeature *RT
 
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64) error {
 	IsRTPMode = true
+	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame(gamecfg)
 	if err != nil {

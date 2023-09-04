@@ -30,6 +30,14 @@ func NewBasicPlugin() *BasicPlugin {
 
 // Random - return [0, r)
 func (bp *BasicPlugin) Random(ctx context.Context, r int) (int, error) {
+	if IsNoRNGCache {
+		ci := rand.Int()
+
+		cr := ci % r
+
+		return cr, nil
+	}
+
 	var ci int
 	if len(bp.Cache) > 0 {
 		ci = bp.Cache[0]

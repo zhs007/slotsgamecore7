@@ -28,6 +28,14 @@ func NewFastPlugin() *FastPlugin {
 
 // Random - return [0, r)
 func (fp *FastPlugin) Random(ctx context.Context, r int) (int, error) {
+	if IsNoRNGCache {
+		ci := int(fp.RNG.Uint32())
+
+		cr := ci % r
+
+		return cr, nil
+	}
+
 	var ci int
 	if len(fp.Cache) > 0 {
 		ci = fp.Cache[0]
