@@ -12,6 +12,7 @@ require (
 	github.com/mkevac/debugcharts v0.0.0-20191222103121-ae1c48aa8615
 	github.com/stretchr/testify v1.8.2
 	github.com/valyala/fasthttp v1.44.0
+	github.com/valyala/fastrand v1.1.0
 	github.com/xuri/excelize/v2 v2.7.1
 	github.com/zhs007/goutils v0.1.50
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.41.1
