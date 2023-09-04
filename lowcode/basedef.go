@@ -8,6 +8,8 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
+var IsRTPMode bool
+
 const (
 	TagCurReels = "reels"
 )
@@ -21,6 +23,10 @@ type GameParams struct {
 }
 
 func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
+	if IsRTPMode {
+		return nil
+	}
+
 	pbmsg := cd.BuildPBComponentData()
 
 	pbany, err := anypb.New(pbmsg)
