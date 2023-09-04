@@ -69,8 +69,8 @@ type Mystery struct {
 
 // maskOtherScene -
 func (mystery *Mystery) maskOtherScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbolCode int) *sgc7game.GameScene {
-	cgs := gs.Clone()
-	// cgs := gs.CloneEx(gameProp.Pool.PoolGameScene)
+	// cgs := gs.Clone()
+	cgs := gs.CloneEx(gameProp.PoolScene)
 
 	for x, arr := range cgs.Arr {
 		for y, v := range arr {
@@ -163,8 +163,8 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 				// gameProp.SetVal(GamePropCurMystery, curmcode)
 
-				sc2 := gs.Clone()
-				// sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
+				// sc2 := gs.Clone()
+				sc2 := gs.CloneEx(gameProp.PoolScene)
 				for _, v := range mystery.MysterySymbols {
 					sc2.ReplaceSymbol(v, curmcode)
 				}
@@ -194,8 +194,8 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 				// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
-				// sc2 := gs.CloneEx(gameProp.Pool.PoolGameScene)
-				sc2 := gs.Clone()
+				sc2 := gs.CloneEx(gameProp.PoolScene)
+				// sc2 := gs.Clone()
 				for _, v := range mystery.MysterySymbols {
 					sc2.ReplaceSymbol(v, curm.Int())
 				}

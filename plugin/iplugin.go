@@ -24,4 +24,8 @@ type IPlugin interface {
 	ClearCache()
 	// Init - initial
 	Init()
+	// SetScenePool - set scene pool
+	SetScenePool(any)
+	// GetScenePool - get scene pool
+	GetScenePool() any
 }

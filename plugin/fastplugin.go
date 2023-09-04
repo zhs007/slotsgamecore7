@@ -10,17 +10,15 @@ import (
 
 // BasicPlugin - basic plugin
 type FastPlugin struct {
-	RngUsed []*sgc7utils.RngInfo
-	Cache   []int
-	Tag     int
-	RNG     *fastrand.RNG
+	PluginBase
+	RNG *fastrand.RNG
 }
 
 // NewBasicPlugin - new a BasicPlugin
 func NewFastPlugin() *FastPlugin {
 	fp := &FastPlugin{
-		Tag: -1,
-		RNG: &fastrand.RNG{},
+		PluginBase: NewPluginBase(),
+		RNG:        &fastrand.RNG{},
 	}
 
 	return fp
@@ -53,48 +51,6 @@ func (fp *FastPlugin) Random(ctx context.Context, r int) (int, error) {
 	})
 
 	return cr, nil
-}
-
-// GetUsedRngs - get used rngs
-func (fp *FastPlugin) GetUsedRngs() []*sgc7utils.RngInfo {
-	return fp.RngUsed
-}
-
-// ClearUsedRngs - clear used rngs
-func (fp *FastPlugin) ClearUsedRngs() {
-	fp.Tag = -1
-	fp.RngUsed = nil
-}
-
-// AddRngUsed - added used rngs
-func (fp *FastPlugin) AddRngUsed(ri *sgc7utils.RngInfo) {
-	fp.RngUsed = append(fp.RngUsed, ri)
-}
-
-// SetCache - set cache
-func (fp *FastPlugin) SetCache(arr []int) {
-	fp.Cache = arr
-}
-
-// ClearCache - clear cached rngs
-func (fp *FastPlugin) ClearCache() {
-	fp.Cache = nil
-}
-
-// TagUsedRngs - new a tag for current UsedRngs
-func (fp *FastPlugin) TagUsedRngs() {
-	fp.Tag = len(fp.RngUsed)
-}
-
-// RollbackUsedRngs - rollback UsedRngs with a tag
-func (fp *FastPlugin) RollbackUsedRngs() error {
-	if fp.Tag >= 0 && fp.Tag <= len(fp.RngUsed) {
-		fp.RngUsed = fp.RngUsed[0:fp.Tag]
-
-		return nil
-	}
-
-	return ErrInvalidTag
 }
 
 // Init - initial
