@@ -106,6 +106,33 @@ func parse2IntSlice(n *ast.Node) ([]int, error) {
 	return iarr, nil
 }
 
+func parse2StringSlice(n *ast.Node) ([]string, error) {
+	arr, err := n.ArrayUseNode()
+	if err != nil {
+		goutils.Error("parse2StringSlice:Array",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	strarr := []string{}
+
+	for i, v := range arr {
+		strv, err := v.String()
+		if err != nil {
+			goutils.Error("parse2StringSlice:String",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		strarr = append(strarr, (strv))
+	}
+
+	return strarr, nil
+}
+
 func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 	paytables := &sgc7game.PayTables{
 		MapPay:     make(map[int][]int),
@@ -344,6 +371,141 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 	return nil
 }
 
+func parseBasicReels(cell *ast.Node) (*BasicReelsConfig, error) {
+	cfg := &BasicReelsConfig{}
+
+	reelSet, err := cell.Get("componentValues").Get("reelSet").String()
+	if err != nil {
+		goutils.Error("parseBasicReels:get:reelSet",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	cfg.ReelSet = reelSet
+
+	return cfg, nil
+}
+
+func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
+	cfg := &BasicWinsConfig{}
+
+	mainType, err := cell.Get("componentValues").Get("mainType").String()
+	if err != nil {
+		goutils.Error("parseBasicWins:get:mainType",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	cfg.MainType = mainType
+
+	betType, err := cell.Get("componentValues").Get("betType").String()
+	if err != nil {
+		goutils.Error("parseBasicWins:get:betType",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	cfg.BetType = betType
+
+	checkWinType, err := cell.Get("componentValues").Get("checkWinType").String()
+	if err != nil {
+		goutils.Error("parseBasicWins:get:checkWinType",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	cfg.StrCheckWinType = checkWinType
+
+	wildSymbols, err := parse2StringSlice(cell.Get("componentValues").Get("wildSymbols"))
+	if err != nil {
+		goutils.Error("parseBasicWins:get:wildSymbols",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	cfg.WildSymbols = wildSymbols
+
+	return cfg, nil
+}
+
+func loadCells(cfg *Config, cells *ast.Node) error {
+	lst, err := cells.ArrayUseNode()
+	if err != nil {
+		goutils.Error("loadCells:ArrayUseNode",
+			zap.Error(err))
+
+		return err
+	}
+
+	startid := ""
+
+	for i, cell := range lst {
+		shape, err := cell.Get("shape").String()
+		if err != nil {
+			goutils.Error("loadCells:Get:shape",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+
+		id, err := cell.Get("id").String()
+		if err != nil {
+			goutils.Error("loadCells:Get:id",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+
+		if shape == "custom-node-width-start" {
+			startid = id
+		} else if shape == "custom-node" {
+			componentType, err := cell.Get("label").String()
+			if err != nil {
+				goutils.Error("loadCells:Get:label",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			if componentType == "basicReels" {
+				componentCfg, err := parseBasicReels(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseBasicReels",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+			} else if componentType == "basicWins" {
+				componentCfg, err := parseBasicWins(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseBasicWins",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+			}
+		}
+	}
+
+	fmt.Printf("%v\n", startid)
+
+	return nil
+}
+
 func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	bet, err := betMethod.Get("bet").Int64()
 	if err != nil {
@@ -355,6 +517,14 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 
 	cfg.Bets = append(cfg.Bets, int(bet))
 	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+
+	err = loadCells(cfg, betMethod.Get("graph").Get("cells"))
+	if err != nil {
+		goutils.Error("loadBetMethod:loadCells",
+			zap.Error(err))
+
+		return err
+	}
 
 	return nil
 }
@@ -372,6 +542,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 		MapLinedate:  make(map[string]*sgc7game.LineData),
 		Reels:        make(map[string]string),
 		MapReels:     make(map[string]*sgc7game.ReelsData),
+		mapConfig:    make(map[string]any),
 	}
 
 	data, err := os.ReadFile(fn)

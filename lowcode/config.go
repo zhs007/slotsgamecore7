@@ -49,6 +49,7 @@ type Config struct {
 	MainPath          string                         `yaml:"mainPath"`
 	MapCmdComponent   map[string]string              `yaml:"mapCmdComponent"`
 	ComponentsMapping map[int]map[string]string      `yaml:"componentsMapping"`
+	mapConfig         map[string]any                 `yaml:"-"`
 }
 
 func (cfg *Config) GetPath(fn string, useFileMapping bool) string {
