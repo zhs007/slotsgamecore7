@@ -36,7 +36,9 @@ func (pool *GamePropertyPool) newGameProp() *GameProperty {
 		PoolScene:        sgc7game.NewGameScenePoolEx(),
 	}
 
-	gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
+	if gameProp.CurLineData != nil {
+		gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
+	}
 
 	for k, v := range pool.MapComponents {
 		gameProp.MapComponentData[k] = v.NewComponentData()
