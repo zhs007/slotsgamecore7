@@ -81,25 +81,30 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	collector.Config = cfg
+	return collector.InitEx(cfg, pool)
+}
 
-	collector.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+// InitEx -
+func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
+	collector.Config = cfg.(*CollectorConfig)
 
-	if cfg.PerLevelAwards != nil {
-		for _, v := range cfg.PerLevelAwards {
+	collector.SymbolCode = pool.DefaultPaytables.MapSymbols[collector.Config.Symbol]
+
+	if collector.Config.PerLevelAwards != nil {
+		for _, v := range collector.Config.PerLevelAwards {
 			v.Init()
 		}
 	}
 
-	if cfg.MapSPLevelAwards != nil {
-		for _, lst := range cfg.MapSPLevelAwards {
+	if collector.Config.MapSPLevelAwards != nil {
+		for _, lst := range collector.Config.MapSPLevelAwards {
 			for _, v := range lst {
 				v.Init()
 			}
 		}
 	}
 
-	collector.onInit(&cfg.BasicComponentConfig)
+	collector.onInit(&collector.Config.BasicComponentConfig)
 
 	return nil
 }

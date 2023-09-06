@@ -54,12 +54,17 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	symbolMulti.Config = cfg
+	return symbolMulti.InitEx(cfg, pool)
+}
 
-	if len(cfg.MapWeightMulti) > 0 {
+// InitEx -
+func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
+	symbolMulti.Config = cfg.(*SymbolMultiConfig)
+
+	if len(symbolMulti.Config.MapWeightMulti) > 0 {
 		symbolMulti.MapWeightMulti = make(map[string]*sgc7game.ValWeights2, 0)
 
-		for k, v := range cfg.MapWeightMulti {
+		for k, v := range symbolMulti.Config.MapWeightMulti {
 			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v, symbolMulti.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 			if err != nil {
 				goutils.Error("SymbolMulti.Init:LoadValWeights2FromExcel",
@@ -84,19 +89,19 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 		symbolMulti.WeightMulti = vw2
 	}
 
-	if len(cfg.Symbols) > 0 {
-		for _, v := range cfg.Symbols {
+	if len(symbolMulti.Config.Symbols) > 0 {
+		for _, v := range symbolMulti.Config.Symbols {
 			symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 		}
 	} else {
-		symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[cfg.Symbol])
+		symbolMulti.SymbolCodes = append(symbolMulti.SymbolCodes, pool.DefaultPaytables.MapSymbols[symbolMulti.Config.Symbol])
 	}
 
-	if cfg.OtherSceneFeature != nil {
-		symbolMulti.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	if symbolMulti.Config.OtherSceneFeature != nil {
+		symbolMulti.OtherSceneFeature = NewOtherSceneFeature(symbolMulti.Config.OtherSceneFeature)
 	}
 
-	symbolMulti.onInit(&cfg.BasicComponentConfig)
+	symbolMulti.onInit(&symbolMulti.Config.BasicComponentConfig)
 
 	return nil
 }

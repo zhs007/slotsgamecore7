@@ -123,9 +123,14 @@ func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	lightning.Config = cfg
+	return lightning.InitEx(cfg, pool)
+}
 
-	lightning.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+// InitEx -
+func (lightning *Lightning) InitEx(cfg any, pool *GamePropertyPool) error {
+	lightning.Config = cfg.(*LightningConfig)
+
+	lightning.SymbolCode = pool.DefaultPaytables.MapSymbols[lightning.Config.Symbol]
 
 	if lightning.Config.Weight != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(lightning.Config.Weight, lightning.Config.UseFileMapping), "val", "weight", pool.DefaultPaytables)
@@ -168,7 +173,7 @@ func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 		}
 	}
 
-	for _, v := range cfg.SymbolTriggerFeatures {
+	for _, v := range lightning.Config.SymbolTriggerFeatures {
 		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
 
 		lightning.MapSymbolTriggerFeatures[symbolCode] = v
@@ -178,7 +183,7 @@ func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 		}
 	}
 
-	lightning.onInit(&cfg.BasicComponentConfig)
+	lightning.onInit(&lightning.Config.BasicComponentConfig)
 
 	return nil
 }

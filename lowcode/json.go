@@ -344,6 +344,21 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 	return nil
 }
 
+func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
+	bet, err := betMethod.Get("bet").Int64()
+	if err != nil {
+		goutils.Error("loadBetMethod:Get:bet",
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg.Bets = append(cfg.Bets, int(bet))
+	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+
+	return nil
+}
+
 func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
 	game := &Game{
 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
@@ -405,6 +420,23 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	err = loadOtherList(cfg, &lstOther)
 	if err != nil {
 		goutils.Error("NewGame2:loadOtherList",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	betMethod, err := sonic.Get(data, "betMethod", 0)
+	if err != nil {
+		goutils.Error("NewGame2:Get",
+			zap.String("key", "betMethod[0]"),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	err = loadBetMethod(cfg, &betMethod)
+	if err != nil {
+		goutils.Error("NewGame2:loadBetMethod",
 			zap.Error(err))
 
 		return nil, err

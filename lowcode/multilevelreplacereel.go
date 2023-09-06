@@ -83,9 +83,14 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) Init(fn string, pool *GamePr
 		return err
 	}
 
-	multiLevelReplaceReel.Config = cfg
+	return multiLevelReplaceReel.InitEx(cfg, pool)
+}
 
-	for _, v := range cfg.Levels {
+// InitEx -
+func (multiLevelReplaceReel *MultiLevelReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
+	multiLevelReplaceReel.Config = cfg.(*MultiLevelReplaceReelDataConfig)
+
+	for _, v := range multiLevelReplaceReel.Config.Levels {
 		if v.Reels != nil {
 			v.SymbolCodeReels = make(map[int][]int)
 
@@ -100,7 +105,7 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) Init(fn string, pool *GamePr
 		}
 	}
 
-	multiLevelReplaceReel.onInit(&cfg.BasicComponentConfig)
+	multiLevelReplaceReel.onInit(&multiLevelReplaceReel.Config.BasicComponentConfig)
 
 	return nil
 }

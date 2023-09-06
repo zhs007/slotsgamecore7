@@ -152,9 +152,14 @@ func (multiRespin *MultiRespin) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	multiRespin.Config = cfg
+	return multiRespin.InitEx(cfg, pool)
+}
 
-	multiRespin.onInit(&cfg.BasicComponentConfig)
+// InitEx -
+func (multiRespin *MultiRespin) InitEx(cfg any, pool *GamePropertyPool) error {
+	multiRespin.Config = cfg.(*MultiRespinConfig)
+
+	multiRespin.onInit(&multiRespin.Config.BasicComponentConfig)
 
 	return nil
 }

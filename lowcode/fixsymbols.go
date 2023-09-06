@@ -100,15 +100,20 @@ func (fixSymbols *FixSymbols) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	fixSymbols.Config = cfg
+	return fixSymbols.InitEx(cfg, pool)
+}
 
-	for _, v := range cfg.Symbols {
+// InitEx -
+func (fixSymbols *FixSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
+	fixSymbols.Config = cfg.(*FixSymbolsConfig)
+
+	for _, v := range fixSymbols.Config.Symbols {
 		fixSymbols.SymbolCodes = append(fixSymbols.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	fixSymbols.Type = parseFixSymbolsType(cfg.Type)
+	fixSymbols.Type = parseFixSymbolsType(fixSymbols.Config.Type)
 
-	fixSymbols.onInit(&cfg.BasicComponentConfig)
+	fixSymbols.onInit(&fixSymbols.Config.BasicComponentConfig)
 
 	return nil
 }

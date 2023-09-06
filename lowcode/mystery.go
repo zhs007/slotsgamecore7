@@ -107,7 +107,12 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	mystery.Config = cfg
+	return mystery.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (mystery *Mystery) InitEx(cfg any, pool *GamePropertyPool) error {
+	mystery.Config = cfg.(*MysteryConfig)
 
 	if mystery.Config.MysteryWeight != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(mystery.Config.MysteryWeight, mystery.Config.UseFileMapping), "val", "weight", pool.DefaultPaytables)
@@ -130,13 +135,13 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 		mystery.MysterySymbols = append(mystery.MysterySymbols, pool.DefaultPaytables.MapSymbols[mystery.Config.Mystery])
 	}
 
-	for _, v := range cfg.MysteryTriggerFeatures {
+	for _, v := range mystery.Config.MysteryTriggerFeatures {
 		symbolCode := pool.DefaultPaytables.MapSymbols[v.Symbol]
 
 		mystery.MapMysteryTriggerFeature[symbolCode] = v
 	}
 
-	mystery.onInit(&cfg.BasicComponentConfig)
+	mystery.onInit(&mystery.Config.BasicComponentConfig)
 
 	return nil
 }

@@ -84,9 +84,14 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, pool *GamePropertyPool) 
 		return err
 	}
 
-	multiLevelReels.Config = cfg
+	return multiLevelReels.InitEx(cfg, pool)
+}
 
-	for _, v := range cfg.Levels {
+// InitEx -
+func (multiLevelReels *MultiLevelReels) InitEx(cfg any, pool *GamePropertyPool) error {
+	multiLevelReels.Config = cfg.(*MultiLevelReelsConfig)
+
+	for _, v := range multiLevelReels.Config.Levels {
 		if v.ReelSetsWeight != "" {
 			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v.ReelSetsWeight, multiLevelReels.Config.UseFileMapping), "val", "weight", sgc7game.NewStrVal)
 			if err != nil {
@@ -101,16 +106,16 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, pool *GamePropertyPool) 
 		}
 	}
 
-	if len(multiLevelReels.LevelReelSetWeights) > 0 && len(multiLevelReels.LevelReelSetWeights) != len(cfg.Levels) {
+	if len(multiLevelReels.LevelReelSetWeights) > 0 && len(multiLevelReels.LevelReelSetWeights) != len(multiLevelReels.Config.Levels) {
 		goutils.Error("MultiLevelReels.Init:check levels",
 			zap.Int("reelsetLength", len(multiLevelReels.LevelReelSetWeights)),
-			zap.Int("levelLength", len(cfg.Levels)),
+			zap.Int("levelLength", len(multiLevelReels.Config.Levels)),
 			zap.Error(ErrIvalidMultiLevelReelsConfig))
 
 		return ErrIvalidMultiLevelReelsConfig
 	}
 
-	multiLevelReels.onInit(&cfg.BasicComponentConfig)
+	multiLevelReels.onInit(&multiLevelReels.Config.BasicComponentConfig)
 
 	return nil
 }

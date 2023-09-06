@@ -51,7 +51,12 @@ func (symbolVal *SymbolVal) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	symbolVal.Config = cfg
+	return symbolVal.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
+	symbolVal.Config = cfg.(*SymbolValConfig)
 
 	if symbolVal.Config.WeightVal != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolVal.Config.WeightVal, symbolVal.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
@@ -66,13 +71,13 @@ func (symbolVal *SymbolVal) Init(fn string, pool *GamePropertyPool) error {
 		symbolVal.WeightVal = vw2
 	}
 
-	symbolVal.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+	symbolVal.SymbolCode = pool.DefaultPaytables.MapSymbols[symbolVal.Config.Symbol]
 
-	if cfg.OtherSceneFeature != nil {
-		symbolVal.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	if symbolVal.Config.OtherSceneFeature != nil {
+		symbolVal.OtherSceneFeature = NewOtherSceneFeature(symbolVal.Config.OtherSceneFeature)
 	}
 
-	symbolVal.onInit(&cfg.BasicComponentConfig)
+	symbolVal.onInit(&symbolVal.Config.BasicComponentConfig)
 
 	return nil
 }
