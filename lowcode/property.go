@@ -15,6 +15,7 @@ const (
 	GamePropCurReels     = 4
 	GamePropCurLineData  = 5
 	GamePropCurLineNum   = 6
+	GamePropCurBetIndex  = 7
 
 	GamePropStepMulti = 100
 	GamePropGameMulti = 101
@@ -66,8 +67,17 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 	gp.SetGameProp(gameProp)
 }
 
-func (gameProp *GameProperty) OnNewGame() error {
+func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 	gameProp.SetVal(GamePropGameMulti, 1)
+
+	curBet := stake.CashBet / stake.CoinBet
+	for i, v := range gameProp.Pool.Config.Bets {
+		if v == int(curBet) {
+			gameProp.SetVal(GamePropCurBetIndex, i)
+
+			break
+		}
+	}
 
 	gameProp.mapGlobalStr = make(map[string]string)
 
@@ -462,6 +472,14 @@ func (gameProp *GameProperty) ProcMulti(ret *sgc7game.Result) {
 	mul := gameProp.GetVal(GamePropStepMulti) * gameProp.GetVal(GamePropGameMulti)
 	ret.CoinWin *= mul
 	ret.CashWin *= mul
+}
+
+func (gameProp *GameProperty) GetBet(stake *sgc7game.Stake, bettype string) int {
+	if bettype == BetTypeTotalBet {
+		return int(stake.CoinBet) * gameProp.Pool.Config.TotalBetInWins[gameProp.GetVal(GamePropCurBetIndex)]
+	}
+
+	return int(stake.CoinBet)
 }
 
 func init() {

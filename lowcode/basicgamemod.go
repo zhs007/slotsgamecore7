@@ -207,7 +207,7 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 
 // OnNewGame -
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
-	gameProp.OnNewGame()
+	gameProp.OnNewGame(stake)
 
 	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
 

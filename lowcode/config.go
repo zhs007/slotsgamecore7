@@ -39,6 +39,7 @@ type Config struct {
 	DefaultPaytables  string                         `yaml:"defaultPaytables"`
 	DefaultLinedata   string                         `yaml:"defaultLinedata"`
 	Bets              []int                          `yaml:"bets"`
+	TotalBetInWins    []int                          `yaml:"totalBetInWins"`
 	StartComponents   map[int]string                 `yaml:"startComponents"`
 	GameMods          []*GameModConfig               `yaml:"gamemods"`
 	StatsSymbols      []string                       `yaml:"statsSymbols"`

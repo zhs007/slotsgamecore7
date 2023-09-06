@@ -116,7 +116,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					SymbolNums: len(pos) / 2,
 				}
 
-				bet := GetBet(stake, symbolValWins.Config.BetType)
+				bet := gameProp.GetBet(stake, symbolValWins.Config.BetType)
 
 				if symbolValWins.Config.IsTriggerSymbolNumMulti {
 					ret.CoinWin = totalvals * symbolnum
