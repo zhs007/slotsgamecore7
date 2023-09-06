@@ -54,13 +54,18 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	symbolVal2.Config = cfg
+	return symbolVal2.InitEx(cfg, pool)
+}
 
-	if cfg.WeightSet != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(cfg.WeightSet, symbolVal2.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+// InitEx -
+func (symbolVal2 *SymbolVal2) InitEx(cfg any, pool *GamePropertyPool) error {
+	symbolVal2.Config = cfg.(*SymbolVal2Config)
+
+	if symbolVal2.Config.WeightSet != "" {
+		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolVal2.Config.WeightSet, symbolVal2.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolVal2.Init:LoadValWeights2FromExcel",
-				zap.String("Weight", cfg.WeightSet),
+				zap.String("Weight", symbolVal2.Config.WeightSet),
 				zap.Error(err))
 
 			return err
@@ -69,7 +74,7 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 		symbolVal2.WeightSet = vw2
 	}
 
-	for _, v := range cfg.WeightsVal {
+	for _, v := range symbolVal2.Config.WeightsVal {
 		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v, symbolVal2.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 		if err != nil {
 			goutils.Error("SymbolVal2.Init:LoadValWeights2FromExcel",
@@ -82,13 +87,13 @@ func (symbolVal2 *SymbolVal2) Init(fn string, pool *GamePropertyPool) error {
 		symbolVal2.WeightsVal = append(symbolVal2.WeightsVal, vw2)
 	}
 
-	symbolVal2.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+	symbolVal2.SymbolCode = pool.DefaultPaytables.MapSymbols[symbolVal2.Config.Symbol]
 
-	if cfg.OtherSceneFeature != nil {
-		symbolVal2.OtherSceneFeature = NewOtherSceneFeature(cfg.OtherSceneFeature)
+	if symbolVal2.Config.OtherSceneFeature != nil {
+		symbolVal2.OtherSceneFeature = NewOtherSceneFeature(symbolVal2.Config.OtherSceneFeature)
 	}
 
-	symbolVal2.onInit(&cfg.BasicComponentConfig)
+	symbolVal2.onInit(&symbolVal2.Config.BasicComponentConfig)
 
 	return nil
 }

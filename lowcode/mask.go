@@ -145,26 +145,31 @@ func (mask *Mask) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	mask.Config = cfg
+	return mask.InitEx(cfg, pool)
+}
 
-	mask.MaskType = parserMaskType(cfg.MaskType)
-	mask.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+// InitEx -
+func (mask *Mask) InitEx(cfg any, pool *GamePropertyPool) error {
+	mask.Config = cfg.(*MaskConfig)
 
-	if cfg.PerMaskAwards != nil {
-		for _, v := range cfg.PerMaskAwards {
+	mask.MaskType = parserMaskType(mask.Config.MaskType)
+	mask.SymbolCode = pool.DefaultPaytables.MapSymbols[mask.Config.Symbol]
+
+	if mask.Config.PerMaskAwards != nil {
+		for _, v := range mask.Config.PerMaskAwards {
 			v.Init()
 		}
 	}
 
-	if cfg.MapSPMaskAwards != nil {
-		for _, lst := range cfg.MapSPMaskAwards {
+	if mask.Config.MapSPMaskAwards != nil {
+		for _, lst := range mask.Config.MapSPMaskAwards {
 			for _, v := range lst {
 				v.Init()
 			}
 		}
 	}
 
-	mask.onInit(&cfg.BasicComponentConfig)
+	mask.onInit(&mask.Config.BasicComponentConfig)
 
 	return nil
 }

@@ -81,7 +81,12 @@ func (symbolCollection *SymbolCollection) Init(fn string, pool *GamePropertyPool
 		return err
 	}
 
-	symbolCollection.Config = cfg
+	return symbolCollection.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (symbolCollection *SymbolCollection) InitEx(cfg any, pool *GamePropertyPool) error {
+	symbolCollection.Config = cfg.(*SymbolCollectionConfig)
 
 	if symbolCollection.Config.WeightVal != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolCollection.Config.WeightVal, symbolCollection.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
@@ -96,7 +101,7 @@ func (symbolCollection *SymbolCollection) Init(fn string, pool *GamePropertyPool
 		symbolCollection.WeightVal = vw2
 	}
 
-	symbolCollection.onInit(&cfg.BasicComponentConfig)
+	symbolCollection.onInit(&symbolCollection.Config.BasicComponentConfig)
 
 	return nil
 }

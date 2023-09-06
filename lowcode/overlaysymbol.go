@@ -108,7 +108,12 @@ func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) erro
 		return err
 	}
 
-	overlaySymbol.Config = cfg
+	return overlaySymbol.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (overlaySymbol *OverlaySymbol) InitEx(cfg any, pool *GamePropertyPool) error {
+	overlaySymbol.Config = cfg.(*OverlaySymbolConfig)
 
 	if overlaySymbol.Config.MapPosition != "" {
 		vm2, err := sgc7game.LoadValMapping2FromExcel(pool.Config.GetPath(overlaySymbol.Config.MapPosition, overlaySymbol.Config.UseFileMapping), "index", "value", sgc7game.NewIntArrVal[int])
@@ -123,9 +128,9 @@ func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) erro
 		overlaySymbol.MapPosition = vm2
 	}
 
-	overlaySymbol.SymbolCode = pool.DefaultPaytables.MapSymbols[cfg.Symbol]
+	overlaySymbol.SymbolCode = pool.DefaultPaytables.MapSymbols[overlaySymbol.Config.Symbol]
 
-	overlaySymbol.onInit(&cfg.BasicComponentConfig)
+	overlaySymbol.onInit(&overlaySymbol.Config.BasicComponentConfig)
 
 	return nil
 }

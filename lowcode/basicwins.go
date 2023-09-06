@@ -233,19 +233,24 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	cfg.CheckWinType = ParseCheckWinType(cfg.StrCheckWinType)
+	return basicWins.InitEx(cfg, pool)
+}
 
-	basicWins.Config = cfg
+// InitEx -
+func (basicWins *BasicWins) InitEx(cfg any, pool *GamePropertyPool) error {
+	basicWins.Config = cfg.(*BasicWinsConfig)
 
-	for _, v := range cfg.ExcludeSymbols {
+	basicWins.Config.CheckWinType = ParseCheckWinType(basicWins.Config.StrCheckWinType)
+
+	for _, v := range basicWins.Config.ExcludeSymbols {
 		basicWins.ExcludeSymbols = append(basicWins.ExcludeSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	for _, v := range cfg.WildSymbols {
+	for _, v := range basicWins.Config.WildSymbols {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	for _, v := range cfg.BeforMain {
+	for _, v := range basicWins.Config.BeforMain {
 		for _, award := range v.Awards {
 			award.Init()
 		}
@@ -261,7 +266,7 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		}
 	}
 
-	for _, v := range cfg.AfterMain {
+	for _, v := range basicWins.Config.AfterMain {
 		for _, award := range v.Awards {
 			award.Init()
 		}
@@ -277,7 +282,7 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 		}
 	}
 
-	basicWins.onInit(&cfg.BasicComponentConfig)
+	basicWins.onInit(&basicWins.Config.BasicComponentConfig)
 
 	return nil
 }

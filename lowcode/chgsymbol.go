@@ -53,13 +53,18 @@ func (chgSymbol *ChgSymbol) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	chgSymbol.Config = cfg
+	return chgSymbol.InitEx(cfg, pool)
+}
 
-	for _, v := range cfg.Nodes {
+// InitEx -
+func (chgSymbol *ChgSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
+	chgSymbol.Config = cfg.(*ChgSymbolConfig)
+
+	for _, v := range chgSymbol.Config.Nodes {
 		v.SymbolCode = pool.DefaultPaytables.MapSymbols[v.Symbol]
 	}
 
-	chgSymbol.onInit(&cfg.BasicComponentConfig)
+	chgSymbol.onInit(&chgSymbol.Config.BasicComponentConfig)
 
 	return nil
 }

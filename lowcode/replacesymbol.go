@@ -49,17 +49,22 @@ func (replaceSymbol *ReplaceSymbol) Init(fn string, pool *GamePropertyPool) erro
 		return err
 	}
 
-	replaceSymbol.Config = cfg
+	return replaceSymbol.InitEx(cfg, pool)
+}
 
-	for _, v := range cfg.Symbols {
+// InitEx -
+func (replaceSymbol *ReplaceSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
+	replaceSymbol.Config = cfg.(*ReplaceSymbolConfig)
+
+	for _, v := range replaceSymbol.Config.Symbols {
 		replaceSymbol.SymbolCodes = append(replaceSymbol.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	for _, v := range cfg.Chg2SymbolInReels {
+	for _, v := range replaceSymbol.Config.Chg2SymbolInReels {
 		replaceSymbol.Chg2SymbolCodeInReels = append(replaceSymbol.Chg2SymbolCodeInReels, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	replaceSymbol.onInit(&cfg.BasicComponentConfig)
+	replaceSymbol.onInit(&replaceSymbol.Config.BasicComponentConfig)
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -164,7 +165,7 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 	}
 
 	for i, v := range lst {
-		k, err := v.Get("fileName").String()
+		name, err := v.Get("fileName").String()
 		if err != nil {
 			goutils.Error("loadPaytables:fileName",
 				zap.Int("i", i),
@@ -182,9 +183,178 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 			return err
 		}
 
-		cfg.Paytables[k] = k
-		cfg.MapPaytables[k] = paytables
+		cfg.Paytables[name] = name
+		cfg.MapPaytables[name] = paytables
+
+		if i == 0 {
+			cfg.DefaultPaytables = name
+		}
 	}
+
+	return nil
+}
+
+func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
+	lined := &sgc7game.LineData{}
+
+	lines, err := n.ArrayUseNode()
+	if err != nil {
+		goutils.Error("parseLineData:ArrayUseNode",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	for j, line := range lines {
+		arr := []int{}
+
+		for i := 0; i < width; i++ {
+			y, err := line.Get(fmt.Sprintf("R%v", i+1)).Int64()
+			if err != nil {
+				goutils.Error("parseLineData:lines",
+					zap.Int("j", j),
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			arr = append(arr, int(y))
+		}
+
+		lined.Lines = append(lined.Lines, arr)
+	}
+
+	return lined, nil
+}
+
+func parseReelData(n *ast.Node, paytables *sgc7game.PayTables) ([]int, error) {
+	reeld := []int{}
+
+	reel, err := n.ArrayUseNode()
+	if err != nil {
+		goutils.Error("parseReelData:ArrayUseNode",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	for i, sym := range reel {
+		strSym, err := sym.String()
+		if err != nil {
+			goutils.Error("parseReelData:String",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		reeld = append(reeld, paytables.MapSymbols[strSym])
+	}
+
+	return reeld, nil
+}
+
+func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
+	reelsd := &sgc7game.ReelsData{}
+
+	reels, err := n.ArrayUseNode()
+	if err != nil {
+		goutils.Error("parseReels:ArrayUseNode",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	for j, reel := range reels {
+		reeld, err := parseReelData(&reel, paytables)
+		if err != nil {
+			goutils.Error("parseReels:parseReelData",
+				zap.Int("j", j),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		reelsd.Reels = append(reelsd.Reels, reeld)
+	}
+
+	return reelsd, nil
+}
+
+func loadOtherList(cfg *Config, lstOther *ast.Node) error {
+	lst, err := lstOther.ArrayUseNode()
+	if err != nil {
+		goutils.Error("loadOtherList:ArrayUseNode",
+			zap.Error(err))
+
+		return err
+	}
+
+	for i, v := range lst {
+		name, err := v.Get("fileName").String()
+		if err != nil {
+			goutils.Error("loadOtherList:fileName",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+
+		t, err := v.Get("type").String()
+		if err != nil {
+			goutils.Error("loadOtherList:type",
+				zap.Int("i", i),
+				zap.Error(err))
+
+			return err
+		}
+
+		if t == "Linedata" {
+			ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
+			if err != nil {
+				goutils.Error("loadOtherList:parseLineData",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.Linedata[name] = name
+			cfg.MapLinedate[name] = ld
+
+			if len(cfg.Linedata) == 1 {
+				cfg.DefaultLinedata = name
+			}
+		} else if t == "Reels" {
+			rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
+			if err != nil {
+				goutils.Error("loadOtherList:parseReels",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.Reels[name] = name
+			cfg.MapReels[name] = rd
+		}
+	}
+
+	return nil
+}
+
+func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
+	bet, err := betMethod.Get("bet").Int64()
+	if err != nil {
+		goutils.Error("loadBetMethod:Get:bet",
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg.Bets = append(cfg.Bets, int(bet))
+	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
 
 	return nil
 }
@@ -198,6 +368,10 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	cfg := &Config{
 		Paytables:    make(map[string]string),
 		MapPaytables: make(map[string]*sgc7game.PayTables),
+		Linedata:     make(map[string]string),
+		MapLinedate:  make(map[string]*sgc7game.LineData),
+		Reels:        make(map[string]string),
+		MapReels:     make(map[string]*sgc7game.ReelsData),
 	}
 
 	data, err := os.ReadFile(fn)
@@ -229,6 +403,40 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	err = loadPaytables(cfg, &lstPaytables)
 	if err != nil {
 		goutils.Error("NewGame2:loadPaytables",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	lstOther, err := sonic.Get(data, "repository", "otherList")
+	if err != nil {
+		goutils.Error("NewGame2:Get",
+			zap.String("key", "repository.otherList"),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	err = loadOtherList(cfg, &lstOther)
+	if err != nil {
+		goutils.Error("NewGame2:loadOtherList",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	betMethod, err := sonic.Get(data, "betMethod", 0)
+	if err != nil {
+		goutils.Error("NewGame2:Get",
+			zap.String("key", "betMethod[0]"),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	err = loadBetMethod(cfg, &betMethod)
+	if err != nil {
+		goutils.Error("NewGame2:loadBetMethod",
 			zap.Error(err))
 
 		return nil, err

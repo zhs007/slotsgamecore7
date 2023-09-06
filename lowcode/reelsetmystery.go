@@ -80,7 +80,12 @@ func (reelSetMystery *ReelSetMystery) Init(fn string, pool *GamePropertyPool) er
 		return err
 	}
 
-	reelSetMystery.Config = cfg
+	return reelSetMystery.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (reelSetMystery *ReelSetMystery) InitEx(cfg any, pool *GamePropertyPool) error {
+	reelSetMystery.Config = cfg.(*ReelSetMysteryConfig)
 
 	for k, v := range reelSetMystery.Config.MapMysteryWeight {
 		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(v, reelSetMystery.Config.UseFileMapping), "val", "weight", pool.DefaultPaytables)
@@ -99,7 +104,7 @@ func (reelSetMystery *ReelSetMystery) Init(fn string, pool *GamePropertyPool) er
 		reelSetMystery.MysterySymbolCodes = append(reelSetMystery.MysterySymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	reelSetMystery.onInit(&cfg.BasicComponentConfig)
+	reelSetMystery.onInit(&reelSetMystery.Config.BasicComponentConfig)
 
 	return nil
 }

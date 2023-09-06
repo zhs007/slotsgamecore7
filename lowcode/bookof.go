@@ -91,7 +91,12 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	bookof.Config = cfg
+	return bookof.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
+	bookof.Config = cfg.(*BookOfConfig)
 
 	if bookof.Config.WeightTrigger != "" {
 		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(bookof.Config.WeightTrigger, bookof.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
@@ -136,7 +141,7 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 		bookof.Config.WildSymbolCodes = append(bookof.Config.WildSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	bookof.onInit(&cfg.BasicComponentConfig)
+	bookof.onInit(&bookof.Config.BasicComponentConfig)
 
 	return nil
 }

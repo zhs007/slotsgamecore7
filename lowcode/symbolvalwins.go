@@ -50,15 +50,20 @@ func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) erro
 		return err
 	}
 
-	symbolValWins.Config = cfg
+	return symbolValWins.InitEx(cfg, pool)
+}
 
-	if cfg.TriggerSymbol != "" {
-		symbolValWins.TriggerSymbolCode = pool.DefaultPaytables.MapSymbols[cfg.TriggerSymbol]
+// InitEx -
+func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) error {
+	symbolValWins.Config = cfg.(*SymbolValWinsConfig)
+
+	if symbolValWins.Config.TriggerSymbol != "" {
+		symbolValWins.TriggerSymbolCode = pool.DefaultPaytables.MapSymbols[symbolValWins.Config.TriggerSymbol]
 	} else {
 		symbolValWins.TriggerSymbolCode = -1
 	}
 
-	symbolValWins.onInit(&cfg.BasicComponentConfig)
+	symbolValWins.onInit(&symbolValWins.Config.BasicComponentConfig)
 
 	return nil
 }

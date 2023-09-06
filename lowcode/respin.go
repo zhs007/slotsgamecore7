@@ -129,9 +129,14 @@ func (respin *Respin) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	respin.Config = cfg
+	return respin.InitEx(cfg, pool)
+}
 
-	respin.onInit(&cfg.BasicComponentConfig)
+// InitEx -
+func (respin *Respin) InitEx(cfg any, pool *GamePropertyPool) error {
+	respin.Config = cfg.(*RespinConfig)
+
+	respin.onInit(&respin.Config.BasicComponentConfig)
 
 	return nil
 }
