@@ -240,9 +240,10 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 
 			bookof.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-			scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, s, GetBet(stake, bookof.Config.BetType), 1, func(scatter int, cursymbol int) bool {
-				return cursymbol == s || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			}, true)
+			scr := sgc7game.CalcScatter3(gs, gameProp.CurPaytables, s, GetBet(stake, bookof.Config.BetType)*gameProp.GetVal(GamePropCurLineNum), 1,
+				func(scatter int, cursymbol int) bool {
+					return cursymbol == s || goutils.IndexOfIntSlice(bookof.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				}, true)
 			if scr != nil {
 				bookof.AddResult(curpr, scr, &cd.BasicComponentData)
 			}

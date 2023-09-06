@@ -14,6 +14,7 @@ const (
 	GamePropCurPaytables = 3
 	GamePropCurReels     = 4
 	GamePropCurLineData  = 5
+	GamePropCurLineNum   = 6
 
 	GamePropStepMulti = 100
 	GamePropGameMulti = 101
@@ -276,6 +277,8 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		}
 
 		gameProp.CurLineData = v
+
+		gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
 	}
 
 	gameProp.MapStrVals[prop] = val
