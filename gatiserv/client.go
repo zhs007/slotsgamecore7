@@ -1,7 +1,7 @@
 package gatiserv
 
 import (
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/valyala/fasthttp"
 
 	goutils "github.com/zhs007/goutils"
@@ -24,8 +24,6 @@ func NewClient(servurl string) *Client {
 
 // GetConfig - get configuration
 func (client *Client) GetConfig() (*sgc7game.Config, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	sc, buff, err := sgc7http.HTTPGet(
 		goutils.AppendString(client.ServURL, "config"),
 		nil)
@@ -46,7 +44,7 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 	}
 
 	cfg := &sgc7game.Config{}
-	err = json.Unmarshal(buff, cfg)
+	err = sonic.Unmarshal(buff, cfg)
 	if err != nil {
 		goutils.Error("gatiserv.Client.GetConfig:JSON",
 			zap.String("ServURL", client.ServURL),
@@ -132,9 +130,7 @@ func (client *Client) PlayEx(param string) (*PlayResult, error) {
 
 // Checksum - checksum
 func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	buf, err := json.Marshal(arr)
+	buf, err := sonic.Marshal(arr)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Checksum:Marshal",
 			zap.String("ServURL", client.ServURL),
@@ -166,7 +162,7 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	}
 
 	ret := []*ComponentChecksum{}
-	err = json.Unmarshal(buff, &ret)
+	err = sonic.Unmarshal(buff, &ret)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Checksum:Unmarshal",
 			zap.String("ServURL", client.ServURL),

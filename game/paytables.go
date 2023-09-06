@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
@@ -58,15 +58,13 @@ func (pt *PayTables) GetStringFromInt(s int) string {
 
 // LoadPayTables5JSON - load json file
 func LoadPayTables5JSON(fn string) (*PayTables, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []payInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}
@@ -92,15 +90,13 @@ func LoadPayTables5JSON(fn string) (*PayTables, error) {
 
 // LoadPayTables3JSON - load json file
 func LoadPayTables3JSON(fn string) (*PayTables, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []payInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}
@@ -126,15 +122,13 @@ func LoadPayTables3JSON(fn string) (*PayTables, error) {
 
 // LoadPayTables6JSON - load json file
 func LoadPayTables6JSON(fn string) (*PayTables, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []payInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}
@@ -160,15 +154,13 @@ func LoadPayTables6JSON(fn string) (*PayTables, error) {
 
 // LoadPayTables15JSON - load json file
 func LoadPayTables15JSON(fn string) (*PayTables, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []payInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}
@@ -194,15 +186,13 @@ func LoadPayTables15JSON(fn string) (*PayTables, error) {
 
 // LoadPayTables25JSON - load json file
 func LoadPayTables25JSON(fn string) (*PayTables, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []payInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}

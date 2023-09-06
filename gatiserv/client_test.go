@@ -4,15 +4,13 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bytedance/sonic"
 	"github.com/jarcoal/httpmock"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
 func Test_ClientGetConfig(t *testing.T) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -55,7 +53,7 @@ func Test_ClientGetConfig(t *testing.T) {
 		configURL,
 		func(req *http.Request) (*http.Response, error) {
 			rcfg := &sgc7game.Config{}
-			resbuff, err := json.Marshal(rcfg)
+			resbuff, err := sonic.Marshal(rcfg)
 			assert.Nil(t, err, "Test_ClientGetConfig Marshal")
 
 			return httpmock.NewStringResponder(200, string(resbuff))(req)
@@ -69,8 +67,6 @@ func Test_ClientGetConfig(t *testing.T) {
 }
 
 func Test_ClientInitialize(t *testing.T) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -115,7 +111,7 @@ func Test_ClientInitialize(t *testing.T) {
 		configURL,
 		func(req *http.Request) (*http.Response, error) {
 			ps := &PlayerState{}
-			resbuff, err := json.Marshal(ps)
+			resbuff, err := sonic.Marshal(ps)
 			assert.Nil(t, err, "Test_ClientInitialize Marshal")
 
 			return httpmock.NewStringResponder(200, string(resbuff))(req)
@@ -147,8 +143,6 @@ func Test_ClientInitialize(t *testing.T) {
 }
 
 func Test_ClientPlayEx(t *testing.T) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -191,7 +185,7 @@ func Test_ClientPlayEx(t *testing.T) {
 		configURL,
 		func(req *http.Request) (*http.Response, error) {
 			pr := &PlayResult{}
-			resbuff, err := json.Marshal(pr)
+			resbuff, err := sonic.Marshal(pr)
 			assert.Nil(t, err, "Test_ClientPlayEx Marshal")
 
 			return httpmock.NewStringResponder(200, string(resbuff))(req)

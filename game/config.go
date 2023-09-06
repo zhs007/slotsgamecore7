@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
@@ -190,10 +190,8 @@ func (cfg *Config) LoadSymboloWeightReels(name string, fn string, reels int) err
 
 // SetDefaultSceneString - [][]int in json
 func (cfg *Config) SetDefaultSceneString(str string) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	var arr [][]int
-	err := json.Unmarshal([]byte(str), &arr)
+	err := sonic.Unmarshal([]byte(str), &arr)
 	if err != nil {
 		return err
 	}
@@ -214,10 +212,8 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 
 // AddDefaultSceneString2 - [][]int in json
 func (cfg *Config) AddDefaultSceneString2(str string) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	var arr [][]int
-	err := json.Unmarshal([]byte(str), &arr)
+	err := sonic.Unmarshal([]byte(str), &arr)
 	if err != nil {
 		return err
 	}

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/bytedance/sonic"
 	"github.com/jarcoal/httpmock"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,15 +26,13 @@ import (
 // }
 
 func Test_GetRngsMock(t *testing.T) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
 	const URL = "http://127.0.0.1:50000/numbers"
 	res := []int{123, 1, 2}
 
-	resbuff, err := json.Marshal(res)
+	resbuff, err := sonic.Marshal(res)
 
 	// httpmock.RegisterResponder("GET",
 	// 	fmt.Sprintf("%s?size=%d", URL, 3),

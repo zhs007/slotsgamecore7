@@ -3,7 +3,7 @@ package sgc7game
 import (
 	"os"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
@@ -44,15 +44,13 @@ func isValidLI5(li5s []lineInfo) bool {
 
 // LoadLine5JSON - load json file
 func LoadLine5JSON(fn string) (*LineData, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []lineInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}
@@ -72,15 +70,13 @@ func LoadLine5JSON(fn string) (*LineData, error) {
 
 // LoadLine3JSON - load json file
 func LoadLine3JSON(fn string) (*LineData, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []lineInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}
@@ -100,15 +96,13 @@ func LoadLine3JSON(fn string) (*LineData, error) {
 
 // LoadLine6JSON - load json file
 func LoadLine6JSON(fn string) (*LineData, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var li []lineInfo
-	err = json.Unmarshal(data, &li)
+	err = sonic.Unmarshal(data, &li)
 	if err != nil {
 		return nil, err
 	}

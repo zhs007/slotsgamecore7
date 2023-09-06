@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
@@ -43,9 +43,7 @@ func HTTPPost(url string, header map[string]string, bodyObj any) (int, []byte, e
 	client := &http.Client{}
 
 	if bodyObj != nil {
-		json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-		bb, err := json.Marshal(bodyObj)
+		bb, err := sonic.Marshal(bodyObj)
 		if err != nil {
 			goutils.Warn("sgc7http.HTTPPost:Marshal",
 				zap.Error(err))

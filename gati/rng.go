@@ -3,7 +3,7 @@ package gati
 import (
 	"strconv"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
 	"go.uber.org/zap"
@@ -11,8 +11,6 @@ import (
 
 // GetRngs - get rngs
 func GetRngs(rngURL string, gameID string, nums int) ([]int, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	url := goutils.AppendString(rngURL, "?size=", strconv.Itoa(nums))
 
 	mapHeader := make(map[string]string)
@@ -35,7 +33,7 @@ func GetRngs(rngURL string, gameID string, nums int) ([]int, error) {
 	}
 
 	lst := []int{}
-	err = json.Unmarshal(body, &lst)
+	err = sonic.Unmarshal(body, &lst)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,7 @@
 package simserv
 
 import (
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/valyala/fasthttp"
 
 	goutils "github.com/zhs007/goutils"
@@ -25,8 +25,6 @@ func NewClient(servurl string) *Client {
 
 // GetConfig - get configuration
 func (client *Client) GetConfig() (*sgc7game.Config, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	sc, buff, err := sgc7http.HTTPGet(
 		goutils.AppendString(client.ServURL, "config"),
 		nil)
@@ -47,7 +45,7 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 	}
 
 	cfg := &sgc7game.Config{}
-	err = json.Unmarshal(buff, cfg)
+	err = sonic.Unmarshal(buff, cfg)
 	if err != nil {
 		goutils.Error("gatiserv.Client.GetConfig:JSON",
 			zap.String("ServURL", client.ServURL),
@@ -62,8 +60,6 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 
 // Initialize - initialize a player
 func (client *Client) Initialize() (*sgc7pb.PlayerState, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	sc, buff, err := sgc7http.HTTPGet(
 		goutils.AppendString(client.ServURL, "initialize"),
 		nil)
@@ -84,7 +80,7 @@ func (client *Client) Initialize() (*sgc7pb.PlayerState, error) {
 	}
 
 	ps := &sgc7pb.PlayerState{}
-	err = json.Unmarshal(buff, ps)
+	err = sonic.Unmarshal(buff, ps)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Initialize:Unmarshal",
 			zap.String("ServURL", client.ServURL),
@@ -99,9 +95,7 @@ func (client *Client) Initialize() (*sgc7pb.PlayerState, error) {
 
 // PlayEx - play with string parameter
 func (client *Client) PlayEx(param *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	buff, err := json.Marshal(param)
+	buff, err := sonic.Marshal(param)
 	if err != nil {
 		goutils.Error("gatiserv.Client.PlayEx:Marshal",
 			zap.String("body", string(buff)),
@@ -132,7 +126,7 @@ func (client *Client) PlayEx(param *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, erro
 	}
 
 	rp := &sgc7pb.ReplyPlay{}
-	err = json.Unmarshal(buff, rp)
+	err = sonic.Unmarshal(buff, rp)
 	if err != nil {
 		goutils.Error("gatiserv.Client.PlayEx:Unmarshal",
 			zap.String("ServURL", client.ServURL),

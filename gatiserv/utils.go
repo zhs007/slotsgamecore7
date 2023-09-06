@@ -3,7 +3,7 @@ package gatiserv
 import (
 	"os"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
@@ -26,8 +26,6 @@ func BuildIPlayerState(ips sgc7game.IPlayerState, ps *PlayerState) error {
 
 // BuildPlayerStateString - sgc7game.IPlayerState => string
 func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	if ps == nil {
 		return "{\"playerStatePublic\":{},\"playerStatePrivate\":{}}", nil
 	}
@@ -40,7 +38,7 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 		return "", err
 	}
 
-	psfb, err := json.Marshal(dps)
+	psfb, err := sonic.Marshal(dps)
 	if err != nil {
 		goutils.Warn("gatiserv.BuildPlayerStateString:Marshal PlayerState",
 			zap.Error(err))
@@ -53,27 +51,9 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 
 // BuildPlayerState - sgc7game.IPlayerState => PlayerState
 func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
-	// json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	if ips == nil {
 		return nil, nil
 	}
-
-	// psb, err := json.Marshal(ips.GetPublic())
-	// if err != nil {
-	// 	goutils.Warn("gatiserv.BuildPlayerState:Marshal GetPublic",
-	// 		zap.Error(err))
-
-	// 	return nil, err
-	// }
-
-	// psp, err := json.Marshal(ips.GetPrivate())
-	// if err != nil {
-	// 	goutils.Warn("gatiserv.BuildPlayerState:Marshal GetPrivate",
-	// 		zap.Error(err))
-
-	// 	return nil, err
-	// }
 
 	return &PlayerState{
 		Public:  ips.GetPublic(),
@@ -83,9 +63,7 @@ func BuildPlayerState(ips sgc7game.IPlayerState) (*PlayerState, error) {
 
 // ParsePlayerState - json => PlayerState
 func ParsePlayerState(str string, ps *PlayerState) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	err := json.Unmarshal([]byte(str), ps)
+	err := sonic.Unmarshal([]byte(str), ps)
 	if err != nil {
 		goutils.Error("gatiserv.ParsePlayerState:JSON",
 			zap.String("str", str),
@@ -108,16 +86,6 @@ func BuildStake(stake Stake) *sgc7game.Stake {
 
 // AddWinResult - add sgc7game.PlayResult
 func AddWinResult(pr *PlayResult, stake Stake, playResult *sgc7game.PlayResult) error {
-	// json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	// prb, err := json.Marshal(playResult)
-	// if err != nil {
-	// 	goutils.Warn("gatiserv.AddWinResult:Marshal PlayResult",
-	// 		zap.Error(err))
-
-	// 	return err
-	// }
-
 	r := &Result{
 		CoinWin:    playResult.CoinWin,
 		ClientData: playResult,
@@ -140,12 +108,10 @@ func AddPlayResult(pr *PlayResult, stake Stake, results []*sgc7game.PlayResult) 
 
 // ParsePlayParams - string => *PlayParams
 func ParsePlayParams(str string, ps *PlayerState) (*PlayParams, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	pp := &PlayParams{
 		PlayerState: ps,
 	}
-	err := json.Unmarshal([]byte(str), pp)
+	err := sonic.Unmarshal([]byte(str), pp)
 	if err != nil {
 		goutils.Error("gatiserv.ParsePlayParams:JSON",
 			zap.String("str", str),
@@ -159,10 +125,8 @@ func ParsePlayParams(str string, ps *PlayerState) (*PlayParams, error) {
 
 // ParsePlayResult - string => *PlayResult
 func ParsePlayResult(str string) (*PlayResult, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	pr := &PlayResult{}
-	err := json.Unmarshal([]byte(str), pr)
+	err := sonic.Unmarshal([]byte(str), pr)
 	if err != nil {
 		goutils.Error("gatiserv.ParsePlayResult:JSON",
 			zap.String("str", str),
@@ -187,15 +151,13 @@ func LoadGATIGameConfig(fn string) (*GATIGameConfig, error) {
 		return &GATIGameConfig{}, nil
 	}
 
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	ccs := &GATIGameConfig{}
-	err = json.Unmarshal(data, ccs)
+	err = sonic.Unmarshal(data, ccs)
 	if err != nil {
 		goutils.Warn("gatiserv.LoadGATIGameConfig",
 			zap.Error(err))

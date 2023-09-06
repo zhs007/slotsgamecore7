@@ -3,7 +3,7 @@ package lowcode
 import (
 	"os"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -57,10 +57,8 @@ func (multiRespin *MultiRespin) parseCmdParam(cmd string, cmdParam string) (*Res
 		return nil, ErrIvalidCmd
 	}
 
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	param := &RespinDataCmdParam{}
-	err := json.Unmarshal([]byte(cmdParam), param)
+	err := sonic.Unmarshal([]byte(cmdParam), param)
 	if err != nil {
 		goutils.Error("MultiRespin.parseCmdParam",
 			zap.Error(ErrIvalidCmdParam))
@@ -182,9 +180,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 				return err
 			}
 
-			json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-			buf, err := json.Marshal(curparam)
+			buf, err := sonic.Marshal(curparam)
 			if err != nil {
 				goutils.Error("MultiRespin.OnPlayGame:Marshal",
 					zap.Error(err))

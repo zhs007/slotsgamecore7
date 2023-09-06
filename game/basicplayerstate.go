@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
@@ -78,10 +78,8 @@ func (ps *BasicPlayerState) GetPrivate() any {
 
 // SetPublicJson - set player public state
 func (ps *BasicPlayerState) SetPublicJson(pubjson string) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	pub := &BasicPlayerPublicState{}
-	err := json.Unmarshal([]byte(pubjson), pub)
+	err := sonic.Unmarshal([]byte(pubjson), pub)
 	if err != nil {
 		goutils.Warn("BasicPlayerState.SetPublicJson",
 			zap.Error(err))
@@ -96,10 +94,8 @@ func (ps *BasicPlayerState) SetPublicJson(pubjson string) error {
 
 // SetPrivateJson - set player private state
 func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	pub := &BasicPlayerPrivateState{}
-	err := json.Unmarshal([]byte(prijson), pub)
+	err := sonic.Unmarshal([]byte(prijson), pub)
 	if err != nil {
 		goutils.Warn("BasicPlayerState.SetPrivateJson",
 			zap.Error(err))
@@ -114,9 +110,7 @@ func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
 
 // GetPublicJson - set player public state
 func (ps *BasicPlayerState) GetPublicJson() string {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	bpub, err := json.Marshal(ps.GetPublic())
+	bpub, err := sonic.Marshal(ps.GetPublic())
 	if err != nil {
 		goutils.Warn("BasicPlayerState.GetPublicJson",
 			zap.Error(err))
@@ -129,9 +123,7 @@ func (ps *BasicPlayerState) GetPublicJson() string {
 
 // GetPrivateJson - set player private state
 func (ps *BasicPlayerState) GetPrivateJson() string {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	bpri, err := json.Marshal(ps.GetPrivate())
+	bpri, err := sonic.Marshal(ps.GetPrivate())
 	if err != nil {
 		goutils.Warn("BasicPlayerState.GetPrivateJson",
 			zap.Error(err))

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
@@ -154,10 +154,8 @@ func (serv *Serv) ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
 	if cheat != "" {
 		str := goutils.AppendString("[", cheat, "]")
 
-		json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 		rngs := []int{}
-		err := json.Unmarshal([]byte(str), &rngs)
+		err := sonic.Unmarshal([]byte(str), &rngs)
 		if err != nil {
 			return err
 		}
