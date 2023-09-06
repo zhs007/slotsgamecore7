@@ -4,14 +4,12 @@ import (
 	"testing"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 )
 
 func Test_Serv(t *testing.T) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	serv := NewServ("127.0.0.1:7890", true)
 
 	type requestBody struct {
@@ -138,7 +136,7 @@ func Test_Serv(t *testing.T) {
 	assert.NotNil(t, buff, "there is a valid buffer")
 
 	rr := &response{}
-	err = json.Unmarshal(buff, rr)
+	err = sonic.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)
@@ -156,7 +154,7 @@ func Test_Serv(t *testing.T) {
 	assert.NotNil(t, buff, "there is a valid buffer")
 	assert.Equal(t, string(buff), "{\"result\":\"123\"}", "they should be equal")
 
-	err = json.Unmarshal(buff, rr)
+	err = sonic.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)
@@ -213,7 +211,7 @@ func Test_Serv(t *testing.T) {
 	assert.NotNil(t, buff, "there is a valid buffer")
 	assert.Equal(t, string(buff), "{\"result\":\"123\"}", "they should be equal")
 
-	err = json.Unmarshal(buff, rr)
+	err = sonic.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)
@@ -231,7 +229,7 @@ func Test_Serv(t *testing.T) {
 	assert.NotNil(t, buff, "there is a valid buffer")
 	assert.Equal(t, string(buff), "{\"result\":\"123\"}", "they should be equal")
 
-	err = json.Unmarshal(buff, rr)
+	err = sonic.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)

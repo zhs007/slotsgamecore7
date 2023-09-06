@@ -1,7 +1,7 @@
 package sgc7game
 
 import (
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
@@ -53,9 +53,7 @@ func GetPlayResultCurIndex(prs []*PlayResult) int {
 
 // PlayResult2JSON - PlayResult => json
 func PlayResult2JSON(pr *PlayResult) ([]byte, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	b, err := json.Marshal(pr)
+	b, err := sonic.Marshal(pr)
 	if err != nil {
 		goutils.Warn("sgc7game.PlayResult2JSON",
 			zap.Error(err))
@@ -68,10 +66,7 @@ func PlayResult2JSON(pr *PlayResult) ([]byte, error) {
 
 // JSON2PlayResult - json => PlayResult
 func JSON2PlayResult(buf []byte, pr *PlayResult) (*PlayResult, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	// pr := &PlayResult{}
-	err := json.Unmarshal(buf, &pr)
+	err := sonic.Unmarshal(buf, &pr)
 	if err != nil {
 		goutils.Warn("sgc7game.JSON2PlayResult",
 			zap.Error(err))

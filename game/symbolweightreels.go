@@ -3,7 +3,7 @@ package sgc7game
 import (
 	"os"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
@@ -43,15 +43,13 @@ type SymbolWeightReels struct {
 
 // LoadSymbolWeightReels5JSON - load json file
 func LoadSymbolWeightReels5JSON(fn string) (*SymbolWeightReels, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	var ri []symbolWeightReels
-	err = json.Unmarshal(data, &ri)
+	err = sonic.Unmarshal(data, &ri)
 	if err != nil {
 		return nil, err
 	}

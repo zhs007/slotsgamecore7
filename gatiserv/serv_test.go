@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 
@@ -132,8 +132,6 @@ func (sv *testService) Evaluate(params *EvaluateParams, id string) (*EvaluateRes
 func Test_Serv(t *testing.T) {
 	goutils.InitLogger("", "", "debug", true, "")
 
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	cfg := &Config{
 		GameID:      "1019",
 		BindAddr:    "127.0.0.1:7891",
@@ -177,7 +175,7 @@ func Test_Serv(t *testing.T) {
 	assert.NotNil(t, buff, "there is a valid buffer")
 
 	rr := &sgc7game.Config{}
-	err = json.Unmarshal(buff, rr)
+	err = sonic.Unmarshal(buff, rr)
 	if err != nil {
 		t.Fatalf("Test_Serv Unmarshal error %v",
 			err)

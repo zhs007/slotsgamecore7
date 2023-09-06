@@ -3,7 +3,7 @@ package sgc7http
 import (
 	"net"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/valyala/fasthttp"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
@@ -92,9 +92,7 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj any) {
 		return
 	}
 
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	b, err := json.Marshal(jsonObj)
+	b, err := sonic.Marshal(jsonObj)
 	if err != nil {
 		goutils.Warn("gatiserv.Serv.SetResponse",
 			zap.Error(err))
@@ -199,9 +197,7 @@ func (s *Serv) outputDebugInfo(ctx *fasthttp.RequestCtx) {
 
 // ParseBody - parse body
 func (s *Serv) ParseBody(ctx *fasthttp.RequestCtx, params any) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	err := json.Unmarshal(ctx.PostBody(), params)
+	err := sonic.Unmarshal(ctx.PostBody(), params)
 	if err != nil {
 		return err
 	}

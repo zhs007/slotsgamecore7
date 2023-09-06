@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"os"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
 )
@@ -47,50 +47,6 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 	return ccs, nil
 }
 
-// // LoadGATICriticalComponents - load
-// func LoadGATICriticalComponents(fn string) (*GATICriticalComponents, error) {
-// 	if fn == "" {
-// 		return &GATICriticalComponents{
-// 			Components: make(map[int]*GATICriticalComponent),
-// 		}, nil
-// 	}
-
-// 	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-// 	data, err := os.ReadFile(fn)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	ccs := &GATICriticalComponents{}
-// 	err = json.Unmarshal(data, ccs)
-// 	if err != nil {
-// 		goutils.Warn("gatiserv.LoadGATICriticalComponents",
-// 			zap.Error(err))
-
-// 		return nil, err
-// 	}
-
-// 	return ccs, nil
-// }
-
-// // SaveGATICriticalComponents - save
-// func SaveGATICriticalComponents(ccs *GATICriticalComponents, fn string) error {
-// 	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-// 	b, err := json.Marshal(ccs)
-// 	if err != nil {
-// 		goutils.Warn("gatiserv.SaveGATICriticalComponents",
-// 			zap.Error(err))
-
-// 		return err
-// 	}
-
-// 	os.WriteFile(fn, b, 0640)
-
-// 	return nil
-// }
-
 // LoadGATIGameInfo - load
 func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 	if fn == "" {
@@ -99,15 +55,13 @@ func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 		}, nil
 	}
 
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
 	ccs := &GATIGameInfo{}
-	err = json.Unmarshal(data, ccs)
+	err = sonic.Unmarshal(data, ccs)
 	if err != nil {
 		goutils.Warn("gatiserv.LoadGATIGameInfo",
 			zap.Error(err))
@@ -120,9 +74,7 @@ func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 
 // SaveGATIGameInfo - save
 func SaveGATIGameInfo(gi *GATIGameInfo, fn string) error {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
-	b, err := json.Marshal(gi)
+	b, err := sonic.Marshal(gi)
 	if err != nil {
 		goutils.Warn("gatiserv.SaveGATIGameInfo",
 			zap.Error(err))

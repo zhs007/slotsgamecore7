@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	goutils "github.com/zhs007/goutils"
 	"go.uber.org/zap"
@@ -182,8 +182,6 @@ func (rd *ReelsData) SaveExcelEx(fn string, paytables *PayTables) error {
 
 // LoadReels5JSON - load json file
 func LoadReels5JSON(fn string) (*ReelsData, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	w := 5
 
 	data, err := os.ReadFile(fn)
@@ -192,7 +190,7 @@ func LoadReels5JSON(fn string) (*ReelsData, error) {
 	}
 
 	var ri []reelsInfo5
-	err = json.Unmarshal(data, &ri)
+	err = sonic.Unmarshal(data, &ri)
 	if err != nil {
 		return nil, err
 	}
@@ -236,8 +234,6 @@ func LoadReels5JSON(fn string) (*ReelsData, error) {
 
 // LoadReels3JSON - load json file
 func LoadReels3JSON(fn string) (*ReelsData, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-
 	w := 3
 
 	data, err := os.ReadFile(fn)
@@ -246,7 +242,7 @@ func LoadReels3JSON(fn string) (*ReelsData, error) {
 	}
 
 	var ri []reelsInfo5
-	err = json.Unmarshal(data, &ri)
+	err = sonic.Unmarshal(data, &ri)
 	if err != nil {
 		return nil, err
 	}
