@@ -8129,11 +8129,9 @@
                             "wildSymbols": [
                                 "W"
                             ],
-                            "SIWMSymbols": [
-                                "W"
-                            ],
+                            "SIWMSymbols": [],
                             "SIWMMul": 2,
-                            "betType": "totalBet",
+                            "betType": "bet",
                             "label": "checkScatter"
                         }
                     },

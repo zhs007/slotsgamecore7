@@ -498,7 +498,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			}
 		}
 
-		if isDone {
+		if !isDone {
 			for i, v := range gameProp.CurLineData.Lines {
 				if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
 					ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet(stake, basicWins.Config.BetType),

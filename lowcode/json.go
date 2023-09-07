@@ -395,7 +395,7 @@ func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, e
 	if componentValues != nil {
 		label, err := componentValues.Get("label").String()
 		if err != nil {
-			goutils.Error("paserSymbolMulti:get:label",
+			goutils.Error("parseTriggerFeatureConfig:get:label",
 				zap.Error(err))
 
 			return "", nil, err
@@ -403,7 +403,7 @@ func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, e
 
 		strType, err := componentValues.Get("type").String()
 		if err != nil {
-			goutils.Error("paserSymbolMulti:get:type",
+			goutils.Error("parseTriggerFeatureConfig:get:type",
 				zap.Error(err))
 
 			return "", nil, err
@@ -413,7 +413,7 @@ func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, e
 
 		symbols, err := parse2StringSlice(componentValues.Get("symbol"))
 		if err != nil {
-			goutils.Error("paserSymbolMulti:get:symbol",
+			goutils.Error("parseTriggerFeatureConfig:get:symbol",
 				zap.Error(err))
 
 			return "", nil, err
@@ -423,7 +423,7 @@ func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, e
 
 		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
 		if err != nil {
-			goutils.Error("paserSymbolMulti:get:wildSymbols",
+			goutils.Error("parseTriggerFeatureConfig:get:wildSymbols",
 				zap.Error(err))
 
 			return "", nil, err
@@ -433,13 +433,37 @@ func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, e
 
 		betType, err := componentValues.Get("betType").String()
 		if err != nil {
-			goutils.Error("paserSymbolMulti:get:betType",
+			goutils.Error("parseTriggerFeatureConfig:get:betType",
 				zap.Error(err))
 
 			return "", nil, err
 		}
 
 		cfg.BetType = betType
+
+		if componentValues.Get("SIWMSymbols") != nil {
+			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
+			if err != nil {
+				goutils.Error("parseTriggerFeatureConfig:get:SIWMSymbols",
+					zap.Error(err))
+
+				return "", nil, err
+			}
+
+			cfg.SIWMSymbols = SIWMSymbols
+		}
+
+		if componentValues.Get("SIWMMul") != nil {
+			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
+			if err != nil {
+				goutils.Error("parseTriggerFeatureConfig:get:SIWMMul",
+					zap.Error(err))
+
+				return "", nil, err
+			}
+
+			cfg.SIWMMul = int(SIWMMul)
+		}
 
 		return label, cfg, nil
 	}
@@ -539,15 +563,41 @@ func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
 
 		cfg.ExcludeSymbols = excludeSymbols
 
-		afterMain, err := componentValues.Get("afterMain").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:afterMain",
-				zap.Error(err))
+		if componentValues.Get("afterMain") != nil {
+			afterMain, err := componentValues.Get("afterMain").String()
+			if err != nil {
+				goutils.Error("parseBasicWins:get:afterMain",
+					zap.Error(err))
 
-			return nil, err
+				return nil, err
+			}
+
+			cfg.AfterMainTriggerName = append(cfg.AfterMainTriggerName, afterMain)
 		}
 
-		cfg.AfterMainTriggerName = append(cfg.AfterMainTriggerName, afterMain)
+		if componentValues.Get("SIWMSymbols") != nil {
+			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
+			if err != nil {
+				goutils.Error("parseBasicWins:get:SIWMSymbols",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			cfg.SIWMSymbols = SIWMSymbols
+		}
+
+		if componentValues.Get("SIWMMul") != nil {
+			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
+			if err != nil {
+				goutils.Error("parseBasicWins:get:SIWMMul",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			cfg.SIWMMul = int(SIWMMul)
+		}
 
 		return cfg, nil
 	}
