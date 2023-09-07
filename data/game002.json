@@ -7656,476 +7656,12 @@
                     },
                     {
                         "position": {
-                            "x": 430,
-                            "y": 80
+                            "x": 680,
+                            "y": -194
                         },
                         "size": {
                             "width": 400,
-                            "height": 320
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 4,
-                                            "height": 40,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 2,
-                                                "y": 120
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 4,
-                                            "height": 40,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 120
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "in": {
-                                    "attrs": {
-                                        "circle": {
-                                            "magnet": true,
-                                            "stroke": "#8f8f8f",
-                                            "r": 5
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "left"
-                                        }
-                                    },
-                                    "position": "leftPortPosition"
-                                },
-                                "out": {
-                                    "attrs": {
-                                        "circle": {
-                                            "magnet": true,
-                                            "stroke": "#8f8f8f",
-                                            "r": 5
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    },
-                                    "position": "rightPortPosition"
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
-                                    "id": "symbolMulti-Scenes-in",
-                                    "group": "in",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "Scenes"
-                                        }
-                                    }
-                                },
-                                {
-                                    "id": "symbolMulti-OtherScenes-out",
-                                    "group": "out",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "OtherScenes"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "id": "b6664c65-9c46-4657-9a7c-3446096a4764",
-                        "label": "symbolMulti",
-                        "item": [
-                            {
-                                "label": "symbols",
-                                "type": "selectSymbols"
-                            },
-                            {
-                                "label": "weightMulti",
-                                "type": "selectWeights"
-                            },
-                            {
-                                "label": "staticMulti",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "mapWeightMulti",
-                                "type": "selectWeights"
-                            },
-                            {
-                                "label": "valUsed",
-                                "type": "inputNumber"
-                            }
-                        ],
-                        "zIndex": 10,
-                        "componentValues": {
-                            "isError": true,
-                            "symbols": [
-                                "W"
-                            ],
-                            "staticMulti": 2
-                        },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "33d3ec91-a7f5-4898-a25e-91b4fd761854",
-                        "zIndex": 11,
-                        "source": {
-                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
-                            "port": "basicReels-Scenes-out"
-                        },
-                        "target": {
-                            "cell": "b6664c65-9c46-4657-9a7c-3446096a4764",
-                            "port": "symbolMulti-Scenes-in"
-                        }
-                    },
-                    {
-                        "position": {
-                            "x": 1570,
-                            "y": -426
-                        },
-                        "size": {
-                            "width": 400,
-                            "height": 736
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 4,
-                                            "height": 40,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 2,
-                                                "y": 120
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 4,
-                                            "height": 40,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 120
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "in": {
-                                    "attrs": {
-                                        "circle": {
-                                            "magnet": true,
-                                            "stroke": "#8f8f8f",
-                                            "r": 5
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "left"
-                                        }
-                                    },
-                                    "position": "leftPortPosition"
-                                },
-                                "out": {
-                                    "attrs": {
-                                        "circle": {
-                                            "magnet": true,
-                                            "stroke": "#8f8f8f",
-                                            "r": 5
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    },
-                                    "position": "rightPortPosition"
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
-                                    "id": "basicWins-trigger-Scenes-in",
-                                    "group": "in",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "Scenes"
-                                        }
-                                    }
-                                },
-                                {
-                                    "id": "basicWins-trigger-tagSymbolNum-out",
-                                    "group": "out",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "tagSymbolNum"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "id": "b7e2812f-7bc1-49f3-b939-d0dd2f45a451",
-                        "label": "basicWins-trigger",
-                        "item": [
-                            {
-                                "label": "symbol",
-                                "type": "selectSymbols"
-                            },
-                            {
-                                "label": "type",
-                                "type": "select",
-                                "option": [
-                                    {
-                                        "label": "lines",
-                                        "value": "lines"
-                                    },
-                                    {
-                                        "label": "ways",
-                                        "value": "ways"
-                                    },
-                                    {
-                                        "label": "scatters",
-                                        "value": "scatters"
-                                    },
-                                    {
-                                        "label": "countscatter",
-                                        "value": "countscatter"
-                                    }
-                                ]
-                            },
-                            {
-                                "label": "minNum",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "wildSymbols",
-                                "type": "selectSymbols"
-                            },
-                            {
-                                "label": "respinNum",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "respinNumWeight",
-                                "type": "selectWeights"
-                            },
-                            {
-                                "label": "respinNumWithScatterNum",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "respinNumWeightWithScatterNum",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "betType",
-                                "type": "select",
-                                "option": [
-                                    {
-                                        "label": "bet",
-                                        "value": "bet"
-                                    },
-                                    {
-                                        "label": "totalBet",
-                                        "value": "totalBet"
-                                    },
-                                    {
-                                        "label": "noPay",
-                                        "value": "noPay"
-                                    }
-                                ]
-                            },
-                            {
-                                "label": "respinComponent",
-                                "type": "selectCells"
-                            },
-                            {
-                                "label": "awards",
-                                "type": "selectAwards"
-                            },
-                            {
-                                "label": "symbolAwardsWeights",
-                                "type": "selectWeights"
-                            },
-                            {
-                                "label": "countScatterPayAs",
-                                "type": "selectSymbols"
-                            }
-                        ],
-                        "zIndex": 12,
-                        "componentValues": {
-                            "isError": false,
-                            "symbol": [
-                                "L"
-                            ],
-                            "type": "scatters",
-                            "wildSymbols": [
-                                "W"
-                            ],
-                            "betType": "totalBet",
-                            "label": "triggerScatter"
-                        },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "2ef5b3ca-b0f1-4e1b-a7ae-a951f6ab4d35",
-                        "zIndex": 13,
-                        "source": {
-                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
-                            "port": "basicReels-Scenes-out"
-                        },
-                        "target": {
-                            "cell": "b7e2812f-7bc1-49f3-b939-d0dd2f45a451",
-                            "port": "basicWins-trigger-Scenes-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#0000FF",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "dcbd95c2-d9a5-49ad-84fa-442084d3ef4f",
-                        "zIndex": 14,
-                        "source": {
-                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "b6664c65-9c46-4657-9a7c-3446096a4764",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "position": {
-                            "x": 1060,
-                            "y": -130
-                        },
-                        "size": {
-                            "width": 400,
-                            "height": 424
+                            "height": 528
                         },
                         "view": "react-shape-view",
                         "shape": "custom-node",
@@ -8243,7 +7779,7 @@
                                 }
                             ]
                         },
-                        "id": "e0629b40-5a83-4673-aeda-3b069a5a04c0",
+                        "id": "4e39c898-9bd9-4bfb-829e-3132ab1ced0e",
                         "label": "basicWins",
                         "item": [
                             {
@@ -8305,6 +7841,14 @@
                                 "type": "selectSymbols"
                             },
                             {
+                                "label": "SIWMSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMMul",
+                                "type": "inputNumber"
+                            },
+                            {
                                 "label": "beforMain",
                                 "type": "selectCells"
                             },
@@ -8324,58 +7868,274 @@
                                 }
                             ]
                         },
-                        "zIndex": 15,
+                        "zIndex": 4,
                         "componentValues": {
                             "isError": true,
                             "mainType": "lines",
                             "betType": "bet",
-                            "checkWinType": "left2right",
+                            "checkWinType": "all",
                             "excludeSymbols": [
                                 "L"
                             ],
                             "wildSymbols": [
                                 "W"
                             ],
-                            "afterMain": "triggerScatter"
+                            "SIWMSymbols": [
+                                "W"
+                            ],
+                            "SIWMMul": 2,
+                            "afterMain": "checkScatter"
                         }
                     },
                     {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
+                        "position": {
+                            "x": 1160,
+                            "y": -350
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 840
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 4,
+                                            "height": 40,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 2,
+                                                "y": 120
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 4,
+                                            "height": 40,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 120
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "in": {
+                                    "attrs": {
+                                        "circle": {
+                                            "magnet": true,
+                                            "stroke": "#8f8f8f",
+                                            "r": 5
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "left"
+                                        }
+                                    },
+                                    "position": "leftPortPosition"
+                                },
+                                "out": {
+                                    "attrs": {
+                                        "circle": {
+                                            "magnet": true,
+                                            "stroke": "#8f8f8f",
+                                            "r": 5
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    },
+                                    "position": "rightPortPosition"
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "basicWins-trigger-Scenes-in",
+                                    "group": "in",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "Scenes"
+                                        }
+                                    }
+                                },
+                                {
+                                    "id": "basicWins-trigger-tagSymbolNum-out",
+                                    "group": "out",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "tagSymbolNum"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "90ec783b-0238-42fa-a25c-d0c6155bbc81",
+                        "label": "basicWins-trigger",
+                        "item": [
+                            {
+                                "label": "symbol",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "type",
+                                "type": "select",
+                                "option": [
+                                    {
+                                        "label": "lines",
+                                        "value": "lines"
+                                    },
+                                    {
+                                        "label": "ways",
+                                        "value": "ways"
+                                    },
+                                    {
+                                        "label": "scatters",
+                                        "value": "scatters"
+                                    },
+                                    {
+                                        "label": "countscatter",
+                                        "value": "countscatter"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "minNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "wildSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMMul",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "respinNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "respinNumWeight",
+                                "type": "selectWeights"
+                            },
+                            {
+                                "label": "respinNumWithScatterNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "respinNumWeightWithScatterNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "betType",
+                                "type": "select",
+                                "option": [
+                                    {
+                                        "label": "bet",
+                                        "value": "bet"
+                                    },
+                                    {
+                                        "label": "totalBet",
+                                        "value": "totalBet"
+                                    },
+                                    {
+                                        "label": "noPay",
+                                        "value": "noPay"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "respinComponent",
+                                "type": "selectCells"
+                            },
+                            {
+                                "label": "awards",
+                                "type": "selectAwards"
+                            },
+                            {
+                                "label": "symbolAwardsWeights",
+                                "type": "selectWeights"
+                            },
+                            {
+                                "label": "countScatterPayAs",
+                                "type": "selectSymbols"
                             }
+                        ],
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         },
-                        "id": "d4146f87-76b7-4182-853b-4c0ac4d54a7e",
-                        "source": {
-                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
-                            "port": "basicReels-Scenes-out"
-                        },
-                        "target": {
-                            "cell": "e0629b40-5a83-4673-aeda-3b069a5a04c0",
-                            "port": "basicWins-Scenes-in"
-                        },
-                        "zIndex": 16
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "5645fd8d-41f6-42af-84d7-7d4b897e7d17",
-                        "source": {
-                            "cell": "b6664c65-9c46-4657-9a7c-3446096a4764",
-                            "port": "symbolMulti-OtherScenes-out"
-                        },
-                        "target": {
-                            "cell": "e0629b40-5a83-4673-aeda-3b069a5a04c0",
-                            "port": "basicWins-OtherScenes-in"
-                        },
-                        "zIndex": 17
+                        "zIndex": 5,
+                        "componentValues": {
+                            "isError": false,
+                            "symbol": [
+                                "L"
+                            ],
+                            "type": "scatters",
+                            "wildSymbols": [
+                                "W"
+                            ],
+                            "SIWMSymbols": [
+                                "W"
+                            ],
+                            "SIWMMul": 2,
+                            "betType": "totalBet",
+                            "label": "checkScatter"
+                        }
                     },
                     {
                         "shape": "edge",
@@ -8385,16 +8145,54 @@
                                 "strokeWidth": 1
                             }
                         },
-                        "id": "c4257fd8-0563-4fe7-a97f-d9afa015d26f",
+                        "id": "8d4c7b37-e30c-472b-a212-d1b3dc6ebea5",
                         "source": {
-                            "cell": "b6664c65-9c46-4657-9a7c-3446096a4764",
+                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
                             "port": "component-groups-out"
                         },
                         "target": {
-                            "cell": "e0629b40-5a83-4673-aeda-3b069a5a04c0",
+                            "cell": "4e39c898-9bd9-4bfb-829e-3132ab1ced0e",
                             "port": "component-groups-in"
                         },
-                        "zIndex": 18
+                        "zIndex": 6
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "6fd0e3e1-81d0-42da-9657-b81be5c78622",
+                        "source": {
+                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
+                            "port": "basicReels-Scenes-out"
+                        },
+                        "target": {
+                            "cell": "4e39c898-9bd9-4bfb-829e-3132ab1ced0e",
+                            "port": "basicWins-Scenes-in"
+                        },
+                        "zIndex": 7
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "050c95da-f03e-413b-8bb3-bc25f9d04517",
+                        "source": {
+                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
+                            "port": "basicReels-Scenes-out"
+                        },
+                        "target": {
+                            "cell": "90ec783b-0238-42fa-a25c-d0c6155bbc81",
+                            "port": "basicWins-trigger-Scenes-in"
+                        },
+                        "zIndex": 8
                     }
                 ]
             }

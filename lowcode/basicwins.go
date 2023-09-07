@@ -26,6 +26,19 @@ const (
 	BetTypeNoPay    = "noPay"
 )
 
+func procSIWM(ret *sgc7game.Result, gs *sgc7game.GameScene, syms []int, mul int) {
+	for i := 0; i < ret.SymbolNums; i++ {
+		if goutils.IndexOfIntSlice(syms, gs.Arr[ret.Pos[i*2]][ret.Pos[i*2+1]], 0) >= 0 {
+			ret.OtherMul = mul
+
+			ret.CashWin *= mul
+			ret.CoinWin *= mul
+
+			return
+		}
+	}
+}
+
 type BasicWinsData struct {
 	BasicComponentData
 	NextComponent string
@@ -61,6 +74,9 @@ type TriggerFeatureConfig struct {
 	MinNum                        int            `yaml:"minNum"`                        // like 3
 	WildSymbols                   []string       `yaml:"wildSymbols"`                   // wild etc
 	WildSymbolCodes               []int          `yaml:"-"`                             // wild symbolCode
+	SIWMSymbols                   []string       `yaml:"SIWMSymbols"`                   // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
+	SIWMSymbolCodes               []int          `yaml:"-"`                             //
+	SIWMMul                       int            `yaml:"SIWMMul"`                       // 这里是SIWM的倍数
 	Scripts                       string         `yaml:"scripts"`                       // scripts
 	RespinNum                     int            `yaml:"respinNum"`                     // respin number
 	RespinNumWeight               string         `yaml:"respinNumWeight"`               // respin number weight
@@ -95,6 +111,10 @@ func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
 		tfCfg.WildSymbolCodes = append(tfCfg.WildSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
 
+	for _, v := range tfCfg.SIWMSymbols {
+		tfCfg.SIWMSymbolCodes = append(tfCfg.SIWMSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
 	return nil
 }
 
@@ -105,6 +125,9 @@ type BasicWinsConfig struct {
 	BetType              string                  `yaml:"betType"`        // bet or totalBet
 	StrCheckWinType      string                  `yaml:"checkWinType"`   // left2right or right2left or all
 	CheckWinType         CheckWinType            `yaml:"-"`              //
+	SIWMSymbols          []string                `yaml:"SIWMSymbols"`    // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
+	SIWMSymbolCodes      []int                   `yaml:"-"`              //
+	SIWMMul              int                     `yaml:"SIWMMul"`        // 这里是SIWM的倍数
 	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
 	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
 	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
@@ -140,11 +163,15 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			}, true)
 
 		if ret != nil {
-			gameProp.ProcMulti(ret)
-
 			if tf.BetType == BetTypeNoPay {
 				ret.CoinWin = 0
 				ret.CashWin = 0
+			} else {
+				gameProp.ProcMulti(ret)
+
+				if len(tf.SIWMSymbolCodes) > 0 {
+					procSIWM(ret, gs, tf.SIWMSymbolCodes, tf.SIWMMul)
+				}
 			}
 
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
@@ -156,15 +183,21 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		})
 
 		if ret != nil {
-			gameProp.ProcMulti(ret)
-
 			if tf.BetType == BetTypeNoPay {
 				ret.CoinWin = 0
 				ret.CashWin = 0
-			} else if tf.SymbolCodeCountScatterPayAs > 0 {
-				ret.Mul = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-				ret.CoinWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-				ret.CashWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet(stake, tf.BetType)
+			} else {
+				if tf.SymbolCodeCountScatterPayAs > 0 {
+					ret.Mul = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+					ret.CoinWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+					ret.CashWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet(stake, tf.BetType)
+				}
+
+				gameProp.ProcMulti(ret)
+
+				if len(tf.SIWMSymbolCodes) > 0 {
+					procSIWM(ret, gs, tf.SIWMSymbolCodes, tf.SIWMMul)
+				}
 			}
 
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
@@ -276,6 +309,10 @@ func (basicWins *BasicWins) InitEx(cfg any, pool *GamePropertyPool) error {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
+	for _, v := range basicWins.Config.SIWMSymbols {
+		basicWins.Config.SIWMSymbolCodes = append(basicWins.Config.SIWMSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
 	for _, v := range basicWins.Config.BeforMain {
 		v.onInit(pool)
 	}
@@ -327,6 +364,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 				for _, v := range currets {
 					gameProp.ProcMulti(v)
+
+					if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+						procSIWM(v, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+					}
 				}
 
 				rets = append(rets, currets...)
@@ -348,6 +389,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 				for _, v := range currets {
 					gameProp.ProcMulti(v)
+
+					if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+						procSIWM(v, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+					}
 				}
 
 				rets = append(rets, currets...)
@@ -368,6 +413,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 			for _, v := range currets {
 				gameProp.ProcMulti(v)
+
+				if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+					procSIWM(v, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+				}
 			}
 
 			rets = append(rets, currets...)
@@ -404,6 +453,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 							gameProp.ProcMulti(ret)
 
+							if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+								procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+							}
+
 							rets = append(rets, ret)
 
 							if ret.SymbolNums == gs.Width {
@@ -433,6 +486,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 							ret.LineIndex = i
 
 							gameProp.ProcMulti(ret)
+
+							if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+								procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+							}
 
 							rets = append(rets, ret)
 						}
@@ -465,6 +522,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 						gameProp.ProcMulti(ret)
 
+						if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+							procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+						}
+
 						rets = append(rets, ret)
 					}
 				}
@@ -490,6 +551,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 						ret.LineIndex = i
 
 						gameProp.ProcMulti(ret)
+
+						if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+							procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+						}
 
 						rets = append(rets, ret)
 					}
