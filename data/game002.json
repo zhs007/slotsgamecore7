@@ -7865,7 +7865,7 @@
                             "isError": true,
                             "mainType": "lines",
                             "betType": "bet",
-                            "checkWinType": "all",
+                            "checkWinType": "left2right",
                             "wildSymbols": [
                                 "W"
                             ]

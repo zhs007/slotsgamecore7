@@ -60,6 +60,21 @@
                 "SPINNUMS": "10000",
                 "CORE":"2",
             }
+        },
+        {
+            "name": "lowcodertp2",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/lowcodertp/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/app",
+            "env": {
+                "GAMECFG": "${workspaceFolder}/data/game002.json",
+                "OUTPUTPATH": "${workspaceFolder}/output",
+                "SPINNUMS": "10000",
+                "CORE":"2",
+            }
         }
     ]
 }
