@@ -59,6 +59,8 @@ type TriggerFeatureConfig struct {
 	Symbol                        string         `yaml:"symbol"`                        // like scatter
 	Type                          string         `yaml:"type"`                          // like scatters
 	MinNum                        int            `yaml:"minNum"`                        // like 3
+	WildSymbols                   []string       `yaml:"wildSymbols"`                   // wild etc
+	WildSymbolCodes               []int          `yaml:"-"`                             // wild symbolCode
 	Scripts                       string         `yaml:"scripts"`                       // scripts
 	RespinNum                     int            `yaml:"respinNum"`                     // respin number
 	RespinNumWeight               string         `yaml:"respinNumWeight"`               // respin number weight
@@ -72,6 +74,28 @@ type TriggerFeatureConfig struct {
 	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
 	Awards                        []*Award       `yaml:"awards"`                        // 新的奖励系统
 	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights"`           // 每个中奖符号随机一组奖励
+}
+
+func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
+	for _, award := range tfCfg.Awards {
+		award.Init()
+	}
+
+	if tfCfg.SymbolAwardsWeights != nil {
+		tfCfg.SymbolAwardsWeights.Init()
+	}
+
+	if tfCfg.CountScatterPayAs != "" {
+		tfCfg.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[tfCfg.CountScatterPayAs]
+	} else {
+		tfCfg.SymbolCodeCountScatterPayAs = -1
+	}
+
+	for _, v := range tfCfg.WildSymbols {
+		tfCfg.WildSymbolCodes = append(tfCfg.WildSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
+	return nil
 }
 
 // BasicWinsConfig - configuration for BasicWins
@@ -110,7 +134,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 	if tf.Type == WinTypeScatters {
 		ret = sgc7game.CalcScatter4(gs, gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], gameProp.GetBet(stake, tf.BetType),
 			func(scatter int, cursymbol int) bool {
-				return cursymbol == scatter
+				return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
 			}, true)
 
 		if ret != nil {
@@ -126,7 +150,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		}
 	} else if tf.Type == WinTypeCountScatter {
 		ret = sgc7game.CalcScatterEx(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum, func(scatter int, cursymbol int) bool {
-			return cursymbol == scatter
+			return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
 		})
 
 		if ret != nil {
@@ -251,35 +275,11 @@ func (basicWins *BasicWins) InitEx(cfg any, pool *GamePropertyPool) error {
 	}
 
 	for _, v := range basicWins.Config.BeforMain {
-		for _, award := range v.Awards {
-			award.Init()
-		}
-
-		if v.SymbolAwardsWeights != nil {
-			v.SymbolAwardsWeights.Init()
-		}
-
-		if v.CountScatterPayAs != "" {
-			v.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[v.CountScatterPayAs]
-		} else {
-			v.SymbolCodeCountScatterPayAs = -1
-		}
+		v.onInit(pool)
 	}
 
 	for _, v := range basicWins.Config.AfterMain {
-		for _, award := range v.Awards {
-			award.Init()
-		}
-
-		if v.SymbolAwardsWeights != nil {
-			v.SymbolAwardsWeights.Init()
-		}
-
-		if v.CountScatterPayAs != "" {
-			v.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[v.CountScatterPayAs]
-		} else {
-			v.SymbolCodeCountScatterPayAs = -1
-		}
+		v.onInit(pool)
 	}
 
 	basicWins.onInit(&basicWins.Config.BasicComponentConfig)
