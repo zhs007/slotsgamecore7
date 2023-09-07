@@ -7889,6 +7889,25 @@
                             "port": "basicWins-Scenes-in"
                         },
                         "zIndex": 5
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#0000FF",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "cdcc17e6-0d4e-49f7-b30f-4e785e8a7862",
+                        "source": {
+                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "298e5dc4-a00a-4c15-890f-6e350f07fc21",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 6
                     }
                 ]
             }

@@ -1,1 +1,1 @@
-GAMECFG=../data/game001/rtp96.yaml go run lowcodertp/*.go
+GAMECFG=../data/game001/rtp96.yaml go run lowcodeasciigame/*.go

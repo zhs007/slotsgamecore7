@@ -23,33 +23,34 @@ type GameModConfig struct {
 }
 
 type Config struct {
-	Name              string                         `yaml:"name"`
-	Width             int                            `yaml:"width"`
-	Height            int                            `yaml:"height"`
-	Linedata          map[string]string              `yaml:"linedata"`
-	MapLinedate       map[string]*sgc7game.LineData  `yaml:"-"`
-	Paytables         map[string]string              `yaml:"paytables"`
-	MapPaytables      map[string]*sgc7game.PayTables `yaml:"-"`
-	IsIntReel         bool                           `yaml:"isIntReel"`
-	Reels             map[string]string              `yaml:"reels"`
-	MapReels          map[string]*sgc7game.ReelsData `yaml:"-"`
-	FileMapping       map[string]string              `yaml:"fileMapping"`
-	SymbolsViewer     string                         `yaml:"symbolsViewer"`
-	DefaultScene      string                         `yaml:"defaultScene"`
-	DefaultPaytables  string                         `yaml:"defaultPaytables"`
-	DefaultLinedata   string                         `yaml:"defaultLinedata"`
-	Bets              []int                          `yaml:"bets"`
-	TotalBetInWins    []int                          `yaml:"totalBetInWins"`
-	StartComponents   map[int]string                 `yaml:"startComponents"`
-	GameMods          []*GameModConfig               `yaml:"gamemods"`
-	StatsSymbols      []string                       `yaml:"statsSymbols"`
-	StatsSymbolCodes  []mathtoolset.SymbolType       `yaml:"-"`
-	Stats             *StatsConfig                   `yaml:"stats"`
-	RTP               *RTPConfig                     `yaml:"rtp"`
-	MainPath          string                         `yaml:"mainPath"`
-	MapCmdComponent   map[string]string              `yaml:"mapCmdComponent"`
-	ComponentsMapping map[int]map[string]string      `yaml:"componentsMapping"`
-	mapConfig         map[string]any                 `yaml:"-"`
+	Name              string                           `yaml:"name"`
+	Width             int                              `yaml:"width"`
+	Height            int                              `yaml:"height"`
+	Linedata          map[string]string                `yaml:"linedata"`
+	MapLinedate       map[string]*sgc7game.LineData    `yaml:"-"`
+	Paytables         map[string]string                `yaml:"paytables"`
+	MapPaytables      map[string]*sgc7game.PayTables   `yaml:"-"`
+	IsIntReel         bool                             `yaml:"isIntReel"`
+	Reels             map[string]string                `yaml:"reels"`
+	MapReels          map[string]*sgc7game.ReelsData   `yaml:"-"`
+	FileMapping       map[string]string                `yaml:"fileMapping"`
+	SymbolsViewer     string                           `yaml:"symbolsViewer"`
+	DefaultScene      string                           `yaml:"defaultScene"`
+	DefaultPaytables  string                           `yaml:"defaultPaytables"`
+	DefaultLinedata   string                           `yaml:"defaultLinedata"`
+	Bets              []int                            `yaml:"bets"`
+	TotalBetInWins    []int                            `yaml:"totalBetInWins"`
+	StartComponents   map[int]string                   `yaml:"startComponents"`
+	GameMods          []*GameModConfig                 `yaml:"gamemods"`
+	StatsSymbols      []string                         `yaml:"statsSymbols"`
+	StatsSymbolCodes  []mathtoolset.SymbolType         `yaml:"-"`
+	Stats             *StatsConfig                     `yaml:"stats"`
+	RTP               *RTPConfig                       `yaml:"rtp"`
+	MainPath          string                           `yaml:"mainPath"`
+	MapCmdComponent   map[string]string                `yaml:"mapCmdComponent"`
+	ComponentsMapping map[int]map[string]string        `yaml:"componentsMapping"`
+	mapConfig         map[string]any                   `yaml:"-"`
+	mapBasicConfig    map[string]*BasicComponentConfig `yaml:"-"`
 }
 
 func (cfg *Config) GetPath(fn string, useFileMapping bool) string {

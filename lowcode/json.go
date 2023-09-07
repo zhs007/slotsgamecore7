@@ -3,6 +3,7 @@ package lowcode
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -433,7 +434,11 @@ func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
 	return cfg, nil
 }
 
-func loadCells(cfg *Config, cells *ast.Node) error {
+func loadCells(cfg *Config, bet int, cells *ast.Node) error {
+	linkScene := make(map[string]string)
+	linkComponent := make(map[string]string)
+	lstStart := []string{}
+
 	lst, err := cells.ArrayUseNode()
 	if err != nil {
 		goutils.Error("loadCells:ArrayUseNode",
@@ -486,6 +491,14 @@ func loadCells(cfg *Config, cells *ast.Node) error {
 				}
 
 				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "basicReels",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
 			} else if componentType == "basicWins" {
 				componentCfg, err := parseBasicWins(&cell)
 				if err != nil {
@@ -497,11 +510,68 @@ func loadCells(cfg *Config, cells *ast.Node) error {
 				}
 
 				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "basicWins",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			}
+		} else if shape == "edge" {
+			source, err := cell.Get("source").Get("cell").String()
+			if err != nil {
+				goutils.Error("loadCells:edge:source:cell",
+					zap.Error(err))
+
+				return err
+			}
+
+			sourcePort, err := cell.Get("source").Get("port").String()
+			if err != nil {
+				goutils.Error("loadCells:edge:source:port",
+					zap.Error(err))
+
+				return err
+			}
+
+			target, err := cell.Get("target").Get("cell").String()
+			if err != nil {
+				goutils.Error("loadCells:edge:target",
+					zap.Error(err))
+
+				return err
+			}
+
+			if source == startid {
+				lstStart = append(lstStart, target)
+			} else {
+				if strings.Contains(sourcePort, "component") {
+					linkComponent[source] = target
+				} else if strings.Contains(sourcePort, "Scenes") {
+					linkScene[source] = target
+				}
 			}
 		}
 	}
 
-	fmt.Printf("%v\n", startid)
+	if len(lstStart) > 0 {
+		cfg.StartComponents[bet] = lstStart[0]
+	}
+
+	for source, target := range linkComponent {
+		basicCfg := cfg.mapBasicConfig[source]
+		basicCfg.DefaultNextComponent = target
+	}
+
+	for source, target := range linkScene {
+		sourceCfg := cfg.mapBasicConfig[source]
+		sourceCfg.TagScenes = append(sourceCfg.TagScenes, source)
+
+		targetCfg := cfg.mapBasicConfig[target]
+		targetCfg.TargetScene = source
+	}
 
 	return nil
 }
@@ -518,7 +588,7 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	cfg.Bets = append(cfg.Bets, int(bet))
 	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
 
-	err = loadCells(cfg, betMethod.Get("graph").Get("cells"))
+	err = loadCells(cfg, int(bet), betMethod.Get("graph").Get("cells"))
 	if err != nil {
 		goutils.Error("loadBetMethod:loadCells",
 			zap.Error(err))
@@ -536,13 +606,15 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	}
 
 	cfg := &Config{
-		Paytables:    make(map[string]string),
-		MapPaytables: make(map[string]*sgc7game.PayTables),
-		Linedata:     make(map[string]string),
-		MapLinedate:  make(map[string]*sgc7game.LineData),
-		Reels:        make(map[string]string),
-		MapReels:     make(map[string]*sgc7game.ReelsData),
-		mapConfig:    make(map[string]any),
+		Paytables:       make(map[string]string),
+		MapPaytables:    make(map[string]*sgc7game.PayTables),
+		Linedata:        make(map[string]string),
+		MapLinedate:     make(map[string]*sgc7game.LineData),
+		Reels:           make(map[string]string),
+		MapReels:        make(map[string]*sgc7game.ReelsData),
+		mapConfig:       make(map[string]any),
+		StartComponents: make(map[int]string),
+		mapBasicConfig:  make(map[string]*BasicComponentConfig),
 	}
 
 	data, err := os.ReadFile(fn)
@@ -596,6 +668,10 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 		return nil, err
 	}
 
+	cfgGameMod := &GameModConfig{}
+	cfgGameMod.Type = "bg"
+	cfg.GameMods = append(cfg.GameMods, cfgGameMod)
+
 	betMethod, err := sonic.Get(data, "betMethod", 0)
 	if err != nil {
 		goutils.Error("NewGame2:Get",
@@ -613,5 +689,23 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 		return nil, err
 	}
 
+	cfg.RTP = &RTPConfig{}
+
+	err = game.Init2(cfg)
+	if err != nil {
+		goutils.Error("NewGame2:Init2",
+			zap.Error(err))
+
+		return nil, err
+	}
+
 	return game, nil
+}
+
+func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	if strings.Contains(fn, ".json") {
+		return NewGame2(fn, funcNewPlugin)
+	}
+
+	return NewGameEx(fn, funcNewPlugin)
 }
