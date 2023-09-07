@@ -109,6 +109,8 @@ type BasicWinsConfig struct {
 	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
 	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
 	AfterMain            []*TriggerFeatureConfig `yaml:"afterMain"`      // after the maintype
+	BeforMainTriggerName []string                `yaml:"-"`              // befor the maintype
+	AfterMainTriggerName []string                `yaml:"-"`              // after the maintype
 }
 
 type BasicWins struct {
