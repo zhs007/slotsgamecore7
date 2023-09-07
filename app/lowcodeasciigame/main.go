@@ -7,6 +7,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/lowcode"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.uber.org/zap"
 )
@@ -36,9 +37,11 @@ func main() {
 		isBreakAtFeature = i64 > 0
 	}
 
-	game, err := lowcode.NewGame(gamecfg)
+	game, err := lowcode.NewGame3(gamecfg, func() sgc7plugin.IPlugin {
+		return sgc7plugin.NewFastPlugin()
+	})
 	if err != nil {
-		goutils.Error("NewGame",
+		goutils.Error("NewGame3",
 			zap.String("gamecfg", gamecfg),
 			zap.Error(err))
 
@@ -67,6 +70,8 @@ func main() {
 		game.OnAsciiGame(gameProp, stake, pr, lst)
 	}, int(autospin), isSkipGetChar, isBreakAtFeature)
 
-	game.Pool.Stats.Wait()
-	game.Pool.Stats.Root.SaveExcel("stats.xlsx")
+	if game.Pool.Stats != nil {
+		game.Pool.Stats.Wait()
+		game.Pool.Stats.Root.SaveExcel("stats.xlsx")
+	}
 }

@@ -32,6 +32,21 @@
             }
         },
         {
+            "name": "lowcodeasciigame2",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/lowcodeasciigame/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/app",
+            "env": {
+                "GAMECFG": "${workspaceFolder}/data/game002.json",
+                "TERM": "xterm-256color",
+                "AUTOSPIN": "1000",
+                "SKIPGETCHAR": "1",
+            }
+        },
+        {
             "name": "lowcodertp",
             "type": "go",
             "request": "launch",

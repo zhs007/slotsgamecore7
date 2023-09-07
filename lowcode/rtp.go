@@ -266,9 +266,11 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	IsRTPMode = true
 	sgc7plugin.IsNoRNGCache = true
 
-	game, err := NewGame(gamecfg)
+	game, err := NewGame3(gamecfg, func() sgc7plugin.IPlugin {
+		return sgc7plugin.NewFastPlugin()
+	})
 	if err != nil {
-		goutils.Error("StartRTP:NewGame",
+		goutils.Error("StartRTP:NewGame3",
 			zap.String("gamecfg", gamecfg),
 			zap.Error(err))
 

@@ -219,30 +219,40 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 		return nil, err
 	}
 
+	return NewGamePropertyPool2(cfg)
+}
+
+func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
 		Config:           cfg,
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
 		MapComponents:    make(map[string]IComponent),
-		// PoolGameScene:    sgc7game.NewGameScenePoolEx(),
 	}
 
-	sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer, false))
-	if err != nil {
-		goutils.Error("NewGamePropertyPool:LoadSymbolsViewer",
-			zap.String("fn", cfg.SymbolsViewer),
-			zap.Error(err))
+	if cfg.SymbolsViewer == "" {
+		sv := NewSymbolViewerFromPaytables(pool.DefaultPaytables)
 
-		return nil, err
+		pool.SymbolsViewer = sv
+	} else {
+		sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer, false))
+		if err != nil {
+			goutils.Error("NewGamePropertyPool2:LoadSymbolsViewer",
+				zap.String("fn", cfg.SymbolsViewer),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		pool.SymbolsViewer = sv
 	}
 
-	pool.SymbolsViewer = sv
 	pool.MapSymbolColor = asciigame.NewSymbolColorMap(pool.DefaultPaytables)
 	wColor := color.New(color.BgRed, color.FgHiWhite)
 	hColor := color.New(color.BgBlue, color.FgHiWhite)
 	mColor := color.New(color.BgGreen, color.FgHiWhite)
 	sColor := color.New(color.BgMagenta, color.FgHiWhite)
-	for k, v := range sv.MapSymbols {
+	for k, v := range pool.SymbolsViewer.MapSymbols {
 		if v.Color == "wild" {
 			pool.MapSymbolColor.AddSymbolColor(k, wColor)
 		} else if v.Color == "high" {

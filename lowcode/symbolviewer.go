@@ -19,6 +19,25 @@ type SymbolsViewer struct {
 	MapSymbols map[int]*SymbolViewerData
 }
 
+func NewSymbolViewerFromPaytables(paytables *sgc7game.PayTables) *SymbolsViewer {
+	symViewer := &SymbolsViewer{
+		MapSymbols: make(map[int]*SymbolViewerData),
+	}
+
+	for key, sym := range paytables.MapSymbols {
+		svd := &SymbolViewerData{
+			Code:   sym,
+			Symbol: key,
+			Output: key,
+			Color:  "low",
+		}
+
+		symViewer.MapSymbols[sym] = svd
+	}
+
+	return symViewer
+}
+
 func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 	symbols := []int{}
 	symbolstr := []string{}

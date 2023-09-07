@@ -284,3 +284,35 @@ func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrCompo
 
 	return bgm
 }
+
+// NewBasicGameMod2 - new BaseGame
+func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
+	bgm := &BasicGameMod{
+		BasicGameMod:  sgc7game.NewBasicGameMod(cfgGameMod.Type, pool.Config.Width, pool.Config.Height),
+		Pool:          pool,
+		MapComponents: make(map[int]*ComponentList),
+	}
+
+	for _, bet := range pool.Config.Bets {
+		components := NewComponentList()
+
+		for _, v := range cfgGameMod.Components {
+			c := mgrComponent.NewComponent(v)
+
+			err := c.InitEx(pool.Config.mapConfig[v.Name], pool)
+			if err != nil {
+				goutils.Error("NewBasicGameMod:Init",
+					zap.Error(err))
+
+				return nil
+			}
+
+			components.AddComponent(v.Name, c)
+			pool.onAddComponent(v.Name, c)
+		}
+
+		bgm.MapComponents[bet] = components
+	}
+
+	return bgm
+}

@@ -48,6 +48,38 @@ func (game *Game) Init(cfgfn string) error {
 	return nil
 }
 
+// Init - initial game
+func (game *Game) Init2(cfg *Config) error {
+	pool, err := NewGamePropertyPool2(cfg)
+	if err != nil {
+		goutils.Error("Game.Init2:NewGamePropertyPool2",
+			zap.Error(err))
+
+		return err
+	}
+
+	game.Pool = pool
+
+	game.Cfg.PayTables = pool.DefaultPaytables
+	game.SetVer(sgc7ver.Version)
+
+	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
+
+	for _, v := range pool.Config.GameMods {
+		game.AddGameMod(NewBasicGameMod2(pool, v, game.MgrComponent))
+	}
+
+	err = pool.InitStats()
+	if err != nil {
+		goutils.Error("Game.Init2:InitStats",
+			zap.Error(err))
+
+		return nil
+	}
+
+	return nil
+}
+
 // CheckStake - check stake
 func (game *Game) CheckStake(stake *sgc7game.Stake) error {
 	if goutils.IndexOfIntSlice(game.Pool.Config.Bets, int(stake.CashBet)/int(stake.CoinBet), 0) < 0 {
