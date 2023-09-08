@@ -388,56 +388,234 @@ func parseBasicReels(cell *ast.Node) (*BasicReelsConfig, error) {
 	return cfg, nil
 }
 
+func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, error) {
+	cfg := &TriggerFeatureConfig{}
+
+	componentValues := cell.Get("componentValues")
+	if componentValues != nil {
+		label, err := componentValues.Get("label").String()
+		if err != nil {
+			goutils.Error("parseTriggerFeatureConfig:get:label",
+				zap.Error(err))
+
+			return "", nil, err
+		}
+
+		strType, err := componentValues.Get("type").String()
+		if err != nil {
+			goutils.Error("parseTriggerFeatureConfig:get:type",
+				zap.Error(err))
+
+			return "", nil, err
+		}
+
+		cfg.Type = strType
+
+		symbols, err := parse2StringSlice(componentValues.Get("symbol"))
+		if err != nil {
+			goutils.Error("parseTriggerFeatureConfig:get:symbol",
+				zap.Error(err))
+
+			return "", nil, err
+		}
+
+		cfg.Symbol = symbols[0]
+
+		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
+		if err != nil {
+			goutils.Error("parseTriggerFeatureConfig:get:wildSymbols",
+				zap.Error(err))
+
+			return "", nil, err
+		}
+
+		cfg.WildSymbols = wildSymbols
+
+		betType, err := componentValues.Get("betType").String()
+		if err != nil {
+			goutils.Error("parseTriggerFeatureConfig:get:betType",
+				zap.Error(err))
+
+			return "", nil, err
+		}
+
+		cfg.BetType = betType
+
+		if componentValues.Get("SIWMSymbols") != nil {
+			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
+			if err != nil {
+				goutils.Error("parseTriggerFeatureConfig:get:SIWMSymbols",
+					zap.Error(err))
+
+				return "", nil, err
+			}
+
+			cfg.SIWMSymbols = SIWMSymbols
+		}
+
+		if componentValues.Get("SIWMMul") != nil {
+			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
+			if err != nil {
+				goutils.Error("parseTriggerFeatureConfig:get:SIWMMul",
+					zap.Error(err))
+
+				return "", nil, err
+			}
+
+			cfg.SIWMMul = int(SIWMMul)
+		}
+
+		return label, cfg, nil
+	}
+
+	goutils.Error("parseTriggerFeatureConfig",
+		zap.Error(ErrIvalidCustomNode))
+
+	return "", nil, ErrIvalidCustomNode
+}
+
+func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
+	cfg := &SymbolMultiConfig{}
+
+	componentValues := cell.Get("componentValues")
+	if componentValues != nil {
+		staticMulti, err := componentValues.Get("staticMulti").Int64()
+		if err != nil {
+			goutils.Error("paserSymbolMulti:get:staticMulti",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		cfg.StaticMulti = int(staticMulti)
+
+		symbols, err := parse2StringSlice(componentValues.Get("symbols"))
+		if err != nil {
+			goutils.Error("paserSymbolMulti:get:symbols",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		cfg.Symbols = symbols
+
+		return cfg, nil
+	}
+
+	goutils.Error("parseTriggerFeatureConfig",
+		zap.Error(ErrIvalidCustomNode))
+
+	return nil, ErrIvalidCustomNode
+}
+
 func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
 	cfg := &BasicWinsConfig{}
 
-	mainType, err := cell.Get("componentValues").Get("mainType").String()
-	if err != nil {
-		goutils.Error("parseBasicWins:get:mainType",
-			zap.Error(err))
+	componentValues := cell.Get("componentValues")
+	if componentValues != nil {
+		mainType, err := componentValues.Get("mainType").String()
+		if err != nil {
+			goutils.Error("parseBasicWins:get:mainType",
+				zap.Error(err))
 
-		return nil, err
+			return nil, err
+		}
+
+		cfg.MainType = mainType
+
+		betType, err := componentValues.Get("betType").String()
+		if err != nil {
+			goutils.Error("parseBasicWins:get:betType",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		cfg.BetType = betType
+
+		checkWinType, err := componentValues.Get("checkWinType").String()
+		if err != nil {
+			goutils.Error("parseBasicWins:get:checkWinType",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		cfg.StrCheckWinType = checkWinType
+
+		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
+		if err != nil {
+			goutils.Error("parseBasicWins:get:wildSymbols",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		cfg.WildSymbols = wildSymbols
+
+		excludeSymbols, err := parse2StringSlice(componentValues.Get("excludeSymbols"))
+		if err != nil {
+			goutils.Error("parseBasicWins:get:excludeSymbols",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		cfg.ExcludeSymbols = excludeSymbols
+
+		if componentValues.Get("afterMain") != nil {
+			afterMain, err := componentValues.Get("afterMain").String()
+			if err != nil {
+				goutils.Error("parseBasicWins:get:afterMain",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			cfg.AfterMainTriggerName = append(cfg.AfterMainTriggerName, afterMain)
+		}
+
+		if componentValues.Get("SIWMSymbols") != nil {
+			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
+			if err != nil {
+				goutils.Error("parseBasicWins:get:SIWMSymbols",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			cfg.SIWMSymbols = SIWMSymbols
+		}
+
+		if componentValues.Get("SIWMMul") != nil {
+			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
+			if err != nil {
+				goutils.Error("parseBasicWins:get:SIWMMul",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			cfg.SIWMMul = int(SIWMMul)
+		}
+
+		return cfg, nil
 	}
 
-	cfg.MainType = mainType
+	goutils.Error("parseTriggerFeatureConfig",
+		zap.Error(ErrIvalidCustomNode))
 
-	betType, err := cell.Get("componentValues").Get("betType").String()
-	if err != nil {
-		goutils.Error("parseBasicWins:get:betType",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	cfg.BetType = betType
-
-	checkWinType, err := cell.Get("componentValues").Get("checkWinType").String()
-	if err != nil {
-		goutils.Error("parseBasicWins:get:checkWinType",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	cfg.StrCheckWinType = checkWinType
-
-	wildSymbols, err := parse2StringSlice(cell.Get("componentValues").Get("wildSymbols"))
-	if err != nil {
-		goutils.Error("parseBasicWins:get:wildSymbols",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	cfg.WildSymbols = wildSymbols
-
-	return cfg, nil
+	return nil, ErrIvalidCustomNode
 }
 
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
-	linkScene := make(map[string]string)
-	linkComponent := make(map[string]string)
+	linkScene := [][]string{}
+	linkOtherScene := [][]string{}
+	linkComponent := [][]string{}
 	lstStart := []string{}
+	mapTrigger := make(map[string]*TriggerFeatureConfig)
+	mapTriggerID := make(map[string]*TriggerFeatureConfig)
+	lstBasicWins := []*BasicWinsConfig{}
 
 	lst, err := cells.ArrayUseNode()
 	if err != nil {
@@ -518,6 +696,40 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+
+				lstBasicWins = append(lstBasicWins, componentCfg)
+			} else if componentType == "symbolMulti" {
+				componentCfg, err := parseSymbolMulti(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseSymbolMulti",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "symbolMulti",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "basicWins-trigger" {
+				triggerName, triggerCfg, err := parseTriggerFeatureConfig(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseTriggerFeatureConfig",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapTrigger[triggerName] = triggerCfg
+
+				mapTriggerID[id] = triggerCfg
 			}
 		} else if shape == "edge" {
 			source, err := cell.Get("source").Get("cell").String()
@@ -548,9 +760,11 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				lstStart = append(lstStart, target)
 			} else {
 				if strings.Contains(sourcePort, "component") {
-					linkComponent[source] = target
-				} else if strings.Contains(sourcePort, "Scenes") {
-					linkScene[source] = target
+					linkComponent = append(linkComponent, []string{source, target})
+				} else if strings.Contains(sourcePort, "-Scenes-") {
+					linkScene = append(linkScene, []string{source, target})
+				} else if strings.Contains(sourcePort, "-OtherScenes-") {
+					linkOtherScene = append(linkOtherScene, []string{source, target})
 				}
 			}
 		}
@@ -560,17 +774,60 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 		cfg.StartComponents[bet] = lstStart[0]
 	}
 
-	for source, target := range linkComponent {
-		basicCfg := cfg.mapBasicConfig[source]
-		basicCfg.DefaultNextComponent = target
+	for _, arr := range linkComponent {
+		basicCfg := cfg.mapBasicConfig[arr[0]]
+		basicCfg.DefaultNextComponent = arr[1]
 	}
 
-	for source, target := range linkScene {
-		sourceCfg := cfg.mapBasicConfig[source]
-		sourceCfg.TagScenes = append(sourceCfg.TagScenes, source)
+	for _, arr := range linkScene {
+		sourceCfg := cfg.mapBasicConfig[arr[0]]
+		sourceCfg.TagScenes = append(sourceCfg.TagScenes, arr[0])
 
-		targetCfg := cfg.mapBasicConfig[target]
-		targetCfg.TargetScene = source
+		targetCfg := cfg.mapBasicConfig[arr[1]]
+		if targetCfg != nil {
+			targetCfg.TargetScene = arr[0]
+		}
+
+		triggerCfg := mapTriggerID[arr[1]]
+		if triggerCfg != nil {
+			triggerCfg.TargetScene = arr[0]
+		}
+	}
+
+	for _, arr := range linkOtherScene {
+		sourceCfg := cfg.mapBasicConfig[arr[0]]
+		sourceCfg.TagOtherScenes = append(sourceCfg.TagOtherScenes, arr[0])
+
+		targetCfg := cfg.mapBasicConfig[arr[1]]
+		targetCfg.TargetOtherScene = arr[0]
+	}
+
+	for _, basicWinsCfg := range lstBasicWins {
+		for _, k := range basicWinsCfg.BeforMainTriggerName {
+			cfg, isok := mapTrigger[k]
+			if !isok {
+				goutils.Error("loadCells:BeforMain",
+					zap.String("label", k),
+					zap.Error(ErrIvalidTriggerLabel))
+
+				return ErrIvalidTriggerLabel
+			}
+
+			basicWinsCfg.BeforMain = append(basicWinsCfg.BeforMain, cfg)
+		}
+
+		for _, k := range basicWinsCfg.AfterMainTriggerName {
+			cfg, isok := mapTrigger[k]
+			if !isok {
+				goutils.Error("loadCells:AfterMain",
+					zap.String("label", k),
+					zap.Error(ErrIvalidTriggerLabel))
+
+				return ErrIvalidTriggerLabel
+			}
+
+			basicWinsCfg.AfterMain = append(basicWinsCfg.AfterMain, cfg)
+		}
 	}
 
 	return nil

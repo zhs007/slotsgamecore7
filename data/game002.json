@@ -7479,7 +7479,7 @@
                     },
                     {
                         "position": {
-                            "x": 180,
+                            "x": 60,
                             "y": -270
                         },
                         "size": {
@@ -7618,6 +7618,11 @@
                                 "type": "boolean"
                             }
                         ],
+                        "zIndex": 2,
+                        "componentValues": {
+                            "isError": true,
+                            "reelSet": "reels.xlsx"
+                        },
                         "tools": {
                             "items": [
                                 {
@@ -7628,11 +7633,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 2,
-                        "componentValues": {
-                            "isError": true,
-                            "reelSet": "reels.xlsx"
                         }
                     },
                     {
@@ -7644,6 +7644,7 @@
                             }
                         },
                         "id": "57c2a2b9-4442-494f-b0e7-f0d9cde37961",
+                        "zIndex": 3,
                         "source": {
                             "cell": "15cd741d-f93b-4010-8015-4b99828a5ccd",
                             "port": "start-out"
@@ -7651,17 +7652,16 @@
                         "target": {
                             "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 3
+                        }
                     },
                     {
                         "position": {
-                            "x": 750,
-                            "y": -110
+                            "x": 680,
+                            "y": -194
                         },
                         "size": {
                             "width": 400,
-                            "height": 424
+                            "height": 528
                         },
                         "view": "react-shape-view",
                         "shape": "custom-node",
@@ -7769,17 +7769,17 @@
                                     }
                                 },
                                 {
-                                    "id": "basicWins-OtherScene-in",
+                                    "id": "basicWins-OtherScenes-in",
                                     "group": "in",
                                     "attrs": {
                                         "text": {
-                                            "text": "OtherScene"
+                                            "text": "OtherScenes"
                                         }
                                     }
                                 }
                             ]
                         },
-                        "id": "298e5dc4-a00a-4c15-890f-6e350f07fc21",
+                        "id": "4e39c898-9bd9-4bfb-829e-3132ab1ced0e",
                         "label": "basicWins",
                         "item": [
                             {
@@ -7841,6 +7841,14 @@
                                 "type": "selectSymbols"
                             },
                             {
+                                "label": "SIWMSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMMul",
+                                "type": "inputNumber"
+                            },
+                            {
                                 "label": "beforMain",
                                 "type": "selectCells"
                             },
@@ -7866,29 +7874,266 @@
                             "mainType": "lines",
                             "betType": "bet",
                             "checkWinType": "all",
+                            "excludeSymbols": [
+                                "L"
+                            ],
                             "wildSymbols": [
                                 "W"
-                            ]
+                            ],
+                            "SIWMSymbols": [
+                                "W"
+                            ],
+                            "SIWMMul": 2,
+                            "afterMain": "checkScatter"
                         }
                     },
                     {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
+                        "position": {
+                            "x": 1160,
+                            "y": -350
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 840
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 4,
+                                            "height": 40,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 2,
+                                                "y": 120
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 4,
+                                            "height": 40,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 120
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "in": {
+                                    "attrs": {
+                                        "circle": {
+                                            "magnet": true,
+                                            "stroke": "#8f8f8f",
+                                            "r": 5
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "left"
+                                        }
+                                    },
+                                    "position": "leftPortPosition"
+                                },
+                                "out": {
+                                    "attrs": {
+                                        "circle": {
+                                            "magnet": true,
+                                            "stroke": "#8f8f8f",
+                                            "r": 5
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    },
+                                    "position": "rightPortPosition"
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "basicWins-trigger-Scenes-in",
+                                    "group": "in",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "Scenes"
+                                        }
+                                    }
+                                },
+                                {
+                                    "id": "basicWins-trigger-tagSymbolNum-out",
+                                    "group": "out",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "tagSymbolNum"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "90ec783b-0238-42fa-a25c-d0c6155bbc81",
+                        "label": "basicWins-trigger",
+                        "item": [
+                            {
+                                "label": "symbol",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "type",
+                                "type": "select",
+                                "option": [
+                                    {
+                                        "label": "lines",
+                                        "value": "lines"
+                                    },
+                                    {
+                                        "label": "ways",
+                                        "value": "ways"
+                                    },
+                                    {
+                                        "label": "scatters",
+                                        "value": "scatters"
+                                    },
+                                    {
+                                        "label": "countscatter",
+                                        "value": "countscatter"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "minNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "wildSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMMul",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "respinNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "respinNumWeight",
+                                "type": "selectWeights"
+                            },
+                            {
+                                "label": "respinNumWithScatterNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "respinNumWeightWithScatterNum",
+                                "type": "inputNumber"
+                            },
+                            {
+                                "label": "betType",
+                                "type": "select",
+                                "option": [
+                                    {
+                                        "label": "bet",
+                                        "value": "bet"
+                                    },
+                                    {
+                                        "label": "totalBet",
+                                        "value": "totalBet"
+                                    },
+                                    {
+                                        "label": "noPay",
+                                        "value": "noPay"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "respinComponent",
+                                "type": "selectCells"
+                            },
+                            {
+                                "label": "awards",
+                                "type": "selectAwards"
+                            },
+                            {
+                                "label": "symbolAwardsWeights",
+                                "type": "selectWeights"
+                            },
+                            {
+                                "label": "countScatterPayAs",
+                                "type": "selectSymbols"
                             }
+                        ],
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         },
-                        "id": "ec2ee6d5-545d-4957-a9b1-fd9b8762fd5b",
-                        "source": {
-                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
-                            "port": "basicReels-Scenes-out"
-                        },
-                        "target": {
-                            "cell": "298e5dc4-a00a-4c15-890f-6e350f07fc21",
-                            "port": "basicWins-Scenes-in"
-                        },
-                        "zIndex": 5
+                        "zIndex": 5,
+                        "componentValues": {
+                            "isError": false,
+                            "symbol": [
+                                "L"
+                            ],
+                            "type": "scatters",
+                            "wildSymbols": [
+                                "W"
+                            ],
+                            "SIWMSymbols": [],
+                            "SIWMMul": 2,
+                            "betType": "bet",
+                            "label": "checkScatter"
+                        }
                     },
                     {
                         "shape": "edge",
@@ -7898,16 +8143,54 @@
                                 "strokeWidth": 1
                             }
                         },
-                        "id": "cdcc17e6-0d4e-49f7-b30f-4e785e8a7862",
+                        "id": "8d4c7b37-e30c-472b-a212-d1b3dc6ebea5",
                         "source": {
                             "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
                             "port": "component-groups-out"
                         },
                         "target": {
-                            "cell": "298e5dc4-a00a-4c15-890f-6e350f07fc21",
+                            "cell": "4e39c898-9bd9-4bfb-829e-3132ab1ced0e",
                             "port": "component-groups-in"
                         },
                         "zIndex": 6
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "6fd0e3e1-81d0-42da-9657-b81be5c78622",
+                        "source": {
+                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
+                            "port": "basicReels-Scenes-out"
+                        },
+                        "target": {
+                            "cell": "4e39c898-9bd9-4bfb-829e-3132ab1ced0e",
+                            "port": "basicWins-Scenes-in"
+                        },
+                        "zIndex": 7
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "050c95da-f03e-413b-8bb3-bc25f9d04517",
+                        "source": {
+                            "cell": "e49ea51d-130e-42e8-8f58-d49996dbbc6e",
+                            "port": "basicReels-Scenes-out"
+                        },
+                        "target": {
+                            "cell": "90ec783b-0238-42fa-a25c-d0c6155bbc81",
+                            "port": "basicWins-trigger-Scenes-in"
+                        },
+                        "zIndex": 8
                     }
                 ]
             }

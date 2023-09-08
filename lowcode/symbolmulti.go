@@ -15,9 +15,10 @@ import (
 // SymbolMultiConfig - configuration for SymbolMulti feature
 type SymbolMultiConfig struct {
 	BasicComponentConfig `yaml:",inline"`
-	Symbol               string                   `yaml:"symbol"`
-	Symbols              []string                 `yaml:"symbols"`
-	WeightMulti          string                   `yaml:"weightMulti"`
+	Symbol               string                   `yaml:"symbol"`         // 弃用，用symbols
+	Symbols              []string                 `yaml:"symbols"`        // 这些符号可以有倍数
+	WeightMulti          string                   `yaml:"weightMulti"`    // 倍数权重
+	StaticMulti          int                      `yaml:"staticMulti"`    // 恒定倍数
 	MapWeightMulti       map[string]string        `yaml:"mapWeightMulti"` // 可以配置多套权重
 	ValUsed              string                   `yaml:"valUsed"`        // 用这个值来确定使用的权重
 	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
@@ -118,34 +119,39 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	if gs.HasSymbols(symbolMulti.SymbolCodes) {
 		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
-		// os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-		// if err != nil {
-		// 	goutils.Error("SymbolMulti.OnPlayGame:NewGameScene",
-		// 		zap.Error(err))
 
-		// 	return err
-		// }
-
-		vw2 := symbolMulti.WeightMulti
-		if len(symbolMulti.MapWeightMulti) > 0 && symbolMulti.Config.ValUsed != "" {
-			val := gameProp.GetTagGlobalStr(symbolMulti.Config.ValUsed)
-			vw2 = symbolMulti.MapWeightMulti[val]
-		}
-
-		for x, arr := range gs.Arr {
-			for y, s := range arr {
-				if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
-					cv, err := vw2.RandVal(plugin)
-					if err != nil {
-						goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
-							zap.Error(err))
-
-						return err
+		if symbolMulti.WeightMulti == nil {
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
+						os.Arr[x][y] = symbolMulti.Config.StaticMulti
+					} else {
+						os.Arr[x][y] = 1
 					}
+				}
+			}
+		} else {
+			vw2 := symbolMulti.WeightMulti
+			if len(symbolMulti.MapWeightMulti) > 0 && symbolMulti.Config.ValUsed != "" {
+				val := gameProp.GetTagGlobalStr(symbolMulti.Config.ValUsed)
+				vw2 = symbolMulti.MapWeightMulti[val]
+			}
 
-					os.Arr[x][y] = cv.Int()
-				} else {
-					os.Arr[x][y] = 1
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(symbolMulti.SymbolCodes, s, 0) >= 0 {
+						cv, err := vw2.RandVal(plugin)
+						if err != nil {
+							goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
+								zap.Error(err))
+
+							return err
+						}
+
+						os.Arr[x][y] = cv.Int()
+					} else {
+						os.Arr[x][y] = 1
+					}
 				}
 			}
 		}

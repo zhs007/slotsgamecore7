@@ -26,6 +26,19 @@ const (
 	BetTypeNoPay    = "noPay"
 )
 
+func procSIWM(ret *sgc7game.Result, gs *sgc7game.GameScene, syms []int, mul int) {
+	for i := 0; i < ret.SymbolNums; i++ {
+		if goutils.IndexOfIntSlice(syms, gs.Arr[ret.Pos[i*2]][ret.Pos[i*2+1]], 0) >= 0 {
+			ret.OtherMul = mul
+
+			ret.CashWin *= mul
+			ret.CoinWin *= mul
+
+			return
+		}
+	}
+}
+
 type BasicWinsData struct {
 	BasicComponentData
 	NextComponent string
@@ -59,6 +72,11 @@ type TriggerFeatureConfig struct {
 	Symbol                        string         `yaml:"symbol"`                        // like scatter
 	Type                          string         `yaml:"type"`                          // like scatters
 	MinNum                        int            `yaml:"minNum"`                        // like 3
+	WildSymbols                   []string       `yaml:"wildSymbols"`                   // wild etc
+	WildSymbolCodes               []int          `yaml:"-"`                             // wild symbolCode
+	SIWMSymbols                   []string       `yaml:"SIWMSymbols"`                   // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
+	SIWMSymbolCodes               []int          `yaml:"-"`                             //
+	SIWMMul                       int            `yaml:"SIWMMul"`                       // 这里是SIWM的倍数
 	Scripts                       string         `yaml:"scripts"`                       // scripts
 	RespinNum                     int            `yaml:"respinNum"`                     // respin number
 	RespinNumWeight               string         `yaml:"respinNumWeight"`               // respin number weight
@@ -74,6 +92,32 @@ type TriggerFeatureConfig struct {
 	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights"`           // 每个中奖符号随机一组奖励
 }
 
+func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
+	for _, award := range tfCfg.Awards {
+		award.Init()
+	}
+
+	if tfCfg.SymbolAwardsWeights != nil {
+		tfCfg.SymbolAwardsWeights.Init()
+	}
+
+	if tfCfg.CountScatterPayAs != "" {
+		tfCfg.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[tfCfg.CountScatterPayAs]
+	} else {
+		tfCfg.SymbolCodeCountScatterPayAs = -1
+	}
+
+	for _, v := range tfCfg.WildSymbols {
+		tfCfg.WildSymbolCodes = append(tfCfg.WildSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
+	for _, v := range tfCfg.SIWMSymbols {
+		tfCfg.SIWMSymbolCodes = append(tfCfg.SIWMSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
+	return nil
+}
+
 // BasicWinsConfig - configuration for BasicWins
 type BasicWinsConfig struct {
 	BasicComponentConfig `yaml:",inline"`
@@ -81,10 +125,15 @@ type BasicWinsConfig struct {
 	BetType              string                  `yaml:"betType"`        // bet or totalBet
 	StrCheckWinType      string                  `yaml:"checkWinType"`   // left2right or right2left or all
 	CheckWinType         CheckWinType            `yaml:"-"`              //
+	SIWMSymbols          []string                `yaml:"SIWMSymbols"`    // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
+	SIWMSymbolCodes      []int                   `yaml:"-"`              //
+	SIWMMul              int                     `yaml:"SIWMMul"`        // 这里是SIWM的倍数
 	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
 	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
 	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
 	AfterMain            []*TriggerFeatureConfig `yaml:"afterMain"`      // after the maintype
+	BeforMainTriggerName []string                `yaml:"-"`              // befor the maintype
+	AfterMainTriggerName []string                `yaml:"-"`              // after the maintype
 }
 
 type BasicWins struct {
@@ -110,15 +159,19 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 	if tf.Type == WinTypeScatters {
 		ret = sgc7game.CalcScatter4(gs, gameProp.CurPaytables, gameProp.CurPaytables.MapSymbols[tf.Symbol], gameProp.GetBet(stake, tf.BetType),
 			func(scatter int, cursymbol int) bool {
-				return cursymbol == scatter
+				return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
 			}, true)
 
 		if ret != nil {
-			gameProp.ProcMulti(ret)
-
 			if tf.BetType == BetTypeNoPay {
 				ret.CoinWin = 0
 				ret.CashWin = 0
+			} else {
+				gameProp.ProcMulti(ret)
+
+				if len(tf.SIWMSymbolCodes) > 0 {
+					procSIWM(ret, gs, tf.SIWMSymbolCodes, tf.SIWMMul)
+				}
 			}
 
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
@@ -126,19 +179,25 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		}
 	} else if tf.Type == WinTypeCountScatter {
 		ret = sgc7game.CalcScatterEx(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum, func(scatter int, cursymbol int) bool {
-			return cursymbol == scatter
+			return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
 		})
 
 		if ret != nil {
-			gameProp.ProcMulti(ret)
-
 			if tf.BetType == BetTypeNoPay {
 				ret.CoinWin = 0
 				ret.CashWin = 0
-			} else if tf.SymbolCodeCountScatterPayAs > 0 {
-				ret.Mul = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-				ret.CoinWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-				ret.CashWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet(stake, tf.BetType)
+			} else {
+				if tf.SymbolCodeCountScatterPayAs > 0 {
+					ret.Mul = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+					ret.CoinWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+					ret.CashWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet(stake, tf.BetType)
+				}
+
+				gameProp.ProcMulti(ret)
+
+				if len(tf.SIWMSymbolCodes) > 0 {
+					procSIWM(ret, gs, tf.SIWMSymbolCodes, tf.SIWMMul)
+				}
 			}
 
 			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
@@ -250,36 +309,16 @@ func (basicWins *BasicWins) InitEx(cfg any, pool *GamePropertyPool) error {
 		basicWins.WildSymbols = append(basicWins.WildSymbols, pool.DefaultPaytables.MapSymbols[v])
 	}
 
+	for _, v := range basicWins.Config.SIWMSymbols {
+		basicWins.Config.SIWMSymbolCodes = append(basicWins.Config.SIWMSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
 	for _, v := range basicWins.Config.BeforMain {
-		for _, award := range v.Awards {
-			award.Init()
-		}
-
-		if v.SymbolAwardsWeights != nil {
-			v.SymbolAwardsWeights.Init()
-		}
-
-		if v.CountScatterPayAs != "" {
-			v.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[v.CountScatterPayAs]
-		} else {
-			v.SymbolCodeCountScatterPayAs = -1
-		}
+		v.onInit(pool)
 	}
 
 	for _, v := range basicWins.Config.AfterMain {
-		for _, award := range v.Awards {
-			award.Init()
-		}
-
-		if v.SymbolAwardsWeights != nil {
-			v.SymbolAwardsWeights.Init()
-		}
-
-		if v.CountScatterPayAs != "" {
-			v.SymbolCodeCountScatterPayAs = pool.DefaultPaytables.MapSymbols[v.CountScatterPayAs]
-		} else {
-			v.SymbolCodeCountScatterPayAs = -1
-		}
+		v.onInit(pool)
 	}
 
 	basicWins.onInit(&basicWins.Config.BasicComponentConfig)
@@ -325,6 +364,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 				for _, v := range currets {
 					gameProp.ProcMulti(v)
+
+					if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+						procSIWM(v, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+					}
 				}
 
 				rets = append(rets, currets...)
@@ -346,6 +389,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 				for _, v := range currets {
 					gameProp.ProcMulti(v)
+
+					if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+						procSIWM(v, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+					}
 				}
 
 				rets = append(rets, currets...)
@@ -366,12 +413,92 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 			for _, v := range currets {
 				gameProp.ProcMulti(v)
+
+				if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+					procSIWM(v, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+				}
 			}
 
 			rets = append(rets, currets...)
 		}
 	} else if basicWins.Config.MainType == WinTypeLines {
-		if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
+		isDone := false
+		if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
+			os := basicWins.GetTargetOtherScene(gameProp, curpr, &bwd.BasicComponentData)
+
+			if os != nil {
+				isDone = true
+
+				for i, v := range gameProp.CurLineData.Lines {
+					isTriggerFull := false
+					if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
+						ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet(stake, basicWins.Config.BetType),
+							func(cursymbol int) bool {
+								return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+							}, func(cursymbol int) bool {
+								return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+							}, func(cursymbol int, startsymbol int) bool {
+								if cursymbol == startsymbol {
+									return true
+								}
+
+								return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+							}, func(cursymbol int) int {
+								return cursymbol
+							}, func(x, y int) int {
+								return os.Arr[x][y]
+							})
+						if ret != nil {
+							ret.LineIndex = i
+
+							gameProp.ProcMulti(ret)
+
+							if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+								procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+							}
+
+							rets = append(rets, ret)
+
+							if ret.SymbolNums == gs.Width {
+								isTriggerFull = true
+							}
+						}
+					}
+
+					if !isTriggerFull && basicWins.Config.CheckWinType != CheckWinTypeLeftRight {
+						ret := sgc7game.CalcLineRL2(gs, gameProp.CurPaytables, v, gameProp.GetBet(stake, basicWins.Config.BetType),
+							func(cursymbol int) bool {
+								return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+							}, func(cursymbol int) bool {
+								return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+							}, func(cursymbol int, startsymbol int) bool {
+								if cursymbol == startsymbol {
+									return true
+								}
+
+								return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+							}, func(cursymbol int) int {
+								return cursymbol
+							}, func(x, y int) int {
+								return os.Arr[x][y]
+							})
+						if ret != nil {
+							ret.LineIndex = i
+
+							gameProp.ProcMulti(ret)
+
+							if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+								procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+							}
+
+							rets = append(rets, ret)
+						}
+					}
+				}
+			}
+		}
+
+		if !isDone {
 			for i, v := range gameProp.CurLineData.Lines {
 				if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
 					ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet(stake, basicWins.Config.BetType),
@@ -394,6 +521,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 						ret.LineIndex = i
 
 						gameProp.ProcMulti(ret)
+
+						if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+							procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+						}
 
 						rets = append(rets, ret)
 					}
@@ -421,28 +552,13 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 						gameProp.ProcMulti(ret)
 
+						if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+							procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+						}
+
 						rets = append(rets, ret)
 					}
 				}
-			}
-		}
-	}
-
-	if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" && basicWins.Config.MainType == WinTypeLines {
-		os := basicWins.GetTargetOtherScene(gameProp, curpr, &bwd.BasicComponentData)
-
-		if os != nil {
-			for _, v := range rets {
-				mul := 1
-
-				for i := 0; i < len(v.Pos)/2; i++ {
-					mul *= os.Arr[v.Pos[i*2]][v.Pos[i*2+1]]
-				}
-
-				v.OtherMul = mul
-
-				v.CashWin *= mul
-				v.CoinWin *= mul
 			}
 		}
 	}

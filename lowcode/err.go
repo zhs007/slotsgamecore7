@@ -64,4 +64,9 @@ var (
 
 	// ErrIvalidSymbolCollection - invalid SymbolColletion
 	ErrIvalidSymbolCollection = errors.New("invalid SymbolColletion")
+
+	// ErrIvalidCustomNode - invalid custom-node
+	ErrIvalidCustomNode = errors.New("invalid custom-node")
+	// ErrIvalidTriggerLabel - invalid trigger label
+	ErrIvalidTriggerLabel = errors.New("invalid trigger label")
 )
