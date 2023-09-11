@@ -73,4 +73,6 @@ var (
 	ErrIvalidPayTables = errors.New("invalid invalid paytables")
 	// ErrIvalidSymbolInReels - invalid symbol in reels
 	ErrIvalidSymbolInReels = errors.New("invalid symbol in reels")
+	// ErrNoComponentValues - no componentValues
+	ErrNoComponentValues = errors.New("no componentValues")
 )

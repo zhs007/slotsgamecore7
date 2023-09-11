@@ -13,10 +13,22 @@ import (
 	"go.uber.org/zap"
 )
 
-type PaytableData struct {
+type paytableData struct {
 	Code   int    `json:"Code"`
 	Symbol string `json:"Symbol"`
 	Data   []int  `json:"data"`
+}
+
+type basicReelsData struct {
+	ReelSet      string `json:"reelSet"`
+	IsExpandReel string `json:"isExpandReel"`
+}
+
+func (basicReels *basicReelsData) build() *BasicReelsConfig {
+	return &BasicReelsConfig{
+		ReelSet:      basicReels.ReelSet,
+		IsExpandReel: basicReels.IsExpandReel == "true",
+	}
 }
 
 func loadBasicInfo(cfg *Config, buf []byte) error {
@@ -421,19 +433,33 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 }
 
 func parseBasicReels(cell *ast.Node) (*BasicReelsConfig, error) {
-	cfg := &BasicReelsConfig{}
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseBasicReels:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-	reelSet, err := cell.Get("componentValues").Get("reelSet").String()
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseBasicReels:get:reelSet",
+		goutils.Error("parseBasicReels:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	cfg.ReelSet = reelSet
+	data := &basicReelsData{}
 
-	return cfg, nil
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBasicReels:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
 }
 
 func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, error) {
