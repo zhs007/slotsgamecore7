@@ -13,6 +13,12 @@ import (
 	"go.uber.org/zap"
 )
 
+type PaytableData struct {
+	Code   int    `json:"Code"`
+	Symbol string `json:"Symbol"`
+	Data   []int  `json:"data"`
+}
+
 func loadBasicInfo(cfg *Config, buf []byte) error {
 	gameName, err := sonic.Get(buf, "gameName")
 	if err != nil {
@@ -135,10 +141,35 @@ func parse2StringSlice(n *ast.Node) ([]string, error) {
 }
 
 func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
+	if n == nil {
+		goutils.Error("parsePaytables",
+			zap.Error(ErrIvalidPayTables))
+
+		return nil, ErrIvalidPayTables
+	}
+
 	paytables := &sgc7game.PayTables{
 		MapPay:     make(map[int][]int),
 		MapSymbols: make(map[string]int),
 	}
+
+	// buf, err := n.MarshalJSON()
+	// if err != nil {
+	// 	goutils.Error("parsePaytables:MarshalJSON",
+	// 		zap.Error(err))
+
+	// 	return nil, err
+	// }
+
+	// dataPaytables := []*PaytableData{}
+
+	// err = sonic.Unmarshal(buf, &dataPaytables)
+	// if err != nil {
+	// 	goutils.Error("parsePaytables:Unmarshal",
+	// 		zap.Error(err))
+
+	// 	return nil, err
+	// }
 
 	syms, err := n.ArrayUseNode()
 	if err != nil {
@@ -284,24 +315,41 @@ func parseReelData(n *ast.Node, paytables *sgc7game.PayTables) ([]int, error) {
 }
 
 func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
-	reelsd := &sgc7game.ReelsData{}
-
-	reels, err := n.ArrayUseNode()
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseReels:ArrayUseNode",
+		goutils.Error("parseReels:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for j, reel := range reels {
-		reeld, err := parseReelData(&reel, paytables)
-		if err != nil {
-			goutils.Error("parseReels:parseReelData",
-				zap.Int("j", j),
-				zap.Error(err))
+	dataReels := [][]string{}
 
-			return nil, err
+	err = sonic.Unmarshal(buf, &dataReels)
+	if err != nil {
+		goutils.Error("parseReels:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	reelsd := &sgc7game.ReelsData{}
+
+	for x, arr := range dataReels {
+		reeld := []int{}
+
+		for y, strSym := range arr {
+			sc, isok := paytables.MapSymbols[strSym]
+			if !isok {
+				goutils.Error("parseReels:MapSymbols",
+					zap.Int("x", x),
+					zap.Int("y", y),
+					zap.Error(ErrIvalidSymbolInReels))
+
+				return nil, ErrIvalidSymbolInReels
+			}
+
+			reeld = append(reeld, sc)
 		}
 
 		reelsd.Reels = append(reelsd.Reels, reeld)

@@ -69,4 +69,8 @@ var (
 	ErrIvalidCustomNode = errors.New("invalid custom-node")
 	// ErrIvalidTriggerLabel - invalid trigger label
 	ErrIvalidTriggerLabel = errors.New("invalid trigger label")
+	// ErrIvalidPayTables - invalid paytables
+	ErrIvalidPayTables = errors.New("invalid invalid paytables")
+	// ErrIvalidSymbolInReels - invalid symbol in reels
+	ErrIvalidSymbolInReels = errors.New("invalid symbol in reels")
 )
