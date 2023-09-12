@@ -445,6 +445,66 @@ func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
 	return data.build(), nil
 }
 
+func parseSymbolVal(cell *ast.Node) (*SymbolValConfig, error) {
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseSymbolVal:componentValues",
+			zap.Error(ErrNoComponentValues))
+
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolVal:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	data := &symbolValData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolVal:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
+}
+
+func parseSymbolVal2(cell *ast.Node) (*SymbolVal2Config, error) {
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseSymbolVal2:componentValues",
+			zap.Error(ErrNoComponentValues))
+
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolVal2:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	data := &symbolVal2Data{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolVal2:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
+}
+
 func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
 	componentValues := cell.Get("componentValues")
 	if componentValues == nil {
@@ -581,6 +641,44 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				ccfg := &ComponentConfig{
 					Name: id,
 					Type: "symbolMulti",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "symbolVal" {
+				componentCfg, err := parseSymbolVal(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseSymbolVal",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "symbolVal",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "symbolVal2" {
+				componentCfg, err := parseSymbolVal2(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseSymbolVal2",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "symbolVal2",
 				}
 
 				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
