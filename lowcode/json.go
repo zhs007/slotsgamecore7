@@ -416,37 +416,33 @@ func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, e
 }
 
 func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
-	cfg := &SymbolMultiConfig{}
-
 	componentValues := cell.Get("componentValues")
-	if componentValues != nil {
-		staticMulti, err := componentValues.Get("staticMulti").Int64()
-		if err != nil {
-			goutils.Error("paserSymbolMulti:get:staticMulti",
-				zap.Error(err))
+	if componentValues == nil {
+		goutils.Error("parseSymbolMulti:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-			return nil, err
-		}
-
-		cfg.StaticMulti = int(staticMulti)
-
-		symbols, err := parse2StringSlice(componentValues.Get("symbols"))
-		if err != nil {
-			goutils.Error("paserSymbolMulti:get:symbols",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.Symbols = symbols
-
-		return cfg, nil
+		return nil, ErrNoComponentValues
 	}
 
-	goutils.Error("parseTriggerFeatureConfig",
-		zap.Error(ErrIvalidCustomNode))
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolMulti:MarshalJSON",
+			zap.Error(err))
 
-	return nil, ErrIvalidCustomNode
+		return nil, err
+	}
+
+	data := &symbolMultiData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolMulti:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
 }
 
 func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {

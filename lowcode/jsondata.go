@@ -80,3 +80,18 @@ func (triggerFeature *triggerFeatureData) build() *TriggerFeatureConfig {
 		// SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights"`           // 每个中奖符号随机一组奖励
 	}
 }
+
+type symbolMultiData struct {
+	Symbols     []string `json:"symbols"`
+	StaticMulti int      `json:"staticMulti"`
+	ValUsed     int      `json:"valUsed"`
+}
+
+func (symbolMulti *symbolMultiData) build() *SymbolMultiConfig {
+	return &SymbolMultiConfig{
+		Symbols:     symbolMulti.Symbols,
+		StaticMulti: symbolMulti.StaticMulti,
+		// WeightMulti          string                   `yaml:"weightMulti"`    // 倍数权重
+		// OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
+	}
+}
