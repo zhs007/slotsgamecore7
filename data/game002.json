@@ -8052,7 +8052,8 @@
                             ],
                             "SIWMMul": 2,
                             "afterMain": "checkScatter",
-                            "checkWinType": "all"
+                            "checkWinType": "all",
+                            "beforMain": "checkScatter"
                         },
                         "tools": {
                             "items": [

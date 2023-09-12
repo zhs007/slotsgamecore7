@@ -30,6 +30,32 @@ func (basicReels *basicReelsData) build() *BasicReelsConfig {
 	}
 }
 
+type basicWinsData struct {
+	MainType       string   `json:"mainType"`
+	BetType        string   `json:"betType"`
+	ExcludeSymbols []string `json:"excludeSymbols"`
+	WildSymbols    []string `json:"wildSymbols"`
+	CheckWinType   string   `json:"checkWinType"`
+	SIWMSymbols    []string `json:"SIWMSymbols"`
+	SIWMMul        int      `json:"SIWMMul"`
+	AfterMain      string   `json:"afterMain"`
+	BeforMain      string   `json:"beforMain"`
+}
+
+func (basicWins *basicWinsData) build() *BasicWinsConfig {
+	return &BasicWinsConfig{
+		MainType:             basicWins.MainType,
+		BetType:              basicWins.BetType,
+		StrCheckWinType:      basicWins.CheckWinType,
+		SIWMSymbols:          basicWins.SIWMSymbols,
+		SIWMMul:              basicWins.SIWMMul,
+		ExcludeSymbols:       basicWins.ExcludeSymbols,
+		WildSymbols:          basicWins.WildSymbols,
+		BeforMainTriggerName: []string{basicWins.BeforMain},
+		AfterMainTriggerName: []string{basicWins.AfterMain},
+	}
+}
+
 func loadBasicInfo(cfg *Config, buf []byte) error {
 	gameName, err := sonic.Get(buf, "gameName")
 	if err != nil {
@@ -524,103 +550,33 @@ func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
 }
 
 func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
-	cfg := &BasicWinsConfig{}
-
 	componentValues := cell.Get("componentValues")
-	if componentValues != nil {
-		mainType, err := componentValues.Get("mainType").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:mainType",
-				zap.Error(err))
+	if componentValues == nil {
+		goutils.Error("parseBasicWins:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-			return nil, err
-		}
-
-		cfg.MainType = mainType
-
-		betType, err := componentValues.Get("betType").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:betType",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.BetType = betType
-
-		checkWinType, err := componentValues.Get("checkWinType").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:checkWinType",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.StrCheckWinType = checkWinType
-
-		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
-		if err != nil {
-			goutils.Error("parseBasicWins:get:wildSymbols",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.WildSymbols = wildSymbols
-
-		excludeSymbols, err := parse2StringSlice(componentValues.Get("excludeSymbols"))
-		if err != nil {
-			goutils.Error("parseBasicWins:get:excludeSymbols",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.ExcludeSymbols = excludeSymbols
-
-		if componentValues.Get("afterMain") != nil {
-			afterMain, err := componentValues.Get("afterMain").String()
-			if err != nil {
-				goutils.Error("parseBasicWins:get:afterMain",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			cfg.AfterMainTriggerName = append(cfg.AfterMainTriggerName, afterMain)
-		}
-
-		if componentValues.Get("SIWMSymbols") != nil {
-			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
-			if err != nil {
-				goutils.Error("parseBasicWins:get:SIWMSymbols",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			cfg.SIWMSymbols = SIWMSymbols
-		}
-
-		if componentValues.Get("SIWMMul") != nil {
-			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
-			if err != nil {
-				goutils.Error("parseBasicWins:get:SIWMMul",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			cfg.SIWMMul = int(SIWMMul)
-		}
-
-		return cfg, nil
+		return nil, ErrNoComponentValues
 	}
 
-	goutils.Error("parseTriggerFeatureConfig",
-		zap.Error(ErrIvalidCustomNode))
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseBasicWins:MarshalJSON",
+			zap.Error(err))
 
-	return nil, ErrIvalidCustomNode
+		return nil, err
+	}
+
+	data := &basicWinsData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBasicWins:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
 }
 
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
