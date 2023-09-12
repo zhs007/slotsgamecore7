@@ -160,68 +160,73 @@ func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 		return nil, ErrIvalidPayTables
 	}
 
-	paytables := &sgc7game.PayTables{
-		MapPay:     make(map[int][]int),
-		MapSymbols: make(map[string]int),
-	}
-
-	// buf, err := n.MarshalJSON()
-	// if err != nil {
-	// 	goutils.Error("parsePaytables:MarshalJSON",
-	// 		zap.Error(err))
-
-	// 	return nil, err
-	// }
-
-	// dataPaytables := []*PaytableData{}
-
-	// err = sonic.Unmarshal(buf, &dataPaytables)
-	// if err != nil {
-	// 	goutils.Error("parsePaytables:Unmarshal",
-	// 		zap.Error(err))
-
-	// 	return nil, err
-	// }
-
-	syms, err := n.ArrayUseNode()
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parsePaytables:ArrayUseNode",
+		goutils.Error("parsePaytables:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for j, sym := range syms {
-		c, err := sym.Get("Code").Int64()
-		if err != nil {
-			goutils.Error("parsePaytables:syms:Code",
-				zap.Int("j", j),
-				zap.Error(err))
+	dataPaytables := []*paytableData{}
 
-			return nil, err
-		}
+	err = sonic.Unmarshal(buf, &dataPaytables)
+	if err != nil {
+		goutils.Error("parsePaytables:Unmarshal",
+			zap.Error(err))
 
-		s, err := sym.Get("Symbol").String()
-		if err != nil {
-			goutils.Error("parsePaytables:syms:Symbol",
-				zap.Int("j", j),
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		arr, err := parse2IntSlice(sym.Get("data"))
-		if err != nil {
-			goutils.Error("parsePaytables:syms:data",
-				zap.Int("j", j),
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		paytables.MapSymbols[s] = int(c)
-		paytables.MapPay[int(c)] = arr
+		return nil, err
 	}
+
+	paytables := &sgc7game.PayTables{
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
+	}
+
+	for _, node := range dataPaytables {
+		paytables.MapPay[node.Code] = node.Data
+		paytables.MapSymbols[node.Symbol] = node.Code
+	}
+
+	// syms, err := n.ArrayUseNode()
+	// if err != nil {
+	// 	goutils.Error("parsePaytables:ArrayUseNode",
+	// 		zap.Error(err))
+
+	// 	return nil, err
+	// }
+
+	// for j, sym := range syms {
+	// 	c, err := sym.Get("Code").Int64()
+	// 	if err != nil {
+	// 		goutils.Error("parsePaytables:syms:Code",
+	// 			zap.Int("j", j),
+	// 			zap.Error(err))
+
+	// 		return nil, err
+	// 	}
+
+	// 	s, err := sym.Get("Symbol").String()
+	// 	if err != nil {
+	// 		goutils.Error("parsePaytables:syms:Symbol",
+	// 			zap.Int("j", j),
+	// 			zap.Error(err))
+
+	// 		return nil, err
+	// 	}
+
+	// 	arr, err := parse2IntSlice(sym.Get("data"))
+	// 	if err != nil {
+	// 		goutils.Error("parsePaytables:syms:data",
+	// 			zap.Int("j", j),
+	// 			zap.Error(err))
+
+	// 		return nil, err
+	// 	}
+
+	// 	paytables.MapSymbols[s] = int(c)
+	// 	paytables.MapPay[int(c)] = arr
+	// }
 
 	return paytables, nil
 }
@@ -297,33 +302,6 @@ func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
 	}
 
 	return lined, nil
-}
-
-func parseReelData(n *ast.Node, paytables *sgc7game.PayTables) ([]int, error) {
-	reeld := []int{}
-
-	reel, err := n.ArrayUseNode()
-	if err != nil {
-		goutils.Error("parseReelData:ArrayUseNode",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	for i, sym := range reel {
-		strSym, err := sym.String()
-		if err != nil {
-			goutils.Error("parseReelData:String",
-				zap.Int("i", i),
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		reeld = append(reeld, paytables.MapSymbols[strSym])
-	}
-
-	return reeld, nil
 }
 
 func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
