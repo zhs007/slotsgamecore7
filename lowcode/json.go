@@ -12,50 +12,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type paytableData struct {
-	Code   int    `json:"Code"`
-	Symbol string `json:"Symbol"`
-	Data   []int  `json:"data"`
-}
-
-type basicReelsData struct {
-	ReelSet      string `json:"reelSet"`
-	IsExpandReel string `json:"isExpandReel"`
-}
-
-func (basicReels *basicReelsData) build() *BasicReelsConfig {
-	return &BasicReelsConfig{
-		ReelSet:      basicReels.ReelSet,
-		IsExpandReel: basicReels.IsExpandReel == "true",
-	}
-}
-
-type basicWinsData struct {
-	MainType       string   `json:"mainType"`
-	BetType        string   `json:"betType"`
-	ExcludeSymbols []string `json:"excludeSymbols"`
-	WildSymbols    []string `json:"wildSymbols"`
-	CheckWinType   string   `json:"checkWinType"`
-	SIWMSymbols    []string `json:"SIWMSymbols"`
-	SIWMMul        int      `json:"SIWMMul"`
-	AfterMain      string   `json:"afterMain"`
-	BeforMain      string   `json:"beforMain"`
-}
-
-func (basicWins *basicWinsData) build() *BasicWinsConfig {
-	return &BasicWinsConfig{
-		MainType:             basicWins.MainType,
-		BetType:              basicWins.BetType,
-		StrCheckWinType:      basicWins.CheckWinType,
-		SIWMSymbols:          basicWins.SIWMSymbols,
-		SIWMMul:              basicWins.SIWMMul,
-		ExcludeSymbols:       basicWins.ExcludeSymbols,
-		WildSymbols:          basicWins.WildSymbols,
-		BeforMainTriggerName: []string{basicWins.BeforMain},
-		AfterMainTriggerName: []string{basicWins.AfterMain},
-	}
-}
-
 func loadBasicInfo(cfg *Config, buf []byte) error {
 	gameName, err := sonic.Get(buf, "gameName")
 	if err != nil {
@@ -430,89 +386,33 @@ func parseBasicReels(cell *ast.Node) (*BasicReelsConfig, error) {
 }
 
 func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, error) {
-	cfg := &TriggerFeatureConfig{}
-
 	componentValues := cell.Get("componentValues")
-	if componentValues != nil {
-		label, err := componentValues.Get("label").String()
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:label",
-				zap.Error(err))
+	if componentValues == nil {
+		goutils.Error("parseTriggerFeatureConfig:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-			return "", nil, err
-		}
-
-		strType, err := componentValues.Get("type").String()
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:type",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.Type = strType
-
-		symbols, err := parse2StringSlice(componentValues.Get("symbol"))
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:symbol",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.Symbol = symbols[0]
-
-		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:wildSymbols",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.WildSymbols = wildSymbols
-
-		betType, err := componentValues.Get("betType").String()
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:betType",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.BetType = betType
-
-		if componentValues.Get("SIWMSymbols") != nil {
-			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
-			if err != nil {
-				goutils.Error("parseTriggerFeatureConfig:get:SIWMSymbols",
-					zap.Error(err))
-
-				return "", nil, err
-			}
-
-			cfg.SIWMSymbols = SIWMSymbols
-		}
-
-		if componentValues.Get("SIWMMul") != nil {
-			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
-			if err != nil {
-				goutils.Error("parseTriggerFeatureConfig:get:SIWMMul",
-					zap.Error(err))
-
-				return "", nil, err
-			}
-
-			cfg.SIWMMul = int(SIWMMul)
-		}
-
-		return label, cfg, nil
+		return "", nil, ErrNoComponentValues
 	}
 
-	goutils.Error("parseTriggerFeatureConfig",
-		zap.Error(ErrIvalidCustomNode))
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseTriggerFeatureConfig:MarshalJSON",
+			zap.Error(err))
 
-	return "", nil, ErrIvalidCustomNode
+		return "", nil, err
+	}
+
+	data := &triggerFeatureData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseTriggerFeatureConfig:Unmarshal",
+			zap.Error(err))
+
+		return "", nil, err
+	}
+
+	return data.Label, data.build(), nil
 }
 
 func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
