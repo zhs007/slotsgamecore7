@@ -1,7 +1,6 @@
 package lowcode
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -188,46 +187,6 @@ func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 		paytables.MapSymbols[node.Symbol] = node.Code
 	}
 
-	// syms, err := n.ArrayUseNode()
-	// if err != nil {
-	// 	goutils.Error("parsePaytables:ArrayUseNode",
-	// 		zap.Error(err))
-
-	// 	return nil, err
-	// }
-
-	// for j, sym := range syms {
-	// 	c, err := sym.Get("Code").Int64()
-	// 	if err != nil {
-	// 		goutils.Error("parsePaytables:syms:Code",
-	// 			zap.Int("j", j),
-	// 			zap.Error(err))
-
-	// 		return nil, err
-	// 	}
-
-	// 	s, err := sym.Get("Symbol").String()
-	// 	if err != nil {
-	// 		goutils.Error("parsePaytables:syms:Symbol",
-	// 			zap.Int("j", j),
-	// 			zap.Error(err))
-
-	// 		return nil, err
-	// 	}
-
-	// 	arr, err := parse2IntSlice(sym.Get("data"))
-	// 	if err != nil {
-	// 		goutils.Error("parsePaytables:syms:data",
-	// 			zap.Int("j", j),
-	// 			zap.Error(err))
-
-	// 		return nil, err
-	// 	}
-
-	// 	paytables.MapSymbols[s] = int(c)
-	// 	paytables.MapPay[int(c)] = arr
-	// }
-
 	return paytables, nil
 }
 
@@ -271,40 +230,44 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 }
 
 func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
-	lined := &sgc7game.LineData{}
+	if n == nil {
+		goutils.Error("parseLineData",
+			zap.Error(ErrIvalidReels))
 
-	lines, err := n.ArrayUseNode()
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseLineData:ArrayUseNode",
+		goutils.Error("parseLineData:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for j, line := range lines {
-		arr := []int{}
+	dataLines := [][]int{}
 
-		for i := 0; i < width; i++ {
-			y, err := line.Get(fmt.Sprintf("R%v", i+1)).Int64()
-			if err != nil {
-				goutils.Error("parseLineData:lines",
-					zap.Int("j", j),
-					zap.Int("i", i),
-					zap.Error(err))
+	err = sonic.Unmarshal(buf, &dataLines)
+	if err != nil {
+		goutils.Error("parseLineData:Unmarshal",
+			zap.Error(err))
 
-				return nil, err
-			}
-
-			arr = append(arr, int(y))
-		}
-
-		lined.Lines = append(lined.Lines, arr)
+		return nil, err
 	}
 
-	return lined, nil
+	return &sgc7game.LineData{
+		Lines: dataLines,
+	}, nil
 }
 
 func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
+	if n == nil {
+		goutils.Error("parseReels",
+			zap.Error(ErrIvalidReels))
+
+		return nil, ErrIvalidReels
+	}
+
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseReels:MarshalJSON",

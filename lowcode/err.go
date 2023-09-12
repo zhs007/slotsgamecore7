@@ -70,9 +70,11 @@ var (
 	// ErrIvalidTriggerLabel - invalid trigger label
 	ErrIvalidTriggerLabel = errors.New("invalid trigger label")
 	// ErrIvalidPayTables - invalid paytables
-	ErrIvalidPayTables = errors.New("invalid invalid paytables")
+	ErrIvalidPayTables = errors.New("invalid paytables")
 	// ErrIvalidSymbolInReels - invalid symbol in reels
 	ErrIvalidSymbolInReels = errors.New("invalid symbol in reels")
 	// ErrNoComponentValues - no componentValues
 	ErrNoComponentValues = errors.New("no componentValues")
+	// ErrIvalidReels - invalid reels
+	ErrIvalidReels = errors.New("invalid reels")
 )
