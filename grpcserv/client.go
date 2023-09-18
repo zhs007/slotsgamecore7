@@ -11,14 +11,14 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Client - DTGameLogicClient
+// Client - GameLogicClient
 type Client struct {
 	servAddr string
 	conn     *grpc.ClientConn
-	client   sgc7pb.DTGameLogicClient
+	client   sgc7pb.GameLogicClient
 }
 
-// NewClient - new DTGameLogicClient
+// NewClient - new GameLogicClient
 func NewClient(servAddr string) (*Client, error) {
 	client := &Client{
 		servAddr: servAddr,
@@ -50,7 +50,7 @@ func (client *Client) GetConfig(ctx context.Context) (*sgc7pb.GameConfig, error)
 		}
 
 		client.conn = conn
-		client.client = sgc7pb.NewDTGameLogicClient(conn)
+		client.client = sgc7pb.NewGameLogicClient(conn)
 	}
 
 	res, err := client.client.GetConfig(ctx, &sgc7pb.RequestConfig{})
@@ -80,7 +80,7 @@ func (client *Client) Initialize(ctx context.Context) (*sgc7pb.PlayerState, erro
 		}
 
 		client.conn = conn
-		client.client = sgc7pb.NewDTGameLogicClient(conn)
+		client.client = sgc7pb.NewGameLogicClient(conn)
 	}
 
 	res, err := client.client.Initialize(ctx, &sgc7pb.RequestInitialize{})
@@ -115,7 +115,7 @@ func (client *Client) Play(ctx context.Context, ps *sgc7pb.PlayerState,
 		}
 
 		client.conn = conn
-		client.client = sgc7pb.NewDTGameLogicClient(conn)
+		client.client = sgc7pb.NewGameLogicClient(conn)
 	}
 
 	stream, err := client.client.Play(ctx, &sgc7pb.RequestPlay{

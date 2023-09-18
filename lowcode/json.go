@@ -1,7 +1,6 @@
 package lowcode
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -135,49 +134,39 @@ func parse2StringSlice(n *ast.Node) ([]string, error) {
 }
 
 func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
-	paytables := &sgc7game.PayTables{
-		MapPay:     make(map[int][]int),
-		MapSymbols: make(map[string]int),
+	if n == nil {
+		goutils.Error("parsePaytables",
+			zap.Error(ErrIvalidPayTables))
+
+		return nil, ErrIvalidPayTables
 	}
 
-	syms, err := n.ArrayUseNode()
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parsePaytables:ArrayUseNode",
+		goutils.Error("parsePaytables:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for j, sym := range syms {
-		c, err := sym.Get("Code").Int64()
-		if err != nil {
-			goutils.Error("parsePaytables:syms:Code",
-				zap.Int("j", j),
-				zap.Error(err))
+	dataPaytables := []*paytableData{}
 
-			return nil, err
-		}
+	err = sonic.Unmarshal(buf, &dataPaytables)
+	if err != nil {
+		goutils.Error("parsePaytables:Unmarshal",
+			zap.Error(err))
 
-		s, err := sym.Get("Symbol").String()
-		if err != nil {
-			goutils.Error("parsePaytables:syms:Symbol",
-				zap.Int("j", j),
-				zap.Error(err))
+		return nil, err
+	}
 
-			return nil, err
-		}
+	paytables := &sgc7game.PayTables{
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
+	}
 
-		arr, err := parse2IntSlice(sym.Get("data"))
-		if err != nil {
-			goutils.Error("parsePaytables:syms:data",
-				zap.Int("j", j),
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		paytables.MapSymbols[s] = int(c)
-		paytables.MapPay[int(c)] = arr
+	for _, node := range dataPaytables {
+		paytables.MapPay[node.Code] = node.Data
+		paytables.MapSymbols[node.Symbol] = node.Code
 	}
 
 	return paytables, nil
@@ -223,85 +212,79 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 }
 
 func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
-	lined := &sgc7game.LineData{}
+	if n == nil {
+		goutils.Error("parseLineData",
+			zap.Error(ErrIvalidReels))
 
-	lines, err := n.ArrayUseNode()
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseLineData:ArrayUseNode",
+		goutils.Error("parseLineData:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for j, line := range lines {
-		arr := []int{}
+	dataLines := [][]int{}
 
-		for i := 0; i < width; i++ {
-			y, err := line.Get(fmt.Sprintf("R%v", i+1)).Int64()
-			if err != nil {
-				goutils.Error("parseLineData:lines",
-					zap.Int("j", j),
-					zap.Int("i", i),
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			arr = append(arr, int(y))
-		}
-
-		lined.Lines = append(lined.Lines, arr)
-	}
-
-	return lined, nil
-}
-
-func parseReelData(n *ast.Node, paytables *sgc7game.PayTables) ([]int, error) {
-	reeld := []int{}
-
-	reel, err := n.ArrayUseNode()
+	err = sonic.Unmarshal(buf, &dataLines)
 	if err != nil {
-		goutils.Error("parseReelData:ArrayUseNode",
+		goutils.Error("parseLineData:Unmarshal",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for i, sym := range reel {
-		strSym, err := sym.String()
-		if err != nil {
-			goutils.Error("parseReelData:String",
-				zap.Int("i", i),
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		reeld = append(reeld, paytables.MapSymbols[strSym])
-	}
-
-	return reeld, nil
+	return &sgc7game.LineData{
+		Lines: dataLines,
+	}, nil
 }
 
 func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
-	reelsd := &sgc7game.ReelsData{}
+	if n == nil {
+		goutils.Error("parseReels",
+			zap.Error(ErrIvalidReels))
 
-	reels, err := n.ArrayUseNode()
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseReels:ArrayUseNode",
+		goutils.Error("parseReels:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	for j, reel := range reels {
-		reeld, err := parseReelData(&reel, paytables)
-		if err != nil {
-			goutils.Error("parseReels:parseReelData",
-				zap.Int("j", j),
-				zap.Error(err))
+	dataReels := [][]string{}
 
-			return nil, err
+	err = sonic.Unmarshal(buf, &dataReels)
+	if err != nil {
+		goutils.Error("parseReels:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	reelsd := &sgc7game.ReelsData{}
+
+	for x, arr := range dataReels {
+		reeld := []int{}
+
+		for y, strSym := range arr {
+			sc, isok := paytables.MapSymbols[strSym]
+			if !isok {
+				goutils.Error("parseReels:MapSymbols",
+					zap.Int("x", x),
+					zap.Int("y", y),
+					zap.Error(ErrIvalidSymbolInReels))
+
+				return nil, ErrIvalidSymbolInReels
+			}
+
+			reeld = append(reeld, sc)
 		}
 
 		reelsd.Reels = append(reelsd.Reels, reeld)
@@ -373,239 +356,183 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 }
 
 func parseBasicReels(cell *ast.Node) (*BasicReelsConfig, error) {
-	cfg := &BasicReelsConfig{}
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseBasicReels:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-	reelSet, err := cell.Get("componentValues").Get("reelSet").String()
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseBasicReels:get:reelSet",
+		goutils.Error("parseBasicReels:MarshalJSON",
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	cfg.ReelSet = reelSet
+	data := &basicReelsData{}
 
-	return cfg, nil
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBasicReels:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
 }
 
 func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, error) {
-	cfg := &TriggerFeatureConfig{}
-
 	componentValues := cell.Get("componentValues")
-	if componentValues != nil {
-		label, err := componentValues.Get("label").String()
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:label",
-				zap.Error(err))
+	if componentValues == nil {
+		goutils.Error("parseTriggerFeatureConfig:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-			return "", nil, err
-		}
-
-		strType, err := componentValues.Get("type").String()
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:type",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.Type = strType
-
-		symbols, err := parse2StringSlice(componentValues.Get("symbol"))
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:symbol",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.Symbol = symbols[0]
-
-		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:wildSymbols",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.WildSymbols = wildSymbols
-
-		betType, err := componentValues.Get("betType").String()
-		if err != nil {
-			goutils.Error("parseTriggerFeatureConfig:get:betType",
-				zap.Error(err))
-
-			return "", nil, err
-		}
-
-		cfg.BetType = betType
-
-		if componentValues.Get("SIWMSymbols") != nil {
-			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
-			if err != nil {
-				goutils.Error("parseTriggerFeatureConfig:get:SIWMSymbols",
-					zap.Error(err))
-
-				return "", nil, err
-			}
-
-			cfg.SIWMSymbols = SIWMSymbols
-		}
-
-		if componentValues.Get("SIWMMul") != nil {
-			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
-			if err != nil {
-				goutils.Error("parseTriggerFeatureConfig:get:SIWMMul",
-					zap.Error(err))
-
-				return "", nil, err
-			}
-
-			cfg.SIWMMul = int(SIWMMul)
-		}
-
-		return label, cfg, nil
+		return "", nil, ErrNoComponentValues
 	}
 
-	goutils.Error("parseTriggerFeatureConfig",
-		zap.Error(ErrIvalidCustomNode))
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseTriggerFeatureConfig:MarshalJSON",
+			zap.Error(err))
 
-	return "", nil, ErrIvalidCustomNode
+		return "", nil, err
+	}
+
+	data := &triggerFeatureData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseTriggerFeatureConfig:Unmarshal",
+			zap.Error(err))
+
+		return "", nil, err
+	}
+
+	return data.Label, data.build(), nil
 }
 
 func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
-	cfg := &SymbolMultiConfig{}
-
 	componentValues := cell.Get("componentValues")
-	if componentValues != nil {
-		staticMulti, err := componentValues.Get("staticMulti").Int64()
-		if err != nil {
-			goutils.Error("paserSymbolMulti:get:staticMulti",
-				zap.Error(err))
+	if componentValues == nil {
+		goutils.Error("parseSymbolMulti:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-			return nil, err
-		}
-
-		cfg.StaticMulti = int(staticMulti)
-
-		symbols, err := parse2StringSlice(componentValues.Get("symbols"))
-		if err != nil {
-			goutils.Error("paserSymbolMulti:get:symbols",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.Symbols = symbols
-
-		return cfg, nil
+		return nil, ErrNoComponentValues
 	}
 
-	goutils.Error("parseTriggerFeatureConfig",
-		zap.Error(ErrIvalidCustomNode))
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolMulti:MarshalJSON",
+			zap.Error(err))
 
-	return nil, ErrIvalidCustomNode
+		return nil, err
+	}
+
+	data := &symbolMultiData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolMulti:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
+}
+
+func parseSymbolVal(cell *ast.Node) (*SymbolValConfig, error) {
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseSymbolVal:componentValues",
+			zap.Error(ErrNoComponentValues))
+
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolVal:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	data := &symbolValData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolVal:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
+}
+
+func parseSymbolVal2(cell *ast.Node) (*SymbolVal2Config, error) {
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseSymbolVal2:componentValues",
+			zap.Error(ErrNoComponentValues))
+
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolVal2:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	data := &symbolVal2Data{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolVal2:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
 }
 
 func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
-	cfg := &BasicWinsConfig{}
-
 	componentValues := cell.Get("componentValues")
-	if componentValues != nil {
-		mainType, err := componentValues.Get("mainType").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:mainType",
-				zap.Error(err))
+	if componentValues == nil {
+		goutils.Error("parseBasicWins:componentValues",
+			zap.Error(ErrNoComponentValues))
 
-			return nil, err
-		}
-
-		cfg.MainType = mainType
-
-		betType, err := componentValues.Get("betType").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:betType",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.BetType = betType
-
-		checkWinType, err := componentValues.Get("checkWinType").String()
-		if err != nil {
-			goutils.Error("parseBasicWins:get:checkWinType",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.StrCheckWinType = checkWinType
-
-		wildSymbols, err := parse2StringSlice(componentValues.Get("wildSymbols"))
-		if err != nil {
-			goutils.Error("parseBasicWins:get:wildSymbols",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.WildSymbols = wildSymbols
-
-		excludeSymbols, err := parse2StringSlice(componentValues.Get("excludeSymbols"))
-		if err != nil {
-			goutils.Error("parseBasicWins:get:excludeSymbols",
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		cfg.ExcludeSymbols = excludeSymbols
-
-		if componentValues.Get("afterMain") != nil {
-			afterMain, err := componentValues.Get("afterMain").String()
-			if err != nil {
-				goutils.Error("parseBasicWins:get:afterMain",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			cfg.AfterMainTriggerName = append(cfg.AfterMainTriggerName, afterMain)
-		}
-
-		if componentValues.Get("SIWMSymbols") != nil {
-			SIWMSymbols, err := parse2StringSlice(componentValues.Get("SIWMSymbols"))
-			if err != nil {
-				goutils.Error("parseBasicWins:get:SIWMSymbols",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			cfg.SIWMSymbols = SIWMSymbols
-		}
-
-		if componentValues.Get("SIWMMul") != nil {
-			SIWMMul, err := componentValues.Get("SIWMMul").Int64()
-			if err != nil {
-				goutils.Error("parseBasicWins:get:SIWMMul",
-					zap.Error(err))
-
-				return nil, err
-			}
-
-			cfg.SIWMMul = int(SIWMMul)
-		}
-
-		return cfg, nil
+		return nil, ErrNoComponentValues
 	}
 
-	goutils.Error("parseTriggerFeatureConfig",
-		zap.Error(ErrIvalidCustomNode))
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseBasicWins:MarshalJSON",
+			zap.Error(err))
 
-	return nil, ErrIvalidCustomNode
+		return nil, err
+	}
+
+	data := &basicWinsData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBasicWins:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
 }
 
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
@@ -714,6 +641,44 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				ccfg := &ComponentConfig{
 					Name: id,
 					Type: "symbolMulti",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "symbolVal" {
+				componentCfg, err := parseSymbolVal(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseSymbolVal",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "symbolVal",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "symbolVal2" {
+				componentCfg, err := parseSymbolVal2(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseSymbolVal2",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "symbolVal2",
 				}
 
 				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
@@ -857,6 +822,27 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 }
 
 func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		goutils.Error("NewGame2:ReadFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return NewGame2WithData(data, funcNewPlugin)
+}
+
+func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	if strings.Contains(fn, ".json") {
+		return NewGame2(fn, funcNewPlugin)
+	}
+
+	return NewGameEx(fn, funcNewPlugin)
+}
+
+func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
 	game := &Game{
 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
 		MgrComponent: NewComponentMgr(),
@@ -874,18 +860,9 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 		mapBasicConfig:  make(map[string]*BasicComponentConfig),
 	}
 
-	data, err := os.ReadFile(fn)
+	err := loadBasicInfo(cfg, data)
 	if err != nil {
-		goutils.Error("NewGame2:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	err = loadBasicInfo(cfg, data)
-	if err != nil {
-		goutils.Error("NewGame2:loadBasicInfo",
+		goutils.Error("NewGame2WithData:loadBasicInfo",
 			zap.Error(err))
 
 		return nil, err
@@ -893,7 +870,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	lstPaytables, err := sonic.Get(data, "repository", "paytableList")
 	if err != nil {
-		goutils.Error("NewGame2:Get",
+		goutils.Error("NewGame2WithData:Get",
 			zap.String("key", "repository.paytableList"),
 			zap.Error(err))
 
@@ -902,7 +879,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = loadPaytables(cfg, &lstPaytables)
 	if err != nil {
-		goutils.Error("NewGame2:loadPaytables",
+		goutils.Error("NewGame2WithData:loadPaytables",
 			zap.Error(err))
 
 		return nil, err
@@ -910,7 +887,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	lstOther, err := sonic.Get(data, "repository", "otherList")
 	if err != nil {
-		goutils.Error("NewGame2:Get",
+		goutils.Error("NewGame2WithData:Get",
 			zap.String("key", "repository.otherList"),
 			zap.Error(err))
 
@@ -919,7 +896,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = loadOtherList(cfg, &lstOther)
 	if err != nil {
-		goutils.Error("NewGame2:loadOtherList",
+		goutils.Error("NewGame2WithData:loadOtherList",
 			zap.Error(err))
 
 		return nil, err
@@ -931,7 +908,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	betMethod, err := sonic.Get(data, "betMethod", 0)
 	if err != nil {
-		goutils.Error("NewGame2:Get",
+		goutils.Error("NewGame2WithData:Get",
 			zap.String("key", "betMethod[0]"),
 			zap.Error(err))
 
@@ -940,7 +917,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = loadBetMethod(cfg, &betMethod)
 	if err != nil {
-		goutils.Error("NewGame2:loadBetMethod",
+		goutils.Error("NewGame2WithData:loadBetMethod",
 			zap.Error(err))
 
 		return nil, err
@@ -950,19 +927,11 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = game.Init2(cfg)
 	if err != nil {
-		goutils.Error("NewGame2:Init2",
+		goutils.Error("NewGame2WithData:Init2",
 			zap.Error(err))
 
 		return nil, err
 	}
 
 	return game, nil
-}
-
-func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	if strings.Contains(fn, ".json") {
-		return NewGame2(fn, funcNewPlugin)
-	}
-
-	return NewGameEx(fn, funcNewPlugin)
 }
