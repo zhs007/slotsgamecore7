@@ -89,7 +89,7 @@ func (client *Client) InitGame(ctx context.Context, gameCode string, data string
 }
 
 // GetGameConfig - get config
-func (client *Client) GetGameConfig(ctx context.Context) (*sgc7pb.ReplyGameConfig, error) {
+func (client *Client) GetGameConfig(ctx context.Context, gameCode string) (*sgc7pb.ReplyGameConfig, error) {
 	err := client.onRequest(ctx)
 	if err != nil {
 		goutils.Error("Client.GetGameConfig:onRequest",
@@ -98,7 +98,9 @@ func (client *Client) GetGameConfig(ctx context.Context) (*sgc7pb.ReplyGameConfi
 		return nil, err
 	}
 
-	res, err := client.client.GetGameConfig(ctx, &sgc7pb.RequestGameConfig{})
+	res, err := client.client.GetGameConfig(ctx, &sgc7pb.RequestGameConfig{
+		GameCode: gameCode,
+	})
 	if err != nil {
 		goutils.Error("Client.GetGameConfig:GetGameConfig",
 			zap.String("server address", client.servAddr),
