@@ -1,0 +1,21 @@
+syntax = "proto3";
+package sgc7pb;
+option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
+
+// RequestInitGame - initial game
+message RequestInitGame {
+    string gameCode = 1;
+    string config = 2;
+}
+
+// ReplyInitGame - reply initial game
+message ReplyInitGame {
+    bool isOK = 1;
+    string err = 2;
+}
+
+// Rng - RNG Service
+service GameLogicCollection {
+	// initGame - initial game
+    rpc initGame(RequestInitGame) returns (ReplyInitGame) {}
+}

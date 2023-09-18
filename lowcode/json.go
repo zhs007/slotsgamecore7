@@ -822,6 +822,27 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 }
 
 func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		goutils.Error("NewGame2:ReadFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return NewGame2WithData(data, funcNewPlugin)
+}
+
+func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	if strings.Contains(fn, ".json") {
+		return NewGame2(fn, funcNewPlugin)
+	}
+
+	return NewGameEx(fn, funcNewPlugin)
+}
+
+func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
 	game := &Game{
 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
 		MgrComponent: NewComponentMgr(),
@@ -839,18 +860,9 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 		mapBasicConfig:  make(map[string]*BasicComponentConfig),
 	}
 
-	data, err := os.ReadFile(fn)
+	err := loadBasicInfo(cfg, data)
 	if err != nil {
-		goutils.Error("NewGame2:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	err = loadBasicInfo(cfg, data)
-	if err != nil {
-		goutils.Error("NewGame2:loadBasicInfo",
+		goutils.Error("NewGame2WithData:loadBasicInfo",
 			zap.Error(err))
 
 		return nil, err
@@ -858,7 +870,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	lstPaytables, err := sonic.Get(data, "repository", "paytableList")
 	if err != nil {
-		goutils.Error("NewGame2:Get",
+		goutils.Error("NewGame2WithData:Get",
 			zap.String("key", "repository.paytableList"),
 			zap.Error(err))
 
@@ -867,7 +879,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = loadPaytables(cfg, &lstPaytables)
 	if err != nil {
-		goutils.Error("NewGame2:loadPaytables",
+		goutils.Error("NewGame2WithData:loadPaytables",
 			zap.Error(err))
 
 		return nil, err
@@ -875,7 +887,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	lstOther, err := sonic.Get(data, "repository", "otherList")
 	if err != nil {
-		goutils.Error("NewGame2:Get",
+		goutils.Error("NewGame2WithData:Get",
 			zap.String("key", "repository.otherList"),
 			zap.Error(err))
 
@@ -884,7 +896,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = loadOtherList(cfg, &lstOther)
 	if err != nil {
-		goutils.Error("NewGame2:loadOtherList",
+		goutils.Error("NewGame2WithData:loadOtherList",
 			zap.Error(err))
 
 		return nil, err
@@ -896,7 +908,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	betMethod, err := sonic.Get(data, "betMethod", 0)
 	if err != nil {
-		goutils.Error("NewGame2:Get",
+		goutils.Error("NewGame2WithData:Get",
 			zap.String("key", "betMethod[0]"),
 			zap.Error(err))
 
@@ -905,7 +917,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = loadBetMethod(cfg, &betMethod)
 	if err != nil {
-		goutils.Error("NewGame2:loadBetMethod",
+		goutils.Error("NewGame2WithData:loadBetMethod",
 			zap.Error(err))
 
 		return nil, err
@@ -915,19 +927,11 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 
 	err = game.Init2(cfg)
 	if err != nil {
-		goutils.Error("NewGame2:Init2",
+		goutils.Error("NewGame2WithData:Init2",
 			zap.Error(err))
 
 		return nil, err
 	}
 
 	return game, nil
-}
-
-func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	if strings.Contains(fn, ".json") {
-		return NewGame2(fn, funcNewPlugin)
-	}
-
-	return NewGameEx(fn, funcNewPlugin)
 }

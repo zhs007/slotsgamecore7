@@ -167,3 +167,15 @@ service DTGameLogic {
     // play2 - play game v2
     rpc play2(RequestPlay) returns (ReplyPlay) {}
 }
+
+// GameLogic - GameLogic
+service GameLogic {
+	// getConfig - get config
+    rpc getConfig(RequestConfig) returns (GameConfig) {}
+    // initialize - initialize a player
+    rpc initialize(RequestInitialize) returns (PlayerState) {}
+    // play - play game
+    rpc play(RequestPlay) returns (stream ReplyPlay) {}
+    // play2 - play game v2
+    rpc play2(RequestPlay) returns (ReplyPlay) {}
+}
