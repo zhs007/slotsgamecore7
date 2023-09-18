@@ -17,6 +17,7 @@ type Serv struct {
 	sgc7pb.UnimplementedGameLogicCollectionServer
 	lis      net.Listener
 	grpcServ *grpc.Server
+	mgrGame  *GameMgr
 }
 
 // NewServ -
@@ -43,6 +44,7 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, err
 	serv := &Serv{
 		lis:      lis,
 		grpcServ: grpcServ,
+		mgrGame:  NewGameMgr(),
 	}
 
 	sgc7pb.RegisterGameLogicCollectionServer(grpcServ, serv)
@@ -67,5 +69,18 @@ func (serv *Serv) Stop() {
 
 // initGame - initial game
 func (serv *Serv) InitGame(ctx context.Context, req *sgc7pb.RequestInitGame) (*sgc7pb.ReplyInitGame, error) {
-	return nil, nil
+	err := serv.mgrGame.InitGame(req.GameCode, []byte(req.Config))
+	if err != nil {
+		goutils.Error("Serv.InitGame:InitGame",
+			zap.Error(err))
+
+		return &sgc7pb.ReplyInitGame{
+			IsOK: false,
+			Err:  err.Error(),
+		}, nil
+	}
+
+	return &sgc7pb.ReplyInitGame{
+		IsOK: true,
+	}, nil
 }
