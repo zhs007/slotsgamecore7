@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Serv - DreamTech Service
+// Serv - Game Logic Service
 type Serv struct {
 	sgc7pb.UnimplementedDTGameLogicServer
 	lis      net.Listener
