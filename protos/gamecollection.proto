@@ -1,6 +1,7 @@
 syntax = "proto3";
 package sgc7pb;
 option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
+import "game.proto";
 
 // RequestInitGame - initial game
 message RequestInitGame {
@@ -14,8 +15,54 @@ message ReplyInitGame {
     string err = 2;
 }
 
+// RequestGameConfig - get game config
+message RequestGameConfig {
+    string gameCode = 1;
+    RequestConfig req = 2;
+}
+
+// ReplyGameConfig - reply game config
+message ReplyGameConfig {
+    bool isOK = 1;
+    string err = 2;
+    GameConfig gameConfig = 3;
+}
+
+// RequestInitializeGamePlayer - initialize a game player
+message RequestInitializeGamePlayer {
+    string gameCode = 1;
+}
+
+// ReplyInitializeGamePlayer - reply initialize a game player
+message ReplyInitializeGamePlayer {
+    bool isOK = 1;
+    string err = 2;
+    PlayerState playerState = 3;    
+}
+
+// RequestPlayGame - play input parameters for the game
+message RequestPlayGame {
+    string gameCode = 1;
+    RequestPlay play = 2;
+}
+
+// RequestPlayGame - play input parameters for the game
+message ReplyPlayGame {
+    bool isOK = 1;
+    string err = 2;
+    ReplyPlay play = 3;
+}
+
 // Rng - RNG Service
 service GameLogicCollection {
 	// initGame - initial game
     rpc initGame(RequestInitGame) returns (ReplyInitGame) {}
+	// getGameConfig - get game config
+    rpc getGameConfig(RequestGameConfig) returns (ReplyGameConfig) {}
+    // initializeGamePlayer - initialize a game player
+    rpc initializeGamePlayer(RequestInitializeGamePlayer) returns (ReplyInitializeGamePlayer) {}
+    // playGame - play game
+    rpc playGame(RequestPlayGame) returns (stream ReplyPlayGame) {}
+    // playGame2 - play game v2
+    rpc playGame2(RequestPlayGame) returns (ReplyPlayGame) {}    
 }
