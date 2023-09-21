@@ -101,7 +101,7 @@ func (mgr *GameMgr) PlayGame(gameCode string, req *sgc7pb.RequestPlay) (*sgc7pb.
 	}
 
 	reply, err := gameD.Play(req)
-	if !isok {
+	if err != nil {
 		goutils.Error("GameMgr.PlayGame",
 			zap.String("gameCode", gameCode),
 			zap.Error(err))
