@@ -28,8 +28,8 @@ type basicWinsData struct {
 	CheckWinType   string   `json:"checkWinType"`
 	SIWMSymbols    []string `json:"SIWMSymbols"`
 	SIWMMul        int      `json:"SIWMMul"`
-	AfterMain      string   `json:"afterMain"`
-	BeforMain      string   `json:"beforMain"`
+	AfterMain      []string `json:"afterMain"`
+	BeforMain      []string `json:"beforMain"`
 }
 
 func (basicWins *basicWinsData) build() *BasicWinsConfig {
@@ -41,8 +41,8 @@ func (basicWins *basicWinsData) build() *BasicWinsConfig {
 		SIWMMul:              basicWins.SIWMMul,
 		ExcludeSymbols:       basicWins.ExcludeSymbols,
 		WildSymbols:          basicWins.WildSymbols,
-		BeforMainTriggerName: []string{basicWins.BeforMain},
-		AfterMainTriggerName: []string{basicWins.AfterMain},
+		BeforMainTriggerName: basicWins.BeforMain,
+		AfterMainTriggerName: basicWins.AfterMain,
 	}
 }
 

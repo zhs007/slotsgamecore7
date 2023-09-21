@@ -1,7 +1,5 @@
 {
-    "gameName": "kof2",
-    "gameType": "SpinningReels",
-    "gameCode": "kof2",
+    "gameName": "kof3",
     "parameter": [
         {
             "name": "Width",
@@ -135,11 +133,11 @@
                 "fileName": "paytables.xlsx",
                 "file": {
                     "file": {
-                        "uid": "rc-upload-1694487808327-3"
+                        "uid": "rc-upload-1695269898717-2"
                     },
                     "fileList": [
                         {
-                            "uid": "rc-upload-1694487808327-3",
+                            "uid": "rc-upload-1695269898717-2",
                             "fileJson": [
                                 {
                                     "Code": 0,
@@ -391,7 +389,7 @@
                             "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             "percent": 0,
                             "originFileObj": {
-                                "uid": "rc-upload-1694487808327-3",
+                                "uid": "rc-upload-1695269898717-2",
                                 "fileJson": [
                                     {
                                         "Code": 0,
@@ -893,11 +891,11 @@
                 "fileName": "reels.xlsx",
                 "file": {
                     "file": {
-                        "uid": "rc-upload-1694144418732-5"
+                        "uid": "rc-upload-1695269898717-5"
                     },
                     "fileList": [
                         {
-                            "uid": "rc-upload-1694144418732-5",
+                            "uid": "rc-upload-1695269898717-5",
                             "fileJson": [
                                 [
                                     "H",
@@ -2988,7 +2986,7 @@
                             "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             "percent": 0,
                             "originFileObj": {
-                                "uid": "rc-upload-1694144418732-5",
+                                "uid": "rc-upload-1695269898717-5",
                                 "fileJson": [
                                     [
                                         "H",
@@ -7166,11 +7164,11 @@
                 "fileName": "linedata.xlsx",
                 "file": {
                     "file": {
-                        "uid": "rc-upload-1694487808327-6"
+                        "uid": "rc-upload-1695269898717-8"
                     },
                     "fileList": [
                         {
-                            "uid": "rc-upload-1694487808327-6",
+                            "uid": "rc-upload-1695269898717-8",
                             "fileJson": [
                                 [
                                     1,
@@ -7317,7 +7315,7 @@
                             "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             "percent": 0,
                             "originFileObj": {
-                                "uid": "rc-upload-1694487808327-6",
+                                "uid": "rc-upload-1695269898717-8",
                                 "fileJson": [
                                     [
                                         1,
@@ -7612,8 +7610,8 @@
                 "cells": [
                     {
                         "position": {
-                            "x": 0,
-                            "y": 0
+                            "x": -150,
+                            "y": -80
                         },
                         "size": {
                             "width": 1,
@@ -7672,13 +7670,13 @@
                                 }
                             ]
                         },
-                        "id": "a969f127-9d27-471e-8837-d22798b05165",
+                        "id": "8bbf7f7f-cb03-425b-9d64-2d4e56190732",
                         "zIndex": 1
                     },
                     {
                         "position": {
-                            "x": 120,
-                            "y": -240
+                            "x": 150,
+                            "y": -340
                         },
                         "size": {
                             "width": 400,
@@ -7800,7 +7798,7 @@
                                 }
                             ]
                         },
-                        "id": "33d5dad9-ee9b-4481-8f2e-9a9e57abe3db",
+                        "id": "24c92637-7a76-4dbc-832f-d11ebae7f4c6",
                         "label": "basicReels",
                         "item": [
                             {
@@ -7816,11 +7814,6 @@
                                 "type": "boolean"
                             }
                         ],
-                        "zIndex": 2,
-                        "componentValues": {
-                            "isError": true,
-                            "reelSet": "reels.xlsx"
-                        },
                         "tools": {
                             "items": [
                                 {
@@ -7831,12 +7824,36 @@
                                     }
                                 }
                             ]
+                        },
+                        "zIndex": 2,
+                        "componentValues": {
+                            "isError": true,
+                            "reelSet": "reels.xlsx"
                         }
                     },
                     {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#0000FF",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "86825c7c-79bb-458d-a8e5-9701e77294fe",
+                        "source": {
+                            "cell": "8bbf7f7f-cb03-425b-9d64-2d4e56190732",
+                            "port": "start-out"
+                        },
+                        "target": {
+                            "cell": "24c92637-7a76-4dbc-832f-d11ebae7f4c6",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 3
+                    },
+                    {
                         "position": {
-                            "x": 730,
-                            "y": -150
+                            "x": 840,
+                            "y": -240
                         },
                         "size": {
                             "width": 400,
@@ -7958,7 +7975,7 @@
                                 }
                             ]
                         },
-                        "id": "e4735389-ab79-4705-ad68-2d36e196ea54",
+                        "id": "f1d13f46-beb2-4f5e-887b-1539253f9c54",
                         "label": "basicWins",
                         "item": [
                             {
@@ -8029,32 +8046,19 @@
                             },
                             {
                                 "label": "beforMain",
-                                "type": "selectCells"
+                                "type": "selectCells",
+                                "setting": {
+                                    "mode": "multiple"
+                                }
                             },
                             {
                                 "label": "afterMain",
-                                "type": "selectCells"
+                                "type": "selectCells",
+                                "setting": {
+                                    "mode": "multiple"
+                                }
                             }
                         ],
-                        "zIndex": 3,
-                        "componentValues": {
-                            "isError": true,
-                            "mainType": "lines",
-                            "betType": "bet",
-                            "excludeSymbols": [
-                                "S"
-                            ],
-                            "wildSymbols": [
-                                "W"
-                            ],
-                            "SIWMSymbols": [
-                                "W"
-                            ],
-                            "SIWMMul": 2,
-                            "afterMain": "checkScatter",
-                            "checkWinType": "all",
-                            "beforMain": "checkScatter"
-                        },
                         "tools": {
                             "items": [
                                 {
@@ -8065,16 +8069,74 @@
                                     }
                                 }
                             ]
+                        },
+                        "zIndex": 4,
+                        "componentValues": {
+                            "isError": true,
+                            "mainType": "lines",
+                            "betType": "bet",
+                            "checkWinType": "all",
+                            "excludeSymbols": [
+                                "S"
+                            ],
+                            "wildSymbols": [
+                                "W"
+                            ],
+                            "SIWMSymbols": [
+                                "W"
+                            ],
+                            "SIWMMul": 2,
+                            "afterMain": [
+                                "checkScatter"
+                            ]
                         }
                     },
                     {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "afca1b4d-0b9c-4165-bae2-396d584b576b",
+                        "source": {
+                            "cell": "24c92637-7a76-4dbc-832f-d11ebae7f4c6",
+                            "port": "basicReels-Scenes-out"
+                        },
+                        "target": {
+                            "cell": "f1d13f46-beb2-4f5e-887b-1539253f9c54",
+                            "port": "basicWins-Scenes-in"
+                        },
+                        "zIndex": 5
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#0000FF",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "36c034c6-2bc6-4fd9-a0f3-574afd012098",
+                        "source": {
+                            "cell": "24c92637-7a76-4dbc-832f-d11ebae7f4c6",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "f1d13f46-beb2-4f5e-887b-1539253f9c54",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 6
+                    },
+                    {
                         "position": {
-                            "x": 1210,
-                            "y": -380
+                            "x": 1490,
+                            "y": -440
                         },
                         "size": {
                             "width": 400,
-                            "height": 840
+                            "height": 448
                         },
                         "view": "react-shape-view",
                         "shape": "custom-node",
@@ -8165,14 +8227,6 @@
                             },
                             "items": [
                                 {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
                                     "id": "basicWins-trigger-Scenes-in",
                                     "group": "in",
                                     "attrs": {
@@ -8192,7 +8246,7 @@
                                 }
                             ]
                         },
-                        "id": "87f31485-5994-4935-9a3a-c27d777e90bc",
+                        "id": "cd89ea5d-7965-4da0-bcfb-272bbd5bd7f7",
                         "label": "basicWins-trigger",
                         "item": [
                             {
@@ -8226,31 +8280,7 @@
                                 "type": "inputNumber"
                             },
                             {
-                                "label": "wildSymbols",
-                                "type": "selectSymbols"
-                            },
-                            {
-                                "label": "SIWMSymbols",
-                                "type": "selectSymbols"
-                            },
-                            {
-                                "label": "SIWMMul",
-                                "type": "inputNumber"
-                            },
-                            {
                                 "label": "respinNum",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "respinNumWeight",
-                                "type": "selectWeights"
-                            },
-                            {
-                                "label": "respinNumWithScatterNum",
-                                "type": "inputNumber"
-                            },
-                            {
-                                "label": "respinNumWeightWithScatterNum",
                                 "type": "inputNumber"
                             },
                             {
@@ -8280,27 +8310,58 @@
                                 "type": "selectAwards"
                             },
                             {
+                                "label": "Advanced settings",
+                                "type": "setting"
+                            },
+                            {
+                                "label": "respinNumWeight",
+                                "type": "selectWeights"
+                            },
+                            {
+                                "label": "respinNumWithScatterNum",
+                                "type": "modalItem",
+                                "children": [
+                                    {
+                                        "label": "ScatterNum",
+                                        "type": "number"
+                                    },
+                                    {
+                                        "label": "respinNum",
+                                        "type": "number"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "respinNumWeightWithScatterNum",
+                                "type": "modalItem",
+                                "children": [
+                                    {
+                                        "label": "ScatterNum",
+                                        "type": "number"
+                                    },
+                                    {
+                                        "label": "respinNumWeight",
+                                        "type": "selectWeight"
+                                    }
+                                ]
+                            },
+                            {
                                 "label": "symbolAwardsWeights",
                                 "type": "selectWeights"
                             },
                             {
                                 "label": "countScatterPayAs",
                                 "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMSymbols",
+                                "type": "selectSymbols"
+                            },
+                            {
+                                "label": "SIWMMul",
+                                "type": "inputNumber"
                             }
                         ],
-                        "zIndex": 4,
-                        "componentValues": {
-                            "isError": false,
-                            "symbol": [
-                                "S"
-                            ],
-                            "type": "scatters",
-                            "wildSymbols": [
-                                "W"
-                            ],
-                            "betType": "bet",
-                            "label": "checkScatter"
-                        },
                         "tools": {
                             "items": [
                                 {
@@ -8311,63 +8372,17 @@
                                     }
                                 }
                             ]
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#0000FF",
-                                "strokeWidth": 1
-                            }
                         },
-                        "id": "7c88632f-0f5b-4fc3-b54b-4c326e63afcb",
-                        "zIndex": 5,
-                        "source": {
-                            "cell": "a969f127-9d27-471e-8837-d22798b05165",
-                            "port": "start-out"
-                        },
-                        "target": {
-                            "cell": "33d5dad9-ee9b-4481-8f2e-9a9e57abe3db",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#0000FF",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "03d98b01-f1a2-4a9a-bb9d-9a9129e13593",
-                        "zIndex": 6,
-                        "source": {
-                            "cell": "33d5dad9-ee9b-4481-8f2e-9a9e57abe3db",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "e4735389-ab79-4705-ad68-2d36e196ea54",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "b29bf5ed-3514-4bb7-ba1a-850858905b96",
                         "zIndex": 7,
-                        "source": {
-                            "cell": "33d5dad9-ee9b-4481-8f2e-9a9e57abe3db",
-                            "port": "basicReels-Scenes-out"
-                        },
-                        "target": {
-                            "cell": "e4735389-ab79-4705-ad68-2d36e196ea54",
-                            "port": "basicWins-Scenes-in"
+                        "componentValues": {
+                            "isError": false,
+                            "label": "checkScatter",
+                            "symbol": [
+                                "S"
+                            ],
+                            "type": "scatters",
+                            "betType": "totalBet",
+                            "openSet": false
                         }
                     },
                     {
@@ -8378,19 +8393,20 @@
                                 "strokeWidth": 1
                             }
                         },
-                        "id": "0bd6258f-16bc-4c34-8485-1c9d8e610e94",
-                        "zIndex": 8,
+                        "id": "3fc70266-6d2c-485d-8f38-68cb13e94a80",
                         "source": {
-                            "cell": "33d5dad9-ee9b-4481-8f2e-9a9e57abe3db",
+                            "cell": "24c92637-7a76-4dbc-832f-d11ebae7f4c6",
                             "port": "basicReels-Scenes-out"
                         },
                         "target": {
-                            "cell": "87f31485-5994-4935-9a3a-c27d777e90bc",
+                            "cell": "cd89ea5d-7965-4da0-bcfb-272bbd5bd7f7",
                             "port": "basicWins-trigger-Scenes-in"
-                        }
+                        },
+                        "zIndex": 8
                     }
                 ]
             }
         }
-    ]
+    ],
+    "code": "nFYgTNqR9ht9Y0yr21x1V"
 }
