@@ -62,6 +62,7 @@ message GameConfig {
     GameScene defaultScene = 8;
     repeated GameScene defaultScene2 = 9;
     repeated int32 betMuls = 10;
+    string data = 11;
 }
 
 // RequestConfig

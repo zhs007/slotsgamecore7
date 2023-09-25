@@ -94,6 +94,7 @@ func BuildPBGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 		Ver:     cfg.Ver,
 		CoreVer: cfg.CoreVer,
 		BetMuls: cfg.BetMuls,
+		Data:    cfg.Data,
 	}
 
 	if cfg.Lines != nil {

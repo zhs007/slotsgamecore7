@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"github.com/bytedance/sonic"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
@@ -45,6 +46,14 @@ func (game *Game) Init(cfgfn string) error {
 		return nil
 	}
 
+	err = game.BuildGameConfigData()
+	if err != nil {
+		goutils.Error("Game.Init:BuildGameConfigData",
+			zap.Error(err))
+
+		return nil
+	}
+
 	return nil
 }
 
@@ -72,6 +81,14 @@ func (game *Game) Init2(cfg *Config) error {
 	err = pool.InitStats()
 	if err != nil {
 		goutils.Error("Game.Init2:InitStats",
+			zap.Error(err))
+
+		return nil
+	}
+
+	err = game.BuildGameConfigData()
+	if err != nil {
+		goutils.Error("Game.Init2:BuildGameConfigData",
 			zap.Error(err))
 
 		return nil
@@ -129,6 +146,27 @@ func (game *Game) NewGameData() any {
 	gameProp, _ := game.Pool.NewGameProp()
 
 	return gameProp
+}
+
+// BuildGameConfigData - build game configration data
+func (game *Game) BuildGameConfigData() error {
+	mapComponent := make(map[string]any)
+
+	for k, component := range game.Pool.MapComponents {
+		mapComponent[k] = component
+	}
+
+	buf, err := sonic.Marshal(mapComponent)
+	if err != nil {
+		goutils.Error("Game.BuildGameConfigData:Marshal",
+			zap.Error(err))
+
+		return err
+	}
+
+	game.Cfg.Data = string(buf)
+
+	return nil
 }
 
 // NewGame - new a Game

@@ -19,6 +19,7 @@ type Config struct {
 	SWReels       map[string]*SymbolWeightReels `json:"-"`
 	DefaultScene2 []*GameScene                  `json:"defaultscene2"`
 	BetMuls       []int32                       `json:"betMuls"`
+	Data          string                        `json:"data"`
 }
 
 // NewConfig - new a Config
