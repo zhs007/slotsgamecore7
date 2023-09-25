@@ -48,25 +48,25 @@ func (bookOfData *BookOfData) BuildPBComponentData() proto.Message {
 
 // BookOfConfig - configuration for BookOf feature
 type BookOfConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	BetType              string   `yaml:"betType"`     // bet or totalBet
-	WildSymbols          []string `yaml:"wildSymbols"` // 可以不要wild
-	WildSymbolCodes      []int    `yaml:"-"`
-	ForceTrigger         bool     `yaml:"forceTrigger"`
-	WeightTrigger        string   `yaml:"weightTrigger"`
-	WeightSymbolNum      string   `yaml:"weightSymbolNum"`
-	WeightSymbol         string   `yaml:"weightSymbol"`
-	ForceSymbolNum       int      `yaml:"forceSymbolNum"`
-	SymbolRNG            string   `yaml:"symbolRNG"`        // 只在ForceSymbolNum为1时有效
-	SymbolCollection     string   `yaml:"symbolCollection"` // 图标从一个SymbolCollection里获取
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	BetType              string   `yaml:"betType" json:"betType"`         // bet or totalBet
+	WildSymbols          []string `yaml:"wildSymbols" json:"wildSymbols"` // 可以不要wild
+	WildSymbolCodes      []int    `yaml:"-" json:"-"`
+	ForceTrigger         bool     `yaml:"forceTrigger" json:"forceTrigger"`
+	WeightTrigger        string   `yaml:"weightTrigger" json:"weightTrigger"`
+	WeightSymbolNum      string   `yaml:"weightSymbolNum" json:"weightSymbolNum"`
+	WeightSymbol         string   `yaml:"weightSymbol" json:"weightSymbol"`
+	ForceSymbolNum       int      `yaml:"forceSymbolNum" json:"forceSymbolNum"`
+	SymbolRNG            string   `yaml:"symbolRNG" json:"symbolRNG"`               // 只在ForceSymbolNum为1时有效
+	SymbolCollection     string   `yaml:"symbolCollection" json:"symbolCollection"` // 图标从一个SymbolCollection里获取
 }
 
 type BookOf struct {
-	*BasicComponent
-	Config          *BookOfConfig
-	WeightTrigger   *sgc7game.ValWeights2
-	WeightSymbolNum *sgc7game.ValWeights2
-	WeightSymbol    *sgc7game.ValWeights2
+	*BasicComponent `json:"-"`
+	Config          *BookOfConfig         `json:"config"`
+	WeightTrigger   *sgc7game.ValWeights2 `json:"-"`
+	WeightSymbolNum *sgc7game.ValWeights2 `json:"-"`
+	WeightSymbol    *sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -

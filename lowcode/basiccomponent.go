@@ -73,14 +73,14 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 }
 
 type BasicComponentConfig struct {
-	DefaultNextComponent string            `yaml:"defaultNextComponent"` // next component, if it is empty jump to ending
-	TagScenes            []string          `yaml:"tagScenes"`            // tag scenes
-	TagOtherScenes       []string          `yaml:"tagOtherScenes"`       // tag otherScenes
-	TargetScene          string            `yaml:"targetScene"`          // target scenes
-	TargetOtherScene     string            `yaml:"targetOtherScene"`     // target otherscenes
-	TagRNG               []string          `yaml:"tagRNG"`               // tag RNG
-	InitStrVals          map[string]string `yaml:"initStrVals"`          // 只要这个组件被执行，就会初始化这些strvals
-	UseFileMapping       bool              `yaml:"useFileMapping"`       // 兼容性配置，新配置应该一定用filemapping
+	DefaultNextComponent string            `yaml:"defaultNextComponent" json:"defaultNextComponent"` // next component, if it is empty jump to ending
+	TagScenes            []string          `yaml:"tagScenes" json:"tagScenes"`                       // tag scenes
+	TagOtherScenes       []string          `yaml:"tagOtherScenes" json:"tagOtherScenes"`             // tag otherScenes
+	TargetScene          string            `yaml:"targetScene" json:"targetScene"`                   // target scenes
+	TargetOtherScene     string            `yaml:"targetOtherScene" json:"targetOtherScene"`         // target otherscenes
+	TagRNG               []string          `yaml:"tagRNG" json:"tagRNG"`                             // tag RNG
+	InitStrVals          map[string]string `yaml:"initStrVals" json:"initStrVals"`                   // 只要这个组件被执行，就会初始化这些strvals
+	UseFileMapping       bool              `yaml:"useFileMapping" json:"useFileMapping"`             // 兼容性配置，新配置应该一定用filemapping
 }
 
 type BasicComponent struct {

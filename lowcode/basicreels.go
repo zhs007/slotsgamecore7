@@ -14,16 +14,16 @@ import (
 
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	ReelSetsWeight       string `yaml:"reelSetWeight"`
-	ReelSet              string `yaml:"reelSet"`
-	IsExpandReel         bool   `yaml:"isExpandReel"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	ReelSetsWeight       string `yaml:"reelSetWeight" json:"reelSetWeight"`
+	ReelSet              string `yaml:"reelSet" json:"reelSet"`
+	IsExpandReel         bool   `yaml:"isExpandReel" json:"isExpandReel"`
 }
 
 type BasicReels struct {
-	*BasicComponent
-	Config         *BasicReelsConfig
-	ReelSetWeights *sgc7game.ValWeights2
+	*BasicComponent `json:"-"`
+	Config          *BasicReelsConfig     `json:"config"`
+	ReelSetWeights  *sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -
