@@ -75,7 +75,15 @@ func (game *Game) Init2(cfg *Config) error {
 	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
 
 	for _, v := range pool.Config.GameMods {
-		game.AddGameMod(NewBasicGameMod2(pool, v, game.MgrComponent))
+		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
+		if err != nil {
+			goutils.Error("Game.Init2:NewBasicGameMod2",
+				zap.Error(err))
+
+			return err
+		}
+
+		game.AddGameMod(gamemod)
 	}
 
 	err = pool.InitStats()

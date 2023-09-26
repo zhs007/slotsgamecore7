@@ -286,7 +286,7 @@ func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrCompo
 }
 
 // NewBasicGameMod2 - new BaseGame
-func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
+func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) (*BasicGameMod, error) {
 	bgm := &BasicGameMod{
 		BasicGameMod:  sgc7game.NewBasicGameMod(cfgGameMod.Type, pool.Config.Width, pool.Config.Height),
 		Pool:          pool,
@@ -304,7 +304,7 @@ func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComp
 				goutils.Error("NewBasicGameMod:Init",
 					zap.Error(err))
 
-				return nil
+				return nil, err
 			}
 
 			components.AddComponent(v.Name, c)
@@ -314,5 +314,5 @@ func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComp
 		bgm.MapComponents[bet] = components
 	}
 
-	return bgm
+	return bgm, nil
 }

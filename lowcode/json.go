@@ -740,13 +740,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	}
 
 	for _, arr := range linkComponent {
-		basicCfg := cfg.mapBasicConfig[arr[0]]
-		basicCfg.DefaultNextComponent = arr[1]
+		basicCfg, isok := cfg.mapBasicConfig[arr[0]]
+		if isok {
+			basicCfg.DefaultNextComponent = arr[1]
+		}
 	}
 
 	for _, arr := range linkScene {
-		sourceCfg := cfg.mapBasicConfig[arr[0]]
-		sourceCfg.TagScenes = append(sourceCfg.TagScenes, arr[0])
+		sourceCfg, isok0 := cfg.mapBasicConfig[arr[0]]
+		if isok0 {
+			sourceCfg.TagScenes = append(sourceCfg.TagScenes, arr[0])
+		}
 
 		targetCfg := cfg.mapBasicConfig[arr[1]]
 		if targetCfg != nil {
@@ -761,10 +765,14 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 
 	for _, arr := range linkOtherScene {
 		sourceCfg := cfg.mapBasicConfig[arr[0]]
-		sourceCfg.TagOtherScenes = append(sourceCfg.TagOtherScenes, arr[0])
+		if sourceCfg != nil {
+			sourceCfg.TagOtherScenes = append(sourceCfg.TagOtherScenes, arr[0])
+		}
 
 		targetCfg := cfg.mapBasicConfig[arr[1]]
-		targetCfg.TargetOtherScene = arr[0]
+		if targetCfg != nil {
+			targetCfg.TargetOtherScene = arr[0]
+		}
 	}
 
 	for _, basicWinsCfg := range lstBasicWins {
