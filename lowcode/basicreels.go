@@ -56,16 +56,20 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	basicReels.Config = cfg.(*BasicReelsConfig)
 
 	if basicReels.Config.ReelSetsWeight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping), "val", "weight", sgc7game.NewStrVal)
-		if err != nil {
-			goutils.Error("BasicReels.Init:LoadValWeights2FromExcel",
-				zap.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
-				zap.Error(err))
+		if pool.Config.mapValWeights != nil {
+			basicReels.ReelSetWeights = pool.Config.mapValWeights[basicReels.Config.ReelSetsWeight]
+		} else {
+			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping), "val", "weight", sgc7game.NewStrVal)
+			if err != nil {
+				goutils.Error("BasicReels.Init:LoadValWeights2FromExcel",
+					zap.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
+					zap.Error(err))
 
-			return err
+				return err
+			}
+
+			basicReels.ReelSetWeights = vw2
 		}
-
-		basicReels.ReelSetWeights = vw2
 	}
 
 	basicReels.onInit(&basicReels.Config.BasicComponentConfig)
