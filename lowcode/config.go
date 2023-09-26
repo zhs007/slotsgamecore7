@@ -51,6 +51,7 @@ type Config struct {
 	ComponentsMapping map[int]map[string]string        `yaml:"componentsMapping"`
 	mapConfig         map[string]any                   `yaml:"-"`
 	mapBasicConfig    map[string]*BasicComponentConfig `yaml:"-"`
+	mapValWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
 }
 
 func (cfg *Config) GetPath(fn string, useFileMapping bool) string {

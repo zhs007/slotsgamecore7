@@ -6,6 +6,11 @@ type paytableData struct {
 	Data   []int  `json:"data"`
 }
 
+type weightData struct {
+	Val    string `json:"val"`
+	Weight int    `json:"weight"`
+}
+
 type basicReelsData struct {
 	ReelSet       string `json:"reelSet"`
 	ReelSetWeight string `json:"reelSetWeight"`

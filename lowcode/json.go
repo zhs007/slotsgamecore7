@@ -349,6 +349,17 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 			cfg.Reels[name] = name
 			cfg.MapReels[name] = rd
+		} else if t == "Weights" {
+			vw2, err := parseValWeights(v.Get("fileJson"))
+			if err != nil {
+				goutils.Error("loadOtherList:parseValWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapValWeights[name] = vw2
 		}
 	}
 
@@ -866,6 +877,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 		mapConfig:       make(map[string]any),
 		StartComponents: make(map[int]string),
 		mapBasicConfig:  make(map[string]*BasicComponentConfig),
+		mapValWeights:   make(map[string]*sgc7game.ValWeights2),
 	}
 
 	err := loadBasicInfo(cfg, data)
