@@ -209,6 +209,24 @@ func (pool *GamePropertyPool) InitStats() error {
 	return nil
 }
 
+// LoadValWeights2FromExcel - load xlsx file
+func (pool *GamePropertyPool) LoadValWeights(fn string, headerVal string, headerWeight string, funcNew sgc7game.FuncNewIVal, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if pool.Config.mapValWeights != nil {
+		return pool.Config.mapValWeights[fn], nil
+	}
+
+	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), headerVal, headerWeight, funcNew)
+	if err != nil {
+		goutils.Error("GamePropertyPool.LoadValWeights:LoadValWeights2FromExcel",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return vw2, nil
+}
+
 func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {
