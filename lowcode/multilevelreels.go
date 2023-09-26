@@ -93,7 +93,7 @@ func (multiLevelReels *MultiLevelReels) InitEx(cfg any, pool *GamePropertyPool) 
 
 	for _, v := range multiLevelReels.Config.Levels {
 		if v.ReelSetsWeight != "" {
-			vw2, err := pool.LoadValWeights(v.ReelSetsWeight, "val", "weight", sgc7game.NewStrVal, multiLevelReels.Config.UseFileMapping)
+			vw2, err := pool.LoadStrWeights(v.ReelSetsWeight, multiLevelReels.Config.UseFileMapping)
 			if err != nil {
 				goutils.Error("MultiLevelReels.Init:LoadSymbolWeights",
 					zap.String("Weight", v.ReelSetsWeight),

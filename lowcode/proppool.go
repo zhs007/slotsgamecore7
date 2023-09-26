@@ -209,15 +209,57 @@ func (pool *GamePropertyPool) InitStats() error {
 	return nil
 }
 
-// LoadValWeights - load xlsx file
-func (pool *GamePropertyPool) LoadValWeights(fn string, headerVal string, headerWeight string, funcNew sgc7game.FuncNewIVal, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+// LoadStrWeights - load xlsx file
+func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
 	if pool.Config.mapValWeights != nil {
 		return pool.Config.mapValWeights[fn], nil
 	}
 
-	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), headerVal, headerWeight, funcNew)
+	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewStrVal)
 	if err != nil {
-		goutils.Error("GamePropertyPool.LoadValWeights:LoadValWeights2FromExcel",
+		goutils.Error("GamePropertyPool.LoadStrWeights:LoadValWeights2FromExcel",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return vw2, nil
+}
+
+// LoadIntWeights - load xlsx file
+func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if pool.Config.mapValWeights != nil {
+		vw := pool.Config.mapValWeights[fn]
+
+		vals := make([]sgc7game.IVal, len(vw.Vals))
+
+		for _, v := range vw.Vals {
+			i64, err := goutils.String2Int64(v.String())
+			if err != nil {
+				goutils.Error("GamePropertyPool.LoadIntWeights:String2Int64",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			vals = append(vals, sgc7game.NewIntValEx[int](int(i64)))
+		}
+
+		nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
+		if err != nil {
+			goutils.Error("GamePropertyPool.LoadIntWeights:NewValWeights2",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		return nvw, nil
+	}
+
+	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+	if err != nil {
+		goutils.Error("GamePropertyPool.LoadIntWeights:LoadValWeights2FromExcel",
 			zap.String("fn", fn),
 			zap.Error(err))
 

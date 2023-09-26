@@ -133,7 +133,7 @@ func (lightning *Lightning) InitEx(cfg any, pool *GamePropertyPool) error {
 	lightning.SymbolCode = pool.DefaultPaytables.MapSymbols[lightning.Config.Symbol]
 
 	if lightning.Config.Weight != "" {
-		vw2, err := pool.LoadValWeights(lightning.Config.Weight, "val", "weight", sgc7game.NewStrVal, lightning.Config.UseFileMapping)
+		vw2, err := pool.LoadStrWeights(lightning.Config.Weight, lightning.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("Lightning.Init:LoadValWeights",
 				zap.String("Weight", lightning.Config.Weight),
@@ -153,7 +153,7 @@ func (lightning *Lightning) InitEx(cfg any, pool *GamePropertyPool) error {
 			Config:     v,
 		}
 
-		vw2, err := pool.LoadValWeights(v.Weight, "val", "weight", sgc7game.NewStrVal, lightning.Config.UseFileMapping)
+		vw2, err := pool.LoadStrWeights(v.Weight, lightning.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("Lightning.Init:LoadValWeights",
 				zap.String("Weight", v.Weight),

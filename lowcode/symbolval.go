@@ -59,7 +59,7 @@ func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
 	symbolVal.Config = cfg.(*SymbolValConfig)
 
 	if symbolVal.Config.WeightVal != "" {
-		vw2, err := pool.LoadValWeights(symbolVal.Config.WeightVal, "val", "weight", sgc7game.NewIntVal[int], symbolVal.Config.UseFileMapping)
+		vw2, err := pool.LoadIntWeights(symbolVal.Config.WeightVal, symbolVal.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("SymbolVal.Init:LoadValWeights",
 				zap.String("Weight", symbolVal.Config.WeightVal),

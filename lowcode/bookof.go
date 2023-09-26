@@ -99,7 +99,7 @@ func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
 	bookof.Config = cfg.(*BookOfConfig)
 
 	if bookof.Config.WeightTrigger != "" {
-		vw2, err := pool.LoadValWeights(bookof.Config.WeightTrigger, "val", "weight", sgc7game.NewStrVal, bookof.Config.UseFileMapping)
+		vw2, err := pool.LoadStrWeights(bookof.Config.WeightTrigger, bookof.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("BookOf.Init:LoadValWeights",
 				zap.String("Weight", bookof.Config.WeightTrigger),
@@ -112,7 +112,7 @@ func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
 	}
 
 	if bookof.Config.WeightSymbolNum != "" {
-		vw2, err := pool.LoadValWeights(bookof.Config.WeightSymbolNum, "val", "weight", sgc7game.NewStrVal, bookof.Config.UseFileMapping)
+		vw2, err := pool.LoadStrWeights(bookof.Config.WeightSymbolNum, bookof.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("BookOf.Init:LoadValWeights",
 				zap.String("Weight", bookof.Config.WeightSymbolNum),
