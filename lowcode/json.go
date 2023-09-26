@@ -349,6 +349,17 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 			cfg.Reels[name] = name
 			cfg.MapReels[name] = rd
+		} else if t == "Weights" {
+			vw2, err := parseValWeights(v.Get("fileJson"))
+			if err != nil {
+				goutils.Error("loadOtherList:parseValWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapValWeights[name] = vw2
 		}
 	}
 
@@ -535,6 +546,36 @@ func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
 	return data.build(), nil
 }
 
+func parseBookOf(cell *ast.Node) (*BookOfConfig, error) {
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseBookOf:componentValues",
+			zap.Error(ErrNoComponentValues))
+
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseBookOf:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	data := &bookOfData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBookOf:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
+}
+
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	linkScene := [][]string{}
 	linkOtherScene := [][]string{}
@@ -679,6 +720,25 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				ccfg := &ComponentConfig{
 					Name: id,
 					Type: "symbolVal2",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "bookOf" {
+				componentCfg, err := parseBookOf(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseBookOf",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "bookOf",
 				}
 
 				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
@@ -866,6 +926,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 		mapConfig:       make(map[string]any),
 		StartComponents: make(map[int]string),
 		mapBasicConfig:  make(map[string]*BasicComponentConfig),
+		mapValWeights:   make(map[string]*sgc7game.ValWeights2),
 	}
 
 	err := loadBasicInfo(cfg, data)

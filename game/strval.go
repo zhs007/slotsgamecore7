@@ -11,6 +11,12 @@ func NewStrVal() IVal {
 	return &StrVal{}
 }
 
+func NewStrValEx(val string) IVal {
+	return &StrVal{
+		Val: val,
+	}
+}
+
 // StrVal
 type StrVal struct {
 	Val string `json:"val"`

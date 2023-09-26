@@ -209,6 +209,100 @@ func (pool *GamePropertyPool) InitStats() error {
 	return nil
 }
 
+// LoadStrWeights - load xlsx file
+func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if pool.Config.mapValWeights != nil {
+		return pool.Config.mapValWeights[fn], nil
+	}
+
+	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewStrVal)
+	if err != nil {
+		goutils.Error("GamePropertyPool.LoadStrWeights:LoadValWeights2FromExcel",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return vw2, nil
+}
+
+// LoadIntWeights - load xlsx file
+func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if pool.Config.mapValWeights != nil {
+		vw := pool.Config.mapValWeights[fn]
+
+		vals := make([]sgc7game.IVal, len(vw.Vals))
+
+		for _, v := range vw.Vals {
+			i64, err := goutils.String2Int64(v.String())
+			if err != nil {
+				goutils.Error("GamePropertyPool.LoadIntWeights:String2Int64",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			vals = append(vals, sgc7game.NewIntValEx[int](int(i64)))
+		}
+
+		nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
+		if err != nil {
+			goutils.Error("GamePropertyPool.LoadIntWeights:NewValWeights2",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		return nvw, nil
+	}
+
+	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+	if err != nil {
+		goutils.Error("GamePropertyPool.LoadIntWeights:LoadValWeights2FromExcel",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return vw2, nil
+}
+
+// LoadSymbolWeights - load xlsx file
+func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if pool.Config.mapValWeights != nil {
+		vw := pool.Config.mapValWeights[fn]
+
+		vals := make([]sgc7game.IVal, len(vw.Vals))
+
+		for i, v := range vw.Vals {
+			vals[i] = sgc7game.NewIntValEx(paytables.MapSymbols[v.String()])
+		}
+
+		nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
+		if err != nil {
+			goutils.Error("GamePropertyPool.LoadValWeights:NewValWeights2",
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		return nvw, nil
+	}
+
+	vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(fn, useFileMapping), headerVal, headerWeight, paytables)
+	if err != nil {
+		goutils.Error("GamePropertyPool.LoadValWeights:LoadValWeights2FromExcel",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return vw2, nil
+}
+
 func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {

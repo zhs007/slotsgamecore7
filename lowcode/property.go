@@ -231,10 +231,10 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 func (gameProp *GameProperty) GetIntValWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
 	vw2, isok := gameProp.MapIntValWeights[fn]
 	if !isok {
-		curvw2, err := sgc7game.LoadValWeights2FromExcel(gameProp.Pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+		curvw2, err := gameProp.Pool.LoadIntWeights(fn, useFileMapping)
 		if err != nil {
-			goutils.Error("GameProperty.GetIntValWeights:LoadValWeights2FromExcel",
-				zap.String("fn", fn),
+			goutils.Error("GameProperty.GetIntValWeights:LoadSymbolWeights",
+				zap.String("Weight", fn),
 				zap.Error(err))
 
 			return nil, err

@@ -93,10 +93,10 @@ func (multiLevelReels *MultiLevelReels) InitEx(cfg any, pool *GamePropertyPool) 
 
 	for _, v := range multiLevelReels.Config.Levels {
 		if v.ReelSetsWeight != "" {
-			vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v.ReelSetsWeight, multiLevelReels.Config.UseFileMapping), "val", "weight", sgc7game.NewStrVal)
+			vw2, err := pool.LoadStrWeights(v.ReelSetsWeight, multiLevelReels.Config.UseFileMapping)
 			if err != nil {
-				goutils.Error("MultiLevelReels.Init:LoadValWeights2FromExcel",
-					zap.String("ReelSetsWeight", v.ReelSetsWeight),
+				goutils.Error("MultiLevelReels.Init:LoadSymbolWeights",
+					zap.String("Weight", v.ReelSetsWeight),
 					zap.Error(err))
 
 				return err
