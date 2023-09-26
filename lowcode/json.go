@@ -546,6 +546,36 @@ func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
 	return data.build(), nil
 }
 
+func parseBookOf(cell *ast.Node) (*BookOfConfig, error) {
+	componentValues := cell.Get("componentValues")
+	if componentValues == nil {
+		goutils.Error("parseBookOf:componentValues",
+			zap.Error(ErrNoComponentValues))
+
+		return nil, ErrNoComponentValues
+	}
+
+	buf, err := componentValues.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseBookOf:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	data := &bookOfData{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBookOf:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return data.build(), nil
+}
+
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	linkScene := [][]string{}
 	linkOtherScene := [][]string{}
@@ -690,6 +720,25 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				ccfg := &ComponentConfig{
 					Name: id,
 					Type: "symbolVal2",
+				}
+
+				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
+			} else if componentType == "bookOf" {
+				componentCfg, err := parseBookOf(&cell)
+				if err != nil {
+					goutils.Error("loadCells:parseBookOf",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				cfg.mapConfig[id] = componentCfg
+				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+
+				ccfg := &ComponentConfig{
+					Name: id,
+					Type: "bookOf",
 				}
 
 				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)

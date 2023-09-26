@@ -136,3 +136,24 @@ func (symbolVal2 *symbolVal2Data) build() *SymbolVal2Config {
 		// OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
 	}
 }
+
+type bookOfData struct {
+	BetType       string `json:"betType"`
+	WeightTrigger string `json:"weightTrigger"`
+	// WeightSymbolNum int    `json:"weightSymbolNum"`
+	WeightSymbol string `json:"weightSymbol"`
+}
+
+func (bookOfData *bookOfData) build() *BookOfConfig {
+	return &BookOfConfig{
+		BetType:       bookOfData.BetType,
+		WeightTrigger: bookOfData.WeightTrigger,
+		WeightSymbol:  bookOfData.WeightSymbol,
+		// WildSymbols          []string `yaml:"wildSymbols" json:"wildSymbols"` // 可以不要wild
+		// ForceTrigger         bool     `yaml:"forceTrigger" json:"forceTrigger"`
+		// WeightSymbolNum      string   `yaml:"weightSymbolNum" json:"weightSymbolNum"`
+		// ForceSymbolNum       int      `yaml:"forceSymbolNum" json:"forceSymbolNum"`
+		// SymbolRNG            string   `yaml:"symbolRNG" json:"symbolRNG"`               // 只在ForceSymbolNum为1时有效
+		// SymbolCollection     string   `yaml:"symbolCollection" json:"symbolCollection"` // 图标从一个SymbolCollection里获取
+	}
+}
