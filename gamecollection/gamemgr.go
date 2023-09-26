@@ -26,6 +26,9 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 			return nil
 		}
 
+		goutils.Info("GameMgr.InitGame",
+			zap.String("data", string(data)))
+
 		gameD1, err := NewGameDataWithHash(gameCode, data, hash)
 		if err != nil {
 			goutils.Error("GameMgr.InitGame:NewGameDataWithHash",
@@ -38,6 +41,9 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 
 		return nil
 	}
+
+	goutils.Info("GameMgr.InitGame",
+		zap.String("data", string(data)))
 
 	gameD1, err := NewGameData(gameCode, data)
 	if err != nil {

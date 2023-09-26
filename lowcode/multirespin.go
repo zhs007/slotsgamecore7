@@ -20,24 +20,24 @@ type RespinDataCmdParam struct {
 
 // RespinDataConfig - configuration for MultiRespin
 type RespinDataConfig struct {
-	RespinNum                     int            `yaml:"respinNum"`                     // respin number
-	RespinNumWeight               string         `yaml:"respinNumWeight"`               // respin number weight
-	RespinNumWithScatterNum       map[int]int    `yaml:"respinNumWithScatterNum"`       // respin number with scatter number
-	RespinNumWeightWithScatterNum map[int]string `yaml:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
-	RespinComponent               string         `yaml:"respinComponent"`               // like fg-spin
-	Cmd                           string         `yaml:"cmd"`                           // cmd
+	RespinNum                     int            `yaml:"respinNum" json:"respinNum"`                                         // respin number
+	RespinNumWeight               string         `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
+	RespinNumWithScatterNum       map[int]int    `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
+	RespinNumWeightWithScatterNum map[int]string `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
+	RespinComponent               string         `yaml:"respinComponent" json:"respinComponent"`                             // like fg-spin
+	Cmd                           string         `yaml:"cmd" json:"cmd"`                                                     // cmd
 }
 
 // BasicWinsConfig - configuration for BasicWins
 type MultiRespinConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	RespinData           []*RespinDataConfig `yaml:"respinData"`      // wait player select
-	TargetSymbolNum      string              `yaml:"targetSymbolNum"` // 这里可以用到一个前面记下的tagSymbolNum值
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	RespinData           []*RespinDataConfig `yaml:"respinData" json:"respinData"`           // wait player select
+	TargetSymbolNum      string              `yaml:"targetSymbolNum" json:"targetSymbolNum"` // 这里可以用到一个前面记下的tagSymbolNum值
 }
 
 type MultiRespin struct {
-	*BasicComponent
-	Config *MultiRespinConfig
+	*BasicComponent `json:"-"`
+	Config          *MultiRespinConfig `json:"config"`
 }
 
 func (multiRespin *MultiRespin) parseCmdParam(cmd string, cmdParam string) (*RespinDataCmdParam, error) {

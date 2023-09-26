@@ -44,21 +44,21 @@ func (multiLevelReplaceReelData *MultiLevelReplaceReelData) BuildPBComponentData
 
 // MultiLevelReplaceReelLevelConfig - configuration for MultiLevelReplaceReelData's Level
 type MultiLevelReplaceReelLevelConfig struct {
-	Reels           map[int][]string `yaml:"reels"` // x - [0, width)
-	SymbolCodeReels map[int][]int    `yaml:"-"`
-	Collector       string           `yaml:"collector"`
-	CollectorVal    int              `yaml:"collectorVal"`
+	Reels           map[int][]string `yaml:"reels" json:"reels"` // x - [0, width)
+	SymbolCodeReels map[int][]int    `yaml:"-" json:"-"`
+	Collector       string           `yaml:"collector" json:"collector"`
+	CollectorVal    int              `yaml:"collectorVal" json:"collectorVal"`
 }
 
 // MultiLevelReplaceReelDataConfig - configuration for MultiLevelReplaceReelData
 type MultiLevelReplaceReelDataConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Levels               []*MultiLevelReplaceReelLevelConfig `yaml:"levels"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Levels               []*MultiLevelReplaceReelLevelConfig `yaml:"levels" json:"levels"`
 }
 
 type MultiLevelReplaceReel struct {
-	*BasicComponent
-	Config *MultiLevelReplaceReelDataConfig
+	*BasicComponent `json:"-"`
+	Config          *MultiLevelReplaceReelDataConfig `json:"config"`
 }
 
 // Init -

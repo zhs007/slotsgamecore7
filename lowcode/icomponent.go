@@ -15,7 +15,7 @@ type IComponent interface {
 	Init(fn string, pool *GamePropertyPool) error
 	// InitEx -
 	InitEx(cfg any, pool *GamePropertyPool) error
-	// OnNewGame -
+	// OnNewGame - 这个一定要注意处理正确，为了节省cpu，没有主动处理componentData的该接口，如果确定需要，要自己调用
 	OnNewGame(gameProp *GameProperty) error
 	// OnNewStep -
 	OnNewStep(gameProp *GameProperty) error

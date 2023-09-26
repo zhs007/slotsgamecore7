@@ -27,16 +27,16 @@ func parseFixSymbolsType(str string) int {
 
 // FixSymbolsConfig - configuration for FixSymbols feature
 type FixSymbolsConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Type                 string   `yaml:"type"`
-	Symbols              []string `yaml:"symbols"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Type                 string   `yaml:"type" json:"type"`
+	Symbols              []string `yaml:"symbols" json:"symbols"`
 }
 
 type FixSymbols struct {
-	*BasicComponent
-	Config      *FixSymbolsConfig
-	SymbolCodes []int
-	Type        int
+	*BasicComponent `json:"-"`
+	Config          *FixSymbolsConfig `json:"config"`
+	SymbolCodes     []int             `json:"-"`
+	Type            int               `json:"-"`
 }
 
 // checkMergeDown -

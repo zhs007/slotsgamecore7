@@ -61,25 +61,25 @@ func (lightningData *LightningData) BuildPBComponentData() proto.Message {
 
 // LightningTriggerFeatureConfig - configuration for lightning trigger feature
 type LightningTriggerFeatureConfig struct {
-	Symbol  string `yaml:"symbol"`  // like NEW_COLLECTOR
-	Feature string `yaml:"feature"` // like collector
+	Symbol  string `yaml:"symbol" json:"symbol"`   // like NEW_COLLECTOR
+	Feature string `yaml:"feature" json:"feature"` // like collector
 }
 
 // LightningSymbolValConfig - configuration for symbol value
 type LightningSymbolValConfig struct {
-	Symbol string `yaml:"symbol"`
-	Weight string `yaml:"weight"`
-	Type   string `yaml:"type"` // like val or mul
+	Symbol string `yaml:"symbol" json:"symbol"`
+	Weight string `yaml:"weight" json:"weight"`
+	Type   string `yaml:"type" json:"type"` // like val or mul
 }
 
 // LightningConfig - configuration for Lightning
 type LightningConfig struct {
-	BasicComponentConfig  `yaml:",inline"`
-	Symbol                string                           `yaml:"symbol"`
-	Weight                string                           `yaml:"weight"`
-	SymbolVals            []*LightningSymbolValConfig      `yaml:"symbolVals"`
-	SymbolTriggerFeatures []*LightningTriggerFeatureConfig `yaml:"symbolTriggerFeatures"`
-	EndingFirstComponent  string                           `yaml:"endingFirstComponent"`
+	BasicComponentConfig  `yaml:",inline" json:",inline"`
+	Symbol                string                           `yaml:"symbol" json:"symbol"`
+	Weight                string                           `yaml:"weight" json:"weight"`
+	SymbolVals            []*LightningSymbolValConfig      `yaml:"symbolVals" json:"symbolVals"`
+	SymbolTriggerFeatures []*LightningTriggerFeatureConfig `yaml:"symbolTriggerFeatures" json:"symbolTriggerFeatures"`
+	EndingFirstComponent  string                           `yaml:"endingFirstComponent" json:"endingFirstComponent"`
 }
 
 // LightningSymbolData - symbol data for Lightning
@@ -90,15 +90,15 @@ type LightningSymbolData struct {
 }
 
 type Lightning struct {
-	*BasicComponent
-	Config                   *LightningConfig
-	SymbolCode               int
-	Weight                   *sgc7game.ValWeights2
-	MapSymbols               map[int]*LightningSymbolData
-	MapSymbolTriggerFeatures map[int]*LightningTriggerFeatureConfig
-	ValSymbolCode            int
-	MulSymbolCode            int
-	CollectorSymbolCode      int
+	*BasicComponent          `json:"-"`
+	Config                   *LightningConfig                       `json:"config"`
+	SymbolCode               int                                    `json:"-"`
+	Weight                   *sgc7game.ValWeights2                  `json:"-"`
+	MapSymbols               map[int]*LightningSymbolData           `json:"-"`
+	MapSymbolTriggerFeatures map[int]*LightningTriggerFeatureConfig `json:"-"`
+	ValSymbolCode            int                                    `json:"-"`
+	MulSymbolCode            int                                    `json:"-"`
+	CollectorSymbolCode      int                                    `json:"-"`
 }
 
 // Init -

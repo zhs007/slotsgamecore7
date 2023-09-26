@@ -45,26 +45,26 @@ func (mysteryData *MysteryData) BuildPBComponentData() proto.Message {
 
 // MysteryTriggerFeatureConfig - configuration for mystery trigger feature
 type MysteryTriggerFeatureConfig struct {
-	Symbol               string `yaml:"symbol"`               // like LIGHTNING
-	RespinFirstComponent string `yaml:"respinFirstComponent"` // like lightning
+	Symbol               string `yaml:"symbol" json:"symbol"`                             // like LIGHTNING
+	RespinFirstComponent string `yaml:"respinFirstComponent" json:"respinFirstComponent"` // like lightning
 }
 
 // MysteryConfig - configuration for Mystery
 type MysteryConfig struct {
-	BasicComponentConfig   `yaml:",inline"`
-	MysteryRNG             string                         `yaml:"mysteryRNG"` // 强制用已经使用的随机数结果做 Mystery
-	MysteryWeight          string                         `yaml:"mysteryWeight"`
-	Mystery                string                         `yaml:"mystery"`
-	Mysterys               []string                       `yaml:"mysterys"`
-	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures"`
+	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	MysteryRNG             string                         `yaml:"mysteryRNG" json:"mysteryRNG"` // 强制用已经使用的随机数结果做 Mystery
+	MysteryWeight          string                         `yaml:"mysteryWeight" json:"mysteryWeight"`
+	Mystery                string                         `yaml:"mystery" json:"-"`
+	Mysterys               []string                       `yaml:"mysterys" json:"mysterys"`
+	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig `yaml:"mysteryTriggerFeatures" json:"mysteryTriggerFeatures"`
 }
 
 type Mystery struct {
-	*BasicComponent
-	Config                   *MysteryConfig
-	MysteryWeights           *sgc7game.ValWeights2
-	MysterySymbols           []int
-	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
+	*BasicComponent          `json:"-"`
+	Config                   *MysteryConfig                       `json:"config"`
+	MysteryWeights           *sgc7game.ValWeights2                `json:"-"`
+	MysterySymbols           []int                                `json:"-"`
+	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig `json:"-"`
 }
 
 // maskOtherScene -

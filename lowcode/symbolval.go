@@ -14,19 +14,19 @@ import (
 
 // SymbolValConfig - configuration for SymbolMulti feature
 type SymbolValConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Symbol               string                   `yaml:"symbol"`
-	WeightVal            string                   `yaml:"weightVal"`
-	DefaultVal           int                      `yaml:"defaultVal"`
-	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbol               string                   `yaml:"symbol" json:"symbol"`
+	WeightVal            string                   `yaml:"weightVal" json:"weightVal"`
+	DefaultVal           int                      `yaml:"defaultVal" json:"defaultVal"`
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature" json:"otherSceneFeature"`
 }
 
 type SymbolVal struct {
-	*BasicComponent
-	Config            *SymbolValConfig
-	SymbolCode        int
-	WeightVal         *sgc7game.ValWeights2
-	OtherSceneFeature *OtherSceneFeature
+	*BasicComponent   `json:"-"`
+	Config            *SymbolValConfig      `json:"config"`
+	SymbolCode        int                   `json:"-"`
+	WeightVal         *sgc7game.ValWeights2 `json:"-"`
+	OtherSceneFeature *OtherSceneFeature    `json:"-"`
 }
 
 // Init -

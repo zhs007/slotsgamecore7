@@ -14,16 +14,16 @@ import (
 
 // WeightTriggerConfig - configuration for WeightTrigger
 type WeightTriggerConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	NextComponents       []string `yaml:"nextComponents"`
-	RespinNums           []int    `yaml:"respinNums"`
-	WeightSet            string   `yaml:"weightSet"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	NextComponents       []string `yaml:"nextComponents" json:"nextComponents"`
+	RespinNums           []int    `yaml:"respinNums" json:"respinNums"`
+	WeightSet            string   `yaml:"weightSet" json:"weightSet"`
 }
 
 type WeightTrigger struct {
-	*BasicComponent
-	Config    *WeightTriggerConfig
-	WeightSet *sgc7game.ValWeights2
+	*BasicComponent `json:"-"`
+	Config          *WeightTriggerConfig  `json:"config"`
+	WeightSet       *sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -

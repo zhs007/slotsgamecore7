@@ -44,22 +44,22 @@ func (multiLevelReelsData *MultiLevelReelsData) BuildPBComponentData() proto.Mes
 
 // MultiLevelReelsLevelConfig - configuration for MultiLevelReels's Level
 type MultiLevelReelsLevelConfig struct {
-	Reel           string `yaml:"reel"`
-	ReelSetsWeight string `yaml:"reelSetWeight"`
-	Collector      string `yaml:"collector"`
-	CollectorVal   int    `yaml:"collectorVal"`
+	Reel           string `yaml:"reel" json:"reel"`
+	ReelSetsWeight string `yaml:"reelSetWeight" json:"reelSetWeight"`
+	Collector      string `yaml:"collector" json:"collector"`
+	CollectorVal   int    `yaml:"collectorVal" json:"collectorVal"`
 }
 
 // MultiLevelReelsConfig - configuration for MultiLevelReels
 type MultiLevelReelsConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Levels               []*MultiLevelReelsLevelConfig `yaml:"levels"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Levels               []*MultiLevelReelsLevelConfig `yaml:"levels" json:"levels"`
 }
 
 type MultiLevelReels struct {
-	*BasicComponent
-	Config              *MultiLevelReelsConfig
-	LevelReelSetWeights []*sgc7game.ValWeights2
+	*BasicComponent     `json:"-"`
+	Config              *MultiLevelReelsConfig  `json:"config"`
+	LevelReelSetWeights []*sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -

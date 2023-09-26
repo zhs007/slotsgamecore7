@@ -46,17 +46,17 @@ func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 
 // CollectorConfig - configuration for Collector
 type CollectorConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Symbol               string           `yaml:"symbol"`
-	MaxVal               int              `yaml:"maxVal"`
-	PerLevelAwards       []*Award         `yaml:"perLevelAwards"`
-	MapSPLevelAwards     map[int][]*Award `yaml:"mapSPLevelAwards"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbol               string           `yaml:"symbol" json:"symbol"`
+	MaxVal               int              `yaml:"maxVal" json:"maxVal"`
+	PerLevelAwards       []*Award         `yaml:"perLevelAwards" json:"perLevelAwards"`
+	MapSPLevelAwards     map[int][]*Award `yaml:"mapSPLevelAwards" json:"mapSPLevelAwards"`
 }
 
 type Collector struct {
-	*BasicComponent
-	Config     *CollectorConfig
-	SymbolCode int
+	*BasicComponent `json:"-"`
+	Config          *CollectorConfig `json:"config"`
+	SymbolCode      int              `json:"-"`
 }
 
 // Init -

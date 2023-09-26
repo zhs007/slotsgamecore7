@@ -107,20 +107,20 @@ func newMaskData(num int) *MaskData {
 
 // MaskConfig - configuration for Mask
 type MaskConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	MaskType             string           `yaml:"maskType"`
-	Symbol               string           `yaml:"symbol"`
-	Num                  int              `yaml:"num"`
-	PerMaskAwards        []*Award         `yaml:"perMaskAwards"`
-	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards"` // -1表示全满的奖励
-	EndingSPAward        string           `yaml:"endingSPAward"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	MaskType             string           `yaml:"maskType" json:"maskType"`
+	Symbol               string           `yaml:"symbol" json:"symbol"`
+	Num                  int              `yaml:"num" json:"num"`
+	PerMaskAwards        []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
+	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
+	EndingSPAward        string           `yaml:"endingSPAward" json:"endingSPAward"`
 }
 
 type Mask struct {
-	*BasicComponent
-	Config     *MaskConfig
-	MaskType   int
-	SymbolCode int
+	*BasicComponent `json:"-"`
+	Config          *MaskConfig `json:"config"`
+	MaskType        int         `json:"-"`
+	SymbolCode      int         `json:"-"`
 }
 
 // Init -
