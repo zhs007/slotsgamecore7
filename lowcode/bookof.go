@@ -99,9 +99,9 @@ func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
 	bookof.Config = cfg.(*BookOfConfig)
 
 	if bookof.Config.WeightTrigger != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(bookof.Config.WeightTrigger, bookof.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := pool.LoadValWeights(bookof.Config.WeightTrigger, "val", "weight", sgc7game.NewStrVal, bookof.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("BookOf.Init:LoadValWeights2FromExcel",
+			goutils.Error("BookOf.Init:LoadValWeights",
 				zap.String("Weight", bookof.Config.WeightTrigger),
 				zap.Error(err))
 
@@ -112,9 +112,9 @@ func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
 	}
 
 	if bookof.Config.WeightSymbolNum != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(bookof.Config.WeightSymbolNum, bookof.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := pool.LoadValWeights(bookof.Config.WeightSymbolNum, "val", "weight", sgc7game.NewStrVal, bookof.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("BookOf.Init:LoadValWeights2FromExcel",
+			goutils.Error("BookOf.Init:LoadValWeights",
 				zap.String("Weight", bookof.Config.WeightSymbolNum),
 				zap.Error(err))
 
@@ -125,9 +125,9 @@ func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
 	}
 
 	if bookof.Config.WeightSymbol != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(bookof.Config.WeightSymbol, bookof.Config.UseFileMapping), "val", "weight", pool.DefaultPaytables)
+		vw2, err := pool.LoadSymbolWeights(bookof.Config.WeightSymbol, "val", "weight", pool.DefaultPaytables, bookof.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("BookOf.Init:LoadValWeights2FromExcelWithSymbols",
+			goutils.Error("BookOf.Init:LoadSymbolWeights",
 				zap.String("Weight", bookof.Config.WeightSymbol),
 				zap.Error(err))
 
