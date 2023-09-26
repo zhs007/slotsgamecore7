@@ -62,9 +62,9 @@ func (symbolVal2 *SymbolVal2) InitEx(cfg any, pool *GamePropertyPool) error {
 	symbolVal2.Config = cfg.(*SymbolVal2Config)
 
 	if symbolVal2.Config.WeightSet != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(symbolVal2.Config.WeightSet, symbolVal2.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := pool.LoadValWeights(symbolVal2.Config.WeightSet, "val", "weight", sgc7game.NewIntVal[int], symbolVal2.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("SymbolVal2.Init:LoadValWeights2FromExcel",
+			goutils.Error("SymbolVal2.Init:LoadValWeights",
 				zap.String("Weight", symbolVal2.Config.WeightSet),
 				zap.Error(err))
 
@@ -75,9 +75,9 @@ func (symbolVal2 *SymbolVal2) InitEx(cfg any, pool *GamePropertyPool) error {
 	}
 
 	for _, v := range symbolVal2.Config.WeightsVal {
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v, symbolVal2.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := pool.LoadValWeights(v, "val", "weight", sgc7game.NewIntVal[int], symbolVal2.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("SymbolVal2.Init:LoadValWeights2FromExcel",
+			goutils.Error("SymbolVal2.Init:LoadValWeights",
 				zap.String("Weight", v),
 				zap.Error(err))
 

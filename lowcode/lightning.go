@@ -133,9 +133,9 @@ func (lightning *Lightning) InitEx(cfg any, pool *GamePropertyPool) error {
 	lightning.SymbolCode = pool.DefaultPaytables.MapSymbols[lightning.Config.Symbol]
 
 	if lightning.Config.Weight != "" {
-		vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(lightning.Config.Weight, lightning.Config.UseFileMapping), "val", "weight", pool.DefaultPaytables)
+		vw2, err := pool.LoadValWeights(lightning.Config.Weight, "val", "weight", sgc7game.NewStrVal, lightning.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("Lightning.Init:LoadValWeights2FromExcelWithSymbols",
+			goutils.Error("Lightning.Init:LoadValWeights",
 				zap.String("Weight", lightning.Config.Weight),
 				zap.Error(err))
 
@@ -153,9 +153,9 @@ func (lightning *Lightning) InitEx(cfg any, pool *GamePropertyPool) error {
 			Config:     v,
 		}
 
-		vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(v.Weight, lightning.Config.UseFileMapping), "val", "weight", sgc7game.NewIntVal[int])
+		vw2, err := pool.LoadValWeights(v.Weight, "val", "weight", sgc7game.NewStrVal, lightning.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("Lightning.Init:LoadValWeights2FromExcelWithSymbols",
+			goutils.Error("Lightning.Init:LoadValWeights",
 				zap.String("Weight", v.Weight),
 				zap.Error(err))
 
