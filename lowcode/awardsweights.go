@@ -8,13 +8,13 @@ import (
 )
 
 type AwardsNode struct {
-	Weight int      `yaml:"weight"`
-	Awards []*Award `yaml:"awards"`
+	Weight int      `yaml:"weight" json:"weight"`
+	Awards []*Award `yaml:"awards" json:"awards"`
 }
 
 type AwardsWeights struct {
-	Nodes     []*AwardsNode `yaml:"nodes"`
-	MaxWeight int           `yaml:"-"`
+	Nodes     []*AwardsNode `yaml:"nodes" json:"nodes"`
+	MaxWeight int           `yaml:"-" json:"-"`
 }
 
 func (aw *AwardsWeights) Init() {

@@ -49,18 +49,18 @@ func (multiLevelMysteryData *MultiLevelMysteryData) BuildPBComponentData() proto
 
 // MultiLevelMysteryLevelConfig - configuration for MultiLevelMystery's Level
 type MultiLevelMysteryLevelConfig struct {
-	MysteryWeight string `yaml:"mysteryWeight"`
-	Collector     string `yaml:"collector"`
-	CollectorVal  int    `yaml:"collectorVal"`
+	MysteryWeight string `yaml:"mysteryWeight" json:"mysteryWeight"`
+	Collector     string `yaml:"collector" json:"collector"`
+	CollectorVal  int    `yaml:"collectorVal" json:"collectorVal"`
 }
 
 // MultiLevelMysteryConfig - configuration for MultiLevelMystery
 type MultiLevelMysteryConfig struct {
-	BasicComponentConfig   `yaml:",inline"`
-	Mystery                string                          `yaml:"mystery"`
-	Mysterys               []string                        `yaml:"mysterys"`
-	Levels                 []*MultiLevelMysteryLevelConfig `yaml:"levels"`
-	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig  `yaml:"mysteryTriggerFeatures"`
+	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	Mystery                string                          `yaml:"mystery" json:"-"`
+	Mysterys               []string                        `yaml:"mysterys" json:"mysterys"`
+	Levels                 []*MultiLevelMysteryLevelConfig `yaml:"levels" json:"levels"`
+	MysteryTriggerFeatures []*MysteryTriggerFeatureConfig  `yaml:"mysteryTriggerFeatures" json:"mysteryTriggerFeatures"`
 }
 
 type MultiLevelMystery struct {

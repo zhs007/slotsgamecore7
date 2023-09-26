@@ -150,13 +150,7 @@ func (game *Game) NewGameData() any {
 
 // BuildGameConfigData - build game configration data
 func (game *Game) BuildGameConfigData() error {
-	mapComponent := make(map[string]any)
-
-	for k, component := range game.Pool.MapComponents {
-		mapComponent[k] = component
-	}
-
-	buf, err := sonic.Marshal(mapComponent)
+	buf, err := sonic.Marshal(game.Pool.MapComponents)
 	if err != nil {
 		goutils.Error("Game.BuildGameConfigData:Marshal",
 			zap.Error(err))

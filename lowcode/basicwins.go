@@ -68,28 +68,28 @@ func (basicWinsData *BasicWinsData) BuildPBComponentData() proto.Message {
 
 // TriggerFeatureConfig - configuration for trigger feature
 type TriggerFeatureConfig struct {
-	TargetScene                   string         `yaml:"targetScene"`                   // like basicReels.mstery
-	Symbol                        string         `yaml:"symbol"`                        // like scatter
-	Type                          string         `yaml:"type"`                          // like scatters
-	MinNum                        int            `yaml:"minNum"`                        // like 3
-	WildSymbols                   []string       `yaml:"wildSymbols"`                   // wild etc
-	WildSymbolCodes               []int          `yaml:"-"`                             // wild symbolCode
-	SIWMSymbols                   []string       `yaml:"SIWMSymbols"`                   // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
-	SIWMSymbolCodes               []int          `yaml:"-"`                             //
-	SIWMMul                       int            `yaml:"SIWMMul"`                       // 这里是SIWM的倍数
-	Scripts                       string         `yaml:"scripts"`                       // scripts
-	RespinNum                     int            `yaml:"respinNum"`                     // respin number
-	RespinNumWeight               string         `yaml:"respinNumWeight"`               // respin number weight
-	RespinNumWithScatterNum       map[int]int    `yaml:"respinNumWithScatterNum"`       // respin number with scatter number
-	RespinNumWeightWithScatterNum map[int]string `yaml:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
-	BetType                       string         `yaml:"betType"`                       // bet or totalBet
-	CountScatterPayAs             string         `yaml:"countScatterPayAs"`             // countscatter时，按什么符号赔付
-	SymbolCodeCountScatterPayAs   int            `yaml:"-"`                             // countscatter时，按什么符号赔付
-	RespinComponent               string         `yaml:"respinComponent"`               // like fg-spin
-	NextComponent                 string         `yaml:"nextComponent"`                 // next component
-	TagSymbolNum                  string         `yaml:"tagSymbolNum"`                  // 这里可以将symbol数量记下来，别的地方能获取到
-	Awards                        []*Award       `yaml:"awards"`                        // 新的奖励系统
-	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights"`           // 每个中奖符号随机一组奖励
+	TargetScene                   string         `yaml:"targetScene" json:"targetScene"`                                     // like basicReels.mstery
+	Symbol                        string         `yaml:"symbol" json:"symbol"`                                               // like scatter
+	Type                          string         `yaml:"type" json:"type"`                                                   // like scatters
+	MinNum                        int            `yaml:"minNum" json:"minNum"`                                               // like 3
+	WildSymbols                   []string       `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
+	WildSymbolCodes               []int          `yaml:"-" json:"-"`                                                         // wild symbolCode
+	SIWMSymbols                   []string       `yaml:"SIWMSymbols" json:"SIWMSymbols"`                                     // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
+	SIWMSymbolCodes               []int          `yaml:"-" json:"-"`                                                         //
+	SIWMMul                       int            `yaml:"SIWMMul" json:"SIWMMul"`                                             // 这里是SIWM的倍数
+	Scripts                       string         `yaml:"scripts" json:"scripts"`                                             // scripts
+	RespinNum                     int            `yaml:"respinNum" json:"respinNum"`                                         // respin number
+	RespinNumWeight               string         `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
+	RespinNumWithScatterNum       map[int]int    `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
+	RespinNumWeightWithScatterNum map[int]string `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
+	BetType                       string         `yaml:"betType" json:"betType"`                                             // bet or totalBet
+	CountScatterPayAs             string         `yaml:"countScatterPayAs" json:"countScatterPayAs"`                         // countscatter时，按什么符号赔付
+	SymbolCodeCountScatterPayAs   int            `yaml:"-" json:"-"`                                                         // countscatter时，按什么符号赔付
+	RespinComponent               string         `yaml:"respinComponent" json:"respinComponent"`                             // like fg-spin
+	NextComponent                 string         `yaml:"nextComponent" json:"nextComponent"`                                 // next component
+	TagSymbolNum                  string         `yaml:"tagSymbolNum" json:"tagSymbolNum"`                                   // 这里可以将symbol数量记下来，别的地方能获取到
+	Awards                        []*Award       `yaml:"awards" json:"awards"`                                               // 新的奖励系统
+	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
 }
 
 func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
@@ -120,20 +120,20 @@ func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
 
 // BasicWinsConfig - configuration for BasicWins
 type BasicWinsConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	MainType             string                  `yaml:"mainType"`       // lines or ways
-	BetType              string                  `yaml:"betType"`        // bet or totalBet
-	StrCheckWinType      string                  `yaml:"checkWinType"`   // left2right or right2left or all
-	CheckWinType         CheckWinType            `yaml:"-"`              //
-	SIWMSymbols          []string                `yaml:"SIWMSymbols"`    // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
-	SIWMSymbolCodes      []int                   `yaml:"-"`              //
-	SIWMMul              int                     `yaml:"SIWMMul"`        // 这里是SIWM的倍数
-	ExcludeSymbols       []string                `yaml:"excludeSymbols"` // w/s etc
-	WildSymbols          []string                `yaml:"wildSymbols"`    // wild etc
-	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain"`      // befor the maintype
-	AfterMain            []*TriggerFeatureConfig `yaml:"afterMain"`      // after the maintype
-	BeforMainTriggerName []string                `yaml:"-"`              // befor the maintype
-	AfterMainTriggerName []string                `yaml:"-"`              // after the maintype
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	MainType             string                  `yaml:"mainType" json:"mainType"`             // lines or ways
+	BetType              string                  `yaml:"betType" json:"betType"`               // bet or totalBet
+	StrCheckWinType      string                  `yaml:"checkWinType" json:"checkWinType"`     // left2right or right2left or all
+	CheckWinType         CheckWinType            `yaml:"-" json:"-"`                           //
+	SIWMSymbols          []string                `yaml:"SIWMSymbols" json:"SIWMSymbols"`       // SIWM就是如果有符号参与中奖考虑倍数，这里是SIWM的图标
+	SIWMSymbolCodes      []int                   `yaml:"-" json:"-"`                           //
+	SIWMMul              int                     `yaml:"SIWMMul" json:"SIWMMul"`               // 这里是SIWM的倍数
+	ExcludeSymbols       []string                `yaml:"excludeSymbols" json:"excludeSymbols"` // w/s etc
+	WildSymbols          []string                `yaml:"wildSymbols" json:"wildSymbols"`       // wild etc
+	BeforMain            []*TriggerFeatureConfig `yaml:"beforMain" json:"beforMain"`           // befor the maintype
+	AfterMain            []*TriggerFeatureConfig `yaml:"afterMain" json:"afterMain"`           // after the maintype
+	BeforMainTriggerName []string                `yaml:"-" json:"-"`                           // befor the maintype
+	AfterMainTriggerName []string                `yaml:"-" json:"-"`                           // after the maintype
 }
 
 type BasicWins struct {

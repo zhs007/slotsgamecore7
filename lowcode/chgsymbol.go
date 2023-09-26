@@ -14,16 +14,16 @@ import (
 
 // ChgSymbolNodeConfig -
 type ChgSymbolNodeConfig struct {
-	X          int    `yaml:"x"`
-	Y          int    `yaml:"y"`
-	Symbol     string `yaml:"symbol"`
-	SymbolCode int    `yaml:"symbolCode"`
+	X          int    `yaml:"x" json:"x"`
+	Y          int    `yaml:"y" json:"y"`
+	Symbol     string `yaml:"symbol" json:"symbol"`
+	SymbolCode int    `yaml:"symbolCode" json:"symbolCode"`
 }
 
 // ChgSymbolConfig - configuration for ChgSymbol feature
 type ChgSymbolConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Nodes                []*ChgSymbolNodeConfig `yaml:"nodes"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Nodes                []*ChgSymbolNodeConfig `yaml:"nodes" json:"nodes"`
 }
 
 type ChgSymbol struct {
