@@ -14,17 +14,17 @@ import (
 
 // ReplaceSymbolConfig - configuration for ReplaceSymbol
 type ReplaceSymbolConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Symbols              []string `yaml:"symbols"`
-	Chg2SymbolInReels    []string `yaml:"chg2SymbolInReels"`
-	Mask                 string   `yaml:"mask"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbols              []string `yaml:"symbols" json:"symbols"`
+	Chg2SymbolInReels    []string `yaml:"chg2SymbolInReels" json:"chg2SymbolInReels"`
+	Mask                 string   `yaml:"mask" json:"mask"`
 }
 
 type ReplaceSymbol struct {
-	*BasicComponent
-	Config                *ReplaceSymbolConfig
-	SymbolCodes           []int
-	Chg2SymbolCodeInReels []int
+	*BasicComponent       `json:"-"`
+	Config                *ReplaceSymbolConfig `json:"config"`
+	SymbolCodes           []int                `json:"-"`
+	Chg2SymbolCodeInReels []int                `json:"-"`
 }
 
 // Init -

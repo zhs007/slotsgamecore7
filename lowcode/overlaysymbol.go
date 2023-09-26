@@ -45,18 +45,18 @@ func (overlaySymbolData *OverlaySymbolData) BuildPBComponentData() proto.Message
 
 // OverlaySymbolConfig - configuration for OverlaySymbol feature
 type OverlaySymbolConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Symbol               string `yaml:"symbol"`
-	MapPosition          string `yaml:"mapPosition"`
-	DefaultLevel         int    `yaml:"defaultLevel"`
-	Collector            string `yaml:"collector"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbol               string `yaml:"symbol" json:"symbol"`
+	MapPosition          string `yaml:"mapPosition" json:"mapPosition"`
+	DefaultLevel         int    `yaml:"defaultLevel" json:"defaultLevel"`
+	Collector            string `yaml:"collector" json:"collector"`
 }
 
 type OverlaySymbol struct {
-	*BasicComponent
-	Config      *OverlaySymbolConfig
-	SymbolCode  int
-	MapPosition *sgc7game.ValMapping2
+	*BasicComponent `json:"-"`
+	Config          *OverlaySymbolConfig  `json:"config"`
+	SymbolCode      int                   `json:"-"`
+	MapPosition     *sgc7game.ValMapping2 `json:"-"`
 }
 
 // OnNewGame -

@@ -14,22 +14,22 @@ import (
 
 // SymbolVal2Config - configuration for SymbolVal2 feature
 type SymbolVal2Config struct {
-	BasicComponentConfig `yaml:",inline"`
-	Symbol               string                   `yaml:"symbol"`
-	WeightSet            string                   `yaml:"weightSet"`
-	WeightsVal           []string                 `yaml:"weightsVal"`
-	DefaultVal           int                      `yaml:"defaultVal"`
-	RNGSet               string                   `yaml:"RNGSet"`
-	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbol               string                   `yaml:"symbol" json:"symbol"`
+	WeightSet            string                   `yaml:"weightSet" json:"weightSet"`
+	WeightsVal           []string                 `yaml:"weightsVal" json:"weightsVal"`
+	DefaultVal           int                      `yaml:"defaultVal" json:"defaultVal"`
+	RNGSet               string                   `yaml:"RNGSet" json:"RNGSet"`
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature" json:"otherSceneFeature"`
 }
 
 type SymbolVal2 struct {
-	*BasicComponent
-	Config            *SymbolVal2Config
-	SymbolCode        int
-	WeightsVal        []*sgc7game.ValWeights2
-	WeightSet         *sgc7game.ValWeights2
-	OtherSceneFeature *OtherSceneFeature
+	*BasicComponent   `json:"-"`
+	Config            *SymbolVal2Config       `json:"config"`
+	SymbolCode        int                     `json:"-"`
+	WeightsVal        []*sgc7game.ValWeights2 `json:"-"`
+	WeightSet         *sgc7game.ValWeights2   `json:"-"`
+	OtherSceneFeature *OtherSceneFeature      `json:"-"`
 }
 
 // Init -

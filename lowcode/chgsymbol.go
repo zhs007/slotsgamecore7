@@ -27,8 +27,8 @@ type ChgSymbolConfig struct {
 }
 
 type ChgSymbol struct {
-	*BasicComponent
-	Config *ChgSymbolConfig
+	*BasicComponent `json:"-"`
+	Config          *ChgSymbolConfig `json:"config"`
 }
 
 // Init -

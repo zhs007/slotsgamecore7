@@ -90,15 +90,15 @@ type LightningSymbolData struct {
 }
 
 type Lightning struct {
-	*BasicComponent
-	Config                   *LightningConfig
-	SymbolCode               int
-	Weight                   *sgc7game.ValWeights2
-	MapSymbols               map[int]*LightningSymbolData
-	MapSymbolTriggerFeatures map[int]*LightningTriggerFeatureConfig
-	ValSymbolCode            int
-	MulSymbolCode            int
-	CollectorSymbolCode      int
+	*BasicComponent          `json:"-"`
+	Config                   *LightningConfig                       `json:"config"`
+	SymbolCode               int                                    `json:"-"`
+	Weight                   *sgc7game.ValWeights2                  `json:"-"`
+	MapSymbols               map[int]*LightningSymbolData           `json:"-"`
+	MapSymbolTriggerFeatures map[int]*LightningTriggerFeatureConfig `json:"-"`
+	ValSymbolCode            int                                    `json:"-"`
+	MulSymbolCode            int                                    `json:"-"`
+	CollectorSymbolCode      int                                    `json:"-"`
 }
 
 // Init -

@@ -14,18 +14,18 @@ import (
 
 // SymbolValWinsConfig - configuration for SymbolValWins
 type SymbolValWinsConfig struct {
-	BasicComponentConfig    `yaml:",inline"`
-	BetType                 string `yaml:"betType"`                 // bet or totalBet
-	TriggerSymbol           string `yaml:"triggerSymbol"`           // like collect
-	Type                    string `yaml:"type"`                    // like scatters
-	MinNum                  int    `yaml:"minNum"`                  // like 3
-	IsTriggerSymbolNumMulti bool   `yaml:"isTriggerSymbolNumMulti"` // totalwins = totalvals * triggetSymbol's num
+	BasicComponentConfig    `yaml:",inline" json:",inline"`
+	BetType                 string `yaml:"betType" json:"betType"`                                 // bet or totalBet
+	TriggerSymbol           string `yaml:"triggerSymbol" json:"triggerSymbol"`                     // like collect
+	Type                    string `yaml:"type" json:"type"`                                       // like scatters
+	MinNum                  int    `yaml:"minNum" json:"minNum"`                                   // like 3
+	IsTriggerSymbolNumMulti bool   `yaml:"isTriggerSymbolNumMulti" json:"isTriggerSymbolNumMulti"` // totalwins = totalvals * triggetSymbol's num
 }
 
 type SymbolValWins struct {
-	*BasicComponent
-	Config            *SymbolValWinsConfig
-	TriggerSymbolCode int
+	*BasicComponent   `json:"-"`
+	Config            *SymbolValWinsConfig `json:"config"`
+	TriggerSymbolCode int                  `json:"-"`
 }
 
 // Init -

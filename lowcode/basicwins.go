@@ -137,10 +137,10 @@ type BasicWinsConfig struct {
 }
 
 type BasicWins struct {
-	*BasicComponent
-	Config         *BasicWinsConfig
-	ExcludeSymbols []int
-	WildSymbols    []int
+	*BasicComponent `json:"-"`
+	Config          *BasicWinsConfig `json:"config"`
+	ExcludeSymbols  []int            `json:"-"`
+	WildSymbols     []int            `json:"-"`
 }
 
 // AddResult -

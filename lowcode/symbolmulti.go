@@ -14,23 +14,23 @@ import (
 
 // SymbolMultiConfig - configuration for SymbolMulti feature
 type SymbolMultiConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	Symbol               string                   `yaml:"symbol"`         // 弃用，用symbols
-	Symbols              []string                 `yaml:"symbols"`        // 这些符号可以有倍数
-	WeightMulti          string                   `yaml:"weightMulti"`    // 倍数权重
-	StaticMulti          int                      `yaml:"staticMulti"`    // 恒定倍数
-	MapWeightMulti       map[string]string        `yaml:"mapWeightMulti"` // 可以配置多套权重
-	ValUsed              string                   `yaml:"valUsed"`        // 用这个值来确定使用的权重
-	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbol               string                   `yaml:"symbol" json:"-"`                      // 弃用，用symbols
+	Symbols              []string                 `yaml:"symbols" json:"symbols"`               // 这些符号可以有倍数
+	WeightMulti          string                   `yaml:"weightMulti" json:"weightMulti"`       // 倍数权重
+	StaticMulti          int                      `yaml:"staticMulti" json:"staticMulti"`       // 恒定倍数
+	MapWeightMulti       map[string]string        `yaml:"mapWeightMulti" json:"mapWeightMulti"` // 可以配置多套权重
+	ValUsed              string                   `yaml:"valUsed" json:"valUsed"`               // 用这个值来确定使用的权重
+	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature" json:"otherSceneFeature"`
 }
 
 type SymbolMulti struct {
-	*BasicComponent
-	Config            *SymbolMultiConfig
-	SymbolCodes       []int
-	WeightMulti       *sgc7game.ValWeights2
-	MapWeightMulti    map[string]*sgc7game.ValWeights2
-	OtherSceneFeature *OtherSceneFeature
+	*BasicComponent   `json:"-"`
+	Config            *SymbolMultiConfig               `json:"config"`
+	SymbolCodes       []int                            `json:"-"`
+	WeightMulti       *sgc7game.ValWeights2            `json:"-"`
+	MapWeightMulti    map[string]*sgc7game.ValWeights2 `json:"-"`
+	OtherSceneFeature *OtherSceneFeature               `json:"-"`
 }
 
 // Init -

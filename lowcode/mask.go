@@ -117,10 +117,10 @@ type MaskConfig struct {
 }
 
 type Mask struct {
-	*BasicComponent
-	Config     *MaskConfig
-	MaskType   int
-	SymbolCode int
+	*BasicComponent `json:"-"`
+	Config          *MaskConfig `json:"config"`
+	MaskType        int         `json:"-"`
+	SymbolCode      int         `json:"-"`
 }
 
 // Init -

@@ -33,10 +33,10 @@ type FixSymbolsConfig struct {
 }
 
 type FixSymbols struct {
-	*BasicComponent
-	Config      *FixSymbolsConfig
-	SymbolCodes []int
-	Type        int
+	*BasicComponent `json:"-"`
+	Config          *FixSymbolsConfig `json:"config"`
+	SymbolCodes     []int             `json:"-"`
+	Type            int               `json:"-"`
 }
 
 // checkMergeDown -

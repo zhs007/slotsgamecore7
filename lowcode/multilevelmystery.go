@@ -64,11 +64,11 @@ type MultiLevelMysteryConfig struct {
 }
 
 type MultiLevelMystery struct {
-	*BasicComponent
-	Config                   *MultiLevelMysteryConfig
-	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
-	LevelMysteryWeights      []*sgc7game.ValWeights2
-	MysterySymbols           []int
+	*BasicComponent          `json:"-"`
+	Config                   *MultiLevelMysteryConfig             `json:"config"`
+	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig `json:"-"`
+	LevelMysteryWeights      []*sgc7game.ValWeights2              `json:"-"`
+	MysterySymbols           []int                                `json:"-"`
 }
 
 // maskOtherScene -

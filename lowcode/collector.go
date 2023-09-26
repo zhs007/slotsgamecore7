@@ -54,9 +54,9 @@ type CollectorConfig struct {
 }
 
 type Collector struct {
-	*BasicComponent
-	Config     *CollectorConfig
-	SymbolCode int
+	*BasicComponent `json:"-"`
+	Config          *CollectorConfig `json:"config"`
+	SymbolCode      int              `json:"-"`
 }
 
 // Init -

@@ -48,15 +48,15 @@ func (symbolCollectionData *SymbolCollectionData) BuildPBComponentData() proto.M
 
 // SymbolCollectionConfig - configuration for SymbolCollection feature
 type SymbolCollectionConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	WeightVal            string `yaml:"weightVal"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	WeightVal            string `yaml:"weightVal" json:"weightVal"`
 }
 
 // SymbolCollection - 也是一个非常特殊的组件，用来处理symbol随机集合的，譬如一共8个符号，按恒定权重先后选出3个符号
 type SymbolCollection struct {
-	*BasicComponent
-	Config    *SymbolCollectionConfig
-	WeightVal *sgc7game.ValWeights2
+	*BasicComponent `json:"-"`
+	Config          *SymbolCollectionConfig `json:"config"`
+	WeightVal       *sgc7game.ValWeights2   `json:"-"`
 }
 
 // Init -

@@ -45,17 +45,17 @@ func (reelSetMysteryData *ReelSetMysteryData) BuildPBComponentData() proto.Messa
 
 // ReelSetMysteryConfig - configuration for ReelSetMystery
 type ReelSetMysteryConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	MysteryRNG           string            `yaml:"mysteryRNG"` // 强制用已经使用的随机数结果做 ReelSetMystery
-	MysterySymbols       []string          `yaml:"mysterySymbols"`
-	MapMysteryWeight     map[string]string `yaml:"mapMysteryWeight"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	MysteryRNG           string            `yaml:"mysteryRNG" json:"mysteryRNG"` // 强制用已经使用的随机数结果做 ReelSetMystery
+	MysterySymbols       []string          `yaml:"mysterySymbols" json:"mysterySymbols"`
+	MapMysteryWeight     map[string]string `yaml:"mapMysteryWeight" json:"mapMysteryWeight"`
 }
 
 type ReelSetMystery struct {
-	*BasicComponent
-	Config             *ReelSetMysteryConfig
-	MapMysteryWeights  map[string]*sgc7game.ValWeights2
-	MysterySymbolCodes []int
+	*BasicComponent    `json:"-"`
+	Config             *ReelSetMysteryConfig            `json:"config"`
+	MapMysteryWeights  map[string]*sgc7game.ValWeights2 `json:"-"`
+	MysterySymbolCodes []int                            `json:"-"`
 }
 
 // Init -

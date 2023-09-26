@@ -36,8 +36,8 @@ type MultiRespinConfig struct {
 }
 
 type MultiRespin struct {
-	*BasicComponent
-	Config *MultiRespinConfig
+	*BasicComponent `json:"-"`
+	Config          *MultiRespinConfig `json:"config"`
 }
 
 func (multiRespin *MultiRespin) parseCmdParam(cmd string, cmdParam string) (*RespinDataCmdParam, error) {

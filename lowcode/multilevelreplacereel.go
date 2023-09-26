@@ -57,8 +57,8 @@ type MultiLevelReplaceReelDataConfig struct {
 }
 
 type MultiLevelReplaceReel struct {
-	*BasicComponent
-	Config *MultiLevelReplaceReelDataConfig
+	*BasicComponent `json:"-"`
+	Config          *MultiLevelReplaceReelDataConfig `json:"config"`
 }
 
 // Init -

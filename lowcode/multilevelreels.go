@@ -57,9 +57,9 @@ type MultiLevelReelsConfig struct {
 }
 
 type MultiLevelReels struct {
-	*BasicComponent
-	Config              *MultiLevelReelsConfig
-	LevelReelSetWeights []*sgc7game.ValWeights2
+	*BasicComponent     `json:"-"`
+	Config              *MultiLevelReelsConfig  `json:"config"`
+	LevelReelSetWeights []*sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -

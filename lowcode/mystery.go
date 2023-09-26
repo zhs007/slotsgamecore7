@@ -60,11 +60,11 @@ type MysteryConfig struct {
 }
 
 type Mystery struct {
-	*BasicComponent
-	Config                   *MysteryConfig
-	MysteryWeights           *sgc7game.ValWeights2
-	MysterySymbols           []int
-	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig
+	*BasicComponent          `json:"-"`
+	Config                   *MysteryConfig                       `json:"config"`
+	MysteryWeights           *sgc7game.ValWeights2                `json:"-"`
+	MysterySymbols           []int                                `json:"-"`
+	MapMysteryTriggerFeature map[int]*MysteryTriggerFeatureConfig `json:"-"`
 }
 
 // maskOtherScene -

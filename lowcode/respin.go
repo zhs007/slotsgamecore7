@@ -59,24 +59,24 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 
 // RespinLevelConfig - configuration for Respin Level
 type RespinLevelConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	LastRespinNum        int    `yaml:"lastRespinNum"` // 倒数第几局开始
-	MaxCoinWins          int    `yaml:"maxCoinWins"`   // 如果最大获奖低于这个
-	JumpComponent        string `yaml:"jumpComponent"` // 跳转到这个component
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	LastRespinNum        int    `yaml:"lastRespinNum" json:"lastRespinNum"` // 倒数第几局开始
+	MaxCoinWins          int    `yaml:"maxCoinWins" json:"maxCoinWins"`     // 如果最大获奖低于这个
+	JumpComponent        string `yaml:"jumpComponent" json:"jumpComponent"` // 跳转到这个component
 }
 
 // RespinConfig - configuration for Respin
 type RespinConfig struct {
-	BasicComponentConfig `yaml:",inline"`
-	InitRespinNum        int                  `yaml:"initRespinNum"`
-	MainComponent        string               `yaml:"mainComponent"`
-	IsWinBreak           bool                 `yaml:"isWinBreak"`
-	Levels               []*RespinLevelConfig `yaml:"levels"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	InitRespinNum        int                  `yaml:"initRespinNum" json:"initRespinNum"`
+	MainComponent        string               `yaml:"mainComponent" json:"mainComponent"`
+	IsWinBreak           bool                 `yaml:"isWinBreak" json:"isWinBreak"`
+	Levels               []*RespinLevelConfig `yaml:"levels" json:"levels"`
 }
 
 type Respin struct {
-	*BasicComponent
-	Config *RespinConfig
+	*BasicComponent `json:"-"`
+	Config          *RespinConfig `json:"config"`
 }
 
 // OnNewGame -

@@ -1,7 +1,7 @@
 package lowcode
 
 type OtherSceneFeatureConfig struct {
-	Type string `yaml:"type"`
+	Type string `yaml:"type" json:"type"`
 }
 
 func (cfg *OtherSceneFeatureConfig) GetType() int {
