@@ -73,6 +73,17 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			}
 
 			cfg.Height = int(h)
+		} else if str == "Scene" {
+			scene, err := v.Get("value").String()
+			if err != nil {
+				goutils.Error("loadBasicInfo:value",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.DefaultScene = scene
 		}
 	}
 
