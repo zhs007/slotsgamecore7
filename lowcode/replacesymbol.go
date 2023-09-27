@@ -14,17 +14,18 @@ import (
 
 // ReplaceSymbolConfig - configuration for ReplaceSymbol
 type ReplaceSymbolConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbols              []string `yaml:"symbols" json:"symbols"`
-	Chg2SymbolInReels    []string `yaml:"chg2SymbolInReels" json:"chg2SymbolInReels"`
-	Mask                 string   `yaml:"mask" json:"mask"`
+	BasicComponentConfig     `yaml:",inline" json:",inline"`
+	Symbols                  []string       `yaml:"symbols" json:"symbols"`
+	Chg2SymbolInReels        []string       `yaml:"chg2SymbolInReels" json:"chg2SymbolInReels"`
+	MapChg2SymbolInReels     map[int]string `yaml:"mapChg2SymbolInReels" json:"mapChg2SymbolInReels"`
+	Mask                     string         `yaml:"mask" json:"mask"`
+	SymbolCodes              []int          `yaml:"-" json:"-"`
+	MapChg2SymbolCodeInReels map[int]int    `yaml:"-" json:"-"`
 }
 
 type ReplaceSymbol struct {
-	*BasicComponent       `json:"-"`
-	Config                *ReplaceSymbolConfig `json:"config"`
-	SymbolCodes           []int                `json:"-"`
-	Chg2SymbolCodeInReels []int                `json:"-"`
+	*BasicComponent `json:"-"`
+	Config          *ReplaceSymbolConfig `json:"config"`
 }
 
 // Init -
@@ -57,11 +58,17 @@ func (replaceSymbol *ReplaceSymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 	replaceSymbol.Config = cfg.(*ReplaceSymbolConfig)
 
 	for _, v := range replaceSymbol.Config.Symbols {
-		replaceSymbol.SymbolCodes = append(replaceSymbol.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+		replaceSymbol.Config.SymbolCodes = append(replaceSymbol.Config.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
 
-	for _, v := range replaceSymbol.Config.Chg2SymbolInReels {
-		replaceSymbol.Chg2SymbolCodeInReels = append(replaceSymbol.Chg2SymbolCodeInReels, pool.DefaultPaytables.MapSymbols[v])
+	replaceSymbol.Config.MapChg2SymbolCodeInReels = make(map[int]int)
+
+	for i, v := range replaceSymbol.Config.Chg2SymbolInReels {
+		replaceSymbol.Config.MapChg2SymbolCodeInReels[i] = pool.DefaultPaytables.MapSymbols[v]
+	}
+
+	for k, v := range replaceSymbol.Config.MapChg2SymbolInReels {
+		replaceSymbol.Config.MapChg2SymbolCodeInReels[k] = pool.DefaultPaytables.MapSymbols[v]
 	}
 
 	replaceSymbol.onInit(&replaceSymbol.Config.BasicComponentConfig)
@@ -79,7 +86,7 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	gs := replaceSymbol.GetTargetScene(gameProp, curpr, cd, "")
 
-	if !gs.HasSymbols(replaceSymbol.SymbolCodes) {
+	if !gs.HasSymbols(replaceSymbol.Config.SymbolCodes) {
 		replaceSymbol.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)
 	} else {
 		// sc2 := gs.Clone()
@@ -90,9 +97,12 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 			if md != nil {
 				for x, arr := range sc2.Arr {
 					if md.Vals[x] {
-						for y, s := range arr {
-							if goutils.IndexOfIntSlice(replaceSymbol.SymbolCodes, s, 0) >= 0 {
-								sc2.Arr[x][y] = replaceSymbol.Chg2SymbolCodeInReels[x]
+						destSymbol, isok := replaceSymbol.Config.MapChg2SymbolCodeInReels[x]
+						if isok {
+							for y, s := range arr {
+								if goutils.IndexOfIntSlice(replaceSymbol.Config.SymbolCodes, s, 0) >= 0 {
+									sc2.Arr[x][y] = destSymbol
+								}
 							}
 						}
 					}
@@ -101,8 +111,11 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		} else {
 			for x, arr := range sc2.Arr {
 				for y, s := range arr {
-					if goutils.IndexOfIntSlice(replaceSymbol.SymbolCodes, s, 0) >= 0 {
-						sc2.Arr[x][y] = replaceSymbol.Chg2SymbolCodeInReels[x]
+					destSymbol, isok := replaceSymbol.Config.MapChg2SymbolCodeInReels[x]
+					if isok {
+						if goutils.IndexOfIntSlice(replaceSymbol.Config.SymbolCodes, s, 0) >= 0 {
+							sc2.Arr[x][y] = destSymbol
+						}
 					}
 				}
 			}
