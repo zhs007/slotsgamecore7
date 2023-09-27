@@ -72,7 +72,7 @@ func (game *Game) Init2(cfg *Config) error {
 	game.Cfg.PayTables = pool.DefaultPaytables
 	game.SetVer(sgc7ver.Version)
 
-	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
+	game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
 
 	for _, v := range pool.Config.GameMods {
 		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
