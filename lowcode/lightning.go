@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const LightningTypeName = "lightning"
+
 const (
 	LightningTypeVal = "val"
 	LightningTypeMul = "mul"
@@ -129,6 +131,7 @@ func (lightning *Lightning) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (lightning *Lightning) InitEx(cfg any, pool *GamePropertyPool) error {
 	lightning.Config = cfg.(*LightningConfig)
+	lightning.Config.ComponentType = LightningTypeName
 
 	lightning.SymbolCode = pool.DefaultPaytables.MapSymbols[lightning.Config.Symbol]
 

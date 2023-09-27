@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const SymbolMultiTypeName = "symbolMulti"
+
 // SymbolMultiConfig - configuration for SymbolMulti feature
 type SymbolMultiConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -61,6 +63,7 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
 	symbolMulti.Config = cfg.(*SymbolMultiConfig)
+	symbolMulti.Config.ComponentType = SymbolMultiTypeName
 
 	if len(symbolMulti.Config.MapWeightMulti) > 0 {
 		symbolMulti.MapWeightMulti = make(map[string]*sgc7game.ValWeights2, 0)

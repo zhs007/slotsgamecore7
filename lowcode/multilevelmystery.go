@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const MultiLevelMysteryTypeName = "multiLevelMystery"
+
 type MultiLevelMysteryData struct {
 	BasicComponentData
 	CurLevel       int
@@ -117,6 +119,7 @@ func (multiLevelMystery *MultiLevelMystery) Init(fn string, pool *GamePropertyPo
 // InitEx -
 func (multiLevelMystery *MultiLevelMystery) InitEx(cfg any, pool *GamePropertyPool) error {
 	multiLevelMystery.Config = cfg.(*MultiLevelMysteryConfig)
+	multiLevelMystery.Config.ComponentType = MultiLevelMysteryTypeName
 
 	for _, v := range multiLevelMystery.Config.Levels {
 		vw2, err := pool.LoadSymbolWeights(v.MysteryWeight, "val", "weight", pool.DefaultPaytables, multiLevelMystery.Config.UseFileMapping)

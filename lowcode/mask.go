@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const MaskTypeName = "mask"
+
 func boolArr2Int(vals []bool) int {
 	iv := 0
 
@@ -151,6 +153,7 @@ func (mask *Mask) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (mask *Mask) InitEx(cfg any, pool *GamePropertyPool) error {
 	mask.Config = cfg.(*MaskConfig)
+	mask.Config.ComponentType = MaskTypeName
 
 	mask.MaskType = parserMaskType(mask.Config.MaskType)
 	mask.SymbolCode = pool.DefaultPaytables.MapSymbols[mask.Config.Symbol]

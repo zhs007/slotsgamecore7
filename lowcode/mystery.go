@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const MysteryTypeName = "mystery"
+
 type MysteryData struct {
 	BasicComponentData
 	CurMysteryCode int
@@ -113,6 +115,7 @@ func (mystery *Mystery) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (mystery *Mystery) InitEx(cfg any, pool *GamePropertyPool) error {
 	mystery.Config = cfg.(*MysteryConfig)
+	mystery.Config.ComponentType = MysteryTypeName
 
 	if mystery.Config.MysteryWeight != "" {
 		vw2, err := pool.LoadSymbolWeights(mystery.Config.MysteryWeight, "val", "weight", pool.DefaultPaytables, mystery.Config.UseFileMapping)

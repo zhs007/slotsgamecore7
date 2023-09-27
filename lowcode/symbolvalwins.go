@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const SymbolValWinsTypeName = "symbolValWins"
+
 // SymbolValWinsConfig - configuration for SymbolValWins
 type SymbolValWinsConfig struct {
 	BasicComponentConfig    `yaml:",inline" json:",inline"`
@@ -56,6 +58,7 @@ func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) erro
 // InitEx -
 func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) error {
 	symbolValWins.Config = cfg.(*SymbolValWinsConfig)
+	symbolValWins.Config.ComponentType = SymbolValWinsTypeName
 
 	if symbolValWins.Config.TriggerSymbol != "" {
 		symbolValWins.TriggerSymbolCode = pool.DefaultPaytables.MapSymbols[symbolValWins.Config.TriggerSymbol]

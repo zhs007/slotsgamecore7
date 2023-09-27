@@ -81,6 +81,7 @@ type BasicComponentConfig struct {
 	TagRNG               []string          `yaml:"tagRNG" json:"tagRNG"`                             // tag RNG
 	InitStrVals          map[string]string `yaml:"initStrVals" json:"initStrVals"`                   // 只要这个组件被执行，就会初始化这些strvals
 	UseFileMapping       bool              `yaml:"useFileMapping" json:"useFileMapping"`             // 兼容性配置，新配置应该一定用filemapping
+	ComponentType        string            `yaml:"-" json:"componentType"`                           // 组件类型
 }
 
 type BasicComponent struct {

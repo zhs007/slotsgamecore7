@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const CollectorTypeName = "collector"
+
 type CollectorData struct {
 	BasicComponentData
 	Val          int // 当前总值, Current total value
@@ -87,6 +89,7 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
 	collector.Config = cfg.(*CollectorConfig)
+	collector.Config.ComponentType = CollectorTypeName
 
 	collector.SymbolCode = pool.DefaultPaytables.MapSymbols[collector.Config.Symbol]
 

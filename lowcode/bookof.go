@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const BookOfTypeName = "bookOf"
+
 type BookOfData struct {
 	BasicComponentData
 	Symbols []int
@@ -97,6 +99,7 @@ func (bookof *BookOf) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (bookof *BookOf) InitEx(cfg any, pool *GamePropertyPool) error {
 	bookof.Config = cfg.(*BookOfConfig)
+	bookof.Config.ComponentType = BookOfTypeName
 
 	if bookof.Config.WeightTrigger != "" {
 		vw2, err := pool.LoadStrWeights(bookof.Config.WeightTrigger, bookof.Config.UseFileMapping)
