@@ -79,7 +79,7 @@ func (mgr *GameMgr) InitializeGamePlayer(gameCode string) (*sgc7pb.PlayerState, 
 	defer mgr.Unlock()
 
 	gameD, isok := mgr.MapGames[gameCode]
-	if !isok {
+	if !isok || gameD == nil || gameD.Game == nil || gameD.Service == nil {
 		goutils.Error("GameMgr.InitializeGamePlayer",
 			zap.String("gameCode", gameCode),
 			zap.Error(ErrInvalidGameCode))
