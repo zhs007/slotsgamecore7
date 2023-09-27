@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const SymbolValTypeName = "symbolVal"
+
 // SymbolValConfig - configuration for SymbolMulti feature
 type SymbolValConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -57,6 +59,7 @@ func (symbolVal *SymbolVal) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
 	symbolVal.Config = cfg.(*SymbolValConfig)
+	symbolVal.Config.ComponentType = SymbolValTypeName
 
 	if symbolVal.Config.WeightVal != "" {
 		vw2, err := pool.LoadIntWeights(symbolVal.Config.WeightVal, symbolVal.Config.UseFileMapping)

@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const ChgSymbolTypeName = "chgSymbol"
+
 // ChgSymbolNodeConfig -
 type ChgSymbolNodeConfig struct {
 	X          int    `yaml:"x" json:"x"`
@@ -59,6 +61,7 @@ func (chgSymbol *ChgSymbol) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (chgSymbol *ChgSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 	chgSymbol.Config = cfg.(*ChgSymbolConfig)
+	chgSymbol.Config.ComponentType = ChgSymbolTypeName
 
 	for _, v := range chgSymbol.Config.Nodes {
 		v.SymbolCode = pool.DefaultPaytables.MapSymbols[v.Symbol]

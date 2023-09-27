@@ -15,6 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const MultiLevelReelsTypeName = "multiLevelReels"
+
 type MultiLevelReelsData struct {
 	BasicComponentData
 	CurLevel int
@@ -90,6 +92,7 @@ func (multiLevelReels *MultiLevelReels) Init(fn string, pool *GamePropertyPool) 
 // InitEx -
 func (multiLevelReels *MultiLevelReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	multiLevelReels.Config = cfg.(*MultiLevelReelsConfig)
+	multiLevelReels.Config.ComponentType = MultiLevelReelsTypeName
 
 	for _, v := range multiLevelReels.Config.Levels {
 		if v.ReelSetsWeight != "" {

@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const SymbolCollectionTypeName = "symbolCollection"
+
 type SymbolCollectionData struct {
 	BasicComponentData
 	SymbolCodes []int
@@ -87,6 +89,7 @@ func (symbolCollection *SymbolCollection) Init(fn string, pool *GamePropertyPool
 // InitEx -
 func (symbolCollection *SymbolCollection) InitEx(cfg any, pool *GamePropertyPool) error {
 	symbolCollection.Config = cfg.(*SymbolCollectionConfig)
+	symbolCollection.Config.ComponentType = SymbolCollectionTypeName
 
 	if symbolCollection.Config.WeightVal != "" {
 		vw2, err := pool.LoadIntWeights(symbolCollection.Config.WeightVal, symbolCollection.Config.UseFileMapping)

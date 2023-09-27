@@ -15,6 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const BasicWinsTypeName = "basicWins"
+
 const (
 	WinTypeLines        = "lines"
 	WinTypeWays         = "ways"
@@ -298,6 +300,7 @@ func (basicWins *BasicWins) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (basicWins *BasicWins) InitEx(cfg any, pool *GamePropertyPool) error {
 	basicWins.Config = cfg.(*BasicWinsConfig)
+	basicWins.Config.ComponentType = BasicWinsTypeName
 
 	basicWins.Config.CheckWinType = ParseCheckWinType(basicWins.Config.StrCheckWinType)
 

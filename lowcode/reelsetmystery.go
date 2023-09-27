@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const ReelSetMysteryTypeName = "reelSetMystery"
+
 type ReelSetMysteryData struct {
 	BasicComponentData
 	CurMysteryCode int
@@ -86,6 +88,7 @@ func (reelSetMystery *ReelSetMystery) Init(fn string, pool *GamePropertyPool) er
 // InitEx -
 func (reelSetMystery *ReelSetMystery) InitEx(cfg any, pool *GamePropertyPool) error {
 	reelSetMystery.Config = cfg.(*ReelSetMysteryConfig)
+	reelSetMystery.Config.ComponentType = ReelSetMysteryTypeName
 
 	for k, v := range reelSetMystery.Config.MapMysteryWeight {
 		vw2, err := pool.LoadSymbolWeights(v, "val", "weight", pool.DefaultPaytables, reelSetMystery.Config.UseFileMapping)

@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const BasicReelsTypeName = "basicReels"
+
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -54,6 +56,7 @@ func (basicReels *BasicReels) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	basicReels.Config = cfg.(*BasicReelsConfig)
+	basicReels.Config.ComponentType = BasicReelsTypeName
 
 	if basicReels.Config.ReelSetsWeight != "" {
 		vw2, err := pool.LoadStrWeights(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping)

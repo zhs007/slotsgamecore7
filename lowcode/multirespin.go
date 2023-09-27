@@ -13,6 +13,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const MultiRespinTypeName = "multiRespin"
+
 type RespinDataCmdParam struct {
 	RespinNum       int    `json:"RespinNum"`       // respin number
 	RespinComponent string `json:"respinComponent"` // like fg-spin
@@ -158,6 +160,7 @@ func (multiRespin *MultiRespin) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (multiRespin *MultiRespin) InitEx(cfg any, pool *GamePropertyPool) error {
 	multiRespin.Config = cfg.(*MultiRespinConfig)
+	multiRespin.Config.ComponentType = MultiRespinTypeName
 
 	multiRespin.onInit(&multiRespin.Config.BasicComponentConfig)
 

@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const ReplaceSymbolTypeName = "replaceSymbol"
+
 // ReplaceSymbolConfig - configuration for ReplaceSymbol
 type ReplaceSymbolConfig struct {
 	BasicComponentConfig     `yaml:",inline" json:",inline"`
@@ -56,6 +58,7 @@ func (replaceSymbol *ReplaceSymbol) Init(fn string, pool *GamePropertyPool) erro
 // InitEx -
 func (replaceSymbol *ReplaceSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 	replaceSymbol.Config = cfg.(*ReplaceSymbolConfig)
+	replaceSymbol.Config.ComponentType = ReplaceSymbolTypeName
 
 	for _, v := range replaceSymbol.Config.Symbols {
 		replaceSymbol.Config.SymbolCodes = append(replaceSymbol.Config.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])

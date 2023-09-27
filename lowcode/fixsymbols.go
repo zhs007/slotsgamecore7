@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const FixSymbolsTypeName = "fixSymbols"
+
 const (
 	FixSymbolsTypeUnknow    int = 0 // unknow
 	FixSymbolsTypeMergeDown int = 1 // merge & down
@@ -106,6 +108,7 @@ func (fixSymbols *FixSymbols) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (fixSymbols *FixSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	fixSymbols.Config = cfg.(*FixSymbolsConfig)
+	fixSymbols.Config.ComponentType = FixSymbolsTypeName
 
 	for _, v := range fixSymbols.Config.Symbols {
 		fixSymbols.SymbolCodes = append(fixSymbols.SymbolCodes, pool.DefaultPaytables.MapSymbols[v])

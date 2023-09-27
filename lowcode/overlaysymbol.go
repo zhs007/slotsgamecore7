@@ -15,6 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const OverlaySymbolTypeName = "overlaySymbol"
+
 type OverlaySymbolData struct {
 	BasicComponentData
 	CurLevel int
@@ -114,6 +116,7 @@ func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) erro
 // InitEx -
 func (overlaySymbol *OverlaySymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 	overlaySymbol.Config = cfg.(*OverlaySymbolConfig)
+	overlaySymbol.Config.ComponentType = OverlaySymbolTypeName
 
 	if overlaySymbol.Config.MapPosition != "" {
 		vm2, err := sgc7game.LoadValMapping2FromExcel(pool.Config.GetPath(overlaySymbol.Config.MapPosition, overlaySymbol.Config.UseFileMapping), "index", "value", sgc7game.NewIntArrVal[int])

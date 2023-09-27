@@ -15,6 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const MultiLevelReplaceReelTypeName = "multiLevelReplaceReel"
+
 type MultiLevelReplaceReelData struct {
 	BasicComponentData
 	CurLevel int
@@ -89,6 +91,7 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) Init(fn string, pool *GamePr
 // InitEx -
 func (multiLevelReplaceReel *MultiLevelReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
 	multiLevelReplaceReel.Config = cfg.(*MultiLevelReplaceReelDataConfig)
+	multiLevelReplaceReel.Config.ComponentType = MultiLevelReplaceReelTypeName
 
 	for _, v := range multiLevelReplaceReel.Config.Levels {
 		if v.Reels != nil {

@@ -16,6 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const RespinTypeName = "respin"
+
 type RespinData struct {
 	BasicComponentData
 	LastRespinNum   int
@@ -135,6 +137,7 @@ func (respin *Respin) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (respin *Respin) InitEx(cfg any, pool *GamePropertyPool) error {
 	respin.Config = cfg.(*RespinConfig)
+	respin.Config.ComponentType = RespinTypeName
 
 	respin.onInit(&respin.Config.BasicComponentConfig)
 

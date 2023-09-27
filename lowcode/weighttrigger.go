@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const WeightTriggerTypeName = "weightTrigger"
+
 // WeightTriggerConfig - configuration for WeightTrigger
 type WeightTriggerConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -54,6 +56,7 @@ func (weightTrigger *WeightTrigger) Init(fn string, pool *GamePropertyPool) erro
 // InitEx -
 func (weightTrigger *WeightTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	weightTrigger.Config = cfg.(*WeightTriggerConfig)
+	weightTrigger.Config.ComponentType = WeightTriggerTypeName
 
 	if weightTrigger.Config.WeightSet != "" {
 		vw2, err := pool.LoadIntWeights(weightTrigger.Config.WeightSet, weightTrigger.Config.UseFileMapping)
