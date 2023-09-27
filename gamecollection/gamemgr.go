@@ -23,6 +23,8 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 		hash := Hash(data)
 
 		if hash == gameD.HashCode {
+			goutils.Info("GameMgr.InitGame:same hash")
+
 			return nil
 		}
 
@@ -39,6 +41,9 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 
 		mgr.MapGames[gameCode] = gameD1
 
+		goutils.Info("GameMgr.InitGame:OK!",
+			zap.String("gameCode", gameCode))
+
 		return nil
 	}
 
@@ -54,6 +59,9 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 	}
 
 	mgr.MapGames[gameCode] = gameD1
+
+	goutils.Info("GameMgr.InitGame:OK!",
+		zap.String("gameCode", gameCode))
 
 	return nil
 }
