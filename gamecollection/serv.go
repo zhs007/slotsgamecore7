@@ -118,7 +118,7 @@ func (serv *Serv) InitializeGamePlayer(ctx context.Context, req *sgc7pb.RequestI
 
 	ps, err := serv.mgrGame.InitializeGamePlayer(req.GameCode)
 	if err != nil {
-		goutils.Error("Serv.GetGameConfig:GetGameConfig",
+		goutils.Error("Serv.InitializeGamePlayer:InitializeGamePlayer",
 			zap.Error(err))
 
 		return &sgc7pb.ReplyInitializeGamePlayer{

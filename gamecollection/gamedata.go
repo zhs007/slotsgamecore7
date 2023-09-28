@@ -156,6 +156,7 @@ func NewGameDataWithHash(gameCode string, data []byte, hash string) (*GameData, 
 		Data:     data,
 		Game:     game,
 		HashCode: hash,
+		Service:  NewService(),
 	}
 
 	return gameD, nil
