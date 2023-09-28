@@ -23,13 +23,15 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 		hash := Hash(data)
 
 		if hash == gameD.HashCode {
-			goutils.Info("GameMgr.InitGame:same hash")
+			goutils.Info("GameMgr.InitGame:same hash",
+				zap.String("gameCode", gameCode),
+				zap.String("hash", hash))
 
 			return nil
 		}
 
-		goutils.Info("GameMgr.InitGame",
-			zap.String("data", string(data)))
+		// goutils.Info("GameMgr.InitGame",
+		// 	zap.String("data", string(data)))
 
 		gameD1, err := NewGameDataWithHash(gameCode, data, hash)
 		if err != nil {
@@ -47,8 +49,8 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 		return nil
 	}
 
-	goutils.Info("GameMgr.InitGame",
-		zap.String("data", string(data)))
+	// goutils.Info("GameMgr.InitGame",
+	// 	zap.String("data", string(data)))
 
 	gameD1, err := NewGameData(gameCode, data)
 	if err != nil {
@@ -74,6 +76,7 @@ func (mgr *GameMgr) GetGameConfig(gameCode string) (*sgc7game.Config, error) {
 	if !isok {
 		goutils.Error("GameMgr.GetGameConfig",
 			zap.String("gameCode", gameCode),
+			zap.Int("game number", len(mgr.MapGames)),
 			zap.Error(ErrInvalidGameCode))
 
 		return nil, ErrInvalidGameCode
@@ -90,6 +93,10 @@ func (mgr *GameMgr) InitializeGamePlayer(gameCode string) (*sgc7pb.PlayerState, 
 	if !isok || gameD == nil || gameD.Game == nil || gameD.Service == nil {
 		goutils.Error("GameMgr.InitializeGamePlayer",
 			zap.String("gameCode", gameCode),
+			zap.Bool("gameD", gameD != nil),
+			zap.Bool("gameD.Game", gameD.Game != nil),
+			zap.Bool("gameD.Service", gameD.Service != nil),
+			zap.Int("game number", len(mgr.MapGames)),
 			zap.Error(ErrInvalidGameCode))
 
 		return nil, ErrInvalidGameCode
