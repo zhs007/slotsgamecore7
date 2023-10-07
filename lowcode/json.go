@@ -54,33 +54,33 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 		if str == "Width" {
 			w, err := v.Get("value").Int64()
 			if err != nil {
-				goutils.Error("loadBasicInfo:value",
+				goutils.Error("loadBasicInfo:Width",
 					zap.Int("i", i),
 					zap.Error(err))
 
-				return err
+				return ErrIvalidWidth
 			}
 
 			cfg.Width = int(w)
 		} else if str == "Height" {
 			h, err := v.Get("value").Int64()
 			if err != nil {
-				goutils.Error("loadBasicInfo:value",
+				goutils.Error("loadBasicInfo:Height",
 					zap.Int("i", i),
 					zap.Error(err))
 
-				return err
+				return ErrIvalidHeight
 			}
 
 			cfg.Height = int(h)
 		} else if str == "Scene" {
 			scene, err := v.Get("value").String()
 			if err != nil {
-				goutils.Error("loadBasicInfo:value",
+				goutils.Error("loadBasicInfo:Scene",
 					zap.Int("i", i),
 					zap.Error(err))
 
-				return err
+				return ErrIvalidDefaultScene
 			}
 
 			cfg.DefaultScene = scene
