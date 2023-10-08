@@ -611,7 +611,7 @@ func (basicWins *BasicWins) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 	for _, v := range lst {
 		gp, isok := v.CurGameModParams.(*GameParams)
 		if isok {
-			curComponent, isok := gp.MapComponents[basicWins.Name]
+			curComponent, isok := gp.MapComponentMsgs[basicWins.Name]
 			if isok {
 				curwins, err := basicWins.OnStatsWithPB(feature, curComponent, v)
 				if err != nil {

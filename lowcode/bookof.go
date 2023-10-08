@@ -327,7 +327,7 @@ func (bookof *BookOf) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 	for _, v := range lst {
 		gp, isok := v.CurGameModParams.(*GameParams)
 		if isok {
-			curComponent, isok := gp.MapComponents[bookof.Name]
+			curComponent, isok := gp.MapComponentMsgs[bookof.Name]
 			if isok {
 				curwins, err := bookof.OnStatsWithPB(feature, curComponent, v)
 				if err != nil {
