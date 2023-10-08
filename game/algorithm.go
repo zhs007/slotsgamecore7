@@ -946,6 +946,7 @@ func CalcFullLineExWithMulti(scene *GameScene, pt *PayTables, bet int,
 
 		for x := 0; x < scene.Width; x++ {
 			curnums := 0
+			curmul := 0
 			for y := 0; y < len(scene.Arr[x]); y++ {
 				if !isValidSymbolEx(cs, scene, x, y) {
 					continue
@@ -963,7 +964,8 @@ func CalcFullLineExWithMulti(scene *GameScene, pt *PayTables, bet int,
 						symbolnums++
 					}
 
-					curnums += getMulti(x, y)
+					curnums++
+					curmul += getMulti(x, y)
 				}
 			}
 
@@ -971,7 +973,7 @@ func CalcFullLineExWithMulti(scene *GameScene, pt *PayTables, bet int,
 				break
 			}
 
-			mul *= curnums
+			mul *= curmul
 		}
 
 		if symbolnums > 0 && pt.MapPay[cs][symbolnums-1] > 0 {
