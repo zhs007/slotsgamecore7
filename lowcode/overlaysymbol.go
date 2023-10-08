@@ -192,15 +192,13 @@ func (overlaySymbol *OverlaySymbol) OnStats(feature *sgc7stats.Feature, stake *s
 }
 
 // OnStatsWithPB -
-func (overlaySymbol *OverlaySymbol) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.OverlaySymbolData{}
+func (overlaySymbol *OverlaySymbol) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.OverlaySymbolData)
+	if !isok {
+		goutils.Error("OverlaySymbol.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("OverlaySymbol.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return overlaySymbol.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

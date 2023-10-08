@@ -125,8 +125,8 @@ github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 h1:OAmKAfT06//esDdpi/DZ8Q
 github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22/go.mod h1:WwHg+CVyzlv/TX9xqBFXEZAuxOPxn2k1GNHwG41IIUQ=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
-github.com/zhs007/goutils v0.1.50 h1:3ufwUPvjeEccooo91rBpFQ1+u20VgS4E2ukRt9TMELA=
-github.com/zhs007/goutils v0.1.50/go.mod h1:Vdbh4fCSjf1cvvolWVQkJP7hQuYmWMBX+xXiiFRRRGs=
+github.com/zhs007/goutils v0.1.51 h1:GxBYpBQlcV3p5B/tV19pgWAekZOMYB7sMy2xTzNMe1k=
+github.com/zhs007/goutils v0.1.51/go.mod h1:Vdbh4fCSjf1cvvolWVQkJP7hQuYmWMBX+xXiiFRRRGs=
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.41.1 h1:Ei1FUQ5CbSNkl2o/XAiksXSyQNAeJBX3ivqJpJ254Ak=
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.41.1/go.mod h1:f7TOPTlEcliCBlOYPuNnZTuND71MVTAoINWIt1SmP/c=
 go.opentelemetry.io/otel v1.15.1 h1:3Iwq3lfRByPaws0f6bU3naAqOR1n5IeDWd9390kWHa8=

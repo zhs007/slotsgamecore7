@@ -14,7 +14,7 @@ require (
 	github.com/valyala/fasthttp v1.44.0
 	github.com/valyala/fastrand v1.1.0
 	github.com/xuri/excelize/v2 v2.7.1
-	github.com/zhs007/goutils v0.1.50
+	github.com/zhs007/goutils v0.1.51
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.41.1
 	go.opentelemetry.io/otel v1.15.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.15.1

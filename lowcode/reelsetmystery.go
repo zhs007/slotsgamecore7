@@ -208,15 +208,13 @@ func (reelSetMystery *ReelSetMystery) OnStats(feature *sgc7stats.Feature, stake 
 }
 
 // OnStatsWithPB -
-func (reelSetMystery *ReelSetMystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.ReelSetMysteryData{}
+func (reelSetMystery *ReelSetMystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.ReelSetMysteryData)
+	if !isok {
+		goutils.Error("ReelSetMystery.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("ReelSetMystery.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return reelSetMystery.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

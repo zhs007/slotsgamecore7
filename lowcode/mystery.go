@@ -251,15 +251,13 @@ func (mystery *Mystery) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stak
 }
 
 // OnStatsWithPB -
-func (mystery *Mystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.MysteryData{}
+func (mystery *Mystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.MysteryData)
+	if !isok {
+		goutils.Error("Mystery.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("Mystery.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return mystery.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

@@ -84,4 +84,7 @@ var (
 	ErrIvalidWidth = errors.New("invalid width")
 	// ErrIvalidHeight - invalid height
 	ErrIvalidHeight = errors.New("invalid height")
+
+	// ErrIvalidProto - invalid proto
+	ErrIvalidProto = errors.New("invalid proto")
 )

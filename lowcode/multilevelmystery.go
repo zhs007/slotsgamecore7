@@ -257,15 +257,13 @@ func (multiLevelMystery *MultiLevelMystery) OnStats(feature *sgc7stats.Feature, 
 }
 
 // OnStatsWithPB -
-func (multiLevelMystery *MultiLevelMystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.MultiLevelMysteryData{}
+func (multiLevelMystery *MultiLevelMystery) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.MultiLevelMysteryData)
+	if !isok {
+		goutils.Error("MultiLevelMystery.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("MultiLevelMystery.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return multiLevelMystery.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

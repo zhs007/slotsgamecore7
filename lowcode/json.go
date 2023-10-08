@@ -587,6 +587,16 @@ func parseBookOf(cell *ast.Node) (*BookOfConfig, error) {
 	return data.build(), nil
 }
 
+// func isLine(cell *ast.Node) bool {
+// 	if cell.Get("labels") != nil && cell.Get("labels").Index(0) != nil {
+// 		if cell.Get("labels").Index(0).Get("data") == nil {
+// 			return true
+// 		}
+// 	}
+
+// 	return false
+// }
+
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	linkScene := [][]string{}
 	linkOtherScene := [][]string{}
@@ -768,6 +778,10 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				mapTriggerID[id] = triggerCfg
 			}
 		} else if shape == "edge" {
+			// if !isLine(&cell) {
+			// 	continue
+			// }
+
 			source, err := cell.Get("source").Get("cell").String()
 			if err != nil {
 				goutils.Error("loadCells:edge:source:cell",

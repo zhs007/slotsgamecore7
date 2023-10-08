@@ -61,6 +61,8 @@ func main() {
 		Currency: "EUR",
 	}
 
+	lowcode.IsStatsComponentMsg = true
+
 	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, gameData any) {
 		gameProp, isok := gameData.(*lowcode.GameProperty)
 		if !isok {

@@ -347,15 +347,13 @@ func (lightning *Lightning) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 }
 
 // OnStatsWithPB -
-func (lightning *Lightning) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.LightningData{}
+func (lightning *Lightning) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.LightningData)
+	if !isok {
+		goutils.Error("Lightning.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("Lightning.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return lightning.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
