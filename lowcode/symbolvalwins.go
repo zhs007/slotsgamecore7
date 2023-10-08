@@ -165,9 +165,9 @@ func (symbolValWins *SymbolValWins) OnStats(feature *sgc7stats.Feature, stake *s
 	for _, v := range lst {
 		gp, isok := v.CurGameModParams.(*GameParams)
 		if isok {
-			curComponent, isok := gp.MapComponents[symbolValWins.Name]
+			curMsg, isok := gp.MapComponentMsgs[symbolValWins.Name]
 			if isok {
-				curwins, err := symbolValWins.OnStatsWithPB(feature, curComponent, v)
+				curwins, err := symbolValWins.OnStatsWithPB(feature, curMsg, v)
 				if err != nil {
 					goutils.Error("SymbolValWins.OnStats",
 						zap.Error(err))

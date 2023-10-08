@@ -359,15 +359,13 @@ func (bookof *BookOf) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 }
 
 // OnStatsWithPB -
-func (bookof *BookOf) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.BookOfData{}
+func (bookof *BookOf) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.BookOfData)
+	if !isok {
+		goutils.Error("BookOf.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("BookOf.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return bookof.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

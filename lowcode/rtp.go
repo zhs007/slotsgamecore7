@@ -263,7 +263,7 @@ func procHitRate(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgHitRateFeature *RT
 }
 
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64) error {
-	IsRTPMode = true
+	IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame3(gamecfg, func() sgc7plugin.IPlugin {

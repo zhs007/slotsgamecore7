@@ -77,4 +77,14 @@ var (
 	ErrNoComponentValues = errors.New("no componentValues")
 	// ErrIvalidReels - invalid reels
 	ErrIvalidReels = errors.New("invalid reels")
+
+	// ErrIvalidDefaultScene - invalid default scene
+	ErrIvalidDefaultScene = errors.New("invalid default scene")
+	// ErrIvalidWidth - invalid width
+	ErrIvalidWidth = errors.New("invalid width")
+	// ErrIvalidHeight - invalid height
+	ErrIvalidHeight = errors.New("invalid height")
+
+	// ErrIvalidProto - invalid proto
+	ErrIvalidProto = errors.New("invalid proto")
 )

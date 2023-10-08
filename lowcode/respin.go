@@ -220,15 +220,13 @@ func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake,
 }
 
 // onStatsWithPBEnding -
-func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) error {
-	pbcd := &sgc7pb.RespinData{}
+func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
+	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
+	if !isok {
+		goutils.Error("Respin.onStatsWithPBEnding",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("Respin.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return err
+		return ErrIvalidProto
 	}
 
 	if feature.RespinNumStatus != nil {
@@ -243,15 +241,13 @@ func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponen
 }
 
 // onStatsWithPBEnding -
-func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) error {
-	pbcd := &sgc7pb.RespinData{}
+func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
+	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
+	if !isok {
+		goutils.Error("Respin.onStatsWithPBStart",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("Respin.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return err
+		return ErrIvalidProto
 	}
 
 	if feature.RespinStartNumStatus != nil {

@@ -197,15 +197,13 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStats(feature *sgc7stats.F
 }
 
 // OnStatsWithPB -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.MultiLevelReplaceReelData{}
+func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.MultiLevelReplaceReelData)
+	if !isok {
+		goutils.Error("MultiLevelReplaceReel.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("multiLevelReplaceReel.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return multiLevelReplaceReel.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

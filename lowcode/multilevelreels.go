@@ -241,15 +241,13 @@ func (multiLevelReels *MultiLevelReels) OnStats(feature *sgc7stats.Feature, stak
 }
 
 // OnStatsWithPB -
-func (multiLevelReels *MultiLevelReels) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.MultiLevelReelsData{}
+func (multiLevelReels *MultiLevelReels) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.MultiLevelReelsData)
+	if !isok {
+		goutils.Error("MultiLevelReels.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("MultiLevelReels.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return multiLevelReels.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

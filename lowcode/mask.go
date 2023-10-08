@@ -301,15 +301,13 @@ func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst
 }
 
 // OnStatsWithPB -
-func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.MaskData{}
+func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.MaskData)
+	if !isok {
+		goutils.Error("Mask.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("Mask.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	if feature.RespinEndingStatus != nil {

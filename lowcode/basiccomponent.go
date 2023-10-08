@@ -195,15 +195,13 @@ func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, ba
 }
 
 // OnStatsWithPB -
-func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData *anypb.Any, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd := &sgc7pb.ComponentData{}
+func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.ComponentData)
+	if !isok {
+		goutils.Error("BasicComponent.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("BasicComponent.OnStatsWithPB:UnmarshalTo",
-			zap.Error(err))
-
-		return 0, err
+		return 0, ErrIvalidProto
 	}
 
 	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd, pr), nil

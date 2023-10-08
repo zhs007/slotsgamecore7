@@ -138,10 +138,11 @@ func (symbolVal2 *symbolVal2Data) build() *SymbolVal2Config {
 }
 
 type bookOfData struct {
-	BetType       string `json:"betType"`
-	WeightTrigger string `json:"weightTrigger"`
-	// WeightSymbolNum int    `json:"weightSymbolNum"`
-	WeightSymbol string `json:"weightSymbol"`
+	BetType        string   `json:"betType"`
+	WildSymbols    []string `json:"wildSymbols"`
+	WeightTrigger  string   `json:"weightTrigger"`
+	ForceSymbolNum int      `json:"forceSymbolNum"`
+	WeightSymbol   string   `json:"weightSymbol"`
 }
 
 func (bookOfData *bookOfData) build() *BookOfConfig {
@@ -149,10 +150,10 @@ func (bookOfData *bookOfData) build() *BookOfConfig {
 		BetType:       bookOfData.BetType,
 		WeightTrigger: bookOfData.WeightTrigger,
 		WeightSymbol:  bookOfData.WeightSymbol,
-		// WildSymbols          []string `yaml:"wildSymbols" json:"wildSymbols"` // 可以不要wild
-		// ForceTrigger         bool     `yaml:"forceTrigger" json:"forceTrigger"`
+		WildSymbols:   bookOfData.WildSymbols,
+		// ForceTrigger     :bookOfData.ForceTrigger,
 		// WeightSymbolNum      string   `yaml:"weightSymbolNum" json:"weightSymbolNum"`
-		// ForceSymbolNum       int      `yaml:"forceSymbolNum" json:"forceSymbolNum"`
+		ForceSymbolNum: bookOfData.ForceSymbolNum,
 		// SymbolRNG            string   `yaml:"symbolRNG" json:"symbolRNG"`               // 只在ForceSymbolNum为1时有效
 		// SymbolCollection     string   `yaml:"symbolCollection" json:"symbolCollection"` // 图标从一个SymbolCollection里获取
 	}
