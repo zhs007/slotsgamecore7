@@ -11,6 +11,21 @@ func RemoveSymbolWithResult(scene *GameScene, result *PlayResult) error {
 	return nil
 }
 
+type FuncCanRemoveSymbol func(x, y int) bool
+
+// RemoveSymbolWithResult2 - remove symbol with win result
+func RemoveSymbolWithResult2(scene *GameScene, result *PlayResult, canRemove FuncCanRemoveSymbol) error {
+	for _, v := range result.Results {
+		for i := 0; i < len(v.Pos)/2; i++ {
+			if canRemove(v.Pos[i*2], v.Pos[i*2+1]) {
+				scene.Arr[v.Pos[i*2]][v.Pos[i*2+1]] = -1
+			}
+		}
+	}
+
+	return nil
+}
+
 // DropDownSymbols - drop down symbols
 func DropDownSymbols(scene *GameScene) error {
 	for _, arr := range scene.Arr {
