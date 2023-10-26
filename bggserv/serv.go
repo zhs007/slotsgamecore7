@@ -19,7 +19,7 @@ import (
 
 // Serv - Game Logic Service
 type Serv struct {
-	sgc7pb.UnimplementedDTGameLogicServer
+	sgc7pb.UnimplementedGameLogicServer
 	lis      net.Listener
 	grpcServ *grpc.Server
 	service  IService
@@ -54,7 +54,7 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 		game:     game,
 	}
 
-	sgc7pb.RegisterDTGameLogicServer(grpcServ, serv)
+	sgc7pb.RegisterGameLogicServer(grpcServ, serv)
 
 	goutils.Info("NewServ OK.",
 		zap.String("addr", bindaddr),
@@ -110,7 +110,7 @@ func (serv *Serv) Initialize(ctx context.Context, req *sgc7pb.RequestInitialize)
 }
 
 // Play - play game
-func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.DTGameLogic_PlayServer) error {
+func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.GameLogic_PlayServer) error {
 	goutils.Debug("Serv.Play",
 		goutils.JSON("req", req))
 
