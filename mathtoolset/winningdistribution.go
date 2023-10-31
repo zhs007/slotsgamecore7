@@ -2,9 +2,12 @@ package mathtoolset
 
 import (
 	"math"
+	"os"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 )
 
 type WinTimesData struct {
@@ -18,16 +21,16 @@ type WinPerData struct {
 }
 
 type AvgWinData struct {
-	AvgWin  float64
-	Percent float64
-	MapWins map[int]*WinPerData
+	AvgWin  float64             `yaml:"win" json:"win"`
+	Percent float64             `yaml:"percent" json:"percent"`
+	MapWins map[int]*WinPerData `yaml:"-" json:"-"`
 }
 
 type WinningDistribution struct {
-	TimesWins   map[int]*WinTimesData
-	PercentWins map[int]*WinPerData
-	AvgWins     map[int]*AvgWinData
-	TotalTimes  int64
+	TimesWins   map[int]*WinTimesData `yaml:"-" json:"-"`
+	PercentWins map[int]*WinPerData   `yaml:"-" json:"-"`
+	AvgWins     map[int]*AvgWinData   `yaml:"avgwins" json:"avgwins"`
+	TotalTimes  int64                 `yaml:"-" json:"-"`
 }
 
 func (wd *WinningDistribution) AddTimesWin(win int, times int64) {
@@ -106,7 +109,7 @@ func (wd *WinningDistribution) rebuildAvgWin(bet int) {
 		tper := float64(0)
 
 		for _, v1 := range v0.MapWins {
-			twin += float64(v1.Win) * v1.Percent
+			twin += float64(v1.Win) / float64(bet) * v1.Percent
 			tper += v1.Percent
 		}
 
@@ -235,6 +238,42 @@ func (wd *WinningDistribution) SaveExcel(fn string, scale float64) {
 	f.DeleteSheet(lstname[0])
 
 	f.SaveAs(fn)
+}
+
+func (wd *WinningDistribution) Save(fn string) {
+	buf, err := yaml.Marshal(wd)
+	if err != nil {
+		goutils.Error("Save:Marshal",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return
+	}
+
+	os.WriteFile(fn, buf, 0644)
+}
+
+func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		goutils.Error("LoadWinningDistribution:ReadFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	wd := NewWinningDistribution()
+	err = yaml.Unmarshal(data, wd)
+	if err != nil {
+		goutils.Error("LoadWinningDistribution:Unmarshal",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return wd, nil
 }
 
 func NewWinningDistribution() *WinningDistribution {
