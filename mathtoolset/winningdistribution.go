@@ -1,8 +1,8 @@
 package mathtoolset
 
 import (
-	"io/ioutil"
 	"math"
+	"os"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
@@ -250,7 +250,30 @@ func (wd *WinningDistribution) Save(fn string) {
 		return
 	}
 
-	ioutil.WriteFile(fn, buf, 0644)
+	os.WriteFile(fn, buf, 0644)
+}
+
+func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		goutils.Error("LoadWinningDistribution:ReadFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	wd := NewWinningDistribution()
+	err = yaml.Unmarshal(data, wd)
+	if err != nil {
+		goutils.Error("LoadWinningDistribution:Unmarshal",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return wd, nil
 }
 
 func NewWinningDistribution() *WinningDistribution {
