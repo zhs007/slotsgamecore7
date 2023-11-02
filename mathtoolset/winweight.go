@@ -3,6 +3,9 @@ package mathtoolset
 import (
 	"math"
 	"sort"
+
+	"github.com/zhs007/goutils"
+	"go.uber.org/zap"
 )
 
 type WinWeightFitOptions struct {
@@ -12,6 +15,8 @@ type WinWeightFitOptions struct {
 	FuncSetWeight  func(any, int)
 	WinScale       int
 	MaxFitTimes    int
+	MinNodes       int // merge时，某一边节点数低于这个就需要merge
+	MinSeeds       int // merge时，某一边seed数低于这个就需要merge
 }
 
 func (wwfo *WinWeightFitOptions) cmpWin(win0, win1 float64) int {
@@ -167,7 +172,134 @@ func (ww *WinWeight) sort() {
 	}
 }
 
+func (ww *WinWeight) isValidData(si int, ci int, avgwin float64, bet int, options *WinWeightFitOptions) (bool, bool) {
+	lessnum := 0
+	lessseednum := 0
+	bignum := 0
+	bigseednum := 0
+	equnum := 0
+
+	for i := si; i <= ci; i++ {
+		wd, isok := ww.MapData[i]
+		if isok {
+			for _, v := range wd.Wins {
+				n := options.FuncGetDataNum(v.Data)
+
+				cw := float64(v.Win) / float64(bet)
+				if cw > avgwin {
+					bignum++
+					bigseednum += n
+				} else if cw < avgwin {
+					lessnum++
+					lessseednum += n
+				} else {
+					equnum++
+				}
+			}
+		}
+	}
+
+	if bignum == 0 && lessnum == 0 && equnum > 0 {
+		return true, true
+	}
+
+	ret0 := true
+	ret1 := true
+
+	if lessnum < options.MinNodes || lessseednum < options.MinSeeds {
+		ret0 = false
+	}
+
+	if bignum < options.MinNodes || bigseednum < options.MinSeeds {
+		ret1 = false
+	}
+
+	return ret0, ret1
+}
+
+func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWeightFitOptions, si int, ci int, maxi int) (int, error) {
+	for i := ci; i <= maxi; i++ {
+		_, isok := wd.AvgWins[i]
+		if isok {
+			aw := wd.getAvgWin(si, i)
+
+			ret0, ret1 := ww.isValidData(si, i, aw, bet, options)
+			if !ret0 {
+				goutils.Error("WinWeight.mergeNext:less",
+					zap.Error(ErrWinWeightMerge))
+
+				return -1, ErrWinWeightMerge
+			}
+
+			if ret1 {
+				ww.merge(si, i)
+				wd.mergeAvgWins(si, i)
+
+				return i, nil
+			}
+		}
+	}
+
+	goutils.Error("WinWeight.mergeNext:unless",
+		zap.Error(ErrWinWeightMerge))
+
+	return -1, ErrWinWeightMerge
+}
+
+func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWeightFitOptions) error {
+	si := 0
+	lasti := 0
+	maxi := wd.getMax()
+
+	for i := 0; i <= maxi; i++ {
+		_, isok := wd.AvgWins[i]
+		if isok {
+			aw := wd.getAvgWin(si, i)
+
+			ret0, ret1 := ww.isValidData(si, i, aw, bet, options)
+			if si == 0 && !ret0 {
+				goutils.Error("WinWeight.mergeWith:0",
+					zap.Error(ErrWinWeightMerge))
+
+				return ErrWinWeightMerge
+			}
+
+			if !ret0 {
+				si = lasti
+			}
+
+			if !ret1 {
+				ni, err := ww.mergeNext(wd, bet, options, si, i, maxi)
+				if err != nil {
+					goutils.Error("WinWeight.mergeWith:mergeNext",
+						zap.Int("si", si),
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				i = ni
+				si = ni + 1
+			} else if !ret0 {
+				ww.merge(si, i)
+				wd.mergeAvgWins(si, i)
+			}
+		}
+	}
+
+	return nil
+}
+
 func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFitOptions) (*WinWeight, error) {
+	err := ww.mergeWith(wd, bet, options)
+	if err != nil {
+		goutils.Error("WinWeight.Fit:mergeWith",
+			zap.Error(err))
+
+		return nil, err
+	}
+
 	ww.sort()
 
 	target := NewWinWeight()

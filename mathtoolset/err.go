@@ -48,5 +48,9 @@ var (
 	// ErrInvalidScatterNumber - invalid scatter number
 	ErrInvalidScatterNumber = errors.New("invalid scatter number")
 
+	// ErrCannotBeConverged - cannot be converged
 	ErrCannotBeConverged = errors.New("cannot be converged")
+
+	// ErrWinWeightMerge - WinWeight.Merge error
+	ErrWinWeightMerge = errors.New("WinWeight.Merge error")
 )
