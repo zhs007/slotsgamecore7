@@ -253,6 +253,24 @@ func (wd *WinningDistribution) Save(fn string) {
 	os.WriteFile(fn, buf, 0644)
 }
 
+func (wd *WinningDistribution) mergeAvgWins(mini, maxi int) {
+	nawd := &AvgWinData{}
+
+	for i := mini; i <= maxi; i++ {
+		nd, isok := wd.AvgWins[i]
+		if isok {
+			nawd.AvgWin += nd.AvgWin * nd.Percent
+			for k0, v0 := range nd.MapWins {
+				nawd.MapWins[k0] = v0
+			}
+
+			delete(wd.AvgWins, i)
+		}
+	}
+
+	wd.AvgWins[int(math.Floor(nawd.AvgWin))] = nawd
+}
+
 func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
