@@ -396,6 +396,18 @@ func (ww *WinWeight) isValidData(si int, ci int, avgwin float64, bet int, option
 	return ret0, ret1
 }
 
+func (ww *WinWeight) getMaxIndex() int {
+	maxi := 0
+
+	for k := range ww.MapData {
+		if k > maxi {
+			maxi = k
+		}
+	}
+
+	return maxi
+}
+
 func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWeightFitOptions, si int, ci int, maxi int) (int, error) {
 	for i := ci; i <= maxi; i++ {
 		_, isok := wd.AvgWins[i]
@@ -415,6 +427,26 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 				ww.merge(si, i, newi)
 
 				return newi, nil
+			}
+
+			if i == maxi {
+				maxj := ww.getMaxIndex()
+				for j := i + 1; j <= maxj; j++ {
+					ret0, ret1 := ww.isValidData(si, j, aw, bet, options)
+					if !ret0 {
+						goutils.Error("WinWeight.mergeNext:less",
+							zap.Error(ErrWinWeightMerge))
+
+						return -1, ErrWinWeightMerge
+					}
+
+					if ret1 {
+						newi := wd.mergeAvgWins(si, i)
+						ww.merge(si, j, newi)
+
+						return newi, nil
+					}
+				}
 			}
 		}
 	}
