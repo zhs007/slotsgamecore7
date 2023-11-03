@@ -33,6 +33,31 @@ type WinningDistribution struct {
 	TotalTimes  int64                 `yaml:"-" json:"-"`
 }
 
+func (wd *WinningDistribution) getAvgWin(si, ci int) float64 {
+	vw := float64(0)
+
+	for i := si; i <= ci; i++ {
+		v, isok := wd.AvgWins[i]
+		if isok {
+			vw += v.AvgWin * v.Percent
+		}
+	}
+
+	return vw
+}
+
+func (wd *WinningDistribution) getMax() int {
+	max := 0
+
+	for k := range wd.AvgWins {
+		if k > max {
+			max = k
+		}
+	}
+
+	return max
+}
+
 func (wd *WinningDistribution) AddTimesWin(win int, times int64) {
 	wd.TotalTimes += times
 
@@ -251,6 +276,28 @@ func (wd *WinningDistribution) Save(fn string) {
 	}
 
 	os.WriteFile(fn, buf, 0644)
+}
+
+func (wd *WinningDistribution) mergeAvgWins(mini, maxi int) int {
+	nawd := &AvgWinData{}
+
+	for i := mini; i <= maxi; i++ {
+		nd, isok := wd.AvgWins[i]
+		if isok {
+			nawd.AvgWin += nd.AvgWin * nd.Percent
+			for k0, v0 := range nd.MapWins {
+				nawd.MapWins[k0] = v0
+			}
+
+			delete(wd.AvgWins, i)
+		}
+	}
+
+	newi := int(math.Floor(nawd.AvgWin))
+
+	wd.AvgWins[newi] = nawd
+
+	return newi
 }
 
 func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
