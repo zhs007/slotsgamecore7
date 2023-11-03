@@ -289,7 +289,7 @@ func (wd *WinningDistribution) mergeAvgWins(mini, maxi int) int {
 		nd, isok := wd.AvgWins[i]
 		if isok {
 			totalw += nd.AvgWin * nd.Percent
-			totalp = nd.Percent
+			totalp += nd.Percent
 
 			for k0, v0 := range nd.MapWins {
 				nawd.MapWins[k0] = v0
