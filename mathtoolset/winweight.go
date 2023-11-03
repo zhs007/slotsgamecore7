@@ -443,6 +443,13 @@ func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWei
 				return ErrWinWeightMerge
 			}
 
+			if ret0 && ret1 {
+				lasti = si
+				si = i + 1
+
+				continue
+			}
+
 			if !ret0 {
 				si = lasti
 			}
