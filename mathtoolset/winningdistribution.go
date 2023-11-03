@@ -35,15 +35,17 @@ type WinningDistribution struct {
 
 func (wd *WinningDistribution) getAvgWin(si, ci int) float64 {
 	vw := float64(0)
+	totalw := float64(0)
 
 	for i := si; i <= ci; i++ {
 		v, isok := wd.AvgWins[i]
 		if isok {
 			vw += v.AvgWin * v.Percent
+			totalw += v.Percent
 		}
 	}
 
-	return vw
+	return vw / totalw
 }
 
 func (wd *WinningDistribution) getMax() int {
