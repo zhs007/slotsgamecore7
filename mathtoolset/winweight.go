@@ -466,6 +466,8 @@ func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWei
 				}
 
 				i = ni
+
+				lasti = si
 				si = ni + 1
 			} else if !ret0 {
 				newi := wd.mergeAvgWins(si, i)
