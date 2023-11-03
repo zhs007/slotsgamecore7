@@ -414,7 +414,7 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 				newi := wd.mergeAvgWins(si, i)
 				ww.merge(si, i, newi)
 
-				return i, nil
+				return newi, nil
 			}
 		}
 	}
