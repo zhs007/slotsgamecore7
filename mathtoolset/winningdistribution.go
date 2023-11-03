@@ -282,11 +282,15 @@ func (wd *WinningDistribution) Save(fn string) {
 
 func (wd *WinningDistribution) mergeAvgWins(mini, maxi int) int {
 	nawd := &AvgWinData{}
+	totalw := float64(0)
+	totalp := float64(0)
 
 	for i := mini; i <= maxi; i++ {
 		nd, isok := wd.AvgWins[i]
 		if isok {
-			nawd.AvgWin += nd.AvgWin * nd.Percent
+			totalw += nd.AvgWin * nd.Percent
+			totalp = nd.Percent
+
 			for k0, v0 := range nd.MapWins {
 				nawd.MapWins[k0] = v0
 			}
@@ -294,6 +298,9 @@ func (wd *WinningDistribution) mergeAvgWins(mini, maxi int) int {
 			delete(wd.AvgWins, i)
 		}
 	}
+
+	nawd.AvgWin = totalw / totalp
+	nawd.Percent = totalp
 
 	newi := int(math.Floor(nawd.AvgWin))
 
