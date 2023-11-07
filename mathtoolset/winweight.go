@@ -290,6 +290,192 @@ retry:
 	return false
 }
 
+func (wad *WinAreaData) scaleUp2(avgWin float64, bet int, options *WinWeightFitOptions) bool {
+	lst := []int{}
+
+	// wins经过排序，从小到大，这里会break，但希望lst从小到大，所以写法要注意
+	for i := len(wad.Wins) - 1; i >= 0; i-- {
+		v := wad.Wins[i]
+
+		if float64(v.Win)/float64(bet) <= avgWin {
+			break
+		}
+
+		lst = append(lst, i)
+	}
+
+	if len(lst) <= 0 {
+		// 前面经过merge，不可能出现这种情况
+		goutils.Error("WinAreaData.scaleUp:empty lst",
+			zap.Error(ErrWinWeightMerge))
+
+		return false
+	}
+
+	for wad.checkTurn(avgWin, bet, options, true, lst[len(lst)-1], 1, false) {
+		wad.scale(10)
+	}
+
+	retrynum := 0
+	isneedscale := false
+retry:
+	for _, i := range lst {
+		// 首先看加1是否就会跳
+		if wad.checkTurn(avgWin, bet, options, true, i, 1, true) {
+			// 因为排序，所以直接break
+			isneedscale = true
+
+			break
+		}
+
+		n := options.FuncGetDataNum(wad.Wins[i].Data)
+		if n > 1 {
+			// 再看加满是否会跳，如果加满不会跳，就直接加满
+			if !wad.checkTurn(avgWin, bet, options, true, i, n, true) {
+				wad.Wins[i].Weight += n
+
+				if wad.checkWin(avgWin, bet, options) == 0 {
+					return true
+				}
+			} else {
+				tn := -1
+				for cn := 2; cn < n; cn++ {
+					if wad.checkTurn(avgWin, bet, options, true, i, cn, true) {
+						tn = cn - 1
+
+						break
+					}
+				}
+
+				if tn < 0 {
+					wad.Wins[i].Weight += n - 1
+				} else {
+					wad.Wins[i].Weight += tn
+				}
+
+				if wad.checkWin(avgWin, bet, options) == 0 {
+					return true
+				}
+			}
+		} else {
+			wad.Wins[i].Weight++
+
+			if wad.checkWin(avgWin, bet, options) == 0 {
+				return true
+			}
+		}
+	}
+
+	if !isneedscale {
+		goto retry
+	}
+
+	if retrynum < options.MaxFitTimes {
+		wad.scale(10)
+		retrynum++
+
+		goto retry
+	} else {
+		goutils.Error("WinAreaData.scaleUp",
+			zap.Error(ErrWinWeightMerge))
+	}
+
+	return false
+}
+
+func (wad *WinAreaData) scaleDown2(avgWin float64, bet int, options *WinWeightFitOptions) bool {
+	lst := []int{}
+
+	// wins经过排序，从小到大，这里lst是从大到小，逻辑上是由近及远
+	for i := 0; i < len(wad.Wins); i++ {
+		v := wad.Wins[i]
+
+		if float64(v.Win)/float64(bet) >= avgWin {
+			break
+		}
+
+		lst = append(lst, i)
+	}
+
+	if len(lst) <= 0 {
+		// 前面经过merge，不可能出现这种情况
+		goutils.Error("WinAreaData.scaleDown",
+			zap.Error(ErrWinWeightMerge))
+
+		return false
+	}
+
+	for wad.checkTurn(avgWin, bet, options, false, lst[len(lst)-1], 1, false) {
+		wad.scale(10)
+	}
+
+	retrynum := 0
+	isneedscale := false
+retry:
+	for _, i := range lst {
+		// 首先看加1是否就会跳
+		if wad.checkTurn(avgWin, bet, options, false, i, 1, true) {
+			// 直接放弃，下一轮
+			isneedscale = true
+
+			break
+		}
+
+		n := options.FuncGetDataNum(wad.Wins[i].Data)
+		if n > 1 {
+			// 再看加满是否会跳，如果加满不会跳，就直接加满
+			if !wad.checkTurn(avgWin, bet, options, false, i, n, true) {
+				wad.Wins[i].Weight += n
+
+				if wad.checkWin(avgWin, bet, options) == 0 {
+					return true
+				}
+			} else {
+				tn := -1
+				for cn := 2; cn < n; cn++ {
+					if wad.checkTurn(avgWin, bet, options, false, i, cn, true) {
+						tn = cn - 1
+
+						break
+					}
+				}
+
+				if tn < 0 {
+					wad.Wins[i].Weight += n - 1
+				} else {
+					wad.Wins[i].Weight += tn
+				}
+
+				if wad.checkWin(avgWin, bet, options) == 0 {
+					return true
+				}
+			}
+		} else {
+			wad.Wins[i].Weight++
+
+			if wad.checkWin(avgWin, bet, options) == 0 {
+				return true
+			}
+		}
+	}
+
+	if !isneedscale {
+		goto retry
+	}
+
+	if retrynum < options.MaxFitTimes {
+		wad.scale(10)
+		retrynum++
+
+		goto retry
+	} else {
+		goutils.Error("WinAreaData.scaleDown",
+			zap.Error(ErrWinWeightMerge))
+	}
+
+	return false
+}
+
 func (wad *WinAreaData) scale(mul int) {
 	for _, v := range wad.Wins {
 		v.Weight *= mul
@@ -326,6 +512,23 @@ func (wad *WinAreaData) Fit(avgWin float64, bet int, options *WinWeightFitOption
 	}
 
 	return wad.scaleDown(avgWin, bet, options)
+}
+
+func (wad *WinAreaData) Fit2(avgWin float64, bet int, options *WinWeightFitOptions) bool {
+	wad.initWeights(options)
+
+	curawin := wad.calcAvgWin(bet)
+
+	wo := options.cmpWin(curawin, avgWin)
+	if wo == 0 {
+		return true
+	}
+
+	if wo < 0 {
+		return wad.scaleUp2(avgWin, bet, options)
+	}
+
+	return wad.scaleDown2(avgWin, bet, options)
 }
 
 type WinWeight struct {
@@ -549,7 +752,51 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 
 				for _, win := range wwv.Wins {
 					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
-					options.FuncSetWeight(win.Data, int(cw))
+					if cw < 0.5 {
+						options.FuncSetWeight(win.Data, 0)
+					} else if cw < 1 {
+						options.FuncSetWeight(win.Data, 1)
+					} else {
+						options.FuncSetWeight(win.Data, int(cw))
+					}
+				}
+			}
+		}
+	}
+
+	return target, nil
+}
+
+func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFitOptions) (*WinWeight, error) {
+	err := ww.mergeWith(wd, bet, options)
+	if err != nil {
+		goutils.Error("WinWeight.Fit2:mergeWith",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	ww.sort()
+
+	target := NewWinWeight()
+
+	for k, v := range wd.AvgWins {
+		wwv, isok := ww.MapData[k]
+		if isok {
+			if wwv.Fit2(v.AvgWin, bet, options) {
+				target.MapData[k] = wwv
+
+				wwv.countTotalWeight()
+
+				for _, win := range wwv.Wins {
+					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
+					if cw < 0.5 {
+						options.FuncSetWeight(win.Data, 0)
+					} else if cw < 1 {
+						options.FuncSetWeight(win.Data, 1)
+					} else {
+						options.FuncSetWeight(win.Data, int(cw))
+					}
 				}
 			}
 		}
