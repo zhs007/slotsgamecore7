@@ -325,7 +325,7 @@ retry:
 			// 因为排序，所以直接break
 			isneedscale = true
 
-			break
+			continue
 		}
 
 		n := options.FuncGetDataNum(wad.Wins[i].Data)
@@ -418,7 +418,7 @@ retry:
 			// 直接放弃，下一轮
 			isneedscale = true
 
-			break
+			continue
 		}
 
 		n := options.FuncGetDataNum(wad.Wins[i].Data)
