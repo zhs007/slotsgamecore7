@@ -119,7 +119,7 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
-		goutils.Error("WinAreaData.scaleUp",
+		goutils.Error("WinAreaData.scaleUp:empty lst",
 			zap.Error(ErrWinWeightMerge))
 
 		return false
@@ -200,7 +200,7 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 	for i := 0; i < len(wad.Wins); i++ {
 		v := wad.Wins[i]
 
-		if float64(v.Win)/float64(bet) <= avgWin {
+		if float64(v.Win)/float64(bet) >= avgWin {
 			break
 		}
 
