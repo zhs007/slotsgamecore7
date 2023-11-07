@@ -138,7 +138,7 @@ retry:
 			continue
 		}
 
-		n := options.FuncGetDataNum(wad.Wins[i])
+		n := options.FuncGetDataNum(wad.Wins[i].Data)
 		if n > 1 {
 			// 再看加满是否会跳，如果加满不会跳，就直接加满
 			if !wad.checkTurn(avgWin, bet, options, true, i, n, true) {
@@ -228,7 +228,7 @@ retry:
 			continue
 		}
 
-		n := options.FuncGetDataNum(wad.Wins[i])
+		n := options.FuncGetDataNum(wad.Wins[i].Data)
 		if n > 1 {
 			// 再看加满是否会跳，如果加满不会跳，就直接加满
 			if !wad.checkTurn(avgWin, bet, options, false, i, n, true) {
