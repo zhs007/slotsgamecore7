@@ -303,6 +303,14 @@ func (wad *WinAreaData) initWeights(options *WinWeightFitOptions) {
 	}
 }
 
+func (wad *WinAreaData) countTotalWeight() {
+	wad.TotalWeights = 0
+
+	for _, v := range wad.Wins {
+		wad.TotalWeights += v.Weight
+	}
+}
+
 func (wad *WinAreaData) Fit(avgWin float64, bet int, options *WinWeightFitOptions) bool {
 	wad.initWeights(options)
 
@@ -536,6 +544,8 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 		if isok {
 			if wwv.Fit(v.AvgWin, bet, options) {
 				target.MapData[k] = wwv
+
+				wwv.countTotalWeight()
 
 				for _, win := range wwv.Wins {
 					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
