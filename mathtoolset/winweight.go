@@ -106,7 +106,7 @@ func (wad *WinAreaData) checkTurn(avgWin float64, bet int, options *WinWeightFit
 func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOptions) bool {
 	lst := []int{}
 
-	// wins经过排序，从小到大，这里lst是从大到小，缩小也要注意维持逻辑一致
+	// wins经过排序，从小到大，这里会break，但希望lst从小到大，所以写法要注意
 	for i := len(wad.Wins) - 1; i >= 0; i-- {
 		v := wad.Wins[i]
 
@@ -114,7 +114,7 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 			break
 		}
 
-		lst = append(lst, i)
+		lst = append([]int{i}, lst...)
 	}
 
 	if len(lst) <= 0 {
@@ -128,14 +128,14 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 	for wad.checkTurn(avgWin, bet, options, true, lst[len(lst)-1], 1, false) {
 		wad.scale(10)
 	}
-retry:
-	isChg := false
 
+	retrynum := 0
+retry:
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, true, i, 1, true) {
-			// 直接放弃，下一个
-			continue
+			// 因为排序，所以直接break
+			break
 		}
 
 		n := options.FuncGetDataNum(wad.Wins[i].Data)
@@ -143,7 +143,6 @@ retry:
 			// 再看加满是否会跳，如果加满不会跳，就直接加满
 			if !wad.checkTurn(avgWin, bet, options, true, i, n, true) {
 				wad.Wins[i].Weight += n
-				isChg = true
 
 				if wad.checkWin(avgWin, bet, options) == 0 {
 					return true
@@ -158,8 +157,6 @@ retry:
 					}
 				}
 
-				isChg = true
-
 				if tn < 0 {
 					wad.Wins[i].Weight += n - 1
 				} else {
@@ -171,8 +168,6 @@ retry:
 				}
 			}
 		} else {
-			isChg = true
-
 			wad.Wins[i].Weight++
 
 			if wad.checkWin(avgWin, bet, options) == 0 {
@@ -181,8 +176,9 @@ retry:
 		}
 	}
 
-	if isChg {
+	if retrynum < options.MaxFitTimes {
 		wad.scale(10)
+		retrynum++
 
 		goto retry
 	} else {
@@ -196,7 +192,7 @@ retry:
 func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFitOptions) bool {
 	lst := []int{}
 
-	// wins经过排序，从小到大，这里lst是从小到大，逻辑上是由远及近
+	// wins经过排序，从小到大，这里lst是从大到小，逻辑上是由近及远
 	for i := 0; i < len(wad.Wins); i++ {
 		v := wad.Wins[i]
 
@@ -204,7 +200,7 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 			break
 		}
 
-		lst = append(lst, i)
+		lst = append([]int{i}, lst...)
 	}
 
 	if len(lst) <= 0 {
@@ -218,14 +214,14 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 	for wad.checkTurn(avgWin, bet, options, false, lst[len(lst)-1], 1, false) {
 		wad.scale(10)
 	}
-retry:
-	isChg := false
 
+	retrynum := 0
+retry:
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, false, i, 1, true) {
-			// 直接放弃，下一个
-			continue
+			// 直接放弃，下一轮
+			break
 		}
 
 		n := options.FuncGetDataNum(wad.Wins[i].Data)
@@ -233,7 +229,6 @@ retry:
 			// 再看加满是否会跳，如果加满不会跳，就直接加满
 			if !wad.checkTurn(avgWin, bet, options, false, i, n, true) {
 				wad.Wins[i].Weight += n
-				isChg = true
 
 				if wad.checkWin(avgWin, bet, options) == 0 {
 					return true
@@ -248,8 +243,6 @@ retry:
 					}
 				}
 
-				isChg = true
-
 				if tn < 0 {
 					wad.Wins[i].Weight += n - 1
 				} else {
@@ -261,8 +254,6 @@ retry:
 				}
 			}
 		} else {
-			isChg = true
-
 			wad.Wins[i].Weight++
 
 			if wad.checkWin(avgWin, bet, options) == 0 {
@@ -271,8 +262,9 @@ retry:
 		}
 	}
 
-	if isChg {
+	if retrynum < options.MaxFitTimes {
 		wad.scale(10)
+		retrynum++
 
 		goto retry
 	} else {
