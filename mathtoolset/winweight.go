@@ -534,7 +534,11 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 		wwv, isok := ww.MapData[k]
 		if isok {
 			if wwv.Fit(v.AvgWin, bet, options) {
-				delete(wd.AvgWins, k)
+				target.MapData[k] = wwv
+
+				for _, win := range wwv.Wins {
+					options.FuncSetWeight(win.Data, win.Weight)
+				}
 			}
 		}
 	}
