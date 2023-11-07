@@ -17,6 +17,7 @@ type WinWeightFitOptions struct {
 	MaxFitTimes    int
 	MinNodes       int // merge时，某一边节点数低于这个就需要merge
 	MinSeeds       int // merge时，某一边seed数低于这个就需要merge
+	TotalWeight    int // 总权重
 }
 
 func (wwfo *WinWeightFitOptions) cmpWin(win0, win1 float64) int {
@@ -537,7 +538,8 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 				target.MapData[k] = wwv
 
 				for _, win := range wwv.Wins {
-					options.FuncSetWeight(win.Data, win.Weight)
+					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
+					options.FuncSetWeight(win.Data, int(cw))
 				}
 			}
 		}
