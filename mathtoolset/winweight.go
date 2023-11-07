@@ -130,11 +130,14 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 	}
 
 	retrynum := 0
+	isneedscale := false
 retry:
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, true, i, 1, true) {
 			// 因为排序，所以直接break
+			isneedscale = true
+
 			break
 		}
 
@@ -174,6 +177,10 @@ retry:
 				return true
 			}
 		}
+	}
+
+	if !isneedscale {
+		goto retry
 	}
 
 	if retrynum < options.MaxFitTimes {
@@ -216,11 +223,14 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 	}
 
 	retrynum := 0
+	isneedscale := false
 retry:
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, false, i, 1, true) {
 			// 直接放弃，下一轮
+			isneedscale = true
+
 			break
 		}
 
@@ -260,6 +270,10 @@ retry:
 				return true
 			}
 		}
+	}
+
+	if !isneedscale {
+		goto retry
 	}
 
 	if retrynum < options.MaxFitTimes {
