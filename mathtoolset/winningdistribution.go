@@ -335,7 +335,7 @@ func (wd *WinningDistribution) mergeSmooth(si int, maxwin int, per float64) {
 	totalnum := 1
 
 	for i := si + 1; i <= maxwin; i++ {
-		totalper += float64(wd.AvgWins[i].Percent)
+		totalper += wd.AvgWins[i].Percent
 		totalnum++
 
 		cp := totalper / float64(totalnum)
@@ -349,6 +349,8 @@ func (wd *WinningDistribution) mergeSmooth(si int, maxwin int, per float64) {
 			}
 		} else {
 			wd.setAvgWinPercent(si, i, cp)
+
+			return
 		}
 	}
 }
@@ -373,6 +375,16 @@ func (wd *WinningDistribution) Format(maxwin int) {
 
 	// 再平滑
 	wd.smooth(maxwin)
+
+	totalper := float64(0)
+
+	for _, v := range wd.AvgWins {
+		totalper += v.Percent
+	}
+
+	for _, v := range wd.AvgWins {
+		v.Percent /= totalper
+	}
 }
 
 func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
