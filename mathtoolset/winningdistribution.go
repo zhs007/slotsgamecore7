@@ -309,6 +309,72 @@ func (wd *WinningDistribution) mergeAvgWins(mini, maxi int) int {
 	return newi
 }
 
+func (wd *WinningDistribution) fill(maxwin int) {
+	lastper := float64(0)
+	for i := -1; i <= maxwin; i++ {
+		nd, isok := wd.AvgWins[i]
+		if isok {
+			lastper = nd.Percent
+		} else {
+			wd.AvgWins[i] = &AvgWinData{
+				AvgWin:  float64(i) + 0.5,
+				Percent: lastper,
+			}
+		}
+	}
+}
+
+func (wd *WinningDistribution) setAvgWinPercent(si int, ei int, per float64) {
+	for i := si; i <= ei; i++ {
+		wd.AvgWins[i].Percent = per
+	}
+}
+
+func (wd *WinningDistribution) mergeSmooth(si int, maxwin int, per float64) {
+	totalper := float64(wd.AvgWins[si].Percent)
+	totalnum := 1
+
+	for i := si + 1; i <= maxwin; i++ {
+		totalper += float64(wd.AvgWins[i].Percent)
+		totalnum++
+
+		cp := totalper / float64(totalnum)
+
+		if cp > per {
+			// 如果到最后都没办法，全部给一样的值
+			if i == maxwin {
+				wd.setAvgWinPercent(si, maxwin, per)
+
+				return
+			}
+		} else {
+			wd.setAvgWinPercent(si, i, cp)
+		}
+	}
+}
+
+func (wd *WinningDistribution) smooth(maxwin int) {
+	lastper := wd.AvgWins[-1].Percent
+	for i := 0; i <= maxwin; i++ {
+		nd, isok := wd.AvgWins[i]
+		if isok {
+			if nd.Percent > lastper {
+				wd.mergeSmooth(i, maxwin, lastper)
+			}
+
+			lastper = nd.Percent
+		}
+	}
+}
+
+func (wd *WinningDistribution) Format(maxwin int) {
+	// 先填充满
+	wd.fill(maxwin)
+
+	// 再平滑
+	wd.smooth(maxwin)
+}
+
 func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
