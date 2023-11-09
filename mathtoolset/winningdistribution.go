@@ -336,7 +336,7 @@ func (wd *WinningDistribution) mergeSmooth(si int, maxwin int, per float64) {
 
 	for i := si + 1; i <= maxwin; i++ {
 		totalper += wd.AvgWins[i].Percent
-		totalwin += wd.AvgWins[si].AvgWin
+		totalwin += wd.AvgWins[i].AvgWin
 
 		cp := totalper / float64(totalwin)
 
