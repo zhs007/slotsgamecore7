@@ -331,14 +331,14 @@ func (wd *WinningDistribution) setAvgWinPercent(si int, ei int, per float64) {
 }
 
 func (wd *WinningDistribution) mergeSmooth(si int, maxwin int, per float64) {
-	totalper := float64(wd.AvgWins[si].Percent)
-	totalnum := 1
+	totalper := wd.AvgWins[si].Percent * wd.AvgWins[si].AvgWin
+	totalwin := wd.AvgWins[si].AvgWin
 
 	for i := si + 1; i <= maxwin; i++ {
 		totalper += wd.AvgWins[i].Percent
-		totalnum++
+		totalwin += wd.AvgWins[si].AvgWin
 
-		cp := totalper / float64(totalnum)
+		cp := totalper / float64(totalwin)
 
 		if cp > per {
 			// 如果到最后都没办法，全部给一样的值
