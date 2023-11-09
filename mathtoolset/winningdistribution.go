@@ -361,7 +361,7 @@ func (wd *WinningDistribution) getPreLessPercent(si int, per float64) int {
 	prei := si
 
 	for i := si; i >= 0; i-- {
-		if wd.AvgWins[i].Percent < per {
+		if wd.AvgWins[i].Percent <= per {
 			prei = i
 		} else {
 			return prei
