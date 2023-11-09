@@ -361,7 +361,7 @@ func (wd *WinningDistribution) smooth(maxwin int) {
 		nd, isok := wd.AvgWins[i]
 		if isok {
 			if nd.Percent > lastper {
-				wd.mergeSmooth(i, maxwin, lastper)
+				wd.mergeSmooth(i-1, maxwin, lastper)
 			}
 
 			lastper = nd.Percent
@@ -369,12 +369,12 @@ func (wd *WinningDistribution) smooth(maxwin int) {
 	}
 }
 
-func (wd *WinningDistribution) Format(maxwin int) {
-	// 先填充满
+func (wd *WinningDistribution) Format(maxwin int, isneedsmooth bool) {
 	wd.fill(maxwin)
 
-	// 再平滑
-	wd.smooth(maxwin)
+	if isneedsmooth {
+		wd.smooth(maxwin)
+	}
 
 	totalper := float64(0)
 
