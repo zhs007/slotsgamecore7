@@ -665,6 +665,12 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 						return newi, nil
 					}
 				}
+
+				// 如果到最后都合不上，也没办法了，就是最后一个解可能无解
+				newi := wd.mergeAvgWins(si, i)
+				ww.merge(si, maxj, newi)
+
+				return newi, nil
 			}
 		}
 	}
