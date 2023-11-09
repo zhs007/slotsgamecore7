@@ -330,29 +330,45 @@ func (wd *WinningDistribution) setAvgWinPercent(si int, ei int, per float64) {
 	}
 }
 
-func (wd *WinningDistribution) mergeSmooth(si int, maxwin int, per float64) {
-	totalper := wd.AvgWins[si].Percent * wd.AvgWins[si].AvgWin
-	totalwin := wd.AvgWins[si].AvgWin
+func (wd *WinningDistribution) mergeSmooth(si0 int, si1 int, per float64) {
+	totalper := float64(0)
+	totalwin := float64(0)
 
-	for i := si + 1; i <= maxwin; i++ {
+	for i := si0; i <= si1; i++ {
 		totalper += wd.AvgWins[i].Percent * wd.AvgWins[i].AvgWin
 		totalwin += wd.AvgWins[i].AvgWin
+	}
 
-		cp := totalper / float64(totalwin)
+	cp := totalper / float64(totalwin)
+	wd.setAvgWinPercent(si0, si1, cp)
+}
 
-		if cp > per {
-			// 如果到最后都没办法，全部给一样的值
-			if i == maxwin {
-				wd.setAvgWinPercent(si, maxwin, per)
+func (wd *WinningDistribution) getMaxPercent(si int, ei int) (int, float64) {
+	maxi := si
+	maxp := wd.AvgWins[si].Percent
 
-				return
-			}
-		} else {
-			wd.setAvgWinPercent(si, i, cp)
-
-			return
+	for i := si + 1; i <= ei; i++ {
+		if wd.AvgWins[i].Percent >= maxp {
+			maxi = i
+			maxp = wd.AvgWins[i].Percent
 		}
 	}
+
+	return maxi, maxp
+}
+
+func (wd *WinningDistribution) getPreLessPercent(si int, per float64) int {
+	prei := si
+
+	for i := si; i >= 0; i-- {
+		if wd.AvgWins[i].Percent < per {
+			prei = i
+		} else {
+			return prei
+		}
+	}
+
+	return 0
 }
 
 func (wd *WinningDistribution) smooth(maxwin int) {
@@ -361,11 +377,10 @@ func (wd *WinningDistribution) smooth(maxwin int) {
 		nd, isok := wd.AvgWins[i]
 		if isok {
 			if nd.Percent > lastper {
-				if i >= 1 {
-					wd.mergeSmooth(i-1, maxwin, wd.AvgWins[i-2].Percent)
-				} else {
-					wd.mergeSmooth(i-1, maxwin, wd.AvgWins[-1].Percent)
-				}
+				ei, maxp := wd.getMaxPercent(i, maxwin)
+				prei := wd.getPreLessPercent(i, maxp)
+
+				wd.mergeSmooth(prei, ei, maxp)
 			}
 
 			lastper = nd.Percent
