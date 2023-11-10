@@ -9,11 +9,10 @@ import (
 )
 
 type WinWeightFitOptions struct {
-	MapDataNum     map[int]int
-	DataNum        int
 	FuncGetDataNum func(any) int
 	FuncSetWeight  func(any, int)
-	WinScale       int
+	WinScale       int // 在fit时，这个是比较精度，一般给100即可，就是精确到0.01
+	RTPScale       int // 在fitending时，用这个替代winscale，一般来说，这个最好要精确到0.0001
 	MaxFitTimes    int
 	MinNodes       int // merge时，某一边节点数低于这个就需要merge
 	MinSeeds       int // merge时，某一边seed数低于这个就需要merge
@@ -39,6 +38,14 @@ type WinData struct {
 	Win    int `yaml:"win" json:"win"`
 	Weight int `yaml:"weight" json:"weight"`
 	Data   any `yaml:"data" json:"data"`
+}
+
+func (wd *WinData) Clone() *WinData {
+	return &WinData{
+		Win:    wd.Win,
+		Weight: wd.Weight,
+		Data:   wd.Data,
+	}
 }
 
 type WinAreaData struct {
@@ -121,12 +128,12 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleUp:empty lst",
-			zap.Error(ErrWinWeightMerge))
+			zap.Error(ErrWinWeightScale))
 
 		return false
 	}
 
-	for wad.checkTurn(avgWin, bet, options, true, lst[len(lst)-1], 1, false) {
+	for wad.checkTurn(avgWin, bet, options, true, lst[0], 1, false) {
 		wad.scale(10)
 	}
 
@@ -191,7 +198,7 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleUp",
-			zap.Error(ErrWinWeightMerge))
+			zap.Error(ErrWinWeightScale))
 	}
 
 	return false
@@ -214,12 +221,12 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleDown",
-			zap.Error(ErrWinWeightMerge))
+			zap.Error(ErrWinWeightScale))
 
 		return false
 	}
 
-	for wad.checkTurn(avgWin, bet, options, false, lst[len(lst)-1], 1, false) {
+	for wad.checkTurn(avgWin, bet, options, false, lst[0], 1, false) {
 		wad.scale(10)
 	}
 
@@ -284,7 +291,7 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleDown",
-			zap.Error(ErrWinWeightMerge))
+			zap.Error(ErrWinWeightScale))
 	}
 
 	return false
@@ -307,7 +314,7 @@ func (wad *WinAreaData) scaleUp2(avgWin float64, bet int, options *WinWeightFitO
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleUp:empty lst",
-			zap.Error(ErrWinWeightMerge))
+			zap.Error(ErrWinWeightScale))
 
 		return false
 	}
@@ -377,8 +384,170 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleUp",
-			zap.Error(ErrWinWeightMerge))
+			zap.Error(ErrWinWeightScale))
 	}
+
+	return false
+}
+
+func (wad *WinAreaData) findWinWithMinWeight(win int) int {
+	curweight := -1
+	curi := -1
+
+	for i, v := range wad.Wins {
+		if v.Win == win {
+			if curi == -1 {
+				curi = i
+				curweight = v.Weight
+			} else {
+				if v.Weight < curweight {
+					curi = i
+					curweight = v.Weight
+				}
+			}
+		}
+	}
+
+	return curi
+}
+
+func (wad *WinAreaData) scaleUpEnding(avgWin float64, bet int, options *WinWeightFitOptions) bool {
+	// 最后的缩放逻辑，为了拟合rtp，这里不能再整体放大倍数了
+	// 因为是最后的缩放了，所以从近端开始，而且一个win，一次只放大权重最小的1个
+
+	lst := []int{}
+
+	// wins经过排序，从小到大，这里会break，但希望lst从小到大，所以写法要注意
+	for i := len(wad.Wins) - 1; i >= 0; i-- {
+		v := wad.Wins[i]
+
+		if float64(v.Win)/float64(bet) <= avgWin {
+			break
+		}
+
+		lst = append([]int{i}, lst...)
+	}
+
+	if len(lst) <= 0 {
+		// 最后的缩放，如果lst为空就没办法了
+		goutils.Error("WinAreaData.scaleUpEnding:empty lst",
+			zap.Error(ErrWinWeightScale))
+
+		return false
+	}
+
+	for wad.checkTurn(avgWin, bet, options, true, lst[0], 1, false) {
+		// 最后的缩放，如果最近端都不能放大，则算失败
+		goutils.Error("WinAreaData.scaleUpEnding:check 0 cannot scaleup",
+			zap.Error(ErrWinWeightScale))
+
+		return false
+	}
+
+retry:
+	chgnum := 0
+	prewin := -1
+
+	for _, i := range lst {
+		if wad.Wins[i].Win <= prewin {
+			continue
+		}
+
+		prewin = wad.Wins[i].Win
+
+		// 先找到这个win里权重最小的
+		curi := wad.findWinWithMinWeight(prewin)
+
+		// 首先看加1是否就会跳
+		if wad.checkTurn(avgWin, bet, options, true, curi, 1, true) {
+			// 因为排序，所以直接break
+			break
+		}
+
+		chgnum++
+		wad.Wins[curi].Weight++
+
+		if wad.checkWin(avgWin, bet, options) == 0 {
+			return true
+		}
+	}
+
+	if chgnum > 0 {
+		goto retry
+	}
+
+	goutils.Error("WinAreaData.scaleUpEnding:cannot scaleup",
+		zap.Error(ErrWinWeightScale))
+
+	return false
+}
+
+func (wad *WinAreaData) scaleDownEnding(avgWin float64, bet int, options *WinWeightFitOptions) bool {
+	// 最后的缩放逻辑，为了拟合rtp，这里不能再整体放大倍数了
+	// 因为是最后的缩放了，所以从近端开始，而且一个win，一次只放大权重最小的1个
+	lst := []int{}
+
+	// wins经过排序，从小到大，这里lst是从大到小，逻辑上是由近及远
+	for i := 0; i < len(wad.Wins); i++ {
+		v := wad.Wins[i]
+
+		if float64(v.Win)/float64(bet) >= avgWin {
+			break
+		}
+
+		lst = append([]int{i}, lst...)
+	}
+
+	if len(lst) <= 0 {
+		// 最后的缩放，如果lst为空就没办法了
+		goutils.Error("WinAreaData.scaleDownEnding:empty lst",
+			zap.Error(ErrWinWeightScale))
+
+		return false
+	}
+
+	for wad.checkTurn(avgWin, bet, options, true, lst[0], 1, false) {
+		// 最后的缩放，如果最近端都不能放大，则算失败
+		goutils.Error("WinAreaData.scaleDownEnding:check 0 cannot scaleup",
+			zap.Error(ErrWinWeightScale))
+
+		return false
+	}
+
+retry:
+	chgnum := 0
+	prewin := -1
+
+	for _, i := range lst {
+		if wad.Wins[i].Win <= prewin {
+			continue
+		}
+
+		prewin = wad.Wins[i].Win
+
+		// 先找到这个win里权重最小的
+		curi := wad.findWinWithMinWeight(prewin)
+
+		// 首先看加1是否就会跳
+		if wad.checkTurn(avgWin, bet, options, true, curi, 1, true) {
+			// 因为排序，所以直接break
+			break
+		}
+
+		chgnum++
+		wad.Wins[curi].Weight++
+
+		if wad.checkWin(avgWin, bet, options) == 0 {
+			return true
+		}
+	}
+
+	if chgnum > 0 {
+		goto retry
+	}
+
+	goutils.Error("WinAreaData.scaleDownEnding:cannot scaleup",
+		zap.Error(ErrWinWeightScale))
 
 	return false
 }
@@ -529,6 +698,33 @@ func (wad *WinAreaData) Fit2(avgWin float64, bet int, options *WinWeightFitOptio
 	}
 
 	return wad.scaleDown2(avgWin, bet, options)
+}
+
+func (wad *WinAreaData) FitEnding(avgWin float64, bet int, options *WinWeightFitOptions) bool {
+	// 先排序
+	sort.Slice(wad.Wins, func(i, j int) bool {
+		return wad.Wins[i].Win < wad.Wins[j].Win
+	})
+
+	curawin := wad.calcAvgWin(bet)
+
+	// 因为前面拟合用于win，这里本质上是rtp的拟合
+	srcWinScale := options.WinScale
+	options.WinScale = options.RTPScale
+	defer func() {
+		options.WinScale = srcWinScale
+	}()
+
+	wo := options.cmpWin(curawin, avgWin)
+	if wo == 0 {
+		return true
+	}
+
+	if wo < 0 {
+		return wad.scaleUpEnding(avgWin, bet, options)
+	}
+
+	return wad.scaleDownEnding(avgWin, bet, options)
 }
 
 type WinWeight struct {
@@ -748,6 +944,8 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 
 	target := NewWinWeight()
 
+	lstwd := []*WinData{}
+
 	for k, v := range wd.AvgWins {
 		wwv, isok := ww.MapData[k]
 		if isok {
@@ -757,18 +955,34 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 				wwv.countTotalWeight()
 
 				for _, win := range wwv.Wins {
+					nw := win.Clone()
+
 					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
 					if cw < 0.5 {
+						nw.Weight = 0
+
 						options.FuncSetWeight(win.Data, 0)
 					} else if cw < 1 {
+						nw.Weight = 1
+
 						options.FuncSetWeight(win.Data, 1)
 					} else {
+						nw.Weight = int(cw)
+
 						options.FuncSetWeight(win.Data, int(cw))
 					}
+
+					lstwd = append(lstwd, nw)
 				}
 			}
 		}
 	}
+
+	nwad := &WinAreaData{
+		Wins: lstwd,
+	}
+
+	nwad.FitEnding(wd.getAllAvgWin(), bet, options)
 
 	return target, nil
 }
@@ -786,6 +1000,8 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 
 	target := NewWinWeight()
 
+	lstwd := []*WinData{}
+
 	for k, v := range wd.AvgWins {
 		wwv, isok := ww.MapData[k]
 		if isok {
@@ -795,18 +1011,34 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 				wwv.countTotalWeight()
 
 				for _, win := range wwv.Wins {
+					nw := win.Clone()
+
 					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
 					if cw < 0.5 {
+						nw.Weight = 0
+
 						options.FuncSetWeight(win.Data, 0)
 					} else if cw < 1 {
+						nw.Weight = 1
+
 						options.FuncSetWeight(win.Data, 1)
 					} else {
+						nw.Weight = int(cw)
+
 						options.FuncSetWeight(win.Data, int(cw))
 					}
+
+					lstwd = append(lstwd, nw)
 				}
 			}
 		}
 	}
+
+	nwad := &WinAreaData{
+		Wins: lstwd,
+	}
+
+	nwad.FitEnding(wd.getAllAvgWin(), bet, options)
 
 	return target, nil
 }

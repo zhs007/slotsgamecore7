@@ -53,4 +53,6 @@ var (
 
 	// ErrWinWeightMerge - WinWeight.Merge error
 	ErrWinWeightMerge = errors.New("WinWeight.Merge error")
+	// ErrWinWeightScale - WinWeight.scale error
+	ErrWinWeightScale = errors.New("WinWeight.scale error")
 )
