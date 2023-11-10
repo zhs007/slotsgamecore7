@@ -506,7 +506,7 @@ func (wad *WinAreaData) scaleDownEnding(avgWin float64, bet int, options *WinWei
 		return false
 	}
 
-	for wad.checkTurn(avgWin, bet, options, true, lst[0], 1, false) {
+	for wad.checkTurn(avgWin, bet, options, false, lst[0], 1, false) {
 		// 最后的缩放，如果最近端都不能放大，则算失败
 		goutils.Error("WinAreaData.scaleDownEnding:check 0 cannot scaleup",
 			zap.Error(ErrWinWeightScale))
@@ -529,7 +529,7 @@ retry:
 		curi := wad.findWinWithMinWeight(prewin)
 
 		// 首先看加1是否就会跳
-		if wad.checkTurn(avgWin, bet, options, true, curi, 1, true) {
+		if wad.checkTurn(avgWin, bet, options, false, curi, 1, true) {
 			// 因为排序，所以直接break
 			break
 		}
