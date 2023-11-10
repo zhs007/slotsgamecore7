@@ -519,7 +519,7 @@ retry:
 	prewin := -1
 
 	for _, i := range lst {
-		if prewin < 0 || wad.Wins[i].Win > prewin {
+		if prewin >= 0 && wad.Wins[i].Win > prewin {
 			continue
 		}
 
