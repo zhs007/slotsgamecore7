@@ -715,6 +715,12 @@ func (wad *WinAreaData) FitEnding(avgWin float64, bet int, options *WinWeightFit
 		options.WinScale = srcWinScale
 	}()
 
+	defer func() {
+		for _, v := range wad.Wins {
+			options.FuncSetWeight(v.Data, v.Weight)
+		}
+	}()
+
 	wo := options.cmpWin(curawin, avgWin)
 	if wo == 0 {
 		return true
@@ -1015,7 +1021,7 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 
 					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
 					if cw < 0.5 {
-						nw.Weight = 0
+						nw.Weight = 1
 
 						options.FuncSetWeight(win.Data, 0)
 					} else if cw < 1 {
