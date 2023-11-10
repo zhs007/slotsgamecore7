@@ -138,8 +138,8 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 	}
 
 	retrynum := 0
-	isneedscale := false
 retry:
+	isneedscale := false
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, true, i, 1, true) {
@@ -231,8 +231,8 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 	}
 
 	retrynum := 0
-	isneedscale := false
 retry:
+	isneedscale := false
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, false, i, 1, true) {
@@ -324,8 +324,8 @@ func (wad *WinAreaData) scaleUp2(avgWin float64, bet int, options *WinWeightFitO
 	}
 
 	retrynum := 0
-	isneedscale := false
 retry:
+	isneedscale := false
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, true, i, 1, true) {
@@ -579,8 +579,8 @@ func (wad *WinAreaData) scaleDown2(avgWin float64, bet int, options *WinWeightFi
 	}
 
 	retrynum := 0
-	isneedscale := false
 retry:
+	isneedscale := false
 	for _, i := range lst {
 		// 首先看加1是否就会跳
 		if wad.checkTurn(avgWin, bet, options, false, i, 1, true) {
