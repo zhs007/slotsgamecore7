@@ -965,7 +965,7 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 
 					cw := v.Percent * float64(options.TotalWeight) * float64(win.Weight) / float64(wwv.TotalWeights)
 					if cw < 0.5 {
-						nw.Weight = 0
+						nw.Weight = 1
 
 						options.FuncSetWeight(win.Data, 0)
 					} else if cw < 1 {
