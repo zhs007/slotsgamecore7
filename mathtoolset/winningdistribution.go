@@ -33,6 +33,18 @@ type WinningDistribution struct {
 	TotalTimes  int64                 `yaml:"-" json:"-"`
 }
 
+func (wd *WinningDistribution) getAllAvgWin() float64 {
+	vw := float64(0)
+	totalw := float64(0)
+
+	for _, v := range wd.AvgWins {
+		vw += v.AvgWin * v.Percent
+		totalw += v.Percent
+	}
+
+	return vw / totalw
+}
+
 func (wd *WinningDistribution) getAvgWin(si, ci int) float64 {
 	vw := float64(0)
 	totalw := float64(0)
