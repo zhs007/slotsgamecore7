@@ -902,6 +902,16 @@ func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWei
 			}
 
 			if ret0 && ret1 {
+				if si != i {
+					newi := wd.mergeAvgWins(si, i)
+					ww.merge(si, i, newi)
+
+					lasti = newi
+					si = i + 1
+
+					continue
+				}
+
 				lasti = si
 				si = i + 1
 
@@ -930,6 +940,9 @@ func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWei
 			} else if !ret0 {
 				newi := wd.mergeAvgWins(si, i)
 				ww.merge(si, i, newi)
+
+				lasti = newi
+				si = i + 1
 			}
 		}
 	}
@@ -1050,15 +1063,15 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 }
 
 func (ww *WinWeight) merge(mini, maxi int, newi int) error {
-	if !(newi >= mini && newi <= maxi) {
-		goutils.Error("WinWeight.merge",
-			zap.Int("min index", mini),
-			zap.Int("max index", maxi),
-			zap.Int("new index", newi),
-			zap.Error(ErrWinWeightMerge))
+	// if !(newi >= mini && newi <= maxi) {
+	// 	goutils.Error("WinWeight.merge",
+	// 		zap.Int("min index", mini),
+	// 		zap.Int("max index", maxi),
+	// 		zap.Int("new index", newi),
+	// 		zap.Error(ErrWinWeightMerge))
 
-		return ErrWinWeightMerge
-	}
+	// 	return ErrWinWeightMerge
+	// }
 
 	nwad := &WinAreaData{}
 
