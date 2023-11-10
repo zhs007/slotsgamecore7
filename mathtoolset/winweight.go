@@ -870,7 +870,7 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 
 				// 如果到最后都合不上，也没办法了，就是最后一个解可能无解
 				newi := wd.mergeAvgWins(si, i)
-				ww.merge(si, maxj, newi)
+				ww.merge(si, i, newi)
 
 				return newi, nil
 			}
@@ -965,10 +965,12 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 
 	lstwd := []*WinData{}
 
+	maxi := ww.getMaxIndex()
+
 	for k, v := range wd.AvgWins {
 		wwv, isok := ww.MapData[k]
 		if isok {
-			if wwv.Fit(v.AvgWin, bet, options) {
+			if wwv.Fit(v.AvgWin, bet, options) || k == maxi {
 				target.MapData[k] = wwv
 
 				wwv.countTotalWeight()
@@ -1021,10 +1023,12 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 
 	lstwd := []*WinData{}
 
+	maxi := ww.getMaxIndex()
+
 	for k, v := range wd.AvgWins {
 		wwv, isok := ww.MapData[k]
 		if isok {
-			if wwv.Fit2(v.AvgWin, bet, options) {
+			if wwv.Fit2(v.AvgWin, bet, options) || k == maxi {
 				target.MapData[k] = wwv
 
 				wwv.countTotalWeight()
@@ -1063,15 +1067,15 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 }
 
 func (ww *WinWeight) merge(mini, maxi int, newi int) error {
-	// if !(newi >= mini && newi <= maxi) {
-	// 	goutils.Error("WinWeight.merge",
-	// 		zap.Int("min index", mini),
-	// 		zap.Int("max index", maxi),
-	// 		zap.Int("new index", newi),
-	// 		zap.Error(ErrWinWeightMerge))
+	if !(newi >= mini && newi <= maxi) {
+		goutils.Error("WinWeight.merge",
+			zap.Int("min index", mini),
+			zap.Int("max index", maxi),
+			zap.Int("new index", newi),
+			zap.Error(ErrWinWeightMerge))
 
-	// 	return ErrWinWeightMerge
-	// }
+		return ErrWinWeightMerge
+	}
 
 	nwad := &WinAreaData{}
 
