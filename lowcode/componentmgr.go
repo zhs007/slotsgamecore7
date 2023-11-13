@@ -54,6 +54,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(MultiLevelReplaceReelTypeName, NewMultiLevelReplaceReel)
 	mgr.Reg(FixSymbolsTypeName, NewFixSymbols)
 	mgr.Reg(SymbolCollectionTypeName, NewSymbolCollection)
+	mgr.Reg(WeightChgSymbolTypeName, NewWeightChgSymbol)
 
 	return mgr
 }
