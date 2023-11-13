@@ -449,6 +449,7 @@ retry:
 	prewin := -1
 
 	for _, i := range lst {
+		// 放大时则一档先只变一个
 		if wad.Wins[i].Win <= prewin {
 			continue
 		}
@@ -519,6 +520,7 @@ retry:
 	prewin := -1
 
 	for _, i := range lst {
+		// 一般情况下，缩小时改的数据量会比较小，所以每个都会变，而放大时则一档先只变一个
 		if prewin >= 0 && wad.Wins[i].Win > prewin {
 			continue
 		}

@@ -3,9 +3,11 @@ package mathtoolset
 import (
 	"math"
 	"os"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -129,6 +131,32 @@ func (wd *WinningDistribution) addAvgWin(bet int, win int, percent float64) {
 
 		wd.AvgWins[wini] = wind
 	}
+}
+
+func (wd *WinningDistribution) AddAvgWin(winf float64, percent float64) error {
+	wini := int(math.Floor(winf))
+
+	if winf == 0 {
+		wini = -1
+	}
+
+	wind, isok := wd.AvgWins[wini]
+	if isok {
+		goutils.Error("WinningDistribution.AddAvgWin",
+			zap.Int("key", wini),
+			zap.Error(ErrDuplicateAvgWin))
+
+		return ErrDuplicateAvgWin
+	} else {
+		wind = &AvgWinData{
+			AvgWin:  winf,
+			Percent: percent,
+		}
+
+		wd.AvgWins[wini] = wind
+	}
+
+	return nil
 }
 
 func (wd *WinningDistribution) rebuildAvgWin(bet int) {
@@ -436,6 +464,67 @@ func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
 			zap.Error(err))
 
 		return nil, err
+	}
+
+	return wd, nil
+}
+
+func LoadWinningDistributionFromExcel(fn string) (*WinningDistribution, error) {
+	wd := NewWinningDistribution()
+	curdat := 0
+	curavgwin := 0.0
+	curpercent := 0.0
+	cury := -1
+	err := sgc7game.LoadExcel(fn, "avgwin", func(x int, str string) string {
+		return strings.TrimSpace(strings.ToLower(str))
+	}, func(x int, y int, header string, data string) error {
+		if y != cury {
+			if curdat == 2 {
+				wd.AddAvgWin(curavgwin, curpercent)
+			}
+
+			cury = y
+			curdat = 0
+		}
+
+		if header == "avgwin" {
+			winf, err := goutils.String2Float64(data)
+			if err != nil {
+				goutils.Error("LoadWinningDistributionFromExcel:String2Float64:avgwin",
+					zap.String("avgwin", data),
+					zap.Error(err))
+
+				return err
+			}
+
+			curavgwin = winf
+			curdat++
+		} else if header == "percent" {
+			perf, err := goutils.String2Float64(data)
+			if err != nil {
+				goutils.Error("LoadWinningDistributionFromExcel:String2Float64:percent",
+					zap.String("percent", data),
+					zap.Error(err))
+
+				return err
+			}
+
+			curpercent = perf
+			curdat++
+		}
+
+		return nil
+	})
+	if err != nil {
+		goutils.Error("LoadWinningDistributionFromExcel:LoadExcel",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	if curdat == 2 {
+		wd.AddAvgWin(curavgwin, curpercent)
 	}
 
 	return wd, nil

@@ -55,4 +55,6 @@ var (
 	ErrWinWeightMerge = errors.New("WinWeight.Merge error")
 	// ErrWinWeightScale - WinWeight.scale error
 	ErrWinWeightScale = errors.New("WinWeight.scale error")
+	// ErrDuplicateAvgWin - duplicate avgwin
+	ErrDuplicateAvgWin = errors.New("duplicate avgwin")
 )
