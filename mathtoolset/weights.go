@@ -153,7 +153,7 @@ func forEachArrWithLength(dest []int, src []int, length int, onforeach funcFEAWL
 
 		onforeach(dest)
 
-		dest = dest[0 : len(dest)-len(src)]
+		// dest = dest[0 : len(dest)-len(src)]
 
 		return
 	}
