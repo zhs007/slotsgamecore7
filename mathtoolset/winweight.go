@@ -111,6 +111,49 @@ func (wad *WinAreaData) checkTurn(avgWin float64, bet int, options *WinWeightFit
 	return false
 }
 
+// checkTurnEx - 判断所有元素加权重后，是否会发生反转
+func (wad *WinAreaData) checkTurnEx(avgWin float64, bet int, options *WinWeightFitOptions, isLess bool, lst []int, num int, isIgnoreEqu bool) bool {
+	for _, i := range lst {
+		wad.Wins[i].Weight += num
+	}
+
+	defer func() {
+		for _, i := range lst {
+			wad.Wins[i].Weight -= num
+		}
+	}()
+
+	curaw := wad.calcAvgWin(bet)
+
+	if isLess {
+		co := options.cmpWin(curaw, avgWin)
+		if isIgnoreEqu {
+			if co > 0 {
+				return true
+			}
+		} else {
+			if co >= 0 {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	co := options.cmpWin(curaw, avgWin)
+	if isIgnoreEqu {
+		if co < 0 {
+			return true
+		}
+	} else {
+		if co <= 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOptions) bool {
 	lst := []int{}
 
@@ -444,6 +487,13 @@ func (wad *WinAreaData) scaleUpEnding(avgWin float64, bet int, options *WinWeigh
 		return false
 	}
 
+	tn := 100
+	for !wad.checkTurnEx(avgWin, bet, options, true, lst, tn, false) {
+		for _, i := range lst {
+			wad.Wins[i].Weight += tn
+		}
+	}
+
 retry:
 	chgnum := 0
 	prewin := -1
@@ -513,6 +563,13 @@ func (wad *WinAreaData) scaleDownEnding(avgWin float64, bet int, options *WinWei
 			zap.Error(ErrWinWeightScale))
 
 		return false
+	}
+
+	tn := 100
+	for !wad.checkTurnEx(avgWin, bet, options, false, lst, tn, false) {
+		for _, i := range lst {
+			wad.Wins[i].Weight += tn
+		}
 	}
 
 retry:
