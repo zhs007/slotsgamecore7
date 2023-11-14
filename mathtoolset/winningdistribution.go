@@ -534,5 +534,6 @@ func NewWinningDistribution() *WinningDistribution {
 	return &WinningDistribution{
 		TimesWins:   make(map[int]*WinTimesData),
 		PercentWins: make(map[int]*WinPerData),
+		AvgWins:     make(map[int]*AvgWinData),
 	}
 }
