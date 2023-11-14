@@ -761,6 +761,17 @@ func (wad *WinAreaData) Fit2(avgWin float64, bet int, options *WinWeightFitOptio
 	return wad.scaleDown2(avgWin, bet, options)
 }
 
+func (wad *WinAreaData) Format(options *WinWeightFitOptions) {
+	totalweight := 0.0
+	for _, v := range wad.Wins {
+		totalweight += float64(v.Weight)
+	}
+
+	for _, v := range wad.Wins {
+		v.Weight = int(math.Floor(float64(v.Weight) * float64(options.TotalWeight) / totalweight))
+	}
+}
+
 func (wad *WinAreaData) FitEnding(avgWin float64, bet int, options *WinWeightFitOptions) bool {
 	// 先排序
 	sort.Slice(wad.Wins, func(i, j int) bool {
@@ -777,6 +788,8 @@ func (wad *WinAreaData) FitEnding(avgWin float64, bet int, options *WinWeightFit
 	}()
 
 	defer func() {
+		wad.Format(options)
+
 		for _, v := range wad.Wins {
 			options.FuncSetWeight(v.Data, v.Weight)
 		}
