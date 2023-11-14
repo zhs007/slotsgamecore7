@@ -134,13 +134,17 @@ func (wd *WinningDistribution) addAvgWin(bet int, win int, percent float64) {
 }
 
 func (wd *WinningDistribution) AddAvgWin(winf float64, percent float64) error {
+	if percent == 0 {
+		return nil
+	}
+
 	wini := int(math.Floor(winf))
 
 	if winf == 0 {
 		wini = -1
 	}
 
-	wind, isok := wd.AvgWins[wini]
+	_, isok := wd.AvgWins[wini]
 	if isok {
 		goutils.Error("WinningDistribution.AddAvgWin",
 			zap.Int("key", wini),
@@ -148,7 +152,7 @@ func (wd *WinningDistribution) AddAvgWin(winf float64, percent float64) error {
 
 		return ErrDuplicateAvgWin
 	} else {
-		wind = &AvgWinData{
+		wind := &AvgWinData{
 			AvgWin:  winf,
 			Percent: percent,
 		}
