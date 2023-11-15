@@ -51,24 +51,24 @@ func (bookOf2Data *BookOf2Data) BuildPBComponentData() proto.Message {
 // BookOf2Config - configuration for BookOf feature
 type BookOf2Config struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	BetType              string   `yaml:"betType" json:"betType"`         // bet or totalBet
-	WildSymbols          []string `yaml:"wildSymbols" json:"wildSymbols"` // 可以不要wild
-	WildSymbolCodes      []int    `yaml:"-" json:"-"`
-	ForceTrigger         bool     `yaml:"forceTrigger" json:"forceTrigger"`
-	WeightTrigger        string   `yaml:"weightTrigger" json:"weightTrigger"`
-	WeightSymbolNum      string   `yaml:"weightSymbolNum" json:"weightSymbolNum"`
-	WeightSymbol         string   `yaml:"weightSymbol" json:"weightSymbol"`
-	ForceSymbolNum       int      `yaml:"forceSymbolNum" json:"forceSymbolNum"`
-	SymbolRNG            string   `yaml:"symbolRNG" json:"symbolRNG"`               // 只在ForceSymbolNum为1时有效
-	SymbolCollection     string   `yaml:"symbolCollection" json:"symbolCollection"` // 图标从一个SymbolCollection里获取
+	BetType              string                `yaml:"betType" json:"betType"`         // bet or totalBet
+	WildSymbols          []string              `yaml:"wildSymbols" json:"wildSymbols"` // 可以不要wild
+	WildSymbolCodes      []int                 `yaml:"-" json:"-"`
+	ForceTrigger         bool                  `yaml:"forceTrigger" json:"forceTrigger"`
+	WeightTrigger        string                `yaml:"weightTrigger" json:"weightTrigger"`
+	WeightTriggerVW      *sgc7game.ValWeights2 `json:"-"`
+	WeightSymbolNum      string                `yaml:"weightSymbolNum" json:"weightSymbolNum"`
+	WeightSymbolNumVW    *sgc7game.ValWeights2 `json:"-"`
+	WeightSymbol         string                `yaml:"weightSymbol" json:"weightSymbol"`
+	WeightSymbolVW       *sgc7game.ValWeights2 `json:"-"`
+	ForceSymbolNum       int                   `yaml:"forceSymbolNum" json:"forceSymbolNum"`
+	SymbolRNG            string                `yaml:"symbolRNG" json:"symbolRNG"`               // 只在ForceSymbolNum为1时有效
+	SymbolCollection     string                `yaml:"symbolCollection" json:"symbolCollection"` // 图标从一个SymbolCollection里获取
 }
 
 type BookOf2 struct {
 	*BasicComponent `json:"-"`
-	Config          *BookOf2Config        `json:"config"`
-	WeightTrigger   *sgc7game.ValWeights2 `json:"-"`
-	WeightSymbolNum *sgc7game.ValWeights2 `json:"-"`
-	WeightSymbol    *sgc7game.ValWeights2 `json:"-"`
+	Config          *BookOf2Config `json:"config"`
 }
 
 // Init -
@@ -111,7 +111,7 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 			return err
 		}
 
-		bookof2.WeightTrigger = vw2
+		bookof2.Config.WeightTriggerVW = vw2
 	}
 
 	if bookof2.Config.WeightSymbolNum != "" {
@@ -124,7 +124,7 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 			return err
 		}
 
-		bookof2.WeightSymbolNum = vw2
+		bookof2.Config.WeightSymbolNumVW = vw2
 	}
 
 	if bookof2.Config.WeightSymbol != "" {
@@ -137,7 +137,7 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 			return err
 		}
 
-		bookof2.WeightSymbol = vw2
+		bookof2.Config.WeightSymbolVW = vw2
 	}
 
 	for _, v := range bookof2.Config.WildSymbols {
@@ -159,8 +159,8 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	isTrigger := bookof2.Config.ForceTrigger
 
-	if !isTrigger && bookof2.WeightTrigger != nil {
-		iv, err := bookof2.WeightTrigger.RandVal(plugin)
+	if !isTrigger && bookof2.Config.WeightTriggerVW != nil {
+		iv, err := bookof2.Config.WeightTriggerVW.RandVal(plugin)
 		if err != nil {
 			goutils.Error("bookof2.OnPlayGame:WeightTrigger.RandVal",
 				zap.Error(err))
@@ -193,8 +193,8 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		} else {
 			symbolNum := bookof2.Config.ForceSymbolNum
 
-			if symbolNum <= 0 && bookof2.WeightSymbolNum != nil {
-				iv, err := bookof2.WeightSymbolNum.RandVal(plugin)
+			if symbolNum <= 0 && bookof2.Config.WeightSymbolNumVW != nil {
+				iv, err := bookof2.Config.WeightSymbolNumVW.RandVal(plugin)
 				if err != nil {
 					goutils.Error("bookof2.OnPlayGame:WeightSymbolNum.RandVal",
 						zap.Error(err))
@@ -207,11 +207,11 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 			if bookof2.Config.ForceSymbolNum == 1 && bookof2.Config.SymbolRNG != "" {
 				rng := gameProp.GetTagInt(bookof2.Config.SymbolRNG)
-				cs := bookof2.WeightSymbol.Vals[rng]
+				cs := bookof2.Config.WeightSymbolVW.Vals[rng]
 
 				cd.Symbols = append(cd.Symbols, cs.Int())
 			} else {
-				curWeight := bookof2.WeightSymbol.Clone()
+				curWeight := bookof2.Config.WeightSymbolVW.Clone()
 
 				for i := 0; i < symbolNum; i++ {
 					cs, err := curWeight.RandVal(plugin)
