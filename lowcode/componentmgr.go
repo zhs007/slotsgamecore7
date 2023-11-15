@@ -55,6 +55,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(FixSymbolsTypeName, NewFixSymbols)
 	mgr.Reg(SymbolCollectionTypeName, NewSymbolCollection)
 	mgr.Reg(WeightChgSymbolTypeName, NewWeightChgSymbol)
+	mgr.Reg(BookOf2TypeName, NewBookOf2)
 
 	return mgr
 }
