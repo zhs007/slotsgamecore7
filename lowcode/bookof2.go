@@ -64,6 +64,8 @@ type BookOf2Config struct {
 	ForceSymbolNum       int                   `yaml:"forceSymbolNum" json:"forceSymbolNum"`
 	SymbolRNG            string                `yaml:"symbolRNG" json:"symbolRNG"`               // 只在ForceSymbolNum为1时有效
 	SymbolCollection     string                `yaml:"symbolCollection" json:"symbolCollection"` // 图标从一个SymbolCollection里获取
+	MapSymbols           map[string][]string   `yaml:"mapSymbols" json:"mapSymbols"`             // 一个符号对应1+wild数量个变化，第1个是被选中，第2个是wild[0]变化效果，第3个是wild[1]变化效果
+	MapSymbolCodes       map[int][]int         `yaml:"-" json:"-"`
 }
 
 type BookOf2 struct {
@@ -104,7 +106,7 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 	if bookof2.Config.WeightTrigger != "" {
 		vw2, err := pool.LoadStrWeights(bookof2.Config.WeightTrigger, bookof2.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("BookOf2.Init:LoadValWeights",
+			goutils.Error("BookOf2.InitEx:LoadValWeights",
 				zap.String("Weight", bookof2.Config.WeightTrigger),
 				zap.Error(err))
 
@@ -117,7 +119,7 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 	if bookof2.Config.WeightSymbolNum != "" {
 		vw2, err := pool.LoadStrWeights(bookof2.Config.WeightSymbolNum, bookof2.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("BookOf2.Init:LoadValWeights",
+			goutils.Error("BookOf2.InitEx:LoadValWeights",
 				zap.String("Weight", bookof2.Config.WeightSymbolNum),
 				zap.Error(err))
 
@@ -130,7 +132,7 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 	if bookof2.Config.WeightSymbol != "" {
 		vw2, err := pool.LoadSymbolWeights(bookof2.Config.WeightSymbol, "val", "weight", pool.DefaultPaytables, bookof2.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("BookOf2.Init:LoadSymbolWeights",
+			goutils.Error("BookOf2.InitEx:LoadSymbolWeights",
 				zap.String("Weight", bookof2.Config.WeightSymbol),
 				zap.Error(err))
 
@@ -142,6 +144,45 @@ func (bookof2 *BookOf2) InitEx(cfg any, pool *GamePropertyPool) error {
 
 	for _, v := range bookof2.Config.WildSymbols {
 		bookof2.Config.WildSymbolCodes = append(bookof2.Config.WildSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
+	if len(bookof2.Config.MapSymbols) > 0 {
+		bookof2.Config.MapSymbolCodes = make(map[int][]int)
+
+		for strs, arrs := range bookof2.Config.MapSymbols {
+			arrsc := []int{}
+			k, isok := pool.DefaultPaytables.MapSymbols[strs]
+			if !isok {
+				goutils.Error("BookOf2.InitEx:mapSymbols",
+					zap.String("symbol", strs),
+					zap.Error(ErrInvalidSymbol))
+
+				return ErrInvalidSymbol
+			}
+
+			if len(arrs) != len(bookof2.Config.WildSymbols)+1 {
+				goutils.Error("BookOf2.InitEx:mapSymbols",
+					zap.String("symbol", strs),
+					zap.Error(ErrIvalidComponentConfig))
+
+				return ErrIvalidComponentConfig
+			}
+
+			for _, cs := range arrs {
+				ck, isok := pool.DefaultPaytables.MapSymbols[cs]
+				if !isok {
+					goutils.Error("BookOf2.InitEx:mapSymbols",
+						zap.String("symbol", strs),
+						zap.Error(ErrInvalidSymbol))
+
+					return ErrInvalidSymbol
+				}
+
+				arrsc = append(arrsc, ck)
+			}
+
+			bookof2.Config.MapSymbolCodes[k] = arrsc
+		}
 	}
 
 	bookof2.onInit(&bookof2.Config.BasicComponentConfig)
@@ -237,6 +278,8 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 		gs := bookof2.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
 
+		bookof2.procInitScene(gameProp, gs, curpr, cd)
+
 		for _, s := range cd.Symbols {
 			ngs, err := bookof2.procBookOfScene(gameProp, gs, s)
 			if err != nil {
@@ -266,23 +309,68 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 }
 
 // procBookOfScene - outpur to asciigame
-func (bookof2 *BookOf2) procBookOfScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbol int) (*sgc7game.GameScene, error) {
-	ngs := gs.CloneEx(gameProp.PoolScene)
-	// ngs := gs.Clone()
+func (bookof2 *BookOf2) procInitScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, cd *BookOf2Data) {
+	if len(bookof2.Config.MapSymbolCodes) > 0 {
+		ngs := gs.CloneEx(gameProp.PoolScene)
 
-	for x, arr := range gs.Arr {
-		hass := false
-		for _, s := range arr {
-			if s == symbol || goutils.IndexOfIntSlice(bookof2.Config.WildSymbolCodes, s, 0) >= 0 {
-				hass = true
-
-				break
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				ci := goutils.IndexOfIntSlice(cd.Symbols, s, 0)
+				if ci >= 0 {
+					ngs.Arr[x][y] = bookof2.Config.MapSymbolCodes[cd.Symbols[ci]][0]
+				}
 			}
 		}
 
-		if hass {
-			for y := range arr {
-				ngs.Arr[x][y] = symbol
+		bookof2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+	}
+}
+
+// procBookOfScene - outpur to asciigame
+func (bookof2 *BookOf2) procBookOfScene(gameProp *GameProperty, gs *sgc7game.GameScene, symbol int) (*sgc7game.GameScene, error) {
+	ngs := gs.CloneEx(gameProp.PoolScene)
+
+	if len(bookof2.Config.MapSymbolCodes) > 0 {
+		for x, arr := range gs.Arr {
+			hass := false
+			wi := -1
+			for _, s := range arr {
+				ci := goutils.IndexOfIntSlice(bookof2.Config.WildSymbolCodes, s, 0)
+				if ci >= 0 {
+					if wi > ci {
+						wi = ci
+					}
+				} else if s == symbol {
+					hass = true
+				}
+			}
+
+			if wi >= 0 {
+				for y := range arr {
+					ngs.Arr[x][y] = bookof2.Config.MapSymbolCodes[symbol][wi+1]
+				}
+			}
+			if hass {
+				for y := range arr {
+					ngs.Arr[x][y] = bookof2.Config.MapSymbolCodes[symbol][0]
+				}
+			}
+		}
+	} else {
+		for x, arr := range gs.Arr {
+			hass := false
+			for _, s := range arr {
+				if s == symbol || goutils.IndexOfIntSlice(bookof2.Config.WildSymbolCodes, s, 0) >= 0 {
+					hass = true
+
+					break
+				}
+			}
+
+			if hass {
+				for y := range arr {
+					ngs.Arr[x][y] = symbol
+				}
 			}
 		}
 	}
