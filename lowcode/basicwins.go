@@ -92,6 +92,7 @@ type TriggerFeatureConfig struct {
 	TagSymbolNum                  string         `yaml:"tagSymbolNum" json:"tagSymbolNum"`                                   // 这里可以将symbol数量记下来，别的地方能获取到
 	Awards                        []*Award       `yaml:"awards" json:"awards"`                                               // 新的奖励系统
 	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
+	IsNeedBreak                   bool           `yaml:"isNeedBreak" json:"isNeedBreak"`                                     // 如果触发，需要能break，不继续处理后续的trigger，仅限于当前队列
 }
 
 func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
@@ -340,7 +341,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	rets := []*sgc7game.Result{}
 
 	for _, v := range basicWins.Config.BeforMain {
-		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, bwd)
+		ret := basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, bwd)
+		if ret != nil && v.IsNeedBreak {
+			break
+		}
 	}
 
 	gs := basicWins.GetTargetScene(gameProp, curpr, &bwd.BasicComponentData, "")
@@ -567,7 +571,10 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	}
 
 	for _, v := range basicWins.Config.AfterMain {
-		basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, bwd)
+		ret := basicWins.ProcTriggerFeature(v, gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, bwd)
+		if ret != nil && v.IsNeedBreak {
+			break
+		}
 	}
 
 	for _, v := range rets {
