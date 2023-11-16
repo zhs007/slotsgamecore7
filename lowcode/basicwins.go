@@ -18,10 +18,11 @@ import (
 const BasicWinsTypeName = "basicWins"
 
 const (
-	WinTypeLines        = "lines"
-	WinTypeWays         = "ways"
-	WinTypeScatters     = "scatters"
-	WinTypeCountScatter = "countscatter"
+	WinTypeLines              = "lines"
+	WinTypeWays               = "ways"
+	WinTypeScatters           = "scatters"
+	WinTypeCountScatter       = "countscatter"
+	WinTypeCountScatterInArea = "countscatterInArea"
 
 	BetTypeNormal   = "bet"
 	BetTypeTotalBet = "totalBet"
@@ -93,6 +94,7 @@ type TriggerFeatureConfig struct {
 	Awards                        []*Award       `yaml:"awards" json:"awards"`                                               // 新的奖励系统
 	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
 	IsNeedBreak                   bool           `yaml:"isNeedBreak" json:"isNeedBreak"`                                     // 如果触发，需要能break，不继续处理后续的trigger，仅限于当前队列
+	PosArea                       []int          `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
 }
 
 func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
@@ -184,6 +186,36 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		ret = sgc7game.CalcScatterEx(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum, func(scatter int, cursymbol int) bool {
 			return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
 		})
+
+		if ret != nil {
+			if tf.BetType == BetTypeNoPay {
+				ret.CoinWin = 0
+				ret.CashWin = 0
+			} else {
+				if tf.SymbolCodeCountScatterPayAs > 0 {
+					ret.Mul = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+					ret.CoinWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+					ret.CashWin = gameProp.CurPaytables.MapPay[tf.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet(stake, tf.BetType)
+				}
+
+				gameProp.ProcMulti(ret)
+
+				if len(tf.SIWMSymbolCodes) > 0 {
+					procSIWM(ret, gs, tf.SIWMSymbolCodes, tf.SIWMMul)
+				}
+			}
+
+			basicWins.AddResult(curpr, ret, &bwd.BasicComponentData)
+			isTrigger = true
+		}
+	} else if tf.Type == WinTypeCountScatterInArea {
+		ret = sgc7game.CountScatterInArea(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum,
+			func(x, y int) bool {
+				return x >= tf.PosArea[0] && x <= tf.PosArea[1] && y >= tf.PosArea[2] && y <= tf.PosArea[3]
+			},
+			func(scatter int, cursymbol int) bool {
+				return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
+			})
 
 		if ret != nil {
 			if tf.BetType == BetTypeNoPay {
