@@ -251,6 +251,38 @@ func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScat
 	return nil
 }
 
+// FuncIsInArea - check pos(x, y) is valid
+type FuncIsInArea func(x, y int) bool
+
+// CountScatterInArea - count scatter
+func CountScatterInArea(scene *GameScene, scatter int, nums int, isInArea FuncIsInArea, isScatter FuncIsScatter) *Result {
+	curnums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+	for x := 0; x < len(scene.Arr); x++ {
+		for y := 0; y < len(scene.Arr[x]); y++ {
+			if isInArea(x, y) && isScatter(scatter, scene.Arr[x][y]) {
+				curnums++
+
+				pos = append(pos, x, y)
+			}
+		}
+	}
+
+	if curnums >= nums {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatterEx,
+			LineIndex:  -1,
+			Pos:        pos,
+			SymbolNums: curnums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcScatterOnReels - calc scatter
 func CalcScatterOnReels(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter) *Result {
 	curnums := 0

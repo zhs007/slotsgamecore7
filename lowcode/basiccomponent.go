@@ -42,7 +42,9 @@ func (basicComponentData *BasicComponentData) OnNewStep() {
 
 // BuildPBComponentData
 func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Message {
-	return basicComponentData.BuildPBBasicComponentData()
+	return &sgc7pb.BasicComponentData{
+		BasicComponentData: basicComponentData.BuildPBBasicComponentData(),
+	}
 }
 
 // BuildPBBasicComponentData
@@ -196,7 +198,7 @@ func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, ba
 
 // OnStatsWithPB -
 func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.ComponentData)
+	pbcd, isok := pbComponentData.(*sgc7pb.BasicComponentData)
 	if !isok {
 		goutils.Error("BasicComponent.OnStatsWithPB",
 			zap.Error(ErrIvalidProto))
@@ -204,7 +206,7 @@ func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, 
 		return 0, ErrIvalidProto
 	}
 
-	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd, pr), nil
+	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
 }
 
 // OnStatsWithComponent -
@@ -259,7 +261,7 @@ func (basicComponent *BasicComponent) NewComponentData() IComponentData {
 
 // EachUsedResults -
 func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
-	pbcd := &sgc7pb.ComponentData{}
+	pbcd := &sgc7pb.BasicComponentData{}
 
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
@@ -269,7 +271,7 @@ func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, p
 		return
 	}
 
-	for _, v := range pbcd.UsedResults {
+	for _, v := range pbcd.BasicComponentData.UsedResults {
 		oneach(pr.Results[v])
 	}
 }

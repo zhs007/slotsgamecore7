@@ -12,13 +12,16 @@ func RemoveSymbolWithResult(scene *GameScene, result *PlayResult) error {
 }
 
 type FuncCanRemoveSymbol func(x, y int) bool
+type FuncCanRemoveResult func(*Result) bool
 
 // RemoveSymbolWithResult2 - remove symbol with win result
-func RemoveSymbolWithResult2(scene *GameScene, result *PlayResult, canRemove FuncCanRemoveSymbol) error {
+func RemoveSymbolWithResult2(scene *GameScene, result *PlayResult, canRemoveResult FuncCanRemoveResult, canRemoveSymbol FuncCanRemoveSymbol) error {
 	for _, v := range result.Results {
-		for i := 0; i < len(v.Pos)/2; i++ {
-			if canRemove(v.Pos[i*2], v.Pos[i*2+1]) {
-				scene.Arr[v.Pos[i*2]][v.Pos[i*2+1]] = -1
+		if canRemoveResult(v) {
+			for i := 0; i < len(v.Pos)/2; i++ {
+				if canRemoveSymbol(v.Pos[i*2], v.Pos[i*2+1]) {
+					scene.Arr[v.Pos[i*2]][v.Pos[i*2+1]] = -1
+				}
 			}
 		}
 	}

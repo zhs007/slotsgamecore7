@@ -15,8 +15,19 @@ message ComponentData {
     int32 runIndex = 9;
 }
 
+// BasicComponentData
+message BasicComponentData {
+    ComponentData basicComponentData = 1;
+}
+
 // BookOfData
 message BookOfData {
+    ComponentData basicComponentData = 1;
+    repeated int32 symbols = 2;
+}
+
+// BookOf2Data
+message BookOf2Data {
     ComponentData basicComponentData = 1;
     repeated int32 symbols = 2;
 }

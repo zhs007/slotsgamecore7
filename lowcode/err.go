@@ -51,6 +51,9 @@ var (
 	// ErrIvalidStatsComponentInConfig - invalid Stats's component in config
 	ErrIvalidStatsComponentInConfig = errors.New("invalid Stats's component in config")
 
+	// ErrIvalidComponentConfig - invalid component config
+	ErrIvalidComponentConfig = errors.New("invalid component config")
+
 	// ErrIvalidGameData - invalid gameData
 	ErrIvalidGameData = errors.New("invalid gameData")
 
