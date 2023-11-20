@@ -309,6 +309,10 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 		if symbolTrigger.Config.JumpToComponent != "" {
 			std.NextComponent = symbolTrigger.Config.JumpToComponent
+
+			symbolTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+
+			return nil
 		}
 	}
 
