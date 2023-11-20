@@ -482,6 +482,16 @@ func (gameProp *GameProperty) GetBet(stake *sgc7game.Stake, bettype string) int 
 	return int(stake.CoinBet)
 }
 
+func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
+	if bt == BTypeTotalBet {
+		return int(stake.CoinBet) * gameProp.Pool.Config.TotalBetInWins[gameProp.GetVal(GamePropCurBetIndex)]
+	} else if bt == BTypeBet {
+		return int(stake.CoinBet)
+	}
+
+	return 0
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 

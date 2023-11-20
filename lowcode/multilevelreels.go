@@ -123,14 +123,14 @@ func (multiLevelReels *MultiLevelReels) InitEx(cfg any, pool *GamePropertyPool) 
 	return nil
 }
 
-// OnNewGame -
-func (multiLevelReels *MultiLevelReels) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[multiLevelReels.Name]
+// // OnNewGame -
+// func (multiLevelReels *MultiLevelReels) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[multiLevelReels.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // OnNewStep -
 func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error {

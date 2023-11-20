@@ -118,6 +118,10 @@ func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *s
 
 // OnNewGame -
 func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
+	cd := gameProp.MapComponentData[basicComponent.Name]
+
+	cd.OnNewGame()
+
 	return nil
 }
 

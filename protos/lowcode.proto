@@ -116,6 +116,12 @@ message SymbolCollectionData {
     repeated int32 symbolCodes = 2;
 }
 
+// SymbolTriggerData
+message SymbolTriggerData {
+    ComponentData basicComponentData = 1;
+	string nextComponent = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

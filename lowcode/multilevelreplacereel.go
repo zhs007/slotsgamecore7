@@ -113,14 +113,14 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) InitEx(cfg any, pool *GamePr
 	return nil
 }
 
-// OnNewGame -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name]
+// // OnNewGame -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // OnNewStep -
 func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewStep(gameProp *GameProperty) error {

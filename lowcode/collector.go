@@ -112,14 +112,14 @@ func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame - 因为 BasicComponent 考虑到效率，没有执行ComponentData的OnNewGame，所以这里需要特殊处理
-func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[collector.Name]
+// // OnNewGame - 因为 BasicComponent 考虑到效率，没有执行ComponentData的OnNewGame，所以这里需要特殊处理
+// func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[collector.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // Add -
 func (collector *Collector) Add(plugin sgc7plugin.IPlugin, num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {

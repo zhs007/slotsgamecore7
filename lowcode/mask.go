@@ -177,14 +177,14 @@ func (mask *Mask) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-// OnNewGame - 因为 BasicComponent 考虑到效率，没有执行ComponentData的OnNewGame，所以这里需要特殊处理
-func (mask *Mask) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[mask.Name]
+// // OnNewGame - 因为 BasicComponent 考虑到效率，没有执行ComponentData的OnNewGame，所以这里需要特殊处理
+// func (mask *Mask) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[mask.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // onMaskChg -
 func (mask *Mask) ChgMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, md *MaskData, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, val bool, noProcSPLevel bool) {
