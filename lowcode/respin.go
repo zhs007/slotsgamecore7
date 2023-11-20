@@ -81,14 +81,14 @@ type Respin struct {
 	Config          *RespinConfig `json:"config"`
 }
 
-// OnNewGame -
-func (respin *Respin) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[respin.Name]
+// // OnNewGame -
+// func (respin *Respin) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[respin.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // OnPlayGame - on playgame
 func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData, gameProp *GameProperty) bool {

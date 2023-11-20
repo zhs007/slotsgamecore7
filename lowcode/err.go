@@ -90,4 +90,10 @@ var (
 
 	// ErrIvalidProto - invalid proto
 	ErrIvalidProto = errors.New("invalid proto")
+
+	// ErrIvalidSymbol - invalid symbol
+	ErrIvalidSymbol = errors.New("invalid symbol")
+
+	// ErrIvalidSymbolTriggerType - invalid SymbolTriggerType
+	ErrIvalidSymbolTriggerType = errors.New("invalid SymbolTriggerType")
 )

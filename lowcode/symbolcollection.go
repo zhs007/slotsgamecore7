@@ -157,14 +157,14 @@ func (symbolCollection *SymbolCollection) Push(plugin sgc7plugin.IPlugin, gamePr
 	return nil
 }
 
-// OnNewGame -
-func (symbolCollection *SymbolCollection) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[symbolCollection.Name]
+// // OnNewGame -
+// func (symbolCollection *SymbolCollection) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[symbolCollection.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // playgame
 func (symbolCollection *SymbolCollection) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,

@@ -153,14 +153,14 @@ func (multiLevelMystery *MultiLevelMystery) InitEx(cfg any, pool *GamePropertyPo
 	return nil
 }
 
-// OnNewGame -
-func (multiLevelMystery *MultiLevelMystery) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[multiLevelMystery.Name]
+// // OnNewGame -
+// func (multiLevelMystery *MultiLevelMystery) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[multiLevelMystery.Name]
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
 // OnNewStep -
 func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) error {
