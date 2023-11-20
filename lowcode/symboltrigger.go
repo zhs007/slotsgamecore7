@@ -92,7 +92,6 @@ func (symbolTriggerData *SymbolTriggerData) BuildPBComponentData() proto.Message
 // SymbolTriggerConfig - configuration for SymbolTrigger
 type SymbolTriggerConfig struct {
 	BasicComponentConfig        `yaml:",inline" json:",inline"`
-	TargetScene                 string            `yaml:"targetScene" json:"targetScene"`                 // like basicReels.mstery
 	Symbol                      string            `yaml:"symbol" json:"symbol"`                           // like scatter
 	SymbolCode                  int               `yaml:"-" json:"-"`                                     // like scatter
 	Type                        string            `yaml:"type" json:"type"`                               // like scatters
