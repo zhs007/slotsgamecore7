@@ -57,6 +57,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WeightChgSymbolTypeName, NewWeightChgSymbol)
 	mgr.Reg(BookOf2TypeName, NewBookOf2)
 	mgr.Reg(SymbolTriggerTypeName, NewSymbolTrigger)
+	mgr.Reg(ReplaceReelTypeName, NewReplaceReel)
 
 	return mgr
 }
