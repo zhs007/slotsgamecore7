@@ -156,13 +156,9 @@ func (symbolTrigger *SymbolTrigger) InitEx(cfg any, pool *GamePropertyPool) erro
 	symbolTrigger.Config.SymbolCode = sc
 
 	sc, isok = pool.DefaultPaytables.MapSymbols[symbolTrigger.Config.CountScatterPayAs]
-	if !isok {
-		goutils.Error("SymbolTrigger.InitEx:CountScatterPayAs",
-			zap.String("symbol", symbolTrigger.Config.CountScatterPayAs),
-			zap.Error(ErrIvalidSymbol))
+	if isok {
+		symbolTrigger.Config.SymbolCodeCountScatterPayAs = sc
 	}
-
-	symbolTrigger.Config.SymbolCodeCountScatterPayAs = sc
 
 	for _, s := range symbolTrigger.Config.WildSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
