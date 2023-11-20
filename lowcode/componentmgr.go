@@ -58,6 +58,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(BookOf2TypeName, NewBookOf2)
 	mgr.Reg(SymbolTriggerTypeName, NewSymbolTrigger)
 	mgr.Reg(ReplaceReelTypeName, NewReplaceReel)
+	mgr.Reg(MoveSymbolTypeName, NewMoveSymbol)
 
 	return mgr
 }
