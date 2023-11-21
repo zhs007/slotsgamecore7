@@ -61,6 +61,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(MoveSymbolTypeName, NewMoveSymbol)
 	mgr.Reg(MoveReelTypeName, NewMoveReel)
 	mgr.Reg(MergeSymbolTypeName, NewMergeSymbol)
+	mgr.Reg(ReRollReelTypeName, NewReRollReel)
 
 	return mgr
 }
