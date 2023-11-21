@@ -7,6 +7,7 @@ import (
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 )
@@ -301,6 +302,36 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 	}
 
 	return vw2, nil
+}
+
+func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, mask []bool) error {
+	ic, isok := pool.MapComponents[name]
+	if !isok {
+		goutils.Error("GamePropertyPool.SetMask",
+			zap.String("name", name),
+			zap.Error(ErrIvalidComponentName))
+
+		return ErrIvalidComponentName
+	}
+
+	ic.SetMask(plugin, gameProp, curpr, gp, mask)
+
+	return nil
+}
+
+func (pool *GamePropertyPool) GetMask(name string) ([]bool, error) {
+	ic, isok := pool.MapComponents[name]
+	if !isok {
+		goutils.Error("GamePropertyPool.GetMask",
+			zap.String("name", name),
+			zap.Error(ErrIvalidComponentName))
+
+		return nil, ErrIvalidComponentName
+	}
+
+	mask := ic.GetMask()
+
+	return mask, nil
 }
 
 func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {

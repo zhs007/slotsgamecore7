@@ -16,9 +16,10 @@ type GameScene struct {
 	Arr      [][]int `json:"arr"`
 	Width    int     `json:"-"`
 	Height   int     `json:"-"`
-	Indexes  []int   `json:"indexes"`
-	ValidRow []int   `json:"validrow"`
+	Indexes  []int   `json:"-"`
+	ValidRow []int   `json:"-"`
 	HeightEx []int   `json:"-"`
+	ReelName string  `json:"-"`
 }
 
 // isArrEx - is a GameSceneEx
@@ -526,6 +527,36 @@ func (gs *GameScene) ResetReelIndex(game IGame, reelsName string, x int, index i
 	return nil
 }
 
+// ResetReelIndex2 - reset reel with index
+//
+//	某些游戏里，可能会出现重新移动某一轴，这个就是移动某一轴的接口
+func (gs *GameScene) ResetReelIndex2(reels *ReelsData, x int, index int) error {
+	if x < 0 || x >= gs.Width {
+		return ErrInvalidSceneX
+	}
+
+	if gs.Indexes != nil {
+		gs.Indexes[x] = index
+	}
+
+	for ; index < 0; index += len(reels.Reels[x]) {
+	}
+
+	for ; index >= len(reels.Reels[x]); index -= len(reels.Reels[x]) {
+	}
+
+	for y := range gs.Arr[x] {
+		gs.Arr[x][y] = reels.Reels[x][index]
+
+		index++
+		if index >= len(reels.Reels[x]) {
+			index -= len(reels.Reels[x])
+		}
+	}
+
+	return nil
+}
+
 // FuncForEach - function for ForEach
 type FuncForEach func(x, y int, val int)
 
@@ -615,10 +646,17 @@ func (gs *GameScene) Clone() *GameScene {
 		copy(ngs.Arr[i], gs.Arr[i])
 	}
 
+	if len(gs.Indexes) > 0 {
+		ngs.Indexes = make([]int, len(gs.Indexes))
+		copy(ngs.Indexes, gs.Indexes)
+	}
+
 	if len(gs.HeightEx) > 0 {
 		ngs.HeightEx = make([]int, len(gs.HeightEx))
 		copy(ngs.HeightEx, gs.HeightEx)
 	}
+
+	ngs.ReelName = gs.ReelName
 
 	return ngs
 }
@@ -632,10 +670,17 @@ func (gs *GameScene) CloneEx(pool *GameScenePoolEx) *GameScene {
 		copy(ngs.Arr[i], gs.Arr[i])
 	}
 
+	if len(gs.Indexes) > 0 {
+		ngs.Indexes = make([]int, len(gs.Indexes))
+		copy(ngs.Indexes, gs.Indexes)
+	}
+
 	if len(gs.HeightEx) > 0 {
 		ngs.HeightEx = make([]int, len(gs.HeightEx))
 		copy(ngs.HeightEx, gs.HeightEx)
 	}
+
+	ngs.ReelName = gs.ReelName
 
 	return ngs
 }

@@ -80,6 +80,8 @@ type BasicComponentConfig struct {
 	TagOtherScenes       []string          `yaml:"tagOtherScenes" json:"tagOtherScenes"`             // tag otherScenes
 	TargetScene          string            `yaml:"targetScene" json:"targetScene"`                   // target scenes
 	TargetOtherScene     string            `yaml:"targetOtherScene" json:"targetOtherScene"`         // target otherscenes
+	TagGlobalScenes      []string          `yaml:"tagGlobalScenes" json:"tagGlobalScenes"`           // tag global scenes
+	TargetGlobalScene    string            `yaml:"targetGlobalScene" json:"targetGlobalScene"`       // target global scenes
 	TagRNG               []string          `yaml:"tagRNG" json:"tagRNG"`                             // tag RNG
 	InitStrVals          map[string]string `yaml:"initStrVals" json:"initStrVals"`                   // 只要这个组件被执行，就会初始化这些strvals
 	UseFileMapping       bool              `yaml:"useFileMapping" json:"useFileMapping"`             // 兼容性配置，新配置应该一定用filemapping
@@ -146,6 +148,10 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	if usi < len(basicComponent.Config.TagScenes) {
 		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
+	}
+
+	if usi < len(basicComponent.Config.TagGlobalScenes) {
+		gameProp.TagGlobalScene(basicComponent.Config.TagGlobalScenes[usi], sc)
 	}
 }
 
@@ -235,7 +241,11 @@ func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *s
 // GetTargetScene -
 func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, targetScene string) *sgc7game.GameScene {
 	if targetScene == "" {
-		targetScene = basicComponent.Config.TargetScene
+		if basicComponent.Config.TargetGlobalScene != "" {
+			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
+		} else {
+			targetScene = basicComponent.Config.TargetScene
+		}
 	}
 
 	gs, si := gameProp.GetScene(curpr, targetScene)
@@ -289,6 +299,16 @@ func (basicComponent *BasicComponent) OnPlayGameEnd(gameProp *GameProperty, curp
 // GetName -
 func (basicComponent *BasicComponent) GetName() string {
 	return basicComponent.Name
+}
+
+// SetMask -
+func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error {
+	return ErrNotMask
+}
+
+// GetMask -
+func (basicComponent *BasicComponent) GetMask() []bool {
+	return nil
 }
 
 func NewBasicComponent(name string) *BasicComponent {

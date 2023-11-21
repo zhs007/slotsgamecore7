@@ -51,6 +51,7 @@ type GameProperty struct {
 	mapInt            map[string]int
 	mapStr            map[string]string
 	mapGlobalStr      map[string]string
+	mapGlobalScene    map[string]*sgc7game.GameScene
 	MapComponentData  map[string]IComponentData
 	HistoryComponents []IComponent
 	RespinComponents  []string
@@ -80,6 +81,7 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 	}
 
 	gameProp.mapGlobalStr = make(map[string]string)
+	gameProp.mapGlobalScene = make(map[string]*sgc7game.GameScene)
 
 	return nil
 }
@@ -96,6 +98,19 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.HistoryComponents = nil
 
 	return nil
+}
+
+func (gameProp *GameProperty) TagGlobalScene(tag string, gs *sgc7game.GameScene) {
+	gameProp.mapGlobalScene[tag] = gs
+}
+
+func (gameProp *GameProperty) GetGlobalScene(tag string) *sgc7game.GameScene {
+	gs, isok := gameProp.mapGlobalScene[tag]
+	if !isok {
+		return nil
+	}
+
+	return gs
 }
 
 func (gameProp *GameProperty) TagScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
