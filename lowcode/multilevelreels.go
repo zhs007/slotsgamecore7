@@ -162,6 +162,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
 
+	reelname := ""
 	if multiLevelReels.LevelReelSetWeights != nil {
 		val, err := multiLevelReels.LevelReelSetWeights[cd.CurLevel].RandVal(plugin)
 		if err != nil {
@@ -186,6 +187,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		}
 
 		gameProp.CurReels = rd
+		reelname = curreels
 	} else {
 		rd, isok := gameProp.Pool.Config.MapReels[multiLevelReels.Config.Levels[cd.CurLevel].Reel]
 		if !isok {
@@ -200,9 +202,11 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		gameProp.TagStr(TagCurReels, multiLevelReels.Config.Levels[cd.CurLevel].Reel)
 
 		gameProp.CurReels = rd
+		reelname = multiLevelReels.Config.Levels[cd.CurLevel].Reel
 	}
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
+	sc.ReelName = reelname
 	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	// if err != nil {
 	// 	goutils.Error("MultiLevelReels.OnPlayGame:NewGameScene",

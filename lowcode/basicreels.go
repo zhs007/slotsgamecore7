@@ -84,6 +84,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[basicReels.Name].(*BasicComponentData)
 
+	reelname := ""
 	if basicReels.ReelSetWeights != nil {
 		val, si, err := basicReels.ReelSetWeights.RandValEx(plugin)
 		if err != nil {
@@ -107,6 +108,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		}
 
 		gameProp.CurReels = rd
+		reelname = curreels
 	} else {
 		rd, isok := gameProp.Pool.Config.MapReels[basicReels.Config.ReelSet]
 		if !isok {
@@ -119,9 +121,11 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.TagStr(TagCurReels, basicReels.Config.ReelSet)
 
 		gameProp.CurReels = rd
+		reelname = basicReels.Config.ReelSet
 	}
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
+	sc.ReelName = reelname
 	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	// if err != nil {
 	// 	goutils.Error("BasicReels.OnPlayGame:NewGameScene",
