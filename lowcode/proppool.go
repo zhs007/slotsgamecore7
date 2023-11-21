@@ -319,6 +319,21 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	return nil
 }
 
+func (pool *GamePropertyPool) GetMask(name string) ([]bool, error) {
+	ic, isok := pool.MapComponents[name]
+	if !isok {
+		goutils.Error("GamePropertyPool.GetMask",
+			zap.String("name", name),
+			zap.Error(ErrIvalidComponentName))
+
+		return nil, ErrIvalidComponentName
+	}
+
+	mask := ic.GetMask()
+
+	return mask, nil
+}
+
 func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {

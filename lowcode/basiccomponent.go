@@ -306,6 +306,11 @@ func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gamePro
 	return ErrNotMask
 }
 
+// GetMask -
+func (basicComponent *BasicComponent) GetMask() []bool {
+	return nil
+}
+
 func NewBasicComponent(name string) *BasicComponent {
 	return &BasicComponent{
 		Name: name,
