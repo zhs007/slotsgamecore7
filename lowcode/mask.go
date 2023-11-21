@@ -361,6 +361,19 @@ func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResu
 	return nil
 }
 
+// SetMask -
+func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, arrMask []bool) error {
+	if mask.MaskType == MaskTypeSymbolInReel {
+		cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+
+		for x, v := range arrMask {
+			mask.ChgMask(plugin, gameProp, cd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
+		}
+	}
+
+	return nil
+}
+
 func NewMask(name string) IComponent {
 	mask := &Mask{
 		BasicComponent: NewBasicComponent(name),

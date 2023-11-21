@@ -35,4 +35,6 @@ type IComponent interface {
 		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error
 	// GetName -
 	GetName() string
+	// SetMask -
+	SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error
 }

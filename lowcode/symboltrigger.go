@@ -109,6 +109,7 @@ type SymbolTriggerConfig struct {
 	TagSymbolNum                string            `yaml:"tagSymbolNum" json:"tagSymbolNum"`               // 这里可以将symbol数量记下来，别的地方能获取到
 	Awards                      []*Award          `yaml:"awards" json:"awards"`                           // 新的奖励系统
 	SymbolAwardsWeights         *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"` // 每个中奖符号随机一组奖励
+	TargetMask                  string            `yaml:"targetMask" json:"targetMask"`                   // 如果是scatter这一组判断，可以把结果传递给一个mask
 }
 
 type SymbolTrigger struct {
@@ -200,6 +201,23 @@ func (symbolTrigger *SymbolTrigger) InitEx(cfg any, pool *GamePropertyPool) erro
 }
 
 // playgame
+func (symbolTrigger *SymbolTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
+
+	if symbolTrigger.Config.TargetMask != "" {
+		mask := make([]bool, gs.Width)
+
+		for i := 0; i < len(ret.Pos)/2; i++ {
+			mask[ret.Pos[i*2+1]] = true
+		}
+
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, symbolTrigger.Config.TargetMask, mask)
+	}
+
+	return nil
+}
+
+// playgame
 func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
@@ -280,6 +298,14 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	if isTrigger {
+		err := symbolTrigger.procMask(gs, gameProp, curpr, gp, plugin, ret)
+		if err != nil {
+			goutils.Error("SymbolTrigger.OnPlayGame:procMask",
+				zap.Error(err))
+
+			return err
+		}
+
 		if symbolTrigger.Config.TagSymbolNum != "" {
 			gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, ret.SymbolNums)
 		}

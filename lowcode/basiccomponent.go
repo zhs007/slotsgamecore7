@@ -291,6 +291,11 @@ func (basicComponent *BasicComponent) GetName() string {
 	return basicComponent.Name
 }
 
+// SetMask -
+func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error {
+	return ErrNotMask
+}
+
 func NewBasicComponent(name string) *BasicComponent {
 	return &BasicComponent{
 		Name: name,

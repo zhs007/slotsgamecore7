@@ -96,4 +96,7 @@ var (
 
 	// ErrIvalidSymbolTriggerType - invalid SymbolTriggerType
 	ErrIvalidSymbolTriggerType = errors.New("invalid SymbolTriggerType")
+
+	// ErrNotMask - not mask
+	ErrNotMask = errors.New("not mask")
 )
