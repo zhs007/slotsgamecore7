@@ -74,7 +74,7 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	sc2 := gs1.CloneEx(gameProp.PoolScene)
 
-	mask, err := gameProp.Pool.GetMask(mergeSymbol.Config.TargetMask)
+	mask, err := gameProp.Pool.GetMask(mergeSymbol.Config.TargetMask, gameProp)
 	if err != nil {
 		goutils.Error("MergeSymbol.OnPlayGame:GetMask",
 			zap.Error(err))

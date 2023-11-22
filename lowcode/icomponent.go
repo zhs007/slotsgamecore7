@@ -39,7 +39,7 @@ type IComponent interface {
 	// SetMask -
 	SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error
 	// GetMask -
-	GetMask() []bool
+	GetMask(gameProp *GameProperty) []bool
 
 	// IsRespin -
 	IsRespin() bool
