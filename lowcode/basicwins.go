@@ -139,6 +139,7 @@ type BasicWinsConfig struct {
 	AfterMain            []*TriggerFeatureConfig `yaml:"afterMain" json:"afterMain"`           // after the maintype
 	BeforMainTriggerName []string                `yaml:"-" json:"-"`                           // befor the maintype
 	AfterMainTriggerName []string                `yaml:"-" json:"-"`                           // after the maintype
+	IsRespinBreak        bool                    `yaml:"isRespinBreak" json:"isRespinBreak"`   // 如果触发了respin就不执行next，这个是兼容性配置，新游戏应该给true，维持逻辑的一致性
 }
 
 type BasicWins struct {
@@ -611,6 +612,14 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	for _, v := range rets {
 		basicWins.AddResult(curpr, v, &bwd.BasicComponentData)
+	}
+
+	if basicWins.Config.IsRespinBreak {
+		if gp.NextStepFirstComponent != "" {
+			gameProp.SetStrVal(GamePropNextComponent, "")
+
+			return nil
+		}
 	}
 
 	basicWins.onStepEnd(gameProp, curpr, gp, bwd.NextComponent)
