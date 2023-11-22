@@ -122,6 +122,8 @@ func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *s
 
 		gp.NextStepFirstComponent = nextComponent
 
+		gameProp.SetStrVal(GamePropNextComponent, "")
+
 		return
 	}
 
