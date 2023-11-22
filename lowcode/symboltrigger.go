@@ -208,7 +208,7 @@ func (symbolTrigger *SymbolTrigger) procMask(gs *sgc7game.GameScene, gameProp *G
 		mask := make([]bool, gs.Width)
 
 		for i := 0; i < len(ret.Pos)/2; i++ {
-			mask[ret.Pos[i*2+1]] = true
+			mask[ret.Pos[i*2]] = true
 		}
 
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, symbolTrigger.Config.TargetMask, mask)
