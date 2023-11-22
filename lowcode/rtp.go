@@ -295,12 +295,14 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		}
 	}
 
-	for _, m := range game.Pool.Config.RTP.Modules {
-		newRTPGameModule(rtp, game.Pool, m)
-	}
+	if game.Pool.Config.RTP != nil {
+		for _, m := range game.Pool.Config.RTP.Modules {
+			newRTPGameModule(rtp, game.Pool, m)
+		}
 
-	for _, hr := range game.Pool.Config.RTP.HitRateFeatures {
-		procHitRate(rtp, game.Pool, hr)
+		for _, hr := range game.Pool.Config.RTP.HitRateFeatures {
+			procHitRate(rtp, game.Pool, hr)
+		}
 	}
 
 	d := sgc7rtp.StartRTP(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
