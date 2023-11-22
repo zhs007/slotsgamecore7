@@ -100,13 +100,11 @@ func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData
 }
 
 // OnPlayGame - on playgame
-func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) error {
+func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
 	cd.LastRespinNum += num
 	cd.CurAddRespinNum += num
-
-	return nil
 }
 
 // Init -
@@ -297,6 +295,11 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 	}
 
 	return nil
+}
+
+// IsRespin -
+func (respin *Respin) IsRespin() bool {
+	return true
 }
 
 func NewRespin(name string) IComponent {

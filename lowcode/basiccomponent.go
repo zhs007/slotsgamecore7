@@ -111,11 +111,21 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 
 // onStepEnd -
 func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) {
-	if nextComponent != "" {
-		gameProp.SetStrVal(GamePropNextComponent, nextComponent)
-	} else {
-		gameProp.SetStrVal(GamePropNextComponent, basicComponent.Config.DefaultNextComponent)
+	if nextComponent == "" {
+		nextComponent = basicComponent.Config.DefaultNextComponent
 	}
+
+	component, isok := gameProp.Pool.MapComponents[nextComponent]
+	if isok && component.IsRespin() {
+		gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
+		gameProp.onTriggerRespin(nextComponent)
+
+		gp.NextStepFirstComponent = nextComponent
+
+		return
+	}
+
+	gameProp.SetStrVal(GamePropNextComponent, nextComponent)
 }
 
 // OnNewGame -
@@ -309,6 +319,11 @@ func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gamePro
 // GetMask -
 func (basicComponent *BasicComponent) GetMask() []bool {
 	return nil
+}
+
+// IsRespin -
+func (basicComponent *BasicComponent) IsRespin() bool {
+	return false
 }
 
 func NewBasicComponent(name string) *BasicComponent {
