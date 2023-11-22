@@ -374,6 +374,13 @@ func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cur
 	return nil
 }
 
+// GetMask -
+func (mask *Mask) GetMask(gameProp *GameProperty) []bool {
+	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+
+	return cd.Vals
+}
+
 func NewMask(name string) IComponent {
 	mask := &Mask{
 		BasicComponent: NewBasicComponent(name),

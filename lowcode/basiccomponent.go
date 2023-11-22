@@ -319,7 +319,7 @@ func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gamePro
 }
 
 // GetMask -
-func (basicComponent *BasicComponent) GetMask() []bool {
+func (basicComponent *BasicComponent) GetMask(gameProp *GameProperty) []bool {
 	return nil
 }
 
