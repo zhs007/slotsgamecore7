@@ -87,6 +87,8 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			for y, s := range arr {
 				sc2.Arr[x][y] = s
 			}
+
+			sc2.Indexes[x] = gs2.Indexes[x]
 		}
 	}
 
