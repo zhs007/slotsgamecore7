@@ -84,9 +84,10 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	for x, arr := range gs2.Arr {
 		if mask[x] {
-			for y, s := range arr {
-				sc2.Arr[x][y] = s
-			}
+			copy(sc2.Arr[x], arr)
+			// for y, s := range arr {
+			// 	sc2.Arr[x][y] = s
+			// }
 
 			sc2.Indexes[x] = gs2.Indexes[x]
 		}
