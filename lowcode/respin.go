@@ -20,11 +20,12 @@ const RespinTypeName = "respin"
 
 type RespinData struct {
 	BasicComponentData
-	LastRespinNum   int
-	CurRespinNum    int
-	CurAddRespinNum int
-	TotalCoinWin    int64
-	TotalCashWin    int64
+	LastRespinNum         int
+	CurRespinNum          int
+	CurAddRespinNum       int
+	RetriggerAddRespinNum int // 再次触发时增加的次数
+	TotalCoinWin          int64
+	TotalCashWin          int64
 }
 
 // OnNewGame -
@@ -36,6 +37,7 @@ func (respinData *RespinData) OnNewGame() {
 	respinData.CurAddRespinNum = 0
 	respinData.TotalCoinWin = 0
 	respinData.TotalCashWin = 0
+	respinData.RetriggerAddRespinNum = 0
 }
 
 // OnNewStep -
@@ -48,12 +50,13 @@ func (respinData *RespinData) OnNewStep() {
 // BuildPBComponentData
 func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RespinData{
-		BasicComponentData: respinData.BuildPBBasicComponentData(),
-		LastRespinNum:      int32(respinData.LastRespinNum),
-		CurRespinNum:       int32(respinData.CurRespinNum),
-		CurAddRespinNum:    int32(respinData.CurAddRespinNum),
-		TotalCoinWin:       respinData.TotalCoinWin,
-		TotalCashWin:       respinData.TotalCashWin,
+		BasicComponentData:    respinData.BuildPBBasicComponentData(),
+		LastRespinNum:         int32(respinData.LastRespinNum),
+		CurRespinNum:          int32(respinData.CurRespinNum),
+		CurAddRespinNum:       int32(respinData.CurAddRespinNum),
+		TotalCoinWin:          respinData.TotalCoinWin,
+		TotalCashWin:          respinData.TotalCashWin,
+		RetriggerAddRespinNum: int32(respinData.RetriggerAddRespinNum),
 	}
 
 	return pbcd
@@ -300,6 +303,28 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 // IsRespin -
 func (respin *Respin) IsRespin() bool {
 	return true
+}
+
+// SaveRetriggerRespinNum -
+func (respin *Respin) SaveRetriggerRespinNum(gameProp *GameProperty) {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	cd.RetriggerAddRespinNum = cd.LastRespinNum
+}
+
+// Retrigger -
+func (respin *Respin) Retrigger(gameProp *GameProperty) {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	cd.LastRespinNum += cd.RetriggerAddRespinNum
+	cd.CurAddRespinNum += cd.RetriggerAddRespinNum
+}
+
+// AddRetriggerRespinNum -
+func (respin *Respin) AddRetriggerRespinNum(gameProp *GameProperty, num int) {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	cd.RetriggerAddRespinNum += num
 }
 
 func NewRespin(name string) IComponent {

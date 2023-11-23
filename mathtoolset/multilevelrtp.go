@@ -34,7 +34,8 @@ func (rtpdata *MultiLevelRTPData) add(spinnum int, endinglevel int, rtp float64)
 	})
 }
 
-func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []float64, levelUpProbs []map[int]float64, spinNum int, levelUpAddSpinNum []int, totalSpinNum int, totalRTP float64) float64 {
+func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []float64, levelUpProbs []map[int]float64, spinNum int, levelUpAddSpinNum []int,
+	totalSpinNum int, totalRTP float64) float64 {
 	if prelevel >= len(levelRTPs) {
 		prelevel = len(levelRTPs) - 1
 	}
@@ -77,6 +78,10 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 	noupprob := float64(1)
 
 	for k, v := range mapProbs {
+		if k == 0 {
+			continue
+		}
+
 		addnum := 0
 		for i := 0; i < k; i++ {
 			cl := prelevel + i
@@ -88,13 +93,13 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 		}
 
 		// 考虑升级的情况
-		currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, currtp) * v
+		currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, totalRTP+currtp) * v
 
 		noupprob -= v
 	}
 
 	// 本次不能升级的情况
-	currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, currtp) * noupprob
+	currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, totalRTP+currtp) * noupprob
 
 	return currtp
 }

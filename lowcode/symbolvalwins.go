@@ -126,11 +126,13 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 				bet := gameProp.GetBet(stake, symbolValWins.Config.BetType)
 
+				mul := gameProp.GetVal(GamePropGameCoinMulti) * gameProp.GetVal(GamePropStepCoinMulti)
+
 				if symbolValWins.Config.IsTriggerSymbolNumMulti {
-					ret.CoinWin = totalvals * symbolnum
+					ret.CoinWin = totalvals * symbolnum * mul
 					ret.CashWin = ret.CoinWin * bet
 				} else {
-					ret.CoinWin = totalvals
+					ret.CoinWin = totalvals * mul
 					ret.CashWin = ret.CoinWin * bet
 				}
 

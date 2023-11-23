@@ -17,8 +17,10 @@ const (
 	GamePropCurLineNum   = 6
 	GamePropCurBetIndex  = 7
 
-	GamePropStepMulti = 100
-	GamePropGameMulti = 101
+	GamePropStepMulti     = 100
+	GamePropGameMulti     = 101
+	GamePropGameCoinMulti = 102 // 这次spin的全部step都生效，是只有coin玩法才生效的倍数
+	GamePropStepCoinMulti = 103 // 这次spin的step才生效，是只有coin玩法才生效的倍数
 
 	GamePropNextComponent   = 200
 	GamePropRespinComponent = 201
@@ -70,6 +72,7 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 
 func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 	gameProp.SetVal(GamePropGameMulti, 1)
+	gameProp.SetVal(GamePropGameCoinMulti, 1)
 
 	curBet := stake.CashBet / stake.CoinBet
 	for i, v := range gameProp.Pool.Config.Bets {
@@ -94,6 +97,7 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.SetStrVal(GamePropRespinComponent, "")
 
 	gameProp.SetVal(GamePropStepMulti, 1)
+	gameProp.SetVal(GamePropStepCoinMulti, 1)
 
 	gameProp.HistoryComponents = nil
 
@@ -349,7 +353,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	if award.Type == AwardRespinTimes {
 		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
-			respin, isok := component.(*Respin)
+			respin, isok := component.(IRespin)
 			if isok {
 				respin.AddRespinTimes(gameProp, award.Vals[0])
 			}
@@ -432,6 +436,26 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				gameProp.AddComponent2History(component, gp)
 			}
 		}
+	} else if award.Type == AwardGameCoinMulti {
+		gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
+	} else if award.Type == AwardStepCoinMulti {
+		gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
+	} else if award.Type == AwardRetriggerRespin {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			respin, isok := component.(IRespin)
+			if isok {
+				respin.Retrigger(gameProp)
+			}
+		}
+	} else if award.Type == AwardAddRetriggerRespinNum {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			respin, isok := component.(IRespin)
+			if isok {
+				respin.AddRetriggerRespinNum(gameProp, award.Vals[0])
+			}
+		}
 	}
 }
 
@@ -505,6 +529,18 @@ func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 	}
 
 	return 0
+}
+
+func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) error {
+	component, isok := gameProp.Pool.MapComponents[respinComponent]
+	if isok {
+		respin, isok := component.(IRespin)
+		if isok {
+			respin.SaveRetriggerRespinNum(gameProp)
+		}
+	}
+
+	return nil
 }
 
 func init() {

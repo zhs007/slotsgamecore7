@@ -95,6 +95,7 @@ type TriggerFeatureConfig struct {
 	SymbolAwardsWeights           *AwardsWeights `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
 	IsNeedBreak                   bool           `yaml:"isNeedBreak" json:"isNeedBreak"`                                     // 如果触发，需要能break，不继续处理后续的trigger，仅限于当前队列
 	PosArea                       []int          `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
+	IsSaveRetriggerRespinNum      bool           `yaml:"isSaveRetriggerRespinNum" json:"isSaveRetriggerRespinNum"`           // 如果配置了这个，触发respin以后，会将这次的respinnum缓存下来，后面可以直接用
 }
 
 func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
