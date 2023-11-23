@@ -38,6 +38,8 @@ func (cfg *Award) getType() int {
 		return AwardRetriggerRespin
 	} else if cfg.AwardType == "addRetriggerRespinNum" {
 		return AwardAddRetriggerRespinNum
+	} else if cfg.AwardType == "setMaskVal" {
+		return AwardSetMaskVal
 	}
 
 	return AwardUnknow
@@ -71,6 +73,7 @@ const (
 	AwardStepCoinMulti         int = 12 // 奖励这个step里的coin倍数
 	AwardRetriggerRespin       int = 13 // 奖励再次触发respin，这种只会用前面记录下的retrigger次数
 	AwardAddRetriggerRespinNum int = 14 // 奖励再次触发respin次数，这种会在前面的基础上增加
+	AwardSetMaskVal            int = 15 // 设置mask的值
 )
 
 // AwardCash
