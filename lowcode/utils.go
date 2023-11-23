@@ -104,3 +104,17 @@ func calcTotalCashWins(lst []*sgc7game.PlayResult) int64 {
 
 	return wins
 }
+
+func isSameBoolSlice(src []bool, dest []bool) bool {
+	if len(src) == len(dest) {
+		for i, v := range src {
+			if v != dest[i] {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	return false
+}
