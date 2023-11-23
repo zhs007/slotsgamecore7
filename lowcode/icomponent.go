@@ -36,10 +36,6 @@ type IComponent interface {
 	// GetName -
 	GetName() string
 
-	// // SetMask -
-	// SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error
-	// // GetMask -
-	// GetMask(gameProp *GameProperty) []bool
 	// IsMask -
 	IsMask() bool
 
