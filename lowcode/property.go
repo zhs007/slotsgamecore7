@@ -353,7 +353,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	if award.Type == AwardRespinTimes {
 		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
-			respin, isok := component.(*Respin)
+			respin, isok := component.(IRespin)
 			if isok {
 				respin.AddRespinTimes(gameProp, award.Vals[0])
 			}
@@ -440,6 +440,22 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
 	} else if award.Type == AwardStepCoinMulti {
 		gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
+	} else if award.Type == AwardRetriggerRespin {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			respin, isok := component.(IRespin)
+			if isok {
+				respin.Retrigger(gameProp)
+			}
+		}
+	} else if award.Type == AwardAddRetriggerRespinNum {
+		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		if isok {
+			respin, isok := component.(IRespin)
+			if isok {
+				respin.AddRetriggerRespinNum(gameProp, award.Vals[0])
+			}
+		}
 	}
 }
 
@@ -513,6 +529,18 @@ func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 	}
 
 	return 0
+}
+
+func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) error {
+	component, isok := gameProp.Pool.MapComponents[respinComponent]
+	if isok {
+		respin, isok := component.(IRespin)
+		if isok {
+			respin.SaveRetriggerRespinNum(gameProp)
+		}
+	}
+
+	return nil
 }
 
 func init() {
