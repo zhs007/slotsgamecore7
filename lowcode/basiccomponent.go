@@ -313,18 +313,23 @@ func (basicComponent *BasicComponent) GetName() string {
 	return basicComponent.Name
 }
 
-// SetMask -
-func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error {
-	return ErrNotMask
-}
+// // SetMask -
+// func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error {
+// 	return ErrNotMask
+// }
 
-// GetMask -
-func (basicComponent *BasicComponent) GetMask(gameProp *GameProperty) []bool {
-	return nil
-}
+// // GetMask -
+// func (basicComponent *BasicComponent) GetMask(gameProp *GameProperty) []bool {
+// 	return nil
+// }
 
 // IsRespin -
 func (basicComponent *BasicComponent) IsRespin() bool {
+	return false
+}
+
+// IsMask -
+func (basicComponent *BasicComponent) IsMask() bool {
 	return false
 }
 

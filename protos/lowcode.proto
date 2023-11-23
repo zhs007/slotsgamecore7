@@ -123,6 +123,12 @@ message SymbolTriggerData {
 	string nextComponent = 2;
 }
 
+// MultiWeightAwardsData
+message MultiWeightAwardsData {
+    ComponentData basicComponentData = 1;
+	repeated bool HasGot = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

@@ -456,6 +456,14 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				respin.AddRetriggerRespinNum(gameProp, award.Vals[0])
 			}
 		}
+	} else if award.Type == AwardSetMaskVal {
+		err := gameProp.Pool.SetMaskVal(plugin, gameProp, curpr, gp, award.StrParams[0], award.Vals[0], award.Vals[1] != 0)
+		if err != nil {
+			goutils.Error("GameProperty.procAward:AwardSetMaskVal:SetMaskVal",
+				zap.Error(err))
+
+			return
+		}
 	}
 }
 

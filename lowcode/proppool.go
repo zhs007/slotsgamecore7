@@ -304,9 +304,33 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 	return vw2, nil
 }
 
+func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, index int, mask bool) error {
+	ic, isok := pool.MapComponents[name]
+	if !isok || !ic.IsMask() {
+		goutils.Error("GamePropertyPool.SetMaskVal",
+			zap.String("name", name),
+			zap.Error(ErrIvalidComponentName))
+
+		return ErrIvalidComponentName
+	}
+
+	im, isok := ic.(IMask)
+	if !isok {
+		goutils.Error("GamePropertyPool.SetMaskVal",
+			zap.String("name", name),
+			zap.Error(ErrNotMask))
+
+		return ErrNotMask
+	}
+
+	im.SetMaskVal(plugin, gameProp, curpr, gp, index, mask)
+
+	return nil
+}
+
 func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, mask []bool) error {
 	ic, isok := pool.MapComponents[name]
-	if !isok {
+	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMask",
 			zap.String("name", name),
 			zap.Error(ErrIvalidComponentName))
@@ -314,14 +338,23 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 		return ErrIvalidComponentName
 	}
 
-	ic.SetMask(plugin, gameProp, curpr, gp, mask)
+	im, isok := ic.(IMask)
+	if !isok {
+		goutils.Error("GamePropertyPool.SetMask",
+			zap.String("name", name),
+			zap.Error(ErrNotMask))
+
+		return ErrNotMask
+	}
+
+	im.SetMask(plugin, gameProp, curpr, gp, mask)
 
 	return nil
 }
 
 func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bool, error) {
 	ic, isok := pool.MapComponents[name]
-	if !isok {
+	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.GetMask",
 			zap.String("name", name),
 			zap.Error(ErrIvalidComponentName))
@@ -329,7 +362,16 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 		return nil, ErrIvalidComponentName
 	}
 
-	mask := ic.GetMask(gameProp)
+	im, isok := ic.(IMask)
+	if !isok {
+		goutils.Error("GamePropertyPool.GetMask",
+			zap.String("name", name),
+			zap.Error(ErrNotMask))
+
+		return nil, ErrNotMask
+	}
+
+	mask := im.GetMask(gameProp)
 
 	return mask, nil
 }
