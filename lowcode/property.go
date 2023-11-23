@@ -17,8 +17,10 @@ const (
 	GamePropCurLineNum   = 6
 	GamePropCurBetIndex  = 7
 
-	GamePropStepMulti = 100
-	GamePropGameMulti = 101
+	GamePropStepMulti     = 100
+	GamePropGameMulti     = 101
+	GamePropGameCoinMulti = 102 // 这次spin的全部step都生效，是只有coin玩法才生效的倍数
+	GamePropStepCoinMulti = 103 // 这次spin的step才生效，是只有coin玩法才生效的倍数
 
 	GamePropNextComponent   = 200
 	GamePropRespinComponent = 201
@@ -70,6 +72,7 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 
 func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 	gameProp.SetVal(GamePropGameMulti, 1)
+	gameProp.SetVal(GamePropGameCoinMulti, 1)
 
 	curBet := stake.CashBet / stake.CoinBet
 	for i, v := range gameProp.Pool.Config.Bets {
@@ -94,6 +97,7 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.SetStrVal(GamePropRespinComponent, "")
 
 	gameProp.SetVal(GamePropStepMulti, 1)
+	gameProp.SetVal(GamePropStepCoinMulti, 1)
 
 	gameProp.HistoryComponents = nil
 
@@ -432,6 +436,10 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				gameProp.AddComponent2History(component, gp)
 			}
 		}
+	} else if award.Type == AwardGameCoinMulti {
+		gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
+	} else if award.Type == AwardStepCoinMulti {
+		gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
 	}
 }
 

@@ -59,6 +59,8 @@ const (
 	AwardNoLevelUpCollector   int = 8  // 奖励收集器，但不会触发升级奖励
 	AwardWeightGameRNG        int = 9  // 权重产生一个rng，供后续逻辑用，全局用，不同step不会reset这个rng
 	AwardPushSymbolCollection int = 10 // 根据SymbolCollection自己的逻辑，产生一定数量的Symbol到SymbolCollection里
+	AwardGameCoinMulti        int = 11 // 奖励游戏整体的coin倍数
+	AwardStepCoinMulti        int = 12 // 奖励这个step里的coin倍数
 )
 
 // AwardCash
