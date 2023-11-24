@@ -64,7 +64,7 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 		if k == 0 {
 			// 如果最后一次
 			if spinNum == 1 {
-				rtpdata.add(totalSpinNum+spinNum, prelevel, totalRTP+currtp, curPer*v)
+				rtpdata.add(totalSpinNum+spinNum, prelevel, totalRTP+levelRTPs[prelevel], curPer*v)
 			} else {
 				currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, totalRTP+levelRTPs[prelevel], curPer*v) * v
 			}
