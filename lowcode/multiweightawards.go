@@ -107,6 +107,10 @@ func (multiWeightAwards *MultiWeightAwards) InitEx(cfg any, pool *GamePropertyPo
 		}
 
 		v.VW = vw2
+
+		for _, award := range v.Awards {
+			award.Init()
+		}
 	}
 
 	multiWeightAwards.onInit(&multiWeightAwards.Config.BasicComponentConfig)
