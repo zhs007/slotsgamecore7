@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -100,11 +101,17 @@ func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 // OnAsciiGame - outpur to asciigame
 func (maskBranch *MaskBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	// cd := gameProp.MapComponentData[reRollReel.Name].(*BasicComponentData)
+	maskdata, err := gameProp.Pool.GetMask(maskBranch.Config.Mask, gameProp)
+	if err != nil {
+		goutils.Error("MaskBranch.OnPlayGame:GetMask",
+			zap.Error(err))
 
-	// if len(cd.UsedScenes) > 0 {
-	// 	asciigame.OutputScene("after reRollReel", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
-	// }
+		return err
+	}
+
+	if maskdata != nil {
+		fmt.Printf("MaskBranch %v, got %v is %#v", maskBranch.GetName(), maskBranch.Config.Mask, maskdata)
+	}
 
 	return nil
 }
