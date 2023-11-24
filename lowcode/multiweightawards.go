@@ -77,7 +77,7 @@ func (multiWeightAwards *MultiWeightAwards) Init(fn string, pool *GamePropertyPo
 		return err
 	}
 
-	cfg := &SymbolCollectionConfig{}
+	cfg := &MultiWeightAwardsConfig{}
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
