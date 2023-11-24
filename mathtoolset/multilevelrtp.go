@@ -12,16 +12,18 @@ type MultiLevelRTPNode struct {
 	SpinNum     int
 	EndingLevel int
 	RTP         float64
+	Percent     float64
 }
 
 type MultiLevelRTPData struct {
 	Nodes []*MultiLevelRTPNode
 }
 
-func (rtpdata *MultiLevelRTPData) add(spinnum int, endinglevel int, rtp float64) {
+func (rtpdata *MultiLevelRTPData) add(spinnum int, endinglevel int, rtp float64, per float64) {
 	for _, v := range rtpdata.Nodes {
 		if v.SpinNum == spinnum && v.EndingLevel == endinglevel {
 			v.RTP += rtp
+			v.Percent += rtp
 
 			return
 		}
@@ -31,11 +33,12 @@ func (rtpdata *MultiLevelRTPData) add(spinnum int, endinglevel int, rtp float64)
 		SpinNum:     spinnum,
 		EndingLevel: endinglevel,
 		RTP:         rtp,
+		Percent:     per,
 	})
 }
 
 func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []float64, levelUpProbs []map[int]float64, spinNum int, levelUpAddSpinNum []int,
-	totalSpinNum int, totalRTP float64) float64 {
+	totalSpinNum int, totalRTP float64, curPer float64) float64 {
 
 	// 如果最后一次spin了
 	if spinNum == 0 {
@@ -48,7 +51,7 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 
 	// 	已经到最高级了，这里不考虑最高级依然可以增加次数，所以直接返回即可
 	if prelevel == len(levelRTPs)-1 {
-		rtpdata.add(totalSpinNum+spinNum, prelevel, totalRTP+levelRTPs[prelevel]*float64(spinNum))
+		rtpdata.add(totalSpinNum+spinNum, prelevel, totalRTP+levelRTPs[prelevel]*float64(spinNum), curPer)
 
 		return levelRTPs[prelevel] * float64(spinNum)
 	}
@@ -61,9 +64,9 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 		if k == 0 {
 			// 如果最后一次
 			if spinNum == 1 {
-				rtpdata.add(totalSpinNum+spinNum, prelevel, totalRTP+currtp)
+				rtpdata.add(totalSpinNum+spinNum, prelevel, (totalRTP+currtp)*curPer*v, curPer*v)
 			} else {
-				currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, (totalRTP+currtp)*v) * v
+				currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, totalRTP+currtp, curPer*v) * v
 			}
 		} else {
 			addnum := 0
@@ -77,7 +80,7 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 
 			if spinNum-1+addnum > 0 {
 				// 考虑升级的情况
-				currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, (totalRTP+currtp)*v) * v
+				currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, totalRTP+currtp, curPer*v) * v
 			}
 		}
 	}
@@ -91,12 +94,12 @@ func (rtpdata *MultiLevelRTPData) CalcMulLevelRTP2(levelRTPs []float64, levelUpP
 	}
 
 	if spinNum == 1 {
-		rtpdata.add(1, 0, levelRTPs[0])
+		rtpdata.add(1, 0, levelRTPs[0], 1)
 
 		return levelRTPs[0]
 	}
 
-	return levelRTPs[0] + rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, 1, levelRTPs[0])
+	return levelRTPs[0] + rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, 1, levelRTPs[0], 1)
 }
 
 func (rtpdata *MultiLevelRTPData) SaveResults(fn string) error {
@@ -106,14 +109,16 @@ func (rtpdata *MultiLevelRTPData) SaveResults(fn string) error {
 
 	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "spinNum")
 	f.SetCellStr(sheet, goutils.Pos2Cell(1, 0), "EndingLevel")
-	f.SetCellStr(sheet, goutils.Pos2Cell(2, 0), "RTP")
+	f.SetCellStr(sheet, goutils.Pos2Cell(2, 0), "Percent")
+	f.SetCellStr(sheet, goutils.Pos2Cell(3, 0), "RTP")
 
 	si := 1
 
 	for _, v := range rtpdata.Nodes {
 		f.SetCellInt(sheet, goutils.Pos2Cell(0, si), v.SpinNum)
 		f.SetCellInt(sheet, goutils.Pos2Cell(1, si), v.EndingLevel)
-		f.SetCellFloat(sheet, goutils.Pos2Cell(2, si), v.RTP, 5, 64)
+		f.SetCellFloat(sheet, goutils.Pos2Cell(2, si), v.Percent, 5, 64)
+		f.SetCellFloat(sheet, goutils.Pos2Cell(3, si), v.RTP, 5, 64)
 
 		si++
 	}
