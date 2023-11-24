@@ -20,14 +20,14 @@ type MultiLevelRTPData struct {
 }
 
 func (rtpdata *MultiLevelRTPData) add(spinnum int, endinglevel int, rtp float64, per float64) {
-	for _, v := range rtpdata.Nodes {
-		if v.SpinNum == spinnum && v.EndingLevel == endinglevel {
-			v.RTP += rtp
-			v.Percent += per
+	// for _, v := range rtpdata.Nodes {
+	// 	if v.SpinNum == spinnum && v.EndingLevel == endinglevel {
+	// 		v.RTP += rtp
+	// 		v.Percent += per
 
-			return
-		}
-	}
+	// 		return
+	// 	}
+	// }
 
 	rtpdata.Nodes = append(rtpdata.Nodes, &MultiLevelRTPNode{
 		SpinNum:     spinnum,
