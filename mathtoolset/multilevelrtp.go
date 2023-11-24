@@ -13,6 +13,7 @@ type MultiLevelRTPNode struct {
 	EndingLevel int
 	RTP         float64
 	Percent     float64
+	TotalRTP    float64
 }
 
 type MultiLevelRTPData struct {
@@ -33,6 +34,25 @@ func (rtpdata *MultiLevelRTPData) add(spinnum int, endinglevel int, rtp float64,
 		SpinNum:     spinnum,
 		EndingLevel: endinglevel,
 		RTP:         rtp,
+		Percent:     per,
+		TotalRTP:    rtp * per,
+	})
+}
+
+func (rtpdata *MultiLevelRTPData) addEx(spinnum int, endinglevel int, rtp float64, per float64) {
+	for _, v := range rtpdata.Nodes {
+		if v.SpinNum == spinnum && v.EndingLevel == endinglevel {
+			v.TotalRTP += rtp * per
+			v.Percent += per
+
+			return
+		}
+	}
+
+	rtpdata.Nodes = append(rtpdata.Nodes, &MultiLevelRTPNode{
+		SpinNum:     spinnum,
+		EndingLevel: endinglevel,
+		TotalRTP:    rtp * per,
 		Percent:     per,
 	})
 }
@@ -102,6 +122,16 @@ func (rtpdata *MultiLevelRTPData) CalcMulLevelRTP2(levelRTPs []float64, levelUpP
 	return levelRTPs[0] + rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, 1, levelRTPs[0], 1)
 }
 
+func (rtpdata *MultiLevelRTPData) Format() *MultiLevelRTPData {
+	rtpdata1 := NewMultiLevelRTPData()
+
+	for _, n := range rtpdata.Nodes {
+		rtpdata1.addEx(n.SpinNum, n.EndingLevel, n.RTP, n.Percent)
+	}
+
+	return rtpdata1
+}
+
 func (rtpdata *MultiLevelRTPData) SaveResults(fn string) error {
 	f := excelize.NewFile()
 
@@ -111,6 +141,7 @@ func (rtpdata *MultiLevelRTPData) SaveResults(fn string) error {
 	f.SetCellStr(sheet, goutils.Pos2Cell(1, 0), "EndingLevel")
 	f.SetCellStr(sheet, goutils.Pos2Cell(2, 0), "Percent")
 	f.SetCellStr(sheet, goutils.Pos2Cell(3, 0), "RTP")
+	f.SetCellStr(sheet, goutils.Pos2Cell(4, 0), "TotalRTP")
 
 	si := 1
 
@@ -119,6 +150,7 @@ func (rtpdata *MultiLevelRTPData) SaveResults(fn string) error {
 		f.SetCellInt(sheet, goutils.Pos2Cell(1, si), v.EndingLevel)
 		f.SetCellFloat(sheet, goutils.Pos2Cell(2, si), v.Percent, 5, 64)
 		f.SetCellFloat(sheet, goutils.Pos2Cell(3, si), v.RTP, 5, 64)
+		f.SetCellFloat(sheet, goutils.Pos2Cell(4, si), v.TotalRTP, 5, 64)
 
 		si++
 	}
