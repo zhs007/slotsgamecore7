@@ -238,9 +238,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 func (moveSymbol *MoveSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 	cd := gameProp.MapComponentData[moveSymbol.Name].(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after moveSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
-	}
+	asciigame.OutputScene("after moveSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 
 	return nil
 }
