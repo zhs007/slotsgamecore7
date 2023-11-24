@@ -63,6 +63,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(MergeSymbolTypeName, NewMergeSymbol)
 	mgr.Reg(ReRollReelTypeName, NewReRollReel)
 	mgr.Reg(MultiWeightAwardsTypeName, NewMultiWeightAwards)
+	mgr.Reg(MaskBranchTypeName, NewMaskBranch)
 
 	return mgr
 }
