@@ -66,7 +66,7 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 			if spinNum == 1 {
 				rtpdata.add(totalSpinNum+spinNum, prelevel, (totalRTP+currtp)*curPer*v, curPer*v)
 			} else {
-				currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, totalRTP+currtp, curPer*v) * v
+				currtp += rtpdata.calcMulLevelRTP2(prelevel, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, totalSpinNum+1, totalRTP+levelRTPs[prelevel], curPer*v) * v
 			}
 		} else {
 			addnum := 0
@@ -80,7 +80,7 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 
 			if spinNum-1+addnum > 0 {
 				// 考虑升级的情况
-				currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, totalRTP+currtp, curPer*v) * v
+				currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, totalRTP+levelRTPs[prelevel], curPer*v) * v
 			}
 		}
 	}
