@@ -487,7 +487,7 @@ func (wad *WinAreaData) scaleUpEnding(avgWin float64, bet int, options *WinWeigh
 		return false
 	}
 
-	for tn := options.TotalWeight / 100; tn > 100; tn /= 10 {
+	for tn := options.TotalWeight / 100; tn >= 10; tn /= 10 {
 		for !wad.checkTurnEx(avgWin, bet, options, true, lst, tn, false) {
 			for _, i := range lst {
 				wad.Wins[i].Weight += tn
@@ -566,7 +566,7 @@ func (wad *WinAreaData) scaleDownEnding(avgWin float64, bet int, options *WinWei
 		return false
 	}
 
-	for tn := options.TotalWeight / 100; tn > 100; tn /= 10 {
+	for tn := options.TotalWeight / 100; tn >= 10; tn /= 10 {
 		for !wad.checkTurnEx(avgWin, bet, options, false, lst, tn, false) {
 			for _, i := range lst {
 				wad.Wins[i].Weight += tn
