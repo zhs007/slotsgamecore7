@@ -101,6 +101,8 @@ func (rtpdata *MultiLevelRTPData) calcMulLevelRTP2(prelevel int, levelRTPs []flo
 			if spinNum-1+addnum > 0 {
 				// 考虑升级的情况
 				currtp += rtpdata.calcMulLevelRTP2(prelevel+k, levelRTPs, levelUpProbs, spinNum-1+addnum, levelUpAddSpinNum, totalSpinNum+1, totalRTP+levelRTPs[prelevel], curPer*v) * v
+			} else if spinNum == 1 {
+				rtpdata.add(totalSpinNum+spinNum, prelevel+k, totalRTP+levelRTPs[prelevel], curPer*v)
 			}
 		}
 	}
@@ -119,7 +121,9 @@ func (rtpdata *MultiLevelRTPData) CalcMulLevelRTP2(levelRTPs []float64, levelUpP
 		return levelRTPs[0]
 	}
 
-	return levelRTPs[0] + rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum, 1, levelRTPs[0], 1)
+	levelUpProbs1 := formatProbsSlice(levelUpProbs)
+
+	return levelRTPs[0] + rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs1, spinNum-1, levelUpAddSpinNum, 1, levelRTPs[0], 1)
 }
 
 func (rtpdata *MultiLevelRTPData) Format() *MultiLevelRTPData {
@@ -285,4 +289,25 @@ func CalcMulLevelRTP2(levelRTPs []float64, levelUpProbs []map[int]float64, spinN
 	}
 
 	return levelRTPs[0] + calcMulLevelRTP2(0, levelRTPs, levelUpProbs, spinNum-1, levelUpAddSpinNum)
+}
+
+func formatProbsSlice(arrProbs []map[int]float64) []map[int]float64 {
+	newarr := []map[int]float64{}
+	for _, m := range arrProbs {
+		newm := make(map[int]float64)
+
+		totalv := float64(0)
+
+		for _, v := range m {
+			totalv += v
+		}
+
+		for k, v := range m {
+			newm[k] = v / totalv
+		}
+
+		newarr = append(newarr, newm)
+	}
+
+	return newarr
 }
