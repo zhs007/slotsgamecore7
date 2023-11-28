@@ -123,7 +123,7 @@ func (rtpdata *MultiLevelRTPData) CalcMulLevelRTP2(levelRTPs []float64, levelUpP
 
 	levelUpProbs1 := formatProbsSlice(levelUpProbs)
 
-	return levelRTPs[0] + rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs1, spinNum-1, levelUpAddSpinNum, 1, levelRTPs[0], 1)
+	return rtpdata.calcMulLevelRTP2(0, levelRTPs, levelUpProbs1, spinNum, levelUpAddSpinNum, 0, 0, 1)
 }
 
 func (rtpdata *MultiLevelRTPData) Format() *MultiLevelRTPData {
