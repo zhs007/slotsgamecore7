@@ -50,21 +50,21 @@ func (wd *WinData) Clone() *WinData {
 
 type WinAreaData struct {
 	Wins         []*WinData `yaml:"wins" json:"wins"`
-	TotalWeights int        `yaml:"maxWeight" json:"maxWeight"`
+	TotalWeights int64      `yaml:"maxWeight" json:"maxWeight"`
 	AvgWin       float64    `yaml:"avgWin" json:"avgWin"`
 	Percent      float64    `yaml:"percent" json:"percent"`
 }
 
 func (wad *WinAreaData) calcAvgWin(bet int) float64 {
 	totalwin := float64(0)
-	totalweights := 0
+	totalweights := float64(0)
 
 	for _, v := range wad.Wins {
 		totalwin += float64(v.Win) / float64(bet) * float64(v.Weight)
-		totalweights += v.Weight
+		totalweights += float64(v.Weight)
 	}
 
-	return totalwin / float64(totalweights)
+	return totalwin / totalweights
 }
 
 func (wad *WinAreaData) checkWin(avgWin float64, bet int, options *WinWeightFitOptions) int {
@@ -723,7 +723,7 @@ func (wad *WinAreaData) countTotalWeight() {
 	wad.TotalWeights = 0
 
 	for _, v := range wad.Wins {
-		wad.TotalWeights += v.Weight
+		wad.TotalWeights += int64(v.Weight)
 	}
 }
 
