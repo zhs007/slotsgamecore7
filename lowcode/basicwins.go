@@ -294,11 +294,14 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = v
-			} else {
+			} else if tf.RespinNum > 0 {
 				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent)
 
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = tf.RespinNum
+			} else {
+				ret.Type = sgc7game.RTFreeGame
+				ret.Value = -1
 			}
 
 			if tf.ForceToNext {
