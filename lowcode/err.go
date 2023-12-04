@@ -99,4 +99,6 @@ var (
 
 	// ErrNotMask - not mask
 	ErrNotMask = errors.New("not mask")
+	// ErrNotRespin - not respin
+	ErrNotRespin = errors.New("not respin")
 )

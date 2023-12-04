@@ -376,6 +376,30 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	return mask, nil
 }
 
+func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, name string, num int) error {
+	ic, isok := pool.MapComponents[name]
+	if !isok || !ic.IsRespin() {
+		goutils.Error("GamePropertyPool.PushTrigger",
+			zap.String("name", name),
+			zap.Error(ErrIvalidComponentName))
+
+		return ErrIvalidComponentName
+	}
+
+	ir, isok := ic.(IRespin)
+	if !isok {
+		goutils.Error("GamePropertyPool.PushTrigger",
+			zap.String("name", name),
+			zap.Error(ErrNotRespin))
+
+		return ErrNotRespin
+	}
+
+	ir.PushTrigger(gameProp, num)
+
+	return nil
+}
+
 func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {

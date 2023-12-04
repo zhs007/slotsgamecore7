@@ -345,11 +345,40 @@ func (gameProp *GameProperty) GetTagGlobalStr(tag string) string {
 
 func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {
 	for _, v := range awards {
-		gameProp.procAward(plugin, v, curpr, gp)
+		gameProp.procAward(plugin, v, curpr, gp, false)
 	}
 }
 
-func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award, curpr *sgc7game.PlayResult, gp *GameParams) {
+func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award, curpr *sgc7game.PlayResult, gp *GameParams, skipTriggerRespin bool) {
+	if !skipTriggerRespin && award.OnTriggerRespin != "" {
+		component, isok := gameProp.Pool.MapComponents[award.OnTriggerRespin]
+		if !isok {
+			goutils.Error("GameProperty.procAward:OnTriggerRespin",
+				zap.Error(ErrInvalidComponent))
+
+			return
+		}
+
+		if !component.IsRespin() {
+			goutils.Error("GameProperty.procAward:OnTriggerRespin:IsRespin",
+				zap.Error(ErrNotRespin))
+
+			return
+		}
+
+		irespin, isok := component.(IRespin)
+		if !isok {
+			goutils.Error("GameProperty.procAward:OnTriggerRespin",
+				zap.Error(ErrNotRespin))
+
+			return
+		}
+
+		irespin.AddTriggerAward(gameProp, award)
+
+		return
+	}
+
 	if award.Type == AwardRespinTimes {
 		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
@@ -445,7 +474,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		if isok {
 			respin, isok := component.(IRespin)
 			if isok {
-				respin.Retrigger(gameProp)
+				respin.Trigger(gameProp)
 			}
 		}
 	} else if award.Type == AwardAddRetriggerRespinNum {
@@ -460,6 +489,14 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		err := gameProp.Pool.SetMaskVal(plugin, gameProp, curpr, gp, award.StrParams[0], award.Vals[0], award.Vals[1] != 0)
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetMaskVal:SetMaskVal",
+				zap.Error(err))
+
+			return
+		}
+	} else if award.Type == AwardTriggerRespin2 {
+		err := gameProp.Pool.PushTrigger(gameProp, award.StrParams[0], award.Vals[0])
+		if err != nil {
+			goutils.Error("GameProperty.procAward:AwardTriggerRespin2:PushTrigger",
 				zap.Error(err))
 
 			return

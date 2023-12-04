@@ -100,6 +100,8 @@ message RespinData {
 	int64 totalCoinWin = 6;
 	int64 totalCashWin = 7;
     int32 retriggerAddRespinNum = 8;
+    int32 lastTriggerNum = 9;
+	int32 curTriggerNum = 10;
 }
 
 // MaskData
