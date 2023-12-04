@@ -20,6 +20,7 @@ type WeightTriggerConfig struct {
 	NextComponents       []string `yaml:"nextComponents" json:"nextComponents"`
 	RespinNums           []int    `yaml:"respinNums" json:"respinNums"`
 	WeightSet            string   `yaml:"weightSet" json:"weightSet"`
+	IsUseTriggerRespin2  bool     `yaml:"isUseTriggerRespin2" json:"isUseTriggerRespin2"` // 给true就用triggerRespin2
 }
 
 type WeightTrigger struct {
@@ -96,7 +97,7 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	if len(weightTrigger.Config.RespinNums) == len(weightTrigger.Config.NextComponents) {
 		if weightTrigger.Config.RespinNums[setIndex] > 0 {
-			gameProp.TriggerRespin(curpr, gp, weightTrigger.Config.RespinNums[setIndex], weightTrigger.Config.NextComponents[setIndex])
+			gameProp.TriggerRespin(curpr, gp, weightTrigger.Config.RespinNums[setIndex], weightTrigger.Config.NextComponents[setIndex], weightTrigger.Config.IsUseTriggerRespin2)
 		}
 		// 	weightTrigger.onStepEnd(gameProp, curpr, gp, "")
 		// } else {

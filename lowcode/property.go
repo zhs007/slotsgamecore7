@@ -200,13 +200,17 @@ func (gameProp *GameProperty) AddComponent2History(component IComponent, gp *Gam
 	gp.HistoryComponents = append(gp.HistoryComponents, component.GetName())
 }
 
-func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string) error {
+func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string, usePushTrigger bool) error {
 	// if respinNum > 0 {
 	component, isok := gameProp.Pool.MapComponents[respinComponent]
 	if isok {
 		respin, isok := component.(*Respin)
 		if isok {
-			respin.AddRespinTimes(gameProp, respinNum)
+			if usePushTrigger {
+				respin.PushTrigger(gameProp, respinNum)
+			} else {
+				respin.AddRespinTimes(gameProp, respinNum)
+			}
 
 			gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
 			gameProp.onTriggerRespin(respinComponent)
@@ -219,7 +223,7 @@ func (gameProp *GameProperty) TriggerRespin(pr *sgc7game.PlayResult, gp *GamePar
 	return nil
 }
 
-func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, useFileMapping bool, respinComponent string) (int, error) {
+func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, fn string, useFileMapping bool, respinComponent string, usePushTrigger bool) (int, error) {
 	vw2, err := gameProp.GetIntValWeights(fn, useFileMapping)
 	if err != nil {
 		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
@@ -239,7 +243,7 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 	}
 
 	if val.Int() > 0 {
-		gameProp.TriggerRespin(pr, gp, val.Int(), respinComponent)
+		gameProp.TriggerRespin(pr, gp, val.Int(), respinComponent, usePushTrigger)
 
 		return val.Int(), nil
 	}
@@ -400,7 +404,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			}
 		}
 	} else if award.Type == AwardTriggerRespin {
-		gameProp.TriggerRespin(curpr, gp, award.Vals[0], award.StrParams[0])
+		gameProp.TriggerRespin(curpr, gp, award.Vals[0], award.StrParams[0], false)
 	} else if award.Type == AwardCollector {
 		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
 		if isok {
