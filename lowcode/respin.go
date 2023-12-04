@@ -309,7 +309,7 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 		cd.LastRespinNum = 0
 	}
 
-	if cd.LastRespinNum == 0 {
+	if cd.LastRespinNum == 0 && cd.LastTriggerNum == 0 {
 		gameProp.onRespinEnding(respin.Name)
 	}
 
