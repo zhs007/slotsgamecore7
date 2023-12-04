@@ -97,6 +97,7 @@ type TriggerFeatureConfig struct {
 	PosArea                       []int          `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
 	IsSaveRetriggerRespinNum      bool           `yaml:"isSaveRetriggerRespinNum" json:"isSaveRetriggerRespinNum"`           // 如果配置了这个，触发respin以后，会将这次的respinnum缓存下来，后面可以直接用
 	ForceToNext                   bool           `yaml:"forceToNext" json:"forceToNext"`                                     // 就算触发了respin，也要先执行next分支
+	IsUseTriggerRespin2           bool           `yaml:"isUseTriggerRespin2" json:"isUseTriggerRespin2"`                     // 给true就用triggerRespin2
 }
 
 func (tfCfg *TriggerFeatureConfig) onInit(pool *GamePropertyPool) error {
@@ -268,7 +269,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 
 		if tf.RespinComponent != "" {
 			if tf.RespinNumWeightWithScatterNum != nil {
-				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], basicWins.Config.UseFileMapping, tf.RespinComponent)
+				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeightWithScatterNum[ret.SymbolNums], basicWins.Config.UseFileMapping, tf.RespinComponent, tf.IsUseTriggerRespin2)
 				if err != nil {
 					goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
 						zap.Error(err))
@@ -279,12 +280,12 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = v
 			} else if len(tf.RespinNumWithScatterNum) > 0 {
-				gameProp.TriggerRespin(curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent)
+				gameProp.TriggerRespin(curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent, tf.IsUseTriggerRespin2)
 
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = tf.RespinNumWithScatterNum[ret.SymbolNums]
 			} else if tf.RespinNumWeight != "" {
-				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, basicWins.Config.UseFileMapping, tf.RespinComponent)
+				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, tf.RespinNumWeight, basicWins.Config.UseFileMapping, tf.RespinComponent, tf.IsUseTriggerRespin2)
 				if err != nil {
 					goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
 						zap.Error(err))
@@ -295,7 +296,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = v
 			} else if tf.RespinNum > 0 {
-				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent)
+				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent, tf.IsUseTriggerRespin2)
 
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = tf.RespinNum

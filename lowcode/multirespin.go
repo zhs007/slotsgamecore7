@@ -33,8 +33,9 @@ type RespinDataConfig struct {
 // BasicWinsConfig - configuration for BasicWins
 type MultiRespinConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	RespinData           []*RespinDataConfig `yaml:"respinData" json:"respinData"`           // wait player select
-	TargetSymbolNum      string              `yaml:"targetSymbolNum" json:"targetSymbolNum"` // 这里可以用到一个前面记下的tagSymbolNum值
+	RespinData           []*RespinDataConfig `yaml:"respinData" json:"respinData"`                   // wait player select
+	TargetSymbolNum      string              `yaml:"targetSymbolNum" json:"targetSymbolNum"`         // 这里可以用到一个前面记下的tagSymbolNum值
+	IsUseTriggerRespin2  bool                `yaml:"isUseTriggerRespin2" json:"isUseTriggerRespin2"` // 给true就用triggerRespin2
 }
 
 type MultiRespin struct {
@@ -217,7 +218,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			return err
 		}
 
-		gameProp.TriggerRespin(curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent)
+		gameProp.TriggerRespin(curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent, multiRespin.Config.IsUseTriggerRespin2)
 
 		multiRespin.onStepEnd(gameProp, curpr, gp, cmdparam.RespinComponent)
 	}
