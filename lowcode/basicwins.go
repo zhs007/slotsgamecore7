@@ -280,7 +280,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = v
 			} else if len(tf.RespinNumWithScatterNum) > 0 {
-				gameProp.TriggerRespin(curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent, tf.IsUseTriggerRespin2)
+				gameProp.TriggerRespin(plugin, curpr, gp, tf.RespinNumWithScatterNum[ret.SymbolNums], tf.RespinComponent, tf.IsUseTriggerRespin2)
 
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = tf.RespinNumWithScatterNum[ret.SymbolNums]
@@ -296,7 +296,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = v
 			} else if tf.RespinNum > 0 {
-				gameProp.TriggerRespin(curpr, gp, tf.RespinNum, tf.RespinComponent, tf.IsUseTriggerRespin2)
+				gameProp.TriggerRespin(plugin, curpr, gp, tf.RespinNum, tf.RespinComponent, tf.IsUseTriggerRespin2)
 
 				ret.Type = sgc7game.RTFreeGame
 				ret.Value = tf.RespinNum

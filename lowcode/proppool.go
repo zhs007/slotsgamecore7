@@ -376,7 +376,7 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	return mask, nil
 }
 
-func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, name string, num int) error {
+func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, name string, num int) error {
 	ic, isok := pool.MapComponents[name]
 	if !isok || !ic.IsRespin() {
 		goutils.Error("GamePropertyPool.PushTrigger",
@@ -395,7 +395,7 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, name string, n
 		return ErrNotRespin
 	}
 
-	ir.PushTrigger(gameProp, num)
+	ir.PushTrigger(gameProp, plugin, curpr, gp, num)
 
 	return nil
 }

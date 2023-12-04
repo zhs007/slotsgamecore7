@@ -218,7 +218,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			return err
 		}
 
-		gameProp.TriggerRespin(curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent, multiRespin.Config.IsUseTriggerRespin2)
+		gameProp.TriggerRespin(plugin, curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent, multiRespin.Config.IsUseTriggerRespin2)
 
 		multiRespin.onStepEnd(gameProp, curpr, gp, cmdparam.RespinComponent)
 	}
