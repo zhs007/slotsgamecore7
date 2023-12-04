@@ -201,7 +201,7 @@ func (mask *Mask) ChgMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, md 
 func (mask *Mask) onMaskChg(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, noProcSPLevel bool) {
 	if mask.Config.PerMaskAwards != nil {
 		for _, v := range mask.Config.PerMaskAwards {
-			gameProp.procAward(plugin, v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp, false)
 		}
 	}
 
@@ -212,7 +212,7 @@ func (mask *Mask) onMaskChg(plugin sgc7plugin.IPlugin, gameProp *GameProperty, c
 	sp, isok := mask.Config.MapSPMaskAwards[curMask-1]
 	if isok {
 		for _, v := range sp {
-			gameProp.procAward(plugin, v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp, false)
 		}
 	}
 }
@@ -350,7 +350,7 @@ func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResu
 				if fullAward != nil {
 					if md.IsFull() {
 						for _, v := range fullAward {
-							gameProp.procAward(plugin, v, curpr, gp)
+							gameProp.procAward(plugin, v, curpr, gp, false)
 						}
 					}
 				}

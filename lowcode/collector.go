@@ -158,7 +158,7 @@ func (collector *Collector) Add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, newLevel int, noProcSPLevel bool) error {
 	if collector.Config.PerLevelAwards != nil {
 		for _, v := range collector.Config.PerLevelAwards {
-			gameProp.procAward(plugin, v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp, false)
 		}
 	}
 
@@ -169,7 +169,7 @@ func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameP
 	sp, isok := collector.Config.MapSPLevelAwards[newLevel]
 	if isok {
 		for _, v := range sp {
-			gameProp.procAward(plugin, v, curpr, gp)
+			gameProp.procAward(plugin, v, curpr, gp, false)
 		}
 	}
 

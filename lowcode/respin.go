@@ -26,6 +26,10 @@ type RespinData struct {
 	RetriggerAddRespinNum int // 再次触发时增加的次数
 	TotalCoinWin          int64
 	TotalCashWin          int64
+	LastTriggerNum        int      // 剩余的触发次数，respin有2种模式，一种是直接增加免费次数，一种是累积整体触发次数
+	CurTriggerNum         int      // 当前已经触发次数
+	Awards                []*Award // 当前已经触发次数
+	TriggerRespinNum      []int    // 配合LastTriggerNum用的respin次数，-1表示用当前的RetriggerAddRespinNum，否则就是具体值
 }
 
 // OnNewGame -
@@ -38,6 +42,9 @@ func (respinData *RespinData) OnNewGame() {
 	respinData.TotalCoinWin = 0
 	respinData.TotalCashWin = 0
 	respinData.RetriggerAddRespinNum = 0
+	respinData.LastTriggerNum = 0
+	respinData.CurTriggerNum = 0
+	respinData.Awards = nil
 }
 
 // OnNewStep -
@@ -57,6 +64,8 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 		TotalCoinWin:          respinData.TotalCoinWin,
 		TotalCashWin:          respinData.TotalCashWin,
 		RetriggerAddRespinNum: int32(respinData.RetriggerAddRespinNum),
+		LastTriggerNum:        int32(respinData.LastTriggerNum),
+		CurTriggerNum:         int32(respinData.CurTriggerNum),
 	}
 
 	return pbcd
@@ -157,7 +166,14 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 		cd.LastRespinNum = respin.Config.InitRespinNum
 	}
 
+recheck:
 	if cd.LastRespinNum == 0 {
+		if cd.LastTriggerNum > 0 {
+			respin.Trigger(gameProp)
+
+			goto recheck
+		}
+
 		respin.onStepEnd(gameProp, curpr, gp, respin.Config.DefaultNextComponent)
 	} else {
 		nextComponent := respin.Config.MainComponent
@@ -312,12 +328,39 @@ func (respin *Respin) SaveRetriggerRespinNum(gameProp *GameProperty) {
 	cd.RetriggerAddRespinNum = cd.LastRespinNum
 }
 
-// Retrigger -
-func (respin *Respin) Retrigger(gameProp *GameProperty) {
+// // Retrigger -
+// func (respin *Respin) Retrigger(gameProp *GameProperty) {
+// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+// 	cd.LastRespinNum += cd.RetriggerAddRespinNum
+// 	cd.CurAddRespinNum += cd.RetriggerAddRespinNum
+
+// 	cd.CurTriggerNum++
+
+// 	if cd.LastTriggerNum > 0 {
+// 		cd.LastTriggerNum--
+// 	}
+// }
+
+// Trigger -
+func (respin *Respin) Trigger(gameProp *GameProperty) {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	cd.LastRespinNum += cd.RetriggerAddRespinNum
-	cd.CurAddRespinNum += cd.RetriggerAddRespinNum
+	n := cd.TriggerRespinNum[cd.CurTriggerNum]
+	if n <= 0 {
+		n = cd.RetriggerAddRespinNum
+
+		cd.TriggerRespinNum[cd.CurTriggerNum] = n
+	}
+
+	cd.LastRespinNum += n
+	cd.CurAddRespinNum += n
+
+	cd.CurTriggerNum++
+
+	if cd.LastTriggerNum > 0 {
+		cd.LastTriggerNum--
+	}
 }
 
 // AddRetriggerRespinNum -
@@ -325,6 +368,28 @@ func (respin *Respin) AddRetriggerRespinNum(gameProp *GameProperty, num int) {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
 	cd.RetriggerAddRespinNum += num
+}
+
+// AddTriggerAward -
+func (respin *Respin) AddTriggerAward(gameProp *GameProperty, award *Award) {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	award.TriggerIndex = cd.CurRespinNum + cd.LastTriggerNum
+
+	cd.Awards = append(cd.Awards, award)
+}
+
+// PushTrigger -
+func (respin *Respin) PushTrigger(gameProp *GameProperty, num int) {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	cd.LastTriggerNum++
+
+	cd.TriggerRespinNum = append(cd.TriggerRespinNum, num)
+
+	if cd.LastRespinNum == 0 {
+		respin.Trigger(gameProp)
+	}
 }
 
 func NewRespin(name string) IComponent {

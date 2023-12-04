@@ -7,6 +7,12 @@ type IRespin interface {
 	SaveRetriggerRespinNum(gameProp *GameProperty)
 	// AddRetriggerRespinNum -
 	AddRetriggerRespinNum(gameProp *GameProperty, num int)
-	// Retrigger -
-	Retrigger(gameProp *GameProperty)
+	// // Retrigger -
+	// Retrigger(gameProp *GameProperty)
+	// Trigger -
+	Trigger(gameProp *GameProperty)
+	// PushTrigger -
+	PushTrigger(gameProp *GameProperty, num int)
+	// AddTriggerAward -
+	AddTriggerAward(gameProp *GameProperty, award *Award)
 }

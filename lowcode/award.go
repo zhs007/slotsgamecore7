@@ -1,12 +1,14 @@
 package lowcode
 
 type Award struct {
-	AwardType string   `yaml:"awardType" json:"awardType"`
-	Type      int      `yaml:"-" json:"-"`
-	Val       int      `yaml:"val" json:"-"`      // 弃用，代码里已经不用了，初始化时会把数据转存到Vals里，为了兼容性保留配置
-	StrParam  string   `yaml:"strParam" json:"-"` // 弃用，代码里已经不用了，初始化时会把数据转存到StrParams里，为了兼容性保留配置
-	Vals      []int    `yaml:"vals" json:"vals"`
-	StrParams []string `yaml:"strParams" json:"strParams"`
+	AwardType       string   `yaml:"awardType" json:"awardType"`
+	Type            int      `yaml:"-" json:"-"`
+	Val             int      `yaml:"val" json:"-"`      // 弃用，代码里已经不用了，初始化时会把数据转存到Vals里，为了兼容性保留配置
+	StrParam        string   `yaml:"strParam" json:"-"` // 弃用，代码里已经不用了，初始化时会把数据转存到StrParams里，为了兼容性保留配置
+	Vals            []int    `yaml:"vals" json:"vals"`
+	StrParams       []string `yaml:"strParams" json:"strParams"`
+	OnTriggerRespin string   `yaml:"onTriggerRespin" json:"onTriggerRespin"` // 在这个respin再次触发时才生效，这个时候会用当前respin的LastTriggerNum+CurTriggerNum作为TriggerIndex记下，当TriggerIndex==CurTriggerNum时才生效
+	TriggerIndex    int      `yaml:"-" json:"-"`                             // 见上
 }
 
 func (cfg *Award) getType() int {
@@ -40,6 +42,8 @@ func (cfg *Award) getType() int {
 		return AwardAddRetriggerRespinNum
 	} else if cfg.AwardType == "setMaskVal" {
 		return AwardSetMaskVal
+	} else if cfg.AwardType == "triggerRespin2" {
+		return AwardTriggerRespin2
 	}
 
 	return AwardUnknow
@@ -74,6 +78,7 @@ const (
 	AwardRetriggerRespin       int = 13 // 奖励再次触发respin，这种只会用前面记录下的retrigger次数
 	AwardAddRetriggerRespinNum int = 14 // 奖励再次触发respin次数，这种会在前面的基础上增加
 	AwardSetMaskVal            int = 15 // 设置mask的值
+	AwardTriggerRespin2        int = 16 // 新的触发respin，不需要考虑trigger、retrigger、respinTimes，直接用这个就行，如果次数给-1，就会用当前的retriggerRespinNum
 )
 
 // AwardCash
