@@ -97,7 +97,7 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	if len(weightTrigger.Config.RespinNums) == len(weightTrigger.Config.NextComponents) {
 		if weightTrigger.Config.RespinNums[setIndex] > 0 {
-			gameProp.TriggerRespin(curpr, gp, weightTrigger.Config.RespinNums[setIndex], weightTrigger.Config.NextComponents[setIndex], weightTrigger.Config.IsUseTriggerRespin2)
+			gameProp.TriggerRespin(plugin, curpr, gp, weightTrigger.Config.RespinNums[setIndex], weightTrigger.Config.NextComponents[setIndex], weightTrigger.Config.IsUseTriggerRespin2)
 		}
 		// 	weightTrigger.onStepEnd(gameProp, curpr, gp, "")
 		// } else {

@@ -169,7 +169,7 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 recheck:
 	if cd.LastRespinNum == 0 {
 		if cd.LastTriggerNum > 0 {
-			respin.Trigger(gameProp)
+			respin.Trigger(gameProp, plugin, curpr, gp)
 
 			goto recheck
 		}
@@ -343,7 +343,7 @@ func (respin *Respin) SaveRetriggerRespinNum(gameProp *GameProperty) {
 // }
 
 // Trigger -
-func (respin *Respin) Trigger(gameProp *GameProperty) {
+func (respin *Respin) Trigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
 	n := cd.TriggerRespinNum[cd.CurTriggerNum]
@@ -361,6 +361,12 @@ func (respin *Respin) Trigger(gameProp *GameProperty) {
 	if cd.LastTriggerNum > 0 {
 		cd.LastTriggerNum--
 	}
+
+	for _, v := range cd.Awards {
+		if v.TriggerIndex == cd.CurTriggerNum {
+			gameProp.procAward(plugin, v, curpr, gp, true)
+		}
+	}
 }
 
 // AddRetriggerRespinNum -
@@ -374,13 +380,13 @@ func (respin *Respin) AddRetriggerRespinNum(gameProp *GameProperty, num int) {
 func (respin *Respin) AddTriggerAward(gameProp *GameProperty, award *Award) {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	award.TriggerIndex = cd.CurRespinNum + cd.LastTriggerNum
+	award.TriggerIndex = cd.CurTriggerNum + cd.LastTriggerNum
 
 	cd.Awards = append(cd.Awards, award)
 }
 
 // PushTrigger -
-func (respin *Respin) PushTrigger(gameProp *GameProperty, num int) {
+func (respin *Respin) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
 	cd.LastTriggerNum++
@@ -388,7 +394,7 @@ func (respin *Respin) PushTrigger(gameProp *GameProperty, num int) {
 	cd.TriggerRespinNum = append(cd.TriggerRespinNum, num)
 
 	if cd.LastRespinNum == 0 {
-		respin.Trigger(gameProp)
+		respin.Trigger(gameProp, plugin, curpr, gp)
 	}
 }
 
