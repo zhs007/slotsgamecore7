@@ -19,8 +19,8 @@ type GamePropertyPool struct {
 	DefaultLineData  *sgc7game.LineData
 	SymbolsViewer    *SymbolsViewer
 	MapSymbolColor   *asciigame.SymbolColorMap
-	MapComponents    map[string]IComponent
 	Stats            *Stats
+	mapComponents    map[string]IComponent // 不能随便用，只用于一些基础的初始化，尽量用gameProp里的Components
 }
 
 func (pool *GamePropertyPool) newGameProp() *GameProperty {
@@ -41,7 +41,7 @@ func (pool *GamePropertyPool) newGameProp() *GameProperty {
 		gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
 	}
 
-	for k, v := range pool.MapComponents {
+	for k, v := range pool.mapComponents {
 		gameProp.MapComponentData[k] = v.NewComponentData()
 	}
 
@@ -58,11 +58,11 @@ func (pool *GamePropertyPool) NewGameProp() (*GameProperty, error) {
 }
 
 func (pool *GamePropertyPool) onAddComponent(name string, component IComponent) {
-	pool.MapComponents[name] = component
+	pool.mapComponents[name] = component
 }
 
 func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg *StatsConfig) (*sgc7stats.Feature, error) {
-	curComponent, isok := pool.MapComponents[cfg.Component]
+	curComponent, isok := pool.mapComponents[cfg.Component]
 	if !isok {
 		goutils.Error("GameProperty.NewStatsWithConfig",
 			zap.Error(ErrIvalidStatsComponentInConfig))
@@ -159,7 +159,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 }
 
 func (pool *GamePropertyPool) newStatusStats(parent *sgc7stats.Feature, componentName string, statusType int, respinName string) (*sgc7stats.Feature, error) {
-	curComponent, isok := pool.MapComponents[componentName]
+	curComponent, isok := pool.mapComponents[componentName]
 	if !isok {
 		goutils.Error("GameProperty.NewStatsWithConfig",
 			zap.Error(ErrIvalidStatsComponentInConfig))
@@ -305,7 +305,7 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 }
 
 func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, index int, mask bool) error {
-	ic, isok := pool.MapComponents[name]
+	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMaskVal",
 			zap.String("name", name),
@@ -329,7 +329,7 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 }
 
 func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, mask []bool) error {
-	ic, isok := pool.MapComponents[name]
+	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMask",
 			zap.String("name", name),
@@ -353,7 +353,7 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 }
 
 func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bool, error) {
-	ic, isok := pool.MapComponents[name]
+	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.GetMask",
 			zap.String("name", name),
@@ -377,7 +377,7 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 }
 
 func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, name string, num int) error {
-	ic, isok := pool.MapComponents[name]
+	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsRespin() {
 		goutils.Error("GamePropertyPool.PushTrigger",
 			zap.String("name", name),
@@ -418,7 +418,7 @@ func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 		Config:           cfg,
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
-		MapComponents:    make(map[string]IComponent),
+		mapComponents:    make(map[string]IComponent),
 	}
 
 	if cfg.SymbolsViewer == "" {

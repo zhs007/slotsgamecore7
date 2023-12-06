@@ -109,7 +109,7 @@ func newFuncSymbolOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbolFe
 			for _, componentName := range cfgSymbolFeature.Components {
 				c, hasComponent := gp.MapComponents[componentName]
 				if hasComponent {
-					component := pool.MapComponents[componentName]
+					component := pool.mapComponents[componentName]
 
 					component.EachUsedResults(pr, c, func(ret *sgc7game.Result) {
 						if ret.Symbol == node.Symbol {
@@ -157,7 +157,7 @@ func newFuncSymbolNumOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbo
 			for _, componentName := range cfgSymbolFeature.Components {
 				c, hasComponent := gp.MapComponents[componentName]
 				if hasComponent {
-					component := pool.MapComponents[componentName]
+					component := pool.mapComponents[componentName]
 
 					component.EachUsedResults(pr, c, func(ret *sgc7game.Result) {
 						if ret.Symbol == node.Symbol && ret.SymbolNums == node.SymbolNums {

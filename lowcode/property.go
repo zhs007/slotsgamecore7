@@ -58,6 +58,7 @@ type GameProperty struct {
 	HistoryComponents []IComponent
 	RespinComponents  []string
 	PoolScene         *sgc7game.GameScenePoolEx
+	Components        *ComponentList
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
@@ -202,7 +203,7 @@ func (gameProp *GameProperty) AddComponent2History(component IComponent, gp *Gam
 
 func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string, usePushTrigger bool) error {
 	// if respinNum > 0 {
-	component, isok := gameProp.Pool.MapComponents[respinComponent]
+	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {
 		respin, isok := component.(*Respin)
 		if isok {
@@ -355,7 +356,7 @@ func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Aw
 
 func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award, curpr *sgc7game.PlayResult, gp *GameParams, skipTriggerRespin bool) {
 	if !skipTriggerRespin && award.OnTriggerRespin != "" {
-		component, isok := gameProp.Pool.MapComponents[award.OnTriggerRespin]
+		component, isok := gameProp.Components.MapComponents[award.OnTriggerRespin]
 		if !isok {
 			goutils.Error("GameProperty.procAward:OnTriggerRespin",
 				zap.Error(ErrInvalidComponent))
@@ -384,7 +385,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	}
 
 	if award.Type == AwardRespinTimes {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			respin, isok := component.(IRespin)
 			if isok {
@@ -396,7 +397,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	} else if award.Type == AwardStepMulti {
 		gameProp.SetVal(GamePropStepMulti, award.Vals[0])
 	} else if award.Type == AwardInitMask {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			mask, isok := component.(*Mask)
 			if isok {
@@ -406,7 +407,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	} else if award.Type == AwardTriggerRespin {
 		gameProp.TriggerRespin(plugin, curpr, gp, award.Vals[0], award.StrParams[0], false)
 	} else if award.Type == AwardCollector {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			collector, isok := component.(*Collector)
 			if isok {
@@ -420,7 +421,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			}
 		}
 	} else if award.Type == AwardNoLevelUpCollector {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			collector, isok := component.(*Collector)
 			if isok {
@@ -452,7 +453,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 		gameProp.TagInt(award.StrParams[1], cr.Int())
 	} else if award.Type == AwardPushSymbolCollection {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			symbolCollection, isok := component.(*SymbolCollection)
 			if isok {
@@ -474,7 +475,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	} else if award.Type == AwardStepCoinMulti {
 		gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
 	} else if award.Type == AwardRetriggerRespin {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			respin, isok := component.(IRespin)
 			if isok {
@@ -482,7 +483,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			}
 		}
 	} else if award.Type == AwardAddRetriggerRespinNum {
-		component, isok := gameProp.Pool.MapComponents[award.StrParams[0]]
+		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			respin, isok := component.(IRespin)
 			if isok {
@@ -581,7 +582,7 @@ func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 }
 
 func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) error {
-	component, isok := gameProp.Pool.MapComponents[respinComponent]
+	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {
 		respin, isok := component.(IRespin)
 		if isok {

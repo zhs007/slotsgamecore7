@@ -115,7 +115,7 @@ func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *s
 		nextComponent = basicComponent.Config.DefaultNextComponent
 	}
 
-	component, isok := gameProp.Pool.MapComponents[nextComponent]
+	component, isok := gameProp.Components.MapComponents[nextComponent]
 	if isok && component.IsRespin() {
 		gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
 		gameProp.onTriggerRespin(nextComponent)
