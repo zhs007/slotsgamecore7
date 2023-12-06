@@ -48,6 +48,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		return nil, ErrIvalidGameData
 	}
 
+	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+	gameProp.Components = components
+
 	if len(prs) == 0 {
 		bgm.OnNewGame(gameProp, stake)
 	}
@@ -55,8 +58,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	bgm.OnNewStep(gameProp, stake)
 
 	pr, gp := bgm.newPlayResult(prs)
-
-	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
 
 	curComponent := components.Components[0]
 
@@ -209,9 +210,9 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	gameProp.OnNewGame(stake)
 
-	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
 
-	for i, v := range components.Components {
+	for i, v := range gameProp.Components.Components {
 		err := v.OnNewGame(gameProp)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
@@ -229,9 +230,9 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	gameProp.OnNewStep()
 
-	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
 
-	for i, v := range components.Components {
+	for i, v := range gameProp.Components.Components {
 		err := v.OnNewStep(gameProp)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
