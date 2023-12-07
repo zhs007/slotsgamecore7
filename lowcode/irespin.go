@@ -20,4 +20,7 @@ type IRespin interface {
 	PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int)
 	// AddTriggerAward -
 	AddTriggerAward(gameProp *GameProperty, award *Award)
+
+	// GetLastRespinNum -
+	GetLastRespinNum(gameProp *GameProperty) int
 }

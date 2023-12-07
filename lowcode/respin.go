@@ -398,6 +398,13 @@ func (respin *Respin) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlu
 	}
 }
 
+// GetLastRespinNum -
+func (respin *Respin) GetLastRespinNum(gameProp *GameProperty) int {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	return cd.LastRespinNum
+}
+
 func NewRespin(name string) IComponent {
 	return &Respin{
 		BasicComponent: NewBasicComponent(name),

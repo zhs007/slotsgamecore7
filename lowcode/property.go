@@ -593,6 +593,18 @@ func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) err
 	return nil
 }
 
+func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
+	component, isok := gameProp.Components.MapComponents[respinComponent]
+	if isok {
+		respin, isok := component.(IRespin)
+		if isok {
+			return respin.GetLastRespinNum(gameProp)
+		}
+	}
+
+	return 0
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 
