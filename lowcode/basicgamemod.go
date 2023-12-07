@@ -22,6 +22,7 @@ func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.Pl
 
 	pr := &sgc7game.PlayResult{
 		IsFinish:         true,
+		CurGameMod:       "bg",
 		NextGameMod:      "bg",
 		CurGameModParams: gp,
 	}
