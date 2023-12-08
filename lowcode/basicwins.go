@@ -310,7 +310,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 			} else {
 				rn := gameProp.GetLastRespinNum(tf.RespinComponent)
 				if rn > 0 {
-					gameProp.TriggerRespin(plugin, curpr, gp, rn, tf.RespinComponent, tf.IsUseTriggerRespin2)
+					gameProp.TriggerRespin(plugin, curpr, gp, 0, tf.RespinComponent, tf.IsUseTriggerRespin2)
 
 					ret.Type = sgc7game.RTFreeGame
 					ret.Value = rn
