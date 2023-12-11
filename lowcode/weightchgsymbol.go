@@ -86,7 +86,7 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 
 	cd := gameProp.MapComponentData[weightChgSymbol.Name].(*BasicComponentData)
 
-	gs := weightChgSymbol.GetTargetScene(gameProp, curpr, cd, "")
+	gs := weightChgSymbol.GetTargetScene2(gameProp, curpr, cd, weightChgSymbol.Name, "")
 
 	cgs := gs.CloneEx(gameProp.PoolScene)
 

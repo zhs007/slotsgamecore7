@@ -69,8 +69,8 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd := gameProp.MapComponentData[mergeSymbol.Name].(*BasicComponentData)
 
-	gs1 := mergeSymbol.GetTargetScene(gameProp, curpr, cd, mergeSymbol.Config.SrcScene[0])
-	gs2 := mergeSymbol.GetTargetScene(gameProp, curpr, cd, mergeSymbol.Config.SrcScene[1])
+	gs1 := mergeSymbol.GetTargetScene2(gameProp, curpr, cd, mergeSymbol.Name, mergeSymbol.Config.SrcScene[0])
+	gs2 := mergeSymbol.GetTargetScene2(gameProp, curpr, cd, mergeSymbol.Name+":1", mergeSymbol.Config.SrcScene[1])
 
 	sc2 := gs1.CloneEx(gameProp.PoolScene)
 

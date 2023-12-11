@@ -276,7 +276,7 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 			}
 		}
 
-		gs := bookof2.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+		gs := bookof2.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, bookof2.Name, "")
 
 		bookof2.procInitScene(gameProp, gs, curpr, cd)
 

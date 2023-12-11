@@ -118,7 +118,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
 
-	gs := symbolMulti.GetTargetScene(gameProp, curpr, cd, "")
+	gs := symbolMulti.GetTargetScene2(gameProp, curpr, cd, symbolMulti.Name, "")
 
 	if gs.HasSymbols(symbolMulti.SymbolCodes) {
 		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)

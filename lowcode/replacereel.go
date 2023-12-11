@@ -84,7 +84,7 @@ func (replaceReel *ReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd := gameProp.MapComponentData[replaceReel.Name].(*BasicComponentData)
 
-	gs := replaceReel.GetTargetScene(gameProp, curpr, cd, "")
+	gs := replaceReel.GetTargetScene2(gameProp, curpr, cd, replaceReel.Name, "")
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 

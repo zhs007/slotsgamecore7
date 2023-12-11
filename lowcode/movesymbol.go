@@ -205,7 +205,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[moveSymbol.Name].(*BasicComponentData)
 
-	gs := moveSymbol.GetTargetScene(gameProp, curpr, cd, "")
+	gs := moveSymbol.GetTargetScene2(gameProp, curpr, cd, moveSymbol.Name, "")
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 

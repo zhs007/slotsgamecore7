@@ -153,7 +153,7 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
 
 	if multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels != nil {
-		gs := multiLevelReplaceReel.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+		gs := multiLevelReplaceReel.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, multiLevelReplaceReel.Name, "")
 
 		// sc := gs.Clone()
 		sc := gs.CloneEx(gameProp.PoolScene)
@@ -167,7 +167,7 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 
 		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
 	} else {
-		multiLevelReplaceReel.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+		multiLevelReplaceReel.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, multiLevelReplaceReel.Name, "")
 
 		multiLevelReplaceReel.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	}

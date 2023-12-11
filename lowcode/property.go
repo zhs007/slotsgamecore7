@@ -42,23 +42,25 @@ func String2Property(str string) (int, error) {
 }
 
 type GameProperty struct {
-	Pool              *GamePropertyPool
-	MapVals           map[int]int
-	MapStrVals        map[int]string
-	CurPaytables      *sgc7game.PayTables
-	CurLineData       *sgc7game.LineData
-	CurReels          *sgc7game.ReelsData
-	MapIntValWeights  map[string]*sgc7game.ValWeights2
-	MapStats          map[string]*sgc7stats.Feature
-	mapInt            map[string]int
-	mapStr            map[string]string
-	mapGlobalStr      map[string]string
-	mapGlobalScene    map[string]*sgc7game.GameScene
-	MapComponentData  map[string]IComponentData
-	HistoryComponents []IComponent
-	RespinComponents  []string
-	PoolScene         *sgc7game.GameScenePoolEx
-	Components        *ComponentList
+	Pool                   *GamePropertyPool
+	MapVals                map[int]int
+	MapStrVals             map[int]string
+	CurPaytables           *sgc7game.PayTables
+	CurLineData            *sgc7game.LineData
+	CurReels               *sgc7game.ReelsData
+	MapIntValWeights       map[string]*sgc7game.ValWeights2
+	MapStats               map[string]*sgc7stats.Feature
+	mapInt                 map[string]int
+	mapStr                 map[string]string
+	mapGlobalStr           map[string]string
+	mapGlobalScene         map[string]*sgc7game.GameScene // v0.13开始弃用
+	mapComponentScene      map[string]*sgc7game.GameScene
+	mapComponentOtherScene map[string]*sgc7game.GameScene
+	MapComponentData       map[string]IComponentData
+	HistoryComponents      []IComponent
+	RespinComponents       []string
+	PoolScene              *sgc7game.GameScenePoolEx
+	Components             *ComponentList
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
@@ -86,6 +88,8 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 
 	gameProp.mapGlobalStr = make(map[string]string)
 	gameProp.mapGlobalScene = make(map[string]*sgc7game.GameScene)
+	gameProp.mapComponentScene = make(map[string]*sgc7game.GameScene)
+	gameProp.mapComponentOtherScene = make(map[string]*sgc7game.GameScene)
 
 	return nil
 }
@@ -111,6 +115,32 @@ func (gameProp *GameProperty) TagGlobalScene(tag string, gs *sgc7game.GameScene)
 
 func (gameProp *GameProperty) GetGlobalScene(tag string) *sgc7game.GameScene {
 	gs, isok := gameProp.mapGlobalScene[tag]
+	if !isok {
+		return nil
+	}
+
+	return gs
+}
+
+func (gameProp *GameProperty) SetComponentScene(component string, gs *sgc7game.GameScene) {
+	gameProp.mapComponentScene[component] = gs
+}
+
+func (gameProp *GameProperty) GetComponentScene(component string) *sgc7game.GameScene {
+	gs, isok := gameProp.mapComponentScene[component]
+	if !isok {
+		return nil
+	}
+
+	return gs
+}
+
+func (gameProp *GameProperty) SetComponentOtherScene(component string, gs *sgc7game.GameScene) {
+	gameProp.mapComponentOtherScene[component] = gs
+}
+
+func (gameProp *GameProperty) GetComponentOtherScene(component string) *sgc7game.GameScene {
+	gs, isok := gameProp.mapComponentOtherScene[component]
 	if !isok {
 		return nil
 	}
