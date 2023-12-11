@@ -17,7 +17,8 @@ const MoveReelTypeName = "moveReel"
 // MoveReelConfig - configuration for MoveReel
 type MoveReelConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	MoveReelIndex        []int `yaml:"moveReelIndex" json:"moveReelIndex"` // 每个轴的移动幅度，-1是上移
+	MoveReelIndex        []int `yaml:"moveReelIndex" json:"moveReelIndex"`           // 每个轴的移动幅度，-1是上移
+	EmptyOtherSceneVal   int   `yaml:"emptyOtherSceneVal" json:"emptyOtherSceneVal"` // 如果要移动otherscene时，这个是移出去以后的默认值
 }
 
 type MoveReel struct {
@@ -77,6 +78,40 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 	}
 
 	moveReel.AddScene(gameProp, curpr, sc2, cd)
+
+	os := moveReel.GetTargetScene2(gameProp, curpr, cd, moveReel.Name, "")
+
+	if os != nil {
+		os2 := os.CloneEx(gameProp.PoolScene)
+
+		for x, v := range moveReel.Config.MoveReelIndex {
+			if v == 0 {
+				continue
+			}
+
+			if v < 0 {
+				v = -v
+
+				for y := 0; y < os2.Height; y++ {
+					if y < v {
+						os2.Arr[x][y] = moveReel.Config.EmptyOtherSceneVal
+					} else if y+v < os2.Height {
+						os2.Arr[x][y] = os.Arr[x][y+v]
+					}
+				}
+			} else {
+				for y := 0; y < os2.Height; y++ {
+					if y-v < os2.Height {
+						os2.Arr[x][y] = os.Arr[x][y-v]
+					} else {
+						os2.Arr[x][y] = moveReel.Config.EmptyOtherSceneVal
+					}
+				}
+			}
+		}
+
+		moveReel.AddOtherScene(gameProp, curpr, os2, cd)
+	}
 
 	moveReel.onStepEnd(gameProp, curpr, gp, "")
 

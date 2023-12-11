@@ -21,6 +21,7 @@ type SymbolValConfig struct {
 	WeightVal            string                   `yaml:"weightVal" json:"weightVal"`
 	DefaultVal           int                      `yaml:"defaultVal" json:"defaultVal"`
 	OtherSceneFeature    *OtherSceneFeatureConfig `yaml:"otherSceneFeature" json:"otherSceneFeature"`
+	EmptyOtherSceneVal   int                      `yaml:"emptyOtherSceneVal" json:"emptyOtherSceneVal"` // 如果配置了otherscene，那么当otherscene里的某个位置为这个值时，才新赋值
 }
 
 type SymbolVal struct {
@@ -96,37 +97,63 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	gs := symbolVal.GetTargetScene2(gameProp, curpr, cd, symbolVal.Name, "")
 
 	if gs.HasSymbol(symbolVal.SymbolCode) {
-		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
-		// os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-		// if err != nil {
-		// 	goutils.Error("SymbolVal.OnPlayGame:NewGameScene",
-		// 		zap.Error(err))
+		os1 := symbolVal.GetTargetOtherScene2(gameProp, curpr, cd, symbolVal.Name, "")
+		if os1 == nil {
+			os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
 
-		// 	return err
-		// }
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if s == symbolVal.SymbolCode {
+						cv, err := symbolVal.WeightVal.RandVal(plugin)
+						if err != nil {
+							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
+								zap.Error(err))
 
-		for x, arr := range gs.Arr {
-			for y, s := range arr {
-				if s == symbolVal.SymbolCode {
-					cv, err := symbolVal.WeightVal.RandVal(plugin)
-					if err != nil {
-						goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
-							zap.Error(err))
+							return err
+						}
 
-						return err
+						os.Arr[x][y] = cv.Int()
+					} else {
+						os.Arr[x][y] = symbolVal.Config.DefaultVal
 					}
-
-					os.Arr[x][y] = cv.Int()
-				} else {
-					os.Arr[x][y] = symbolVal.Config.DefaultVal
 				}
 			}
-		}
 
-		symbolVal.AddOtherScene(gameProp, curpr, os, cd)
+			symbolVal.AddOtherScene(gameProp, curpr, os, cd)
 
-		if symbolVal.OtherSceneFeature != nil {
-			gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
+			if symbolVal.OtherSceneFeature != nil {
+				gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
+			}
+		} else {
+			os := os1.CloneEx(gameProp.PoolScene)
+
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if s != symbolVal.Config.EmptyOtherSceneVal {
+						continue
+					}
+
+					if s == symbolVal.SymbolCode {
+						cv, err := symbolVal.WeightVal.RandVal(plugin)
+						if err != nil {
+							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
+								zap.Error(err))
+
+							return err
+						}
+
+						os.Arr[x][y] = cv.Int()
+					} else {
+						os.Arr[x][y] = symbolVal.Config.DefaultVal
+					}
+				}
+			}
+
+			symbolVal.AddOtherScene(gameProp, curpr, os, cd)
+
+			if symbolVal.OtherSceneFeature != nil {
+				gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
+			}
 		}
 	}
 
