@@ -184,7 +184,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
 
-	gs := collector.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+	gs := collector.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, collector.Name, "")
 
 	nn := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
 		return cursymbol == collector.SymbolCode

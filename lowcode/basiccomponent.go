@@ -74,18 +74,24 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 	return pbcd
 }
 
+// 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
-	DefaultNextComponent string            `yaml:"defaultNextComponent" json:"defaultNextComponent"` // next component, if it is empty jump to ending
-	TagScenes            []string          `yaml:"tagScenes" json:"tagScenes"`                       // tag scenes
-	TagOtherScenes       []string          `yaml:"tagOtherScenes" json:"tagOtherScenes"`             // tag otherScenes
-	TargetScene          string            `yaml:"targetScene" json:"targetScene"`                   // target scenes
-	TargetOtherScene     string            `yaml:"targetOtherScene" json:"targetOtherScene"`         // target otherscenes
-	TagGlobalScenes      []string          `yaml:"tagGlobalScenes" json:"tagGlobalScenes"`           // tag global scenes
-	TargetGlobalScene    string            `yaml:"targetGlobalScene" json:"targetGlobalScene"`       // target global scenes
-	TagRNG               []string          `yaml:"tagRNG" json:"tagRNG"`                             // tag RNG
-	InitStrVals          map[string]string `yaml:"initStrVals" json:"initStrVals"`                   // 只要这个组件被执行，就会初始化这些strvals
-	UseFileMapping       bool              `yaml:"useFileMapping" json:"useFileMapping"`             // 兼容性配置，新配置应该一定用filemapping
-	ComponentType        string            `yaml:"-" json:"componentType"`                           // 组件类型
+	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
+	TagScenes              []string          `yaml:"tagScenes" json:"tagScenes"`                           // tag scenes，v0.13开始弃用
+	TagOtherScenes         []string          `yaml:"tagOtherScenes" json:"tagOtherScenes"`                 // tag otherScenes，v0.13开始弃用
+	TargetScene            string            `yaml:"targetScene" json:"targetScene"`                       // target scenes，v0.13开始弃用
+	TargetOtherScene       string            `yaml:"targetOtherScene" json:"targetOtherScene"`             // target otherscenes，v0.13开始弃用
+	TagGlobalScenes        []string          `yaml:"tagGlobalScenes" json:"tagGlobalScenes"`               // tag global scenes，v0.13开始弃用
+	TargetGlobalScene      string            `yaml:"targetGlobalScene" json:"targetGlobalScene"`           // target global scenes，v0.13开始弃用
+	TagGlobalOtherScenes   []string          `yaml:"tagGlobalOtherScenes" json:"tagGlobalOtherScenes"`     // tag global other scenes，v0.13开始弃用
+	TargetGlobalOtherScene string            `yaml:"targetGlobalOtherScene" json:"targetGlobalOtherScene"` // target global other scenes，v0.13开始弃用
+	Scene2Components       []string          `yaml:"scene2Components" json:"scene2Components"`             // 新版本，关于scene换了个思路，用目标对象来驱动
+	OtherScene2Components  []string          `yaml:"otherScene2Components" json:"otherScene2Components"`   // 新版本，关于other scene换了个思路，用目标对象来驱动
+	TagRNG                 []string          `yaml:"tagRNG" json:"tagRNG"`                                 // tag RNG
+	InitStrVals            map[string]string `yaml:"initStrVals" json:"initStrVals"`                       // 只要这个组件被执行，就会初始化这些strvals
+	UseFileMapping         bool              `yaml:"useFileMapping" json:"useFileMapping"`                 // 兼容性配置，新配置应该一定用filemapping
+	ComponentType          string            `yaml:"-" json:"componentType"`                               // 组件类型
+	UseSceneV2             bool              `yaml:"useSceneV2" json:"useSceneV2"`                         // 新版本的scene
 }
 
 type BasicComponent struct {
@@ -158,12 +164,20 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
-	if usi < len(basicComponent.Config.TagScenes) {
-		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
-	}
+	if basicComponent.Config.UseSceneV2 {
+		if len(basicComponent.Config.Scene2Components) > 0 {
+			for _, v := range basicComponent.Config.Scene2Components {
+				gameProp.SetComponentScene(v, sc)
+			}
+		}
+	} else {
+		if usi < len(basicComponent.Config.TagScenes) {
+			gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
+		}
 
-	if usi < len(basicComponent.Config.TagGlobalScenes) {
-		gameProp.TagGlobalScene(basicComponent.Config.TagGlobalScenes[usi], sc)
+		if usi < len(basicComponent.Config.TagGlobalScenes) {
+			gameProp.TagGlobalScene(basicComponent.Config.TagGlobalScenes[usi], sc)
+		}
 	}
 }
 
@@ -189,8 +203,16 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 
 	curpr.OtherScenes = append(curpr.OtherScenes, sc)
 
-	if usi < len(basicComponent.Config.TagOtherScenes) {
-		gameProp.TagOtherScene(curpr, basicComponent.Config.TagOtherScenes[usi], si)
+	if basicComponent.Config.UseSceneV2 {
+		if len(basicComponent.Config.OtherScene2Components) > 0 {
+			for _, v := range basicComponent.Config.OtherScene2Components {
+				gameProp.SetComponentOtherScene(v, sc)
+			}
+		}
+	} else {
+		if usi < len(basicComponent.Config.TagOtherScenes) {
+			gameProp.TagOtherScene(curpr, basicComponent.Config.TagOtherScenes[usi], si)
+		}
 	}
 }
 
@@ -331,6 +353,20 @@ func (basicComponent *BasicComponent) IsRespin() bool {
 // IsMask -
 func (basicComponent *BasicComponent) IsMask() bool {
 	return false
+}
+
+func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
+	if basicComponent.Config.UseSceneV2 {
+		return gameProp.GetComponentScene(component)
+	}
+
+	if tag == "" {
+		tag = basicComponent.Config.TargetScene
+	}
+
+	gs, _ := gameProp.GetScene(curpr, tag)
+
+	return gs
 }
 
 func NewBasicComponent(name string) *BasicComponent {

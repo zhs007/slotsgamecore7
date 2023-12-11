@@ -235,7 +235,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			}
 		}
 
-		gs := bookof.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+		gs := bookof.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, bookof.Name, "")
 
 		for _, s := range cd.Symbols {
 			ngs, err := bookof.procBookOfScene(gameProp, gs, s)

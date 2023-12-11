@@ -79,7 +79,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd := gameProp.MapComponentData[symbolValWins.Name].(*BasicComponentData)
 
-	gs := symbolValWins.GetTargetScene(gameProp, curpr, cd, "")
+	gs := symbolValWins.GetTargetScene2(gameProp, curpr, cd, symbolValWins.Name, "")
 	isTrigger := true
 	symbolnum := 0
 

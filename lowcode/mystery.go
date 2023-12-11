@@ -157,7 +157,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
 
-	gs := mystery.GetTargetScene(gameProp, curpr, &cd.BasicComponentData, "")
+	gs := mystery.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, mystery.Name, "")
 	if !gs.HasSymbols(mystery.MysterySymbols) {
 		mystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	} else {

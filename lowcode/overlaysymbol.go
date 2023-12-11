@@ -148,7 +148,7 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	_, hasVal := overlaySymbol.MapPosition.MapVals[osd.CurLevel]
 	if hasVal {
-		gs := overlaySymbol.GetTargetScene(gameProp, curpr, &osd.BasicComponentData, "")
+		gs := overlaySymbol.GetTargetScene2(gameProp, curpr, &osd.BasicComponentData, overlaySymbol.Name, "")
 
 		// cgs := gs.Clone()
 		cgs := gs.CloneEx(gameProp.PoolScene)
@@ -162,7 +162,7 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 		overlaySymbol.AddScene(gameProp, curpr, cgs, &osd.BasicComponentData)
 	} else {
-		overlaySymbol.GetTargetScene(gameProp, curpr, &osd.BasicComponentData, "")
+		overlaySymbol.GetTargetScene2(gameProp, curpr, &osd.BasicComponentData, overlaySymbol.Name, "")
 
 		overlaySymbol.ReTagScene(gameProp, curpr, osd.TargetSceneIndex, &osd.BasicComponentData)
 	}
