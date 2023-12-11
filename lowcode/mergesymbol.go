@@ -17,8 +17,9 @@ const MergeSymbolTypeName = "mergeSymbol"
 // MergeSymbolConfig - configuration for MergeSymbol
 type MergeSymbolConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	SrcScene             []string `yaml:"srcScene" json:"srcScene"`     // 2个scene，mask false表示用0，true表示用1
-	TargetMask           string   `yaml:"targetMask" json:"targetMask"` // mask
+	SrcScene             []string `yaml:"srcScene" json:"srcScene"`                     // 2个scene，mask false表示用0，true表示用1
+	TargetMask           string   `yaml:"targetMask" json:"targetMask"`                 // mask
+	EmptyOtherSceneVal   int      `yaml:"emptyOtherSceneVal" json:"emptyOtherSceneVal"` // 如果要合并otherscene时，某一个otherscene不存在时，就用这个作默认值
 }
 
 type MergeSymbol struct {
@@ -94,6 +95,52 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	}
 
 	mergeSymbol.AddScene(gameProp, curpr, sc2, cd)
+
+	os1 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, cd, mergeSymbol.Name, "")
+	os2 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, cd, mergeSymbol.Name+":1", "")
+	if os1 != nil || os2 != nil {
+		var os3 *sgc7game.GameScene
+
+		mask, err := gameProp.Pool.GetMask(mergeSymbol.Config.TargetMask, gameProp)
+		if err != nil {
+			goutils.Error("MergeSymbol.OnPlayGame:GetMask",
+				zap.Error(err))
+
+			return err
+		}
+
+		if os1 == nil {
+			os3 = os2.CloneEx(gameProp.PoolScene)
+
+			for x, arr := range os3.Arr {
+				if !mask[x] {
+					for y := range arr {
+						os3.Arr[x][y] = mergeSymbol.Config.EmptyOtherSceneVal
+					}
+				}
+			}
+		} else if os2 == nil {
+			os3 = os1.CloneEx(gameProp.PoolScene)
+
+			for x, arr := range os3.Arr {
+				if mask[x] {
+					for y := range arr {
+						os3.Arr[x][y] = mergeSymbol.Config.EmptyOtherSceneVal
+					}
+				}
+			}
+		} else {
+			os3 = os1.CloneEx(gameProp.PoolScene)
+
+			for x, arr := range os2.Arr {
+				if mask[x] {
+					copy(os3.Arr[x], arr)
+				}
+			}
+		}
+
+		mergeSymbol.AddOtherScene(gameProp, curpr, os3, cd)
+	}
 
 	mergeSymbol.onStepEnd(gameProp, curpr, gp, "")
 
