@@ -369,6 +369,20 @@ func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, cu
 	return gs
 }
 
+func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
+	if basicComponent.Config.UseSceneV2 {
+		return gameProp.GetComponentOtherScene(component)
+	}
+
+	if tag == "" {
+		tag = basicComponent.Config.TargetScene
+	}
+
+	gs, _ := gameProp.GetOtherScene(curpr, tag)
+
+	return gs
+}
+
 func NewBasicComponent(name string) *BasicComponent {
 	return &BasicComponent{
 		Name: name,
