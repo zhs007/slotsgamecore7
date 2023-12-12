@@ -110,6 +110,7 @@ type SymbolTriggerConfig struct {
 	Awards                      []*Award          `yaml:"awards" json:"awards"`                           // 新的奖励系统
 	SymbolAwardsWeights         *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"` // 每个中奖符号随机一组奖励
 	TargetMask                  string            `yaml:"targetMask" json:"targetMask"`                   // 如果是scatter这一组判断，可以把结果传递给一个mask
+	IsReverse                   bool              `yaml:"isReverse" json:"isReverse"`                     // 如果isReverse，表示判定为否才触发
 }
 
 type SymbolTrigger struct {
@@ -295,6 +296,10 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 			symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
 			isTrigger = true
 		}
+	}
+
+	if symbolTrigger.Config.IsReverse {
+		isTrigger = !isTrigger
 	}
 
 	if isTrigger {
