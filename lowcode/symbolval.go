@@ -129,7 +129,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
-					if s != symbolVal.Config.EmptyOtherSceneVal {
+					if os.Arr[x][y] != symbolVal.Config.EmptyOtherSceneVal {
 						continue
 					}
 
