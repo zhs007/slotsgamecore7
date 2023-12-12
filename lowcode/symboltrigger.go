@@ -92,8 +92,8 @@ func (symbolTriggerData *SymbolTriggerData) BuildPBComponentData() proto.Message
 // SymbolTriggerConfig - configuration for SymbolTrigger
 type SymbolTriggerConfig struct {
 	BasicComponentConfig        `yaml:",inline" json:",inline"`
-	Symbol                      string            `yaml:"symbol" json:"symbol"`                           // like scatter
-	SymbolCode                  int               `yaml:"-" json:"-"`                                     // like scatter
+	Symbols                     []string          `yaml:"symbols" json:"symbols"`                         // like scatter
+	SymbolCodes                 []int             `yaml:"-" json:"-"`                                     // like scatter
 	Type                        string            `yaml:"type" json:"type"`                               // like scatters
 	TriggerType                 SymbolTriggerType `yaml:"-" json:"-"`                                     // SymbolTriggerType
 	BetTypeString               string            `yaml:"betType" json:"betType"`                         // bet or totalBet or noPay
@@ -148,16 +148,18 @@ func (symbolTrigger *SymbolTrigger) InitEx(cfg any, pool *GamePropertyPool) erro
 	symbolTrigger.Config = cfg.(*SymbolTriggerConfig)
 	symbolTrigger.Config.ComponentType = SymbolTriggerTypeName
 
-	sc, isok := pool.DefaultPaytables.MapSymbols[symbolTrigger.Config.Symbol]
-	if !isok {
-		goutils.Error("SymbolTrigger.InitEx:Symbol",
-			zap.String("symbol", symbolTrigger.Config.Symbol),
-			zap.Error(ErrIvalidSymbol))
+	for _, s := range symbolTrigger.Config.Symbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("SymbolTrigger.InitEx:Symbol",
+				zap.String("symbol", s),
+				zap.Error(ErrIvalidSymbol))
+		}
+
+		symbolTrigger.Config.SymbolCodes = append(symbolTrigger.Config.SymbolCodes, sc)
 	}
 
-	symbolTrigger.Config.SymbolCode = sc
-
-	sc, isok = pool.DefaultPaytables.MapSymbols[symbolTrigger.Config.CountScatterPayAs]
+	sc, isok := pool.DefaultPaytables.MapSymbols[symbolTrigger.Config.CountScatterPayAs]
 	if isok {
 		symbolTrigger.Config.SymbolCodeCountScatterPayAs = sc
 	}
@@ -232,7 +234,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 	var ret *sgc7game.Result
 
 	if symbolTrigger.Config.TriggerType == STTypeScatters {
-		ret = sgc7game.CalcScatter4(gs, gameProp.CurPaytables, symbolTrigger.Config.SymbolCode, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
+		ret = sgc7game.CalcScatter4(gs, gameProp.CurPaytables, symbolTrigger.Config.SymbolCodes[0], gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
 			func(scatter int, cursymbol int) bool {
 				return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			}, true)
@@ -249,7 +251,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 			isTrigger = true
 		}
 	} else if symbolTrigger.Config.TriggerType == STTypeCountScatter {
-		ret = sgc7game.CalcScatterEx(gs, symbolTrigger.Config.SymbolCode, symbolTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
+		ret = sgc7game.CalcScatterEx(gs, symbolTrigger.Config.SymbolCodes[0], symbolTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
 			return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 		})
 
@@ -271,7 +273,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 			isTrigger = true
 		}
 	} else if symbolTrigger.Config.TriggerType == STTypeCountScatterInArea {
-		ret = sgc7game.CountScatterInArea(gs, symbolTrigger.Config.SymbolCode, symbolTrigger.Config.MinNum,
+		ret = sgc7game.CountScatterInArea(gs, symbolTrigger.Config.SymbolCodes[0], symbolTrigger.Config.MinNum,
 			func(x, y int) bool {
 				return x >= symbolTrigger.Config.PosArea[0] && x <= symbolTrigger.Config.PosArea[1] && y >= symbolTrigger.Config.PosArea[2] && y <= symbolTrigger.Config.PosArea[3]
 			},
