@@ -95,14 +95,14 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 				for y := 0; y < os2.Height; y++ {
 					if y < v {
 						os2.Arr[x][y] = moveReel.Config.EmptyOtherSceneVal
-					} else if y+v < os2.Height {
-						os2.Arr[x][y] = os.Arr[x][y+v]
+					} else if y-v < os2.Height {
+						os2.Arr[x][y] = os.Arr[x][y-v]
 					}
 				}
 			} else {
 				for y := 0; y < os2.Height; y++ {
-					if y-v < os2.Height {
-						os2.Arr[x][y] = os.Arr[x][y-v]
+					if y+v < os2.Height {
+						os2.Arr[x][y] = os.Arr[x][y+v]
 					} else {
 						os2.Arr[x][y] = moveReel.Config.EmptyOtherSceneVal
 					}
