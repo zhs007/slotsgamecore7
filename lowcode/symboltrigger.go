@@ -111,6 +111,7 @@ type SymbolTriggerConfig struct {
 	SymbolAwardsWeights         *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"` // 每个中奖符号随机一组奖励
 	TargetMask                  string            `yaml:"targetMask" json:"targetMask"`                   // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                   bool              `yaml:"isReverse" json:"isReverse"`                     // 如果isReverse，表示判定为否才触发
+	NeedDiscardResults          bool              `yaml:"needDiscardResults" json:"needDiscardResults"`   // 如果needDiscardResults，表示抛弃results
 }
 
 type SymbolTrigger struct {
@@ -220,6 +221,110 @@ func (symbolTrigger *SymbolTrigger) procMask(gs *sgc7game.GameScene, gameProp *G
 	return nil
 }
 
+// CanTrigger -
+func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
+
+	gs := symbolTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
+
+	isTrigger := false
+	lst := []*sgc7game.Result{}
+
+	if symbolTrigger.Config.TriggerType == STTypeScatters {
+		for _, s := range symbolTrigger.Config.SymbolCodes {
+			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
+				func(scatter int, cursymbol int) bool {
+					return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				}, true)
+
+			if ret != nil {
+				if symbolTrigger.Config.BetType == BTypeNoPay {
+					ret.CoinWin = 0
+					ret.CashWin = 0
+				} else {
+					gameProp.ProcMulti(ret)
+				}
+
+				if !symbolTrigger.Config.NeedDiscardResults {
+					symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+				}
+
+				isTrigger = true
+
+				lst = append(lst, ret)
+			}
+		}
+	} else if symbolTrigger.Config.TriggerType == STTypeCountScatter {
+		for _, s := range symbolTrigger.Config.SymbolCodes {
+			ret := sgc7game.CalcScatterEx(gs, s, symbolTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
+				return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			})
+
+			if ret != nil {
+				if symbolTrigger.Config.BetType == BTypeNoPay {
+					ret.CoinWin = 0
+					ret.CashWin = 0
+				} else {
+					if symbolTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
+						ret.Mul = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CoinWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CashWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, symbolTrigger.Config.BetType)
+					}
+
+					gameProp.ProcMulti(ret)
+				}
+
+				if !symbolTrigger.Config.NeedDiscardResults {
+					symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+				}
+
+				isTrigger = true
+
+				lst = append(lst, ret)
+			}
+		}
+	} else if symbolTrigger.Config.TriggerType == STTypeCountScatterInArea {
+		for _, s := range symbolTrigger.Config.SymbolCodes {
+			ret := sgc7game.CountScatterInArea(gs, s, symbolTrigger.Config.MinNum,
+				func(x, y int) bool {
+					return x >= symbolTrigger.Config.PosArea[0] && x <= symbolTrigger.Config.PosArea[1] && y >= symbolTrigger.Config.PosArea[2] && y <= symbolTrigger.Config.PosArea[3]
+				},
+				func(scatter int, cursymbol int) bool {
+					return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				})
+
+			if ret != nil {
+				if symbolTrigger.Config.BetType == BTypeNoPay {
+					ret.CoinWin = 0
+					ret.CashWin = 0
+				} else {
+					if symbolTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
+						ret.Mul = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CoinWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CashWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, symbolTrigger.Config.BetType)
+					}
+
+					gameProp.ProcMulti(ret)
+				}
+
+				if !symbolTrigger.Config.NeedDiscardResults {
+					symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+				}
+
+				isTrigger = true
+
+				lst = append(lst, ret)
+			}
+		}
+	}
+
+	if symbolTrigger.Config.IsReverse {
+		isTrigger = !isTrigger
+	}
+
+	return isTrigger, lst
+}
+
 // playgame
 func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -230,82 +335,10 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	gs := symbolTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
-	isTrigger := false
-	var ret *sgc7game.Result
-
-	if symbolTrigger.Config.TriggerType == STTypeScatters {
-		ret = sgc7game.CalcScatter4(gs, gameProp.CurPaytables, symbolTrigger.Config.SymbolCodes[0], gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
-			func(scatter int, cursymbol int) bool {
-				return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			}, true)
-
-		if ret != nil {
-			if symbolTrigger.Config.BetType == BTypeNoPay {
-				ret.CoinWin = 0
-				ret.CashWin = 0
-			} else {
-				gameProp.ProcMulti(ret)
-			}
-
-			symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			isTrigger = true
-		}
-	} else if symbolTrigger.Config.TriggerType == STTypeCountScatter {
-		ret = sgc7game.CalcScatterEx(gs, symbolTrigger.Config.SymbolCodes[0], symbolTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
-			return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		})
-
-		if ret != nil {
-			if symbolTrigger.Config.BetType == BTypeNoPay {
-				ret.CoinWin = 0
-				ret.CashWin = 0
-			} else {
-				if symbolTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
-					ret.Mul = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CoinWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CashWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, symbolTrigger.Config.BetType)
-				}
-
-				gameProp.ProcMulti(ret)
-			}
-
-			symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			isTrigger = true
-		}
-	} else if symbolTrigger.Config.TriggerType == STTypeCountScatterInArea {
-		ret = sgc7game.CountScatterInArea(gs, symbolTrigger.Config.SymbolCodes[0], symbolTrigger.Config.MinNum,
-			func(x, y int) bool {
-				return x >= symbolTrigger.Config.PosArea[0] && x <= symbolTrigger.Config.PosArea[1] && y >= symbolTrigger.Config.PosArea[2] && y <= symbolTrigger.Config.PosArea[3]
-			},
-			func(scatter int, cursymbol int) bool {
-				return cursymbol == scatter || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			})
-
-		if ret != nil {
-			if symbolTrigger.Config.BetType == BTypeNoPay {
-				ret.CoinWin = 0
-				ret.CashWin = 0
-			} else {
-				if symbolTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
-					ret.Mul = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CoinWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CashWin = gameProp.CurPaytables.MapPay[symbolTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, symbolTrigger.Config.BetType)
-				}
-
-				gameProp.ProcMulti(ret)
-			}
-
-			symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			isTrigger = true
-		}
-	}
-
-	if symbolTrigger.Config.IsReverse {
-		isTrigger = !isTrigger
-	}
+	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, curpr, gp, stake)
 
 	if isTrigger {
-		err := symbolTrigger.procMask(gs, gameProp, curpr, gp, plugin, ret)
+		err := symbolTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
 		if err != nil {
 			goutils.Error("SymbolTrigger.OnPlayGame:procMask",
 				zap.Error(err))
@@ -314,7 +347,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if symbolTrigger.Config.TagSymbolNum != "" {
-			gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, ret.SymbolNums)
+			gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
 		}
 
 		if len(symbolTrigger.Config.Awards) > 0 {
@@ -322,7 +355,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if symbolTrigger.Config.SymbolAwardsWeights != nil {
-			for i := 0; i < ret.SymbolNums; i++ {
+			for i := 0; i < lst[0].SymbolNums; i++ {
 				node, err := symbolTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
 				if err != nil {
 					goutils.Error("SymbolTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
