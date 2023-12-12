@@ -361,7 +361,11 @@ func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, cu
 	}
 
 	if tag == "" {
-		tag = basicComponent.Config.TargetScene
+		if basicComponent.Config.TargetGlobalScene != "" {
+			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
+		} else {
+			tag = basicComponent.Config.TargetScene
+		}
 	}
 
 	gs, _ := gameProp.GetScene(curpr, tag)
