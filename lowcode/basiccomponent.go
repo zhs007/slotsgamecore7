@@ -375,7 +375,7 @@ func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GamePropert
 	}
 
 	if tag == "" {
-		tag = basicComponent.Config.TargetScene
+		tag = basicComponent.Config.TargetOtherScene
 	}
 
 	gs, _ := gameProp.GetOtherScene(curpr, tag)

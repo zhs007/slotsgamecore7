@@ -158,7 +158,11 @@ func (gameProp *GameProperty) GetScene(pr *sgc7game.PlayResult, tag string) (*sg
 		return nil, -1
 	}
 
-	return pr.Scenes[si], si
+	if si < len(pr.Scenes) {
+		return pr.Scenes[si], si
+	}
+
+	return nil, -1
 }
 
 func (gameProp *GameProperty) TagOtherScene(pr *sgc7game.PlayResult, tag string, sceneIndex int) {
@@ -171,7 +175,11 @@ func (gameProp *GameProperty) GetOtherScene(pr *sgc7game.PlayResult, tag string)
 		return nil, -1
 	}
 
-	return pr.OtherScenes[si], si
+	if si < len(pr.OtherScenes) {
+		return pr.OtherScenes[si], si
+	}
+
+	return nil, -1
 }
 
 func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, respinComponent string, gs *sgc7game.GameScene, os *sgc7game.GameScene) {
