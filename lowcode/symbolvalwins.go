@@ -100,7 +100,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	if isTrigger {
-		os := symbolValWins.GetTargetOtherScene(gameProp, curpr, cd)
+		os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, cd, symbolValWins.Name, "")
 
 		if os != nil {
 			totalvals := 0
