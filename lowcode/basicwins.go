@@ -402,7 +402,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	if basicWins.Config.MainType == WinTypeWays {
 		if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
-			os := basicWins.GetTargetOtherScene(gameProp, curpr, &bwd.BasicComponentData)
+			os := basicWins.GetTargetOtherScene2(gameProp, curpr, &bwd.BasicComponentData, basicWins.Name, "")
 
 			if os != nil {
 				currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet(stake, basicWins.Config.BetType),
@@ -482,7 +482,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	} else if basicWins.Config.MainType == WinTypeLines {
 		isDone := false
 		if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {
-			os := basicWins.GetTargetOtherScene(gameProp, curpr, &bwd.BasicComponentData)
+			os := basicWins.GetTargetOtherScene2(gameProp, curpr, &bwd.BasicComponentData, basicWins.Name, "")
 
 			if os != nil {
 				isDone = true
