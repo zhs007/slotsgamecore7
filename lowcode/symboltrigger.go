@@ -493,6 +493,30 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sg
 			lst = append(lst, currets...)
 		}
 
+	} else if symbolTrigger.Config.TriggerType == STTypeCheckWays {
+		currets := sgc7game.CheckWays(gs, symbolTrigger.Config.MinNum,
+			func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+				return goutils.IndexOfIntSlice(symbolTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+			}, func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, func(cursymbol int, startsymbol int) bool {
+				if cursymbol == startsymbol {
+					return true
+				}
+
+				return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			})
+
+		for _, v := range currets {
+			gameProp.ProcMulti(v)
+
+			if isSaveResult {
+				symbolTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			}
+		}
+
+		lst = append(lst, currets...)
+
 	} else if symbolTrigger.Config.TriggerType == STTypeScatters {
 		for _, s := range symbolTrigger.Config.SymbolCodes {
 			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
