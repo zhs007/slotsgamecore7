@@ -378,6 +378,66 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sg
 				}
 			}
 		}
+	} else if symbolTrigger.Config.TriggerType == STTypeCheckLines {
+
+		for i, v := range gameProp.CurLineData.Lines {
+			if symbolTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
+				ret := sgc7game.CheckLine(gs, v, symbolTrigger.Config.MinNum,
+					func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(symbolTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int) int {
+						return cursymbol
+					})
+				if ret != nil {
+					ret.LineIndex = i
+
+					gameProp.ProcMulti(ret)
+
+					lst = append(lst, ret)
+
+					if isSaveResult {
+						symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+					}
+				}
+			}
+
+			if symbolTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
+				ret := sgc7game.CheckLineRL(gs, v, symbolTrigger.Config.MinNum,
+					func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(symbolTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int) int {
+						return cursymbol
+					})
+				if ret != nil {
+					ret.LineIndex = i
+
+					gameProp.ProcMulti(ret)
+
+					lst = append(lst, ret)
+
+					if isSaveResult {
+						symbolTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+					}
+				}
+			}
+		}
+
 	} else if symbolTrigger.Config.TriggerType == STTypeWays {
 		os := symbolTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
