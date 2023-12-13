@@ -393,9 +393,9 @@ func (respin *Respin) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlu
 
 	cd.TriggerRespinNum = append(cd.TriggerRespinNum, num)
 
-	if cd.LastRespinNum == 0 {
-		respin.Trigger(gameProp, plugin, curpr, gp)
-	}
+	// if cd.LastRespinNum == 0 {
+	// 	respin.Trigger(gameProp, plugin, curpr, gp)
+	// }
 }
 
 // GetLastRespinNum -
