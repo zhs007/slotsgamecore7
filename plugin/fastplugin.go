@@ -2,6 +2,7 @@ package sgc7plugin
 
 import (
 	"context"
+	"time"
 
 	"github.com/valyala/fastrand"
 
@@ -20,6 +21,8 @@ func NewFastPlugin() *FastPlugin {
 		PluginBase: NewPluginBase(),
 		RNG:        &fastrand.RNG{},
 	}
+
+	fp.Init()
 
 	return fp
 }
@@ -55,4 +58,5 @@ func (fp *FastPlugin) Random(ctx context.Context, r int) (int, error) {
 
 // Init - initial
 func (fp *FastPlugin) Init() {
+	fp.RNG.Seed(uint32(time.Now().UnixNano()))
 }

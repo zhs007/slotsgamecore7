@@ -100,6 +100,7 @@ type SymbolTriggerConfig struct {
 	BasicComponentConfig        `yaml:",inline" json:",inline"`
 	Symbols                     []string          `yaml:"symbols" json:"symbols"`                         // like scatter
 	SymbolCodes                 []int             `yaml:"-" json:"-"`                                     // like scatter
+	ExcludeSymbolCodes          []int             `yaml:"-" json:"-"`                                     // 在 lines 和 ways 里有用
 	Type                        string            `yaml:"type" json:"type"`                               // like scatters
 	TriggerType                 SymbolTriggerType `yaml:"-" json:"-"`                                     // SymbolTriggerType
 	BetTypeString               string            `yaml:"betType" json:"betType"`                         // bet or totalBet or noPay
@@ -107,6 +108,8 @@ type SymbolTriggerConfig struct {
 	MinNum                      int               `yaml:"minNum" json:"minNum"`                           // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
 	WildSymbols                 []string          `yaml:"wildSymbols" json:"wildSymbols"`                 // wild etc
 	WildSymbolCodes             []int             `yaml:"-" json:"-"`                                     // wild symbolCode
+	StrCheckWinType             string            `yaml:"checkWinType" json:"checkWinType"`               // left2right or right2left or all
+	CheckWinType                CheckWinType      `yaml:"-" json:"-"`                                     //
 	PosArea                     []int             `yaml:"posArea" json:"posArea"`                         // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
 	CountScatterPayAs           string            `yaml:"countScatterPayAs" json:"countScatterPayAs"`     // countscatter时，按什么符号赔付
 	SymbolCodeCountScatterPayAs int               `yaml:"-" json:"-"`                                     // countscatter时，按什么符号赔付
@@ -205,6 +208,12 @@ func (symbolTrigger *SymbolTrigger) InitEx(cfg any, pool *GamePropertyPool) erro
 		symbolTrigger.Config.SymbolAwardsWeights.Init()
 	}
 
+	if symbolTrigger.Config.TriggerType == STTypeLines || symbolTrigger.Config.TriggerType == STTypeWays {
+		symbolTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, symbolTrigger.Config.SymbolCodes)
+	}
+
+	symbolTrigger.Config.CheckWinType = ParseCheckWinType(symbolTrigger.Config.StrCheckWinType)
+
 	symbolTrigger.onInit(&symbolTrigger.Config.BasicComponentConfig)
 
 	return nil
@@ -236,8 +245,141 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sg
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
-	if symbolTrigger.Config.TriggerType == STTypeScatters {
+	if symbolTrigger.Config.TriggerType == STTypeLines {
+		// isDone := false
 
+		// os := symbolTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
+
+		// if os != nil {
+		// 	isDone = true
+
+		// 	for i, v := range gameProp.CurLineData.Lines {
+		// 		isTriggerFull := false
+		// 		if symbolTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
+		// 			ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
+		// 				func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(symbolTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+		// 				}, func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+		// 				}, func(cursymbol int, startsymbol int) bool {
+		// 					if cursymbol == startsymbol {
+		// 						return true
+		// 					}
+
+		// 					return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+		// 				}, func(cursymbol int) int {
+		// 					return cursymbol
+		// 				}, func(x, y int) int {
+		// 					return os.Arr[x][y]
+		// 				})
+		// 			if ret != nil {
+		// 				ret.LineIndex = i
+
+		// 				gameProp.ProcMulti(ret)
+
+		// 				lst = append(lst, ret)
+
+		// 				if ret.SymbolNums == gs.Width {
+		// 					isTriggerFull = true
+		// 				}
+		// 			}
+		// 		}
+
+		// 		if !isTriggerFull && symbolTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
+		// 			ret := sgc7game.CalcLineRL2(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
+		// 				func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(symbolTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+		// 				}, func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+		// 				}, func(cursymbol int, startsymbol int) bool {
+		// 					if cursymbol == startsymbol {
+		// 						return true
+		// 					}
+
+		// 					return goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+		// 				}, func(cursymbol int) int {
+		// 					return cursymbol
+		// 				}, func(x, y int) int {
+		// 					return os.Arr[x][y]
+		// 				})
+		// 			if ret != nil {
+		// 				ret.LineIndex = i
+
+		// 				gameProp.ProcMulti(ret)
+
+		// 				if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+		// 					procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+		// 				}
+
+		// 				rets = append(rets, ret)
+		// 			}
+		// 		}
+		// 	}
+		// }
+
+		// if !isDone {
+		// 	for i, v := range gameProp.CurLineData.Lines {
+		// 		if basicWins.Config.CheckWinType != CheckWinTypeRightLeft {
+		// 			ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet(stake, basicWins.Config.BetType),
+		// 				func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+		// 				}, func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+		// 				}, func(cursymbol int, startsymbol int) bool {
+		// 					if cursymbol == startsymbol {
+		// 						return true
+		// 					}
+
+		// 					return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+		// 				}, func(scene *sgc7game.GameScene, result *sgc7game.Result) int {
+		// 					return 1
+		// 				}, func(cursymbol int) int {
+		// 					return cursymbol
+		// 				})
+		// 			if ret != nil {
+		// 				ret.LineIndex = i
+
+		// 				gameProp.ProcMulti(ret)
+
+		// 				if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+		// 					procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+		// 				}
+
+		// 				rets = append(rets, ret)
+		// 			}
+		// 		}
+
+		// 		if basicWins.Config.CheckWinType != CheckWinTypeLeftRight {
+		// 			ret := sgc7game.CalcLineRLEx(gs, gameProp.CurPaytables, v, gameProp.GetBet(stake, basicWins.Config.BetType),
+		// 				func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(basicWins.ExcludeSymbols, cursymbol, 0) < 0
+		// 				}, func(cursymbol int) bool {
+		// 					return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+		// 				}, func(cursymbol int, startsymbol int) bool {
+		// 					if cursymbol == startsymbol {
+		// 						return true
+		// 					}
+
+		// 					return goutils.IndexOfIntSlice(basicWins.WildSymbols, cursymbol, 0) >= 0
+		// 				}, func(scene *sgc7game.GameScene, result *sgc7game.Result) int {
+		// 					return 1
+		// 				}, func(cursymbol int) int {
+		// 					return cursymbol
+		// 				})
+		// 			if ret != nil {
+		// 				ret.LineIndex = i
+
+		// 				gameProp.ProcMulti(ret)
+
+		// 				if len(basicWins.Config.SIWMSymbolCodes) > 0 {
+		// 					procSIWM(ret, gs, basicWins.Config.SIWMSymbolCodes, basicWins.Config.SIWMMul)
+		// 				}
+
+		// 				rets = append(rets, ret)
+		// 			}
+		// 		}
+		// 	}
+		// }
 	} else if symbolTrigger.Config.TriggerType == STTypeScatters {
 		for _, s := range symbolTrigger.Config.SymbolCodes {
 			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
