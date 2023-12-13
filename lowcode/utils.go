@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"google.golang.org/protobuf/proto"
 )
@@ -117,4 +118,16 @@ func isSameBoolSlice(src []bool, dest []bool) bool {
 	}
 
 	return false
+}
+
+func GetExcludeSymbols(pt *sgc7game.PayTables, symbols []int) []int {
+	es := []int{}
+
+	for s := range pt.MapPay {
+		if goutils.IndexOfIntSlice(symbols, s, 0) < 0 {
+			es = append(es, s)
+		}
+	}
+
+	return es
 }
