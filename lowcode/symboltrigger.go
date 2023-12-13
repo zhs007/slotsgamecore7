@@ -26,6 +26,8 @@ const (
 	STTypeScatters           SymbolTriggerType = 3
 	STTypeCountScatter       SymbolTriggerType = 4
 	STTypeCountScatterInArea SymbolTriggerType = 5
+	STTypeCheckLines         SymbolTriggerType = 6
+	STTypeCheckWays          SymbolTriggerType = 7
 )
 
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
@@ -39,6 +41,10 @@ func ParseSymbolTriggerType(str string) SymbolTriggerType {
 		return STTypeCountScatter
 	} else if str == "countscatterInArea" {
 		return STTypeCountScatterInArea
+	} else if str == "checkLines" {
+		return STTypeCheckLines
+	} else if str == "checkWays" {
+		return STTypeCheckWays
 	}
 
 	return STTypeUnknow
@@ -98,7 +104,7 @@ type SymbolTriggerConfig struct {
 	TriggerType                 SymbolTriggerType `yaml:"-" json:"-"`                                     // SymbolTriggerType
 	BetTypeString               string            `yaml:"betType" json:"betType"`                         // bet or totalBet or noPay
 	BetType                     BetType           `yaml:"-" json:"-"`                                     // bet or totalBet or noPay
-	MinNum                      int               `yaml:"minNum" json:"minNum"`                           // like 3，STTypeCountScatter 或 STTypeCountScatterInArea 时生效
+	MinNum                      int               `yaml:"minNum" json:"minNum"`                           // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
 	WildSymbols                 []string          `yaml:"wildSymbols" json:"wildSymbols"`                 // wild etc
 	WildSymbolCodes             []int             `yaml:"-" json:"-"`                                     // wild symbolCode
 	PosArea                     []int             `yaml:"posArea" json:"posArea"`                         // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
@@ -231,6 +237,8 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sg
 	lst := []*sgc7game.Result{}
 
 	if symbolTrigger.Config.TriggerType == STTypeScatters {
+
+	} else if symbolTrigger.Config.TriggerType == STTypeScatters {
 		for _, s := range symbolTrigger.Config.SymbolCodes {
 			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
