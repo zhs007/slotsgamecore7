@@ -155,6 +155,8 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 				gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
 			}
 		}
+	} else {
+		symbolVal.ClearOtherScene(gameProp)
 	}
 
 	symbolVal.onStepEnd(gameProp, curpr, gp, "")

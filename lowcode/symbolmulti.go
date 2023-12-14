@@ -164,6 +164,8 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		if symbolMulti.OtherSceneFeature != nil {
 			gameProp.procOtherSceneFeature(symbolMulti.OtherSceneFeature, curpr, os)
 		}
+	} else {
+		symbolMulti.ClearOtherScene(gameProp)
 	}
 
 	symbolMulti.onStepEnd(gameProp, curpr, gp, "")

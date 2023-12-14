@@ -162,6 +162,8 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		if symbolVal2.OtherSceneFeature != nil {
 			gameProp.procOtherSceneFeature(symbolVal2.OtherSceneFeature, curpr, os)
 		}
+	} else {
+		symbolVal2.ClearOtherScene(gameProp)
 	}
 
 	symbolVal2.onStepEnd(gameProp, curpr, gp, "")

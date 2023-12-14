@@ -506,6 +506,286 @@ func CalcLineEx(scene *GameScene, pt *PayTables, ld []int, bet int,
 	return r
 }
 
+// CheckLine - check line
+func CheckLine(scene *GameScene, ld []int, minnum int,
+	isValidSymbol FuncIsValidSymbol,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol,
+	getSymbol FuncGetSymbol) *Result {
+
+	sx := 0
+
+	s0 := getSymbol(scene.Arr[sx][ld[sx]])
+	if !isValidSymbol(s0) {
+		return nil
+	}
+
+	nums := 1
+	pos := make([]int, 0, len(ld)*2)
+
+	pos = append(pos, 0, ld[sx])
+
+	if isWild(s0) {
+		wilds := 1
+		ws := -1
+		wnums := 1
+		wpos := make([]int, 0, len(ld)*2)
+
+		wpos = append(wpos, sx, ld[sx])
+
+		for x := 1; x < len(ld); x++ {
+			cs := scene.Arr[sx+x][ld[sx+x]]
+
+			if !isValidSymbol(cs) {
+				break
+			}
+
+			if ws == -1 {
+				if isWild(cs) {
+					wilds++
+
+					wnums++
+					nums++
+
+					pos = append(pos, sx+x, ld[sx+x])
+					wpos = append(wpos, sx+x, ld[sx+x])
+				} else {
+					ws = cs
+
+					nums++
+					pos = append(pos, sx+x, ld[sx+x])
+				}
+			} else {
+				if isWild(cs) {
+					wilds++
+				}
+
+				if isSameSymbol(cs, ws) {
+					nums++
+
+					pos = append(pos, sx+x, ld[sx+x])
+				} else {
+					break
+				}
+			}
+		}
+
+		if ws == -1 {
+			if wnums >= minnum {
+				r := &Result{
+					Symbol:     s0,
+					Type:       RTLine,
+					Mul:        0,
+					CoinWin:    0,
+					CashWin:    0,
+					Pos:        wpos,
+					Wilds:      wilds,
+					SymbolNums: wnums,
+				}
+
+				return r
+			}
+
+			return nil
+		}
+
+		if nums >= minnum {
+			r := &Result{
+				Symbol:     ws,
+				Type:       RTLine,
+				Mul:        0,
+				CoinWin:    0,
+				CashWin:    0,
+				Pos:        pos,
+				Wilds:      wilds,
+				SymbolNums: nums,
+			}
+
+			return r
+		}
+
+		return nil
+	}
+
+	wilds := 0
+	for x := 1; x < len(ld); x++ {
+		cs := scene.Arr[sx+x][ld[sx+x]]
+
+		if !isValidSymbol(cs) {
+			break
+		}
+
+		if isSameSymbol(cs, s0) {
+			if isWild(cs) {
+				wilds++
+			}
+
+			nums++
+
+			pos = append(pos, sx+x, ld[sx+x])
+		} else {
+			break
+		}
+	}
+
+	if nums >= minnum {
+		r := &Result{
+			Symbol:     s0,
+			Type:       RTLine,
+			Mul:        0,
+			CoinWin:    0,
+			CashWin:    0,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
+// CheckLineRL - check line with right->left
+func CheckLineRL(scene *GameScene, ld []int, minnum int,
+	isValidSymbol FuncIsValidSymbol,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol,
+	getSymbol FuncGetSymbol) *Result {
+
+	sx := len(scene.Arr) - 1
+
+	s0 := getSymbol(scene.Arr[sx][ld[sx]])
+	if !isValidSymbol(s0) {
+		return nil
+	}
+
+	nums := 1
+	pos := make([]int, 0, len(ld)*2)
+
+	pos = append(pos, sx, ld[sx])
+
+	if isWild(s0) {
+		wilds := 1
+		ws := -1
+		wnums := 1
+		wpos := make([]int, 0, len(ld)*2)
+
+		wpos = append(wpos, sx, ld[sx])
+
+		for x := 1; x < len(ld); x++ {
+			cs := scene.Arr[sx-x][ld[sx-x]]
+
+			if !isValidSymbol(cs) {
+				break
+			}
+
+			if ws == -1 {
+				if isWild(cs) {
+					wilds++
+
+					wnums++
+					nums++
+
+					pos = append(pos, sx-x, ld[sx-x])
+					wpos = append(wpos, sx-x, ld[sx-x])
+				} else {
+					ws = cs
+
+					nums++
+					pos = append(pos, sx-x, ld[sx-x])
+				}
+			} else {
+				if isWild(cs) {
+					wilds++
+				}
+
+				if isSameSymbol(cs, ws) {
+					nums++
+
+					pos = append(pos, sx-x, ld[sx-x])
+				} else {
+					break
+				}
+			}
+		}
+
+		if ws == -1 {
+			if wnums >= minnum {
+				r := &Result{
+					Symbol:     s0,
+					Type:       RTLine,
+					Mul:        0,
+					CoinWin:    0,
+					CashWin:    0,
+					Pos:        wpos,
+					Wilds:      wilds,
+					SymbolNums: wnums,
+				}
+
+				return r
+			}
+
+			return nil
+		}
+
+		if nums >= minnum {
+			r := &Result{
+				Symbol:     ws,
+				Type:       RTLine,
+				Mul:        0,
+				CoinWin:    0,
+				CashWin:    0,
+				Pos:        pos,
+				Wilds:      wilds,
+				SymbolNums: nums,
+			}
+
+			return r
+		}
+
+		return nil
+	}
+
+	wilds := 0
+	for x := 1; x < len(ld); x++ {
+		cs := scene.Arr[sx-x][ld[sx-x]]
+
+		if !isValidSymbol(cs) {
+			break
+		}
+
+		if isSameSymbol(cs, s0) {
+			if isWild(cs) {
+				wilds++
+			}
+
+			nums++
+
+			pos = append(pos, sx-x, ld[sx-x])
+		} else {
+			break
+		}
+	}
+
+	if nums >= minnum {
+		r := &Result{
+			Symbol:     s0,
+			Type:       RTLine,
+			Mul:        0,
+			CoinWin:    0,
+			CashWin:    0,
+			Pos:        pos,
+			Wilds:      wilds,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcLineRL - calc line with right->left
 func CalcLineRL(scene *GameScene, pt *PayTables, ld []int, bet int,
 	isValidSymbol FuncIsValidSymbol,
@@ -1015,6 +1295,84 @@ func CalcFullLineExWithMulti(scene *GameScene, pt *PayTables, bet int,
 				Mul:        pt.MapPay[cs][symbolnums-1],
 				CoinWin:    pt.MapPay[cs][symbolnums-1] * mul,
 				CashWin:    pt.MapPay[cs][symbolnums-1] * bet * mul,
+				Pos:        arrpos,
+				Wilds:      wildnums,
+				SymbolNums: symbolnums,
+			}
+
+			results = append(results, r)
+		}
+	}
+
+	return results
+}
+
+// 用数个数的方式来计算全线游戏，第一轴不能有wild
+func CheckWays(scene *GameScene, minnum int,
+	isValidSymbolEx FuncIsValidSymbolEx,
+	isWild FuncIsWild,
+	isSameSymbol FuncIsSameSymbol) []*Result {
+
+	results := []*Result{}
+
+	arrSymbol := make([]int, 0, scene.Height)
+
+	for y0 := 0; y0 < len(scene.Arr[0]); y0++ {
+		cs := scene.Arr[0][y0]
+		if !isValidSymbolEx(cs, scene, 0, y0) {
+			continue
+		}
+
+		if goutils.IndexOfIntSlice(arrSymbol, cs, 0) >= 0 {
+			continue
+		}
+
+		arrSymbol = append(arrSymbol, cs)
+
+		arrpos := make([]int, 0, scene.Height*scene.Width*2)
+		symbolnums := 0
+		wildnums := 0
+		mul := 1
+
+		for x := 0; x < scene.Width; x++ {
+			curnums := 0
+			curmul := 0
+			for y := 0; y < len(scene.Arr[x]); y++ {
+				if !isValidSymbolEx(cs, scene, x, y) {
+					continue
+				}
+
+				if isSameSymbol(scene.Arr[x][y], cs) {
+
+					arrpos = append(arrpos, x, y)
+
+					if isWild(scene.Arr[x][y]) {
+						wildnums++
+					}
+
+					if curnums == 0 {
+						symbolnums++
+					}
+
+					curnums++
+					curmul++
+				}
+			}
+
+			if curnums == 0 {
+				break
+			}
+
+			mul *= curmul
+		}
+
+		if symbolnums > minnum {
+			r := &Result{
+				Symbol:     cs,
+				Type:       RTFullLineEx,
+				Mul:        0,
+				CoinWin:    0,
+				CashWin:    0,
 				Pos:        arrpos,
 				Wilds:      wildnums,
 				SymbolNums: symbolnums,
