@@ -216,6 +216,17 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 	}
 }
 
+// ClearOtherScene -
+func (basicComponent *BasicComponent) ClearOtherScene(gameProp *GameProperty) {
+	if basicComponent.Config.UseSceneV2 {
+		if len(basicComponent.Config.OtherScene2Components) > 0 {
+			for _, v := range basicComponent.Config.OtherScene2Components {
+				gameProp.ClearComponentOtherScene(v)
+			}
+		}
+	}
+}
+
 // AddResult -
 func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret *sgc7game.Result, basicCD *BasicComponentData) {
 	basicCD.CoinWin += ret.CoinWin

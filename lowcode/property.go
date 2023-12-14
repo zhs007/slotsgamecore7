@@ -139,6 +139,10 @@ func (gameProp *GameProperty) SetComponentOtherScene(component string, gs *sgc7g
 	gameProp.mapComponentOtherScene[component] = gs
 }
 
+func (gameProp *GameProperty) ClearComponentOtherScene(component string) {
+	delete(gameProp.mapComponentOtherScene, component)
+}
+
 func (gameProp *GameProperty) GetComponentOtherScene(component string) *sgc7game.GameScene {
 	gs, isok := gameProp.mapComponentOtherScene[component]
 	if !isok {
