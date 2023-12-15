@@ -1,8 +1,6 @@
 package lowcode
 
 import (
-	"sync"
-
 	"github.com/fatih/color"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
@@ -13,7 +11,7 @@ import (
 )
 
 type GamePropertyPool struct {
-	Pool             sync.Pool
+	// MapGamePropPool  map[int]sync.Pool
 	Config           *Config
 	DefaultPaytables *sgc7game.PayTables
 	DefaultLineData  *sgc7game.LineData
@@ -415,6 +413,7 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 
 func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
+		// MapGamePropPool:  make(map[int]sync.Pool),
 		Config:           cfg,
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
@@ -459,11 +458,13 @@ func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 		return pool.SymbolsViewer.MapSymbols[s].Output
 	}
 
-	pool.Pool = sync.Pool{
-		New: func() any {
-			return pool.newGameProp()
-		},
-	}
+	// for _, bet := range cfg.Bets {
+	// 	pool.MapGamePropPool[bet] = sync.Pool{
+	// 		New: func() any {
+	// 			return pool.newGameProp()
+	// 		},
+	// 	}
+	// }
 
 	return pool, nil
 }

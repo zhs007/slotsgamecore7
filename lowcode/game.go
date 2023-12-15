@@ -150,10 +150,15 @@ func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr 
 }
 
 // NewGameData - new GameData
-func (game *Game) NewGameData() any {
+func (game *Game) NewGameData(stake *sgc7game.Stake) sgc7game.IGameData {
 	gameProp, _ := game.Pool.NewGameProp()
 
 	return gameProp
+}
+
+// DeleteGameData - delete GameData
+func (game *Game) DeleteGameData(gamed sgc7game.IGameData) {
+
 }
 
 // BuildGameConfigData - build game configration data

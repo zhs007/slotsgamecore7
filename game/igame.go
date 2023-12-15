@@ -24,7 +24,9 @@ type IGame interface {
 	// Play - play
 	Play(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData any) (*PlayResult, error)
 	// NewGameData - new GameData
-	NewGameData() any
+	NewGameData(stake *Stake) IGameData
+	// DeleteGameData - delete GameData
+	DeleteGameData(gamed IGameData)
 
 	// AddGameMod - add a gamemod
 	AddGameMod(gmod IGameMod) error

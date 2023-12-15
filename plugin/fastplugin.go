@@ -15,7 +15,7 @@ type FastPlugin struct {
 	RNG *fastrand.RNG
 }
 
-// NewBasicPlugin - new a BasicPlugin
+// NewFastPlugin - new a BasicPlugin
 func NewFastPlugin() *FastPlugin {
 	fp := &FastPlugin{
 		PluginBase: NewPluginBase(),

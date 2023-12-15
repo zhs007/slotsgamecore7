@@ -42,6 +42,7 @@ func String2Property(str string) (int, error) {
 }
 
 type GameProperty struct {
+	CurBetMul              int
 	Pool                   *GamePropertyPool
 	MapVals                map[int]int
 	MapStrVals             map[int]string
@@ -61,6 +62,10 @@ type GameProperty struct {
 	RespinComponents       []string
 	PoolScene              *sgc7game.GameScenePoolEx
 	Components             *ComponentList
+}
+
+func (gameProp *GameProperty) GetBetMul() int {
+	return gameProp.CurBetMul
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {

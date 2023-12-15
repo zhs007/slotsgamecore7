@@ -104,7 +104,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 		balance -= int(stake.CashBet)
 		spinwins := 0
-		gameData := game.NewGameData()
+		gameData := game.NewGameData(stake)
 
 		fmt.Printf("bet %v, balance %v\n",
 			FormatColorString(fmt.Sprintf("%v", stake.CashBet), ColorNumber),
@@ -217,11 +217,11 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 			if len(pr.NextCmds) > 0 {
 				cmd = pr.NextCmds[curSelected]
-				
+
 				if len(pr.NextCmdParams) > 0 {
 					cmdparam = pr.NextCmdParams[curSelected]
-				} else{
-					cmdparam = ""	
+				} else {
+					cmdparam = ""
 				}
 			} else {
 				cmd = "SPIN"
