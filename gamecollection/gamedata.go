@@ -49,6 +49,7 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 
 	results := []*sgc7game.PlayResult{}
 	gameData := gameD.Game.NewGameData(stake)
+	defer gameD.Game.DeleteGameData(gameData)
 
 	cmd := req.Command
 

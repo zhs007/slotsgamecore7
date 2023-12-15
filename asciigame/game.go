@@ -105,6 +105,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		balance -= int(stake.CashBet)
 		spinwins := 0
 		gameData := game.NewGameData(stake)
+		defer game.DeleteGameData(gameData)
 
 		fmt.Printf("bet %v, balance %v\n",
 			FormatColorString(fmt.Sprintf("%v", stake.CashBet), ColorNumber),

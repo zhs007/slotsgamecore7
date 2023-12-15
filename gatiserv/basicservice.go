@@ -99,6 +99,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 	results := []*sgc7game.PlayResult{}
 	gameData := sv.Game.NewGameData(stake)
+	defer sv.Game.DeleteGameData(gameData)
 
 	cmd := params.Cmd
 

@@ -1,6 +1,8 @@
 package lowcode
 
 import (
+	"sync"
+
 	"github.com/fatih/color"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
@@ -11,7 +13,7 @@ import (
 )
 
 type GamePropertyPool struct {
-	// MapGamePropPool  map[int]sync.Pool
+	MapGamePropPool  map[int]*sync.Pool
 	Config           *Config
 	DefaultPaytables *sgc7game.PayTables
 	DefaultLineData  *sgc7game.LineData
@@ -21,8 +23,9 @@ type GamePropertyPool struct {
 	mapComponents    map[string]IComponent // 不能随便用，只用于一些基础的初始化，尽量用gameProp里的Components
 }
 
-func (pool *GamePropertyPool) newGameProp() *GameProperty {
+func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 	gameProp := &GameProperty{
+		CurBetMul:        betMul,
 		Pool:             pool,
 		MapVals:          make(map[int]int),
 		MapStrVals:       make(map[int]string),
@@ -43,17 +46,20 @@ func (pool *GamePropertyPool) newGameProp() *GameProperty {
 		gameProp.MapComponentData[k] = v.NewComponentData()
 	}
 
-	return gameProp
-}
-
-func (pool *GamePropertyPool) NewGameProp() (*GameProperty, error) {
-	gameProp := pool.newGameProp()
-
 	gameProp.SetVal(GamePropWidth, pool.Config.Width)
 	gameProp.SetVal(GamePropHeight, pool.Config.Height)
 
-	return gameProp, nil
+	return gameProp
 }
+
+// func (pool *GamePropertyPool) NewGameProp(betMul int) (*GameProperty, error) {
+// 	gameProp := pool.newGameProp()
+
+// 	gameProp.SetVal(GamePropWidth, pool.Config.Width)
+// 	gameProp.SetVal(GamePropHeight, pool.Config.Height)
+
+// 	return gameProp, nil
+// }
 
 func (pool *GamePropertyPool) onAddComponent(name string, component IComponent) {
 	pool.mapComponents[name] = component
@@ -413,7 +419,7 @@ func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 
 func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
-		// MapGamePropPool:  make(map[int]sync.Pool),
+		MapGamePropPool:  make(map[int]*sync.Pool),
 		Config:           cfg,
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
@@ -458,13 +464,13 @@ func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 		return pool.SymbolsViewer.MapSymbols[s].Output
 	}
 
-	// for _, bet := range cfg.Bets {
-	// 	pool.MapGamePropPool[bet] = sync.Pool{
-	// 		New: func() any {
-	// 			return pool.newGameProp()
-	// 		},
-	// 	}
-	// }
+	for _, bet := range cfg.Bets {
+		pool.MapGamePropPool[bet] = &sync.Pool{
+			New: func() any {
+				return pool.newGameProp(bet)
+			},
+		}
+	}
 
 	return pool, nil
 }
