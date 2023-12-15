@@ -104,6 +104,21 @@ message RespinData {
 	int32 curTriggerNum = 10;
 }
 
+
+// Respin2Data
+message Respin2Data {
+    ComponentData basicComponentData = 1;
+    int32 lastRespinNum = 2;
+    int32 totalRespinNum = 3 [deprecated = true];
+	int32 curRespinNum = 4;
+	int32 curAddRespinNum = 5;
+	int64 totalCoinWin = 6;
+	int64 totalCashWin = 7;
+    int32 retriggerAddRespinNum = 8;
+    int32 lastTriggerNum = 9;
+	int32 curTriggerNum = 10;
+}
+
 // MaskData
 message MaskData {
     ComponentData basicComponentData = 1;

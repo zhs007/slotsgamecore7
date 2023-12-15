@@ -69,7 +69,7 @@ const (
 	AwardGameMulti             int = 4  // 奖励游戏整体倍数
 	AwardStepMulti             int = 5  // 奖励这个step里的倍数
 	AwardInitMask              int = 6  // 初始化mask
-	AwardTriggerRespin         int = 7  // 触发respin，理论上，在respin外面应该用AwardTriggerRespin，在respin里面应该用AwardRespinTimes，如果分不清楚，就统一用AwardTriggerRespin
+	AwardTriggerRespin         int = 7  // 弃用，触发respin，理论上，在respin外面应该用AwardTriggerRespin，在respin里面应该用AwardRespinTimes，如果分不清楚，就统一用AwardTriggerRespin
 	AwardNoLevelUpCollector    int = 8  // 奖励收集器，但不会触发升级奖励
 	AwardWeightGameRNG         int = 9  // 权重产生一个rng，供后续逻辑用，全局用，不同step不会reset这个rng
 	AwardPushSymbolCollection  int = 10 // 根据SymbolCollection自己的逻辑，产生一定数量的Symbol到SymbolCollection里
