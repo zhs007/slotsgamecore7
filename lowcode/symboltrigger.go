@@ -97,30 +97,34 @@ func (symbolTriggerData *SymbolTriggerData) BuildPBComponentData() proto.Message
 
 // SymbolTriggerConfig - configuration for SymbolTrigger
 type SymbolTriggerConfig struct {
-	BasicComponentConfig        `yaml:",inline" json:",inline"`
-	Symbols                     []string          `yaml:"symbols" json:"symbols"`                         // like scatter
-	SymbolCodes                 []int             `yaml:"-" json:"-"`                                     // like scatter
-	ExcludeSymbolCodes          []int             `yaml:"-" json:"-"`                                     // 在 lines 和 ways 里有用
-	Type                        string            `yaml:"type" json:"type"`                               // like scatters
-	TriggerType                 SymbolTriggerType `yaml:"-" json:"-"`                                     // SymbolTriggerType
-	BetTypeString               string            `yaml:"betType" json:"betType"`                         // bet or totalBet or noPay
-	BetType                     BetType           `yaml:"-" json:"-"`                                     // bet or totalBet or noPay
-	MinNum                      int               `yaml:"minNum" json:"minNum"`                           // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols                 []string          `yaml:"wildSymbols" json:"wildSymbols"`                 // wild etc
-	WildSymbolCodes             []int             `yaml:"-" json:"-"`                                     // wild symbolCode
-	StrCheckWinType             string            `yaml:"checkWinType" json:"checkWinType"`               // left2right or right2left or all
-	CheckWinType                CheckWinType      `yaml:"-" json:"-"`                                     //
-	PosArea                     []int             `yaml:"posArea" json:"posArea"`                         // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
-	CountScatterPayAs           string            `yaml:"countScatterPayAs" json:"countScatterPayAs"`     // countscatter时，按什么符号赔付
-	SymbolCodeCountScatterPayAs int               `yaml:"-" json:"-"`                                     // countscatter时，按什么符号赔付
-	JumpToComponent             string            `yaml:"jumpToComponent" json:"jumpToComponent"`         // jump to
-	ForcedJump                  bool              `yaml:"forcedJump" json:"forcedJump"`                   // 强制跳转，中断当前流程
-	TagSymbolNum                string            `yaml:"tagSymbolNum" json:"tagSymbolNum"`               // 这里可以将symbol数量记下来，别的地方能获取到
-	Awards                      []*Award          `yaml:"awards" json:"awards"`                           // 新的奖励系统
-	SymbolAwardsWeights         *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"` // 每个中奖符号随机一组奖励
-	TargetMask                  string            `yaml:"targetMask" json:"targetMask"`                   // 如果是scatter这一组判断，可以把结果传递给一个mask
-	IsReverse                   bool              `yaml:"isReverse" json:"isReverse"`                     // 如果isReverse，表示判定为否才触发
-	NeedDiscardResults          bool              `yaml:"needDiscardResults" json:"needDiscardResults"`   // 如果needDiscardResults，表示抛弃results
+	BasicComponentConfig          `yaml:",inline" json:",inline"`
+	Symbols                       []string          `yaml:"symbols" json:"symbols"`                                             // like scatter
+	SymbolCodes                   []int             `yaml:"-" json:"-"`                                                         // like scatter
+	ExcludeSymbolCodes            []int             `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
+	Type                          string            `yaml:"type" json:"type"`                                                   // like scatters
+	TriggerType                   SymbolTriggerType `yaml:"-" json:"-"`                                                         // SymbolTriggerType
+	BetTypeString                 string            `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
+	BetType                       BetType           `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
+	MinNum                        int               `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols                   []string          `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
+	WildSymbolCodes               []int             `yaml:"-" json:"-"`                                                         // wild symbolCode
+	StrCheckWinType               string            `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
+	CheckWinType                  CheckWinType      `yaml:"-" json:"-"`                                                         //
+	PosArea                       []int             `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
+	CountScatterPayAs             string            `yaml:"countScatterPayAs" json:"countScatterPayAs"`                         // countscatter时，按什么符号赔付
+	SymbolCodeCountScatterPayAs   int               `yaml:"-" json:"-"`                                                         // countscatter时，按什么符号赔付
+	JumpToComponent               string            `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
+	ForceToNext                   bool              `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
+	TagSymbolNum                  string            `yaml:"tagSymbolNum" json:"tagSymbolNum"`                                   // 这里可以将symbol数量记下来，别的地方能获取到
+	Awards                        []*Award          `yaml:"awards" json:"awards"`                                               // 新的奖励系统
+	SymbolAwardsWeights           *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
+	TargetMask                    string            `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
+	IsReverse                     bool              `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
+	NeedDiscardResults            bool              `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
+	RespinNum                     int               `yaml:"respinNum" json:"respinNum"`                                         // respin number
+	RespinNumWeight               string            `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
+	RespinNumWithScatterNum       map[int]int       `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
+	RespinNumWeightWithScatterNum map[int]string    `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 }
 
 type SymbolTrigger struct {
@@ -656,6 +660,56 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if symbolTrigger.Config.JumpToComponent != "" {
+
+			if symbolTrigger.Config.RespinNumWeightWithScatterNum != nil {
+				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeightWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
+				if err != nil {
+					goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
+						zap.Error(err))
+
+					return nil
+				}
+
+				lst[0].Type = sgc7game.RTFreeGame
+				lst[0].Value = v
+			} else if len(symbolTrigger.Config.RespinNumWithScatterNum) > 0 {
+				gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.JumpToComponent, true)
+
+				lst[0].Type = sgc7game.RTFreeGame
+				lst[0].Value = symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums]
+			} else if symbolTrigger.Config.RespinNumWeight != "" {
+				v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeight, symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
+				if err != nil {
+					goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
+						zap.Error(err))
+
+					return nil
+				}
+
+				lst[0].Type = sgc7game.RTFreeGame
+				lst[0].Value = v
+			} else if symbolTrigger.Config.RespinNum > 0 {
+				gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNum, symbolTrigger.Config.JumpToComponent, true)
+
+				lst[0].Type = sgc7game.RTFreeGame
+				lst[0].Value = symbolTrigger.Config.RespinNum
+			} else {
+				lst[0].Type = sgc7game.RTFreeGame
+				lst[0].Value = -1
+			}
+
+			if symbolTrigger.Config.ForceToNext {
+				std.NextComponent = symbolTrigger.Config.DefaultNextComponent
+			} else {
+				rn := gameProp.GetLastRespinNum(symbolTrigger.Config.JumpToComponent)
+				if rn > 0 {
+					gameProp.TriggerRespin(plugin, curpr, gp, 0, symbolTrigger.Config.JumpToComponent, true)
+
+					lst[0].Type = sgc7game.RTFreeGame
+					lst[0].Value = rn
+				}
+			}
+
 			std.NextComponent = symbolTrigger.Config.JumpToComponent
 
 			symbolTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
