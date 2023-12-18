@@ -3,10 +3,11 @@ package lowcode
 type Award struct {
 	AwardType       string   `yaml:"awardType" json:"awardType"`
 	Type            int      `yaml:"-" json:"-"`
-	Val             int      `yaml:"val" json:"-"`      // 弃用，代码里已经不用了，初始化时会把数据转存到Vals里，为了兼容性保留配置
-	StrParam        string   `yaml:"strParam" json:"-"` // 弃用，代码里已经不用了，初始化时会把数据转存到StrParams里，为了兼容性保留配置
-	Vals            []int    `yaml:"vals" json:"vals"`
-	StrParams       []string `yaml:"strParams" json:"strParams"`
+	Val             int      `yaml:"val" json:"-"`                           // 弃用，代码里已经不用了，初始化时会把数据转存到Vals里，为了兼容性保留配置
+	StrParam        string   `yaml:"strParam" json:"-"`                      // 弃用，代码里已经不用了，初始化时会把数据转存到StrParams里，为了兼容性保留配置
+	Vals            []int    `yaml:"vals" json:"vals"`                       // 数值参数
+	StrParams       []string `yaml:"strParams" json:"strParams"`             // 字符串参数
+	ComponentVals   []string `yaml:"componentVals" json:"componentVals"`     // 可以用component数值来替代常量，如果val长度为2，需要替换第二个参数，那么第一个参数应该给空字符串
 	OnTriggerRespin string   `yaml:"onTriggerRespin" json:"onTriggerRespin"` // 在这个respin再次触发时才生效，这个时候会用当前respin的LastTriggerNum+CurTriggerNum作为TriggerIndex记下，当TriggerIndex==CurTriggerNum时才生效
 	TriggerIndex    int      `yaml:"-" json:"-"`                             // 见上
 }
@@ -59,6 +60,21 @@ func (cfg *Award) Init() {
 	}
 
 	cfg.Type = cfg.getType()
+}
+
+func (cfg *Award) GetVal(gameProp *GameProperty, i int) int {
+	val := 0
+	if i < len(cfg.Vals) {
+		val = cfg.Vals[i]
+	}
+
+	if i < len(cfg.ComponentVals) {
+		if cfg.ComponentVals[i] != "" {
+			val, _ = gameProp.GetComponentVal(cfg.ComponentVals[i])
+		}
+	}
+
+	return val
 }
 
 const (

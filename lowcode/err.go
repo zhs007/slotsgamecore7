@@ -101,4 +101,9 @@ var (
 	ErrNotMask = errors.New("not mask")
 	// ErrNotRespin - not respin
 	ErrNotRespin = errors.New("not respin")
+
+	// ErrInvalidSymbolNum - invalid SymbolNum
+	ErrInvalidSymbolNum = errors.New("invalid SymbolNum")
+	// ErrInvalidComponentVal - invalid ComponentVal
+	ErrInvalidComponentVal = errors.New("invalid ComponentVal")
 )

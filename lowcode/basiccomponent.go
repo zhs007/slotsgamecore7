@@ -40,6 +40,16 @@ func (basicComponentData *BasicComponentData) OnNewStep() {
 	basicComponentData.RNG = nil
 }
 
+// GetVal -
+func (basicComponentData *BasicComponentData) GetVal(key string) int {
+	return 0
+}
+
+// SetVal -
+func (basicComponentData *BasicComponentData) SetVal(key string, val int) {
+
+}
+
 // BuildPBComponentData
 func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Message {
 	return &sgc7pb.BasicComponentData{
