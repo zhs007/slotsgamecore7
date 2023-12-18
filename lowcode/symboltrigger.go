@@ -720,7 +720,7 @@ func (symbolTrigger *SymbolTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret
 		}
 	} else if len(symbolTrigger.Config.RespinNumWithScatterNum) > 0 {
 		v, isok := symbolTrigger.Config.RespinNumWithScatterNum[ret.SymbolNums]
-		if isok {
+		if !isok {
 			goutils.Error("SymbolTrigger.calcRespinNum:RespinNumWithScatterNum",
 				zap.Int("SymbolNum", ret.SymbolNums),
 				zap.Error(ErrInvalidSymbolNum))
