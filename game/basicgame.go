@@ -104,6 +104,11 @@ func (game *BasicGame) ResetConfig(cfg any) {
 }
 
 // NewGameData - new GameData
-func (game *BasicGame) NewGameData() any {
+func (game *BasicGame) NewGameData(stake *Stake) IGameData {
 	return nil
+}
+
+// DeleteGameData - delete GameData
+func (game *BasicGame) DeleteGameData(gamed IGameData) {
+
 }

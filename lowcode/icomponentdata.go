@@ -14,4 +14,8 @@ type IComponentData interface {
 	OnNewStep()
 	// BuildPBComponentData
 	BuildPBComponentData() proto.Message
+	// GetVal -
+	GetVal(key string) int
+	// SetVal -
+	SetVal(key string, val int)
 }

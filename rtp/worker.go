@@ -50,7 +50,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			ps := game.NewPlayerState()
 			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
-			gameData := game.NewGameData()
+			gameData := game.NewGameData(stake)
+			defer game.DeleteGameData(gameData)
 			cmd := "SPIN"
 			cmdparam := ""
 			off := 0
@@ -239,7 +240,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 			ps := game.NewPlayerState()
 			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
-			gameData := game.NewGameData()
+			gameData := game.NewGameData(stake)
+			defer game.DeleteGameData(gameData)
 			cmd := "SPIN"
 			off := 0
 			cmdparam := ""

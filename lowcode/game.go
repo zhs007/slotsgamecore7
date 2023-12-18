@@ -150,10 +150,15 @@ func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr 
 }
 
 // NewGameData - new GameData
-func (game *Game) NewGameData() any {
-	gameProp, _ := game.Pool.NewGameProp()
+func (game *Game) NewGameData(stake *sgc7game.Stake) sgc7game.IGameData {
+	gameProp := game.Pool.MapGamePropPool[int(stake.CashBet)/int(stake.CoinBet)].Get().(*GameProperty)
 
 	return gameProp
+}
+
+// DeleteGameData - delete GameData
+func (game *Game) DeleteGameData(gamed sgc7game.IGameData) {
+	game.Pool.MapGamePropPool[gamed.GetBetMul()].Put(gamed)
 }
 
 // BuildGameConfigData - build game configration data

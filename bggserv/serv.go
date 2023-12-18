@@ -195,7 +195,8 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	}
 
 	results := []*sgc7game.PlayResult{}
-	gameData := serv.game.NewGameData()
+	gameData := serv.game.NewGameData(stake)
+	defer serv.game.DeleteGameData(gameData)
 
 	cmd := req.Command
 

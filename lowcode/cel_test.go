@@ -11,8 +11,7 @@ func Test_ScriptCore(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, pool)
 
-	gameProp, err := pool.NewGameProp()
-	assert.NoError(t, err)
+	gameProp := pool.newGameProp(10)
 	assert.NotNil(t, gameProp)
 
 	script, err := NewScriptCore(gameProp)

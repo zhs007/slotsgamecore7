@@ -1,6 +1,8 @@
 package lowcode
 
 import (
+	"strings"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
@@ -42,6 +44,7 @@ func String2Property(str string) (int, error) {
 }
 
 type GameProperty struct {
+	CurBetMul              int
 	Pool                   *GamePropertyPool
 	MapVals                map[int]int
 	MapStrVals             map[int]string
@@ -61,6 +64,10 @@ type GameProperty struct {
 	RespinComponents       []string
 	PoolScene              *sgc7game.GameScenePoolEx
 	Components             *ComponentList
+}
+
+func (gameProp *GameProperty) GetBetMul() int {
+	return gameProp.CurBetMul
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
@@ -390,6 +397,37 @@ func (gameProp *GameProperty) GetTagGlobalStr(tag string) string {
 	return gameProp.mapGlobalStr[tag]
 }
 
+func (gameProp *GameProperty) IsRespin(componentName string) bool {
+	component, isok := gameProp.Components.MapComponents[componentName]
+	if isok {
+		return component.IsRespin()
+	}
+
+	return false
+}
+
+func (gameProp *GameProperty) GetComponentVal(componentVal string) (int, error) {
+	arr := strings.Split(componentVal, ".")
+	if len(arr) != 2 {
+		goutils.Error("GameProperty.GetComponentVal",
+			zap.String("componentVal", componentVal),
+			zap.Error(ErrInvalidComponentVal))
+
+		return 0, ErrInvalidComponentVal
+	}
+
+	cd, isok := gameProp.MapComponentData[arr[0]]
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal:MapComponentData",
+			zap.String("componentVal", componentVal),
+			zap.Error(ErrIvalidComponentName))
+
+		return 0, ErrIvalidComponentName
+	}
+
+	return cd.GetVal(arr[1]), nil
+}
+
 func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {
 	for _, v := range awards {
 		gameProp.procAward(plugin, v, curpr, gp, false)
@@ -541,7 +579,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	} else if award.Type == AwardTriggerRespin2 {
-		err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, award.StrParams[0], award.Vals[0])
+		err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardTriggerRespin2:PushTrigger",
 				zap.Error(err))
