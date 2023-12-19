@@ -319,10 +319,8 @@ func (symbolTrigger *SymbolTrigger) triggerScatter(gameProp *GameProperty, stake
 }
 
 // CanTrigger -
-func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
+func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
 	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
-
-	gs := symbolTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
@@ -657,7 +655,7 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sg
 		// for _, s := range symbolTrigger.Config.SymbolCodes {
 		ret := sgc7game.CountScatterInArea(gs, symbolTrigger.Config.SymbolCodes[0], symbolTrigger.Config.MinNum,
 			func(x, y int) bool {
-				return x >= symbolTrigger.Config.PosArea[0] && x <= symbolTrigger.Config.PosArea[1] && y >= symbolTrigger.Config.PosArea[2] && y <= symbolTrigger.Config.PosArea[3]
+				return IsInPosArea(x, y, symbolTrigger.Config.PosArea)
 			},
 			func(scatter int, cursymbol int) bool {
 				return goutils.IndexOfIntSlice(symbolTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -756,7 +754,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	gs := symbolTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
-	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, curpr, gp, stake, !symbolTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, gs, curpr, stake, !symbolTrigger.Config.NeedDiscardResults)
 
 	if isTrigger {
 		std.SymbolNum = lst[0].SymbolNums

@@ -89,7 +89,7 @@ func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *
 		return err
 	}
 
-	if rv.Int() == 1 {
+	if rv.Int() != 0 {
 		weightTrigger2.onStepEnd(gameProp, curpr, gp, weightTrigger2.Config.JumpToComponent)
 	} else {
 		weightTrigger2.onStepEnd(gameProp, curpr, gp, "")

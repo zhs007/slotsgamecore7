@@ -685,6 +685,21 @@ func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
 	return 0
 }
 
+// CanTrigger -
+func (gameProp *GameProperty) CanTrigger(componentName string, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
+	component, isok := gameProp.Components.MapComponents[componentName]
+	if isok {
+		st, isok := component.(ISymbolTrigger)
+		if isok {
+			isTrigger, _ := st.CanTrigger(gameProp, gs, curpr, stake, false)
+
+			return isTrigger
+		}
+	}
+
+	return false
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 
