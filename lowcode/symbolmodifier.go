@@ -268,7 +268,7 @@ func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *
 			if symbolModifier.Config.MinNum > 0 {
 				minnum = symbolModifier.Config.MinNum
 
-				if minnum > len(lst)/2 {
+				if minnum <= len(lst)/2 {
 					gs1 := gs.CloneEx(gameProp.PoolScene)
 
 					isok := symbolModifier.procSymbolsRandPos(gameProp, plugin, gs1, lst, minnum, curpr, stake)
@@ -277,7 +277,7 @@ func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *
 					}
 				}
 			} else {
-				if minnum > len(lst)/2 {
+				if minnum <= len(lst)/2 {
 					gs1 := gs.CloneEx(gameProp.PoolScene)
 
 					isok := symbolModifier.procSymbols(gameProp, plugin, gs1, lst, minnum, curpr, stake)
