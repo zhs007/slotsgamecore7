@@ -278,10 +278,10 @@ func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrCompo
 			}
 
 			components.AddComponent(v.Name, c)
-			pool.onAddComponent(v.Name, c)
 		}
 
 		bgm.MapComponents[bet] = components
+		pool.onAddComponentList(bet, components)
 	}
 
 	return bgm
@@ -310,10 +310,10 @@ func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComp
 			}
 
 			components.AddComponent(v.Name, c)
-			pool.onAddComponent(v.Name, c)
 		}
 
 		bgm.MapComponents[bet] = components
+		pool.onAddComponentList(bet, components)
 	}
 
 	return bgm, nil

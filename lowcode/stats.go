@@ -78,6 +78,7 @@ type Stats struct {
 	TotalNum  int64
 	Pool      *GamePropertyPool
 	NoStats   bool
+	Bet       int
 }
 
 func (stats *Stats) StartWorker() {

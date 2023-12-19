@@ -927,12 +927,33 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	return NewGame2WithData(data, funcNewPlugin)
 }
 
+func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		goutils.Error("NewGame2:ReadFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return NewGame2WithData(data, funcNewPlugin)
+}
+
 func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
 	if strings.Contains(fn, ".json") {
 		return NewGame2(fn, funcNewPlugin)
 	}
 
 	return NewGameEx(fn, funcNewPlugin)
+}
+
+func NewGame3ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	if strings.Contains(fn, ".json") {
+		return NewGame2(fn, funcNewPlugin)
+	}
+
+	return NewGameExForRTP(bet, fn, funcNewPlugin)
 }
 
 func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {

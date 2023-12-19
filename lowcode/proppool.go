@@ -20,7 +20,7 @@ type GamePropertyPool struct {
 	SymbolsViewer    *SymbolsViewer
 	MapSymbolColor   *asciigame.SymbolColorMap
 	Stats            *Stats
-	mapComponents    map[string]IComponent // 不能随便用，只用于一些基础的初始化，尽量用gameProp里的Components
+	mapComponents    map[int]*ComponentList
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -42,7 +42,16 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
 	}
 
-	for k, v := range pool.mapComponents {
+	mapc, isok := pool.mapComponents[betMul]
+	if !isok {
+		goutils.Error("GamePropertyPool.newGameProp:mapComponents",
+			zap.Int("betMul", betMul),
+			zap.Error(ErrInvalidBet))
+
+		return nil
+	}
+
+	for k, v := range mapc.MapComponents {
 		gameProp.MapComponentData[k] = v.NewComponentData()
 	}
 
@@ -61,12 +70,21 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 // 	return gameProp, nil
 // }
 
-func (pool *GamePropertyPool) onAddComponent(name string, component IComponent) {
-	pool.mapComponents[name] = component
+func (pool *GamePropertyPool) onAddComponentList(betMul int, components *ComponentList) {
+	pool.mapComponents[betMul] = components
 }
 
-func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg *StatsConfig) (*sgc7stats.Feature, error) {
-	curComponent, isok := pool.mapComponents[cfg.Component]
+func (pool *GamePropertyPool) NewStatsWithConfig(betMul int, parent *sgc7stats.Feature, cfg *StatsConfig) (*sgc7stats.Feature, error) {
+	components, isok := pool.mapComponents[betMul]
+	if !isok {
+		goutils.Error("GameProperty.NewStatsWithConfig",
+			zap.Int("bet", betMul),
+			zap.Error(ErrInvalidBet))
+
+		return nil, ErrInvalidBet
+	}
+
+	curComponent, isok := components.MapComponents[cfg.Component]
 	if !isok {
 		goutils.Error("GameProperty.NewStatsWithConfig",
 			zap.Error(ErrIvalidStatsComponentInConfig))
@@ -83,7 +101,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}, pool.Config.Width, pool.Config.StatsSymbolCodes, StatusTypeUnknow, "")
 
 	for _, v := range cfg.Children {
-		_, err := pool.NewStatsWithConfig(feature, v)
+		_, err := pool.NewStatsWithConfig(betMul, feature, v)
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:NewStatsWithConfig",
 				goutils.JSON("v", v),
@@ -94,7 +112,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	for k, v := range cfg.RespinEndingStatus {
-		_, err := pool.newStatusStats(feature, v, StatusTypeRespinEnding, k)
+		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinEnding, k)
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
 				goutils.JSON("v", v),
@@ -105,7 +123,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	for k, v := range cfg.RespinStartStatus {
-		_, err := pool.newStatusStats(feature, v, StatusTypeRespinStart, k)
+		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStart, k)
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
 				goutils.JSON("v", v),
@@ -116,7 +134,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	for k, v := range cfg.RespinStartStatusEx {
-		_, err := pool.newStatusStats(feature, v, StatusTypeRespinStartEx, k)
+		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStartEx, k)
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
 				goutils.JSON("v", v),
@@ -127,7 +145,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	for _, v := range cfg.RespinNumStatus {
-		_, err := pool.newStatusStats(feature, v, StatusTypeRespinNum, "")
+		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinNum, "")
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
 				goutils.JSON("v", v),
@@ -138,7 +156,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	for _, v := range cfg.RespinWinStatus {
-		_, err := pool.newStatusStats(feature, v, StatusTypeRespinWin, "")
+		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinWin, "")
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
 				goutils.JSON("v", v),
@@ -149,7 +167,7 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	}
 
 	for _, v := range cfg.RespinStartNumStatus {
-		_, err := pool.newStatusStats(feature, v, StatusTypeRespinStartNum, "")
+		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStartNum, "")
 		if err != nil {
 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
 				goutils.JSON("v", v),
@@ -162,8 +180,17 @@ func (pool *GamePropertyPool) NewStatsWithConfig(parent *sgc7stats.Feature, cfg 
 	return feature, nil
 }
 
-func (pool *GamePropertyPool) newStatusStats(parent *sgc7stats.Feature, componentName string, statusType int, respinName string) (*sgc7stats.Feature, error) {
-	curComponent, isok := pool.mapComponents[componentName]
+func (pool *GamePropertyPool) newStatusStats(betMul int, parent *sgc7stats.Feature, componentName string, statusType int, respinName string) (*sgc7stats.Feature, error) {
+	components, isok := pool.mapComponents[betMul]
+	if !isok {
+		goutils.Error("GameProperty.newStatusStats",
+			zap.Int("bet", betMul),
+			zap.Error(ErrInvalidBet))
+
+		return nil, ErrInvalidBet
+	}
+
+	curComponent, isok := components.MapComponents[componentName]
 	if !isok {
 		goutils.Error("GameProperty.NewStatsWithConfig",
 			zap.Error(ErrIvalidStatsComponentInConfig))
@@ -178,7 +205,7 @@ func (pool *GamePropertyPool) newStatusStats(parent *sgc7stats.Feature, componen
 	return feature, nil
 }
 
-func (pool *GamePropertyPool) InitStats() error {
+func (pool *GamePropertyPool) InitStats(betMul int) error {
 	err := pool.Config.BuildStatsSymbolCodes(pool.DefaultPaytables)
 	if err != nil {
 		goutils.Error("GamePropertyPool.InitStats:BuildStatsSymbolCodes",
@@ -198,7 +225,7 @@ func (pool *GamePropertyPool) InitStats() error {
 			return true, s.CashBet, totalWin
 		}, nil)
 
-		_, err := pool.NewStatsWithConfig(statsTotal, pool.Config.Stats)
+		_, err := pool.NewStatsWithConfig(betMul, statsTotal, pool.Config.Stats)
 		if err != nil {
 			goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
 				zap.Error(err))
@@ -207,6 +234,7 @@ func (pool *GamePropertyPool) InitStats() error {
 		}
 
 		pool.Stats = NewStats(statsTotal, pool)
+		pool.Stats.Bet = betMul
 
 		go pool.Stats.StartWorker()
 	}
@@ -404,26 +432,26 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plu
 	return nil
 }
 
-func NewGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
+func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {
-		goutils.Error("NewGamePropertyPool:LoadConfig",
+		goutils.Error("newGamePropertyPool:LoadConfig",
 			zap.String("cfgfn", cfgfn),
 			zap.Error(err))
 
 		return nil, err
 	}
 
-	return NewGamePropertyPool2(cfg)
+	return newGamePropertyPool2(cfg)
 }
 
-func NewGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
+func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
 		MapGamePropPool:  make(map[int]*sync.Pool),
 		Config:           cfg,
 		DefaultPaytables: cfg.GetDefaultPaytables(),
 		DefaultLineData:  cfg.GetDefaultLineData(),
-		mapComponents:    make(map[string]IComponent),
+		mapComponents:    make(map[int]*ComponentList),
 	}
 
 	if cfg.SymbolsViewer == "" {

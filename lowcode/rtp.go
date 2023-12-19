@@ -109,7 +109,8 @@ func newFuncSymbolOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbolFe
 			for _, componentName := range cfgSymbolFeature.Components {
 				c, hasComponent := gp.MapComponents[componentName]
 				if hasComponent {
-					component := pool.mapComponents[componentName]
+					components := pool.mapComponents[pool.Stats.Bet]
+					component := components.MapComponents[componentName]
 
 					component.EachUsedResults(pr, c, func(ret *sgc7game.Result) {
 						if ret.Symbol == node.Symbol {
@@ -157,7 +158,8 @@ func newFuncSymbolNumOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbo
 			for _, componentName := range cfgSymbolFeature.Components {
 				c, hasComponent := gp.MapComponents[componentName]
 				if hasComponent {
-					component := pool.mapComponents[componentName]
+					components := pool.mapComponents[pool.Stats.Bet]
+					component := components.MapComponents[componentName]
 
 					component.EachUsedResults(pr, c, func(ret *sgc7game.Result) {
 						if ret.Symbol == node.Symbol && ret.SymbolNums == node.SymbolNums {
@@ -266,7 +268,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
-	game, err := NewGame3(gamecfg, func() sgc7plugin.IPlugin {
+	game, err := NewGame3ForRTP(int(bet), gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
 	})
 	if err != nil {

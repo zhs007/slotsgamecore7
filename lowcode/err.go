@@ -106,4 +106,6 @@ var (
 	ErrInvalidSymbolNum = errors.New("invalid SymbolNum")
 	// ErrInvalidComponentVal - invalid ComponentVal
 	ErrInvalidComponentVal = errors.New("invalid ComponentVal")
+	// ErrInvalidBet - invalid Bet
+	ErrInvalidBet = errors.New("invalid Bet")
 )
