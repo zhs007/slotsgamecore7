@@ -67,6 +67,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(Respin2TypeName, NewRespin2)
 	mgr.Reg(WeightTrigger2TypeName, NewWeightTrigger2)
 	mgr.Reg(SymbolModifierTypeName, NewSymbolModifier)
+	mgr.Reg(ComponentTriggerTypeName, NewComponentTrigger)
 
 	return mgr
 }
