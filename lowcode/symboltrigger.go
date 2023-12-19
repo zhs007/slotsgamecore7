@@ -20,14 +20,14 @@ const SymbolTriggerTypeName = "symbolTrigger"
 type SymbolTriggerType int
 
 const (
-	STTypeUnknow             SymbolTriggerType = 0
-	STTypeLines              SymbolTriggerType = 1
-	STTypeWays               SymbolTriggerType = 2
-	STTypeScatters           SymbolTriggerType = 3
-	STTypeCountScatter       SymbolTriggerType = 4
-	STTypeCountScatterInArea SymbolTriggerType = 5
-	STTypeCheckLines         SymbolTriggerType = 6
-	STTypeCheckWays          SymbolTriggerType = 7
+	STTypeUnknow             SymbolTriggerType = 0 // 非法
+	STTypeLines              SymbolTriggerType = 1 // 线中奖判断，一定是判断全部线，且读paytable来判断是否可以中奖
+	STTypeWays               SymbolTriggerType = 2 // ways中奖判断，且读paytable来判断是否可以中奖
+	STTypeScatters           SymbolTriggerType = 3 // scatter中奖判断，且读paytable来判断是否可以中奖
+	STTypeCountScatter       SymbolTriggerType = 4 // scatter判断，需要传入minnum，不读paytable
+	STTypeCountScatterInArea SymbolTriggerType = 5 // 区域内的scatter判断，需要传入minnum，不读paytable
+	STTypeCheckLines         SymbolTriggerType = 6 // 线判断，一定是判断全部线，需要传入minnum，不读paytable
+	STTypeCheckWays          SymbolTriggerType = 7 // ways判断，需要传入minnum，不读paytable
 )
 
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
@@ -319,10 +319,8 @@ func (symbolTrigger *SymbolTrigger) triggerScatter(gameProp *GameProperty, stake
 }
 
 // CanTrigger -
-func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
+func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
 	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
-
-	gs := symbolTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
@@ -657,7 +655,7 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, curpr *sg
 		// for _, s := range symbolTrigger.Config.SymbolCodes {
 		ret := sgc7game.CountScatterInArea(gs, symbolTrigger.Config.SymbolCodes[0], symbolTrigger.Config.MinNum,
 			func(x, y int) bool {
-				return x >= symbolTrigger.Config.PosArea[0] && x <= symbolTrigger.Config.PosArea[1] && y >= symbolTrigger.Config.PosArea[2] && y <= symbolTrigger.Config.PosArea[3]
+				return IsInPosArea(x, y, symbolTrigger.Config.PosArea)
 			},
 			func(scatter int, cursymbol int) bool {
 				return goutils.IndexOfIntSlice(symbolTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -756,7 +754,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	gs := symbolTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
-	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, curpr, gp, stake, !symbolTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, gs, curpr, stake, !symbolTrigger.Config.NeedDiscardResults)
 
 	if isTrigger {
 		std.SymbolNum = lst[0].SymbolNums

@@ -131,3 +131,7 @@ func GetExcludeSymbols(pt *sgc7game.PayTables, symbols []int) []int {
 
 	return es
 }
+
+func IsInPosArea(x, y int, posArea []int) bool {
+	return x >= posArea[0] && x <= posArea[1] && y >= posArea[2] && y <= posArea[3]
+}

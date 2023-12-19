@@ -215,7 +215,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 	} else if tf.Type == WinTypeCountScatterInArea {
 		ret = sgc7game.CountScatterInArea(gs, gameProp.CurPaytables.MapSymbols[tf.Symbol], tf.MinNum,
 			func(x, y int) bool {
-				return x >= tf.PosArea[0] && x <= tf.PosArea[1] && y >= tf.PosArea[2] && y <= tf.PosArea[3]
+				return IsInPosArea(x, y, tf.PosArea)
 			},
 			func(scatter int, cursymbol int) bool {
 				return cursymbol == scatter || goutils.IndexOfIntSlice(tf.WildSymbolCodes, cursymbol, 0) >= 0
