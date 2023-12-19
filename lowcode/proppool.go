@@ -432,6 +432,10 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plu
 	return nil
 }
 
+func (pool *GamePropertyPool) GetComponentList(bet int) *ComponentList {
+	return pool.mapComponents[bet]
+}
+
 func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {
