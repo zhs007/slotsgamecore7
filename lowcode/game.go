@@ -18,9 +18,9 @@ type Game struct {
 
 // Init - initial game
 func (game *Game) Init(cfgfn string) error {
-	pool, err := NewGamePropertyPool(cfgfn)
+	pool, err := newGamePropertyPool(cfgfn)
 	if err != nil {
-		goutils.Error("Game.Init:NewGamePropertyPool",
+		goutils.Error("Game.Init:newGamePropertyPool",
 			zap.String("fn", cfgfn),
 			zap.Error(err))
 
@@ -38,7 +38,48 @@ func (game *Game) Init(cfgfn string) error {
 		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
 	}
 
-	err = pool.InitStats()
+	err = pool.InitStats(pool.Config.Bets[0])
+	if err != nil {
+		goutils.Error("Game.Init:InitStats",
+			zap.Error(err))
+
+		return nil
+	}
+
+	err = game.BuildGameConfigData()
+	if err != nil {
+		goutils.Error("Game.Init:BuildGameConfigData",
+			zap.Error(err))
+
+		return nil
+	}
+
+	return nil
+}
+
+// Init - initial game
+func (game *Game) InitForRTP(bet int, cfgfn string) error {
+	pool, err := newGamePropertyPool(cfgfn)
+	if err != nil {
+		goutils.Error("Game.Init:newGamePropertyPool",
+			zap.String("fn", cfgfn),
+			zap.Error(err))
+
+		return err
+	}
+
+	game.Pool = pool
+
+	game.Cfg.PayTables = pool.DefaultPaytables
+	game.SetVer(sgc7ver.Version)
+
+	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
+
+	for _, v := range pool.Config.GameMods {
+		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
+	}
+
+	err = pool.InitStats(bet)
 	if err != nil {
 		goutils.Error("Game.Init:InitStats",
 			zap.Error(err))
@@ -59,7 +100,7 @@ func (game *Game) Init(cfgfn string) error {
 
 // Init - initial game
 func (game *Game) Init2(cfg *Config) error {
-	pool, err := NewGamePropertyPool2(cfg)
+	pool, err := newGamePropertyPool2(cfg)
 	if err != nil {
 		goutils.Error("Game.Init2:NewGamePropertyPool2",
 			zap.Error(err))
@@ -86,7 +127,55 @@ func (game *Game) Init2(cfg *Config) error {
 		game.AddGameMod(gamemod)
 	}
 
-	err = pool.InitStats()
+	err = pool.InitStats(pool.Config.Bets[0])
+	if err != nil {
+		goutils.Error("Game.Init2:InitStats",
+			zap.Error(err))
+
+		return nil
+	}
+
+	err = game.BuildGameConfigData()
+	if err != nil {
+		goutils.Error("Game.Init2:BuildGameConfigData",
+			zap.Error(err))
+
+		return nil
+	}
+
+	return nil
+}
+
+// Init - initial game
+func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
+	pool, err := newGamePropertyPool2(cfg)
+	if err != nil {
+		goutils.Error("Game.Init2:NewGamePropertyPool2",
+			zap.Error(err))
+
+		return err
+	}
+
+	game.Pool = pool
+
+	game.Cfg.PayTables = pool.DefaultPaytables
+	game.SetVer(sgc7ver.Version)
+
+	game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
+
+	for _, v := range pool.Config.GameMods {
+		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
+		if err != nil {
+			goutils.Error("Game.Init2:NewBasicGameMod2",
+				zap.Error(err))
+
+			return err
+		}
+
+		game.AddGameMod(gamemod)
+	}
+
+	err = pool.InitStats(bet)
 	if err != nil {
 		goutils.Error("Game.Init2:InitStats",
 			zap.Error(err))
@@ -201,6 +290,21 @@ func NewGameEx(cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, err
 	}
 
 	err := game.Init(cfgfn)
+	if err != nil {
+		return nil, err
+	}
+
+	return game, nil
+}
+
+// NewGame - new a Game
+func NewGameExForRTP(bet int, cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+	game := &Game{
+		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
+		MgrComponent: NewComponentMgr(),
+	}
+
+	err := game.InitForRTP(bet, cfgfn)
 	if err != nil {
 		return nil, err
 	}
