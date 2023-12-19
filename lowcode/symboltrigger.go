@@ -20,14 +20,14 @@ const SymbolTriggerTypeName = "symbolTrigger"
 type SymbolTriggerType int
 
 const (
-	STTypeUnknow             SymbolTriggerType = 0
-	STTypeLines              SymbolTriggerType = 1
-	STTypeWays               SymbolTriggerType = 2
-	STTypeScatters           SymbolTriggerType = 3
-	STTypeCountScatter       SymbolTriggerType = 4
-	STTypeCountScatterInArea SymbolTriggerType = 5
-	STTypeCheckLines         SymbolTriggerType = 6
-	STTypeCheckWays          SymbolTriggerType = 7
+	STTypeUnknow             SymbolTriggerType = 0 // 非法
+	STTypeLines              SymbolTriggerType = 1 // 线中奖判断，一定是判断全部线，且读paytable来判断是否可以中奖
+	STTypeWays               SymbolTriggerType = 2 // ways中奖判断，且读paytable来判断是否可以中奖
+	STTypeScatters           SymbolTriggerType = 3 // scatter中奖判断，且读paytable来判断是否可以中奖
+	STTypeCountScatter       SymbolTriggerType = 4 // scatter判断，需要传入minnum，不读paytable
+	STTypeCountScatterInArea SymbolTriggerType = 5 // 区域内的scatter判断，需要传入minnum，不读paytable
+	STTypeCheckLines         SymbolTriggerType = 6 // 线判断，一定是判断全部线，需要传入minnum，不读paytable
+	STTypeCheckWays          SymbolTriggerType = 7 // ways判断，需要传入minnum，不读paytable
 )
 
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
