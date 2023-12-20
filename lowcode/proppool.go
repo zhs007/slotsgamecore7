@@ -13,16 +13,18 @@ import (
 )
 
 type GamePropertyPool struct {
-	MapGamePropPool  map[int]*sync.Pool
-	Config           *Config
-	DefaultPaytables *sgc7game.PayTables
-	DefaultLineData  *sgc7game.LineData
-	SymbolsViewer    *SymbolsViewer
-	MapSymbolColor   *asciigame.SymbolColorMap
-	Stats            *Stats
-	mapComponents    map[int]*ComponentList
-	Lock             sync.Mutex
-	MapIntValWeights map[string]*sgc7game.ValWeights2
+	MapGamePropPool     map[int]*sync.Pool
+	Config              *Config
+	DefaultPaytables    *sgc7game.PayTables
+	DefaultLineData     *sgc7game.LineData
+	SymbolsViewer       *SymbolsViewer
+	MapSymbolColor      *asciigame.SymbolColorMap
+	Stats               *Stats
+	mapComponents       map[int]*ComponentList
+	lock                sync.RWMutex
+	mapStrValWeights    map[string]*sgc7game.ValWeights2
+	mapIntValWeights    map[string]*sgc7game.ValWeights2
+	mapSymbolValWeights map[string]*sgc7game.ValWeights2
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -246,8 +248,23 @@ func (pool *GamePropertyPool) InitStats(betMul int) error {
 
 // LoadStrWeights - load xlsx file
 func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	pool.lock.RLock()
+	vw, isok := pool.mapStrValWeights[fn]
+	if isok {
+		pool.lock.RUnlock()
+
+		return vw, nil
+	}
+	pool.lock.RUnlock()
+
 	if pool.Config.mapValWeights != nil {
-		return pool.Config.mapValWeights[fn], nil
+		nvw := pool.Config.mapValWeights[fn]
+
+		pool.lock.Lock()
+		pool.mapStrValWeights[fn] = nvw
+		pool.lock.Unlock()
+
+		return nvw, nil
 	}
 
 	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewStrVal)
@@ -259,11 +276,24 @@ func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*s
 		return nil, err
 	}
 
+	pool.lock.Lock()
+	pool.mapStrValWeights[fn] = vw2
+	pool.lock.Unlock()
+
 	return vw2, nil
 }
 
 // LoadIntWeights - load xlsx file
 func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	pool.lock.RLock()
+	vw, isok := pool.mapIntValWeights[fn]
+	if isok {
+		pool.lock.RUnlock()
+
+		return vw, nil
+	}
+	pool.lock.RUnlock()
+
 	if pool.Config.mapValWeights != nil {
 		vw := pool.Config.mapValWeights[fn]
 
@@ -289,6 +319,10 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 			return nil, err
 		}
 
+		pool.lock.Lock()
+		pool.mapIntValWeights[fn] = nvw
+		pool.lock.Unlock()
+
 		return nvw, nil
 	}
 
@@ -301,11 +335,24 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 		return nil, err
 	}
 
+	pool.lock.Lock()
+	pool.mapIntValWeights[fn] = vw2
+	pool.lock.Unlock()
+
 	return vw2, nil
 }
 
 // LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	pool.lock.RLock()
+	vw, isok := pool.mapSymbolValWeights[fn]
+	if isok {
+		pool.lock.RUnlock()
+
+		return vw, nil
+	}
+	pool.lock.RUnlock()
+
 	if pool.Config.mapValWeights != nil {
 		vw := pool.Config.mapValWeights[fn]
 
@@ -323,6 +370,10 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 			return nil, err
 		}
 
+		pool.lock.Lock()
+		pool.mapSymbolValWeights[fn] = nvw
+		pool.lock.Unlock()
+
 		return nvw, nil
 	}
 
@@ -334,6 +385,10 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 
 		return nil, err
 	}
+
+	pool.lock.Lock()
+	pool.mapSymbolValWeights[fn] = vw2
+	pool.lock.Unlock()
 
 	return vw2, nil
 }
@@ -453,11 +508,14 @@ func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 
 func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
-		MapGamePropPool:  make(map[int]*sync.Pool),
-		Config:           cfg,
-		DefaultPaytables: cfg.GetDefaultPaytables(),
-		DefaultLineData:  cfg.GetDefaultLineData(),
-		mapComponents:    make(map[int]*ComponentList),
+		MapGamePropPool:     make(map[int]*sync.Pool),
+		Config:              cfg,
+		DefaultPaytables:    cfg.GetDefaultPaytables(),
+		DefaultLineData:     cfg.GetDefaultLineData(),
+		mapComponents:       make(map[int]*ComponentList),
+		mapStrValWeights:    make(map[string]*sgc7game.ValWeights2),
+		mapIntValWeights:    make(map[string]*sgc7game.ValWeights2),
+		mapSymbolValWeights: make(map[string]*sgc7game.ValWeights2),
 	}
 
 	if cfg.SymbolsViewer == "" {
