@@ -917,9 +917,56 @@ func (symbolTrigger *SymbolTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
+// OnStatsWithPB -
+func (symbolTrigger *SymbolTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.SymbolTriggerData)
+	if !isok {
+		goutils.Error("SymbolTrigger.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
+
+		return 0, ErrIvalidProto
+	}
+
+	return symbolTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+}
+
 // OnStats
 func (symbolTrigger *SymbolTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
+	wins := int64(0)
+	isTrigger := false
+
+	for _, v := range lst {
+		gp, isok := v.CurGameModParams.(*GameParams)
+		if isok {
+			curComponent, isok := gp.MapComponentMsgs[symbolTrigger.Name]
+			if isok {
+				curwins, err := symbolTrigger.OnStatsWithPB(feature, curComponent, v)
+				if err != nil {
+					goutils.Error("SymbolTrigger.OnStats",
+						zap.Error(err))
+
+					continue
+				}
+
+				isTrigger = true
+				wins += curwins
+			}
+		}
+	}
+
+	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
+
+	if feature.Parent != nil {
+		totalwins := int64(0)
+
+		for _, v := range lst {
+			totalwins += v.CashWin
+		}
+
+		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
+	}
+
+	return isTrigger, stake.CashBet, wins
 }
 
 // NewComponentData -
