@@ -85,7 +85,7 @@ func (weightChgSymbol *WeightChgSymbol) InitEx(cfg any, pool *GamePropertyPool) 
 func (weightChgSymbol *WeightChgSymbol) GetChgWeight(gameProp *GameProperty, basicCD *BasicComponentData, symbol int) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(WCSCVMapChgWeight + ":" + gameProp.Pool.Config.GetDefaultPaytables().GetStringFromInt(symbol))
 	if str != "" {
-		vw2, _ := gameProp.Pool.LoadIntWeights(str, weightChgSymbol.Config.UseFileMapping)
+		vw2, _ := gameProp.Pool.LoadSymbolWeights(str, "val", "weight", gameProp.Pool.DefaultPaytables, weightChgSymbol.Config.UseFileMapping)
 
 		return vw2
 	}
