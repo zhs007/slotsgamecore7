@@ -700,6 +700,16 @@ func (gameProp *GameProperty) CanTrigger(componentName string, gs *sgc7game.Game
 	return false
 }
 
+func (gameProp *GameProperty) InHistoryComponents(componentName string) bool {
+	for _, ic := range gameProp.HistoryComponents {
+		if ic.GetName() == componentName {
+			return true
+		}
+	}
+
+	return false
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 
