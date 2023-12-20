@@ -21,6 +21,8 @@ type GamePropertyPool struct {
 	MapSymbolColor   *asciigame.SymbolColorMap
 	Stats            *Stats
 	mapComponents    map[int]*ComponentList
+	Lock             sync.Mutex
+	MapIntValWeights map[string]*sgc7game.ValWeights2
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {

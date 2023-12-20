@@ -77,6 +77,10 @@ func (componentTrigger *ComponentTrigger) OnPlayGame(gameProp *GameProperty, cur
 		}
 	}
 
+	if componentTrigger.Config.IsReverse {
+		isTrigger = !isTrigger
+	}
+
 	if isTrigger {
 		componentTrigger.onStepEnd(gameProp, curpr, gp, componentTrigger.Config.JumpToComponent)
 	} else {
