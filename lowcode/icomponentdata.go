@@ -18,4 +18,8 @@ type IComponentData interface {
 	GetVal(key string) int
 	// SetVal -
 	SetVal(key string, val int)
+	// GetConfigVal -
+	GetConfigVal(key string) string
+	// SetConfigVal -
+	SetConfigVal(key string, val string)
 }

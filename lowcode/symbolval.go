@@ -14,6 +14,10 @@ import (
 
 const SymbolValTypeName = "symbolVal"
 
+const (
+	SVCVWeightVal string = "weightVal" // 可以修改配置项里的 weightVal
+)
+
 // SymbolValConfig - configuration for SymbolMulti feature
 type SymbolValConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -86,6 +90,17 @@ func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (symbolVal *SymbolVal) GetWeightVal(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(SVCVWeightVal)
+	if str != "" {
+		vw2, _ := gameProp.Pool.LoadIntWeights(str, symbolVal.Config.UseFileMapping)
+
+		return vw2
+	}
+
+	return symbolVal.WeightVal
+}
+
 // playgame
 func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -97,6 +112,8 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	gs := symbolVal.GetTargetScene2(gameProp, curpr, cd, symbolVal.Name, "")
 
 	if gs.HasSymbol(symbolVal.SymbolCode) {
+		vw := symbolVal.GetWeightVal(gameProp, cd)
+
 		os1 := symbolVal.GetTargetOtherScene2(gameProp, curpr, cd, symbolVal.Name, "")
 		if os1 == nil {
 			os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
@@ -104,7 +121,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if s == symbolVal.SymbolCode {
-						cv, err := symbolVal.WeightVal.RandVal(plugin)
+						cv, err := vw.RandVal(plugin)
 						if err != nil {
 							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
 								zap.Error(err))
@@ -134,7 +151,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 					}
 
 					if s == symbolVal.SymbolCode {
-						cv, err := symbolVal.WeightVal.RandVal(plugin)
+						cv, err := vw.RandVal(plugin)
 						if err != nil {
 							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
 								zap.Error(err))

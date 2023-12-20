@@ -45,6 +45,8 @@ func (cfg *Award) getType() int {
 		return AwardSetMaskVal
 	} else if cfg.AwardType == "triggerRespin2" {
 		return AwardTriggerRespin2
+	} else if cfg.AwardType == "setComponentConfigVal" {
+		return AwardSetComponentConfigVal
 	}
 
 	return AwardUnknow
@@ -95,6 +97,7 @@ const (
 	AwardAddRetriggerRespinNum int = 14 // 奖励再次触发respin次数，这种会在前面的基础上增加
 	AwardSetMaskVal            int = 15 // 设置mask的值
 	AwardTriggerRespin2        int = 16 // 新的触发respin，不需要考虑trigger、retrigger、respinTimes，直接用这个就行，如果次数给-1，就会用当前的retriggerRespinNum
+	AwardSetComponentConfigVal int = 17 // 设置组件的configVal
 )
 
 // AwardCash

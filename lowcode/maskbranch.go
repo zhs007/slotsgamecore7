@@ -17,8 +17,9 @@ const MaskBranchTypeName = "maskBranch"
 
 // MaskBranchNode -
 type MaskBranchNode struct {
-	MaskVal         []bool `yaml:"mask" json:"mask"`
-	JumpToComponent string `yaml:"jumpToComponent" json:"jumpToComponent"`
+	MaskVal         []bool   `yaml:"mask" json:"mask"`
+	Awards          []*Award `yaml:"awards" json:"awards"` // 新的奖励系统
+	JumpToComponent string   `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
 
 // MaskBranchConfig - configuration for MaskBranch
@@ -63,6 +64,12 @@ func (maskBranch *MaskBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 	maskBranch.Config = cfg.(*MaskBranchConfig)
 	maskBranch.Config.ComponentType = MaskBranchTypeName
 
+	for _, node := range maskBranch.Config.Nodes {
+		for _, award := range node.Awards {
+			award.Init()
+		}
+	}
+
 	maskBranch.onInit(&maskBranch.Config.BasicComponentConfig)
 
 	return nil
@@ -88,6 +95,10 @@ func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	for _, n := range maskBranch.Config.Nodes {
 		if isSameBoolSlice(n.MaskVal, maskdata) {
+			if len(n.Awards) > 0 {
+				gameProp.procAwards(plugin, n.Awards, curpr, gp)
+			}
+
 			nextComponent = n.JumpToComponent
 
 			break
