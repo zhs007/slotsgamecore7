@@ -892,7 +892,7 @@ func (symbolTrigger *SymbolTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
 
 	if std.NextComponent != "" {
-		fmt.Printf("%v triggered, jump to %v", symbolTrigger.Name, std.NextComponent)
+		fmt.Printf("%v triggered, jump to %v \n", symbolTrigger.Name, std.NextComponent)
 	}
 
 	return nil

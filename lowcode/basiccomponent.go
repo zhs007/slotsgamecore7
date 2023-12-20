@@ -389,7 +389,11 @@ func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, cu
 		}
 	}
 
-	gs, _ := gameProp.GetScene(curpr, tag)
+	gs, si := gameProp.GetScene(curpr, tag)
+
+	if si >= 0 {
+		basicCD.TargetSceneIndex = si
+	}
 
 	return gs
 }
