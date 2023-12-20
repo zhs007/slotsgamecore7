@@ -588,6 +588,14 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return
 		}
+	} else if award.Type == AwardSetComponentConfigVal {
+		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.StrParams[1])
+		if err != nil {
+			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:SetComponentConfigVal",
+				zap.Error(err))
+
+			return
+		}
 	}
 }
 
@@ -734,6 +742,30 @@ func (gameProp *GameProperty) IsStartedRespin(componentName string) bool {
 	}
 
 	return false
+}
+
+func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName string, val string) error {
+	arr := strings.Split(componentConfigValName, ".")
+	if len(arr) != 2 {
+		goutils.Error("GameProperty.SetComponentConfigVal",
+			zap.String("componentConfigValName", componentConfigValName),
+			zap.Error(ErrInvalidComponentVal))
+
+		return ErrInvalidComponentVal
+	}
+
+	cd, isok := gameProp.MapComponentData[arr[0]]
+	if !isok {
+		goutils.Error("GameProperty.SetComponentConfigVal:MapComponentData",
+			zap.String("componentConfigValName", componentConfigValName),
+			zap.Error(ErrIvalidComponentName))
+
+		return ErrIvalidComponentName
+	}
+
+	cd.SetConfigVal(arr[1], val)
+
+	return nil
 }
 
 func init() {
