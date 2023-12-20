@@ -72,6 +72,7 @@ const (
 	STDVSymbolNum string = "symbolNum" // 触发后，中奖的符号数量
 	STDVWildNum   string = "wildNum"   // 触发后，中奖符号里的wild数量
 	STDVRespinNum string = "respinNum" // 触发后，如果有产生respin的逻辑，这就是最终respin的次数
+	STDVWins      string = "wins"      // 中奖的数值，线注的倍数
 )
 
 type SymbolTriggerData struct {
@@ -80,6 +81,7 @@ type SymbolTriggerData struct {
 	SymbolNum     int
 	WildNum       int
 	RespinNum     int
+	Wins          int
 }
 
 // OnNewGame -
@@ -95,6 +97,7 @@ func (symbolTriggerData *SymbolTriggerData) OnNewStep() {
 	symbolTriggerData.SymbolNum = 0
 	symbolTriggerData.WildNum = 0
 	symbolTriggerData.RespinNum = 0
+	symbolTriggerData.Wins = 0
 }
 
 // BuildPBComponentData
@@ -105,6 +108,7 @@ func (symbolTriggerData *SymbolTriggerData) BuildPBComponentData() proto.Message
 		SymbolNum:          int32(symbolTriggerData.SymbolNum),
 		WildNum:            int32(symbolTriggerData.WildNum),
 		RespinNum:          int32(symbolTriggerData.RespinNum),
+		Wins:               int32(symbolTriggerData.Wins),
 	}
 
 	return pbcd
@@ -118,6 +122,8 @@ func (symbolTriggerData *SymbolTriggerData) GetVal(key string) int {
 		return symbolTriggerData.WildNum
 	} else if key == STDVRespinNum {
 		return symbolTriggerData.RespinNum
+	} else if key == STDVWins {
+		return symbolTriggerData.Wins
 	}
 
 	return 0
@@ -131,6 +137,8 @@ func (symbolTriggerData *SymbolTriggerData) SetVal(key string, val int) {
 		symbolTriggerData.WildNum = val
 	} else if key == STDVRespinNum {
 		symbolTriggerData.RespinNum = val
+	} else if key == STDVWins {
+		symbolTriggerData.Wins = val
 	}
 }
 
@@ -693,7 +701,16 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7g
 	return isTrigger, lst
 }
 
-// playgame
+// procWins
+func (symbolTrigger *SymbolTrigger) procWins(std *SymbolTriggerData, lst []*sgc7game.Result) (int, error) {
+	for _, v := range lst {
+		std.Wins += v.CoinWin
+	}
+
+	return std.Wins, nil
+}
+
+// calcRespinNum
 func (symbolTrigger *SymbolTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sgc7game.Result) (int, error) {
 
 	if len(symbolTrigger.Config.RespinNumWeightWithScatterNumVW) > 0 {
@@ -757,6 +774,8 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, gs, curpr, stake, !symbolTrigger.Config.NeedDiscardResults)
 
 	if isTrigger {
+		symbolTrigger.procWins(std, lst)
+
 		std.SymbolNum = lst[0].SymbolNums
 		std.WildNum = lst[0].Wilds
 

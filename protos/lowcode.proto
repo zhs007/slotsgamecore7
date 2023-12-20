@@ -141,6 +141,7 @@ message SymbolTriggerData {
     int32 symbolNum = 3;
     int32 wildNum = 4;
     int32 respinNum = 5;
+    int32 wins = 6;
 }
 
 // MultiWeightAwardsData
