@@ -14,6 +14,10 @@ import (
 
 const BasicReelsTypeName = "basicReels"
 
+const (
+	BRCVReelSet string = "reelSet" // 可以修改配置项里的ReelSet
+)
+
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -76,6 +80,15 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
+	str := basicCD.GetConfigVal(BRCVReelSet)
+	if str != "" {
+		return str
+	}
+
+	return basicReels.Config.ReelSet
+}
+
 // playgame
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -110,7 +123,8 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.CurReels = rd
 		reelname = curreels
 	} else {
-		rd, isok := gameProp.Pool.Config.MapReels[basicReels.Config.ReelSet]
+		reelname = basicReels.GetReelSet(cd)
+		rd, isok := gameProp.Pool.Config.MapReels[reelname]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
@@ -118,10 +132,10 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			return ErrInvalidReels
 		}
 
-		gameProp.TagStr(TagCurReels, basicReels.Config.ReelSet)
+		gameProp.TagStr(TagCurReels, reelname)
 
 		gameProp.CurReels = rd
-		reelname = basicReels.Config.ReelSet
+		// reelname = basicReels.Config.ReelSet
 	}
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)

@@ -21,12 +21,12 @@ type BasicComponentData struct {
 	TargetSceneIndex      int
 	TargetOtherSceneIndex int
 	RNG                   []int
-	MapWeights            map[string]string
+	MapConfigVals         map[string]string
 }
 
 // OnNewGame -
 func (basicComponentData *BasicComponentData) OnNewGame() {
-	basicComponentData.MapWeights = make(map[string]string)
+	basicComponentData.MapConfigVals = make(map[string]string)
 }
 
 // OnNewStep -
@@ -52,14 +52,14 @@ func (basicComponentData *BasicComponentData) SetVal(key string, val int) {
 
 }
 
-// GetWeight -
-func (basicComponentData *BasicComponentData) GetWeight(key string) string {
-	return basicComponentData.MapWeights[key]
+// GetConfigVal -
+func (basicComponentData *BasicComponentData) GetConfigVal(key string) string {
+	return basicComponentData.MapConfigVals[key]
 }
 
-// SetWeight -
-func (basicComponentData *BasicComponentData) SetWeight(key string, weight string) {
-	basicComponentData.MapWeights[key] = weight
+// SetConfigVal -
+func (basicComponentData *BasicComponentData) SetConfigVal(key string, val string) {
+	basicComponentData.MapConfigVals[key] = val
 }
 
 // BuildPBComponentData
