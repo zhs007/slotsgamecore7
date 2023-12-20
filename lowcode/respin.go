@@ -310,7 +310,7 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 	}
 
 	if cd.LastRespinNum == 0 && cd.LastTriggerNum == 0 {
-		gameProp.onRespinEnding(respin.Name)
+		gameProp.removeRespin(respin.Name)
 	}
 
 	return nil
@@ -404,6 +404,20 @@ func (respin *Respin) GetLastRespinNum(gameProp *GameProperty) int {
 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
 	return cd.LastRespinNum
+}
+
+// IsEnding -
+func (respin *Respin) IsEnding(gameProp *GameProperty) bool {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	return cd.LastRespinNum == 0 && cd.LastTriggerNum == 0
+}
+
+// IsStarted -
+func (respin *Respin) IsStarted(gameProp *GameProperty) bool {
+	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+
+	return cd.CurRespinNum > 0
 }
 
 func NewRespin(name string) IComponent {

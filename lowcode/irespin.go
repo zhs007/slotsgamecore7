@@ -23,4 +23,9 @@ type IRespin interface {
 
 	// GetLastRespinNum -
 	GetLastRespinNum(gameProp *GameProperty) int
+
+	// IsEnding -
+	IsEnding(gameProp *GameProperty) bool
+	// IsStarted -
+	IsStarted(gameProp *GameProperty) bool
 }

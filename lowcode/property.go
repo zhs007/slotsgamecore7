@@ -217,9 +217,11 @@ func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
 	return nil
 }
 
-func (gameProp *GameProperty) onRespinEnding(respinComponent string) error {
-	if len(gameProp.RespinComponents) > 0 && gameProp.RespinComponents[len(gameProp.RespinComponents)-1] == respinComponent {
-		gameProp.RespinComponents = gameProp.RespinComponents[0 : len(gameProp.RespinComponents)-1]
+func (gameProp *GameProperty) removeRespin(respinComponent string) error {
+	for i, respin := range gameProp.RespinComponents {
+		if respin == respinComponent {
+			gameProp.RespinComponents = append(gameProp.RespinComponents[:i], gameProp.RespinComponents[i+1:]...)
+		}
 	}
 
 	return nil
@@ -704,6 +706,30 @@ func (gameProp *GameProperty) InHistoryComponents(componentName string) bool {
 	for _, ic := range gameProp.HistoryComponents {
 		if ic.GetName() == componentName {
 			return true
+		}
+	}
+
+	return false
+}
+
+func (gameProp *GameProperty) IsEndingRespin(componentName string) bool {
+	component, isok := gameProp.Components.MapComponents[componentName]
+	if isok {
+		respin, isok := component.(IRespin)
+		if isok {
+			return respin.IsEnding(gameProp)
+		}
+	}
+
+	return false
+}
+
+func (gameProp *GameProperty) IsStartedRespin(componentName string) bool {
+	component, isok := gameProp.Components.MapComponents[componentName]
+	if isok {
+		respin, isok := component.(IRespin)
+		if isok {
+			return respin.IsStarted(gameProp)
 		}
 	}
 

@@ -367,7 +367,7 @@ func (respin2 *Respin2) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Pl
 	}
 
 	if cd.LastRespinNum == 0 && cd.LastTriggerNum == 0 {
-		gameProp.onRespinEnding(respin2.Name)
+		gameProp.removeRespin(respin2.Name)
 	}
 
 	return nil
