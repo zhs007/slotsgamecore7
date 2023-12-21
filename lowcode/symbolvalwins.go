@@ -7,12 +7,72 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
 const SymbolValWinsTypeName = "symbolValWins"
+
+const (
+	SVWDVWins      string = "wins"      // 中奖的数值，线注的倍数
+	SVWDVSymbolNum string = "symbolNum" // 符号数量
+)
+
+type SymbolValWinsData struct {
+	BasicComponentData
+	SymbolNum int
+	Wins      int
+}
+
+// OnNewGame -
+func (symbolValWinsData *SymbolValWinsData) OnNewGame() {
+	symbolValWinsData.BasicComponentData.OnNewGame()
+}
+
+// OnNewStep -
+func (symbolValWinsData *SymbolValWinsData) OnNewStep() {
+	symbolValWinsData.BasicComponentData.OnNewStep()
+
+	symbolValWinsData.SymbolNum = 0
+	symbolValWinsData.Wins = 0
+}
+
+// BuildPBComponentData
+func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.SymbolValWinsData{
+		BasicComponentData: symbolValWinsData.BuildPBBasicComponentData(),
+	}
+
+	if !gIsReleaseMode {
+		pbcd.SymbolNum = int32(symbolValWinsData.SymbolNum)
+		pbcd.Wins = int32(symbolValWinsData.Wins)
+	}
+
+	return pbcd
+}
+
+// GetVal -
+func (symbolValWinsData *SymbolValWinsData) GetVal(key string) int {
+	if key == SVWDVSymbolNum {
+		return symbolValWinsData.SymbolNum
+	} else if key == SVWDVWins {
+		return symbolValWinsData.Wins
+	}
+
+	return 0
+}
+
+// SetVal -
+func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
+	if key == STDVSymbolNum {
+		symbolValWinsData.SymbolNum = val
+	} else if key == STDVWins {
+		symbolValWinsData.Wins = val
+	}
+}
 
 // SymbolValWinsConfig - configuration for SymbolValWins
 type SymbolValWinsConfig struct {
@@ -77,9 +137,9 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	symbolValWins.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[symbolValWins.Name].(*BasicComponentData)
+	cd := gameProp.MapComponentData[symbolValWins.Name].(*SymbolValWinsData)
 
-	gs := symbolValWins.GetTargetScene2(gameProp, curpr, cd, symbolValWins.Name, "")
+	gs := symbolValWins.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, symbolValWins.Name, "")
 	isTrigger := true
 	symbolnum := 0
 
@@ -100,7 +160,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	if isTrigger {
-		os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, cd, symbolValWins.Name, "")
+		os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, &cd.BasicComponentData, symbolValWins.Name, "")
 
 		if os != nil {
 			totalvals := 0
@@ -136,7 +196,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					ret.CashWin = ret.CoinWin * bet
 				}
 
-				symbolValWins.AddResult(curpr, ret, cd)
+				symbolValWins.AddResult(curpr, ret, &cd.BasicComponentData)
 			}
 		}
 	}
@@ -150,13 +210,26 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 // OnAsciiGame - outpur to asciigame
 func (symbolValWins *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[symbolValWins.Name].(*BasicComponentData)
+	cd := gameProp.MapComponentData[symbolValWins.Name].(*SymbolValWinsData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(cd.UsedResults, i, 0) >= 0
 	}, mapSymbolColor)
 
 	return nil
+}
+
+// OnStatsWithPB -
+func (symbolValWins *SymbolValWins) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.SymbolValWinsData)
+	if !isok {
+		goutils.Error("SymbolValWins.OnStatsWithPB",
+			zap.Error(ErrIvalidProto))
+
+		return 0, ErrIvalidProto
+	}
+
+	return symbolValWins.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
 }
 
 // OnStats
@@ -167,9 +240,9 @@ func (symbolValWins *SymbolValWins) OnStats(feature *sgc7stats.Feature, stake *s
 	for _, v := range lst {
 		gp, isok := v.CurGameModParams.(*GameParams)
 		if isok {
-			curMsg, isok := gp.MapComponentMsgs[symbolValWins.Name]
+			curComponent, isok := gp.MapComponentMsgs[symbolValWins.Name]
 			if isok {
-				curwins, err := symbolValWins.OnStatsWithPB(feature, curMsg, v)
+				curwins, err := symbolValWins.OnStatsWithPB(feature, curComponent, v)
 				if err != nil {
 					goutils.Error("SymbolValWins.OnStats",
 						zap.Error(err))
@@ -196,6 +269,11 @@ func (symbolValWins *SymbolValWins) OnStats(feature *sgc7stats.Feature, stake *s
 	}
 
 	return isTrigger, stake.CashBet, wins
+}
+
+// NewComponentData -
+func (symbolValWins *SymbolValWins) NewComponentData() IComponentData {
+	return &SymbolValWinsData{}
 }
 
 func NewSymbolValWins(name string) IComponent {

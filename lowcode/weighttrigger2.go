@@ -14,6 +14,10 @@ import (
 
 const WeightTrigger2TypeName = "weightTrigger2"
 
+const (
+	WT2CVTriggerWeight string = "triggerWeight" // 可以修改配置项里的triggerWeight
+)
+
 // WeightTrigger2Config - configuration for WeightTrigger2
 type WeightTrigger2Config struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -75,13 +79,28 @@ func (weightTrigger2 *WeightTrigger2) InitEx(cfg any, pool *GamePropertyPool) er
 	return nil
 }
 
+func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(WT2CVTriggerWeight)
+	if str != "" {
+		vw2, _ := gameProp.Pool.LoadIntWeights(str, weightTrigger2.Config.UseFileMapping)
+
+		return vw2
+	}
+
+	return weightTrigger2.Config.TriggerWeightVW
+}
+
 // playgame
 func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	rv, err := weightTrigger2.Config.TriggerWeightVW.RandVal(plugin)
+	cd := gameProp.MapComponentData[weightTrigger2.Name].(*BasicComponentData)
+
+	vw := weightTrigger2.getTriggerWeight(gameProp, cd)
+
+	rv, err := vw.RandVal(plugin)
 	if err != nil {
 		goutils.Error("WeightTrigger2.OnPlayGame:RandVal",
 			zap.Error(err))

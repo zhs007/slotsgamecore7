@@ -269,6 +269,35 @@ func (gs *GameScene) RandReelsWithReelData(reels *ReelsData, plugin sgc7plugin.I
 	return nil
 }
 
+// RandMaskReelsWithReelData - random with reels
+func (gs *GameScene) RandMaskReelsWithReelData(reels *ReelsData, plugin sgc7plugin.IPlugin, masks []bool, isReverse bool) error {
+	if gs.Indexes == nil {
+		gs.Indexes = make([]int, 0, gs.Width)
+	}
+
+	for x, arr := range gs.Arr {
+		if masks[x] == isReverse {
+			cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
+			if err != nil {
+				return err
+			}
+
+			gs.Indexes = append(gs.Indexes, cn)
+
+			for y := range arr {
+				gs.Arr[x][y] = reels.Reels[x][cn]
+
+				cn++
+				if cn >= len(reels.Reels[x]) {
+					cn -= len(reels.Reels[x])
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // RandExpandReelsWithReelData - random with reels
 func (gs *GameScene) RandExpandReelsWithReelData(reels *ReelsData, plugin sgc7plugin.IPlugin) error {
 	if gs.Indexes == nil {

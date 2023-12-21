@@ -74,6 +74,14 @@ func SetForceDisableStats() {
 	gIsForceDisableStats = true
 }
 
+// gIsReleaseMode - release mode
+var gIsReleaseMode bool
+
+// SetReleaseMode - release mode
+func SetReleaseMode() {
+	gIsReleaseMode = true
+}
+
 type CheckWinType int
 
 const (

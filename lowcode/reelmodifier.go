@@ -1,319 +1,236 @@
 package lowcode
 
-// import (
-// 	"context"
-// 	"os"
-
-// 	"github.com/zhs007/goutils"
-// 	"github.com/zhs007/slotsgamecore7/asciigame"
-// 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-// 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-// 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
-// 	"go.uber.org/zap"
-// 	"gopkg.in/yaml.v2"
-// )
-
-// const ReelModifierTypeName = "reelModifier"
-
-// // ReelModifierConfig - configuration for ReelModifier feature
-// type ReelModifierConfig struct {
-// 	BasicComponentConfig `yaml:",inline" json:",inline"`
-// 	Reel                 string   `yaml:"reel" json:"reel"`
-// 	Symbols              []string `yaml:"symbols" json:"symbols"`
-// 	SymbolCodes          []int    `yaml:"-" json:"-"`
-// 	TargetSymbols        []string `yaml:"targetSymbols" json:"targetSymbols"`
-// 	TargetSymbolCodes    []int    `yaml:"-" json:"-"`
-// 	Triggers             []string `yaml:"triggers" json:"triggers"` // 替换完图标后需要保证所有trigger返回true
-// 	MinNum               int      `yaml:"minNum" json:"minNum"`     // 至少换几个，如果小于等于0，就表示要全部换
-// 	PosArea              []int    `yaml:"posArea" json:"posArea"`   // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
-// }
-
-// type ReelModifier struct {
-// 	*BasicComponent `json:"-"`
-// 	Config          *ReelModifierConfig `json:"config"`
-// }
-
-// // Init -
-// func (symbolModifier *ReelModifier) Init(fn string, pool *GamePropertyPool) error {
-// 	data, err := os.ReadFile(fn)
-// 	if err != nil {
-// 		goutils.Error("ReelModifier.Init:ReadFile",
-// 			zap.String("fn", fn),
-// 			zap.Error(err))
-
-// 		return err
-// 	}
-
-// 	cfg := &SymbolModifierConfig{}
-
-// 	err = yaml.Unmarshal(data, cfg)
-// 	if err != nil {
-// 		goutils.Error("ReelModifier.Init:Unmarshal",
-// 			zap.String("fn", fn),
-// 			zap.Error(err))
-
-// 		return err
-// 	}
-
-// 	return symbolModifier.InitEx(cfg, pool)
-// }
-
-// // InitEx -
-// func (symbolModifier *ReelModifier) InitEx(cfg any, pool *GamePropertyPool) error {
-// 	symbolModifier.Config = cfg.(*SymbolModifierConfig)
-// 	symbolModifier.Config.ComponentType = SymbolValTypeName
-
-// 	for _, s := range symbolModifier.Config.Symbols {
-// 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
-// 		if !isok {
-// 			goutils.Error("SymbolModifier.InitEx:Symbols",
-// 				zap.String("symbol", s),
-// 				zap.Error(ErrInvalidSymbol))
-// 		}
-
-// 		symbolModifier.Config.SymbolCodes = append(symbolModifier.Config.SymbolCodes, sc)
-// 	}
-
-// 	for _, s := range symbolModifier.Config.TargetSymbols {
-// 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
-// 		if !isok {
-// 			goutils.Error("SymbolModifier.InitEx:TargetSymbols",
-// 				zap.String("symbol", s),
-// 				zap.Error(ErrInvalidSymbol))
-// 		}
-
-// 		symbolModifier.Config.TargetSymbolCodes = append(symbolModifier.Config.TargetSymbolCodes, sc)
-// 	}
-
-// 	symbolModifier.onInit(&symbolModifier.Config.BasicComponentConfig)
-
-// 	return nil
-// }
-
-// // getSymbols
-// func (symbolModifier *ReelModifier) getSymbols(gs *sgc7game.GameScene) []int {
-// 	lst := []int{}
-
-// 	if len(symbolModifier.Config.PosArea) == 4 {
-// 		for x, arr := range gs.Arr {
-// 			for y, s := range arr {
-// 				if IsInPosArea(x, y, symbolModifier.Config.PosArea) {
-// 					if goutils.IndexOfIntSlice(symbolModifier.Config.SymbolCodes, s, 0) >= 0 {
-// 						lst = append(lst, x, y)
-// 					}
-// 				}
-// 			}
-// 		}
-// 	} else {
-// 		for x, arr := range gs.Arr {
-// 			for y, s := range arr {
-// 				if goutils.IndexOfIntSlice(symbolModifier.Config.SymbolCodes, s, 0) >= 0 {
-// 					lst = append(lst, x, y)
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return lst
-// }
-
-// // procSymbolsRandPos
-// func (symbolModifier *ReelModifier) canModify(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
-// 	for _, st := range symbolModifier.Config.Triggers {
-// 		if !gameProp.CanTrigger(st, gs, curpr, stake) {
-// 			return false
-// 		}
-// 	}
-
-// 	return true
-// }
-
-// // procSymbolsRandPos
-// func (symbolModifier *ReelModifier) chgSymbols(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, x, y int, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
-// 	srcs := gs.Arr[x][y]
-
-// 	lst := make([]int, len(symbolModifier.Config.TargetSymbolCodes))
-// 	copy(lst, symbolModifier.Config.TargetSymbolCodes)
-
-// 	for {
-// 		cr, err := plugin.Random(context.Background(), len(lst))
-// 		if err != nil {
-// 			goutils.Error("ReelModifier.chgSymbols:random symbols",
-// 				zap.Error(err))
-
-// 			break
-// 		}
-
-// 		gs.Arr[x][y] = lst[cr]
-
-// 		if symbolModifier.canModify(gameProp, gs, curpr, stake) {
-// 			return true
-// 		}
-
-// 		if len(lst) == 1 {
-// 			break
-// 		}
-
-// 		lst = append(lst[0:cr], lst[cr+1:]...)
-// 	}
-
-// 	gs.Arr[x][y] = srcs
-
-// 	return false
-// }
-
-// // procSymbolsRandPos
-// func (symbolModifier *ReelModifier) procSymbolsRandPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, lst []int, minnum int, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
-// 	if minnum > len(lst)/2 {
-// 		return false
-// 	}
-
-// 	ci, err := plugin.Random(context.Background(), len(lst)/2)
-// 	if err != nil {
-// 		goutils.Error("ReelModifier.procSymbolsRandPos:random pos",
-// 			zap.Error(err))
-
-// 		return false
-// 	}
-
-// 	x := lst[ci*2]
-// 	y := lst[ci*2+1]
-
-// 	isok := symbolModifier.chgSymbols(gameProp, plugin, gs, x, y, curpr, stake)
-// 	if isok {
-// 		minnum--
-
-// 		if minnum == 0 {
-// 			return true
-// 		}
-
-// 		if ci == len(lst)/2-1 {
-// 			lst = lst[0 : ci*2]
-// 		} else {
-// 			lst = append(lst[0:ci*2], lst[(ci+1)*2:]...)
-// 		}
-
-// 		return symbolModifier.procSymbolsRandPos(gameProp, plugin, gs, lst, minnum, curpr, stake)
-// 	}
-
-// 	if ci == len(lst)/2-1 {
-// 		lst = lst[0 : ci*2]
-// 	} else {
-// 		lst = append(lst[0:ci*2], lst[(ci+1)*2:]...)
-// 	}
-
-// 	if minnum < len(lst)/2 {
-// 		return false
-// 	}
-
-// 	return symbolModifier.procSymbolsRandPos(gameProp, plugin, gs, lst, minnum, curpr, stake)
-// }
-
-// // procSymbols
-// func (symbolModifier *ReelModifier) procSymbols(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, lst []int, minnum int, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
-// 	if minnum > len(lst)/2 {
-// 		return false
-// 	}
-
-// 	ci := 0
-
-// 	x := lst[ci*2]
-// 	y := lst[ci*2+1]
-
-// 	isok := symbolModifier.chgSymbols(gameProp, plugin, gs, x, y, curpr, stake)
-// 	if isok {
-// 		minnum--
-
-// 		if minnum == 0 {
-// 			return true
-// 		}
-
-// 		if ci == len(lst)/2-1 {
-// 			lst = lst[0 : ci*2]
-// 		} else {
-// 			lst = append(lst[0:ci*2], lst[(ci+1)*2:]...)
-// 		}
-
-// 		return symbolModifier.procSymbolsRandPos(gameProp, plugin, gs, lst, minnum, curpr, stake)
-// 	}
-
-// 	if ci == len(lst)/2-1 {
-// 		lst = lst[0 : ci*2]
-// 	} else {
-// 		lst = append(lst[0:ci*2], lst[(ci+1)*2:]...)
-// 	}
-
-// 	if minnum < len(lst)/2 {
-// 		return false
-// 	}
-
-// 	return symbolModifier.procSymbolsRandPos(gameProp, plugin, gs, lst, minnum, curpr, stake)
-// }
-
-// // playgame
-// func (symbolModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-// 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-// 	symbolModifier.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
-// 	cd := gameProp.MapComponentData[symbolModifier.Name].(*BasicComponentData)
-
-// 	if len(symbolModifier.Config.TargetSymbolCodes) > 0 {
-// 		gs := symbolModifier.GetTargetScene2(gameProp, curpr, cd, symbolModifier.Name, "")
-
-// 		lst := symbolModifier.getSymbols(gs)
-// 		if len(lst) > 0 {
-// 			minnum := len(lst) / 2
-
-// 			// 这个分支将决定是否随机选symbol
-// 			if symbolModifier.Config.MinNum > 0 {
-// 				minnum = symbolModifier.Config.MinNum
-
-// 				if minnum <= len(lst)/2 {
-// 					gs1 := gs.CloneEx(gameProp.PoolScene)
-
-// 					isok := symbolModifier.procSymbolsRandPos(gameProp, plugin, gs1, lst, minnum, curpr, stake)
-// 					if isok {
-// 						symbolModifier.AddScene(gameProp, curpr, gs1, cd)
-// 					}
-// 				}
-// 			} else {
-// 				if minnum <= len(lst)/2 {
-// 					gs1 := gs.CloneEx(gameProp.PoolScene)
-
-// 					isok := symbolModifier.procSymbols(gameProp, plugin, gs1, lst, minnum, curpr, stake)
-// 					if isok {
-// 						symbolModifier.AddScene(gameProp, curpr, gs1, cd)
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	symbolModifier.onStepEnd(gameProp, curpr, gp, "")
-
-// 	return nil
-// }
-
-// // OnAsciiGame - outpur to asciigame
-// func (symbolModifier *ReelModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-
-// 	cd := gameProp.MapComponentData[symbolModifier.Name].(*BasicComponentData)
-
-// 	if len(cd.UsedScenes) > 0 {
-// 		asciigame.OutputScene("symbolModifier symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
-// 	}
-
-// 	return nil
-// }
-
-// // OnStats
-// func (symbolModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// func NewReelModifier(name string) IComponent {
-// 	return &ReelModifier{
-// 		BasicComponent: NewBasicComponent(name),
-// 	}
-// }
+import (
+	"os"
+
+	"github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/asciigame"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
+)
+
+const ReelModifierTypeName = "reelModifier"
+
+const (
+	maxRetryNum int = 100
+)
+
+// ReelModifierConfig - configuration for ReelModifier feature
+type ReelModifierConfig struct {
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Reel                 string              `yaml:"reel" json:"reel"`               // 用这个轮子roll
+	ReelData             *sgc7game.ReelsData `yaml:"-" json:"-"`                     // 用这个轮子roll
+	Mask                 string              `yaml:"mask" json:"mask"`               // 如果mask不为空，则用这个mask的1来roll，可以配置 isReverse 来roll 0
+	IsReverse            bool                `yaml:"isReverse" json:"isReverse"`     // 如果isReverse，表示roll 0
+	HoldSymbols          []string            `yaml:"holdSymbols" json:"holdSymbols"` // 这些符号保留
+	HoldSymbolCodes      []int               `yaml:"-" json:"-"`
+	Triggers             []string            `yaml:"triggers" json:"triggers"` // 替换完轮子后需要保证所有trigger返回true
+}
+
+type ReelModifier struct {
+	*BasicComponent `json:"-"`
+	Config          *ReelModifierConfig `json:"config"`
+}
+
+// Init -
+func (reelModifier *ReelModifier) Init(fn string, pool *GamePropertyPool) error {
+	data, err := os.ReadFile(fn)
+	if err != nil {
+		goutils.Error("ReelModifier.Init:ReadFile",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return err
+	}
+
+	cfg := &ReelModifierConfig{}
+
+	err = yaml.Unmarshal(data, cfg)
+	if err != nil {
+		goutils.Error("ReelModifier.Init:Unmarshal",
+			zap.String("fn", fn),
+			zap.Error(err))
+
+		return err
+	}
+
+	return reelModifier.InitEx(cfg, pool)
+}
+
+// InitEx -
+func (reelModifier *ReelModifier) InitEx(cfg any, pool *GamePropertyPool) error {
+	reelModifier.Config = cfg.(*ReelModifierConfig)
+	reelModifier.Config.ComponentType = ReelModifierTypeName
+
+	for _, s := range reelModifier.Config.HoldSymbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("ReelModifier.InitEx:HoldSymbols",
+				zap.String("symbol", s),
+				zap.Error(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		reelModifier.Config.HoldSymbolCodes = append(reelModifier.Config.HoldSymbolCodes, sc)
+	}
+
+	rn, isok := pool.Config.Reels[reelModifier.Config.Reel]
+	if !isok {
+		goutils.Error("ReelModifier.InitEx:Reels",
+			zap.String("reels", reelModifier.Config.Reel),
+			zap.Error(ErrInvalidReels))
+
+		return ErrInvalidReels
+	}
+
+	rd, _ := pool.Config.MapReels[rn]
+	reelModifier.Config.ReelData = rd
+
+	reelModifier.onInit(&reelModifier.Config.BasicComponentConfig)
+
+	return nil
+}
+
+// procSymbolsRandPos
+func (reelModifier *ReelModifier) canModify(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
+	for _, st := range reelModifier.Config.Triggers {
+		if !gameProp.CanTrigger(st, gs, curpr, stake) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// procSymbolsRandPos
+func (reelModifier *ReelModifier) holdSymbol(src *sgc7game.GameScene, gs *sgc7game.GameScene) {
+	if len(reelModifier.Config.HoldSymbolCodes) > 0 {
+		for x, arr := range src.Arr {
+			for y, s := range arr {
+				if goutils.IndexOfIntSlice(reelModifier.Config.HoldSymbolCodes, s, 0) >= 0 {
+					gs.Arr[x][y] = s
+				}
+			}
+		}
+	}
+}
+
+// chgReel
+func (reelModifier *ReelModifier) chgReel(gameProp *GameProperty, plugin sgc7plugin.IPlugin, src *sgc7game.GameScene, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
+	trynum := 0
+	for {
+		err := gs.RandReelsWithReelData(reelModifier.Config.ReelData, plugin)
+		if err != nil {
+			goutils.Error("ReelModifier.chgReel:RandReelsWithReelData",
+				zap.Error(err))
+
+			break
+		}
+
+		reelModifier.holdSymbol(src, gs)
+
+		if reelModifier.canModify(gameProp, gs, curpr, stake) {
+			return true
+		}
+
+		trynum++
+
+		if trynum >= maxRetryNum {
+			break
+		}
+	}
+
+	return false
+}
+
+// chgReel
+func (reelModifier *ReelModifier) chgReelWithMask(gameProp *GameProperty, plugin sgc7plugin.IPlugin, src *sgc7game.GameScene, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, mask string) bool {
+	maskval, err := gameProp.Pool.GetMask(mask, gameProp)
+	if err != nil {
+		goutils.Error("ReelModifier.chgReelWithMask:GetMask",
+			zap.Error(err))
+
+		return false
+	}
+
+	trynum := 0
+	for {
+		err := gs.RandMaskReelsWithReelData(reelModifier.Config.ReelData, plugin, maskval, reelModifier.Config.IsReverse)
+		if err != nil {
+			goutils.Error("ReelModifier.chgReelWithMask:RandMaskReelsWithReelData",
+				zap.Error(err))
+
+			break
+		}
+
+		reelModifier.holdSymbol(src, gs)
+
+		if reelModifier.canModify(gameProp, gs, curpr, stake) {
+			return true
+		}
+
+		trynum++
+
+		if trynum >= maxRetryNum {
+			break
+		}
+	}
+
+	return false
+}
+
+// playgame
+func (reelModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+
+	reelModifier.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+
+	cd := gameProp.MapComponentData[reelModifier.Name].(*BasicComponentData)
+
+	if reelModifier.Config.Mask != "" {
+		gs := reelModifier.GetTargetScene2(gameProp, curpr, cd, reelModifier.Name, "")
+		gs1 := gs.CloneEx(gameProp.PoolScene)
+
+		if reelModifier.chgReelWithMask(gameProp, plugin, gs, gs1, curpr, stake, reelModifier.Config.Mask) {
+			reelModifier.AddScene(gameProp, curpr, gs1, cd)
+		}
+	} else {
+		gs := reelModifier.GetTargetScene2(gameProp, curpr, cd, reelModifier.Name, "")
+		gs1 := gs.CloneEx(gameProp.PoolScene)
+
+		if reelModifier.chgReel(gameProp, plugin, gs, gs1, curpr, stake) {
+			reelModifier.AddScene(gameProp, curpr, gs1, cd)
+		}
+	}
+
+	reelModifier.onStepEnd(gameProp, curpr, gp, "")
+
+	return nil
+}
+
+// OnAsciiGame - outpur to asciigame
+func (reelModifier *ReelModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+
+	cd := gameProp.MapComponentData[reelModifier.Name].(*BasicComponentData)
+
+	if len(cd.UsedScenes) > 0 {
+		asciigame.OutputScene("reelModifier symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	}
+
+	return nil
+}
+
+// OnStats
+func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
+}
+
+func NewReelModifier(name string) IComponent {
+	return &ReelModifier{
+		BasicComponent: NewBasicComponent(name),
+	}
+}

@@ -68,6 +68,8 @@ func (symbolModifier *SymbolModifier) InitEx(cfg any, pool *GamePropertyPool) er
 			goutils.Error("SymbolModifier.InitEx:Symbols",
 				zap.String("symbol", s),
 				zap.Error(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
 		}
 
 		symbolModifier.Config.SymbolCodes = append(symbolModifier.Config.SymbolCodes, sc)
@@ -79,6 +81,8 @@ func (symbolModifier *SymbolModifier) InitEx(cfg any, pool *GamePropertyPool) er
 			goutils.Error("SymbolModifier.InitEx:TargetSymbols",
 				zap.String("symbol", s),
 				zap.Error(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
 		}
 
 		symbolModifier.Config.TargetSymbolCodes = append(symbolModifier.Config.TargetSymbolCodes, sc)
