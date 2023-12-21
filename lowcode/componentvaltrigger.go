@@ -44,11 +44,11 @@ func ParseOperateType(str string) OperateType {
 // ComponentValTriggerConfig - configuration for ComponentValTrigger
 type ComponentValTriggerConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	ComponentVal         string      `yaml:"componentVal" json:"componentVal"`       // 用来检查的值，bg-wins.wins 这样的命名方式
-	OperateString        string      `yaml:"operate" json:"operate"`                 // ==/>=/<=/>/</!=
-	Operate              OperateType `yaml:"-" json:"-"`                             //
-	TargetVal            int         `yaml:"targetVal" json:"targetVal"`             // 目标值
-	JumpToComponent      string      `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
+	ComponentVals        []string      `yaml:"componentVals" json:"componentVals"`     // 用来检查的值，bg-wins.wins 这样的命名方式
+	OperateString        []string      `yaml:"operate" json:"operate"`                 // ==/>=/<=/>/</!=
+	Operate              []OperateType `yaml:"-" json:"-"`                             //
+	TargetVals           []int         `yaml:"targetVals" json:"targetVals"`           // 目标值
+	JumpToComponent      string        `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
 }
 
 type ComponentValTrigger struct {
@@ -86,11 +86,41 @@ func (componentValTrigger *ComponentValTrigger) InitEx(cfg any, pool *GameProper
 	componentValTrigger.Config = cfg.(*ComponentValTriggerConfig)
 	componentValTrigger.Config.ComponentType = ComponentValTriggerTypeName
 
-	componentValTrigger.Config.Operate = ParseOperateType(componentValTrigger.Config.OperateString)
+	for _, v := range componentValTrigger.Config.OperateString {
+		componentValTrigger.Config.Operate = append(componentValTrigger.Config.Operate, ParseOperateType(v))
+	}
 
 	componentValTrigger.onInit(&componentValTrigger.Config.BasicComponentConfig)
 
 	return nil
+}
+
+func (componentValTrigger *ComponentValTrigger) check(gameProp *GameProperty, valname string, op OperateType, target int) bool {
+	val, err := gameProp.GetComponentVal(valname)
+	if err != nil {
+		goutils.Error("ComponentValTrigger.check:GetComponentVal",
+			zap.String("ComponentVal", valname),
+			zap.Error(err))
+
+		return false
+	}
+
+	switch op {
+	case OTEqual:
+		return (val == target)
+	case OTNotEqual:
+		return (val != target)
+	case OTGreaterEqual:
+		return (val >= target)
+	case OTLessEqual:
+		return (val <= target)
+	case OTGreater:
+		return (val > target)
+	case OTLess:
+		return (val < target)
+	}
+
+	return false
 }
 
 // playgame
@@ -99,29 +129,14 @@ func (componentValTrigger *ComponentValTrigger) OnPlayGame(gameProp *GamePropert
 
 	componentValTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	isTrigger := false
-	val, err := gameProp.GetComponentVal(componentValTrigger.Config.ComponentVal)
-	if err != nil {
-		goutils.Error("ComponentValTrigger.OnPlayGame:GetComponentVal",
-			zap.String("ComponentVal", componentValTrigger.Config.ComponentVal),
-			zap.Error(err))
+	isTrigger := true
 
-		return err
-	}
+	for i, valname := range componentValTrigger.Config.ComponentVals {
+		if !componentValTrigger.check(gameProp, valname, componentValTrigger.Config.Operate[i], componentValTrigger.Config.TargetVals[i]) {
+			isTrigger = false
 
-	switch componentValTrigger.Config.Operate {
-	case OTEqual:
-		isTrigger = (val == componentValTrigger.Config.TargetVal)
-	case OTNotEqual:
-		isTrigger = (val != componentValTrigger.Config.TargetVal)
-	case OTGreaterEqual:
-		isTrigger = (val >= componentValTrigger.Config.TargetVal)
-	case OTLessEqual:
-		isTrigger = (val <= componentValTrigger.Config.TargetVal)
-	case OTGreater:
-		isTrigger = (val > componentValTrigger.Config.TargetVal)
-	case OTLess:
-		isTrigger = (val < componentValTrigger.Config.TargetVal)
+			break
+		}
 	}
 
 	if isTrigger {
