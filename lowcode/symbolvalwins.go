@@ -17,14 +17,16 @@ import (
 const SymbolValWinsTypeName = "symbolValWins"
 
 const (
-	SVWDVWins      string = "wins"      // 中奖的数值，线注的倍数
-	SVWDVSymbolNum string = "symbolNum" // 符号数量
+	SVWDVWins         string = "wins"         // 中奖的数值，线注的倍数
+	SVWDVSymbolNum    string = "symbolNum"    // 符号数量
+	SVWDVCollectorNum string = "collectorNum" // 收集器数量
 )
 
 type SymbolValWinsData struct {
 	BasicComponentData
-	SymbolNum int
-	Wins      int
+	SymbolNum    int
+	Wins         int
+	CollectorNum int
 }
 
 // OnNewGame -
@@ -36,8 +38,9 @@ func (symbolValWinsData *SymbolValWinsData) OnNewGame() {
 func (symbolValWinsData *SymbolValWinsData) OnNewStep() {
 	symbolValWinsData.BasicComponentData.OnNewStep()
 
-	symbolValWinsData.SymbolNum = 0
-	symbolValWinsData.Wins = 0
+	// symbolValWinsData.SymbolNum = 0
+	// symbolValWinsData.Wins = 0
+	// symbolValWinsData.CollectorNum = 0
 }
 
 // BuildPBComponentData
@@ -49,6 +52,7 @@ func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message
 	if !gIsReleaseMode {
 		pbcd.SymbolNum = int32(symbolValWinsData.SymbolNum)
 		pbcd.Wins = int32(symbolValWinsData.Wins)
+		pbcd.CollectorNum = int32(symbolValWinsData.CollectorNum)
 	}
 
 	return pbcd
@@ -60,6 +64,8 @@ func (symbolValWinsData *SymbolValWinsData) GetVal(key string) int {
 		return symbolValWinsData.SymbolNum
 	} else if key == SVWDVWins {
 		return symbolValWinsData.Wins
+	} else if key == SVWDVCollectorNum {
+		return symbolValWinsData.CollectorNum
 	}
 
 	return 0
@@ -71,6 +77,8 @@ func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
 		symbolValWinsData.SymbolNum = val
 	} else if key == STDVWins {
 		symbolValWinsData.Wins = val
+	} else if key == SVWDVCollectorNum {
+		symbolValWinsData.CollectorNum = val
 	}
 }
 
@@ -137,11 +145,15 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	symbolValWins.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[symbolValWins.Name].(*SymbolValWinsData)
+	svwd := gameProp.MapComponentData[symbolValWins.Name].(*SymbolValWinsData)
 
-	gs := symbolValWins.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, symbolValWins.Name, "")
+	gs := symbolValWins.GetTargetScene2(gameProp, curpr, &svwd.BasicComponentData, symbolValWins.Name, "")
 	isTrigger := true
 	symbolnum := 0
+
+	svwd.SymbolNum = 0
+	svwd.Wins = 0
+	svwd.CollectorNum = 0
 
 	if symbolValWins.TriggerSymbolCode >= 0 {
 		isTrigger = false
@@ -160,7 +172,9 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	if isTrigger {
-		os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, &cd.BasicComponentData, symbolValWins.Name, "")
+		svwd.CollectorNum = symbolnum
+
+		os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, &svwd.BasicComponentData, symbolValWins.Name, "")
 
 		if os != nil {
 			totalvals := 0
@@ -171,6 +185,8 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					if os.Arr[x][y] > 0 {
 						totalvals += os.Arr[x][y]
 						pos = append(pos, x, y)
+
+						svwd.SymbolNum++
 					}
 				}
 			}
@@ -196,7 +212,9 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					ret.CashWin = ret.CoinWin * bet
 				}
 
-				symbolValWins.AddResult(curpr, ret, &cd.BasicComponentData)
+				svwd.Wins = ret.CoinWin
+
+				symbolValWins.AddResult(curpr, ret, &svwd.BasicComponentData)
 			}
 		}
 	}
