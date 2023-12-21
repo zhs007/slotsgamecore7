@@ -150,6 +150,13 @@ message MultiWeightAwardsData {
 	repeated bool HasGot = 2;
 }
 
+// SymbolValWinsData
+message SymbolValWinsData {
+    ComponentData basicComponentData = 1;
+	int32 wins = 2;
+    int32 symbolNum = 3;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
