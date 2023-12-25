@@ -64,54 +64,58 @@ type MoveData struct {
 	OverridePath     bool           `yaml:"overridePath" json:"overridePath"`
 }
 
-func (md *MoveData) moveX(gs *sgc7game.GameScene, sx, tx int, y int) {
+func (md *MoveData) moveX(gs *sgc7game.GameScene, sx, tx int, y int, symbolCode int) {
 	if tx > sx {
 		for x := sx + 1; x < tx; x++ {
-			gs.Arr[x][y] = md.TargetSymbolCode
+			gs.Arr[x][y] = symbolCode
 		}
 	} else if tx < sx {
 		for x := sx - 1; x > tx; x-- {
-			gs.Arr[x][y] = md.TargetSymbolCode
+			gs.Arr[x][y] = symbolCode
 		}
 	}
 }
 
-func (md *MoveData) moveY(gs *sgc7game.GameScene, sy, ty int, x int) {
+func (md *MoveData) moveY(gs *sgc7game.GameScene, sy, ty int, x int, symbolCode int) {
 	if ty > sy {
 		for y := sy + 1; y < ty; y++ {
-			gs.Arr[x][y] = md.TargetSymbolCode
+			gs.Arr[x][y] = symbolCode
 		}
 	} else if ty < sy {
 		for y := sy - 1; y > ty; y-- {
-			gs.Arr[x][y] = md.TargetSymbolCode
+			gs.Arr[x][y] = symbolCode
 		}
 	}
 }
 
-func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int) {
+func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode int) {
 	if md.OverrideSrc {
-		gs.Arr[sx][sy] = md.TargetSymbolCode
+		gs.Arr[sx][sy] = symbolCode
 	}
 
 	if md.OverrideTarget {
-		gs.Arr[tx][ty] = md.TargetSymbolCode
+		gs.Arr[tx][ty] = symbolCode
+	}
+
+	if !md.OverridePath {
+		return
 	}
 
 	if md.MoveType == MoveTypeXY {
-		md.moveX(gs, sx, tx, sy) // sx,sy -> tx,sy
+		md.moveX(gs, sx, tx, sy, symbolCode) // sx,sy -> tx,sy
 
 		if sy != ty {
-			gs.Arr[tx][sy] = md.TargetSymbolCode
+			gs.Arr[tx][sy] = symbolCode
 
-			md.moveY(gs, sy, ty, tx) // tx,sy -> tx,ty
+			md.moveY(gs, sy, ty, tx, symbolCode) // tx,sy -> tx,ty
 		}
 	} else if md.MoveType == MoveTypeYX {
-		md.moveY(gs, sy, ty, sx) // sx,sy -> sx,ty
+		md.moveY(gs, sy, ty, sx, symbolCode) // sx,sy -> sx,ty
 
 		if sx != tx {
-			gs.Arr[sx][ty] = md.TargetSymbolCode
+			gs.Arr[sx][ty] = symbolCode
 
-			md.moveX(gs, sx, tx, ty) // sx,sy -> sx,ty
+			md.moveX(gs, sx, tx, ty, symbolCode) // sx,sy -> sx,ty
 		}
 	}
 }
@@ -158,38 +162,42 @@ func (moveSymbol *MoveSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 	moveSymbol.Config.ComponentType = MoveSymbolTypeName
 
 	for _, v := range moveSymbol.Config.MoveData {
-		sc, isok := pool.DefaultPaytables.MapSymbols[v.Src.Symbol]
-		if !isok {
-			goutils.Error("ReplaceReel.InitEx:Src.Symbol",
-				zap.String("symbol", v.Src.Symbol),
-				zap.Error(ErrInvalidSymbol))
+		if v.Src.Type != SelectWithXY {
+			sc, isok := pool.DefaultPaytables.MapSymbols[v.Src.Symbol]
+			if !isok {
+				goutils.Error("ReplaceReel.InitEx:Src.Symbol",
+					zap.String("symbol", v.Src.Symbol),
+					zap.Error(ErrInvalidSymbol))
 
-			return ErrInvalidSymbol
+				return ErrInvalidSymbol
+			}
+
+			v.Src.SymbolCode = sc
+		} else {
+			v.Src.SymbolCode = -1
 		}
 
-		v.Src.SymbolCode = sc
+		if v.Target.Type != SelectWithXY {
+			sc, isok := pool.DefaultPaytables.MapSymbols[v.Target.Symbol]
+			if !isok {
+				goutils.Error("ReplaceReel.InitEx:Target.Symbol",
+					zap.String("symbol", v.Target.Symbol),
+					zap.Error(ErrInvalidSymbol))
 
-		sc, isok = pool.DefaultPaytables.MapSymbols[v.Target.Symbol]
-		if !isok {
-			goutils.Error("ReplaceReel.InitEx:Target.Symbol",
-				zap.String("symbol", v.Target.Symbol),
-				zap.Error(ErrInvalidSymbol))
+				return ErrInvalidSymbol
+			}
 
-			return ErrInvalidSymbol
+			v.Target.SymbolCode = sc
+		} else {
+			v.Target.SymbolCode = -1
 		}
 
-		v.Target.SymbolCode = sc
-
-		sc, isok = pool.DefaultPaytables.MapSymbols[v.TargetSymbol]
-		if !isok {
-			goutils.Error("ReplaceReel.InitEx:TargetSymbol",
-				zap.String("symbol", v.TargetSymbol),
-				zap.Error(ErrInvalidSymbol))
-
-			return ErrInvalidSymbol
+		sc, isok := pool.DefaultPaytables.MapSymbols[v.TargetSymbol]
+		if isok {
+			v.TargetSymbolCode = sc
+		} else {
+			v.TargetSymbolCode = -1
 		}
-
-		v.TargetSymbolCode = sc
 	}
 
 	moveSymbol.onInit(&moveSymbol.Config.BasicComponentConfig)
@@ -220,11 +228,24 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			continue
 		}
 
+		symbolCode := v.TargetSymbolCode
+		if symbolCode == -1 {
+			symbolCode = gs.Arr[srcx][srcy]
+		}
+
 		if srcx == targetx && srcy == targety {
+			if v.OverrideSrc {
+				gs.Arr[srcx][srcy] = symbolCode
+			}
+
+			if v.OverrideTarget {
+				gs.Arr[targetx][targety] = symbolCode
+			}
+
 			continue
 		}
 
-		v.Move(sc2, srcx, srcy, targetx, targety)
+		v.Move(sc2, srcx, srcy, targetx, targety, symbolCode)
 	}
 
 	moveSymbol.AddScene(gameProp, curpr, sc2, cd)
