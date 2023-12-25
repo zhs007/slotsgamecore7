@@ -276,7 +276,7 @@ func (gs *GameScene) RandMaskReelsWithReelData(reels *ReelsData, plugin sgc7plug
 	}
 
 	for x, arr := range gs.Arr {
-		if masks[x] == isReverse {
+		if masks[x] != isReverse {
 			cn, err := plugin.Random(context.Background(), len(reels.Reels[x]))
 			if err != nil {
 				return err
