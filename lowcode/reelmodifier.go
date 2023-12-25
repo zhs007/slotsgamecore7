@@ -78,7 +78,7 @@ func (reelModifier *ReelModifier) InitEx(cfg any, pool *GamePropertyPool) error 
 		reelModifier.Config.HoldSymbolCodes = append(reelModifier.Config.HoldSymbolCodes, sc)
 	}
 
-	rn, isok := pool.Config.Reels[reelModifier.Config.Reel]
+	rd, isok := pool.Config.MapReels[reelModifier.Config.Reel]
 	if !isok {
 		goutils.Error("ReelModifier.InitEx:Reels",
 			zap.String("reels", reelModifier.Config.Reel),
@@ -87,7 +87,6 @@ func (reelModifier *ReelModifier) InitEx(cfg any, pool *GamePropertyPool) error 
 		return ErrInvalidReels
 	}
 
-	rd, _ := pool.Config.MapReels[rn]
 	reelModifier.Config.ReelData = rd
 
 	reelModifier.onInit(&reelModifier.Config.BasicComponentConfig)
