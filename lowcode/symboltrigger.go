@@ -466,6 +466,10 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7g
 				}
 			}
 		}
+
+		if len(lst) > 0 {
+			isTrigger = true
+		}
 	} else if symbolTrigger.Config.TriggerType == STTypeCheckLines {
 
 		for i, v := range gameProp.CurLineData.Lines {
@@ -526,6 +530,9 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7g
 			}
 		}
 
+		if len(lst) > 0 {
+			isTrigger = true
+		}
 	} else if symbolTrigger.Config.TriggerType == STTypeWays {
 		os := symbolTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "")
 
@@ -581,6 +588,9 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7g
 			lst = append(lst, currets...)
 		}
 
+		if len(lst) > 0 {
+			isTrigger = true
+		}
 	} else if symbolTrigger.Config.TriggerType == STTypeCheckWays {
 		currets := sgc7game.CheckWays(gs, symbolTrigger.Config.MinNum,
 			func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
@@ -605,6 +615,9 @@ func (symbolTrigger *SymbolTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7g
 
 		lst = append(lst, currets...)
 
+		if len(lst) > 0 {
+			isTrigger = true
+		}
 	} else if symbolTrigger.Config.TriggerType == STTypeScatters {
 		ret := symbolTrigger.triggerScatter(gameProp, stake, gs)
 		// for _, s := range symbolTrigger.Config.SymbolCodes {
