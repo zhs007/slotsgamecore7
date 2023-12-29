@@ -6,6 +6,7 @@ import (
 	"devt.de/krotik/common/termutil/getch"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"go.uber.org/zap"
 )
 
@@ -40,6 +41,21 @@ func getchar(onchar FuncOnGetChar) error {
 }
 
 type FuncOnResult func(*sgc7game.PlayResult, []*sgc7game.PlayResult, any)
+
+func buildRngString(plugin sgc7plugin.IPlugin) string {
+	strRng := ""
+
+	lst := plugin.GetUsedRngs()
+	for i, v := range lst {
+		if i > 0 {
+			strRng += fmt.Sprintf(",%v", v.Value)
+		} else {
+			strRng += fmt.Sprintf("%v", v.Value)
+		}
+	}
+
+	return strRng
+}
 
 func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult, autogametimes int, isSkipGetChar bool, isBreakAtFeature bool) error {
 	plugin := game.NewPlugin()
@@ -120,6 +136,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 				break
 			}
+
+			fmt.Printf("rng: %v\n", buildRngString(plugin))
 
 			if pr == nil {
 				break
