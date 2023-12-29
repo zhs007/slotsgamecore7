@@ -123,6 +123,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		gameData := game.NewGameData(stake)
 		defer game.DeleteGameData(gameData)
 
+		plugin.ClearUsedRngs()
+
 		fmt.Printf("bet %v, balance %v\n",
 			FormatColorString(fmt.Sprintf("%v", stake.CashBet), ColorNumber),
 			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber))
@@ -136,8 +138,6 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 				break
 			}
-
-			fmt.Printf("rng: %v\n", buildRngString(plugin))
 
 			if pr == nil {
 				break
@@ -251,6 +251,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		fmt.Printf("balance %v , win %v \n",
 			FormatColorString(fmt.Sprintf("%v", balance), ColorNumber),
 			FormatColorString(fmt.Sprintf("%v", spinwins), ColorNumber))
+
+		fmt.Printf("rng: %v\n", buildRngString(plugin))
 
 		fmt.Printf("%v spin end <--\n",
 			FormatColorString(fmt.Sprintf("#%v", curgamenum), ColorNumber))
