@@ -169,6 +169,7 @@ type SymbolTriggerConfig struct {
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
+	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
 	RespinNumWeightVW               *sgc7game.ValWeights2         `yaml:"-" json:"-"`                                                         // respin number weight
@@ -841,7 +842,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 					} else {
 						rn := gameProp.GetLastRespinNum(symbolTrigger.Config.JumpToComponent)
 						if rn > 0 {
-							gameProp.TriggerRespin(plugin, curpr, gp, 0, symbolTrigger.Config.JumpToComponent, true)
+							gameProp.TriggerRespin(plugin, curpr, gp, 0, symbolTrigger.Config.JumpToComponent, !symbolTrigger.Config.IsAddRespinMode)
 
 							lst[0].Type = sgc7game.RTFreeGame
 							lst[0].Value = rn
@@ -849,7 +850,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				} else {
 					// 如果jumpto是respin，需要treigger这个respin
-					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, symbolTrigger.Config.JumpToComponent, true)
+					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, symbolTrigger.Config.JumpToComponent, !symbolTrigger.Config.IsAddRespinMode)
 
 					lst[0].Type = sgc7game.RTFreeGame
 					lst[0].Value = std.RespinNum
