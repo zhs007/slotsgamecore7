@@ -102,6 +102,7 @@ message RespinData {
     int32 retriggerAddRespinNum = 8;
     int32 lastTriggerNum = 9;
 	int32 curTriggerNum = 10;
+    repeated int32 triggerRespinNum = 11;
 }
 
 
