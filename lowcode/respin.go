@@ -68,6 +68,10 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 		CurTriggerNum:         int32(respinData.CurTriggerNum),
 	}
 
+	for _, v := range respinData.TriggerRespinNum {
+		pbcd.TriggerRespinNum = append(pbcd.TriggerRespinNum, int32(v))
+	}
+
 	return pbcd
 }
 
