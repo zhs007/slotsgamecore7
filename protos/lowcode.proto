@@ -159,6 +159,12 @@ message SymbolValWinsData {
     int32 collectorNum = 4;
 }
 
+// WeightReelsData
+message WeightReelsData {
+    ComponentData basicComponentData = 1;
+	int32 reelSetIndex = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
