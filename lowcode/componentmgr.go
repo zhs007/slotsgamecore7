@@ -71,6 +71,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ComponentValTriggerTypeName, NewComponentValTrigger)
 	mgr.Reg(ReelModifierTypeName, NewReelModifier)
 	mgr.Reg(WeightReelsTypeName, NewWeightReels)
+	mgr.Reg(ScatterTriggerTypeName, NewScatterTrigger)
 
 	return mgr
 }

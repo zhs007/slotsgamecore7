@@ -165,6 +165,16 @@ message WeightReelsData {
 	int32 reelSetIndex = 2;
 }
 
+// ScatterTriggerData
+message ScatterTriggerData {
+    ComponentData basicComponentData = 1;
+	string nextComponent = 2;
+    int32 symbolNum = 3;
+    int32 wildNum = 4;
+    int32 respinNum = 5;
+    int32 wins = 6;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
