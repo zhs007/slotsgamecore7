@@ -59,6 +59,7 @@ type MultiWeightAwardsNode struct {
 type MultiWeightAwardsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Nodes                []*MultiWeightAwardsNode `yaml:"nodes" json:"nodes"`
+	InitMask             string                   `yaml:"initMask" json:"initMask"` // 用这个来初始化，true表示需要开奖
 }
 
 type MultiWeightAwards struct {
@@ -128,23 +129,59 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 
 	mwad.HasGot = nil
 
-	for _, v := range multiWeightAwards.Config.Nodes {
-		cv, err := v.VW.RandVal(plugin)
+	if multiWeightAwards.Config.InitMask != "" {
+		mask, err := gameProp.Pool.GetMask(multiWeightAwards.Config.InitMask, gameProp)
 		if err != nil {
-			goutils.Error("MultiWeightAwards.OnPlayGame:RandVal",
+			goutils.Error("MultiWeightAwards.OnPlayGame:GetMask",
+				zap.String("mask", multiWeightAwards.Config.InitMask),
 				zap.Error(err))
 
 			return err
 		}
 
-		if cv.Int() != 0 {
-			if len(v.Awards) > 0 {
-				gameProp.procAwards(plugin, v.Awards, curpr, gp)
+		for i, maskv := range mask {
+			if maskv {
+				v := multiWeightAwards.Config.Nodes[i]
+				cv, err := v.VW.RandVal(plugin)
+				if err != nil {
+					goutils.Error("MultiWeightAwards.OnPlayGame:RandVal",
+						zap.Error(err))
+
+					return err
+				}
+
+				if cv.Int() != 0 {
+					if len(v.Awards) > 0 {
+						gameProp.procAwards(plugin, v.Awards, curpr, gp)
+					}
+
+					mwad.HasGot = append(mwad.HasGot, true)
+				} else {
+					mwad.HasGot = append(mwad.HasGot, false)
+				}
+			} else {
+				mwad.HasGot = append(mwad.HasGot, false)
+			}
+		}
+	} else {
+		for _, v := range multiWeightAwards.Config.Nodes {
+			cv, err := v.VW.RandVal(plugin)
+			if err != nil {
+				goutils.Error("MultiWeightAwards.OnPlayGame:RandVal",
+					zap.Error(err))
+
+				return err
 			}
 
-			mwad.HasGot = append(mwad.HasGot, true)
-		} else {
-			mwad.HasGot = append(mwad.HasGot, false)
+			if cv.Int() != 0 {
+				if len(v.Awards) > 0 {
+					gameProp.procAwards(plugin, v.Awards, curpr, gp)
+				}
+
+				mwad.HasGot = append(mwad.HasGot, true)
+			} else {
+				mwad.HasGot = append(mwad.HasGot, false)
+			}
 		}
 	}
 
