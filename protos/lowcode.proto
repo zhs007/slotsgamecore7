@@ -195,6 +195,12 @@ message WaysTriggerData {
     int32 wins = 6;
 }
 
+// WeightAwardsData
+message WeightAwardsData {
+    ComponentData basicComponentData = 1;
+	repeated int32 gotIndex = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
