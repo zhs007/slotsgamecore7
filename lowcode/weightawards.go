@@ -116,6 +116,17 @@ func (weightAwards *WeightAwards) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
+// InitEx -
+func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd *WeightAwardsData) error {
+	mask := make([]bool, len(weightAwards.Config.Awards))
+
+	for i := 0; i < len(cd.GotIndex); i++ {
+		mask[cd.GotIndex[i]] = true
+	}
+
+	return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, weightAwards.Config.TargetMask, mask)
+}
+
 // playgame
 func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -173,6 +184,16 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		gameProp.procAwards(plugin, weightAwards.Config.Awards[i], curpr, gp)
 
 		mwad.GotIndex = append(mwad.GotIndex, i)
+	}
+
+	if weightAwards.Config.TargetMask != "" {
+		err := weightAwards.buildMask(plugin, gameProp, curpr, gp, mwad)
+		if err != nil {
+			goutils.Error("WeightAwards.OnPlayGame:buildMask",
+				zap.Error(err))
+
+			return err
+		}
 	}
 
 	weightAwards.onStepEnd(gameProp, curpr, gp, "")
