@@ -108,4 +108,7 @@ var (
 	ErrInvalidComponentVal = errors.New("invalid ComponentVal")
 	// ErrInvalidBet - invalid Bet
 	ErrInvalidBet = errors.New("invalid Bet")
+
+	// ErrInvalidWeightVal - invalid weight value
+	ErrInvalidWeightVal = errors.New("invalid weight value")
 )
