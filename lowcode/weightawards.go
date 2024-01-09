@@ -52,9 +52,10 @@ type WeightAwardsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	AwardWeight          string                `yaml:"awardWeight" json:"awardWeight"`
 	AwardWeightVW        *sgc7game.ValWeights2 `json:"-"`
-	Awards               [][]*Award            `yaml:"awards" json:"awards"`         // 新的奖励系统
-	Nums                 int                   `yaml:"nums" json:"nums"`             // how many arards are given
-	TargetMask           string                `yaml:"targetMask" json:"targetMask"` // initial for the mask
+	Awards               [][]*Award            `yaml:"awards" json:"awards"`               // 新的奖励系统
+	Nums                 int                   `yaml:"nums" json:"nums"`                   // how many arards are given
+	TargetMask           string                `yaml:"targetMask" json:"targetMask"`       // output for the mask
+	IsReverseMask        bool                  `yaml:"isReverseMask" json:"isReverseMask"` // reverse the mask
 }
 
 type WeightAwards struct {
@@ -116,6 +117,27 @@ func (weightAwards *WeightAwards) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
+// InitEx -
+func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd *WeightAwardsData) error {
+	mask := make([]bool, len(weightAwards.Config.Awards))
+
+	if weightAwards.Config.IsReverseMask {
+		for i := range mask {
+			mask[i] = true
+		}
+
+		for i := 0; i < len(cd.GotIndex); i++ {
+			mask[cd.GotIndex[i]] = false
+		}
+	} else {
+		for i := 0; i < len(cd.GotIndex); i++ {
+			mask[cd.GotIndex[i]] = true
+		}
+	}
+
+	return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, weightAwards.Config.TargetMask, mask)
+}
+
 // playgame
 func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -173,6 +195,16 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		gameProp.procAwards(plugin, weightAwards.Config.Awards[i], curpr, gp)
 
 		mwad.GotIndex = append(mwad.GotIndex, i)
+	}
+
+	if weightAwards.Config.TargetMask != "" {
+		err := weightAwards.buildMask(plugin, gameProp, curpr, gp, mwad)
+		if err != nil {
+			goutils.Error("WeightAwards.OnPlayGame:buildMask",
+				zap.Error(err))
+
+			return err
+		}
 	}
 
 	weightAwards.onStepEnd(gameProp, curpr, gp, "")
