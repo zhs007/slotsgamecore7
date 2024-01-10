@@ -244,7 +244,7 @@ func (linesTrigger *LinesTrigger) procMask(gs *sgc7game.GameScene, gameProp *Gam
 			mask[ret.Pos[i*2]] = true
 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, linesTrigger.Config.TargetMask, mask)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, linesTrigger.Config.TargetMask, mask, false)
 	}
 
 	return nil
