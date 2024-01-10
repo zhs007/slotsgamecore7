@@ -52,10 +52,10 @@ type WeightAwardsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	AwardWeight          string                `yaml:"awardWeight" json:"awardWeight"`
 	AwardWeightVW        *sgc7game.ValWeights2 `json:"-"`
-	Awards               [][]*Award            `yaml:"awards" json:"awards"`               // 新的奖励系统
-	Nums                 int                   `yaml:"nums" json:"nums"`                   // how many arards are given
-	TargetMask           string                `yaml:"targetMask" json:"targetMask"`       // output for the mask
-	IsReverseMask        bool                  `yaml:"isReverseMask" json:"isReverseMask"` // reverse the mask
+	Awards               [][]*Award            `yaml:"awards" json:"awards"`                       // 新的奖励系统
+	Nums                 int                   `yaml:"nums" json:"nums"`                           // how many arards are given
+	TargetMask           string                `yaml:"targetMask" json:"targetMask"`               // output for the mask
+	ReverseTargetMask    bool                  `yaml:"reverseTargetMask" json:"reverseTargetMask"` // reverse the target mask
 }
 
 type WeightAwards struct {
@@ -121,7 +121,7 @@ func (weightAwards *WeightAwards) InitEx(cfg any, pool *GamePropertyPool) error 
 func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd *WeightAwardsData) error {
 	mask := make([]bool, len(weightAwards.Config.Awards))
 
-	if weightAwards.Config.IsReverseMask {
+	if weightAwards.Config.ReverseTargetMask {
 		for i := range mask {
 			mask[i] = true
 		}
@@ -135,7 +135,7 @@ func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp 
 		}
 	}
 
-	return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, weightAwards.Config.TargetMask, mask)
+	return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, weightAwards.Config.TargetMask, mask, true)
 }
 
 // playgame

@@ -59,7 +59,10 @@ type MultiWeightAwardsNode struct {
 type MultiWeightAwardsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Nodes                []*MultiWeightAwardsNode `yaml:"nodes" json:"nodes"`
-	InitMask             string                   `yaml:"initMask" json:"initMask"` // 用这个来初始化，true表示需要开奖
+	InitMask             string                   `yaml:"initMask" json:"initMask"`                   // 用这个来初始化，true表示需要开奖
+	ReverseInitMask      bool                     `yaml:"reverseInitMask" json:"reverseInitMask"`     // reverse the target mask
+	TargetMask           string                   `yaml:"targetMask" json:"targetMask"`               // 用这个来初始化，true表示需要开奖
+	ReverseTargetMask    bool                     `yaml:"reverseTargetMask" json:"reverseTargetMask"` // reverse the target mask
 }
 
 type MultiWeightAwards struct {
@@ -119,6 +122,21 @@ func (multiWeightAwards *MultiWeightAwards) InitEx(cfg any, pool *GamePropertyPo
 	return nil
 }
 
+// InitEx -
+func (multiWeightAwards *MultiWeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd *MultiWeightAwardsData) error {
+	if multiWeightAwards.Config.ReverseTargetMask {
+		mask := make([]bool, len(cd.HasGot))
+
+		for i := 0; i < len(cd.HasGot); i++ {
+			mask[i] = !cd.HasGot[i]
+		}
+
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, multiWeightAwards.Config.TargetMask, mask, true)
+	}
+
+	return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, multiWeightAwards.Config.TargetMask, cd.HasGot, true)
+}
+
 // playgame
 func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -140,7 +158,7 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 		}
 
 		for i, maskv := range mask {
-			if maskv {
+			if maskv == !multiWeightAwards.Config.ReverseInitMask {
 				v := multiWeightAwards.Config.Nodes[i]
 				cv, err := v.VW.RandVal(plugin)
 				if err != nil {
@@ -182,6 +200,17 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 			} else {
 				mwad.HasGot = append(mwad.HasGot, false)
 			}
+		}
+	}
+
+	if multiWeightAwards.Config.TargetMask != "" {
+		err := multiWeightAwards.buildMask(plugin, gameProp, curpr, gp, mwad)
+		if err != nil {
+			goutils.Error("MultiWeightAwards.OnPlayGame:buildMask",
+				zap.String("mask", multiWeightAwards.Config.TargetMask),
+				zap.Error(err))
+
+			return err
 		}
 	}
 

@@ -244,7 +244,7 @@ func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameP
 			mask[ret.Pos[i*2]] = true
 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, waysTrigger.Config.TargetMask, mask)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, waysTrigger.Config.TargetMask, mask, false)
 	}
 
 	return nil

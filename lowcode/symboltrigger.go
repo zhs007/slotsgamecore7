@@ -313,7 +313,7 @@ func (symbolTrigger *SymbolTrigger) procMask(gs *sgc7game.GameScene, gameProp *G
 			mask[ret.Pos[i*2]] = true
 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, symbolTrigger.Config.TargetMask, mask)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, symbolTrigger.Config.TargetMask, mask, false)
 	}
 
 	return nil

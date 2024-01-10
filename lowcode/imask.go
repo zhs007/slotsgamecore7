@@ -10,6 +10,8 @@ type IMask interface {
 	SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error
 	// SetMaskVal -
 	SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, index int, mask bool) error
+	// SetMaskOnlyTrue -
+	SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error
 	// GetMask -
 	GetMask(gameProp *GameProperty) []bool
 }

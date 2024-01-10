@@ -245,7 +245,7 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 			mask[ret.Pos[i*2]] = true
 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, scatterTrigger.Config.TargetMask, mask)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, scatterTrigger.Config.TargetMask, mask, false)
 	}
 
 	return nil

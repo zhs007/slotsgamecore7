@@ -417,7 +417,7 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	return nil
 }
 
-func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, mask []bool) error {
+func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, mask []bool, isOnlyTrue bool) error {
 	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMask",
@@ -436,7 +436,11 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 		return ErrNotMask
 	}
 
-	im.SetMask(plugin, gameProp, curpr, gp, mask)
+	if isOnlyTrue {
+		im.SetMaskOnlyTrue(plugin, gameProp, curpr, gp, mask)
+	} else {
+		im.SetMask(plugin, gameProp, curpr, gp, mask)
+	}
 
 	return nil
 }
