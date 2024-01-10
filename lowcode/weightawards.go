@@ -151,7 +151,7 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	if weightAwards.Config.Nums > 1 {
 		vw := weightAwards.Config.AwardWeightVW.Clone()
 		for i := 0; i < weightAwards.Config.Nums; i++ {
-			cv, ai, err := vw.RandValEx(plugin)
+			cv, _, err := vw.RandValEx(plugin)
 			if err != nil {
 				goutils.Error("WeightAwards.OnPlayGame:RandValEx",
 					zap.Error(err))
@@ -167,11 +167,11 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 				return ErrInvalidWeightVal
 			}
 
-			gameProp.procAwards(plugin, weightAwards.Config.Awards[ai], curpr, gp)
+			gameProp.procAwards(plugin, weightAwards.Config.Awards[cv.Int()], curpr, gp)
 
 			vw.RemoveVal(cv)
 
-			mwad.GotIndex = append(mwad.GotIndex, ai)
+			mwad.GotIndex = append(mwad.GotIndex, cv.Int())
 		}
 	} else if weightAwards.Config.Nums == 1 {
 		vw := weightAwards.Config.AwardWeightVW
