@@ -64,6 +64,7 @@ type GameProperty struct {
 	RespinComponents       []string
 	PoolScene              *sgc7game.GameScenePoolEx
 	Components             *ComponentList
+	SceneStack             *SceneStack
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
@@ -766,6 +767,44 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 	cd.SetConfigVal(arr[1], val)
 
 	return nil
+}
+
+func (gameProp *GameProperty) onStepEnd(pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
+	// // scene v3
+	// if len(gameProp.SceneStack.Scenes) > 0 {
+
+	// 	return
+	// }
+
+	if pr.IsFinish {
+		gameProp.PoolScene.Reset()
+
+		// for _, curpr := range prs {
+		// 	for _, s := range curpr.Scenes {
+		// 		gameProp.PoolScene.Put(s)
+		// 	}
+
+		// 	for _, s := range curpr.OtherScenes {
+		// 		gameProp.PoolScene.Put(s)
+		// 	}
+
+		// 	for _, s := range curpr.PrizeScenes {
+		// 		gameProp.PoolScene.Put(s)
+		// 	}
+		// }
+
+		// for _, s := range pr.Scenes {
+		// 	gameProp.PoolScene.Put(s)
+		// }
+
+		// for _, s := range pr.OtherScenes {
+		// 	gameProp.PoolScene.Put(s)
+		// }
+
+		// for _, s := range pr.PrizeScenes {
+		// 	gameProp.PoolScene.Put(s)
+		// }
+	}
 }
 
 func init() {

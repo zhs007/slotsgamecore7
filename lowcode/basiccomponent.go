@@ -114,6 +114,9 @@ type BasicComponentConfig struct {
 	UseFileMapping         bool              `yaml:"useFileMapping" json:"useFileMapping"`                 // 兼容性配置，新配置应该一定用filemapping
 	ComponentType          string            `yaml:"-" json:"componentType"`                               // 组件类型
 	UseSceneV2             bool              `yaml:"useSceneV2" json:"useSceneV2"`                         // 新版本的scene
+	TargetScenes3          [][]string        `yaml:"targetScenes3" json:"targetScenes3"`                   // target scenes V3
+	UseSceneV3             bool              `yaml:"useSceneV3" json:"useSceneV3"`                         // 新版本的scene
+	IsNeedCacheScene3      bool              `yaml:"isNeedCacheScene3" json:"isNeedCacheScene3"`           // 是否需要缓存scene
 }
 
 type BasicComponent struct {
@@ -186,7 +189,9 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
-	if basicComponent.Config.UseSceneV2 {
+	if basicComponent.Config.UseSceneV3 {
+		gameProp.SceneStack.Push(basicComponent.Name, si, sc, basicComponent.Config.IsNeedCacheScene3)
+	} else if basicComponent.Config.UseSceneV2 {
 		if len(basicComponent.Config.Scene2Components) > 0 {
 			for _, v := range basicComponent.Config.Scene2Components {
 				gameProp.SetComponentScene(v, sc)
@@ -389,6 +394,32 @@ func (basicComponent *BasicComponent) IsMask() bool {
 }
 
 func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
+	if basicComponent.Config.UseSceneV2 {
+		return gameProp.GetComponentScene(component)
+	}
+
+	if tag == "" {
+		if basicComponent.Config.TargetGlobalScene != "" {
+			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
+		} else {
+			tag = basicComponent.Config.TargetScene
+		}
+	}
+
+	gs, si := gameProp.GetScene(curpr, tag)
+
+	if si >= 0 {
+		basicCD.TargetSceneIndex = si
+	}
+
+	return gs
+}
+
+func (basicComponent *BasicComponent) GetTargetScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
+	if basicComponent.Config.UseSceneV3 {
+		return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si)
+	}
+
 	if basicComponent.Config.UseSceneV2 {
 		return gameProp.GetComponentScene(component)
 	}

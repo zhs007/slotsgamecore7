@@ -9,6 +9,7 @@ var InitGameScenePoolSize int
 
 type gameScenePool struct {
 	Pools []*GameScene
+	used  []*GameScene
 }
 
 func (pool *gameScenePool) put(gs *GameScene) {
@@ -25,6 +26,15 @@ func (pool *gameScenePool) get() *GameScene {
 	}
 
 	return nil
+}
+
+func (pool *gameScenePool) inUsed(sc *GameScene) {
+	pool.used = append(pool.used, sc)
+}
+
+func (pool *gameScenePool) reset() {
+	pool.Pools = append(pool.Pools, pool.used...)
+	pool.used = nil
 }
 
 func newGameScenePool() *gameScenePool {
@@ -57,6 +67,14 @@ func (pool *GameScenePoolEx) Put(scene *GameScene) {
 	pool.MapPools[scene.Width][scene.Height].put(scene)
 }
 
+func (pool *GameScenePoolEx) Reset() {
+	for _, mps := range pool.MapPools {
+		for _, p := range mps {
+			p.reset()
+		}
+	}
+}
+
 func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
 	// pool.Lock.Lock()
 	// defer pool.Lock.Unlock()
@@ -76,6 +94,8 @@ func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
 				gs.Clear(0)
 			}
 
+			p.inUsed(gs)
+
 			return gs
 		}
 	} else {
@@ -84,7 +104,9 @@ func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
 		mps[h] = p
 	}
 
-	return pool.new(w, h)
+	gs := pool.new(w, h)
+	p.inUsed(gs)
+	return gs
 }
 
 func NewGameScenePoolEx() *GameScenePoolEx {

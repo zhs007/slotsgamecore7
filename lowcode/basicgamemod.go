@@ -60,6 +60,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	pr, gp := bgm.newPlayResult(prs)
 
+	gameProp.SceneStack.onStepStart(pr)
+
 	curComponent := components.Components[0]
 
 	if gp.FirstComponent != "" {
@@ -162,33 +164,34 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	gameProp.ProcRespin(pr, gp)
 
-	if pr.IsFinish {
-		for _, curpr := range prs {
-			for _, s := range curpr.Scenes {
-				gameProp.PoolScene.Put(s)
-			}
+	gameProp.onStepEnd(pr, prs)
+	// if pr.IsFinish {
+	// 	for _, curpr := range prs {
+	// 		for _, s := range curpr.Scenes {
+	// 			gameProp.PoolScene.Put(s)
+	// 		}
 
-			for _, s := range curpr.OtherScenes {
-				gameProp.PoolScene.Put(s)
-			}
+	// 		for _, s := range curpr.OtherScenes {
+	// 			gameProp.PoolScene.Put(s)
+	// 		}
 
-			for _, s := range curpr.PrizeScenes {
-				gameProp.PoolScene.Put(s)
-			}
-		}
+	// 		for _, s := range curpr.PrizeScenes {
+	// 			gameProp.PoolScene.Put(s)
+	// 		}
+	// 	}
 
-		for _, s := range pr.Scenes {
-			gameProp.PoolScene.Put(s)
-		}
+	// 	for _, s := range pr.Scenes {
+	// 		gameProp.PoolScene.Put(s)
+	// 	}
 
-		for _, s := range pr.OtherScenes {
-			gameProp.PoolScene.Put(s)
-		}
+	// 	for _, s := range pr.OtherScenes {
+	// 		gameProp.PoolScene.Put(s)
+	// 	}
 
-		for _, s := range pr.PrizeScenes {
-			gameProp.PoolScene.Put(s)
-		}
-	}
+	// 	for _, s := range pr.PrizeScenes {
+	// 		gameProp.PoolScene.Put(s)
+	// 	}
+	// }
 
 	return pr, nil
 }

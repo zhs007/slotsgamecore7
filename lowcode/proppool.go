@@ -40,6 +40,7 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		CurLineData:      pool.DefaultLineData,
 		MapComponentData: make(map[string]IComponentData),
 		PoolScene:        sgc7game.NewGameScenePoolEx(),
+		SceneStack:       NewSceneStack(),
 	}
 
 	if gameProp.CurLineData != nil {

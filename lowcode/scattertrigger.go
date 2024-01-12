@@ -430,7 +430,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 	std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
 
-	gs := scatterTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, scatterTrigger.Name, "")
+	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, scatterTrigger.Name, "", 0)
 
 	isTrigger, lst := scatterTrigger.CanTrigger(gameProp, gs, curpr, stake, !scatterTrigger.Config.NeedDiscardResults)
 

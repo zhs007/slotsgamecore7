@@ -262,7 +262,7 @@ func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *
 	cd := gameProp.MapComponentData[symbolModifier.Name].(*BasicComponentData)
 
 	if len(symbolModifier.Config.TargetSymbolCodes) > 0 {
-		gs := symbolModifier.GetTargetScene2(gameProp, curpr, cd, symbolModifier.Name, "")
+		gs := symbolModifier.GetTargetScene3(gameProp, curpr, cd, symbolModifier.Name, "", 0)
 
 		lst := symbolModifier.getSymbols(gs)
 		if len(lst) > 0 {
