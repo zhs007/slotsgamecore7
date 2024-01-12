@@ -287,7 +287,7 @@ func (mystery *Mystery) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData
 
 func NewMystery(name string) IComponent {
 	mystery := &Mystery{
-		BasicComponent:           NewBasicComponent(name),
+		BasicComponent:           NewBasicComponent(name, 1),
 		MapMysteryTriggerFeature: make(map[int]*MysteryTriggerFeatureConfig),
 	}
 

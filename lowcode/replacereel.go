@@ -120,6 +120,6 @@ func (replaceReel *ReplaceReel) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 
 func NewReplaceReel(name string) IComponent {
 	return &ReplaceReel{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

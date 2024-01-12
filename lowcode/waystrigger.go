@@ -626,6 +626,6 @@ func (waysTrigger *WaysTrigger) NewComponentData() IComponentData {
 
 func NewWaysTrigger(name string) IComponent {
 	return &WaysTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

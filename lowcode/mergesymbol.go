@@ -165,6 +165,6 @@ func (mergeSymbol *MergeSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 
 func NewMergeSymbol(name string) IComponent {
 	return &MergeSymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 2),
 	}
 }

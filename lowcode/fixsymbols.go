@@ -180,6 +180,6 @@ func (fixSymbols *FixSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewFixSymbols(name string) IComponent {
 	return &FixSymbols{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

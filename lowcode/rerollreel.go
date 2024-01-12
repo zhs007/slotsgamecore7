@@ -98,6 +98,6 @@ func (reRollReel *ReRollReel) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewReRollReel(name string) IComponent {
 	return &ReRollReel{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

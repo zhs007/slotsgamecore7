@@ -296,6 +296,6 @@ func (symbolValWins *SymbolValWins) NewComponentData() IComponentData {
 
 func NewSymbolValWins(name string) IComponent {
 	return &SymbolValWins{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

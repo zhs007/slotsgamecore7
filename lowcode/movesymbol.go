@@ -271,6 +271,6 @@ func (moveSymbol *MoveSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewMoveSymbol(name string) IComponent {
 	return &MoveSymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

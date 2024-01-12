@@ -233,7 +233,7 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) EachUsedResults(pr *sgc7game
 
 func NewMultiLevelReplaceReel(name string) IComponent {
 	multiLevelReplaceReel := &MultiLevelReplaceReel{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 
 	return multiLevelReplaceReel

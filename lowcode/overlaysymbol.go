@@ -228,6 +228,6 @@ func (overlaySymbol *OverlaySymbol) EachUsedResults(pr *sgc7game.PlayResult, pbC
 
 func NewOverlaySymbol(name string) IComponent {
 	return &OverlaySymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

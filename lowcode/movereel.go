@@ -136,6 +136,6 @@ func (moveReel *MoveReel) OnStats(feature *sgc7stats.Feature, stake *sgc7game.St
 
 func NewMoveReel(name string) IComponent {
 	return &MoveReel{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

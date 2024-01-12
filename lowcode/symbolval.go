@@ -203,6 +203,6 @@ func (symbolVal *SymbolVal) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 
 func NewSymbolVal(name string) IComponent {
 	return &SymbolVal{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

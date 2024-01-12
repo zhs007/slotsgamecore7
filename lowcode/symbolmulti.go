@@ -195,6 +195,6 @@ func (symbolMulti *SymbolMulti) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 
 func NewSymbolMulti(name string) IComponent {
 	return &SymbolMulti{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

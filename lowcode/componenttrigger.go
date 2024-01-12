@@ -102,6 +102,6 @@ func (componentTrigger *ComponentTrigger) OnStats(feature *sgc7stats.Feature, st
 
 func NewComponentTrigger(name string) IComponent {
 	return &ComponentTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

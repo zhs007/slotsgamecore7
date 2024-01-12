@@ -990,6 +990,6 @@ func (symbolTrigger *SymbolTrigger) NewComponentData() IComponentData {
 
 func NewSymbolTrigger(name string) IComponent {
 	return &SymbolTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

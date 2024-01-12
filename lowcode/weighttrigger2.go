@@ -129,6 +129,6 @@ func (weightTrigger2 *WeightTrigger2) OnStats(feature *sgc7stats.Feature, stake 
 
 func NewWeightTrigger2(name string) IComponent {
 	return &WeightTrigger2{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

@@ -281,7 +281,7 @@ func (multiLevelReels *MultiLevelReels) EachUsedResults(pr *sgc7game.PlayResult,
 
 func NewMultiLevelReels(name string) IComponent {
 	multiLevelReels := &MultiLevelReels{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 
 	return multiLevelReels

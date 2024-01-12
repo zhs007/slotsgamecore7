@@ -304,7 +304,7 @@ func (collector *Collector) EachUsedResults(pr *sgc7game.PlayResult, pbComponent
 
 func NewCollector(name string) IComponent {
 	collector := &Collector{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 
 	return collector

@@ -244,7 +244,7 @@ func (reelSetMystery *ReelSetMystery) EachUsedResults(pr *sgc7game.PlayResult, p
 
 func NewReelSetMystery(name string) IComponent {
 	mystery := &ReelSetMystery{
-		BasicComponent:    NewBasicComponent(name),
+		BasicComponent:    NewBasicComponent(name, 1),
 		MapMysteryWeights: make(map[string]*sgc7game.ValWeights2),
 	}
 

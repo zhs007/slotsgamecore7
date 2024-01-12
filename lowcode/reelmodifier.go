@@ -230,6 +230,6 @@ func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc
 
 func NewReelModifier(name string) IComponent {
 	return &ReelModifier{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

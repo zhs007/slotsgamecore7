@@ -317,6 +317,6 @@ func (symbolModifier *SymbolModifier) OnStats(feature *sgc7stats.Feature, stake 
 
 func NewSymbolModifier(name string) IComponent {
 	return &SymbolModifier{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

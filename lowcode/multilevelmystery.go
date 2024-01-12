@@ -293,7 +293,7 @@ func (multiLevelMystery *MultiLevelMystery) EachUsedResults(pr *sgc7game.PlayRes
 
 func NewMultiLevelMystery(name string) IComponent {
 	multiLevelMystery := &MultiLevelMystery{
-		BasicComponent:           NewBasicComponent(name),
+		BasicComponent:           NewBasicComponent(name, 1),
 		MapMysteryTriggerFeature: make(map[int]*MysteryTriggerFeatureConfig),
 	}
 

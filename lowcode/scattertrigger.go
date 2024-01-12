@@ -637,6 +637,6 @@ func (scatterTrigger *ScatterTrigger) NewComponentData() IComponentData {
 
 func NewScatterTrigger(name string) IComponent {
 	return &ScatterTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

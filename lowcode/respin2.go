@@ -451,6 +451,6 @@ func (respin2 *Respin2) GetLastRespinNum(gameProp *GameProperty) int {
 
 func NewRespin2(name string) IComponent {
 	return &Respin2{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

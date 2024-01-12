@@ -383,7 +383,7 @@ func (lightning *Lightning) EachUsedResults(pr *sgc7game.PlayResult, pbComponent
 
 func NewLightning(name string) IComponent {
 	return &Lightning{
-		BasicComponent:           NewBasicComponent(name),
+		BasicComponent:           NewBasicComponent(name, 0),
 		MapSymbols:               make(map[int]*LightningSymbolData),
 		MapSymbolTriggerFeatures: make(map[int]*LightningTriggerFeatureConfig),
 	}

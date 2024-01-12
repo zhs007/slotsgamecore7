@@ -152,7 +152,7 @@ func (replaceSymbol *ReplaceSymbol) OnStats(feature *sgc7stats.Feature, stake *s
 
 func NewReplaceSymbol(name string) IComponent {
 	replaceSymbol := &ReplaceSymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 
 	return replaceSymbol

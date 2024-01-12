@@ -22,6 +22,7 @@ type BasicComponentData struct {
 	TargetOtherSceneIndex int
 	RNG                   []int
 	MapConfigVals         map[string]string
+	SrcScenes             []int
 }
 
 // OnNewGame -
@@ -40,6 +41,8 @@ func (basicComponentData *BasicComponentData) OnNewStep() {
 	basicComponentData.TargetSceneIndex = -1
 	basicComponentData.TargetOtherSceneIndex = -1
 	basicComponentData.RNG = nil
+
+	basicComponentData.initSrcScenes()
 }
 
 // GetVal -
@@ -60,6 +63,13 @@ func (basicComponentData *BasicComponentData) GetConfigVal(key string) string {
 // SetConfigVal -
 func (basicComponentData *BasicComponentData) SetConfigVal(key string, val string) {
 	basicComponentData.MapConfigVals[key] = val
+}
+
+// InitSrcScenes -
+func (basicComponentData *BasicComponentData) initSrcScenes() {
+	for i := range basicComponentData.SrcScenes {
+		basicComponentData.SrcScenes[i] = -1
+	}
 }
 
 // BuildPBComponentData
@@ -93,6 +103,10 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 		pbcd.UsedPrizeScenes = append(pbcd.UsedPrizeScenes, int32(v))
 	}
 
+	for _, v := range basicComponentData.SrcScenes {
+		pbcd.SrcScenes = append(pbcd.SrcScenes, int32(v))
+	}
+
 	return pbcd
 }
 
@@ -120,8 +134,9 @@ type BasicComponentConfig struct {
 }
 
 type BasicComponent struct {
-	Config *BasicComponentConfig
-	Name   string
+	Config      *BasicComponentConfig
+	Name        string
+	SrcSceneNum int
 }
 
 // onInit -
@@ -342,7 +357,13 @@ func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty
 
 // NewComponentData -
 func (basicComponent *BasicComponent) NewComponentData() IComponentData {
-	return &BasicComponentData{}
+	bcd := &BasicComponentData{}
+
+	if basicComponent.SrcSceneNum > 0 {
+		bcd.SrcScenes = make([]int, basicComponent.SrcSceneNum)
+	}
+
+	return bcd
 }
 
 // EachUsedResults -
@@ -455,8 +476,9 @@ func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GamePropert
 	return gs
 }
 
-func NewBasicComponent(name string) *BasicComponent {
+func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
-		Name: name,
+		Name:        name,
+		SrcSceneNum: srcSceneNum,
 	}
 }

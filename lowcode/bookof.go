@@ -394,6 +394,6 @@ func (bookof *BookOf) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 
 func NewBookOf(name string) IComponent {
 	return &BookOf{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

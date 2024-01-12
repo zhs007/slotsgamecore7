@@ -732,7 +732,7 @@ func (basicWins *BasicWins) EachUsedResults(pr *sgc7game.PlayResult, pbComponent
 
 func NewBasicWins(name string) IComponent {
 	basicWins := &BasicWins{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 
 	return basicWins

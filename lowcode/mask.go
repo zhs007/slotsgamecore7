@@ -414,7 +414,7 @@ func (mask *Mask) GetMask(gameProp *GameProperty) []bool {
 
 func NewMask(name string) IComponent {
 	mask := &Mask{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 
 	return mask

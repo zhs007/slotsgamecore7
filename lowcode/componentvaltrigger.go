@@ -160,6 +160,6 @@ func (componentTrigger *ComponentValTrigger) OnStats(feature *sgc7stats.Feature,
 
 func NewComponentValTrigger(name string) IComponent {
 	return &ComponentValTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

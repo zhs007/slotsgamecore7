@@ -741,6 +741,6 @@ func (linesTrigger *LinesTrigger) NewComponentData() IComponentData {
 
 func NewLinesTrigger(name string) IComponent {
 	return &SymbolTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }
