@@ -86,20 +86,12 @@ func (stack *SceneStack) PopTo(scene string) {
 
 func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *BasicComponentConfig, si int) *sgc7game.GameScene {
 	if len(basicCfg.TargetScenes3) >= si {
-		// if len(basicCfg.TargetScenes3) == 1 {
-		// 	for i := len(stack.Scenes) - 1; i >= 0; i-- {
-		// 		if basicCfg.TargetScenes3[0] == stack.Scenes[i].Component {
-		// 			return stack.Scenes[i].Scene
-		// 		}
-		// 	}
-		// } else {
 		for i := len(stack.Scenes) - 1; i >= 0; i-- {
 			ci := goutils.IndexOfStringSlice(basicCfg.TargetScenes3[si], stack.Scenes[i].Component, 0)
 			if ci >= 0 {
 				return stack.Scenes[i].Scene
 			}
 		}
-		// }
 	}
 
 	ssd := stack.GetTopScene()
@@ -114,6 +106,8 @@ func (stack *SceneStack) onStepStart(pr *sgc7game.PlayResult) {
 	stack.Scenes = nil
 
 	for _, v := range stack.CacheScenes {
+		v.SceneIndex = len(pr.Scenes)
+
 		pr.Scenes = append(pr.Scenes, v.Scene)
 
 		stack.Scenes = append(stack.Scenes, v)
