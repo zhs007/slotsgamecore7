@@ -238,7 +238,7 @@ func (multiRespin *MultiRespin) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 
 func NewMultiRespin(name string) IComponent {
 	multiFG := &MultiRespin{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 
 	return multiFG

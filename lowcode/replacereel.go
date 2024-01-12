@@ -84,7 +84,7 @@ func (replaceReel *ReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd := gameProp.MapComponentData[replaceReel.Name].(*BasicComponentData)
 
-	gs := replaceReel.GetTargetScene2(gameProp, curpr, cd, replaceReel.Name, "")
+	gs := replaceReel.GetTargetScene3(gameProp, curpr, cd, replaceReel.Name, "", 0)
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 
@@ -120,6 +120,6 @@ func (replaceReel *ReplaceReel) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 
 func NewReplaceReel(name string) IComponent {
 	return &ReplaceReel{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

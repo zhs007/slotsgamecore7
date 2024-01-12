@@ -426,6 +426,6 @@ func (respin *Respin) IsStarted(gameProp *GameProperty) bool {
 
 func NewRespin(name string) IComponent {
 	return &Respin{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

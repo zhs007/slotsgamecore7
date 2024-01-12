@@ -157,7 +157,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
 
-	gs := mystery.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, mystery.Name, "")
+	gs := mystery.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, mystery.Name, "", 0)
 	if !gs.HasSymbols(mystery.MysterySymbols) {
 		mystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	} else {
@@ -287,7 +287,7 @@ func (mystery *Mystery) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData
 
 func NewMystery(name string) IComponent {
 	mystery := &Mystery{
-		BasicComponent:           NewBasicComponent(name),
+		BasicComponent:           NewBasicComponent(name, 1),
 		MapMysteryTriggerFeature: make(map[int]*MysteryTriggerFeatureConfig),
 	}
 

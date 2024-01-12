@@ -109,7 +109,7 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[symbolVal2.Name].(*BasicComponentData)
 
-	gs := symbolVal2.GetTargetScene2(gameProp, curpr, cd, symbolVal2.Name, "")
+	gs := symbolVal2.GetTargetScene3(gameProp, curpr, cd, symbolVal2.Name, "", 0)
 
 	if gs.HasSymbol(symbolVal2.SymbolCode) {
 		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
@@ -193,6 +193,6 @@ func (symbolVal2 *SymbolVal2) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewSymbolVal2(name string) IComponent {
 	return &SymbolVal2{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

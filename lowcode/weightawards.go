@@ -265,6 +265,6 @@ func (weightAwards *WeightAwards) NewComponentData() IComponentData {
 
 func NewWeightAwards(name string) IComponent {
 	return &WeightAwards{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

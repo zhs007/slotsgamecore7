@@ -181,7 +181,7 @@ func (basicReels *BasicReels) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewBasicReels(name string) IComponent {
 	basicReels := &BasicReels{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 
 	return basicReels

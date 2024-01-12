@@ -213,7 +213,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[moveSymbol.Name].(*BasicComponentData)
 
-	gs := moveSymbol.GetTargetScene2(gameProp, curpr, cd, moveSymbol.Name, "")
+	gs := moveSymbol.GetTargetScene3(gameProp, curpr, cd, moveSymbol.Name, "", 0)
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 
@@ -271,6 +271,6 @@ func (moveSymbol *MoveSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewMoveSymbol(name string) IComponent {
 	return &MoveSymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

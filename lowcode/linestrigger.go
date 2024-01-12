@@ -534,7 +534,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	std := gameProp.MapComponentData[linesTrigger.Name].(*LinesTriggerData)
 
-	gs := linesTrigger.GetTargetScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
+	gs := linesTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "", 0)
 
 	isTrigger, lst := linesTrigger.CanTrigger(gameProp, gs, curpr, stake, !linesTrigger.Config.NeedDiscardResults)
 
@@ -741,6 +741,6 @@ func (linesTrigger *LinesTrigger) NewComponentData() IComponentData {
 
 func NewLinesTrigger(name string) IComponent {
 	return &SymbolTrigger{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

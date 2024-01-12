@@ -13,6 +13,7 @@ message ComponentData {
     int64 cashWin = 6;
     int32 targetScene = 8;
     int32 runIndex = 9;
+    repeated int32 srcScenes = 10;
 }
 
 // BasicComponentData

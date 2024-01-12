@@ -118,7 +118,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
 
-	gs := symbolMulti.GetTargetScene2(gameProp, curpr, cd, symbolMulti.Name, "")
+	gs := symbolMulti.GetTargetScene3(gameProp, curpr, cd, symbolMulti.Name, "", 0)
 
 	if gs.HasSymbols(symbolMulti.SymbolCodes) {
 		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
@@ -195,6 +195,6 @@ func (symbolMulti *SymbolMulti) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 
 func NewSymbolMulti(name string) IComponent {
 	return &SymbolMulti{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

@@ -272,6 +272,6 @@ func (multiWeightAwards *MultiWeightAwards) NewComponentData() IComponentData {
 
 func NewMultiWeightAwards(name string) IComponent {
 	return &MultiWeightAwards{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

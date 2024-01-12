@@ -134,6 +134,6 @@ func (maskBranch *MaskBranch) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewMaskBranch(name string) IComponent {
 	return &MaskBranch{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

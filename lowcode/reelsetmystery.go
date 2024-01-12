@@ -130,7 +130,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 
 	cd := gameProp.MapComponentData[reelSetMystery.Name].(*ReelSetMysteryData)
 
-	gs := reelSetMystery.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, reelSetMystery.Name, "")
+	gs := reelSetMystery.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, reelSetMystery.Name, "", 0)
 	if !reelSetMystery.hasMystery(gs) {
 		reelSetMystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	} else {
@@ -244,7 +244,7 @@ func (reelSetMystery *ReelSetMystery) EachUsedResults(pr *sgc7game.PlayResult, p
 
 func NewReelSetMystery(name string) IComponent {
 	mystery := &ReelSetMystery{
-		BasicComponent:    NewBasicComponent(name),
+		BasicComponent:    NewBasicComponent(name, 1),
 		MapMysteryWeights: make(map[string]*sgc7game.ValWeights2),
 	}
 

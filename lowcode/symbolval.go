@@ -109,7 +109,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[symbolVal.Name].(*BasicComponentData)
 
-	gs := symbolVal.GetTargetScene2(gameProp, curpr, cd, symbolVal.Name, "")
+	gs := symbolVal.GetTargetScene3(gameProp, curpr, cd, symbolVal.Name, "", 0)
 
 	if gs.HasSymbol(symbolVal.SymbolCode) {
 		vw := symbolVal.GetWeightVal(gameProp, cd)
@@ -203,6 +203,6 @@ func (symbolVal *SymbolVal) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 
 func NewSymbolVal(name string) IComponent {
 	return &SymbolVal{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

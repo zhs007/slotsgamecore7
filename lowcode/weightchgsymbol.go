@@ -101,7 +101,7 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 
 	cd := gameProp.MapComponentData[weightChgSymbol.Name].(*BasicComponentData)
 
-	gs := weightChgSymbol.GetTargetScene2(gameProp, curpr, cd, weightChgSymbol.Name, "")
+	gs := weightChgSymbol.GetTargetScene3(gameProp, curpr, cd, weightChgSymbol.Name, "", 0)
 
 	cgs := gs.CloneEx(gameProp.PoolScene)
 
@@ -149,6 +149,6 @@ func (weightChgSymbol *WeightChgSymbol) OnStats(feature *sgc7stats.Feature, stak
 
 func NewWeightChgSymbol(name string) IComponent {
 	return &WeightChgSymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

@@ -192,7 +192,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
 
-	gs := multiLevelMystery.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, multiLevelMystery.Name, "")
+	gs := multiLevelMystery.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, multiLevelMystery.Name, "", 0)
 
 	if gs.HasSymbols(multiLevelMystery.MysterySymbols) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)
@@ -293,7 +293,7 @@ func (multiLevelMystery *MultiLevelMystery) EachUsedResults(pr *sgc7game.PlayRes
 
 func NewMultiLevelMystery(name string) IComponent {
 	multiLevelMystery := &MultiLevelMystery{
-		BasicComponent:           NewBasicComponent(name),
+		BasicComponent:           NewBasicComponent(name, 1),
 		MapMysteryTriggerFeature: make(map[int]*MysteryTriggerFeatureConfig),
 	}
 

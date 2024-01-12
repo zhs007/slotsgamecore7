@@ -129,7 +129,7 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[fixSymbols.Name].(*BasicComponentData)
 
-	gs := fixSymbols.GetTargetScene2(gameProp, curpr, cd, fixSymbols.Name, "")
+	gs := fixSymbols.GetTargetScene3(gameProp, curpr, cd, fixSymbols.Name, "", 0)
 
 	needReTag := true
 	if fixSymbols.Type == FixSymbolsTypeMergeDown {
@@ -180,6 +180,6 @@ func (fixSymbols *FixSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewFixSymbols(name string) IComponent {
 	return &FixSymbols{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

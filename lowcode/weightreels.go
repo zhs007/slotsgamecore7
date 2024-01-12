@@ -213,7 +213,7 @@ func (weightReels *WeightReels) NewComponentData() IComponentData {
 
 func NewWeightReels(name string) IComponent {
 	weightReels := &WeightReels{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 
 	return weightReels

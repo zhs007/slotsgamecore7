@@ -235,7 +235,7 @@ func (bookof *BookOf) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 			}
 		}
 
-		gs := bookof.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, bookof.Name, "")
+		gs := bookof.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, bookof.Name, "", 0)
 
 		for _, s := range cd.Symbols {
 			ngs, err := bookof.procBookOfScene(gameProp, gs, s)
@@ -394,6 +394,6 @@ func (bookof *BookOf) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 
 func NewBookOf(name string) IComponent {
 	return &BookOf{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

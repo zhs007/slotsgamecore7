@@ -230,6 +230,6 @@ func (symbolCollection *SymbolCollection) EachUsedResults(pr *sgc7game.PlayResul
 
 func NewSymbolCollection(name string) IComponent {
 	return &SymbolCollection{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 0),
 	}
 }

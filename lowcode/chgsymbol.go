@@ -80,7 +80,7 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[chgSymbol.Name].(*BasicComponentData)
 
-	gs := chgSymbol.GetTargetScene2(gameProp, curpr, cd, chgSymbol.Name, "")
+	gs := chgSymbol.GetTargetScene3(gameProp, curpr, cd, chgSymbol.Name, "", 0)
 
 	cgs := gs.CloneEx(gameProp.PoolScene)
 	// cgs := gs.Clone()
@@ -118,6 +118,6 @@ func (chgSymbol *ChgSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.
 
 func NewChgSymbol(name string) IComponent {
 	return &ChgSymbol{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

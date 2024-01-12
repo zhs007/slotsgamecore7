@@ -276,7 +276,7 @@ func (bookof2 *BookOf2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 			}
 		}
 
-		gs := bookof2.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, bookof2.Name, "")
+		gs := bookof2.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, bookof2.Name, "", 0)
 
 		bookof2.procInitScene(gameProp, gs, curpr, cd)
 
@@ -483,6 +483,6 @@ func (bookof2 *BookOf2) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData
 
 func NewBookOf2(name string) IComponent {
 	return &BookOf2{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

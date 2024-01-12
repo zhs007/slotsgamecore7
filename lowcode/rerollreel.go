@@ -67,7 +67,7 @@ func (reRollReel *ReRollReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[reRollReel.Name].(*BasicComponentData)
 
-	gs := reRollReel.GetTargetScene2(gameProp, curpr, cd, reRollReel.Name, "")
+	gs := reRollReel.GetTargetScene3(gameProp, curpr, cd, reRollReel.Name, "", 0)
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 
@@ -98,6 +98,6 @@ func (reRollReel *ReRollReel) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 
 func NewReRollReel(name string) IComponent {
 	return &ReRollReel{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 }

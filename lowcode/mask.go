@@ -222,7 +222,7 @@ func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cu
 	if mask.MaskType == MaskTypeSymbolInReel {
 		cd := gameProp.MapComponentData[mask.Name].(*MaskData)
 
-		gs := mask.GetTargetScene2(gameProp, curpr, &cd.BasicComponentData, mask.Name, targetScene)
+		gs := mask.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, mask.Name, targetScene, 0)
 
 		for x, v := range cd.Vals {
 			if !v {
@@ -414,7 +414,7 @@ func (mask *Mask) GetMask(gameProp *GameProperty) []bool {
 
 func NewMask(name string) IComponent {
 	mask := &Mask{
-		BasicComponent: NewBasicComponent(name),
+		BasicComponent: NewBasicComponent(name, 1),
 	}
 
 	return mask
