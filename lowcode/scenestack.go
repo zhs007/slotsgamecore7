@@ -85,7 +85,7 @@ func (stack *SceneStack) PopTo(scene string) {
 }
 
 func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *BasicComponentConfig, si int) *sgc7game.GameScene {
-	if len(basicCfg.TargetScenes3) >= si {
+	if len(basicCfg.TargetScenes3) > si {
 		for i := len(stack.Scenes) - 1; i >= 0; i-- {
 			ci := goutils.IndexOfStringSlice(basicCfg.TargetScenes3[si], stack.Scenes[i].Component, 0)
 			if ci >= 0 {
