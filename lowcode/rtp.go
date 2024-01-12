@@ -307,7 +307,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		}
 	}
 
-	d := sgc7rtp.StartRTP(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
+	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
 		goutils.Info("processing...",
 			zap.Int64("total nums", totalnums),
 			zap.Int64("current nums", curnums),
