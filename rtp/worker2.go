@@ -201,9 +201,11 @@ func StartRTP2(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stak
 			break
 		}
 
-		ontimer(spinnums, spinnums-rtp.BetNums, time.Since(t1))
+		ontimer(spinnums, rtp.BetNums, time.Since(t1))
 
-		startWorker(game, rtp, spinnums/int64(tasknum), stake, needVariance, limitPayout, ch)
+		if lastnums >= worknums {
+			startWorker(game, rtp, spinnums/int64(tasknum), stake, needVariance, limitPayout, ch)
+		}
 	}
 
 	elapsed := time.Since(t1)
