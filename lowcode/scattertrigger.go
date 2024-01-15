@@ -17,6 +17,10 @@ import (
 
 const ScatterTriggerTypeName = "scatterTrigger"
 
+const (
+	STCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+)
+
 type ScatterTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -24,6 +28,7 @@ type ScatterTriggerData struct {
 	WildNum       int
 	RespinNum     int
 	Wins          int
+	WinMulti      int
 }
 
 // OnNewGame -
@@ -40,6 +45,7 @@ func (scatterTriggerData *ScatterTriggerData) OnNewStep() {
 	scatterTriggerData.WildNum = 0
 	scatterTriggerData.RespinNum = 0
 	scatterTriggerData.Wins = 0
+	scatterTriggerData.WinMulti = 1
 }
 
 // BuildPBComponentData
@@ -51,6 +57,7 @@ func (scatterTriggerData *ScatterTriggerData) BuildPBComponentData() proto.Messa
 		WildNum:            int32(scatterTriggerData.WildNum),
 		RespinNum:          int32(scatterTriggerData.RespinNum),
 		Wins:               int32(scatterTriggerData.Wins),
+		WinMulti:           int32(scatterTriggerData.WinMulti),
 	}
 
 	return pbcd
@@ -100,6 +107,7 @@ type ScatterTriggerConfig struct {
 	PosArea                         []int                         `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
 	CountScatterPayAs               string                        `yaml:"countScatterPayAs" json:"countScatterPayAs"`                         // countscatter时，按什么符号赔付
 	SymbolCodeCountScatterPayAs     int                           `yaml:"-" json:"-"`                                                         // countscatter时，按什么符号赔付
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
@@ -227,6 +235,10 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 
 			scatterTrigger.Config.RespinNumWeightWithScatterNumVW[k] = vw2
 		}
+	}
+
+	if scatterTrigger.Config.WinMulti <= 0 {
+		scatterTrigger.Config.WinMulti = 1
 	}
 
 	scatterTrigger.onInit(&scatterTrigger.Config.BasicComponentConfig)
@@ -364,7 +376,12 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 
 // procWins
 func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
+	std.WinMulti = scatterTrigger.GetWinMulti(&std.BasicComponentData)
+
 	for _, v := range lst {
+		v.OtherMul = std.WinMulti
+		v.CoinWin *= std.WinMulti
+
 		std.Wins += v.CoinWin
 	}
 
@@ -633,6 +650,15 @@ func (scatterTrigger *ScatterTrigger) OnStats(feature *sgc7stats.Feature, stake 
 // NewComponentData -
 func (scatterTrigger *ScatterTrigger) NewComponentData() IComponentData {
 	return &ScatterTriggerData{}
+}
+
+func (scatterTrigger *ScatterTrigger) GetWinMulti(basicCD *BasicComponentData) int {
+	winMulti, isok := basicCD.GetConfigIntVal(STCVWinMulti)
+	if isok {
+		return winMulti
+	}
+
+	return scatterTrigger.Config.WinMulti
 }
 
 func NewScatterTrigger(name string) IComponent {

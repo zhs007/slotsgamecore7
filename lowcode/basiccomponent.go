@@ -22,12 +22,14 @@ type BasicComponentData struct {
 	TargetOtherSceneIndex int
 	RNG                   []int
 	MapConfigVals         map[string]string
+	MapConfigIntVals      map[string]int
 	SrcScenes             []int
 }
 
 // OnNewGame -
 func (basicComponentData *BasicComponentData) OnNewGame() {
 	basicComponentData.MapConfigVals = make(map[string]string)
+	basicComponentData.MapConfigIntVals = make(map[string]int)
 }
 
 // OnNewStep -
@@ -63,6 +65,17 @@ func (basicComponentData *BasicComponentData) GetConfigVal(key string) string {
 // SetConfigVal -
 func (basicComponentData *BasicComponentData) SetConfigVal(key string, val string) {
 	basicComponentData.MapConfigVals[key] = val
+}
+
+// GetConfigIntVal -
+func (basicComponentData *BasicComponentData) GetConfigIntVal(key string) (int, bool) {
+	ival, isok := basicComponentData.MapConfigIntVals[key]
+	return ival, isok
+}
+
+// SetConfigIntVal -
+func (basicComponentData *BasicComponentData) SetConfigIntVal(key string, val int) {
+	basicComponentData.MapConfigIntVals[key] = val
 }
 
 // InitSrcScenes -

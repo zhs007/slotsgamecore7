@@ -174,6 +174,7 @@ message ScatterTriggerData {
     int32 wildNum = 4;
     int32 respinNum = 5;
     int32 wins = 6;
+    int32 winMulti = 7;
 }
 
 // LinesTriggerData
@@ -184,6 +185,7 @@ message LinesTriggerData {
     int32 wildNum = 4;
     int32 respinNum = 5;
     int32 wins = 6;
+    int32 winMulti = 7;
 }
 
 // WaysTriggerData
@@ -194,6 +196,7 @@ message WaysTriggerData {
     int32 wildNum = 4;
     int32 respinNum = 5;
     int32 wins = 6;
+    int32 winMulti = 7;
 }
 
 // WeightAwardsData

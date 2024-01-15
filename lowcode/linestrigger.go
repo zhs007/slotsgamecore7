@@ -17,6 +17,10 @@ import (
 
 const LinesTriggerTypeName = "linesTrigger"
 
+const (
+	LTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+)
+
 type LinesTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -24,6 +28,7 @@ type LinesTriggerData struct {
 	WildNum       int
 	RespinNum     int
 	Wins          int
+	WinMulti      int
 }
 
 // OnNewGame -
@@ -40,6 +45,7 @@ func (linesTriggerData *LinesTriggerData) OnNewStep() {
 	linesTriggerData.WildNum = 0
 	linesTriggerData.RespinNum = 0
 	linesTriggerData.Wins = 0
+	linesTriggerData.WinMulti = 1
 }
 
 // BuildPBComponentData
@@ -51,6 +57,7 @@ func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 		WildNum:            int32(linesTriggerData.WildNum),
 		RespinNum:          int32(linesTriggerData.RespinNum),
 		Wins:               int32(linesTriggerData.Wins),
+		WinMulti:           int32(linesTriggerData.WinMulti),
 	}
 
 	return pbcd
@@ -100,6 +107,7 @@ type LinesTriggerConfig struct {
 	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
 	StrCheckWinType                 string                        `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
 	CheckWinType                    CheckWinType                  `yaml:"-" json:"-"`                                                         //
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
@@ -226,6 +234,10 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 
 			linesTrigger.Config.RespinNumWeightWithScatterNumVW[k] = vw2
 		}
+	}
+
+	if linesTrigger.Config.WinMulti <= 0 {
+		linesTrigger.Config.WinMulti = 1
 	}
 
 	linesTrigger.onInit(&linesTrigger.Config.BasicComponentConfig)
@@ -468,7 +480,12 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 
 // procWins
 func (linesTrigger *LinesTrigger) procWins(std *LinesTriggerData, lst []*sgc7game.Result) (int, error) {
+	std.WinMulti = linesTrigger.GetWinMulti(&std.BasicComponentData)
+
 	for _, v := range lst {
+		v.OtherMul = std.WinMulti
+		v.CoinWin *= std.WinMulti
+
 		std.Wins += v.CoinWin
 	}
 
@@ -737,6 +754,15 @@ func (linesTrigger *LinesTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc
 // NewComponentData -
 func (linesTrigger *LinesTrigger) NewComponentData() IComponentData {
 	return &LinesTriggerData{}
+}
+
+func (linesTrigger *LinesTrigger) GetWinMulti(basicCD *BasicComponentData) int {
+	winMulti, isok := basicCD.GetConfigIntVal(LTCVWinMulti)
+	if isok {
+		return winMulti
+	}
+
+	return linesTrigger.Config.WinMulti
 }
 
 func NewLinesTrigger(name string) IComponent {

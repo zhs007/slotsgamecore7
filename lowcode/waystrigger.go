@@ -17,6 +17,10 @@ import (
 
 const WaysTriggerTypeName = "waysTrigger"
 
+const (
+	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+)
+
 type WaysTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -24,6 +28,7 @@ type WaysTriggerData struct {
 	WildNum       int
 	RespinNum     int
 	Wins          int
+	WinMulti      int
 }
 
 // OnNewGame -
@@ -40,6 +45,7 @@ func (waysTriggerData *WaysTriggerData) OnNewStep() {
 	waysTriggerData.WildNum = 0
 	waysTriggerData.RespinNum = 0
 	waysTriggerData.Wins = 0
+	waysTriggerData.WinMulti = 1
 }
 
 // BuildPBComponentData
@@ -51,6 +57,7 @@ func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 		WildNum:            int32(waysTriggerData.WildNum),
 		RespinNum:          int32(waysTriggerData.RespinNum),
 		Wins:               int32(waysTriggerData.Wins),
+		WinMulti:           int32(waysTriggerData.WinMulti),
 	}
 
 	return pbcd
@@ -100,6 +107,7 @@ type WaysTriggerConfig struct {
 	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
 	StrCheckWinType                 string                        `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
 	CheckWinType                    CheckWinType                  `yaml:"-" json:"-"`                                                         //
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
@@ -228,6 +236,10 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 	}
 
+	if waysTrigger.Config.WinMulti <= 0 {
+		waysTrigger.Config.WinMulti = 1
+	}
+
 	waysTrigger.onInit(&waysTrigger.Config.BasicComponentConfig)
 
 	return nil
@@ -353,7 +365,12 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 
 // procWins
 func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
+	std.WinMulti = waysTrigger.GetWinMulti(&std.BasicComponentData)
+
 	for _, v := range lst {
+		v.OtherMul = std.WinMulti
+		v.CoinWin *= std.WinMulti
+
 		std.Wins += v.CoinWin
 	}
 
@@ -622,6 +639,15 @@ func (waysTrigger *WaysTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 // NewComponentData -
 func (waysTrigger *WaysTrigger) NewComponentData() IComponentData {
 	return &WaysTriggerData{}
+}
+
+func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
+	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
+	if isok {
+		return winMulti
+	}
+
+	return waysTrigger.Config.WinMulti
 }
 
 func NewWaysTrigger(name string) IComponent {
