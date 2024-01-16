@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -90,6 +92,15 @@ type RespinConfig struct {
 	MainComponent        string               `yaml:"mainComponent" json:"mainComponent"`
 	IsWinBreak           bool                 `yaml:"isWinBreak" json:"isWinBreak"`
 	Levels               []*RespinLevelConfig `yaml:"levels" json:"levels"`
+}
+
+// SetLinkComponent
+func (cfg *RespinConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "loop" {
+		cfg.MainComponent = componentName
+	}
 }
 
 type Respin struct {
@@ -428,4 +439,63 @@ func NewRespin(name string) IComponent {
 	return &Respin{
 		BasicComponent: NewBasicComponent(name, 0),
 	}
+}
+
+//	"configuration": {
+//		"isWinBreak": "false"
+//	},
+type jsonRespin struct {
+	IsWinBreak string `json:"isWinBreak"`
+}
+
+func (jr *jsonRespin) build() *RespinConfig {
+	cfg := &RespinConfig{
+		IsWinBreak: jr.IsWinBreak == "true",
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseRespin(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseRespin2:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseRespin2:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonRespin{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseRespin2:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: RespinTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

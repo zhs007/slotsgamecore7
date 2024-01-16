@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -122,6 +124,15 @@ type WaysTriggerConfig struct {
 	RespinNumWithScatterNum         map[int]int                   `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
+}
+
+// SetLinkComponent
+func (cfg *WaysTriggerConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
+	}
 }
 
 type WaysTrigger struct {
@@ -654,4 +665,92 @@ func NewWaysTrigger(name string) IComponent {
 	return &WaysTrigger{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"triggerType": "lines",
+//		"betType": "bet",
+//		"checkWinType": "left2right",
+//		"symbols": [
+//			"WL",
+//			"A",
+//			"B",
+//			"C",
+//			"D",
+//			"E",
+//			"F",
+//			"G",
+//			"H",
+//			"J",
+//			"K",
+//			"L"
+//		],
+//		"wildSymbols": [
+//			"WL"
+//		]
+//	},
+type jsonWaysTrigger struct {
+	Symbols     []string `json:"symbols"`
+	TriggerType string   `json:"triggerType"`
+	BetType     string   `json:"betType"`
+	MinNum      int      `json:"minNum"`
+	WildSymbols []string `json:"wildSymbols"`
+	WinMulti    int      `json:"winMulti"`
+}
+
+func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
+	cfg := &WaysTriggerConfig{
+		Symbols:       jwt.Symbols,
+		Type:          jwt.TriggerType,
+		BetTypeString: jwt.BetType,
+		MinNum:        jwt.MinNum,
+		WildSymbols:   jwt.WildSymbols,
+		WinMulti:      jwt.WinMulti,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseWaysTrigger:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseWaysTrigger:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonWaysTrigger{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseWaysTrigger:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: WaysTriggerTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

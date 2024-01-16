@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -122,6 +124,15 @@ type LinesTriggerConfig struct {
 	RespinNumWithScatterNum         map[int]int                   `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
+}
+
+// SetLinkComponent
+func (cfg *LinesTriggerConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
+	}
 }
 
 type LinesTrigger struct {
@@ -766,7 +777,95 @@ func (linesTrigger *LinesTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 }
 
 func NewLinesTrigger(name string) IComponent {
-	return &SymbolTrigger{
+	return &LinesTrigger{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"triggerType": "lines",
+//		"betType": "bet",
+//		"checkWinType": "left2right",
+//		"symbols": [
+//			"WL",
+//			"A",
+//			"B",
+//			"C",
+//			"D",
+//			"E",
+//			"F",
+//			"G",
+//			"H",
+//			"J",
+//			"K",
+//			"L"
+//		],
+//		"wildSymbols": [
+//			"WL"
+//		]
+//	},
+type jsonLinesTrigger struct {
+	Symbols     []string `json:"symbols"`
+	TriggerType string   `json:"triggerType"`
+	BetType     string   `json:"betType"`
+	MinNum      int      `json:"minNum"`
+	WildSymbols []string `json:"wildSymbols"`
+	WinMulti    int      `json:"winMulti"`
+}
+
+func (jlt *jsonLinesTrigger) build() *LinesTriggerConfig {
+	cfg := &LinesTriggerConfig{
+		Symbols:       jlt.Symbols,
+		Type:          jlt.TriggerType,
+		BetTypeString: jlt.BetType,
+		MinNum:        jlt.MinNum,
+		WildSymbols:   jlt.WildSymbols,
+		WinMulti:      jlt.WinMulti,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseLinesTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseLinesTrigger:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseLinesTrigger:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonLinesTrigger{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseLinesTrigger:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: LinesTriggerTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

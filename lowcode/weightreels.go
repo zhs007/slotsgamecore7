@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -49,6 +51,13 @@ type WeightReelsConfig struct {
 	ReelSetsWeight       string                `yaml:"reelSetWeight" json:"reelSetWeight"`
 	ReelSetsWeightVW     *sgc7game.ValWeights2 `json:"-"`
 	IsExpandReel         bool                  `yaml:"isExpandReel" json:"isExpandReel"`
+}
+
+// SetLinkComponent
+func (cfg *WeightReelsConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type WeightReels struct {
@@ -217,4 +226,66 @@ func NewWeightReels(name string) IComponent {
 	}
 
 	return weightReels
+}
+
+//	"configuration": {
+//		"isExpandReel": "false",
+//		"reelSetWeight": "bgreelweight"
+//	}
+type jsonWeightReels struct {
+	ReelSetWeight string `json:"reelSetWeight"`
+	IsExpandReel  string `json:"isExpandReel"`
+}
+
+func (jwr *jsonWeightReels) build() *WeightReelsConfig {
+	cfg := &WeightReelsConfig{
+		ReelSetsWeight: jwr.ReelSetWeight,
+		IsExpandReel:   jwr.IsExpandReel == "true",
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseWeightReels(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseWeightReels:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseWeightReels:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonWeightReels{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseWeightReels:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: WeightReelsTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

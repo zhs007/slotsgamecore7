@@ -210,6 +210,20 @@ func (pool *GamePropertyPool) newStatusStats(betMul int, parent *sgc7stats.Featu
 	return feature, nil
 }
 
+func (pool *GamePropertyPool) loadAllWeights() {
+	for v, vw2 := range pool.Config.mapValWeights {
+		pool.mapIntValWeights[v] = vw2
+	}
+
+	for v, vw2 := range pool.Config.mapStrWeights {
+		pool.mapStrValWeights[v] = vw2
+	}
+
+	for v, vw2 := range pool.Config.mapReelSetWeights {
+		pool.mapStrValWeights[v] = vw2
+	}
+}
+
 func (pool *GamePropertyPool) InitStats(betMul int) error {
 	err := pool.Config.BuildStatsSymbolCodes(pool.DefaultPaytables)
 	if err != nil {

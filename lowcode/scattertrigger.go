@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -122,6 +124,15 @@ type ScatterTriggerConfig struct {
 	RespinNumWithScatterNum         map[int]int                   `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
+}
+
+// SetLinkComponent
+func (cfg *ScatterTriggerConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
+	}
 }
 
 type ScatterTrigger struct {
@@ -665,4 +676,93 @@ func NewScatterTrigger(name string) IComponent {
 	return &ScatterTrigger{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"triggerType": "countscatterInArea",
+//		"betType": "noPay",
+//		"genRespinType": "none",
+//		"posArea": [
+//			1,
+//			1,
+//			1,
+//			3
+//		],
+//		"minNum": 3,
+//		"symbols": [
+//			"SC"
+//		]
+//	},
+type jsonScatterTrigger struct {
+	Symbols           []string `json:"symbols"`
+	TriggerType       string   `json:"triggerType"`
+	BetType           string   `json:"betType"`
+	MinNum            int      `json:"minNum"`
+	WildSymbols       []string `json:"wildSymbols"`
+	PosArea           []int    `json:"posArea"`
+	CountScatterPayAs string   `json:"countScatterPayAs"`
+	WinMulti          int      `json:"winMulti"`
+}
+
+func (jst *jsonScatterTrigger) build() *ScatterTriggerConfig {
+	cfg := &ScatterTriggerConfig{
+		Symbols:           jst.Symbols,
+		Type:              jst.TriggerType,
+		BetTypeString:     jst.BetType,
+		MinNum:            jst.MinNum,
+		WildSymbols:       jst.WildSymbols,
+		PosArea:           jst.PosArea,
+		CountScatterPayAs: jst.CountScatterPayAs,
+		WinMulti:          jst.WinMulti,
+	}
+
+	for i := range cfg.PosArea {
+		cfg.PosArea[i]--
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseScatterTrigger:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseScatterTrigger:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonScatterTrigger{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseScatterTrigger:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: ScatterTriggerTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }
