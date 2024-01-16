@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -24,6 +26,13 @@ type BasicReelsConfig struct {
 	ReelSetsWeight       string `yaml:"reelSetWeight" json:"reelSetWeight"`
 	ReelSet              string `yaml:"reelSet" json:"reelSet"`
 	IsExpandReel         bool   `yaml:"isExpandReel" json:"isExpandReel"`
+}
+
+// SetLinkComponent
+func (cfg *BasicReelsConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type BasicReels struct {
@@ -185,4 +194,66 @@ func NewBasicReels(name string) IComponent {
 	}
 
 	return basicReels
+}
+
+//	"configuration": {
+//		"isExpandReel": "false",
+//		"reelSet": "bgreelweight"
+//	}
+type jsonBasicReels struct {
+	ReelSet      string `json:"reelSet"`
+	IsExpandReel string `json:"isExpandReel"`
+}
+
+func (jbr *jsonBasicReels) build() *BasicReelsConfig {
+	cfg := &BasicReelsConfig{
+		ReelSet:      jbr.ReelSet,
+		IsExpandReel: jbr.IsExpandReel == "true",
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseBasicReels(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseBasicReels2:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseBasicReels2:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonBasicReels{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseBasicReels2:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: BasicReelsTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

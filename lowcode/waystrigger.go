@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -17,6 +19,10 @@ import (
 
 const WaysTriggerTypeName = "waysTrigger"
 
+const (
+	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+)
+
 type WaysTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -24,6 +30,7 @@ type WaysTriggerData struct {
 	WildNum       int
 	RespinNum     int
 	Wins          int
+	WinMulti      int
 }
 
 // OnNewGame -
@@ -40,6 +47,7 @@ func (waysTriggerData *WaysTriggerData) OnNewStep() {
 	waysTriggerData.WildNum = 0
 	waysTriggerData.RespinNum = 0
 	waysTriggerData.Wins = 0
+	waysTriggerData.WinMulti = 1
 }
 
 // BuildPBComponentData
@@ -51,6 +59,7 @@ func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 		WildNum:            int32(waysTriggerData.WildNum),
 		RespinNum:          int32(waysTriggerData.RespinNum),
 		Wins:               int32(waysTriggerData.Wins),
+		WinMulti:           int32(waysTriggerData.WinMulti),
 	}
 
 	return pbcd
@@ -100,6 +109,7 @@ type WaysTriggerConfig struct {
 	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
 	StrCheckWinType                 string                        `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
 	CheckWinType                    CheckWinType                  `yaml:"-" json:"-"`                                                         //
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
@@ -114,6 +124,15 @@ type WaysTriggerConfig struct {
 	RespinNumWithScatterNum         map[int]int                   `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
+}
+
+// SetLinkComponent
+func (cfg *WaysTriggerConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
+	}
 }
 
 type WaysTrigger struct {
@@ -226,6 +245,10 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 
 			waysTrigger.Config.RespinNumWeightWithScatterNumVW[k] = vw2
 		}
+	}
+
+	if waysTrigger.Config.WinMulti <= 0 {
+		waysTrigger.Config.WinMulti = 1
 	}
 
 	waysTrigger.onInit(&waysTrigger.Config.BasicComponentConfig)
@@ -353,7 +376,12 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 
 // procWins
 func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
+	std.WinMulti = waysTrigger.GetWinMulti(&std.BasicComponentData)
+
 	for _, v := range lst {
+		v.OtherMul = std.WinMulti
+		v.CoinWin *= std.WinMulti
+
 		std.Wins += v.CoinWin
 	}
 
@@ -624,8 +652,105 @@ func (waysTrigger *WaysTrigger) NewComponentData() IComponentData {
 	return &WaysTriggerData{}
 }
 
+func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
+	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
+	if isok {
+		return winMulti
+	}
+
+	return waysTrigger.Config.WinMulti
+}
+
 func NewWaysTrigger(name string) IComponent {
 	return &WaysTrigger{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"triggerType": "lines",
+//		"betType": "bet",
+//		"checkWinType": "left2right",
+//		"symbols": [
+//			"WL",
+//			"A",
+//			"B",
+//			"C",
+//			"D",
+//			"E",
+//			"F",
+//			"G",
+//			"H",
+//			"J",
+//			"K",
+//			"L"
+//		],
+//		"wildSymbols": [
+//			"WL"
+//		]
+//	},
+type jsonWaysTrigger struct {
+	Symbols     []string `json:"symbols"`
+	TriggerType string   `json:"triggerType"`
+	BetType     string   `json:"betType"`
+	MinNum      int      `json:"minNum"`
+	WildSymbols []string `json:"wildSymbols"`
+	WinMulti    int      `json:"winMulti"`
+}
+
+func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
+	cfg := &WaysTriggerConfig{
+		Symbols:       jwt.Symbols,
+		Type:          jwt.TriggerType,
+		BetTypeString: jwt.BetType,
+		MinNum:        jwt.MinNum,
+		WildSymbols:   jwt.WildSymbols,
+		WinMulti:      jwt.WinMulti,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseWaysTrigger:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseWaysTrigger:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonWaysTrigger{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseWaysTrigger:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: WaysTriggerTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

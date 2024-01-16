@@ -68,3 +68,33 @@ func parseValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 
 	return sgc7game.NewValWeights2(vals, weights)
 }
+
+func parseReelSetWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReelSetWeights:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	lst := []*weightData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseReelSetWeights:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	vals := []sgc7game.IVal{}
+	weights := []int{}
+
+	for _, v := range lst {
+		vals = append(vals, sgc7game.NewStrValEx(v.Val))
+		weights = append(weights, v.Weight)
+	}
+
+	return sgc7game.NewValWeights2(vals, weights)
+}

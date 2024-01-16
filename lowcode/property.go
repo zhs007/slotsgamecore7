@@ -597,6 +597,14 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return
 		}
+	} else if award.Type == AwardSetComponentConfigIntVal {
+		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.Vals[0])
+		if err != nil {
+			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardSetComponentConfigIntVal",
+				zap.Error(err))
+
+			return
+		}
 	}
 }
 
@@ -765,6 +773,30 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 	}
 
 	cd.SetConfigVal(arr[1], val)
+
+	return nil
+}
+
+func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName string, val int) error {
+	arr := strings.Split(componentConfigValName, ".")
+	if len(arr) != 2 {
+		goutils.Error("GameProperty.SetComponentConfigIntVal",
+			zap.String("componentConfigValName", componentConfigValName),
+			zap.Error(ErrInvalidComponentVal))
+
+		return ErrInvalidComponentVal
+	}
+
+	cd, isok := gameProp.MapComponentData[arr[0]]
+	if !isok {
+		goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
+			zap.String("componentConfigValName", componentConfigValName),
+			zap.Error(ErrIvalidComponentName))
+
+		return ErrIvalidComponentName
+	}
+
+	cd.SetConfigIntVal(arr[1], val)
 
 	return nil
 }

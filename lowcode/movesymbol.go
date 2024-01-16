@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -124,6 +126,13 @@ func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode 
 type MoveSymbolConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	MoveData             []*MoveData `yaml:"moveData" json:"moveData"`
+}
+
+// SetLinkComponent
+func (cfg *MoveSymbolConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type MoveSymbol struct {
@@ -273,4 +282,156 @@ func NewMoveSymbol(name string) IComponent {
 	return &MoveSymbol{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"isExpandReel": "false",
+//		"moveData": [
+//			{
+//				"src": {
+//					"type": "selectWithXY",
+//					"Y": 1,
+//					"X": 1
+//				},
+//				"target": {
+//					"type": "selectSymbolR2L",
+//					"Y": 1,
+//					"Symbol": "SC"
+//				},
+//				"moveType": "xy",
+//				"targetSymbol": "SC",
+//				"overrideSrc": "false",
+//				"overrideTarget": "false",
+//				"overridePath": "true",
+//				"name": "moveData 1"
+//			},
+//			{
+//				"src": {
+//					"type": "selectWithXY",
+//					"Y": 2,
+//					"X": 1
+//				},
+//				"target": {
+//					"type": "selectSymbolR2L",
+//					"Y": 2,
+//					"Symbol": "SC"
+//				},
+//				"moveType": "xy",
+//				"targetSymbol": "SC",
+//				"overrideSrc": "false",
+//				"overrideTarget": "false",
+//				"overridePath": "true",
+//				"name": "moveData 2"
+//			},
+//			{
+//				"src": {
+//					"type": "selectWithXY",
+//					"Y": 3,
+//					"X": 1
+//				},
+//				"target": {
+//					"type": "selectSymbolR2L",
+//					"Y": 3,
+//					"Symbol": "SC"
+//				},
+//				"moveType": "xy",
+//				"targetSymbol": "SC",
+//				"overrideSrc": "false",
+//				"overrideTarget": "false",
+//				"overridePath": "true",
+//				"name": "moveData 3"
+//			}
+//		]
+//	},
+type jsonMoveData struct {
+	Src            *SelectPosData `json:"src"`
+	Target         *SelectPosData `json:"target"`
+	MoveType       string         `json:"moveType"`
+	TargetSymbol   string         `json:"targetSymbol"`
+	OverrideSrc    string         `json:"overrideSrc"`
+	OverrideTarget string         `json:"overrideTarget"`
+	OverridePath   string         `json:"overridePath"`
+}
+type jsonMoveSymbol struct {
+	MoveData []*jsonMoveData `json:"moveData"`
+}
+
+func (jms *jsonMoveSymbol) build() *MoveSymbolConfig {
+	cfg := &MoveSymbolConfig{}
+
+	for _, v := range jms.MoveData {
+		cmd := &MoveData{
+			Src:            v.Src,
+			Target:         v.Target,
+			MoveType:       v.MoveType,
+			TargetSymbol:   v.TargetSymbol,
+			OverrideSrc:    v.OverrideSrc == "true",
+			OverrideTarget: v.OverrideTarget == "true",
+			OverridePath:   v.OverridePath == "true",
+		}
+
+		if cmd.Src.X > 0 {
+			cmd.Src.X--
+		}
+
+		if cmd.Src.Y > 0 {
+			cmd.Src.Y--
+		}
+
+		if cmd.Target.X > 0 {
+			cmd.Target.X--
+		}
+
+		if cmd.Target.Y > 0 {
+			cmd.Target.Y--
+		}
+
+		cfg.MoveData = append(cfg.MoveData, cmd)
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseMoveSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseMoveSymbol:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseMoveSymbol:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonMoveSymbol{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseMoveSymbol:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: MoveSymbolTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

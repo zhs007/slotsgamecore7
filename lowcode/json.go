@@ -371,240 +371,34 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapValWeights[name] = vw2
+		} else if t == "ReelSetWeight" {
+			vw2, err := parseReelSetWeights(v.Get("fileJson"))
+			if err != nil {
+				goutils.Error("loadOtherList:parseReelSetWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapReelSetWeights[name] = vw2
 		}
 	}
 
 	return nil
 }
 
-func parseBasicReels(cell *ast.Node) (*BasicReelsConfig, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseBasicReels:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseBasicReels:MarshalJSON",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	data := &basicReelsData{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseBasicReels:Unmarshal",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	return data.build(), nil
-}
-
-func parseTriggerFeatureConfig(cell *ast.Node) (string, *TriggerFeatureConfig, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseTriggerFeatureConfig:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return "", nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseTriggerFeatureConfig:MarshalJSON",
-			zap.Error(err))
-
-		return "", nil, err
-	}
-
-	data := &triggerFeatureData{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseTriggerFeatureConfig:Unmarshal",
-			zap.Error(err))
-
-		return "", nil, err
-	}
-
-	return data.Label, data.build(), nil
-}
-
-func parseSymbolMulti(cell *ast.Node) (*SymbolMultiConfig, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseSymbolMulti:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseSymbolMulti:MarshalJSON",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	data := &symbolMultiData{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseSymbolMulti:Unmarshal",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	return data.build(), nil
-}
-
-func parseSymbolVal(cell *ast.Node) (*SymbolValConfig, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseSymbolVal:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseSymbolVal:MarshalJSON",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	data := &symbolValData{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseSymbolVal:Unmarshal",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	return data.build(), nil
-}
-
-func parseSymbolVal2(cell *ast.Node) (*SymbolVal2Config, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseSymbolVal2:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseSymbolVal2:MarshalJSON",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	data := &symbolVal2Data{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseSymbolVal2:Unmarshal",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	return data.build(), nil
-}
-
-func parseBasicWins(cell *ast.Node) (*BasicWinsConfig, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseBasicWins:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseBasicWins:MarshalJSON",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	data := &basicWinsData{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseBasicWins:Unmarshal",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	return data.build(), nil
-}
-
-func parseBookOf(cell *ast.Node) (*BookOfConfig, error) {
-	componentValues := cell.Get("componentValues")
-	if componentValues == nil {
-		goutils.Error("parseBookOf:componentValues",
-			zap.Error(ErrNoComponentValues))
-
-		return nil, ErrNoComponentValues
-	}
-
-	buf, err := componentValues.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseBookOf:MarshalJSON",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	data := &bookOfData{}
-
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseBookOf:Unmarshal",
-			zap.Error(err))
-
-		return nil, err
-	}
-
-	return data.build(), nil
-}
-
-// func isLine(cell *ast.Node) bool {
-// 	if cell.Get("labels") != nil && cell.Get("labels").Index(0) != nil {
-// 		if cell.Get("labels").Index(0).Get("data") == nil {
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
-
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
-	linkScene := [][]string{}
-	linkOtherScene := [][]string{}
+	// linkScene := [][]string{}
+	// linkOtherScene := [][]string{}
 	linkComponent := [][]string{}
+	jumpComponent := [][]string{}
+	loopComponent := [][]string{}
 	lstStart := []string{}
-	mapTrigger := make(map[string]*TriggerFeatureConfig)
-	mapTriggerID := make(map[string]*TriggerFeatureConfig)
-	lstBasicWins := []*BasicWinsConfig{}
+	// mapTrigger := make(map[string]*TriggerFeatureConfig)
+	// mapTriggerID := make(map[string]*TriggerFeatureConfig)
+	// lstBasicWins := []*BasicWinsConfig{}
+	mapComponentName := make(map[string]string)
 
 	lst, err := cells.ArrayUseNode()
 	if err != nil {
@@ -647,8 +441,21 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				return err
 			}
 
-			if componentType == "basicReels" {
-				componentCfg, err := parseBasicReels(&cell)
+			componentType = strings.ToLower(componentType)
+
+			if componentType == "weightreels" {
+				componentName, err := parseWeightReels(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseWeightReels",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "basictreels" {
+				componentName, err := parseBasicReels(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseBasicReels",
 						zap.Int("i", i),
@@ -657,131 +464,70 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 					return err
 				}
 
-				cfg.mapConfig[id] = componentCfg
-				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
-
-				ccfg := &ComponentConfig{
-					Name: id,
-					Type: "basicReels",
-				}
-
-				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
-			} else if componentType == "basicWins" {
-				componentCfg, err := parseBasicWins(&cell)
+				mapComponentName[id] = componentName
+			} else if componentType == "scattertrigger" {
+				componentName, err := parseScatterTrigger(cfg, &cell)
 				if err != nil {
-					goutils.Error("loadCells:parseBasicWins",
+					goutils.Error("loadCells:parseScatterTrigger",
 						zap.Int("i", i),
 						zap.Error(err))
 
 					return err
 				}
 
-				cfg.mapConfig[id] = componentCfg
-				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
-
-				ccfg := &ComponentConfig{
-					Name: id,
-					Type: "basicWins",
-				}
-
-				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
-
-				lstBasicWins = append(lstBasicWins, componentCfg)
-			} else if componentType == "symbolMulti" {
-				componentCfg, err := parseSymbolMulti(&cell)
+				mapComponentName[id] = componentName
+			} else if componentType == "linestrigger" {
+				componentName, err := parseLinesTrigger(cfg, &cell)
 				if err != nil {
-					goutils.Error("loadCells:parseSymbolMulti",
+					goutils.Error("loadCells:parseLinesTrigger",
 						zap.Int("i", i),
 						zap.Error(err))
 
 					return err
 				}
 
-				cfg.mapConfig[id] = componentCfg
-				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
-
-				ccfg := &ComponentConfig{
-					Name: id,
-					Type: "symbolMulti",
-				}
-
-				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
-			} else if componentType == "symbolVal" {
-				componentCfg, err := parseSymbolVal(&cell)
+				mapComponentName[id] = componentName
+			} else if componentType == "waystrigger" {
+				componentName, err := parseWaysTrigger(cfg, &cell)
 				if err != nil {
-					goutils.Error("loadCells:parseSymbolVal",
+					goutils.Error("loadCells:parseWaysTrigger",
 						zap.Int("i", i),
 						zap.Error(err))
 
 					return err
 				}
 
-				cfg.mapConfig[id] = componentCfg
-				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
-
-				ccfg := &ComponentConfig{
-					Name: id,
-					Type: "symbolVal",
-				}
-
-				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
-			} else if componentType == "symbolVal2" {
-				componentCfg, err := parseSymbolVal2(&cell)
+				mapComponentName[id] = componentName
+			} else if componentType == "movesymbol" {
+				componentName, err := parseMoveSymbol(cfg, &cell)
 				if err != nil {
-					goutils.Error("loadCells:parseSymbolVal2",
+					goutils.Error("loadCells:parseMoveSymbol",
 						zap.Int("i", i),
 						zap.Error(err))
 
 					return err
 				}
 
-				cfg.mapConfig[id] = componentCfg
-				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
-
-				ccfg := &ComponentConfig{
-					Name: id,
-					Type: "symbolVal2",
-				}
-
-				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
-			} else if componentType == "bookOf" {
-				componentCfg, err := parseBookOf(&cell)
+				mapComponentName[id] = componentName
+			} else if componentType == "respin" {
+				componentName, err := parseRespin(cfg, &cell)
 				if err != nil {
-					goutils.Error("loadCells:parseBookOf",
+					goutils.Error("loadCells:parseRespin",
 						zap.Int("i", i),
 						zap.Error(err))
 
 					return err
 				}
 
-				cfg.mapConfig[id] = componentCfg
-				cfg.mapBasicConfig[id] = &componentCfg.BasicComponentConfig
+				mapComponentName[id] = componentName
+			} else {
+				goutils.Error("loadCells:ErrUnsupportedComponentType",
+					zap.String("componentType", componentType),
+					zap.Error(ErrUnsupportedComponentType))
 
-				ccfg := &ComponentConfig{
-					Name: id,
-					Type: "bookOf",
-				}
-
-				cfg.GameMods[0].Components = append(cfg.GameMods[0].Components, ccfg)
-			} else if componentType == "basicWins-trigger" {
-				triggerName, triggerCfg, err := parseTriggerFeatureConfig(&cell)
-				if err != nil {
-					goutils.Error("loadCells:parseTriggerFeatureConfig",
-						zap.Int("i", i),
-						zap.Error(err))
-
-					return err
-				}
-
-				mapTrigger[triggerName] = triggerCfg
-
-				mapTriggerID[id] = triggerCfg
+				return ErrUnsupportedComponentType
 			}
 		} else if shape == "edge" {
-			// if !isLine(&cell) {
-			// 	continue
-			// }
-
 			source, err := cell.Get("source").Get("cell").String()
 			if err != nil {
 				goutils.Error("loadCells:edge:source:cell",
@@ -807,14 +553,20 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			}
 
 			if source == startid {
-				lstStart = append(lstStart, target)
+				lstStart = append(lstStart, mapComponentName[target])
 			} else {
-				if strings.Contains(sourcePort, "component") {
-					linkComponent = append(linkComponent, []string{source, target})
-				} else if strings.Contains(sourcePort, "-Scenes-") {
-					linkScene = append(linkScene, []string{source, target})
-				} else if strings.Contains(sourcePort, "-OtherScenes-") {
-					linkOtherScene = append(linkOtherScene, []string{source, target})
+				if sourcePort == "jump-component-groups-out" {
+					jumpComponent = append(jumpComponent, []string{mapComponentName[source], mapComponentName[target]})
+				} else if sourcePort == "component-groups-out" {
+					linkComponent = append(linkComponent, []string{mapComponentName[source], mapComponentName[target]})
+				} else if sourcePort == "loop-component-groups-out" {
+					loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
+				} else {
+					goutils.Error("loadCells:sourcePort",
+						zap.String("sourcePort", sourcePort),
+						zap.Error(ErrUnsupportedLinkType))
+
+					return ErrUnsupportedLinkType
 				}
 			}
 		}
@@ -825,68 +577,82 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	}
 
 	for _, arr := range linkComponent {
-		basicCfg, isok := cfg.mapBasicConfig[arr[0]]
+		icfg, isok := cfg.mapConfig[arr[0]]
 		if isok {
-			basicCfg.DefaultNextComponent = arr[1]
+			icfg.SetLinkComponent("next", arr[1])
 		}
 	}
 
-	for _, arr := range linkScene {
-		sourceCfg, isok0 := cfg.mapBasicConfig[arr[0]]
-		if isok0 {
-			sourceCfg.TagScenes = append(sourceCfg.TagScenes, arr[0])
-		}
-
-		targetCfg := cfg.mapBasicConfig[arr[1]]
-		if targetCfg != nil {
-			targetCfg.TargetScene = arr[0]
-		}
-
-		triggerCfg := mapTriggerID[arr[1]]
-		if triggerCfg != nil {
-			triggerCfg.TargetScene = arr[0]
+	for _, arr := range jumpComponent {
+		icfg, isok := cfg.mapConfig[arr[0]]
+		if isok {
+			icfg.SetLinkComponent("jump", arr[1])
 		}
 	}
 
-	for _, arr := range linkOtherScene {
-		sourceCfg := cfg.mapBasicConfig[arr[0]]
-		if sourceCfg != nil {
-			sourceCfg.TagOtherScenes = append(sourceCfg.TagOtherScenes, arr[0])
-		}
-
-		targetCfg := cfg.mapBasicConfig[arr[1]]
-		if targetCfg != nil {
-			targetCfg.TargetOtherScene = arr[0]
+	for _, arr := range loopComponent {
+		icfg, isok := cfg.mapConfig[arr[0]]
+		if isok {
+			icfg.SetLinkComponent("loop", arr[1])
 		}
 	}
 
-	for _, basicWinsCfg := range lstBasicWins {
-		for _, k := range basicWinsCfg.BeforMainTriggerName {
-			cfg, isok := mapTrigger[k]
-			if !isok {
-				goutils.Error("loadCells:BeforMain",
-					zap.String("label", k),
-					zap.Error(ErrIvalidTriggerLabel))
+	// for _, arr := range linkScene {
+	// 	sourceCfg, isok0 := cfg.mapBasicConfig[arr[0]]
+	// 	if isok0 {
+	// 		sourceCfg.TagScenes = append(sourceCfg.TagScenes, arr[0])
+	// 	}
 
-				return ErrIvalidTriggerLabel
-			}
+	// 	targetCfg := cfg.mapBasicConfig[arr[1]]
+	// 	if targetCfg != nil {
+	// 		targetCfg.TargetScene = arr[0]
+	// 	}
 
-			basicWinsCfg.BeforMain = append(basicWinsCfg.BeforMain, cfg)
-		}
+	// 	triggerCfg := mapTriggerID[arr[1]]
+	// 	if triggerCfg != nil {
+	// 		triggerCfg.TargetScene = arr[0]
+	// 	}
+	// }
 
-		for _, k := range basicWinsCfg.AfterMainTriggerName {
-			cfg, isok := mapTrigger[k]
-			if !isok {
-				goutils.Error("loadCells:AfterMain",
-					zap.String("label", k),
-					zap.Error(ErrIvalidTriggerLabel))
+	// for _, arr := range linkOtherScene {
+	// 	sourceCfg := cfg.mapBasicConfig[arr[0]]
+	// 	if sourceCfg != nil {
+	// 		sourceCfg.TagOtherScenes = append(sourceCfg.TagOtherScenes, arr[0])
+	// 	}
 
-				return ErrIvalidTriggerLabel
-			}
+	// 	targetCfg := cfg.mapBasicConfig[arr[1]]
+	// 	if targetCfg != nil {
+	// 		targetCfg.TargetOtherScene = arr[0]
+	// 	}
+	// }
 
-			basicWinsCfg.AfterMain = append(basicWinsCfg.AfterMain, cfg)
-		}
-	}
+	// for _, basicWinsCfg := range lstBasicWins {
+	// 	for _, k := range basicWinsCfg.BeforMainTriggerName {
+	// 		cfg, isok := mapTrigger[k]
+	// 		if !isok {
+	// 			goutils.Error("loadCells:BeforMain",
+	// 				zap.String("label", k),
+	// 				zap.Error(ErrIvalidTriggerLabel))
+
+	// 			return ErrIvalidTriggerLabel
+	// 		}
+
+	// 		basicWinsCfg.BeforMain = append(basicWinsCfg.BeforMain, cfg)
+	// 	}
+
+	// 	for _, k := range basicWinsCfg.AfterMainTriggerName {
+	// 		cfg, isok := mapTrigger[k]
+	// 		if !isok {
+	// 			goutils.Error("loadCells:AfterMain",
+	// 				zap.String("label", k),
+	// 				zap.Error(ErrIvalidTriggerLabel))
+
+	// 			return ErrIvalidTriggerLabel
+	// 		}
+
+	// 		basicWinsCfg.AfterMain = append(basicWinsCfg.AfterMain, cfg)
+	// 	}
+	// }
 
 	return nil
 }
@@ -963,16 +729,19 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	}
 
 	cfg := &Config{
-		Paytables:       make(map[string]string),
-		MapPaytables:    make(map[string]*sgc7game.PayTables),
-		Linedata:        make(map[string]string),
-		MapLinedate:     make(map[string]*sgc7game.LineData),
-		Reels:           make(map[string]string),
-		MapReels:        make(map[string]*sgc7game.ReelsData),
-		mapConfig:       make(map[string]any),
-		StartComponents: make(map[int]string),
-		mapBasicConfig:  make(map[string]*BasicComponentConfig),
-		mapValWeights:   make(map[string]*sgc7game.ValWeights2),
+		Paytables:         make(map[string]string),
+		MapPaytables:      make(map[string]*sgc7game.PayTables),
+		Linedata:          make(map[string]string),
+		MapLinedate:       make(map[string]*sgc7game.LineData),
+		Reels:             make(map[string]string),
+		MapReels:          make(map[string]*sgc7game.ReelsData),
+		mapConfig:         make(map[string]IComponentConfig),
+		StartComponents:   make(map[int]string),
+		mapBasicConfig:    make(map[string]*BasicComponentConfig),
+		mapValWeights:     make(map[string]*sgc7game.ValWeights2),
+		mapReelSetWeights: make(map[string]*sgc7game.ValWeights2),
+		mapStrWeights:     make(map[string]*sgc7game.ValWeights2),
+		// mapBetConfig:    make(map[int]*BetDataConfig),
 	}
 
 	err := loadBasicInfo(cfg, data)

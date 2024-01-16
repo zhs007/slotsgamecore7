@@ -78,6 +78,12 @@ var (
 	ErrIvalidSymbolInReels = errors.New("invalid symbol in reels")
 	// ErrNoComponentValues - no componentValues
 	ErrNoComponentValues = errors.New("no componentValues")
+	// ErrUnsupportedComponentType - unsupported componentType
+	ErrUnsupportedComponentType = errors.New("unsupported componentType")
+	// ErrUnsupportedLinkType - unsupported link type
+	ErrUnsupportedLinkType = errors.New("unsupported link type")
+	// ErrInvalidJsonNode - invalid json node
+	ErrInvalidJsonNode = errors.New("invalid json node")
 	// ErrIvalidReels - invalid reels
 	ErrIvalidReels = errors.New("invalid reels")
 

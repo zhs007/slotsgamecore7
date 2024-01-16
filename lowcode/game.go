@@ -115,6 +115,8 @@ func (game *Game) Init2(cfg *Config) error {
 
 	game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
 
+	pool.loadAllWeights()
+
 	for _, v := range pool.Config.GameMods {
 		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
 		if err != nil {

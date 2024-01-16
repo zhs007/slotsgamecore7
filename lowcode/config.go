@@ -22,6 +22,20 @@ type GameModConfig struct {
 	Components []*ComponentConfig `yaml:"components"`
 }
 
+// type BetDataConfig struct {
+// 	mapConfig        map[string]any                   `yaml:"-"`
+// 	mapBasicConfig   map[string]*BasicComponentConfig `yaml:"-"`
+// 	mapIntValWeights map[string]*sgc7game.ValWeights2 `yaml:"-"`
+// }
+
+// func newBetDataConfig() *BetDataConfig {
+// 	return &BetDataConfig{
+// 		mapConfig:        make(map[string]any),
+// 		mapBasicConfig:   make(map[string]*BasicComponentConfig),
+// 		mapIntValWeights: make(map[string]*sgc7game.ValWeights2),
+// 	}
+// }
+
 type Config struct {
 	Name              string                           `yaml:"name"`
 	Width             int                              `yaml:"width"`
@@ -49,9 +63,12 @@ type Config struct {
 	MainPath          string                           `yaml:"mainPath"`
 	MapCmdComponent   map[string]string                `yaml:"mapCmdComponent"`
 	ComponentsMapping map[int]map[string]string        `yaml:"componentsMapping"`
-	mapConfig         map[string]any                   `yaml:"-"`
+	mapConfig         map[string]IComponentConfig      `yaml:"-"`
 	mapBasicConfig    map[string]*BasicComponentConfig `yaml:"-"`
 	mapValWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
+	mapReelSetWeights map[string]*sgc7game.ValWeights2 `yaml:"-"`
+	mapStrWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
+	// mapBetConfig      map[int]*BetDataConfig           `yaml:"-"`
 }
 
 func (cfg *Config) GetPath(fn string, useFileMapping bool) string {
