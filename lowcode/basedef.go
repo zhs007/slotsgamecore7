@@ -112,6 +112,14 @@ func initCheckWinType() {
 	strCheckWinType["all"] = CheckWinTypeAll
 }
 
+var gJsonMode bool
+
+func SetJsonMode() {
+	gJsonMode = true
+}
+
 func init() {
 	initCheckWinType()
+
+	gJsonMode = true
 }

@@ -249,7 +249,7 @@ func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 }
 
 func parseWeightReels(gamecfg *Config, cell *ast.Node) (string, error) {
-	cfg, label, err := getConfigInCell(cell)
+	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWeightReels:getConfigInCell",
 			zap.Error(err))

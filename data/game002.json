@@ -64388,8 +64388,8 @@
                     },
                     {
                         "position": {
-                            "x": 1930,
-                            "y": -470
+                            "x": 1940,
+                            "y": -500
                         },
                         "size": {
                             "width": 400,
@@ -65526,7 +65526,7 @@
                     },
                     {
                         "position": {
-                            "x": 3640,
+                            "x": 3660,
                             "y": -670
                         },
                         "size": {
@@ -67273,1149 +67273,12 @@
                     },
                     {
                         "position": {
-                            "x": 7160,
-                            "y": -890
-                        },
-                        "size": {
-                            "width": 400,
-                            "height": 425
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": -5,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "jumpout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "loopout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
-                                    "id": "jump-component-groups-out",
-                                    "group": "jumpout",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "jumpTo"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "id": "4b11ebdd-b7ee-4f4c-95ca-0a34c7ef46ca",
-                        "label": "LinesTrigger",
-                        "item": {
-                            "key": "LinesTrigger",
-                            "label": "LinesTrigger",
-                            "out": [
-                                "wins"
-                            ],
-                            "defaultValue": {
-                                "triggerType": "lines",
-                                "betType": "bet",
-                                "checkWinType": "left2right"
-                            },
-                            "configuration": [
-                                {
-                                    "label": "targetSymbols",
-                                    "type": "selectSymbolsNode"
-                                },
-                                {
-                                    "label": "triggerType",
-                                    "type": "select",
-                                    "association": [
-                                        "minNum"
-                                    ],
-                                    "option": [
-                                        {
-                                            "label": "lines",
-                                            "value": "lines"
-                                        },
-                                        {
-                                            "label": "checkLines",
-                                            "value": "checkLines"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "minNum",
-                                    "type": "inputWidthNumber",
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "checkLines"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "betType",
-                                    "type": "select",
-                                    "option": [
-                                        {
-                                            "label": "bet",
-                                            "value": "bet"
-                                        },
-                                        {
-                                            "label": "totalBet",
-                                            "value": "totalBet"
-                                        },
-                                        {
-                                            "label": "noPay",
-                                            "value": "noPay"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "checkWinType",
-                                    "type": "select",
-                                    "option": [
-                                        {
-                                            "label": "left2right",
-                                            "value": "left2right"
-                                        },
-                                        {
-                                            "label": "right2left",
-                                            "value": "right2left"
-                                        },
-                                        {
-                                            "label": "all",
-                                            "value": "all"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "symbols",
-                                    "type": "selectSymbols",
-                                    "required": true
-                                },
-                                {
-                                    "label": "wildSymbols",
-                                    "type": "selectSymbols"
-                                }
-                            ]
-                        },
-                        "zIndex": 27,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "triggerType": "lines",
-                                "betType": "bet",
-                                "checkWinType": "left2right",
-                                "symbols": [
-                                    "WL",
-                                    "A",
-                                    "B",
-                                    "C",
-                                    "D",
-                                    "E",
-                                    "F",
-                                    "G",
-                                    "H",
-                                    "J",
-                                    "K",
-                                    "L"
-                                ],
-                                "wildSymbols": [
-                                    "WL"
-                                ]
-                            },
-                            "label": "fg-paylines"
-                        },
-                        "basicComponentData": null,
-                        "data": null,
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "3b56eb93-22f5-4f78-8da0-3287e30d5274",
-                        "zIndex": 28,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "a86006d7-d04e-43af-b2f0-6d10190a652b",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "4b11ebdd-b7ee-4f4c-95ca-0a34c7ef46ca",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "dae79af5-ccec-45d6-bdb5-9eea26ae8a6b",
-                        "zIndex": 29,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "f629bb51-147b-4080-bb7a-242e0f07ec22",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "4b11ebdd-b7ee-4f4c-95ca-0a34c7ef46ca",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "position": {
-                            "x": 7810,
-                            "y": -1020
-                        },
-                        "size": {
-                            "width": 400,
-                            "height": 506
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": -5,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "jumpout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "loopout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
-                                    "id": "jump-component-groups-out",
-                                    "group": "jumpout",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "jumpTo"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "id": "0529accf-11a3-4d53-8770-a3ecec74c8fd",
-                        "label": "ScatterTrigger",
-                        "item": {
-                            "key": "ScatterTrigger",
-                            "label": "ScatterTrigger",
-                            "out": [
-                                "wins",
-                                "symbolNum",
-                                "wildNum",
-                                "respinNum"
-                            ],
-                            "defaultValue": {
-                                "triggerType": "scatters",
-                                "betType": "bet",
-                                "genRespinType": "none"
-                            },
-                            "configuration": [
-                                {
-                                    "label": "targetSymbols",
-                                    "type": "selectSymbolsNode"
-                                },
-                                {
-                                    "label": "triggerType",
-                                    "type": "select",
-                                    "association": [
-                                        "minNum",
-                                        "posArea",
-                                        "countScatterPayAs"
-                                    ],
-                                    "option": [
-                                        {
-                                            "label": "scatters",
-                                            "value": "scatters"
-                                        },
-                                        {
-                                            "label": "countscatter",
-                                            "value": "countscatter",
-                                            "setVal": {
-                                                "betType": "noPay"
-                                            }
-                                        },
-                                        {
-                                            "label": "countscatterInArea",
-                                            "value": "countscatterInArea",
-                                            "setVal": {
-                                                "betType": "noPay"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "minNum",
-                                    "type": "inputWidthNumber",
-                                    "required": true,
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "countscatter",
-                                            "countscatterInArea"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "posArea",
-                                    "type": "posArea",
-                                    "required": true,
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "countscatterInArea"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "countScatterPayAs",
-                                    "type": "selectSymbol",
-                                    "required": {
-                                        "label": "betType",
-                                        "value": [
-                                            "bet",
-                                            "totalBet"
-                                        ]
-                                    },
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "countscatter",
-                                            "countscatterInArea"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "betType",
-                                    "type": "select",
-                                    "option": [
-                                        {
-                                            "label": "bet",
-                                            "value": "bet"
-                                        },
-                                        {
-                                            "label": "totalBet",
-                                            "value": "totalBet"
-                                        },
-                                        {
-                                            "label": "noPay",
-                                            "value": "noPay"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "symbols",
-                                    "type": "selectSymbols",
-                                    "required": true
-                                },
-                                {
-                                    "label": "wildSymbols",
-                                    "type": "selectSymbols"
-                                },
-                                {
-                                    "label": "genRespinType",
-                                    "type": "select",
-                                    "association": [
-                                        "respinNum",
-                                        "respinNumWithScatterNum",
-                                        "respinNumWeight",
-                                        "respinNumWeightWithScatterNum"
-                                    ],
-                                    "option": [
-                                        {
-                                            "label": "none",
-                                            "value": "none"
-                                        },
-                                        {
-                                            "label": "number",
-                                            "value": "number"
-                                        },
-                                        {
-                                            "label": "scatterNum",
-                                            "value": "scatterNum"
-                                        },
-                                        {
-                                            "label": "weight",
-                                            "value": "weight"
-                                        },
-                                        {
-                                            "label": "scatterNumWeight",
-                                            "value": "scatterNumWeight"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "respinNum",
-                                    "type": "inputNumberInteger",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "number"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "respinNumWithScatterNum",
-                                    "type": "respinNumWithScatterNum",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "scatterNum"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "respinNumWeight",
-                                    "type": "selectIntValWeight",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "weight"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "respinNumWeightWithScatterNum",
-                                    "type": "respinNumWeightWithScatterNum",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "scatterNumWeight"
-                                        ]
-                                    }
-                                }
-                            ],
-                            "controller": "true"
-                        },
-                        "zIndex": 30,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "triggerType": "scatters",
-                                "betType": "bet",
-                                "genRespinType": "none",
-                                "symbols": [
-                                    "SC"
-                                ]
-                            },
-                            "label": "fg-paysc"
-                        },
-                        "basicComponentData": null,
-                        "data": null,
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "727b35a1-02a6-4347-908c-99b0eaea2c37",
-                        "zIndex": 31,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "4b11ebdd-b7ee-4f4c-95ca-0a34c7ef46ca",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "0529accf-11a3-4d53-8770-a3ecec74c8fd",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "position": {
-                            "x": 8430,
-                            "y": -1080
-                        },
-                        "size": {
-                            "width": 400,
-                            "height": 506
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": -5,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "jumpout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "loopout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
-                                    "id": "jump-component-groups-out",
-                                    "group": "jumpout",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "jumpTo"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "id": "48846c53-a64b-4251-96fd-a8b6cfeb925d",
-                        "label": "ScatterTrigger",
-                        "item": {
-                            "key": "ScatterTrigger",
-                            "label": "ScatterTrigger",
-                            "out": [
-                                "wins",
-                                "symbolNum",
-                                "wildNum",
-                                "respinNum"
-                            ],
-                            "defaultValue": {
-                                "triggerType": "scatters",
-                                "betType": "bet",
-                                "genRespinType": "none"
-                            },
-                            "configuration": [
-                                {
-                                    "label": "targetSymbols",
-                                    "type": "selectSymbolsNode"
-                                },
-                                {
-                                    "label": "triggerType",
-                                    "type": "select",
-                                    "association": [
-                                        "minNum",
-                                        "posArea",
-                                        "countScatterPayAs"
-                                    ],
-                                    "option": [
-                                        {
-                                            "label": "scatters",
-                                            "value": "scatters"
-                                        },
-                                        {
-                                            "label": "countscatter",
-                                            "value": "countscatter",
-                                            "setVal": {
-                                                "betType": "noPay"
-                                            }
-                                        },
-                                        {
-                                            "label": "countscatterInArea",
-                                            "value": "countscatterInArea",
-                                            "setVal": {
-                                                "betType": "noPay"
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "minNum",
-                                    "type": "inputWidthNumber",
-                                    "required": true,
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "countscatter",
-                                            "countscatterInArea"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "posArea",
-                                    "type": "posArea",
-                                    "required": true,
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "countscatterInArea"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "countScatterPayAs",
-                                    "type": "selectSymbol",
-                                    "required": {
-                                        "label": "betType",
-                                        "value": [
-                                            "bet",
-                                            "totalBet"
-                                        ]
-                                    },
-                                    "show": {
-                                        "label": "triggerType",
-                                        "value": [
-                                            "countscatter",
-                                            "countscatterInArea"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "betType",
-                                    "type": "select",
-                                    "option": [
-                                        {
-                                            "label": "bet",
-                                            "value": "bet"
-                                        },
-                                        {
-                                            "label": "totalBet",
-                                            "value": "totalBet"
-                                        },
-                                        {
-                                            "label": "noPay",
-                                            "value": "noPay"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "symbols",
-                                    "type": "selectSymbols",
-                                    "required": true
-                                },
-                                {
-                                    "label": "wildSymbols",
-                                    "type": "selectSymbols"
-                                },
-                                {
-                                    "label": "genRespinType",
-                                    "type": "select",
-                                    "association": [
-                                        "respinNum",
-                                        "respinNumWithScatterNum",
-                                        "respinNumWeight",
-                                        "respinNumWeightWithScatterNum"
-                                    ],
-                                    "option": [
-                                        {
-                                            "label": "none",
-                                            "value": "none"
-                                        },
-                                        {
-                                            "label": "number",
-                                            "value": "number"
-                                        },
-                                        {
-                                            "label": "scatterNum",
-                                            "value": "scatterNum"
-                                        },
-                                        {
-                                            "label": "weight",
-                                            "value": "weight"
-                                        },
-                                        {
-                                            "label": "scatterNumWeight",
-                                            "value": "scatterNumWeight"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "respinNum",
-                                    "type": "inputNumberInteger",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "number"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "respinNumWithScatterNum",
-                                    "type": "respinNumWithScatterNum",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "scatterNum"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "respinNumWeight",
-                                    "type": "selectIntValWeight",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "weight"
-                                        ]
-                                    }
-                                },
-                                {
-                                    "label": "respinNumWeightWithScatterNum",
-                                    "type": "respinNumWeightWithScatterNum",
-                                    "required": true,
-                                    "show": {
-                                        "label": "genRespinType",
-                                        "value": [
-                                            "scatterNumWeight"
-                                        ]
-                                    }
-                                }
-                            ],
-                            "controller": "true"
-                        },
-                        "zIndex": 32,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "triggerType": "scatters",
-                                "betType": "bet",
-                                "genRespinType": "none",
-                                "symbols": [
-                                    "FG"
-                                ]
-                            },
-                            "label": "fg-payfg"
-                        },
-                        "basicComponentData": null,
-                        "data": null,
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "4a747bc5-e46e-4c98-9935-5b628a10fb1a",
-                        "zIndex": 33,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "0529accf-11a3-4d53-8770-a3ecec74c8fd",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "48846c53-a64b-4251-96fd-a8b6cfeb925d",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "position": {
                             "x": 9140,
                             "y": -1150
                         },
                         "size": {
                             "width": 400,
-                            "height": 610
+                            "height": 640
                         },
                         "view": "react-shape-view",
                         "shape": "custom-node",
@@ -68769,7 +67632,14 @@
                                     "FG"
                                 ]
                             },
-                            "label": "fg-fgtrigger"
+                            "label": "fg-fgtrigger",
+                            "controller": [
+                                {
+                                    "type": "AwardRespinTimes",
+                                    "strParams": "fg-start",
+                                    "vals": 15
+                                }
+                            ]
                         },
                         "basicComponentData": null,
                         "data": null,
@@ -68786,6 +67656,302 @@
                         }
                     },
                     {
+                        "position": {
+                            "x": 7240,
+                            "y": -940
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 477
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "jump-component-groups-out",
+                                    "group": "jumpout",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "jumpTo"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
+                        "label": "LinesTrigger",
+                        "item": {
+                            "key": "LinesTrigger",
+                            "label": "LinesTrigger",
+                            "out": [
+                                "wins",
+                                "winMulti"
+                            ],
+                            "defaultValue": {
+                                "triggerType": "lines",
+                                "betType": "bet",
+                                "checkWinType": "left2right",
+                                "winMulti": 1
+                            },
+                            "configuration": [
+                                {
+                                    "label": "targetSymbols",
+                                    "type": "selectSymbolsNode"
+                                },
+                                {
+                                    "label": "triggerType",
+                                    "type": "select",
+                                    "association": [
+                                        "minNum"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "lines",
+                                            "value": "lines"
+                                        },
+                                        {
+                                            "label": "checkLines",
+                                            "value": "checkLines"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "minNum",
+                                    "type": "inputWidthNumber",
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "checkLines"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "betType",
+                                    "type": "select",
+                                    "option": [
+                                        {
+                                            "label": "bet",
+                                            "value": "bet"
+                                        },
+                                        {
+                                            "label": "totalBet",
+                                            "value": "totalBet"
+                                        },
+                                        {
+                                            "label": "noPay",
+                                            "value": "noPay"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "checkWinType",
+                                    "type": "select",
+                                    "option": [
+                                        {
+                                            "label": "left2right",
+                                            "value": "left2right"
+                                        },
+                                        {
+                                            "label": "right2left",
+                                            "value": "right2left"
+                                        },
+                                        {
+                                            "label": "all",
+                                            "value": "all"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "symbols",
+                                    "type": "selectSymbols",
+                                    "required": true
+                                },
+                                {
+                                    "label": "wildSymbols",
+                                    "type": "selectSymbols"
+                                },
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber1"
+                                }
+                            ],
+                            "componentval": [
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 36,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "triggerType": "lines",
+                                "betType": "bet",
+                                "checkWinType": "left2right",
+                                "winMulti": 3,
+                                "symbols": [
+                                    "WL",
+                                    "A",
+                                    "B",
+                                    "C",
+                                    "D",
+                                    "E",
+                                    "F",
+                                    "G",
+                                    "H",
+                                    "J",
+                                    "K",
+                                    "L"
+                                ],
+                                "wildSymbols": [
+                                    "WL"
+                                ]
+                            },
+                            "label": "fg-paylines"
+                        }
+                    },
+                    {
                         "shape": "edge",
                         "attrs": {
                             "line": {
@@ -68793,22 +67959,866 @@
                                 "strokeWidth": 1
                             }
                         },
-                        "id": "11523950-e43d-45d3-a37e-794cb210ab24",
-                        "zIndex": 35,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
+                        "id": "d5350839-1737-426e-a3f8-5ef2019092a4",
                         "source": {
-                            "cell": "48846c53-a64b-4251-96fd-a8b6cfeb925d",
+                            "cell": "a86006d7-d04e-43af-b2f0-6d10190a652b",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 37
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "d81ef2ec-1c2d-43f8-a035-dfe0791b3c44",
+                        "source": {
+                            "cell": "f629bb51-147b-4080-bb7a-242e0f07ec22",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 39
+                    },
+                    {
+                        "position": {
+                            "x": 7850,
+                            "y": -1070
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 558
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "jump-component-groups-out",
+                                    "group": "jumpout",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "jumpTo"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "ce9588a1-481b-405e-b2d9-01ee2ff3ea96",
+                        "label": "ScatterTrigger",
+                        "item": {
+                            "key": "ScatterTrigger",
+                            "label": "ScatterTrigger",
+                            "out": [
+                                "wins",
+                                "symbolNum",
+                                "wildNum",
+                                "respinNum",
+                                "winMulti"
+                            ],
+                            "defaultValue": {
+                                "triggerType": "scatters",
+                                "betType": "bet",
+                                "genRespinType": "none",
+                                "winMulti": 1
+                            },
+                            "configuration": [
+                                {
+                                    "label": "targetSymbols",
+                                    "type": "selectSymbolsNode"
+                                },
+                                {
+                                    "label": "triggerType",
+                                    "type": "select",
+                                    "association": [
+                                        "minNum",
+                                        "posArea",
+                                        "countScatterPayAs"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "scatters",
+                                            "value": "scatters"
+                                        },
+                                        {
+                                            "label": "countscatter",
+                                            "value": "countscatter",
+                                            "setVal": {
+                                                "betType": "noPay"
+                                            }
+                                        },
+                                        {
+                                            "label": "countscatterInArea",
+                                            "value": "countscatterInArea",
+                                            "setVal": {
+                                                "betType": "noPay"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "minNum",
+                                    "type": "inputWidthNumber",
+                                    "required": true,
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "countscatter",
+                                            "countscatterInArea"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "posArea",
+                                    "type": "posArea",
+                                    "required": true,
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "countscatterInArea"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "countScatterPayAs",
+                                    "type": "selectSymbol",
+                                    "required": {
+                                        "label": "betType",
+                                        "value": [
+                                            "bet",
+                                            "totalBet"
+                                        ]
+                                    },
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "countscatter",
+                                            "countscatterInArea"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "betType",
+                                    "type": "select",
+                                    "option": [
+                                        {
+                                            "label": "bet",
+                                            "value": "bet"
+                                        },
+                                        {
+                                            "label": "totalBet",
+                                            "value": "totalBet"
+                                        },
+                                        {
+                                            "label": "noPay",
+                                            "value": "noPay"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "symbols",
+                                    "type": "selectSymbols",
+                                    "required": true
+                                },
+                                {
+                                    "label": "wildSymbols",
+                                    "type": "selectSymbols"
+                                },
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber1"
+                                },
+                                {
+                                    "label": "genRespinType",
+                                    "type": "select",
+                                    "association": [
+                                        "respinNum",
+                                        "respinNumWithScatterNum",
+                                        "respinNumWeight",
+                                        "respinNumWeightWithScatterNum"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "none",
+                                            "value": "none"
+                                        },
+                                        {
+                                            "label": "number",
+                                            "value": "number"
+                                        },
+                                        {
+                                            "label": "scatterNum",
+                                            "value": "scatterNum"
+                                        },
+                                        {
+                                            "label": "weight",
+                                            "value": "weight"
+                                        },
+                                        {
+                                            "label": "scatterNumWeight",
+                                            "value": "scatterNumWeight"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "respinNum",
+                                    "type": "inputNumberInteger",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "number"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "respinNumWithScatterNum",
+                                    "type": "respinNumWithScatterNum",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "scatterNum"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "respinNumWeight",
+                                    "type": "selectIntValWeight",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "weight"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "respinNumWeightWithScatterNum",
+                                    "type": "respinNumWeightWithScatterNum",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "scatterNumWeight"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "controller": "true",
+                            "componentval": [
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 40,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "triggerType": "scatters",
+                                "betType": "bet",
+                                "genRespinType": "none",
+                                "winMulti": 3,
+                                "symbols": [
+                                    "SC"
+                                ]
+                            },
+                            "label": "fg-paysc"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "f5dd5d23-4934-4a39-8513-ad972bc4a1e4",
+                        "source": {
+                            "cell": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "ce9588a1-481b-405e-b2d9-01ee2ff3ea96",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 41
+                    },
+                    {
+                        "position": {
+                            "x": 8490,
+                            "y": -1120
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 558
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "jump-component-groups-out",
+                                    "group": "jumpout",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "jumpTo"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "389fd043-1ec8-4a63-8614-08f2b775ccd7",
+                        "label": "ScatterTrigger",
+                        "item": {
+                            "key": "ScatterTrigger",
+                            "label": "ScatterTrigger",
+                            "out": [
+                                "wins",
+                                "symbolNum",
+                                "wildNum",
+                                "respinNum",
+                                "winMulti"
+                            ],
+                            "defaultValue": {
+                                "triggerType": "scatters",
+                                "betType": "bet",
+                                "genRespinType": "none",
+                                "winMulti": 1
+                            },
+                            "configuration": [
+                                {
+                                    "label": "targetSymbols",
+                                    "type": "selectSymbolsNode"
+                                },
+                                {
+                                    "label": "triggerType",
+                                    "type": "select",
+                                    "association": [
+                                        "minNum",
+                                        "posArea",
+                                        "countScatterPayAs"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "scatters",
+                                            "value": "scatters"
+                                        },
+                                        {
+                                            "label": "countscatter",
+                                            "value": "countscatter",
+                                            "setVal": {
+                                                "betType": "noPay"
+                                            }
+                                        },
+                                        {
+                                            "label": "countscatterInArea",
+                                            "value": "countscatterInArea",
+                                            "setVal": {
+                                                "betType": "noPay"
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "minNum",
+                                    "type": "inputWidthNumber",
+                                    "required": true,
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "countscatter",
+                                            "countscatterInArea"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "posArea",
+                                    "type": "posArea",
+                                    "required": true,
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "countscatterInArea"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "countScatterPayAs",
+                                    "type": "selectSymbol",
+                                    "required": {
+                                        "label": "betType",
+                                        "value": [
+                                            "bet",
+                                            "totalBet"
+                                        ]
+                                    },
+                                    "show": {
+                                        "label": "triggerType",
+                                        "value": [
+                                            "countscatter",
+                                            "countscatterInArea"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "betType",
+                                    "type": "select",
+                                    "option": [
+                                        {
+                                            "label": "bet",
+                                            "value": "bet"
+                                        },
+                                        {
+                                            "label": "totalBet",
+                                            "value": "totalBet"
+                                        },
+                                        {
+                                            "label": "noPay",
+                                            "value": "noPay"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "symbols",
+                                    "type": "selectSymbols",
+                                    "required": true
+                                },
+                                {
+                                    "label": "wildSymbols",
+                                    "type": "selectSymbols"
+                                },
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber1"
+                                },
+                                {
+                                    "label": "genRespinType",
+                                    "type": "select",
+                                    "association": [
+                                        "respinNum",
+                                        "respinNumWithScatterNum",
+                                        "respinNumWeight",
+                                        "respinNumWeightWithScatterNum"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "none",
+                                            "value": "none"
+                                        },
+                                        {
+                                            "label": "number",
+                                            "value": "number"
+                                        },
+                                        {
+                                            "label": "scatterNum",
+                                            "value": "scatterNum"
+                                        },
+                                        {
+                                            "label": "weight",
+                                            "value": "weight"
+                                        },
+                                        {
+                                            "label": "scatterNumWeight",
+                                            "value": "scatterNumWeight"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "respinNum",
+                                    "type": "inputNumberInteger",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "number"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "respinNumWithScatterNum",
+                                    "type": "respinNumWithScatterNum",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "scatterNum"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "respinNumWeight",
+                                    "type": "selectIntValWeight",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "weight"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "respinNumWeightWithScatterNum",
+                                    "type": "respinNumWeightWithScatterNum",
+                                    "required": true,
+                                    "show": {
+                                        "label": "genRespinType",
+                                        "value": [
+                                            "scatterNumWeight"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "controller": "true",
+                            "componentval": [
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 42,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "triggerType": "scatters",
+                                "betType": "bet",
+                                "genRespinType": "none",
+                                "winMulti": 3,
+                                "symbols": [
+                                    "FG"
+                                ]
+                            },
+                            "label": "fg-payfg"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "8fe07f32-7d04-42ed-9e3a-68fb8108dae6",
+                        "source": {
+                            "cell": "ce9588a1-481b-405e-b2d9-01ee2ff3ea96",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "389fd043-1ec8-4a63-8614-08f2b775ccd7",
+                            "port": "component-groups-in"
+                        },
+                        "zIndex": 43
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "ae17a1fe-24b2-434d-a891-957db4575d71",
+                        "source": {
+                            "cell": "389fd043-1ec8-4a63-8614-08f2b775ccd7",
                             "port": "component-groups-out"
                         },
                         "target": {
                             "cell": "ad5669c9-f889-4f79-b4ae-57d80207954a",
                             "port": "component-groups-in"
-                        }
+                        },
+                        "zIndex": 44
                     }
                 ]
             }

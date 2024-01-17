@@ -82,6 +82,8 @@ var (
 	ErrUnsupportedComponentType = errors.New("unsupported componentType")
 	// ErrUnsupportedLinkType - unsupported link type
 	ErrUnsupportedLinkType = errors.New("unsupported link type")
+	// ErrUnsupportedControllerType - unsupported ControllerType
+	ErrUnsupportedControllerType = errors.New("unsupported ControllerType")
 	// ErrInvalidJsonNode - invalid json node
 	ErrInvalidJsonNode = errors.New("invalid json node")
 	// ErrIvalidReels - invalid reels

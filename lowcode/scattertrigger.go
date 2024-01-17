@@ -735,7 +735,7 @@ func (jst *jsonScatterTrigger) build() *ScatterTriggerConfig {
 }
 
 func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
-	cfg, label, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseScatterTrigger:getConfigInCell",
 			zap.Error(err))
@@ -762,6 +762,18 @@ func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(gamecfg, ctrls)
+		if err != nil {
+			goutils.Error("parseScatterTrigger:parseControllers",
+				zap.Error(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig

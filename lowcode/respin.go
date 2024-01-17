@@ -459,7 +459,7 @@ func (jr *jsonRespin) build() *RespinConfig {
 }
 
 func parseRespin(gamecfg *Config, cell *ast.Node) (string, error) {
-	cfg, label, err := getConfigInCell(cell)
+	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRespin2:getConfigInCell",
 			zap.Error(err))
