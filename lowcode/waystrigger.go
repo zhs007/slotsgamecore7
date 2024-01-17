@@ -302,9 +302,9 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 			for _, v := range currets {
 				gameProp.ProcMulti(v)
 
-				if isSaveResult {
-					waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-				}
+				// if isSaveResult {
+				// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+				// }
 			}
 
 			lst = append(lst, currets...)
@@ -327,9 +327,9 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 			for _, v := range currets {
 				gameProp.ProcMulti(v)
 
-				if isSaveResult {
-					waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-				}
+				// if isSaveResult {
+				// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+				// }
 			}
 
 			lst = append(lst, currets...)
@@ -355,9 +355,9 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 		for _, v := range currets {
 			gameProp.ProcMulti(v)
 
-			if isSaveResult {
-				waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-			}
+			// if isSaveResult {
+			// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			// }
 		}
 
 		lst = append(lst, currets...)
@@ -381,6 +381,7 @@ func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.R
 	for _, v := range lst {
 		v.OtherMul = std.WinMulti
 		v.CoinWin *= std.WinMulti
+		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
 	}
@@ -453,6 +454,12 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	if isTrigger {
 		waysTrigger.procWins(std, lst)
+
+		if !waysTrigger.Config.NeedDiscardResults {
+			for _, v := range lst {
+				waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			}
+		}
 
 		std.SymbolNum = lst[0].SymbolNums
 		std.WildNum = lst[0].Wilds
@@ -587,6 +594,10 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
 	std := gameProp.MapComponentData[waysTrigger.Name].(*SymbolTriggerData)
+
+	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
+		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
+	}, mapSymbolColor)
 
 	if std.NextComponent != "" {
 		fmt.Printf("%v triggered, jump to %v \n", waysTrigger.Name, std.NextComponent)

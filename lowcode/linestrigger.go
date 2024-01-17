@@ -314,9 +314,9 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 							isTriggerFull = true
 						}
 
-						if isSaveResult {
-							linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-						}
+						// if isSaveResult {
+						// 	linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+						// }
 					}
 				}
 
@@ -344,9 +344,9 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 
 						lst = append(lst, ret)
 
-						if isSaveResult {
-							linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-						}
+						// if isSaveResult {
+						// 	linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+						// }
 					}
 				}
 			}
@@ -376,9 +376,9 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 
 						lst = append(lst, ret)
 
-						if isSaveResult {
-							linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-						}
+						// if isSaveResult {
+						// 	linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+						// }
 					}
 				}
 
@@ -406,9 +406,9 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 
 						lst = append(lst, ret)
 
-						if isSaveResult {
-							linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-						}
+						// if isSaveResult {
+						// 	linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+						// }
 					}
 				}
 			}
@@ -442,9 +442,9 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 
 					lst = append(lst, ret)
 
-					if isSaveResult {
-						linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-					}
+					// if isSaveResult {
+					// 	linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+					// }
 				}
 			}
 
@@ -470,9 +470,9 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 
 					lst = append(lst, ret)
 
-					if isSaveResult {
-						linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-					}
+					// if isSaveResult {
+					// 	linesTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+					// }
 				}
 			}
 		}
@@ -496,6 +496,7 @@ func (linesTrigger *LinesTrigger) procWins(std *LinesTriggerData, lst []*sgc7gam
 	for _, v := range lst {
 		v.OtherMul = std.WinMulti
 		v.CoinWin *= std.WinMulti
+		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
 	}
@@ -568,6 +569,12 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	if isTrigger {
 		linesTrigger.procWins(std, lst)
+
+		if !linesTrigger.Config.NeedDiscardResults {
+			for _, v := range lst {
+				linesTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			}
+		}
 
 		std.SymbolNum = lst[0].SymbolNums
 		std.WildNum = lst[0].Wilds
@@ -702,6 +709,10 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 func (linesTrigger *LinesTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
 	std := gameProp.MapComponentData[linesTrigger.Name].(*LinesTriggerData)
+
+	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
+		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
+	}, mapSymbolColor)
 
 	if std.NextComponent != "" {
 		fmt.Printf("%v triggered, jump to %v \n", linesTrigger.Name, std.NextComponent)
