@@ -279,7 +279,7 @@ func (scatterTrigger *ScatterTrigger) triggerScatter(gameProp *GameProperty, sta
 	return sgc7game.CalcScatter4(gs, gameProp.CurPaytables, scatterTrigger.Config.SymbolCodes[0], gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
 		func(scatter int, cursymbol int) bool {
 			return goutils.IndexOfIntSlice(scatterTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		}, true)
+		}, false)
 }
 
 // CanTrigger -
