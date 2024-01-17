@@ -284,7 +284,7 @@ func (scatterTrigger *ScatterTrigger) triggerScatter(gameProp *GameProperty, sta
 
 // CanTrigger -
 func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
+	// std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
@@ -305,9 +305,9 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 				gameProp.ProcMulti(ret)
 			}
 
-			if isSaveResult {
-				scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			}
+			// if isSaveResult {
+			// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+			// }
 
 			isTrigger = true
 
@@ -334,9 +334,9 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 				gameProp.ProcMulti(ret)
 			}
 
-			if isSaveResult {
-				scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			}
+			// if isSaveResult {
+			// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+			// }
 
 			isTrigger = true
 
@@ -367,9 +367,9 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 				gameProp.ProcMulti(ret)
 			}
 
-			if isSaveResult {
-				scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			}
+			// if isSaveResult {
+			// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+			// }
 
 			isTrigger = true
 
@@ -392,6 +392,7 @@ func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*s
 	for _, v := range lst {
 		v.OtherMul = std.WinMulti
 		v.CoinWin *= std.WinMulti
+		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
 	}
@@ -464,6 +465,12 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 	if isTrigger {
 		scatterTrigger.procWins(std, lst)
+
+		if !scatterTrigger.Config.NeedDiscardResults {
+			for _, v := range lst {
+				scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			}
+		}
 
 		std.SymbolNum = lst[0].SymbolNums
 		std.WildNum = lst[0].Wilds
@@ -598,6 +605,10 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 func (scatterTrigger *ScatterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
 	std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
+
+	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
+		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
+	}, mapSymbolColor)
 
 	if std.NextComponent != "" {
 		fmt.Printf("%v triggered, jump to %v \n", scatterTrigger.Name, std.NextComponent)
