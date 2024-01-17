@@ -694,26 +694,35 @@ func NewScatterTrigger(name string) IComponent {
 //		]
 //	},
 type jsonScatterTrigger struct {
-	Symbols           []string `json:"symbols"`
-	TriggerType       string   `json:"triggerType"`
-	BetType           string   `json:"betType"`
-	MinNum            int      `json:"minNum"`
-	WildSymbols       []string `json:"wildSymbols"`
-	PosArea           []int    `json:"posArea"`
-	CountScatterPayAs string   `json:"countScatterPayAs"`
-	WinMulti          int      `json:"winMulti"`
+	Symbols                       []string       `json:"symbols"`
+	TriggerType                   string         `json:"triggerType"`
+	BetType                       string         `json:"betType"`
+	MinNum                        int            `json:"minNum"`
+	WildSymbols                   []string       `json:"wildSymbols"`
+	PosArea                       []int          `json:"posArea"`
+	CountScatterPayAs             string         `json:"countScatterPayAs"`
+	WinMulti                      int            `json:"winMulti"`
+	GenRespinType                 string         `json:"genRespinType"`
+	RespinNum                     int            `json:"respinNum"`
+	RespinNumWeight               string         `json:"respinNumWeight"`
+	RespinNumWithScatterNum       map[int]int    `json:"respinNumWithScatterNum"`
+	RespinNumWeightWithScatterNum map[int]string `json:"respinNumWeightWithScatterNum"`
 }
 
 func (jst *jsonScatterTrigger) build() *ScatterTriggerConfig {
 	cfg := &ScatterTriggerConfig{
-		Symbols:           jst.Symbols,
-		Type:              jst.TriggerType,
-		BetTypeString:     jst.BetType,
-		MinNum:            jst.MinNum,
-		WildSymbols:       jst.WildSymbols,
-		PosArea:           jst.PosArea,
-		CountScatterPayAs: jst.CountScatterPayAs,
-		WinMulti:          jst.WinMulti,
+		Symbols:                       jst.Symbols,
+		Type:                          jst.TriggerType,
+		BetTypeString:                 jst.BetType,
+		MinNum:                        jst.MinNum,
+		WildSymbols:                   jst.WildSymbols,
+		PosArea:                       jst.PosArea,
+		CountScatterPayAs:             jst.CountScatterPayAs,
+		WinMulti:                      jst.WinMulti,
+		RespinNum:                     jst.RespinNum,
+		RespinNumWeight:               jst.RespinNumWeight,
+		RespinNumWithScatterNum:       jst.RespinNumWithScatterNum,
+		RespinNumWeightWithScatterNum: jst.RespinNumWeightWithScatterNum,
 	}
 
 	for i := range cfg.PosArea {
@@ -726,7 +735,7 @@ func (jst *jsonScatterTrigger) build() *ScatterTriggerConfig {
 }
 
 func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
-	cfg, label, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseScatterTrigger:getConfigInCell",
 			zap.Error(err))
@@ -753,6 +762,18 @@ func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(gamecfg, ctrls)
+		if err != nil {
+			goutils.Error("parseScatterTrigger:parseControllers",
+				zap.Error(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
