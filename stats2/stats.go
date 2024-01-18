@@ -12,6 +12,18 @@ type StatsWins struct {
 	TotalBet int64
 }
 
+func (wins *StatsWins) Clone() *StatsWins {
+	return &StatsWins{
+		TotalWin: wins.TotalWin,
+		TotalBet: wins.TotalBet,
+	}
+}
+
+func (wins *StatsWins) Merge(src *StatsWins) {
+	wins.TotalBet += src.TotalBet
+	wins.TotalWin += src.TotalWin
+}
+
 func (wins *StatsWins) SaveSheet(f *excelize.File, sheet string) {
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "win")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 1), "bet")
@@ -49,6 +61,28 @@ func (s2 *Stats) OnBet(bet int64) {
 
 	if s2.Wins != nil {
 		s2.Wins.TotalBet += bet
+	}
+}
+
+func (s2 *Stats) Clone() *Stats {
+	target := &Stats{
+		TotalTimes:   s2.TotalTimes,
+		TriggerTimes: s2.TriggerTimes,
+	}
+
+	if s2.Wins != nil {
+		target.Wins = s2.Wins.Clone()
+	}
+
+	return target
+}
+
+func (s2 *Stats) Merge(src *Stats) {
+	s2.TotalTimes += src.TotalTimes
+	s2.TriggerTimes += src.TriggerTimes
+
+	if s2.Wins != nil && src.Wins != nil {
+		s2.Wins.Merge(src.Wins)
 	}
 }
 
