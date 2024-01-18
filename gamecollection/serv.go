@@ -5,6 +5,7 @@ import (
 	"net"
 
 	goutils "github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
@@ -23,6 +24,8 @@ type Serv struct {
 
 // NewServ -
 func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, error) {
+	lowcode.SetJsonMode()
+
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
 		goutils.Error("NewServ.Listen",
