@@ -6,6 +6,7 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -487,6 +488,15 @@ func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GamePropert
 	gs, _ := gameProp.GetOtherScene(curpr, tag)
 
 	return gs
+}
+
+// NewStats2 -
+func (basicComponent *BasicComponent) NewStats2() *stats2.Stats {
+	return nil
+}
+
+// OnStats2
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Stats) {
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {

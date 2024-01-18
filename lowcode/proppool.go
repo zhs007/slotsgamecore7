@@ -224,6 +224,12 @@ func (pool *GamePropertyPool) loadAllWeights() {
 	}
 }
 
+func (pool *GamePropertyPool) onInit() {
+	for _, v := range pool.mapComponents {
+		v.onInit()
+	}
+}
+
 func (pool *GamePropertyPool) InitStats(betMul int) error {
 	err := pool.Config.BuildStatsSymbolCodes(pool.DefaultPaytables)
 	if err != nil {

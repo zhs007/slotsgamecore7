@@ -3,8 +3,9 @@ package stats2
 type Option int
 
 const (
-	OptWins       Option = 1
-	OptSymbolWins Option = 2
+	OptWins        Option = 1
+	OptSymbolWins  Option = 2
+	OptStepTrigger Option = 3
 )
 
 type Options []Option
