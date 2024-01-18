@@ -160,11 +160,19 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		cn := v.GetName()
 		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
+
+		if gAllowStats2 {
+			components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
+		}
 	}
 
 	gameProp.ProcRespin(pr, gp)
 
 	gameProp.onStepEnd(pr, prs)
+
+	if gAllowStats2 && pr.IsFinish {
+		components.Stats2.pushBetEnding()
+	}
 	// if pr.IsFinish {
 	// 	for _, curpr := range prs {
 	// 		for _, s := range curpr.Scenes {
@@ -212,6 +220,10 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 
 // OnNewGame -
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
+	if gAllowStats2 {
+		gameProp.Components.Stats2.pushBet(stake.CashBet / stake.CoinBet)
+	}
+
 	gameProp.OnNewGame(stake)
 
 	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
@@ -232,6 +244,10 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
+	if gAllowStats2 {
+		gameProp.Components.Stats2.pushStep()
+	}
+
 	gameProp.OnNewStep()
 
 	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]

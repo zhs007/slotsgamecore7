@@ -7,7 +7,6 @@ import (
 )
 
 type Stats struct {
-	Trigger     *StatsTrigger
 	StepTrigger *StatsTrigger
 	Wins        *StatsWins
 }
@@ -18,15 +17,7 @@ func (s2 *Stats) OnWins(win int64) {
 	}
 }
 
-func (s2 *Stats) OnTrigger(isTrigger bool) {
-	if isTrigger && s2.Trigger != nil {
-		s2.Trigger.TriggerTimes++
-	}
-}
-
 func (s2 *Stats) OnBet(bet int64) {
-	s2.Trigger.TotalTimes++
-
 	if s2.Wins != nil {
 		s2.Wins.TotalBet += bet
 	}
@@ -39,14 +30,16 @@ func (s2 *Stats) OnStep() {
 }
 
 func (s2 *Stats) OnStepTrigger(isTrigger bool) {
-	if isTrigger && s2.StepTrigger != nil {
+	if s2.StepTrigger != nil && isTrigger {
 		s2.StepTrigger.TriggerTimes++
 	}
 }
 
 func (s2 *Stats) Clone() *Stats {
-	target := &Stats{
-		Trigger: s2.Trigger.Clone(),
+	target := &Stats{}
+
+	if s2.StepTrigger != nil {
+		target.StepTrigger = s2.StepTrigger.Clone()
 	}
 
 	if s2.Wins != nil {
@@ -57,7 +50,9 @@ func (s2 *Stats) Clone() *Stats {
 }
 
 func (s2 *Stats) Merge(src *Stats) {
-	s2.Trigger.Merge(src.Trigger)
+	if s2.StepTrigger != nil && src.StepTrigger != nil {
+		s2.StepTrigger.Merge(src.StepTrigger)
+	}
 
 	if s2.Wins != nil && src.Wins != nil {
 		s2.Wins.Merge(src.Wins)
@@ -65,8 +60,6 @@ func (s2 *Stats) Merge(src *Stats) {
 }
 
 func (s2 *Stats) SaveSheet(f *excelize.File, sheet string) {
-	s2.Trigger.SaveSheet(f, sheet)
-
 	if s2.Wins != nil {
 		sn := fmt.Sprintf("%v - wins", sheet)
 		f.NewSheet(sn)
@@ -76,9 +69,7 @@ func (s2 *Stats) SaveSheet(f *excelize.File, sheet string) {
 }
 
 func NewStats(opts Options) *Stats {
-	s2 := &Stats{
-		Trigger: &StatsTrigger{},
-	}
+	s2 := &Stats{}
 
 	if opts.Has(OptWins) {
 		s2.Wins = &StatsWins{}

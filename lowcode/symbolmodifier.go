@@ -318,7 +318,12 @@ func (symbolModifier *SymbolModifier) OnStats(feature *sgc7stats.Feature, stake 
 
 // NewStats2 -
 func (symbolModifier *SymbolModifier) NewStats2() *stats2.Stats {
-	return stats2.NewStats(nil)
+	return stats2.NewStats(stats2.Options{stats2.OptStepTrigger})
+}
+
+// OnStats2
+func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *Stats2) {
+	s2.pushStepStats(symbolModifier.Name, true)
 }
 
 func NewSymbolModifier(name string) IComponent {

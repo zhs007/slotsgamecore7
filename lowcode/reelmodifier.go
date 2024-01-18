@@ -231,7 +231,12 @@ func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc
 
 // NewStats2 -
 func (reelModifier *ReelModifier) NewStats2() *stats2.Stats {
-	return stats2.NewStats(nil)
+	return stats2.NewStats(stats2.Options{stats2.OptStepTrigger})
+}
+
+// OnStats2
+func (reelModifier *ReelModifier) OnStats2(icd IComponentData, s2 *Stats2) {
+	s2.pushStepStats(reelModifier.Name, true)
 }
 
 func NewReelModifier(name string) IComponent {

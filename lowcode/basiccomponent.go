@@ -496,7 +496,7 @@ func (basicComponent *BasicComponent) NewStats2() *stats2.Stats {
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Stats) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *Stats2) {
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
