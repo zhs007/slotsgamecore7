@@ -252,6 +252,10 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		scatterTrigger.Config.WinMulti = 1
 	}
 
+	if scatterTrigger.Config.BetType == BTypeNoPay {
+		scatterTrigger.Config.NeedDiscardResults = true
+	}
+
 	scatterTrigger.onInit(&scatterTrigger.Config.BasicComponentConfig)
 
 	return nil

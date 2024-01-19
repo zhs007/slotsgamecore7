@@ -54,6 +54,8 @@ func (game *Game) Init(cfgfn string) error {
 		return nil
 	}
 
+	pool.onInit()
+
 	return nil
 }
 
@@ -94,6 +96,8 @@ func (game *Game) InitForRTP(bet int, cfgfn string) error {
 
 		return nil
 	}
+
+	pool.onInit()
 
 	return nil
 }
@@ -145,6 +149,8 @@ func (game *Game) Init2(cfg *Config) error {
 		return nil
 	}
 
+	pool.onInit()
+
 	return nil
 }
 
@@ -192,6 +198,8 @@ func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
 
 		return nil
 	}
+
+	pool.onInit()
 
 	return nil
 }

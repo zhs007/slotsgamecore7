@@ -9,6 +9,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -313,6 +314,16 @@ func (symbolModifier *SymbolModifier) OnAsciiGame(gameProp *GameProperty, pr *sg
 // OnStats
 func (symbolModifier *SymbolModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// NewStats2 -
+func (symbolModifier *SymbolModifier) NewStats2() *stats2.Stats {
+	return stats2.NewStats(stats2.Options{stats2.OptStepTrigger})
+}
+
+// OnStats2
+func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *Stats2) {
+	s2.pushStepStats(symbolModifier.Name, true)
 }
 
 func NewSymbolModifier(name string) IComponent {

@@ -5,6 +5,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -41,4 +42,9 @@ type IComponent interface {
 
 	// IsRespin -
 	IsRespin() bool
+
+	// NewStats2 -
+	NewStats2() *stats2.Stats
+	// OnStats2
+	OnStats2(icd IComponentData, s2 *Stats2)
 }

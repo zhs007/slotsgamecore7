@@ -251,6 +251,10 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		waysTrigger.Config.WinMulti = 1
 	}
 
+	if waysTrigger.Config.BetType == BTypeNoPay {
+		waysTrigger.Config.NeedDiscardResults = true
+	}
+
 	waysTrigger.onInit(&waysTrigger.Config.BasicComponentConfig)
 
 	return nil

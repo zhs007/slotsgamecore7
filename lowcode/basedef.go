@@ -112,14 +112,22 @@ func initCheckWinType() {
 	strCheckWinType["all"] = CheckWinTypeAll
 }
 
+// json mode - 是否json配置模式，json模式下会有些特殊处理，少一些互斥锁
 var gJsonMode bool
 
 func SetJsonMode() {
 	gJsonMode = true
 }
 
+// statsv2 - 是否开启 stats ，默认不开启，有cpu消耗
+var gAllowStats2 bool
+
+func SetAllowStatsV2() {
+	gAllowStats2 = true
+}
+
 func init() {
 	initCheckWinType()
 
-	gJsonMode = true
+	gIsForceDisableStats = true
 }

@@ -224,6 +224,12 @@ func (pool *GamePropertyPool) loadAllWeights() {
 	}
 }
 
+func (pool *GamePropertyPool) onInit() {
+	for _, v := range pool.mapComponents {
+		v.onInit()
+	}
+}
+
 func (pool *GamePropertyPool) InitStats(betMul int) error {
 	err := pool.Config.BuildStatsSymbolCodes(pool.DefaultPaytables)
 	if err != nil {
@@ -263,6 +269,10 @@ func (pool *GamePropertyPool) InitStats(betMul int) error {
 
 // LoadStrWeights - load xlsx file
 func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if gJsonMode {
+		return pool.mapStrValWeights[fn], nil
+	}
+
 	pool.lock.RLock()
 	vw, isok := pool.mapStrValWeights[fn]
 	if isok {
@@ -300,6 +310,10 @@ func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*s
 
 // LoadIntWeights - load xlsx file
 func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if gJsonMode {
+		return pool.mapIntValWeights[fn], nil
+	}
+
 	pool.lock.RLock()
 	vw, isok := pool.mapIntValWeights[fn]
 	if isok {

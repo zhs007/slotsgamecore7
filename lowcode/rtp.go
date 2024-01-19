@@ -332,5 +332,15 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 			zap.Int64("total nums", game.Pool.Stats.TotalNum))
 	}
 
+	if gAllowStats2 {
+		components := game.Pool.mapComponents[int(bet)]
+		components.Stats2.WaitEnding()
+
+		components.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-%v-stats-%v.xlsx", game.Pool.Config.Name, bet, curtime.Format("2006-01-02_15_04_05"))))
+
+		goutils.Info("finish.",
+			zap.Int64("total nums", components.Stats2.BetTimes))
+	}
+
 	return nil
 }
