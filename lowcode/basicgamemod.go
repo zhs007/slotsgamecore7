@@ -109,16 +109,23 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	}
 
 	for {
+		isComponentDoNothing := false
 		err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 		if err != nil {
-			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-				zap.Error(err))
+			if err != ErrComponentDoNothing {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					zap.Error(err))
 
-			return nil, err
+				return nil, err
+			}
+
+			isComponentDoNothing = true
 		}
 
-		gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
-		gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
+		if !isComponentDoNothing {
+			gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
+			gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
+		}
 
 		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
 		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)

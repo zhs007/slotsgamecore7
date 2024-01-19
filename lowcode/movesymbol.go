@@ -224,7 +224,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := moveSymbol.GetTargetScene3(gameProp, curpr, cd, moveSymbol.Name, "", 0)
 
-	sc2 := gs.CloneEx(gameProp.PoolScene)
+	sc2 := gs
 
 	for _, v := range moveSymbol.Config.MoveData {
 		srcok, srcx, srcy := v.Src.Select(sc2)
@@ -254,7 +254,17 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			continue
 		}
 
+		if sc2 == gs {
+			sc2 = gs.CloneEx(gameProp.PoolScene)
+		}
+
 		v.Move(sc2, srcx, srcy, targetx, targety, symbolCode)
+	}
+
+	if sc2 == gs {
+		moveSymbol.onStepEnd(gameProp, curpr, gp, "")
+
+		return ErrComponentDoNothing
 	}
 
 	moveSymbol.AddScene(gameProp, curpr, sc2, cd)

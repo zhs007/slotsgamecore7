@@ -119,4 +119,7 @@ var (
 
 	// ErrInvalidWeightVal - invalid weight value
 	ErrInvalidWeightVal = errors.New("invalid weight value")
+
+	// ErrComponentDoNothing - component do nothing
+	ErrComponentDoNothing = errors.New("component do nothing")
 )
