@@ -75,6 +75,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(LinesTriggerTypeName, NewLinesTrigger)
 	mgr.Reg(WaysTriggerTypeName, NewWaysTrigger)
 	mgr.Reg(WeightAwardsTypeName, NewWeightAwards)
+	mgr.Reg(ClusterTriggerTypeName, NewClusterTrigger)
 
 	return mgr
 }
