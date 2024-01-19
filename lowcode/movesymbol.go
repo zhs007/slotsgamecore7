@@ -290,13 +290,13 @@ func (moveSymbol *MoveSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 }
 
 // NewStats2 -
-func (moveSymbol *MoveSymbol) NewStats2() *stats2.Stats {
-	return stats2.NewStats(stats2.Options{stats2.OptStepTrigger})
+func (moveSymbol *MoveSymbol) NewStats2() *stats2.Feature {
+	return stats2.NewFeature(stats2.Options{stats2.OptStepTrigger})
 }
 
 // OnStats2
-func (moveSymbol *MoveSymbol) OnStats2(icd IComponentData, s2 *Stats2) {
-	s2.pushStepTrigger(moveSymbol.Name, true)
+func (moveSymbol *MoveSymbol) OnStats2(icd IComponentData, s2 *stats2.Stats) {
+	s2.PushStepTrigger(moveSymbol.Name, true)
 }
 
 // // OnStats2Trigger

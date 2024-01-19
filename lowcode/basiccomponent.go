@@ -491,18 +491,18 @@ func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GamePropert
 }
 
 // NewStats2 -
-func (basicComponent *BasicComponent) NewStats2() *stats2.Stats {
+func (basicComponent *BasicComponent) NewStats2() *stats2.Feature {
 	return nil
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *Stats2) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Stats) {
 }
 
-// OnStats2Trigger
-func (basicComponent *BasicComponent) OnStats2Trigger(s2 *Stats2) {
+// // OnStats2Trigger
+// func (basicComponent *BasicComponent) OnStats2Trigger(s2 *Stats2) {
 
-}
+// }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{

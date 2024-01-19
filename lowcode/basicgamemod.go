@@ -169,7 +169,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
 
 		if gAllowStats2 {
-			components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
+			v.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
+			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
 			gameProp.stats2SpinData.onStepStats(v, gameProp.MapComponentData[cn])
 		}
 	}
@@ -179,7 +180,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.onStepEnd(pr, prs)
 
 	if gAllowStats2 && pr.IsFinish {
-		components.Stats2.pushBetEnding()
+		components.Stats2.PushBetEnding()
 
 		gameProp.stats2SpinData.onBetEnding(components.Stats2)
 
@@ -235,7 +236,7 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 // OnNewGame -
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	if gAllowStats2 {
-		gameProp.Components.Stats2.pushBet(stake.CashBet / stake.CoinBet)
+		gameProp.Components.Stats2.PushBet(stake.CashBet / stake.CoinBet)
 
 		gameProp.stats2SpinData = newStats2SpinData()
 	}
@@ -261,7 +262,7 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	if gAllowStats2 {
-		gameProp.Components.Stats2.pushStep()
+		gameProp.Components.Stats2.PushStep()
 	}
 
 	gameProp.OnNewStep()
