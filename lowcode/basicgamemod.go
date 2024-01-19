@@ -4,6 +4,7 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -109,16 +110,23 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	}
 
 	for {
+		isComponentDoNothing := false
 		err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 		if err != nil {
-			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-				zap.Error(err))
+			if err != ErrComponentDoNothing {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					zap.Error(err))
 
-			return nil, err
+				return nil, err
+			}
+
+			isComponentDoNothing = true
 		}
 
-		gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
-		gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
+		if !isComponentDoNothing {
+			gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
+			gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
+		}
 
 		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
 		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
@@ -162,7 +170,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
 
 		if gAllowStats2 {
-			components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
+			v.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
+			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
+			gameProp.stats2SpinData.OnStepTrigger(cn)
 		}
 	}
 
@@ -171,7 +181,13 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.onStepEnd(pr, prs)
 
 	if gAllowStats2 && pr.IsFinish {
-		components.Stats2.pushBetEnding()
+		components.Stats2.PushBetEnding()
+
+		gameProp.stats2SpinData.OnBetEnding(components.Stats2)
+
+		// for _, curpr := range prs {
+		// 	curpr.
+		// }
 	}
 	// if pr.IsFinish {
 	// 	for _, curpr := range prs {
@@ -221,7 +237,13 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 // OnNewGame -
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	if gAllowStats2 {
-		gameProp.Components.Stats2.pushBet(stake.CashBet / stake.CoinBet)
+		gameProp.Components.Stats2.PushBet(stake.CashBet / stake.CoinBet)
+
+		if gameProp.stats2SpinData == nil {
+			gameProp.stats2SpinData = stats2.NewSpinCache()
+		} else {
+			gameProp.stats2SpinData.Clear()
+		}
 	}
 
 	gameProp.OnNewGame(stake)
@@ -245,7 +267,7 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	if gAllowStats2 {
-		gameProp.Components.Stats2.pushStep()
+		gameProp.Components.Stats2.PushStep()
 	}
 
 	gameProp.OnNewStep()

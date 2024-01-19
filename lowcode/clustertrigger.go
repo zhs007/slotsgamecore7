@@ -17,13 +17,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const WaysTriggerTypeName = "waysTrigger"
+const ClusterTriggerTypeName = "clusterTrigger"
 
 const (
-	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+	CTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
 )
 
-type WaysTriggerData struct {
+type ClusterTriggerData struct {
 	BasicComponentData
 	NextComponent string
 	SymbolNum     int
@@ -34,68 +34,68 @@ type WaysTriggerData struct {
 }
 
 // OnNewGame -
-func (waysTriggerData *WaysTriggerData) OnNewGame() {
-	waysTriggerData.BasicComponentData.OnNewGame()
+func (clusterTriggerData *ClusterTriggerData) OnNewGame() {
+	clusterTriggerData.BasicComponentData.OnNewGame()
 }
 
 // OnNewStep -
-func (waysTriggerData *WaysTriggerData) OnNewStep() {
-	waysTriggerData.BasicComponentData.OnNewStep()
+func (clusterTriggerData *ClusterTriggerData) OnNewStep() {
+	clusterTriggerData.BasicComponentData.OnNewStep()
 
-	waysTriggerData.NextComponent = ""
-	waysTriggerData.SymbolNum = 0
-	waysTriggerData.WildNum = 0
-	waysTriggerData.RespinNum = 0
-	waysTriggerData.Wins = 0
-	waysTriggerData.WinMulti = 1
+	clusterTriggerData.NextComponent = ""
+	clusterTriggerData.SymbolNum = 0
+	clusterTriggerData.WildNum = 0
+	clusterTriggerData.RespinNum = 0
+	clusterTriggerData.Wins = 0
+	clusterTriggerData.WinMulti = 1
 }
 
 // BuildPBComponentData
-func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
-	pbcd := &sgc7pb.WaysTriggerData{
-		BasicComponentData: waysTriggerData.BuildPBBasicComponentData(),
-		NextComponent:      waysTriggerData.NextComponent,
-		SymbolNum:          int32(waysTriggerData.SymbolNum),
-		WildNum:            int32(waysTriggerData.WildNum),
-		RespinNum:          int32(waysTriggerData.RespinNum),
-		Wins:               int32(waysTriggerData.Wins),
-		WinMulti:           int32(waysTriggerData.WinMulti),
+func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.ClusterTriggerData{
+		BasicComponentData: clusterTriggerData.BuildPBBasicComponentData(),
+		NextComponent:      clusterTriggerData.NextComponent,
+		SymbolNum:          int32(clusterTriggerData.SymbolNum),
+		WildNum:            int32(clusterTriggerData.WildNum),
+		RespinNum:          int32(clusterTriggerData.RespinNum),
+		Wins:               int32(clusterTriggerData.Wins),
+		WinMulti:           int32(clusterTriggerData.WinMulti),
 	}
 
 	return pbcd
 }
 
 // GetVal -
-func (waysTriggerData *WaysTriggerData) GetVal(key string) int {
+func (clusterTriggerData *ClusterTriggerData) GetVal(key string) int {
 	if key == STDVSymbolNum {
-		return waysTriggerData.SymbolNum
+		return clusterTriggerData.SymbolNum
 	} else if key == STDVWildNum {
-		return waysTriggerData.WildNum
+		return clusterTriggerData.WildNum
 	} else if key == STDVRespinNum {
-		return waysTriggerData.RespinNum
+		return clusterTriggerData.RespinNum
 	} else if key == STDVWins {
-		return waysTriggerData.Wins
+		return clusterTriggerData.Wins
 	}
 
 	return 0
 }
 
 // SetVal -
-func (waysTriggerData *WaysTriggerData) SetVal(key string, val int) {
+func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
 	if key == STDVSymbolNum {
-		waysTriggerData.SymbolNum = val
+		clusterTriggerData.SymbolNum = val
 	} else if key == STDVWildNum {
-		waysTriggerData.WildNum = val
+		clusterTriggerData.WildNum = val
 	} else if key == STDVRespinNum {
-		waysTriggerData.RespinNum = val
+		clusterTriggerData.RespinNum = val
 	} else if key == STDVWins {
-		waysTriggerData.Wins = val
+		clusterTriggerData.Wins = val
 	}
 }
 
-// WaysTriggerConfig - configuration for WaysTrigger
+// ClusterTriggerConfig - configuration for ClusterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
-type WaysTriggerConfig struct {
+type ClusterTriggerConfig struct {
 	BasicComponentConfig            `yaml:",inline" json:",inline"`
 	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
 	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
@@ -127,7 +127,7 @@ type WaysTriggerConfig struct {
 }
 
 // SetLinkComponent
-func (cfg *WaysTriggerConfig) SetLinkComponent(link string, componentName string) {
+func (cfg *ClusterTriggerConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
 	} else if link == "jump" {
@@ -135,226 +135,177 @@ func (cfg *WaysTriggerConfig) SetLinkComponent(link string, componentName string
 	}
 }
 
-type WaysTrigger struct {
+type ClusterTrigger struct {
 	*BasicComponent `json:"-"`
-	Config          *WaysTriggerConfig `json:"config"`
+	Config          *ClusterTriggerConfig `json:"config"`
 }
 
 // Init -
-func (waysTrigger *WaysTrigger) Init(fn string, pool *GamePropertyPool) error {
+func (clusterTrigger *ClusterTrigger) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
-		goutils.Error("WaysTrigger.Init:ReadFile",
+		goutils.Error("ClusterTrigger.Init:ReadFile",
 			zap.String("fn", fn),
 			zap.Error(err))
 
 		return err
 	}
 
-	cfg := &WaysTriggerConfig{}
+	cfg := &ClusterTriggerConfig{}
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
-		goutils.Error("WaysTrigger.Init:Unmarshal",
+		goutils.Error("ClusterTrigger.Init:Unmarshal",
 			zap.String("fn", fn),
 			zap.Error(err))
 
 		return err
 	}
 
-	return waysTrigger.InitEx(cfg, pool)
+	return clusterTrigger.InitEx(cfg, pool)
 }
 
 // InitEx -
-func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
-	waysTrigger.Config = cfg.(*WaysTriggerConfig)
-	waysTrigger.Config.ComponentType = WaysTriggerTypeName
+func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
+	clusterTrigger.Config = cfg.(*ClusterTriggerConfig)
+	clusterTrigger.Config.ComponentType = ClusterTriggerTypeName
 
-	for _, s := range waysTrigger.Config.Symbols {
+	for _, s := range clusterTrigger.Config.Symbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
-			goutils.Error("WaysTrigger.InitEx:Symbol",
+			goutils.Error("ClusterTrigger.InitEx:Symbol",
 				zap.String("symbol", s),
 				zap.Error(ErrIvalidSymbol))
 		}
 
-		waysTrigger.Config.SymbolCodes = append(waysTrigger.Config.SymbolCodes, sc)
+		clusterTrigger.Config.SymbolCodes = append(clusterTrigger.Config.SymbolCodes, sc)
 	}
 
-	for _, s := range waysTrigger.Config.WildSymbols {
+	for _, s := range clusterTrigger.Config.WildSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
-			goutils.Error("WaysTrigger.InitEx:WildSymbols",
+			goutils.Error("ClusterTrigger.InitEx:WildSymbols",
 				zap.String("symbol", s),
 				zap.Error(ErrIvalidSymbol))
 
 			return ErrIvalidSymbol
 		}
 
-		waysTrigger.Config.WildSymbolCodes = append(waysTrigger.Config.WildSymbolCodes, sc)
+		clusterTrigger.Config.WildSymbolCodes = append(clusterTrigger.Config.WildSymbolCodes, sc)
 	}
 
-	stt := ParseSymbolTriggerType(waysTrigger.Config.Type)
+	stt := ParseSymbolTriggerType(clusterTrigger.Config.Type)
 	if stt == STTypeUnknow {
-		goutils.Error("WaysTrigger.InitEx:ParseSymbolTriggerType",
-			zap.String("SymbolTriggerType", waysTrigger.Config.Type),
+		goutils.Error("ClusterTrigger.InitEx:ParseSymbolTriggerType",
+			zap.String("SymbolTriggerType", clusterTrigger.Config.Type),
 			zap.Error(ErrIvalidSymbolTriggerType))
 
 		return ErrIvalidSymbolTriggerType
 	}
 
-	waysTrigger.Config.TriggerType = stt
+	clusterTrigger.Config.TriggerType = stt
 
-	waysTrigger.Config.BetType = ParseBetType(waysTrigger.Config.BetTypeString)
+	clusterTrigger.Config.BetType = ParseBetType(clusterTrigger.Config.BetTypeString)
 
-	for _, award := range waysTrigger.Config.Awards {
+	for _, award := range clusterTrigger.Config.Awards {
 		award.Init()
 	}
 
-	if waysTrigger.Config.SymbolAwardsWeights != nil {
-		waysTrigger.Config.SymbolAwardsWeights.Init()
+	if clusterTrigger.Config.SymbolAwardsWeights != nil {
+		clusterTrigger.Config.SymbolAwardsWeights.Init()
 	}
 
-	waysTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, waysTrigger.Config.SymbolCodes)
+	clusterTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, clusterTrigger.Config.SymbolCodes)
 
-	waysTrigger.Config.CheckWinType = ParseCheckWinType(waysTrigger.Config.StrCheckWinType)
+	clusterTrigger.Config.CheckWinType = ParseCheckWinType(clusterTrigger.Config.StrCheckWinType)
 
-	if waysTrigger.Config.RespinNumWeight != "" {
-		vw2, err := pool.LoadIntWeights(waysTrigger.Config.RespinNumWeight, waysTrigger.Config.UseFileMapping)
+	if clusterTrigger.Config.RespinNumWeight != "" {
+		vw2, err := pool.LoadIntWeights(clusterTrigger.Config.RespinNumWeight, clusterTrigger.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("WaysTrigger.InitEx:LoadIntWeights",
-				zap.String("Weight", waysTrigger.Config.RespinNumWeight),
+			goutils.Error("ClusterTrigger.InitEx:LoadIntWeights",
+				zap.String("Weight", clusterTrigger.Config.RespinNumWeight),
 				zap.Error(err))
 
 			return err
 		}
 
-		waysTrigger.Config.RespinNumWeightVW = vw2
+		clusterTrigger.Config.RespinNumWeightVW = vw2
 	}
 
-	if len(waysTrigger.Config.RespinNumWeightWithScatterNum) > 0 {
-		for k, v := range waysTrigger.Config.RespinNumWeightWithScatterNum {
-			vw2, err := pool.LoadIntWeights(v, waysTrigger.Config.UseFileMapping)
+	if len(clusterTrigger.Config.RespinNumWeightWithScatterNum) > 0 {
+		for k, v := range clusterTrigger.Config.RespinNumWeightWithScatterNum {
+			vw2, err := pool.LoadIntWeights(v, clusterTrigger.Config.UseFileMapping)
 			if err != nil {
-				goutils.Error("WaysTrigger.InitEx:LoadIntWeights",
+				goutils.Error("ClusterTrigger.InitEx:LoadIntWeights",
 					zap.String("Weight", v),
 					zap.Error(err))
 
 				return err
 			}
 
-			waysTrigger.Config.RespinNumWeightWithScatterNumVW[k] = vw2
+			clusterTrigger.Config.RespinNumWeightWithScatterNumVW[k] = vw2
 		}
 	}
 
-	if waysTrigger.Config.WinMulti <= 0 {
-		waysTrigger.Config.WinMulti = 1
+	if clusterTrigger.Config.WinMulti <= 0 {
+		clusterTrigger.Config.WinMulti = 1
 	}
 
-	if waysTrigger.Config.BetType == BTypeNoPay {
-		waysTrigger.Config.NeedDiscardResults = true
+	if clusterTrigger.Config.BetType == BTypeNoPay {
+		clusterTrigger.Config.NeedDiscardResults = true
 	}
 
-	waysTrigger.onInit(&waysTrigger.Config.BasicComponentConfig)
+	clusterTrigger.onInit(&clusterTrigger.Config.BasicComponentConfig)
 
 	return nil
 }
 
 // playgame
-func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+func (clusterTrigger *ClusterTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
 
-	if waysTrigger.Config.TargetMask != "" {
+	if clusterTrigger.Config.TargetMask != "" {
 		mask := make([]bool, gs.Width)
 
 		for i := 0; i < len(ret.Pos)/2; i++ {
 			mask[ret.Pos[i*2]] = true
 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, waysTrigger.Config.TargetMask, mask, false)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, clusterTrigger.Config.TargetMask, mask, false)
 	}
 
 	return nil
 }
 
 // CanTrigger -
-func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
+func (clusterTrigger *ClusterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
+	// std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
-	if waysTrigger.Config.TriggerType == STTypeWays {
-		os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")
+	if clusterTrigger.Config.TriggerType == STTypeCluster {
 
-		if os != nil {
-			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, waysTrigger.Config.BetType),
-				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-					return goutils.IndexOfIntSlice(waysTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
-				}, func(cursymbol int) bool {
-					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, func(cursymbol int, startsymbol int) bool {
-					if cursymbol == startsymbol {
-						return true
-					}
-
-					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, func(x, y int) int {
-					return os.Arr[x][y]
-				})
-
-			for _, v := range currets {
-				gameProp.ProcMulti(v)
-
-				// if isSaveResult {
-				// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-				// }
-			}
-
-			lst = append(lst, currets...)
-		} else {
-			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, waysTrigger.Config.BetType),
-				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-					return goutils.IndexOfIntSlice(waysTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
-				}, func(cursymbol int) bool {
-					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, func(cursymbol int, startsymbol int) bool {
-					if cursymbol == startsymbol {
-						return true
-					}
-
-					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, func(x, y int) int {
-					return 1
-				})
-
-			for _, v := range currets {
-				gameProp.ProcMulti(v)
-
-				// if isSaveResult {
-				// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-				// }
-			}
-
-			lst = append(lst, currets...)
-		}
-
-		if len(lst) > 0 {
-			isTrigger = true
-		}
-	} else if waysTrigger.Config.TriggerType == STTypeCheckWays {
-		currets := sgc7game.CheckWays(gs, waysTrigger.Config.MinNum,
-			func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-				return goutils.IndexOfIntSlice(waysTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
+			func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(clusterTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 			}, func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			}, func(cursymbol int, startsymbol int) bool {
 				if cursymbol == startsymbol {
 					return true
 				}
 
-				return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, func(cursymbol int) int {
+				return cursymbol
 			})
+		if err != nil {
+			goutils.Error("ClusterTrigger.CanTrigger:CalcClusterResult",
+				zap.Error(err))
+
+			return false, nil
+		}
 
 		for _, v := range currets {
 			gameProp.ProcMulti(v)
@@ -371,7 +322,7 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 		}
 	}
 
-	if waysTrigger.Config.IsReverse {
+	if clusterTrigger.Config.IsReverse {
 		isTrigger = !isTrigger
 	}
 
@@ -379,8 +330,8 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 }
 
 // procWins
-func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
-	std.WinMulti = waysTrigger.GetWinMulti(&std.BasicComponentData)
+func (clusterTrigger *ClusterTrigger) procWins(std *ClusterTriggerData, lst []*sgc7game.Result) (int, error) {
+	std.WinMulti = clusterTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {
 		v.OtherMul = std.WinMulti
@@ -394,14 +345,14 @@ func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.R
 }
 
 // calcRespinNum
-func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sgc7game.Result) (int, error) {
+func (clusterTrigger *ClusterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sgc7game.Result) (int, error) {
 
-	if len(waysTrigger.Config.RespinNumWeightWithScatterNumVW) > 0 {
-		vw2, isok := waysTrigger.Config.RespinNumWeightWithScatterNumVW[ret.SymbolNums]
+	if len(clusterTrigger.Config.RespinNumWeightWithScatterNumVW) > 0 {
+		vw2, isok := clusterTrigger.Config.RespinNumWeightWithScatterNumVW[ret.SymbolNums]
 		if isok {
 			cr, err := vw2.RandVal(plugin)
 			if err != nil {
-				goutils.Error("WaysTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
+				goutils.Error("ClusterTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
 					zap.Int("SymbolNum", ret.SymbolNums),
 					zap.Error(err))
 
@@ -410,16 +361,16 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 
 			return cr.Int(), nil
 		} else {
-			goutils.Error("WaysTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
+			goutils.Error("ClusterTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
 				zap.Int("SymbolNum", ret.SymbolNums),
 				zap.Error(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
 		}
-	} else if len(waysTrigger.Config.RespinNumWithScatterNum) > 0 {
-		v, isok := waysTrigger.Config.RespinNumWithScatterNum[ret.SymbolNums]
+	} else if len(clusterTrigger.Config.RespinNumWithScatterNum) > 0 {
+		v, isok := clusterTrigger.Config.RespinNumWithScatterNum[ret.SymbolNums]
 		if !isok {
-			goutils.Error("WaysTrigger.calcRespinNum:RespinNumWithScatterNum",
+			goutils.Error("ClusterTrigger.calcRespinNum:RespinNumWithScatterNum",
 				zap.Int("SymbolNum", ret.SymbolNums),
 				zap.Error(ErrInvalidSymbolNum))
 
@@ -427,50 +378,50 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 		}
 
 		return v, nil
-	} else if waysTrigger.Config.RespinNumWeightVW != nil {
-		cr, err := waysTrigger.Config.RespinNumWeightVW.RandVal(plugin)
+	} else if clusterTrigger.Config.RespinNumWeightVW != nil {
+		cr, err := clusterTrigger.Config.RespinNumWeightVW.RandVal(plugin)
 		if err != nil {
-			goutils.Error("WaysTrigger.calcRespinNum:RespinNumWeightVW",
+			goutils.Error("ClusterTrigger.calcRespinNum:RespinNumWeightVW",
 				zap.Error(err))
 
 			return 0, err
 		}
 
 		return cr.Int(), nil
-	} else if waysTrigger.Config.RespinNum > 0 {
-		return waysTrigger.Config.RespinNum, nil
+	} else if clusterTrigger.Config.RespinNum > 0 {
+		return clusterTrigger.Config.RespinNum, nil
 	}
 
 	return 0, nil
 }
 
 // playgame
-func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	waysTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	clusterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
+	std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
 
-	gs := waysTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "", 0)
+	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, clusterTrigger.Name, "", 0)
 
-	isTrigger, lst := waysTrigger.CanTrigger(gameProp, gs, curpr, stake, !waysTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := clusterTrigger.CanTrigger(gameProp, gs, curpr, stake, !clusterTrigger.Config.NeedDiscardResults)
 
 	if isTrigger {
-		waysTrigger.procWins(std, lst)
+		clusterTrigger.procWins(std, lst)
 
-		if !waysTrigger.Config.NeedDiscardResults {
+		if !clusterTrigger.Config.NeedDiscardResults {
 			for _, v := range lst {
-				waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+				clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
 			}
 		}
 
 		std.SymbolNum = lst[0].SymbolNums
 		std.WildNum = lst[0].Wilds
 
-		respinNum, err := waysTrigger.calcRespinNum(plugin, lst[0])
+		respinNum, err := clusterTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
-			goutils.Error("WaysTrigger.OnPlayGame:calcRespinNum",
+			goutils.Error("ClusterTrigger.OnPlayGame:calcRespinNum",
 				zap.Error(err))
 
 			return nil
@@ -478,9 +429,9 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 		std.RespinNum = respinNum
 
-		err = waysTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
+		err = clusterTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
 		if err != nil {
-			goutils.Error("WaysTrigger.OnPlayGame:procMask",
+			goutils.Error("ClusterTrigger.OnPlayGame:procMask",
 				zap.Error(err))
 
 			return err
@@ -490,15 +441,15 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		// 	gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
 		// }
 
-		if len(waysTrigger.Config.Awards) > 0 {
-			gameProp.procAwards(plugin, waysTrigger.Config.Awards, curpr, gp)
+		if len(clusterTrigger.Config.Awards) > 0 {
+			gameProp.procAwards(plugin, clusterTrigger.Config.Awards, curpr, gp)
 		}
 
-		if waysTrigger.Config.SymbolAwardsWeights != nil {
+		if clusterTrigger.Config.SymbolAwardsWeights != nil {
 			for i := 0; i < lst[0].SymbolNums; i++ {
-				node, err := waysTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
+				node, err := clusterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
 				if err != nil {
-					goutils.Error("WaysTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
+					goutils.Error("ClusterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
 						zap.Error(err))
 
 					return err
@@ -508,16 +459,16 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			}
 		}
 
-		if waysTrigger.Config.JumpToComponent != "" {
-			if gameProp.IsRespin(waysTrigger.Config.JumpToComponent) {
+		if clusterTrigger.Config.JumpToComponent != "" {
+			if gameProp.IsRespin(clusterTrigger.Config.JumpToComponent) {
 				// 如果jumpto是一个respin，那么就需要trigger respin
 				if std.RespinNum == 0 {
-					if waysTrigger.Config.ForceToNext {
-						std.NextComponent = waysTrigger.Config.DefaultNextComponent
+					if clusterTrigger.Config.ForceToNext {
+						std.NextComponent = clusterTrigger.Config.DefaultNextComponent
 					} else {
-						rn := gameProp.GetLastRespinNum(waysTrigger.Config.JumpToComponent)
+						rn := gameProp.GetLastRespinNum(clusterTrigger.Config.JumpToComponent)
 						if rn > 0 {
-							gameProp.TriggerRespin(plugin, curpr, gp, 0, waysTrigger.Config.JumpToComponent, !waysTrigger.Config.IsAddRespinMode)
+							gameProp.TriggerRespin(plugin, curpr, gp, 0, clusterTrigger.Config.JumpToComponent, !clusterTrigger.Config.IsAddRespinMode)
 
 							lst[0].Type = sgc7game.RTFreeGame
 							lst[0].Value = rn
@@ -525,7 +476,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 					}
 				} else {
 					// 如果jumpto是respin，需要treigger这个respin
-					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, waysTrigger.Config.JumpToComponent, !waysTrigger.Config.IsAddRespinMode)
+					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, clusterTrigger.Config.JumpToComponent, !clusterTrigger.Config.IsAddRespinMode)
 
 					lst[0].Type = sgc7game.RTFreeGame
 					lst[0].Value = std.RespinNum
@@ -581,61 +532,61 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			// 	}
 			// }
 
-			std.NextComponent = waysTrigger.Config.JumpToComponent
+			std.NextComponent = clusterTrigger.Config.JumpToComponent
 
-			waysTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+			clusterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
 
 			return nil
 		}
 	}
 
-	waysTrigger.onStepEnd(gameProp, curpr, gp, "")
+	clusterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
 	return nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (clusterTrigger *ClusterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
-	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
+	std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
 	}, mapSymbolColor)
 
 	if std.NextComponent != "" {
-		fmt.Printf("%v triggered, jump to %v \n", waysTrigger.Name, std.NextComponent)
+		fmt.Printf("%v triggered, jump to %v \n", clusterTrigger.Name, std.NextComponent)
 	}
 
 	return nil
 }
 
 // OnStatsWithPB -
-func (waysTrigger *WaysTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.WaysTriggerData)
+func (clusterTrigger *ClusterTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+	pbcd, isok := pbComponentData.(*sgc7pb.ClusterTriggerData)
 	if !isok {
-		goutils.Error("WaysTrigger.OnStatsWithPB",
+		goutils.Error("ClusterTrigger.OnStatsWithPB",
 			zap.Error(ErrIvalidProto))
 
 		return 0, ErrIvalidProto
 	}
 
-	return waysTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+	return clusterTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
 }
 
 // OnStats
-func (waysTrigger *WaysTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+func (clusterTrigger *ClusterTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	wins := int64(0)
 	isTrigger := false
 
 	for _, v := range lst {
 		gp, isok := v.CurGameModParams.(*GameParams)
 		if isok {
-			curComponent, isok := gp.MapComponentMsgs[waysTrigger.Name]
+			curComponent, isok := gp.MapComponentMsgs[clusterTrigger.Name]
 			if isok {
-				curwins, err := waysTrigger.OnStatsWithPB(feature, curComponent, v)
+				curwins, err := clusterTrigger.OnStatsWithPB(feature, curComponent, v)
 				if err != nil {
-					goutils.Error("WaysTrigger.OnStats",
+					goutils.Error("ClusterTrigger.OnStats",
 						zap.Error(err))
 
 					continue
@@ -663,21 +614,21 @@ func (waysTrigger *WaysTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 }
 
 // NewComponentData -
-func (waysTrigger *WaysTrigger) NewComponentData() IComponentData {
-	return &WaysTriggerData{}
+func (clusterTrigger *ClusterTrigger) NewComponentData() IComponentData {
+	return &ClusterTriggerData{}
 }
 
-func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
+func (clusterTrigger *ClusterTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
 	if isok {
 		return winMulti
 	}
 
-	return waysTrigger.Config.WinMulti
+	return clusterTrigger.Config.WinMulti
 }
 
-func NewWaysTrigger(name string) IComponent {
-	return &WaysTrigger{
+func NewClusterTrigger(name string) IComponent {
+	return &ClusterTrigger{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
 }
@@ -704,7 +655,7 @@ func NewWaysTrigger(name string) IComponent {
 //			"WL"
 //		]
 //	},
-type jsonWaysTrigger struct {
+type jsonClusterTrigger struct {
 	Symbols     []string `json:"symbols"`
 	TriggerType string   `json:"triggerType"`
 	BetType     string   `json:"betType"`
@@ -713,8 +664,8 @@ type jsonWaysTrigger struct {
 	WinMulti    int      `json:"winMulti"`
 }
 
-func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
-	cfg := &WaysTriggerConfig{
+func (jwt *jsonClusterTrigger) build() *ClusterTriggerConfig {
+	cfg := &ClusterTriggerConfig{
 		Symbols:       jwt.Symbols,
 		Type:          jwt.TriggerType,
 		BetTypeString: jwt.BetType,
@@ -728,10 +679,10 @@ func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
 	return cfg
 }
 
-func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseClusterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
-		goutils.Error("parseWaysTrigger:getConfigInCell",
+		goutils.Error("parseClusterTrigger:getConfigInCell",
 			zap.Error(err))
 
 		return "", err
@@ -739,17 +690,17 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseWaysTrigger:MarshalJSON",
+		goutils.Error("parseClusterTrigger:MarshalJSON",
 			zap.Error(err))
 
 		return "", err
 	}
 
-	data := &jsonWaysTrigger{}
+	data := &jsonClusterTrigger{}
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
-		goutils.Error("parseWaysTrigger:Unmarshal",
+		goutils.Error("parseClusterTrigger:Unmarshal",
 			zap.Error(err))
 
 		return "", err
@@ -760,7 +711,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	if ctrls != nil {
 		awards, err := parseControllers(gamecfg, ctrls)
 		if err != nil {
-			goutils.Error("parseWaysTrigger:parseControllers",
+			goutils.Error("parseClusterTrigger:parseControllers",
 				zap.Error(err))
 
 			return "", err
@@ -774,7 +725,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 
 	ccfg := &ComponentConfig{
 		Name: label,
-		Type: WaysTriggerTypeName,
+		Type: ClusterTriggerTypeName,
 	}
 
 	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)

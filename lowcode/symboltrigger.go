@@ -28,6 +28,7 @@ const (
 	STTypeCountScatterInArea SymbolTriggerType = 5 // 区域内的scatter判断，需要传入minnum，不读paytable
 	STTypeCheckLines         SymbolTriggerType = 6 // 线判断，一定是判断全部线，需要传入minnum，不读paytable
 	STTypeCheckWays          SymbolTriggerType = 7 // ways判断，需要传入minnum，不读paytable
+	STTypeCluster            SymbolTriggerType = 8 // cluster，且读paytable来判断是否可以中奖
 )
 
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
@@ -45,6 +46,8 @@ func ParseSymbolTriggerType(str string) SymbolTriggerType {
 		return STTypeCheckLines
 	} else if str == "checkWays" {
 		return STTypeCheckWays
+	} else if str == "cluster" {
+		return STTypeCluster
 	}
 
 	return STTypeUnknow

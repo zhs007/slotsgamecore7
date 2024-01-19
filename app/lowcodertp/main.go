@@ -43,6 +43,12 @@ func main() {
 	outputPath := os.Getenv("OUTPUTPATH")
 	strBet := os.Getenv("BET")
 
+	isAllowStats2 := false
+	strAllowStats2 := os.Getenv("ALLOWSTATS2")
+	if strAllowStats2 == "true" {
+		isAllowStats2 = true
+	}
+
 	goutils.InitLogger("lowcodertp", sgc7ver.Version,
 		"info", true, "./logs")
 
@@ -67,6 +73,10 @@ func main() {
 		i64, _ := goutils.String2Int64(strBet)
 
 		bet = i64
+	}
+
+	if isAllowStats2 {
+		lowcode.SetAllowStatsV2()
 	}
 
 	// lowcode.SetForceDisableStats()

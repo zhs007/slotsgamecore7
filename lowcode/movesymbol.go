@@ -10,6 +10,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -224,7 +225,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := moveSymbol.GetTargetScene3(gameProp, curpr, cd, moveSymbol.Name, "", 0)
 
-	sc2 := gs.CloneEx(gameProp.PoolScene)
+	sc2 := gs
 
 	for _, v := range moveSymbol.Config.MoveData {
 		srcok, srcx, srcy := v.Src.Select(sc2)
@@ -254,7 +255,17 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			continue
 		}
 
+		if sc2 == gs {
+			sc2 = gs.CloneEx(gameProp.PoolScene)
+		}
+
 		v.Move(sc2, srcx, srcy, targetx, targety, symbolCode)
+	}
+
+	if sc2 == gs {
+		moveSymbol.onStepEnd(gameProp, curpr, gp, "")
+
+		return ErrComponentDoNothing
 	}
 
 	moveSymbol.AddScene(gameProp, curpr, sc2, cd)
@@ -277,6 +288,21 @@ func (moveSymbol *MoveSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 func (moveSymbol *MoveSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
 }
+
+// NewStats2 -
+func (moveSymbol *MoveSymbol) NewStats2() *stats2.Feature {
+	return stats2.NewFeature(stats2.Options{stats2.OptStepTrigger})
+}
+
+// OnStats2
+func (moveSymbol *MoveSymbol) OnStats2(icd IComponentData, s2 *stats2.Stats) {
+	s2.PushStepTrigger(moveSymbol.Name, true)
+}
+
+// // OnStats2Trigger
+// func (moveSymbol *MoveSymbol) OnStats2Trigger(s2 *Stats2) {
+// 	s2.pushTriggerStats(moveSymbol.Name, true)
+// }
 
 func NewMoveSymbol(name string) IComponent {
 	return &MoveSymbol{

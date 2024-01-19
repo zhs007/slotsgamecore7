@@ -230,14 +230,19 @@ func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc
 }
 
 // NewStats2 -
-func (reelModifier *ReelModifier) NewStats2() *stats2.Stats {
-	return stats2.NewStats(stats2.Options{stats2.OptStepTrigger})
+func (reelModifier *ReelModifier) NewStats2() *stats2.Feature {
+	return stats2.NewFeature(stats2.Options{stats2.OptStepTrigger})
 }
 
 // OnStats2
-func (reelModifier *ReelModifier) OnStats2(icd IComponentData, s2 *Stats2) {
-	s2.pushStepStats(reelModifier.Name, true)
+func (reelModifier *ReelModifier) OnStats2(icd IComponentData, s2 *stats2.Stats) {
+	s2.PushStepTrigger(reelModifier.Name, true)
 }
+
+// // OnStats2Trigger
+// func (reelModifier *ReelModifier) OnStats2Trigger(s2 *Stats2) {
+// 	s2.pushTriggerStats(reelModifier.Name, true)
+// }
 
 func NewReelModifier(name string) IComponent {
 	return &ReelModifier{

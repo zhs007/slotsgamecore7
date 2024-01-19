@@ -199,6 +199,24 @@ message WaysTriggerData {
     int32 winMulti = 7;
 }
 
+// ClusterTriggerData
+message ClusterTriggerData {
+    ComponentData basicComponentData = 1;
+	string nextComponent = 2;
+    int32 symbolNum = 3;
+    int32 wildNum = 4;
+    int32 respinNum = 5;
+    int32 wins = 6;
+    int32 winMulti = 7;
+}
+
+// WinResultMultiData
+message WinResultMultiData {
+    ComponentData basicComponentData = 1;
+    int32 wins = 2;
+    int32 winMulti = 3;
+}
+
 // WeightAwardsData
 message WeightAwardsData {
     ComponentData basicComponentData = 1;

@@ -1,9 +1,11 @@
 package lowcode
 
+import "github.com/zhs007/slotsgamecore7/stats2"
+
 type ComponentList struct {
 	Components    []IComponent
 	MapComponents map[string]IComponent
-	Stats2        *Stats2
+	Stats2        *stats2.Stats
 }
 
 func (lst *ComponentList) AddComponent(name string, component IComponent) {
@@ -15,6 +17,8 @@ func (lst *ComponentList) AddComponent(name string, component IComponent) {
 func (lst *ComponentList) onInit() {
 	if gAllowStats2 {
 		lst.Stats2 = NewStats2(lst)
+
+		lst.Stats2.Start()
 	}
 }
 

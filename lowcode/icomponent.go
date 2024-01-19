@@ -44,7 +44,9 @@ type IComponent interface {
 	IsRespin() bool
 
 	// NewStats2 -
-	NewStats2() *stats2.Stats
+	NewStats2() *stats2.Feature
 	// OnStats2
-	OnStats2(icd IComponentData, s2 *Stats2)
+	OnStats2(icd IComponentData, s2 *stats2.Stats)
+	// // OnStats2Trigger
+	// OnStats2Trigger(s2 *Stats2)
 }

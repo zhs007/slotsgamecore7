@@ -124,6 +124,11 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 	return pbcd
 }
 
+// GetResults -
+func (basicComponentData *BasicComponentData) GetResults() []int {
+	return basicComponentData.UsedResults
+}
+
 // 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
 	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
@@ -491,13 +496,18 @@ func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GamePropert
 }
 
 // NewStats2 -
-func (basicComponent *BasicComponent) NewStats2() *stats2.Stats {
+func (basicComponent *BasicComponent) NewStats2() *stats2.Feature {
 	return nil
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *Stats2) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Stats) {
 }
+
+// // OnStats2Trigger
+// func (basicComponent *BasicComponent) OnStats2Trigger(s2 *Stats2) {
+
+// }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
