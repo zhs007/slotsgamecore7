@@ -15,6 +15,8 @@ func (lst *ComponentList) AddComponent(name string, component IComponent) {
 func (lst *ComponentList) onInit() {
 	if gAllowStats2 {
 		lst.Stats2 = NewStats2(lst)
+
+		lst.Stats2.Start()
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/stats2"
 )
 
-type stepTriggerData struct {
+type triggerData struct {
 	Name      string
 	IsTrigger bool
 }
@@ -15,9 +15,10 @@ type stepTriggerData struct {
 type Stats2 struct {
 	MapStats        map[string]*stats2.Stats
 	chanBet         chan int64
-	chanStepTrigger chan *stepTriggerData
+	chanStepTrigger chan *triggerData
 	chanBetEnding   chan int
 	chanStep        chan int
+	chanTrigger     chan *triggerData
 	BetTimes        int64
 	BetEndingTimes  int64
 }
@@ -46,21 +47,15 @@ func (s2 *Stats2) onStatsStep() {
 	}
 }
 
-// func (s2 *Stats2) onStep() {
-// 	for _, v := range s2.MapStats {
-// 		v.OnStep()
-// 	}
-// }
+func (s2 *Stats2) pushStepTrigger(componentName string, isTrigger bool) {
+	s2.chanStepTrigger <- &triggerData{
+		Name:      componentName,
+		IsTrigger: isTrigger,
+	}
+}
 
-// func (s2 *Stats2) onStats(componentName string, ic IComponent, icd IComponentData) {
-// 	sd2 := s2.MapStats[componentName]
-// 	if sd2 != nil {
-// 		ic.OnStats2(icd, sd2)
-// 	}
-// }
-
-func (s2 *Stats2) pushStepStats(componentName string, isTrigger bool) {
-	s2.chanStepTrigger <- &stepTriggerData{
+func (s2 *Stats2) pushTrigger(componentName string, isTrigger bool) {
+	s2.chanTrigger <- &triggerData{
 		Name:      componentName,
 		IsTrigger: isTrigger,
 	}
@@ -70,8 +65,15 @@ func (s2 *Stats2) onStepStats(ic IComponent, icd IComponentData) {
 	ic.OnStats2(icd, s2)
 }
 
-func (s2 *Stats2) onStatsStepTrigger(std *stepTriggerData) {
+func (s2 *Stats2) onStatsStepTrigger(std *triggerData) {
 	s2.MapStats[std.Name].OnStepTrigger(std.IsTrigger)
+}
+
+func (s2 *Stats2) onStatsTrigger(std *triggerData) {
+	s := s2.MapStats[std.Name]
+	if s != nil {
+		s.OnTrigger(std.IsTrigger)
+	}
 }
 
 func (s2 *Stats2) SaveExcel(fn string) error {
@@ -117,6 +119,14 @@ func (s2 *Stats2) Start() {
 			s2.onStatsStep()
 		}
 	}()
+
+	go func() {
+		for {
+			td := <-s2.chanTrigger
+
+			s2.onStatsTrigger(td)
+		}
+	}()
 }
 
 func (s2 *Stats2) WaitEnding() {
@@ -133,9 +143,10 @@ func NewStats2(components *ComponentList) *Stats2 {
 	s2 := &Stats2{
 		MapStats:        make(map[string]*stats2.Stats),
 		chanBet:         make(chan int64),
-		chanStepTrigger: make(chan *stepTriggerData),
+		chanStepTrigger: make(chan *triggerData),
 		chanBetEnding:   make(chan int),
 		chanStep:        make(chan int),
+		chanTrigger:     make(chan *triggerData),
 	}
 
 	for key, ic := range components.MapComponents {

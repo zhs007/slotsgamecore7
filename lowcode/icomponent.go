@@ -47,4 +47,6 @@ type IComponent interface {
 	NewStats2() *stats2.Stats
 	// OnStats2
 	OnStats2(icd IComponentData, s2 *Stats2)
+	// // OnStats2Trigger
+	// OnStats2Trigger(s2 *Stats2)
 }

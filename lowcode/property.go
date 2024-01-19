@@ -65,6 +65,7 @@ type GameProperty struct {
 	PoolScene              *sgc7game.GameScenePoolEx
 	Components             *ComponentList
 	SceneStack             *SceneStack
+	stats2SpinData         *stats2SpinData
 }
 
 func (gameProp *GameProperty) GetBetMul() int {

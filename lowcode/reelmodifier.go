@@ -236,8 +236,13 @@ func (reelModifier *ReelModifier) NewStats2() *stats2.Stats {
 
 // OnStats2
 func (reelModifier *ReelModifier) OnStats2(icd IComponentData, s2 *Stats2) {
-	s2.pushStepStats(reelModifier.Name, true)
+	s2.pushStepTrigger(reelModifier.Name, true)
 }
+
+// // OnStats2Trigger
+// func (reelModifier *ReelModifier) OnStats2Trigger(s2 *Stats2) {
+// 	s2.pushTriggerStats(reelModifier.Name, true)
+// }
 
 func NewReelModifier(name string) IComponent {
 	return &ReelModifier{

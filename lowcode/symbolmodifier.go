@@ -323,8 +323,13 @@ func (symbolModifier *SymbolModifier) NewStats2() *stats2.Stats {
 
 // OnStats2
 func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *Stats2) {
-	s2.pushStepStats(symbolModifier.Name, true)
+	s2.pushStepTrigger(symbolModifier.Name, true)
 }
+
+// // OnStats2Trigger
+// func (symbolModifier *SymbolModifier) OnStats2Trigger(s2 *Stats2) {
+// 	s2.pushTriggerStats(symbolModifier.Name, true)
+// }
 
 func NewSymbolModifier(name string) IComponent {
 	return &SymbolModifier{
