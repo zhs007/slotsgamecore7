@@ -251,6 +251,10 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		linesTrigger.Config.WinMulti = 1
 	}
 
+	if linesTrigger.Config.BetType == BTypeNoPay {
+		linesTrigger.Config.NeedDiscardResults = true
+	}
+
 	linesTrigger.onInit(&linesTrigger.Config.BasicComponentConfig)
 
 	return nil
