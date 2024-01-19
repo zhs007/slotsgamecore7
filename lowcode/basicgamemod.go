@@ -4,6 +4,7 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -171,7 +172,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		if gAllowStats2 {
 			v.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
 			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
-			gameProp.stats2SpinData.onStepStats(v, gameProp.MapComponentData[cn])
+			gameProp.stats2SpinData.OnStepTrigger(cn)
 		}
 	}
 
@@ -182,7 +183,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	if gAllowStats2 && pr.IsFinish {
 		components.Stats2.PushBetEnding()
 
-		gameProp.stats2SpinData.onBetEnding(components.Stats2)
+		gameProp.stats2SpinData.OnBetEnding(components.Stats2)
 
 		// for _, curpr := range prs {
 		// 	curpr.
@@ -238,7 +239,11 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 	if gAllowStats2 {
 		gameProp.Components.Stats2.PushBet(stake.CashBet / stake.CoinBet)
 
-		gameProp.stats2SpinData = newStats2SpinData()
+		if gameProp.stats2SpinData == nil {
+			gameProp.stats2SpinData = stats2.NewSpinCache()
+		} else {
+			gameProp.stats2SpinData.Clear()
+		}
 	}
 
 	gameProp.OnNewGame(stake)

@@ -7,6 +7,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 )
 
@@ -65,7 +66,7 @@ type GameProperty struct {
 	PoolScene              *sgc7game.GameScenePoolEx
 	Components             *ComponentList
 	SceneStack             *SceneStack
-	stats2SpinData         *stats2SpinData
+	stats2SpinData         *stats2.SpinCache
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
