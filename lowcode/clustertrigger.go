@@ -548,7 +548,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 // OnAsciiGame - outpur to asciigame
 func (clusterTrigger *ClusterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
-	std := gameProp.MapComponentData[clusterTrigger.Name].(*SymbolTriggerData)
+	std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0

@@ -210,6 +210,13 @@ message ClusterTriggerData {
     int32 winMulti = 7;
 }
 
+// WinResultMultiData
+message WinResultMultiData {
+    ComponentData basicComponentData = 1;
+    int32 wins = 2;
+    int32 winMulti = 3;
+}
+
 // WeightAwardsData
 message WeightAwardsData {
     ComponentData basicComponentData = 1;

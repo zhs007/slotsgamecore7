@@ -597,7 +597,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 // OnAsciiGame - outpur to asciigame
 func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
 
-	std := gameProp.MapComponentData[waysTrigger.Name].(*SymbolTriggerData)
+	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
