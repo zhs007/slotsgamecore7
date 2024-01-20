@@ -47,6 +47,10 @@ func (cfg *Award) getType() int {
 		return AwardTriggerRespin2
 	} else if cfg.AwardType == "setComponentConfigVal" {
 		return AwardSetComponentConfigVal
+	} else if cfg.AwardType == "setComponentConfigIntVal" {
+		return AwardSetComponentConfigIntVal
+	} else if cfg.AwardType == "chgComponentConfigIntVal" {
+		return AwardChgComponentConfigIntVal
 	}
 
 	return AwardUnknow
@@ -99,6 +103,7 @@ const (
 	AwardTriggerRespin2           int = 16 // 新的触发respin，不需要考虑trigger、retrigger、respinTimes，直接用这个就行，如果次数给-1，就会用当前的retriggerRespinNum
 	AwardSetComponentConfigVal    int = 17 // 设置组件的configVal
 	AwardSetComponentConfigIntVal int = 18 // 设置组件的configIntVal
+	AwardChgComponentConfigIntVal int = 19 // 改变组件的configIntVal
 )
 
 // AwardCash
