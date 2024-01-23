@@ -122,4 +122,12 @@ var (
 
 	// ErrComponentDoNothing - component do nothing
 	ErrComponentDoNothing = errors.New("component do nothing")
+
+	// ErrTooManySteps - too many steps
+	ErrTooManySteps = errors.New("too many steps")
+	// ErrTooManyComponentsInStep - too many components in step
+	ErrTooManyComponentsInStep = errors.New("too many components in step")
+
+	// ErrCannotForceOutcome - cannot force outcome
+	ErrCannotForceOutcome = errors.New("cannot force outcome")
 )

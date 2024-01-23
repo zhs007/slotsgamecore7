@@ -23,15 +23,17 @@ func Hash(data []byte) string {
 // ProcCheat - process cheat
 func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) error {
 	if cheat != "" {
-		str := goutils.AppendString("[", cheat, "]")
+		if sgc7game.IsRngString(cheat) {
+			str := goutils.AppendString("[", cheat, "]")
 
-		rngs := []int{}
-		err := sonic.Unmarshal([]byte(str), &rngs)
-		if err != nil {
-			return err
+			rngs := []int{}
+			err := sonic.Unmarshal([]byte(str), &rngs)
+			if err != nil {
+				return err
+			}
+
+			plugin.SetCache(rngs)
 		}
-
-		plugin.SetCache(rngs)
 	}
 
 	return nil

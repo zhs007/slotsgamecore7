@@ -145,7 +145,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		c, isok := components.MapComponents[nextComponentName]
 		if !isok {
-			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+			goutils.Error("BasicGameMod.OnPlay:MapComponents",
 				zap.String("nextComponentName", nextComponentName),
 				zap.Error(ErrIvalidComponentName))
 
@@ -153,6 +153,14 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		curComponent = c
+
+		if len(gameProp.HistoryComponents) >= MaxComponentNumInStep {
+			goutils.Error("BasicGameMod.OnPlay",
+				zap.Int("components", len(gameProp.HistoryComponents)),
+				zap.Error(ErrTooManyComponentsInStep))
+
+			return nil, ErrTooManyComponentsInStep
+		}
 	}
 
 	gameProp.BuildGameParam(gp)
