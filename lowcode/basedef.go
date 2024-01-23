@@ -126,6 +126,17 @@ func SetAllowStatsV2() {
 	gAllowStats2 = true
 }
 
+var gAllowForceOutcome bool
+var gMaxForceOutcomeTimes int
+
+func SetAllowForceOutcome(maxTry int) {
+	gAllowForceOutcome = true
+	gMaxForceOutcomeTimes = maxTry
+}
+
+const MaxStepNum = 1000
+const MaxComponentNumInStep = 100
+
 func init() {
 	initCheckWinType()
 

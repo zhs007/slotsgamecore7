@@ -2,7 +2,6 @@ package gamecollection
 
 import (
 	"github.com/zhs007/goutils"
-	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/grpcserv"
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
@@ -35,56 +34,14 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 	plugin := gameD.Game.NewPlugin()
 	defer gameD.Game.FreePlugin(plugin)
 
-	ProcCheat(plugin, req.Cheat)
-
 	stake := sgc7pbutils.BuildStake(req.Stake)
-	err := gameD.Game.CheckStake(stake)
+
+	results, err := lowcode.Spin(gameD.Game, ips, plugin, stake, req.Command, req.ClientParams, req.Cheat)
 	if err != nil {
-		goutils.Error("GameData.Play:CheckStake",
-			goutils.JSON("stake", stake),
+		goutils.Error("GameData.Play:Spin",
 			zap.Error(err))
 
 		return nil, err
-	}
-
-	results := []*sgc7game.PlayResult{}
-	gameData := gameD.Game.NewGameData(stake)
-	defer gameD.Game.DeleteGameData(gameData)
-
-	cmd := req.Command
-
-	for {
-		if cmd == "" {
-			cmd = "SPIN"
-		}
-
-		pr, err := gameD.Game.Play(plugin, cmd, req.ClientParams, ips, stake, results, gameData)
-		if err != nil {
-			goutils.Error("GameData.Play:Play",
-				zap.Int("results", len(results)),
-				zap.Error(err))
-
-			return nil, err
-		}
-
-		if pr == nil {
-			break
-		}
-
-		results = append(results, pr)
-		if pr.IsFinish {
-			break
-		}
-
-		if pr.IsWait {
-			break
-		}
-
-		if len(pr.NextCmds) > 0 {
-			cmd = pr.NextCmds[0]
-		} else {
-			cmd = ""
-		}
 	}
 
 	pr := &sgc7pb.ReplyPlay{

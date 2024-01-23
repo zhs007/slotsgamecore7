@@ -79,6 +79,11 @@ func (basicComponentData *BasicComponentData) SetConfigIntVal(key string, val in
 	basicComponentData.MapConfigIntVals[key] = val
 }
 
+// ChgConfigIntVal -
+func (basicComponentData *BasicComponentData) ChgConfigIntVal(key string, off int) {
+	basicComponentData.MapConfigIntVals[key] += off
+}
+
 // InitSrcScenes -
 func (basicComponentData *BasicComponentData) initSrcScenes() {
 	for i := range basicComponentData.SrcScenes {

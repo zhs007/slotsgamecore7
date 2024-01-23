@@ -26,4 +26,6 @@ type IPlayerState interface {
 	SetCurGameMod(gamemod string)
 	// GetCurGameMod - get current game module
 	GetCurGameMod() string
+
+	Clone() IPlayerState
 }

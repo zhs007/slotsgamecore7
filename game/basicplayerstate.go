@@ -143,3 +143,12 @@ func (ps *BasicPlayerState) SetCurGameMod(gamemod string) {
 func (ps *BasicPlayerState) GetCurGameMod() string {
 	return ps.Public.CurGameMod
 }
+
+func (ps *BasicPlayerState) Clone() IPlayerState {
+	nps := NewBasicPlayerState(ps.GetCurGameMod())
+
+	nps.SetPublicJson(ps.GetPublicJson())
+	nps.SetPrivateJson(ps.GetPrivateJson())
+
+	return nps
+}
