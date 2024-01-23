@@ -8,6 +8,22 @@ import (
 	"go.uber.org/zap"
 )
 
+func cmpVal(srcVal int, op string, targetVal int) bool {
+	if op == "==" {
+		return srcVal == targetVal
+	} else if op == ">=" {
+		return srcVal >= targetVal
+	} else if op == "<=" {
+		return srcVal <= targetVal
+	} else if op == ">" {
+		return srcVal > targetVal
+	} else if op == "<" {
+		return srcVal < targetVal
+	}
+
+	return false
+}
+
 type FOData struct {
 	Component   string
 	Value       string
@@ -16,7 +32,29 @@ type FOData struct {
 }
 
 func (fod *FOData) IsValid(lst []*sgc7game.PlayResult) bool {
-	return true
+	if fod.Value == "" {
+		for _, pr := range lst {
+			gp := pr.CurGameModParams.(*GameParams)
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, fod.Component, 0) >= 0 {
+				return true
+			}
+		}
+	} else {
+		for _, pr := range lst {
+			gp := pr.CurGameModParams.(*GameParams)
+			cdpb, isok := gp.MapComponents[fod.Component]
+			if isok {
+				val, isok2 := GetComponentDataVal(cdpb, fod.Value)
+				if isok2 {
+					if cmpVal(val, fod.Operator, fod.TargetValue) {
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 // parse a

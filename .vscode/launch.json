@@ -76,6 +76,28 @@
                 "CORE":"2",
                 "ALLOWSTATS2":"true"
             }
+        },
+        {
+            "name": "gcserv",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/gcserv/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/app",
+            "env": {
+            }
+        },
+        {
+            "name": "gcclient",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/gcclient/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/app",
+            "env": {
+            }
         }
     ]
 }
