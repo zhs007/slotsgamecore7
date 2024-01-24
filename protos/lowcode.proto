@@ -223,6 +223,12 @@ message WeightAwardsData {
 	repeated int32 gotIndex = 2;
 }
 
+// RemoveSymbolsData
+message RemoveSymbolsData {
+    ComponentData basicComponentData = 1;
+	int32 removedNum = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
