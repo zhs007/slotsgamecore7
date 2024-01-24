@@ -183,25 +183,10 @@ func (removeSymbols *RemoveSymbols) NewComponentData() IComponentData {
 
 // EachUsedResults -
 func (removeSymbols *RemoveSymbols) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
-	pbcd := &sgc7pb.RemoveSymbolsData{}
-
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("RemoveSymbols.EachUsedResults:UnmarshalTo",
-			zap.Error(err))
-
-		return
-	}
-
-	for _, v := range pbcd.BasicComponentData.UsedResults {
-		oneach(pr.Results[v])
-	}
 }
 
 func NewRemoveSymbols(name string) IComponent {
-	mystery := &RemoveSymbols{
+	return &RemoveSymbols{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
-
-	return mystery
 }
