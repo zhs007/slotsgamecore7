@@ -79,6 +79,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RemoveSymbolsTypeName, NewRemoveSymbols)
 	mgr.Reg(WinResultMultiTypeName, NewWinResultMulti)
 	mgr.Reg(DropDownSymbolsTypeName, NewDropDownSymbols)
+	mgr.Reg(RefillSymbolsTypeName, NewRefillSymbols)
 
 	return mgr
 }

@@ -67,31 +67,6 @@ func (dropDownSymbols *DropDownSymbols) InitEx(cfg any, pool *GamePropertyPool) 
 	return nil
 }
 
-func (dropDownSymbols *DropDownSymbols) canDropDown(x, y int, gs *sgc7game.GameScene) bool {
-	curs := gs.Arr[x][y]
-	if curs < 0 {
-		return false
-	}
-
-	if len(dropDownSymbols.Config.HoldSymbolCodes) > 0 {
-		return goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, curs, 0) < 0
-	}
-
-	return true
-}
-
-func (dropDownSymbols *DropDownSymbols) isNeedDropDown(gs *sgc7game.GameScene) bool {
-	for _, arr := range gs.Arr {
-		for _, s := range arr {
-			if s < 0 {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 // playgame
 func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -148,7 +123,7 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 
 // OnAsciiGame - outpur to asciigame
 func (dropDownSymbols *DropDownSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[dropDownSymbols.Name].(*RemoveSymbolsData)
+	cd := gameProp.MapComponentData[dropDownSymbols.Name].(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after dropDownSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
