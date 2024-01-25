@@ -143,7 +143,7 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	cr, err := weightBranch.Config.WeightVW.RandVal(plugin)
 	if err != nil {
-		goutils.Error("MaskBranch.OnPlayGame:RandVal",
+		goutils.Error("WeightBranch.OnPlayGame:RandVal",
 			zap.Error(err))
 
 		return err

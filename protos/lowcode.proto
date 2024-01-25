@@ -241,6 +241,12 @@ message RollSymbolData {
 	int32 symbolCode = 2;
 }
 
+// QueueBranchData
+message QueueBranchData {
+    ComponentData basicComponentData = 1;
+	int32 queue = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
