@@ -228,6 +228,13 @@ func (symbolCollection *SymbolCollection) EachUsedResults(pr *sgc7game.PlayResul
 	}
 }
 
+// GetSymbols -
+func (symbolCollection *SymbolCollection) GetSymbols(gameProp *GameProperty) []int {
+	scd := gameProp.MapComponentData[symbolCollection.Name].(*SymbolCollectionData)
+
+	return scd.SymbolCodes
+}
+
 func NewSymbolCollection(name string) IComponent {
 	return &SymbolCollection{
 		BasicComponent: NewBasicComponent(name, 0),

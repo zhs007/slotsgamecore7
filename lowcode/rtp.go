@@ -214,17 +214,17 @@ func newRTPGameModule(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgGameModule *R
 	return gm
 }
 
-func hasComponent(i int, prs []*sgc7game.PlayResult, component string) bool {
-	gp, isok := prs[i].CurGameModParams.(*GameParams)
-	if isok {
-		_, hasComponent := gp.MapComponentMsgs[component]
-		if hasComponent {
-			return true
-		}
-	}
+// func hasComponent(i int, prs []*sgc7game.PlayResult, component string) bool {
+// 	gp, isok := prs[i].CurGameModParams.(*GameParams)
+// 	if isok {
+// 		_, hasComponent := gp.MapComponentMsgs[component]
+// 		if hasComponent {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
 func hasComponentEx(i int, prs []*sgc7game.PlayResult, components []string) bool {
 	gp, isok := prs[i].CurGameModParams.(*GameParams)

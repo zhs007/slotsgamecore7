@@ -76,6 +76,12 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WaysTriggerTypeName, NewWaysTrigger)
 	mgr.Reg(WeightAwardsTypeName, NewWeightAwards)
 	mgr.Reg(ClusterTriggerTypeName, NewClusterTrigger)
+	mgr.Reg(RemoveSymbolsTypeName, NewRemoveSymbols)
+	mgr.Reg(WinResultMultiTypeName, NewWinResultMulti)
+	mgr.Reg(DropDownSymbolsTypeName, NewDropDownSymbols)
+	mgr.Reg(RefillSymbolsTypeName, NewRefillSymbols)
+	mgr.Reg(ReplaceSymbolGroupTypeName, NewReplaceSymbolGroup)
+	mgr.Reg(RollSymbolTypeName, NewRollSymbol)
 
 	return mgr
 }

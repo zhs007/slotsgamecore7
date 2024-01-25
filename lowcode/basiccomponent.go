@@ -514,6 +514,16 @@ func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.St
 
 // }
 
+// GetSymbols -
+func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
+	return nil
+}
+
+// AddSymbol -
+func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
+
+}
+
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
 		Name:        name,

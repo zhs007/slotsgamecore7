@@ -89,6 +89,58 @@ func (vw *ValWeights2) Reset(vals []IVal, weights []int) {
 	}
 }
 
+func (vw *ValWeights2) CloneWithoutIntArray(arr []int) *ValWeights2 {
+	if len(arr) == 0 {
+		return vw.Clone()
+	}
+
+	nvw := &ValWeights2{
+		Vals:      make([]IVal, len(vw.Vals)),
+		Weights:   make([]int, len(vw.Weights)),
+		MaxWeight: 0,
+	}
+
+	for i, v := range vw.Vals {
+		if goutils.IndexOfIntSlice(arr, v.Int(), 0) < 0 {
+			nvw.Vals = append(nvw.Vals, v)
+			nvw.Weights = append(nvw.Weights, vw.Weights[i])
+			nvw.MaxWeight += vw.Weights[i]
+		}
+	}
+
+	if len(nvw.Vals) == 0 {
+		return nil
+	}
+
+	return nvw
+}
+
+func (vw *ValWeights2) CloneWithIntArray(arr []int) *ValWeights2 {
+	if len(arr) == 0 {
+		return nil
+	}
+
+	nvw := &ValWeights2{
+		Vals:      make([]IVal, len(vw.Vals)),
+		Weights:   make([]int, len(vw.Weights)),
+		MaxWeight: 0,
+	}
+
+	for i, v := range vw.Vals {
+		if goutils.IndexOfIntSlice(arr, v.Int(), 0) >= 0 {
+			nvw.Vals = append(nvw.Vals, v)
+			nvw.Weights = append(nvw.Weights, vw.Weights[i])
+			nvw.MaxWeight += vw.Weights[i]
+		}
+	}
+
+	if len(nvw.Vals) == 0 {
+		return nil
+	}
+
+	return nvw
+}
+
 func (vw *ValWeights2) Clone() *ValWeights2 {
 	nvw := &ValWeights2{
 		Vals:      make([]IVal, len(vw.Vals)),

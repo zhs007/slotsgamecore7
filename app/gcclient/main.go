@@ -64,7 +64,7 @@ func main() {
 	goutils.Info("InitializeGamePlayer",
 		goutils.JSON("ret", ret2))
 
-	ret3, err := client.PlayGame(context.Background(), "moonwalk", ret2.PlayerState, "bg-paylines.wins > 150", &sgc7pb.Stake{
+	ret3, err := client.PlayGame(context.Background(), "moonwalk", ret2.PlayerState, "", &sgc7pb.Stake{
 		CoinBet:  1,
 		CashBet:  10,
 		Currency: "EUR",
