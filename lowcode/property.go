@@ -835,6 +835,22 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 	return nil
 }
 
+func (gameProp *GameProperty) GetComponentSymbols(componentName string) []int {
+	ic, isok := gameProp.Components.MapComponents[componentName]
+	if isok {
+		return ic.GetSymbols(gameProp)
+	}
+
+	return nil
+}
+
+func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCode int) {
+	ic, isok := gameProp.Components.MapComponents[componentName]
+	if isok {
+		ic.AddSymbol(gameProp, symbolCode)
+	}
+}
+
 func (gameProp *GameProperty) onStepEnd(pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
 	// // scene v3
 	// if len(gameProp.SceneStack.Scenes) > 0 {

@@ -235,6 +235,12 @@ message WeightBranchData {
 	string value = 2;
 }
 
+// RollSymbolData
+message RollSymbolData {
+    ComponentData basicComponentData = 1;
+	int32 symbolCode = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

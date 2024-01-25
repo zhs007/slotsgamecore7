@@ -107,7 +107,7 @@ func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error 
 	if weightBranch.Config.Weight != "" {
 		vw2, err := pool.LoadStrWeights(weightBranch.Config.Weight, weightBranch.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("Mystery.Init:LoadStrWeights",
+			goutils.Error("WeightBranch.Init:LoadStrWeights",
 				zap.String("Weight", weightBranch.Config.Weight),
 				zap.Error(err))
 

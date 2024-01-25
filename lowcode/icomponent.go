@@ -49,4 +49,9 @@ type IComponent interface {
 	OnStats2(icd IComponentData, s2 *stats2.Stats)
 	// // OnStats2Trigger
 	// OnStats2Trigger(s2 *Stats2)
+
+	// GetSymbols -
+	GetSymbols(gameProp *GameProperty) []int
+	// AddSymbol -
+	AddSymbol(gameProp *GameProperty, symbolCode int)
 }

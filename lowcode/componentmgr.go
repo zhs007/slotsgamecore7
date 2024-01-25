@@ -81,6 +81,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(DropDownSymbolsTypeName, NewDropDownSymbols)
 	mgr.Reg(RefillSymbolsTypeName, NewRefillSymbols)
 	mgr.Reg(ReplaceSymbolGroupTypeName, NewReplaceSymbolGroup)
+	mgr.Reg(RollSymbolTypeName, NewRollSymbol)
 
 	return mgr
 }
