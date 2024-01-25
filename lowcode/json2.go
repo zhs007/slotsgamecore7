@@ -61,7 +61,7 @@ type jsonControllerData struct {
 }
 
 func (jcd *jsonControllerData) build() *Award {
-	if jcd.Type == "AwardRespinTimes" {
+	if jcd.Type == "addRespinTimes" {
 		return &Award{
 			AwardType: "respinTimes",
 			Vals:      []int{jcd.Vals},

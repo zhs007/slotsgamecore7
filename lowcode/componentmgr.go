@@ -82,6 +82,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RefillSymbolsTypeName, NewRefillSymbols)
 	mgr.Reg(ReplaceSymbolGroupTypeName, NewReplaceSymbolGroup)
 	mgr.Reg(RollSymbolTypeName, NewRollSymbol)
+	mgr.Reg(QueueBranchTypeName, NewQueueBranch)
 
 	return mgr
 }

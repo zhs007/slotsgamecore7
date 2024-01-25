@@ -2161,6 +2161,62 @@ func (x *RollSymbolData) GetSymbolCode() int32 {
 	return 0
 }
 
+// QueueBranchData
+type QueueBranchData struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	BasicComponentData *ComponentData `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
+	Queue              int32          `protobuf:"varint,2,opt,name=queue,proto3" json:"queue,omitempty"`
+}
+
+func (x *QueueBranchData) Reset() {
+	*x = QueueBranchData{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lowcode_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueueBranchData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueueBranchData) ProtoMessage() {}
+
+func (x *QueueBranchData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueueBranchData.ProtoReflect.Descriptor instead.
+func (*QueueBranchData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *QueueBranchData) GetBasicComponentData() *ComponentData {
+	if x != nil {
+		return x.BasicComponentData
+	}
+	return nil
+}
+
+func (x *QueueBranchData) GetQueue() int32 {
+	if x != nil {
+		return x.Queue
+	}
+	return 0
+}
+
 // GameParam
 type GameParam struct {
 	state         protoimpl.MessageState
@@ -2179,7 +2235,7 @@ type GameParam struct {
 func (x *GameParam) Reset() {
 	*x = GameParam{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lowcode_proto_msgTypes[30]
+		mi := &file_lowcode_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2192,7 +2248,7 @@ func (x *GameParam) String() string {
 func (*GameParam) ProtoMessage() {}
 
 func (x *GameParam) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[30]
+	mi := &file_lowcode_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2205,7 +2261,7 @@ func (x *GameParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameParam.ProtoReflect.Descriptor instead.
 func (*GameParam) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{30}
+	return file_lowcode_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GameParam) GetFirstComponent() string {
@@ -2600,7 +2656,14 @@ var file_lowcode_proto_rawDesc = []byte{
 	0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x12, 0x62, 0x61, 0x73, 0x69, 0x63, 0x43, 0x6f,
 	0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x12, 0x1e, 0x0a, 0x0a, 0x73,
 	0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x43, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52,
-	0x0a, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x43, 0x6f, 0x64, 0x65, 0x22, 0xe1, 0x04, 0x0a, 0x09,
+	0x0a, 0x73, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x43, 0x6f, 0x64, 0x65, 0x22, 0x6e, 0x0a, 0x0f, 0x51,
+	0x75, 0x65, 0x75, 0x65, 0x42, 0x72, 0x61, 0x6e, 0x63, 0x68, 0x44, 0x61, 0x74, 0x61, 0x12, 0x45,
+	0x0a, 0x12, 0x62, 0x61, 0x73, 0x69, 0x63, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74,
+	0x44, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x73, 0x67, 0x63,
+	0x37, 0x70, 0x62, 0x2e, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74,
+	0x61, 0x52, 0x12, 0x62, 0x61, 0x73, 0x69, 0x63, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e,
+	0x74, 0x44, 0x61, 0x74, 0x61, 0x12, 0x14, 0x0a, 0x05, 0x71, 0x75, 0x65, 0x75, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x71, 0x75, 0x65, 0x75, 0x65, 0x22, 0xe1, 0x04, 0x0a, 0x09,
 	0x47, 0x61, 0x6d, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x12, 0x26, 0x0a, 0x0e, 0x66, 0x69, 0x72,
 	0x73, 0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x0e, 0x66, 0x69, 0x72, 0x73, 0x74, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e,
@@ -2657,7 +2720,7 @@ func file_lowcode_proto_rawDescGZIP() []byte {
 	return file_lowcode_proto_rawDescData
 }
 
-var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_lowcode_proto_goTypes = []interface{}{
 	(*ComponentData)(nil),             // 0: sgc7pb.ComponentData
 	(*BasicComponentData)(nil),        // 1: sgc7pb.BasicComponentData
@@ -2689,11 +2752,12 @@ var file_lowcode_proto_goTypes = []interface{}{
 	(*RemoveSymbolsData)(nil),         // 27: sgc7pb.RemoveSymbolsData
 	(*WeightBranchData)(nil),          // 28: sgc7pb.WeightBranchData
 	(*RollSymbolData)(nil),            // 29: sgc7pb.RollSymbolData
-	(*GameParam)(nil),                 // 30: sgc7pb.GameParam
-	nil,                               // 31: sgc7pb.GameParam.MapComponentsEntry
-	nil,                               // 32: sgc7pb.GameParam.MapValsEntry
-	nil,                               // 33: sgc7pb.GameParam.MapStrValsEntry
-	(*any1.Any)(nil),                  // 34: google.protobuf.Any
+	(*QueueBranchData)(nil),           // 30: sgc7pb.QueueBranchData
+	(*GameParam)(nil),                 // 31: sgc7pb.GameParam
+	nil,                               // 32: sgc7pb.GameParam.MapComponentsEntry
+	nil,                               // 33: sgc7pb.GameParam.MapValsEntry
+	nil,                               // 34: sgc7pb.GameParam.MapStrValsEntry
+	(*any1.Any)(nil),                  // 35: google.protobuf.Any
 }
 var file_lowcode_proto_depIdxs = []int32{
 	0,  // 0: sgc7pb.BasicComponentData.basicComponentData:type_name -> sgc7pb.ComponentData
@@ -2724,15 +2788,16 @@ var file_lowcode_proto_depIdxs = []int32{
 	0,  // 25: sgc7pb.RemoveSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 26: sgc7pb.WeightBranchData.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 27: sgc7pb.RollSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
-	31, // 28: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
-	32, // 29: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
-	33, // 30: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
-	34, // 31: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	0,  // 28: sgc7pb.QueueBranchData.basicComponentData:type_name -> sgc7pb.ComponentData
+	32, // 29: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
+	33, // 30: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
+	34, // 31: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
+	35, // 32: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_lowcode_proto_init() }
@@ -3102,6 +3167,18 @@ func file_lowcode_proto_init() {
 			}
 		}
 		file_lowcode_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueueBranchData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lowcode_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GameParam); i {
 			case 0:
 				return &v.state
@@ -3120,7 +3197,7 @@ func file_lowcode_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_lowcode_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   34,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
