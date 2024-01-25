@@ -63414,6 +63414,14 @@
             }
         ]
     },
+    "materialsJson": {
+        "fieldname": "file",
+        "originalname": "game (21).json",
+        "encoding": "7bit",
+        "mimetype": "application/json",
+        "size": 149154,
+        "url": "https://gameres.rgs.blugurugames.com/gameproduction/quickslots/BO-hUvSR1706092737206.json"
+    },
     "betMethod": [
         {
             "label": "normal",
@@ -63489,8 +63497,8 @@
                     },
                     {
                         "position": {
-                            "x": 190,
-                            "y": -190
+                            "x": 170,
+                            "y": -250
                         },
                         "size": {
                             "width": 400,
@@ -64120,8 +64128,8 @@
                     },
                     {
                         "position": {
-                            "x": 1410,
-                            "y": -230
+                            "x": 1380,
+                            "y": -270
                         },
                         "size": {
                             "width": 400,
@@ -65125,8 +65133,8 @@
                     },
                     {
                         "position": {
-                            "x": 3060,
-                            "y": -570
+                            "x": 3100,
+                            "y": -720
                         },
                         "size": {
                             "width": 400,
@@ -65526,7 +65534,7 @@
                     },
                     {
                         "position": {
-                            "x": 3660,
+                            "x": 3670,
                             "y": -670
                         },
                         "size": {
@@ -66365,8 +66373,8 @@
                     },
                     {
                         "position": {
-                            "x": 5410,
-                            "y": -810
+                            "x": 5430,
+                            "y": -880
                         },
                         "size": {
                             "width": 400,
@@ -66730,7 +66738,8 @@
                                     "SC"
                                 ]
                             },
-                            "label": "fg-walktrigger"
+                            "label": "fg-walktrigger",
+                            "controllerExpand": false
                         },
                         "basicComponentData": null,
                         "data": null,
@@ -67635,9 +67644,9 @@
                             "label": "fg-fgtrigger",
                             "controller": [
                                 {
-                                    "type": "AwardRespinTimes",
-                                    "strParams": "fg-start",
-                                    "vals": 15
+                                    "type": "addRespinTimes",
+                                    "target": "fg-start",
+                                    "times": 15
                                 }
                             ]
                         },
@@ -67911,17 +67920,6 @@
                                 }
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 36,
                         "componentValues": {
                             "labelIsError": false,
@@ -67949,6 +67947,19 @@
                                 ]
                             },
                             "label": "fg-paylines"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -67960,6 +67971,13 @@
                             }
                         },
                         "id": "d5350839-1737-426e-a3f8-5ef2019092a4",
+                        "zIndex": 37,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "a86006d7-d04e-43af-b2f0-6d10190a652b",
                             "port": "component-groups-out"
@@ -67967,8 +67985,7 @@
                         "target": {
                             "cell": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 37
+                        }
                     },
                     {
                         "shape": "edge",
@@ -67979,6 +67996,13 @@
                             }
                         },
                         "id": "d81ef2ec-1c2d-43f8-a035-dfe0791b3c44",
+                        "zIndex": 39,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "f629bb51-147b-4080-bb7a-242e0f07ec22",
                             "port": "component-groups-out"
@@ -67986,8 +68010,7 @@
                         "target": {
                             "cell": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 39
+                        }
                     },
                     {
                         "position": {
@@ -68350,17 +68373,6 @@
                                 }
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 40,
                         "componentValues": {
                             "labelIsError": false,
@@ -68374,6 +68386,19 @@
                                 ]
                             },
                             "label": "fg-paysc"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -68385,6 +68410,13 @@
                             }
                         },
                         "id": "f5dd5d23-4934-4a39-8513-ad972bc4a1e4",
+                        "zIndex": 41,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "eb303a5e-fd43-4605-b0e3-1f22d8b67a66",
                             "port": "component-groups-out"
@@ -68392,8 +68424,7 @@
                         "target": {
                             "cell": "ce9588a1-481b-405e-b2d9-01ee2ff3ea96",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 41
+                        }
                     },
                     {
                         "position": {
@@ -68756,17 +68787,6 @@
                                 }
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 42,
                         "componentValues": {
                             "labelIsError": false,
@@ -68780,6 +68800,19 @@
                                 ]
                             },
                             "label": "fg-payfg"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -68791,6 +68824,13 @@
                             }
                         },
                         "id": "8fe07f32-7d04-42ed-9e3a-68fb8108dae6",
+                        "zIndex": 43,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "ce9588a1-481b-405e-b2d9-01ee2ff3ea96",
                             "port": "component-groups-out"
@@ -68798,8 +68838,7 @@
                         "target": {
                             "cell": "389fd043-1ec8-4a63-8614-08f2b775ccd7",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 43
+                        }
                     },
                     {
                         "shape": "edge",
@@ -68810,6 +68849,13 @@
                             }
                         },
                         "id": "ae17a1fe-24b2-434d-a891-957db4575d71",
+                        "zIndex": 44,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "389fd043-1ec8-4a63-8614-08f2b775ccd7",
                             "port": "component-groups-out"
@@ -68817,8 +68863,7 @@
                         "target": {
                             "cell": "ad5669c9-f889-4f79-b4ae-57d80207954a",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 44
+                        }
                     }
                 ]
             }
