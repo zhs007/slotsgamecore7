@@ -229,6 +229,12 @@ message RemoveSymbolsData {
 	int32 removedNum = 2;
 }
 
+// WeightBranchData
+message WeightBranchData {
+    ComponentData basicComponentData = 1;
+	string value = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
