@@ -247,6 +247,12 @@ message QueueBranchData {
 	int32 queue = 2;
 }
 
+// SymbolCollection2Data
+message SymbolCollection2Data {
+    ComponentData basicComponentData = 1;
+    repeated int32 symbolCodes = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

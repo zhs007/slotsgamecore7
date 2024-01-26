@@ -454,7 +454,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
-			} else if componentType == "basictreels" {
+			} else if componentType == "basicreels" {
 				componentName, err := parseBasicReels(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseBasicReels",
@@ -511,6 +511,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				mapComponentName[id] = componentName
 			} else if componentType == "respin" {
 				componentName, err := parseRespin(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseRespin",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "symbolcollection" {
+				componentName, err := parseSymbolCollection2(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseRespin",
 						zap.Int("i", i),
