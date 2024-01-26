@@ -50,6 +50,9 @@ type IComponent interface {
 	// // OnStats2Trigger
 	// OnStats2Trigger(s2 *Stats2)
 
+	//----------------------------
+	// SymbolCollection
+
 	// GetSymbols -
 	GetSymbols(gameProp *GameProperty) []int
 	// AddSymbol -
