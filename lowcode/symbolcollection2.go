@@ -109,62 +109,16 @@ func (symbolCollection2 *SymbolCollection2) InitEx(cfg any, pool *GamePropertyPo
 	return nil
 }
 
-// // Push -
-// func (symbolCollection2 *SymbolCollection2) Push(plugin sgc7plugin.IPlugin, gameProp *GameProperty, gp *GameParams) error {
-// 	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+// OnNewGame -
+func (symbolCollection2 *SymbolCollection2) OnNewGame(gameProp *GameProperty) error {
+	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
 
-// 	// 这样分开写，效率稍高一点点
-// 	if len(cd.SymbolCodes) == 0 {
-// 		cr, err := symbolCollection.WeightVal.RandVal(plugin)
-// 		if err != nil {
-// 			goutils.Error("SymbolCollection2.Push:RandVal",
-// 				zap.Error(err))
+	cd.OnNewGame()
 
-// 			return err
-// 		}
+	cd.SymbolCodes = append(cd.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
 
-// 		cd.SymbolCodes = append(cd.SymbolCodes, cr.Int())
-// 	} else if len(cd.SymbolCodes) != len(symbolCollection.WeightVal.Vals) {
-// 		vals := []sgc7game.IVal{}
-// 		weights := []int{}
-
-// 		for i, v := range symbolCollection.WeightVal.Vals {
-// 			if goutils.IndexOfIntSlice(cd.SymbolCodes, v.Int(), 0) < 0 {
-// 				vals = append(vals, v)
-// 				weights = append(weights, symbolCollection.WeightVal.Weights[i])
-// 			}
-// 		}
-
-// 		vw2, err := sgc7game.NewValWeights2(vals, weights)
-// 		if err != nil {
-// 			goutils.Error("SymbolCollection2.Push:NewValWeights2",
-// 				zap.Error(err))
-
-// 			return err
-// 		}
-
-// 		cr, err := vw2.RandVal(plugin)
-// 		if err != nil {
-// 			goutils.Error("SymbolCollection2.Push:RandVal",
-// 				zap.Error(err))
-
-// 			return err
-// 		}
-
-// 		cd.SymbolCodes = append(cd.SymbolCodes, cr.Int())
-// 	}
-
-// 	return nil
-// }
-
-// // OnNewGame -
-// func (symbolCollection *SymbolCollection) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.MapComponentData[symbolCollection.Name]
-
-// 	cd.OnNewGame()
-
-// 	return nil
-// }
+	return nil
+}
 
 // playgame
 func (symbolCollection2 *SymbolCollection2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -198,23 +152,6 @@ func (symbolCollection2 *SymbolCollection2) NewComponentData() IComponentData {
 	return &SymbolCollection2Data{}
 }
 
-// // EachUsedResults -
-// func (symbolCollection2 *SymbolCollection2) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
-// 	pbcd := &sgc7pb.SymbolCollectionData{}
-
-// 	err := pbComponentData.UnmarshalTo(pbcd)
-// 	if err != nil {
-// 		goutils.Error("SymbolCollection.EachUsedResults:UnmarshalTo",
-// 			zap.Error(err))
-
-// 		return
-// 	}
-
-// 	for _, v := range pbcd.BasicComponentData.UsedResults {
-// 		oneach(pr.Results[v])
-// 	}
-// }
-
 // GetSymbols -
 func (symbolCollection2 *SymbolCollection2) GetSymbols(gameProp *GameProperty) []int {
 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
@@ -237,9 +174,8 @@ func NewSymbolCollection2(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"isWinBreak": "false"
-//	},
+// "configuration": {
+// },
 type jsonSymbolCollection2 struct {
 }
 
