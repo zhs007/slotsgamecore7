@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -21,6 +23,13 @@ type DropDownSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	HoldSymbols          []string `yaml:"holdSymbols" json:"holdSymbols"` // 不需要下落的symbol
 	HoldSymbolCodes      []int    `yaml:"-" json:"-"`                     // 不需要下落的symbol
+}
+
+// SetLinkComponent
+func (cfg *DropDownSymbolsConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type DropDownSymbols struct {
@@ -150,4 +159,61 @@ func NewDropDownSymbols(name string) IComponent {
 	return &DropDownSymbols{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+// "configuration": {},
+type jsonDropDownSymbols struct {
+	HoldSymbols []string `json:"holdSymbols"` // 不需要下落的symbol
+}
+
+func (jcfg *jsonDropDownSymbols) build() *DropDownSymbolsConfig {
+	cfg := &DropDownSymbolsConfig{
+		HoldSymbols: jcfg.HoldSymbols,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseDropDownSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseDropDownSymbols:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseDropDownSymbols:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonDropDownSymbols{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseDropDownSymbols:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: DropDownSymbolsTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func Test_GenStackReels(t *testing.T) {
-	rd, err := GenStackReels("../unittestdata/reelsstats2.xlsx", []int{2, 3}, []string{"SC"})
+	rd, err := GenStackReels("../unittestdata/reelsstats2.xlsx", []int{1}, []string{"SC"})
 	assert.NoError(t, err)
 	assert.NotNil(t, rd)
 

@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -22,6 +24,13 @@ type ReplaceSymbolGroupConfig struct {
 	TargetSymbols        []string `yaml:"targetSymbols" json:"targetSymbols"`
 	TargetSymbolCodes    []int    `yaml:"-" json:"-"`
 	Mask                 string   `yaml:"mask" json:"mask"`
+}
+
+// SetLinkComponent
+func (cfg *ReplaceSymbolGroupConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type ReplaceSymbolGroup struct {
@@ -144,4 +153,84 @@ func NewReplaceSymbolGroup(name string) IComponent {
 	return &ReplaceSymbolGroup{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"srcSymbol targetSymbol": [
+//			{
+//				"srcSymbols": "RH",
+//				"targetSymbol": "GH"
+//			},
+//			{
+//				"srcSymbols": "RM",
+//				"targetSymbol": "GM"
+//			},
+//			{
+//				"srcSymbols": "RL",
+//				"targetSymbol": "GL"
+//			}
+//		]
+//	},
+type jsonReplaceSymbolGroupNode struct {
+	SrcSymbols   string `json:"srcSymbols"`   // src
+	TargetSymbol string `json:"targetSymbol"` // target
+}
+
+type jsonReplaceSymbolGroup struct {
+	Symbols []*jsonReplaceSymbolGroupNode `json:"srcSymbol targetSymbol"`
+}
+
+func (jcfg *jsonReplaceSymbolGroup) build() *ReplaceSymbolGroupConfig {
+	cfg := &ReplaceSymbolGroupConfig{}
+
+	for _, s := range jcfg.Symbols {
+		cfg.SrcSymbols = append(cfg.SrcSymbols, s.SrcSymbols)
+		cfg.TargetSymbols = append(cfg.TargetSymbols, s.TargetSymbol)
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseReplaceSymbolGroup(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseReplaceSymbolGroup:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReplaceSymbolGroup:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonReplaceSymbolGroup{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseReplaceSymbolGroup:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: ReplaceSymbolGroupTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

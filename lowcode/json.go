@@ -523,7 +523,73 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			} else if componentType == "symbolcollection" {
 				componentName, err := parseSymbolCollection2(cfg, &cell)
 				if err != nil {
-					goutils.Error("loadCells:parseRespin",
+					goutils.Error("loadCells:parseSymbolCollection2",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "removesymbols" {
+				componentName, err := parseRemoveSymbols(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseRemoveSymbols",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "dropdownsymbols" {
+				componentName, err := parseDropDownSymbols(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseDropDownSymbols",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "refillsymbols" {
+				componentName, err := parseRefillSymbols(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseRefillSymbols",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "collector" {
+				componentName, err := parseCollector(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseCollector",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "queuebranch" {
+				componentName, err := parseQueueBranch(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseQueueBranch",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "replacesymbolgroup" {
+				componentName, err := parseReplaceSymbolGroup(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseReplaceSymbolGroup",
 						zap.Int("i", i),
 						zap.Error(err))
 

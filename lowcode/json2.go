@@ -1,6 +1,8 @@
 package lowcode
 
 import (
+	"strings"
+
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
@@ -51,13 +53,26 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 //		"type": "AwardRespinTimes",
 //		"strParams": "fg-start",
 //		"vals": 15
+//	},
+//
+//	{
+//		"triggerNum": "all",
+//		"type": "chgComponentConfigIntVal",
+//		"target": [
+//			"bg-blueeffect",
+//			"queue"
+//		],
+//		"value": 1
 //	}
 //
 // ]
 type jsonControllerData struct {
-	Type      string `json:"type"`
-	StrParams string `json:"strParams"`
-	Vals      int    `json:"vals"`
+	Type       string   `json:"type"`
+	StrParams  string   `json:"strParams"`
+	Vals       int      `json:"vals"`
+	TriggerNum string   `json:"triggerNum"`
+	Target     []string `json:"target"`
+	Value      int      `json:"value"`
 }
 
 func (jcd *jsonControllerData) build() *Award {
@@ -67,6 +82,12 @@ func (jcd *jsonControllerData) build() *Award {
 			Vals:      []int{jcd.Vals},
 			StrParams: []string{jcd.StrParams},
 		}
+	} else if jcd.Type == "chgComponentConfigIntVal" {
+		return &Award{
+			AwardType: "chgComponentConfigIntVal",
+			Vals:      []int{jcd.Value},
+			StrParams: []string{strings.Join(jcd.Target, ".")},
+		}
 	}
 
 	goutils.Error("jsonControllerData.build",
@@ -74,6 +95,18 @@ func (jcd *jsonControllerData) build() *Award {
 		zap.Error(ErrUnsupportedControllerType))
 
 	return nil
+}
+
+func (jcd *jsonControllerData) build4Collector() (string, *Award) {
+	if jcd.TriggerNum == "" {
+		goutils.Error("jsonControllerData.build4Collector",
+			goutils.JSON("triggerNum", jcd.TriggerNum),
+			zap.Error(ErrUnsupportedControllerType))
+
+		return "", nil
+	}
+
+	return jcd.TriggerNum, jcd.build()
 }
 
 func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
@@ -111,4 +144,58 @@ func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
 	}
 
 	return awards, nil
+}
+
+func parseCollectorControllers(gamecfg *Config, controller *ast.Node) ([]*Award, map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseControllers:MarshalJSON",
+			zap.Error(err))
+
+		return nil, nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseControllers:Unmarshal",
+			zap.Error(err))
+
+		return nil, nil, err
+	}
+
+	awards := []*Award{}
+	mapawards := make(map[int][]*Award)
+
+	for i, v := range lst {
+		str, a := v.build4Collector()
+		if a != nil {
+			if str == "per" {
+				awards = append(awards, a)
+			} else if str == "all" {
+				mapawards[-1] = append(mapawards[-1], a)
+			} else {
+				i64, err := goutils.String2Int64(str)
+				if err != nil {
+					goutils.Error("parseControllers:String2Int64",
+						zap.Int("i", i),
+						zap.String("str", str),
+						zap.Error(err))
+
+					return nil, nil, err
+				}
+
+				mapawards[int(i64)] = append(mapawards[int(i64)], a)
+			}
+		} else {
+			goutils.Error("parseControllers:build4Collector",
+				zap.Int("i", i),
+				zap.Error(ErrUnsupportedControllerType))
+
+			return nil, nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return awards, mapawards, nil
 }

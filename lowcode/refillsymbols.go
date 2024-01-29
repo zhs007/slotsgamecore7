@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -19,6 +21,13 @@ const RefillSymbolsTypeName = "refillSymbols"
 // RefillSymbolsConfig - configuration for RefillSymbols
 type RefillSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
+}
+
+// SetLinkComponent
+func (cfg *RefillSymbolsConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type RefillSymbols struct {
@@ -138,4 +147,58 @@ func NewRefillSymbols(name string) IComponent {
 	return &RefillSymbols{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+// "configuration": {},
+type jsonRefillSymbols struct {
+}
+
+func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
+	cfg := &RefillSymbolsConfig{}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseRefillSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseRefillSymbols:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseRefillSymbols:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonRefillSymbols{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseRefillSymbols:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: RefillSymbolsTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }
