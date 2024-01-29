@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -66,6 +68,15 @@ func (queueBranchData *QueueBranchData) SetVal(key string, val int) {
 type QueueBranchConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	JumpToComponent      string `yaml:"jumpToComponent" json:"jumpToComponent"`
+}
+
+// SetLinkComponent
+func (cfg *QueueBranchConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
+	}
 }
 
 type QueueBranch struct {
@@ -145,4 +156,58 @@ func NewQueueBranch(name string) IComponent {
 	return &QueueBranch{
 		BasicComponent: NewBasicComponent(name, 0),
 	}
+}
+
+// "configuration": {},
+type jsonQueueBranch struct {
+}
+
+func (jcfg *jsonQueueBranch) build() *QueueBranchConfig {
+	cfg := &QueueBranchConfig{}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseQueueBranch(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseQueueBranch:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseQueueBranch:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonQueueBranch{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseQueueBranch:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: QueueBranchTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

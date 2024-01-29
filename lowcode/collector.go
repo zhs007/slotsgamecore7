@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -53,6 +55,14 @@ type CollectorConfig struct {
 	MaxVal               int              `yaml:"maxVal" json:"maxVal"`
 	PerLevelAwards       []*Award         `yaml:"perLevelAwards" json:"perLevelAwards"`
 	MapSPLevelAwards     map[int][]*Award `yaml:"mapSPLevelAwards" json:"mapSPLevelAwards"`
+	IsCycle              bool             `yaml:"isCycle" json:"isCycle"`
+}
+
+// SetLinkComponent
+func (cfg *CollectorConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type Collector struct {
@@ -308,4 +318,81 @@ func NewCollector(name string) IComponent {
 	}
 
 	return collector
+}
+
+// "configuration": {},
+type jsonCollector struct {
+	MaxVal  int  `json:"maxVal"`
+	IsCycle bool `json:"isCycle"`
+}
+
+func (jcfg *jsonCollector) build() *CollectorConfig {
+	cfg := &CollectorConfig{
+		MaxVal:  jcfg.MaxVal,
+		IsCycle: jcfg.IsCycle,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, ctrls, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseCollector:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseCollector:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonCollector{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseCollector:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, mapawards, err := parseCollectorControllers(gamecfg, ctrls)
+		if err != nil {
+			goutils.Error("parseScatterTrigger:parseCollectorControllers",
+				zap.Error(err))
+
+			return "", err
+		}
+
+		if len(awards) > 0 {
+			cfgd.PerLevelAwards = awards
+		}
+
+		if len(mapawards) > 0 {
+			cfgd.MapSPLevelAwards = mapawards
+		}
+	}
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: CollectorTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

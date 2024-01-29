@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -47,9 +49,19 @@ func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message
 // RemoveSymbolsConfig - configuration for RemoveSymbols
 type RemoveSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
+	JumpToComponent      string   `yaml:"jumpToComponent" json:"jumpToComponent"`   // jump to
 	TargetComponents     []string `yaml:"targetComponents" json:"targetComponents"` // 这些组件的中奖会需要参与remove
 	IgnoreSymbols        []string `yaml:"ignoreSymbols" json:"ignoreSymbols"`       // 忽略的symbol
 	IgnoreSymbolCodes    []int    `yaml:"-" json:"-"`                               // 忽略的symbol
+}
+
+// SetLinkComponent
+func (cfg *RemoveSymbolsConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
+	}
 }
 
 type RemoveSymbols struct {
@@ -150,7 +162,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-	removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+	removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
 
 	return nil
 }
@@ -189,4 +201,67 @@ func NewRemoveSymbols(name string) IComponent {
 	return &RemoveSymbols{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"targetComponents": [
+//			"bg-payblue"
+//		]
+//	},
+type jsonRemoveSymbols struct {
+	TargetComponents []string `json:"targetComponents"` // 这些组件的中奖会需要参与remove
+	IgnoreSymbols    []string `json:"ignoreSymbols"`    // 忽略的symbol
+}
+
+func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
+	cfg := &RemoveSymbolsConfig{
+		TargetComponents: jcfg.TargetComponents,
+		IgnoreSymbols:    jcfg.IgnoreSymbols,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseRemoveSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseRemoveSymbols:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseRemoveSymbols:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonRemoveSymbols{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseRemoveSymbols:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: RemoveSymbolsTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }
