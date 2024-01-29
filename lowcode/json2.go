@@ -56,6 +56,12 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 //	},
 //
 //	{
+//		"type": "addRespinTimes",
+//		"target": "fg-start",
+//		"times": 15
+//	},
+//
+//	{
 //		"triggerNum": "all",
 //		"type": "chgComponentConfigIntVal",
 //		"target": [
@@ -71,22 +77,24 @@ type jsonControllerData struct {
 	StrParams  string   `json:"strParams"`
 	Vals       int      `json:"vals"`
 	TriggerNum string   `json:"triggerNum"`
-	Target     []string `json:"target"`
+	Target     string   `json:"target"`
+	TargetArr  []string `json:"targetArr"`
 	Value      int      `json:"value"`
+	Times      int      `json:"times"`
 }
 
 func (jcd *jsonControllerData) build() *Award {
 	if jcd.Type == "addRespinTimes" {
 		return &Award{
 			AwardType: "respinTimes",
-			Vals:      []int{jcd.Vals},
-			StrParams: []string{jcd.StrParams},
+			Vals:      []int{jcd.Times},
+			StrParams: []string{jcd.Target},
 		}
 	} else if jcd.Type == "chgComponentConfigIntVal" {
 		return &Award{
 			AwardType: "chgComponentConfigIntVal",
 			Vals:      []int{jcd.Value},
-			StrParams: []string{strings.Join(jcd.Target, ".")},
+			StrParams: []string{strings.Join(jcd.TargetArr, ".")},
 		}
 	}
 
