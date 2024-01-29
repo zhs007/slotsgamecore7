@@ -25,3 +25,4 @@ unittestdata/*-output.xlsx
 app/stats.xlsx
 output/*.xlsx
 output/*.csv
+__debug_bin
