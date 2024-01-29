@@ -80,7 +80,7 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := gameProp.MapComponentData[chgSymbol.Name].(*BasicComponentData)
 
-	gs := chgSymbol.GetTargetScene3(gameProp, curpr, cd, chgSymbol.Name, "", 0)
+	gs := chgSymbol.GetTargetScene3(gameProp, curpr, prs, cd, chgSymbol.Name, "", 0)
 
 	cgs := gs.CloneEx(gameProp.PoolScene)
 	// cgs := gs.Clone()

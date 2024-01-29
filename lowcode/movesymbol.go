@@ -223,7 +223,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := gameProp.MapComponentData[moveSymbol.Name].(*BasicComponentData)
 
-	gs := moveSymbol.GetTargetScene3(gameProp, curpr, cd, moveSymbol.Name, "", 0)
+	gs := moveSymbol.GetTargetScene3(gameProp, curpr, prs, cd, moveSymbol.Name, "", 0)
 
 	sc2 := gs
 

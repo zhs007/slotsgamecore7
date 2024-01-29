@@ -104,7 +104,7 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty,
 
 	cd := gameProp.MapComponentData[replaceSymbolGroup.Name].(*BasicComponentData)
 
-	gs := replaceSymbolGroup.GetTargetScene3(gameProp, curpr, cd, replaceSymbolGroup.Name, "", 0)
+	gs := replaceSymbolGroup.GetTargetScene3(gameProp, curpr, prs, cd, replaceSymbolGroup.Name, "", 0)
 	ngs := gs
 
 	for x, arr := range gs.Arr {

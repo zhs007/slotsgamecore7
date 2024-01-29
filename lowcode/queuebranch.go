@@ -152,6 +152,11 @@ func (queueBranch *QueueBranch) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 	return false, 0, 0
 }
 
+// NewComponentData -
+func (queueBranch *QueueBranch) NewComponentData() IComponentData {
+	return &QueueBranchData{}
+}
+
 func NewQueueBranch(name string) IComponent {
 	return &QueueBranch{
 		BasicComponent: NewBasicComponent(name, 0),

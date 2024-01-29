@@ -460,9 +460,9 @@ func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, cu
 	return gs
 }
 
-func (basicComponent *BasicComponent) GetTargetScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
+func (basicComponent *BasicComponent) GetTargetScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
 	if basicComponent.Config.UseSceneV3 {
-		return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si)
+		return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
 	}
 
 	if basicComponent.Config.UseSceneV2 {

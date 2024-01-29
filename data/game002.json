@@ -51722,6 +51722,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -51908,6 +51941,39 @@
                                     }
                                 },
                                 "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
                                     "markup": [
                                         {
                                             "tagName": "rect",
@@ -52204,17 +52270,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 4,
                         "componentValues": {
                             "labelIsError": false,
@@ -52236,6 +52291,19 @@
                                 "respinNum": 1
                             },
                             "label": "bg-payblue"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -52337,6 +52405,39 @@
                                     }
                                 },
                                 "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
                                     "markup": [
                                         {
                                             "tagName": "rect",
@@ -52633,17 +52734,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 6,
                         "componentValues": {
                             "labelIsError": false,
@@ -52657,6 +52747,19 @@
                                 ]
                             },
                             "label": "bg-payfg"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -52789,6 +52892,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -52826,6 +52962,16 @@
                                 }
                             ]
                         },
+                        "zIndex": 8,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "isWinBreak": "false"
+                            },
+                            "label": "bg-respin"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -52836,14 +52982,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 8,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "isWinBreak": "false"
-                            },
-                            "label": "bg-respin"
                         }
                     },
                     {
@@ -52855,6 +52993,13 @@
                             }
                         },
                         "id": "24cd5b00-9213-4e2a-b454-450398bb6f3e",
+                        "zIndex": 9,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "7a9710d2-bd15-4ed3-80e3-855872650a21",
                             "port": "jump-component-groups-out"
@@ -52862,8 +53007,7 @@
                         "target": {
                             "cell": "cf4ac9b5-89ea-49e4-9d04-4202dbe57ab2",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 9
+                        }
                     },
                     {
                         "shape": "edge",
@@ -52874,6 +53018,13 @@
                             }
                         },
                         "id": "29aae4a3-2481-40f0-a8e5-0d78c8f4cbf1",
+                        "zIndex": 11,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "bad32345-88a5-474c-a915-78b52cdfb052",
                             "port": "component-groups-out"
@@ -52881,8 +53032,7 @@
                         "target": {
                             "cell": "7a9710d2-bd15-4ed3-80e3-855872650a21",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 11
+                        }
                     },
                     {
                         "position": {
@@ -53014,6 +53164,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -53046,6 +53229,18 @@
                                 }
                             ]
                         },
+                        "zIndex": 12,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "targetComponents": [
+                                    "bg-payblue"
+                                ]
+                            },
+                            "label": "bg-remove"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -53056,16 +53251,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 12,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "targetComponents": [
-                                    "bg-payblue"
-                                ]
-                            },
-                            "label": "bg-remove"
                         }
                     },
                     {
@@ -53077,6 +53262,13 @@
                             }
                         },
                         "id": "3cd0ff4b-5513-4705-a03b-de45f29a4cf2",
+                        "zIndex": 13,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "cf4ac9b5-89ea-49e4-9d04-4202dbe57ab2",
                             "port": "loop-component-groups-out"
@@ -53084,8 +53276,7 @@
                         "target": {
                             "cell": "fa3e996c-fa1f-46ca-ae97-89e9e0068bb6",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 13
+                        }
                     },
                     {
                         "position": {
@@ -53217,6 +53408,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -53242,6 +53466,14 @@
                                 }
                             ]
                         },
+                        "zIndex": 14,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {},
+                            "label": "bg-dropdown"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -53252,12 +53484,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 14,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {},
-                            "label": "bg-dropdown"
                         }
                     },
                     {
@@ -53269,6 +53495,13 @@
                             }
                         },
                         "id": "dbe92153-dbca-4f8b-9a21-8d4696a79059",
+                        "zIndex": 15,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "fa3e996c-fa1f-46ca-ae97-89e9e0068bb6",
                             "port": "component-groups-out"
@@ -53276,8 +53509,7 @@
                         "target": {
                             "cell": "9465b51d-1f15-4a70-a2be-8488d57dcbc0",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 15
+                        }
                     },
                     {
                         "position": {
@@ -53409,6 +53641,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -53429,6 +53694,14 @@
                             "label": "RefillSymbols",
                             "configuration": []
                         },
+                        "zIndex": 16,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {},
+                            "label": "bg-refill"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -53439,12 +53712,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 16,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {},
-                            "label": "bg-refill"
                         }
                     },
                     {
@@ -53456,6 +53723,13 @@
                             }
                         },
                         "id": "24e86fb9-a0c5-4d9d-b886-d1a42246275e",
+                        "zIndex": 17,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "9465b51d-1f15-4a70-a2be-8488d57dcbc0",
                             "port": "component-groups-out"
@@ -53463,8 +53737,7 @@
                         "target": {
                             "cell": "98e7be9b-a876-4262-81f2-6606cda14063",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 17
+                        }
                     },
                     {
                         "position": {
@@ -53596,6 +53869,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -53626,17 +53932,6 @@
                             ],
                             "controller": "true"
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 19,
                         "componentValues": {
                             "labelIsError": false,
@@ -53648,11 +53943,24 @@
                                 {
                                     "triggerNum": "all",
                                     "type": "chgComponentConfigIntVal",
-                                    "target": [
+                                    "targetArr": [
                                         "bg-blueeffect",
                                         "queue"
                                     ],
                                     "value": 1
+                                }
+                            ]
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
                                 }
                             ]
                         }
@@ -53666,6 +53974,13 @@
                             }
                         },
                         "id": "4a93fcde-354b-4ec3-a54a-fca35b33f6e7",
+                        "zIndex": 20,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "b2e6961c-f207-45ff-8ecc-f14446a38772",
                             "port": "component-groups-out"
@@ -53673,8 +53988,7 @@
                         "target": {
                             "cell": "a43e6d9a-8071-4b35-be15-11350d51ee39",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 20
+                        }
                     },
                     {
                         "shape": "edge",
@@ -53685,6 +53999,13 @@
                             }
                         },
                         "id": "9f802b52-5dbe-406f-a032-4264799bff97",
+                        "zIndex": 21,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "a43e6d9a-8071-4b35-be15-11350d51ee39",
                             "port": "component-groups-out"
@@ -53692,8 +54013,7 @@
                         "target": {
                             "cell": "bad32345-88a5-474c-a915-78b52cdfb052",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 21
+                        }
                     },
                     {
                         "position": {
@@ -53825,6 +54145,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -53857,6 +54210,14 @@
                             ],
                             "configuration": []
                         },
+                        "zIndex": 22,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {},
+                            "label": "bg-blueeffect"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -53867,12 +54228,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 22,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {},
-                            "label": "bg-blueeffect"
                         }
                     },
                     {
@@ -53884,6 +54239,13 @@
                             }
                         },
                         "id": "e0cab239-9b62-4d27-b354-d9ae540054c2",
+                        "zIndex": 23,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "98e7be9b-a876-4262-81f2-6606cda14063",
                             "port": "component-groups-out"
@@ -53891,8 +54253,7 @@
                         "target": {
                             "cell": "1bf3e094-9f64-402d-8bba-e35d71845a2c",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 23
+                        }
                     },
                     {
                         "shape": "edge",
@@ -53903,6 +54264,13 @@
                             }
                         },
                         "id": "5e764448-f53c-4b67-99dd-cec50ddd9a6e",
+                        "zIndex": 24,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "1bf3e094-9f64-402d-8bba-e35d71845a2c",
                             "port": "component-groups-out"
@@ -53910,8 +54278,7 @@
                         "target": {
                             "cell": "bad32345-88a5-474c-a915-78b52cdfb052",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 24
+                        }
                     },
                     {
                         "position": {
@@ -54043,6 +54410,39 @@
                                             "name": "right"
                                         }
                                     }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
                                 }
                             },
                             "items": [
@@ -54072,17 +54472,6 @@
                                 }
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 25,
                         "componentValues": {
                             "labelIsError": false,
@@ -54103,6 +54492,19 @@
                                 ]
                             },
                             "label": "bg-replacesyms"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -54114,6 +54516,13 @@
                             }
                         },
                         "id": "a75b2afa-e0b3-42a5-b290-6c9df6019ef2",
+                        "zIndex": 26,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "1bf3e094-9f64-402d-8bba-e35d71845a2c",
                             "port": "jump-component-groups-out"
@@ -54121,8 +54530,7 @@
                         "target": {
                             "cell": "54191f14-2184-4ceb-95c9-12b91b0115c5",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 26
+                        }
                     },
                     {
                         "shape": "edge",
@@ -54133,6 +54541,13 @@
                             }
                         },
                         "id": "6cfa328d-1902-4480-9dfa-08d87b07c4d6",
+                        "zIndex": 27,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "54191f14-2184-4ceb-95c9-12b91b0115c5",
                             "port": "component-groups-out"
@@ -54140,8 +54555,7 @@
                         "target": {
                             "cell": "bad32345-88a5-474c-a915-78b52cdfb052",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 27
+                        }
                     }
                 ]
             }

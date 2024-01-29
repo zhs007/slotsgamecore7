@@ -482,13 +482,13 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	} else if award.Type == AwardStepMulti {
 		gameProp.SetVal(GamePropStepMulti, award.Vals[0])
 	} else if award.Type == AwardInitMask {
-		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		if isok {
-			mask, isok := component.(*Mask)
-			if isok {
-				mask.ProcMask(plugin, gameProp, curpr, gp, award.StrParams[1])
-			}
-		}
+		// component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
+		// if isok {
+		// 	mask, isok := component.(*Mask)
+		// 	if isok {
+		// 		mask.ProcMask(plugin, gameProp, curpr, prs, gp, award.StrParams[1])
+		// 	}
+		// }
 	} else if award.Type == AwardTriggerRespin {
 		gameProp.TriggerRespin(plugin, curpr, gp, award.Vals[0], award.StrParams[0], false)
 	} else if award.Type == AwardCollector {

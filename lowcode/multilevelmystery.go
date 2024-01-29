@@ -192,7 +192,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 
 	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
 
-	gs := multiLevelMystery.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, multiLevelMystery.Name, "", 0)
+	gs := multiLevelMystery.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, multiLevelMystery.Name, "", 0)
 
 	if gs.HasSymbols(multiLevelMystery.MysterySymbols) {
 		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)

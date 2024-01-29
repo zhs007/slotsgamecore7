@@ -567,7 +567,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	std := gameProp.MapComponentData[linesTrigger.Name].(*LinesTriggerData)
 
-	gs := linesTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "", 0)
+	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, linesTrigger.Name, "", 0)
 
 	isTrigger, lst := linesTrigger.CanTrigger(gameProp, gs, curpr, stake, !linesTrigger.Config.NeedDiscardResults)
 
