@@ -84,7 +84,7 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 
 	cd := gameProp.MapComponentData[dropDownSymbols.Name].(*BasicComponentData)
 
-	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, cd, dropDownSymbols.Name, "", 0)
+	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, cd, dropDownSymbols.Name, "", 0)
 	ngs := gs
 
 	for x, arr := range ngs.Arr {

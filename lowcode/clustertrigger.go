@@ -403,7 +403,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 	std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
 
-	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, clusterTrigger.Name, "", 0)
+	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, clusterTrigger.Name, "", 0)
 
 	isTrigger, lst := clusterTrigger.CanTrigger(gameProp, gs, curpr, stake, !clusterTrigger.Config.NeedDiscardResults)
 

@@ -87,7 +87,7 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd := gameProp.MapComponentData[refillSymbols.Name].(*BasicComponentData)
 
-	gs := refillSymbols.GetTargetScene3(gameProp, curpr, cd, refillSymbols.Name, "", 0)
+	gs := refillSymbols.GetTargetScene3(gameProp, curpr, prs, cd, refillSymbols.Name, "", 0)
 	ngs := gs
 
 	for x := 0; x < gs.Width; x++ {

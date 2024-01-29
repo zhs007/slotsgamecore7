@@ -218,24 +218,24 @@ func (mask *Mask) onMaskChg(plugin sgc7plugin.IPlugin, gameProp *GameProperty, c
 }
 
 // onMaskChg -
-func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, targetScene string) {
-	if mask.MaskType == MaskTypeSymbolInReel {
-		cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, gp *GameParams, targetScene string) {
+	// if mask.MaskType == MaskTypeSymbolInReel {
+	// 	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
 
-		gs := mask.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, mask.Name, targetScene, 0)
+	// 	gs := mask.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, mask.Name, targetScene, 0)
 
-		for x, v := range cd.Vals {
-			if !v {
-				for _, s := range gs.Arr[x] {
-					if s == mask.SymbolCode {
-						mask.ChgMask(plugin, gameProp, cd, curpr, gp, x, true, mask.Config.EndingSPAward != "")
+	// 	for x, v := range cd.Vals {
+	// 		if !v {
+	// 			for _, s := range gs.Arr[x] {
+	// 				if s == mask.SymbolCode {
+	// 					mask.ChgMask(plugin, gameProp, cd, curpr, gp, x, true, mask.Config.EndingSPAward != "")
 
-						break
-					}
-				}
-			}
-		}
-	}
+	// 					break
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 // playgame
@@ -244,7 +244,7 @@ func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 
 	mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	mask.ProcMask(plugin, gameProp, curpr, gp, "")
+	// mask.ProcMask(plugin, gameProp, curpr, prs, gp, "")
 
 	mask.onStepEnd(gameProp, curpr, gp, "")
 

@@ -129,7 +129,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd := gameProp.MapComponentData[removeSymbols.Name].(*RemoveSymbolsData)
 
-	gs := removeSymbols.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, removeSymbols.Name, "", 0)
+	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, removeSymbols.Name, "", 0)
 	ngs := gs
 
 	cd.RemovedNum = 0

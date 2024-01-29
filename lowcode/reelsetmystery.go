@@ -130,7 +130,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 
 	cd := gameProp.MapComponentData[reelSetMystery.Name].(*ReelSetMysteryData)
 
-	gs := reelSetMystery.GetTargetScene3(gameProp, curpr, &cd.BasicComponentData, reelSetMystery.Name, "", 0)
+	gs := reelSetMystery.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, reelSetMystery.Name, "", 0)
 	if !reelSetMystery.hasMystery(gs) {
 		reelSetMystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
 	} else {

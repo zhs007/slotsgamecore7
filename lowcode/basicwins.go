@@ -160,7 +160,7 @@ func (basicWins *BasicWins) ProcTriggerFeature(tf *TriggerFeatureConfig, gamePro
 		return nil
 	}
 
-	gs := basicWins.GetTargetScene3(gameProp, curpr, &bwd.BasicComponentData, basicWins.Name, tf.TargetScene, 0)
+	gs := basicWins.GetTargetScene3(gameProp, curpr, prs, &bwd.BasicComponentData, basicWins.Name, tf.TargetScene, 0)
 
 	isTrigger := false
 	var ret *sgc7game.Result
@@ -398,7 +398,7 @@ func (basicWins *BasicWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 	}
 
-	gs := basicWins.GetTargetScene3(gameProp, curpr, &bwd.BasicComponentData, basicWins.Name, "", 0)
+	gs := basicWins.GetTargetScene3(gameProp, curpr, prs, &bwd.BasicComponentData, basicWins.Name, "", 0)
 
 	if basicWins.Config.MainType == WinTypeWays {
 		if basicWins.Config.BasicComponentConfig.TargetOtherScene != "" {

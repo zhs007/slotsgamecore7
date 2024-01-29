@@ -452,7 +452,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
 
-	gs := waysTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "", 0)
+	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, waysTrigger.Name, "", 0)
 
 	isTrigger, lst := waysTrigger.CanTrigger(gameProp, gs, curpr, stake, !waysTrigger.Config.NeedDiscardResults)
 

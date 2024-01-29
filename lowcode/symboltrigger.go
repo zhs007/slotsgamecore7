@@ -786,7 +786,7 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
 
-	gs := symbolTrigger.GetTargetScene3(gameProp, curpr, &std.BasicComponentData, symbolTrigger.Name, "", 0)
+	gs := symbolTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, symbolTrigger.Name, "", 0)
 
 	isTrigger, lst := symbolTrigger.CanTrigger(gameProp, gs, curpr, stake, !symbolTrigger.Config.NeedDiscardResults)
 
