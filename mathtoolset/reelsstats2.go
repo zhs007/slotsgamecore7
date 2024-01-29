@@ -18,6 +18,20 @@ type ReelsStats2 struct {
 	Symbols []string
 }
 
+func NewReelsStats2(reelnum int) *ReelsStats2 {
+	rss2 := &ReelsStats2{}
+
+	for i := 0; i < reelnum; i++ {
+		rs2 := &ReelStats2{
+			MapSymbols: make(map[string]int),
+		}
+
+		rss2.Reels = append(rss2.Reels, rs2)
+	}
+
+	return rss2
+}
+
 func getReelID(str string) (int, error) {
 	arr := strings.Split(str, "reel")
 	if len(arr) == 2 {
@@ -36,8 +50,6 @@ func getReelID(str string) (int, error) {
 }
 
 func LoadReelsStats2(fn string) (*ReelsStats2, error) {
-	rss2 := &ReelsStats2{}
-
 	mapSymbols := make(map[string][]int)
 	reelnum := 0
 	curSymbol := ""
@@ -95,6 +107,15 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 			zap.Error(err))
 
 		return nil, err
+	}
+
+	rss2 := NewReelsStats2(reelnum)
+
+	for s, arr := range mapSymbols {
+		rss2.Symbols = append(rss2.Symbols, s)
+		for i, v := range arr {
+			rss2.Reels[i].MapSymbols[s] = v
+		}
 	}
 
 	return rss2, nil
