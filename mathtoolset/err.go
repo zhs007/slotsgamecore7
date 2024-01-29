@@ -57,4 +57,9 @@ var (
 	ErrWinWeightScale = errors.New("WinWeight.scale error")
 	// ErrDuplicateAvgWin - duplicate avgwin
 	ErrDuplicateAvgWin = errors.New("duplicate avgwin")
+
+	// ErrInvalidReelsStats2File - invalid reelsstats2 file
+	ErrInvalidReelsStats2File = errors.New("invalid reelsstats2 file")
+	// ErrGenStackReel - genStackReel error
+	ErrGenStackReel = errors.New("genStackReel error")
 )

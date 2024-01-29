@@ -278,13 +278,13 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 	return nil
 }
 
-// CanTrigger -
-func (scatterTrigger *ScatterTrigger) triggerScatter(gameProp *GameProperty, stake *sgc7game.Stake, gs *sgc7game.GameScene) *sgc7game.Result {
-	return sgc7game.CalcScatter4(gs, gameProp.CurPaytables, scatterTrigger.Config.SymbolCodes[0], gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
-		func(scatter int, cursymbol int) bool {
-			return goutils.IndexOfIntSlice(scatterTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		}, false)
-}
+// // CanTrigger -
+// func (scatterTrigger *ScatterTrigger) triggerScatter(gameProp *GameProperty, stake *sgc7game.Stake, gs *sgc7game.GameScene) *sgc7game.Result {
+// 	return sgc7game.CalcScatter4(gs, gameProp.CurPaytables, scatterTrigger.Config.SymbolCodes[0], gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
+// 		func(scatter int, cursymbol int) bool {
+// 			return goutils.IndexOfIntSlice(scatterTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+// 		}, false)
+// }
 
 // CanTrigger -
 func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
@@ -294,28 +294,29 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 	lst := []*sgc7game.Result{}
 
 	if scatterTrigger.Config.TriggerType == STTypeScatters {
-		ret := scatterTrigger.triggerScatter(gameProp, stake, gs)
-		// for _, s := range symbolTrigger.Config.SymbolCodes {
-		// ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, symbolTrigger.Config.SymbolCodes[0], gameProp.GetBet2(stake, symbolTrigger.Config.BetType),
-		// 	func(scatter int, cursymbol int) bool {
-		// 		return goutils.IndexOfIntSlice(symbolTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(symbolTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		// 	}, true)
+		// ret := scatterTrigger.triggerScatter(gameProp, stake, gs)
+		for _, s := range scatterTrigger.Config.SymbolCodes {
+			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
+				func(scatter int, cursymbol int) bool {
+					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				}, false)
 
-		if ret != nil {
-			if scatterTrigger.Config.BetType == BTypeNoPay {
-				ret.CoinWin = 0
-				ret.CashWin = 0
-			} else {
-				gameProp.ProcMulti(ret)
+			if ret != nil {
+				if scatterTrigger.Config.BetType == BTypeNoPay {
+					ret.CoinWin = 0
+					ret.CashWin = 0
+				} else {
+					gameProp.ProcMulti(ret)
+				}
+
+				// if isSaveResult {
+				// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
+				// }
+
+				isTrigger = true
+
+				lst = append(lst, ret)
 			}
-
-			// if isSaveResult {
-			// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			// }
-
-			isTrigger = true
-
-			lst = append(lst, ret)
 		}
 		// }
 	} else if scatterTrigger.Config.TriggerType == STTypeCountScatter {

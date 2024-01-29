@@ -21,6 +21,7 @@ utils/*.log
 unittestdata/relaxconfig.xml
 unittestdata/reelsstats.xlsx
 unittestdata/symbolswinsstats.xlsx
+unittestdata/*-output.xlsx
 app/stats.xlsx
 output/*.xlsx
 output/*.csv
