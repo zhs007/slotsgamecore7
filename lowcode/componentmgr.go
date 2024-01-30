@@ -84,6 +84,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RollSymbolTypeName, NewRollSymbol)
 	mgr.Reg(QueueBranchTypeName, NewQueueBranch)
 	mgr.Reg(SymbolCollection2TypeName, NewSymbolCollection2)
+	mgr.Reg(ReplaceReelWithMaskTypeName, NewReplaceReelWithMask)
 
 	return mgr
 }

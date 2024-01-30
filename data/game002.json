@@ -52988,31 +52988,6 @@
                         "shape": "edge",
                         "attrs": {
                             "line": {
-                                "stroke": "#008000",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "24cd5b00-9213-4e2a-b454-450398bb6f3e",
-                        "zIndex": 9,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "7a9710d2-bd15-4ed3-80e3-855872650a21",
-                            "port": "jump-component-groups-out"
-                        },
-                        "target": {
-                            "cell": "cf4ac9b5-89ea-49e4-9d04-4202dbe57ab2",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
                                 "stroke": "#DC143C",
                                 "strokeWidth": 1
                             }
@@ -53947,7 +53922,7 @@
                                         "bg-blueeffect",
                                         "queue"
                                     ],
-                                    "value": 1
+                                    "valueNum": 1
                                 }
                             ]
                         },

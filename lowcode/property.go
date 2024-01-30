@@ -889,6 +889,30 @@ func (gameProp *GameProperty) onStepEnd(pr *sgc7game.PlayResult, prs []*sgc7game
 	}
 }
 
+func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
+	ic, isok := gameProp.Components.MapComponents[name]
+	if !isok || !ic.IsMask() {
+		goutils.Error("GameProperty.GetMask",
+			zap.String("name", name),
+			zap.Error(ErrIvalidComponentName))
+
+		return nil, ErrIvalidComponentName
+	}
+
+	im, isok := ic.(IMask)
+	if !isok {
+		goutils.Error("GameProperty.GetMask",
+			zap.String("name", name),
+			zap.Error(ErrNotMask))
+
+		return nil, ErrNotMask
+	}
+
+	mask := im.GetMask(gameProp)
+
+	return mask, nil
+}
+
 func init() {
 	MapProperty = make(map[string]int)
 
