@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -63,6 +65,13 @@ type RollSymbolConfig struct {
 	SrcSymbolCollection    string                `yaml:"srcSymbolCollection" json:"srcSymbolCollection"`
 	IgnoreSymbolCollection string                `yaml:"ignoreSymbolCollection" json:"ignoreSymbolCollection"`
 	TargetSymbolCollection string                `yaml:"targetSymbolCollection" json:"targetSymbolCollection"`
+}
+
+// SetLinkComponent
+func (cfg *RollSymbolConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type RollSymbol struct {
@@ -207,4 +216,71 @@ func NewRollSymbol(name string) IComponent {
 	return &RollSymbol{
 		BasicComponent: NewBasicComponent(name, 0),
 	}
+}
+
+//	"configuration": {
+//		"weight": "fgbookofsymbol",
+//		"ignoreSymbolCollection": "fg-syms",
+//		"targetSymbolCollection": "fg-syms"
+//	},
+type jsonRollSymbol struct {
+	Weight                 string `json:"weight"`
+	SrcSymbolCollection    string `json:"srcSymbolCollection"`
+	IgnoreSymbolCollection string `json:"ignoreSymbolCollection"`
+	TargetSymbolCollection string `json:"targetSymbolCollection"`
+}
+
+func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
+	cfg := &RollSymbolConfig{
+		Weight:                 jcfg.Weight,
+		SrcSymbolCollection:    jcfg.SrcSymbolCollection,
+		IgnoreSymbolCollection: jcfg.IgnoreSymbolCollection,
+		TargetSymbolCollection: jcfg.TargetSymbolCollection,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseRollSymbol:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseRollSymbol:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonRollSymbol{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseRollSymbol:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: RollSymbolTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

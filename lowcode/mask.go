@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -116,6 +118,13 @@ type MaskConfig struct {
 	PerMaskAwards        []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
 	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
 	EndingSPAward        string           `yaml:"endingSPAward" json:"endingSPAward"`
+}
+
+// SetLinkComponent
+func (cfg *MaskConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type Mask struct {
@@ -418,4 +427,64 @@ func NewMask(name string) IComponent {
 	}
 
 	return mask
+}
+
+//	"configuration": {
+//		"length": 5
+//	},
+type jsonMask struct {
+	Length int `json:"length"`
+}
+
+func (jcfg *jsonMask) build() *MaskConfig {
+	cfg := &MaskConfig{
+		Num:      jcfg.Length,
+		MaskType: "symbolInReel",
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseMask(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseMask:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseMask:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonMask{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseMask:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: MaskTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

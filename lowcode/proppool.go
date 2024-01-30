@@ -373,6 +373,10 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 
 // LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if gJsonMode {
+		return pool.mapIntValWeights[fn], nil
+	}
+
 	pool.lock.RLock()
 	vw, isok := pool.mapSymbolValWeights[fn]
 	if isok {
