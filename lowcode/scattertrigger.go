@@ -705,6 +705,7 @@ func NewScatterTrigger(name string) IComponent {
 //			3
 //		],
 //		"minNum": 3,
+//		"targetMask": "fg-bookof",
 //		"symbols": [
 //			"SC"
 //		]
@@ -718,6 +719,7 @@ type jsonScatterTrigger struct {
 	PosArea                       []int          `json:"posArea"`
 	CountScatterPayAs             string         `json:"countScatterPayAs"`
 	WinMulti                      int            `json:"winMulti"`
+	TargetMask                    string         `json:"targetMask"`
 	GenRespinType                 string         `json:"genRespinType"`
 	RespinNum                     int            `json:"respinNum"`
 	RespinNumWeight               string         `json:"respinNumWeight"`
@@ -725,20 +727,21 @@ type jsonScatterTrigger struct {
 	RespinNumWeightWithScatterNum map[int]string `json:"respinNumWeightWithScatterNum"`
 }
 
-func (jst *jsonScatterTrigger) build() *ScatterTriggerConfig {
+func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 	cfg := &ScatterTriggerConfig{
-		Symbols:                       jst.Symbols,
-		Type:                          jst.TriggerType,
-		BetTypeString:                 jst.BetType,
-		MinNum:                        jst.MinNum,
-		WildSymbols:                   jst.WildSymbols,
-		PosArea:                       jst.PosArea,
-		CountScatterPayAs:             jst.CountScatterPayAs,
-		WinMulti:                      jst.WinMulti,
-		RespinNum:                     jst.RespinNum,
-		RespinNumWeight:               jst.RespinNumWeight,
-		RespinNumWithScatterNum:       jst.RespinNumWithScatterNum,
-		RespinNumWeightWithScatterNum: jst.RespinNumWeightWithScatterNum,
+		Symbols:                       jcfg.Symbols,
+		Type:                          jcfg.TriggerType,
+		BetTypeString:                 jcfg.BetType,
+		MinNum:                        jcfg.MinNum,
+		WildSymbols:                   jcfg.WildSymbols,
+		PosArea:                       jcfg.PosArea,
+		CountScatterPayAs:             jcfg.CountScatterPayAs,
+		WinMulti:                      jcfg.WinMulti,
+		TargetMask:                    jcfg.TargetMask,
+		RespinNum:                     jcfg.RespinNum,
+		RespinNumWeight:               jcfg.RespinNumWeight,
+		RespinNumWithScatterNum:       jcfg.RespinNumWithScatterNum,
+		RespinNumWeightWithScatterNum: jcfg.RespinNumWeightWithScatterNum,
 	}
 
 	for i := range cfg.PosArea {

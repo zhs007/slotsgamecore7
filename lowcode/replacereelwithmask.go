@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -20,6 +22,13 @@ type ReplaceReelWithMaskConfig struct {
 	Symbol               string `yaml:"symbol" json:"symbol"`
 	SymbolCode           int    `yaml:"-" json:"-"`
 	Mask                 string `yaml:"mask" json:"mask"`
+}
+
+// SetLinkComponent
+func (cfg *ReplaceReelWithMaskConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type ReplaceReelWithMask struct {
@@ -138,4 +147,66 @@ func NewReplaceReelWithMask(name string) IComponent {
 	return &ReplaceReelWithMask{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+//	"configuration": {
+//		"targetSymbols": "J",
+//		"srcMask": "fg-bookof"
+//	},
+type jsonReplaceReelWithMask struct {
+	TargetSymbols string `json:"targetSymbols"`
+	SrcMask       string `json:"srcMask"`
+}
+
+func (jcfg *jsonReplaceReelWithMask) build() *ReplaceReelWithMaskConfig {
+	cfg := &ReplaceReelWithMaskConfig{
+		Symbol: jcfg.TargetSymbols,
+		Mask:   jcfg.SrcMask,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseReplaceReelWithMask(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseReplaceReelWithMask:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReplaceReelWithMask:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonReplaceReelWithMask{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseReplaceReelWithMask:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: ReplaceReelWithMaskTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

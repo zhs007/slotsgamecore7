@@ -91,6 +91,8 @@ const (
 	CheckWinTypeRightLeft CheckWinType = 1
 	// CheckWinTypeAll - left -> right & right -> left
 	CheckWinTypeAll CheckWinType = 2
+	// CheckWinTypeCount - count
+	CheckWinTypeCount CheckWinType = 3
 )
 
 var strCheckWinType map[string]CheckWinType
@@ -110,6 +112,7 @@ func initCheckWinType() {
 	strCheckWinType["left2right"] = CheckWinTypeLeftRight
 	strCheckWinType["right2left"] = CheckWinTypeRightLeft
 	strCheckWinType["all"] = CheckWinTypeAll
+	strCheckWinType["count"] = CheckWinTypeCount
 }
 
 // json mode - 是否json配置模式，json模式下会有些特殊处理，少一些互斥锁
