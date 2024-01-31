@@ -11,11 +11,18 @@ import (
 
 type FuncNewComponent func(name string) IComponent
 
+type ForeachSymbolData struct {
+	SymbolCode int
+	Index      int
+}
+
 type IComponent interface {
 	// Init -
 	Init(fn string, pool *GamePropertyPool) error
 	// InitEx -
 	InitEx(cfg any, pool *GamePropertyPool) error
+	// OnGameInited - on game inited
+	OnGameInited(components *ComponentList) error
 	// OnNewGame - 这个一定要注意处理正确，为了节省cpu，没有主动处理componentData的该接口，如果确定需要，要自己调用
 	OnNewGame(gameProp *GameProperty) error
 	// OnNewStep -
@@ -29,6 +36,8 @@ type IComponent interface {
 	OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64)
 	// NewComponentData -
 	NewComponentData() IComponentData
+	// GetComponentData -
+	GetComponentData(gameProp *GameProperty) IComponentData
 	// EachUsedResults -
 	EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult)
 	// OnPlayGame - on playgame
@@ -50,6 +59,9 @@ type IComponent interface {
 	// // OnStats2Trigger
 	// OnStats2Trigger(s2 *Stats2)
 
+	// GetAllLinkComponents - get all link components
+	GetAllLinkComponents() []string
+
 	//----------------------------
 	// SymbolCollection
 
@@ -57,4 +69,16 @@ type IComponent interface {
 	GetSymbols(gameProp *GameProperty) []int
 	// AddSymbol -
 	AddSymbol(gameProp *GameProperty, symbolCode int)
+
+	//----------------------------
+	// for foreach symbols
+
+	// OnEachSymbol - on foreach symbol
+	OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+		prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error)
+	// ForEachSymbols - foreach symbols
+	ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+		prs []*sgc7game.PlayResult) error
+	// SetForeachSymbolData -
+	SetForeachSymbolData(data *ForeachSymbolData)
 }

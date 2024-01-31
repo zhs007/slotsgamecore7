@@ -627,6 +627,11 @@ func (clusterTrigger *ClusterTrigger) GetWinMulti(basicCD *BasicComponentData) i
 	return clusterTrigger.Config.WinMulti
 }
 
+// GetAllLinkComponents - get all link components
+func (clusterTrigger *ClusterTrigger) GetAllLinkComponents() []string {
+	return []string{clusterTrigger.Config.DefaultNextComponent, clusterTrigger.Config.JumpToComponent}
+}
+
 func NewClusterTrigger(name string) IComponent {
 	return &ClusterTrigger{
 		BasicComponent: NewBasicComponent(name, 1),

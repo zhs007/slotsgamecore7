@@ -1,6 +1,8 @@
 package lowcode
 
 import (
+	"fmt"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
@@ -158,9 +160,10 @@ type BasicComponentConfig struct {
 }
 
 type BasicComponent struct {
-	Config      *BasicComponentConfig
-	Name        string
-	SrcSceneNum int
+	Config            *BasicComponentConfig
+	Name              string
+	SrcSceneNum       int
+	dataForeachSymbol *ForeachSymbolData
 }
 
 // onInit -
@@ -522,6 +525,42 @@ func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
 // AddSymbol -
 func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
 
+}
+
+// OnEachSymbol - on foreach symbol
+func (basicComponent *BasicComponent) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState,
+	stake *sgc7game.Stake, prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error) {
+	return "", nil
+}
+
+// ForEachSymbols - foreach symbols
+func (basicComponent *BasicComponent) ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	prs []*sgc7game.PlayResult) error {
+	return nil
+}
+
+// GetComponentData -
+func (basicComponent *BasicComponent) GetComponentData(gameProp *GameProperty) IComponentData {
+	if basicComponent.dataForeachSymbol != nil {
+		return gameProp.MapComponentData[fmt.Sprintf("%v:%v", basicComponent.Name, basicComponent.dataForeachSymbol.Index)]
+	}
+
+	return gameProp.MapComponentData[basicComponent.Name]
+}
+
+// SetForeachSymbolData -
+func (basicComponent *BasicComponent) SetForeachSymbolData(data *ForeachSymbolData) {
+	basicComponent.dataForeachSymbol = data
+}
+
+// OnGameInited - on game inited
+func (basicComponent *BasicComponent) OnGameInited(components *ComponentList) error {
+	return nil
+}
+
+// GetAllLinkComponents - get all link components
+func (basicComponent *BasicComponent) GetAllLinkComponents() []string {
+	return []string{basicComponent.Config.DefaultNextComponent}
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {

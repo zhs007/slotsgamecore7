@@ -157,6 +157,11 @@ func (queueBranch *QueueBranch) NewComponentData() IComponentData {
 	return &QueueBranchData{}
 }
 
+// GetAllLinkComponents - get all link components
+func (queueBranch *QueueBranch) GetAllLinkComponents() []string {
+	return []string{queueBranch.Config.DefaultNextComponent, queueBranch.Config.JumpToComponent}
+}
+
 func NewQueueBranch(name string) IComponent {
 	return &QueueBranch{
 		BasicComponent: NewBasicComponent(name, 0),

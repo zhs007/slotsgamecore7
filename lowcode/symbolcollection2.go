@@ -52,15 +52,19 @@ func (symbolCollection2Data *SymbolCollection2Data) BuildPBComponentData() proto
 // SymbolCollection2Config - configuration for SymbolCollection2 feature
 type SymbolCollection2Config struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	MaxSymbolNum         int      `yaml:"maxSymbolNum" json:"maxSymbolNum"` // 0表示不限制
-	InitSymbols          []string `yaml:"initSymbols" json:"initSymbols"`   // 初始化symbols
-	InitSymbolCodes      []int    `yaml:"-" json:"-"`                       // 初始化symbols
+	ForeachComponent     string   `yaml:"foreachComponent" json:"foreachComponent"` // foreach
+	MaxSymbolNum         int      `yaml:"maxSymbolNum" json:"maxSymbolNum"`         // 0表示不限制
+	InitSymbols          []string `yaml:"initSymbols" json:"initSymbols"`           // 初始化symbols
+	InitSymbolCodes      []int    `yaml:"-" json:"-"`                               // 初始化symbols
+	Children             []string `yaml:"-" json:"-"`                               //
 }
 
 // SetLinkComponent
 func (cfg *SymbolCollection2Config) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
+	} else if link == "foreach" {
+		cfg.ForeachComponent = componentName
 	}
 }
 
@@ -166,6 +170,62 @@ func (symbolCollection2 *SymbolCollection2) AddSymbol(gameProp *GameProperty, sy
 	if symbolCollection2.Config.MaxSymbolNum <= 0 || len(scd.SymbolCodes) < symbolCollection2.Config.MaxSymbolNum {
 		scd.SymbolCodes = append(scd.SymbolCodes, symbolCode)
 	}
+}
+
+// ForEachSymbols - foreach symbols
+func (symbolCollection2 *SymbolCollection2) ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	prs []*sgc7game.PlayResult) error {
+
+	if len(symbolCollection2.Config.Children) > 0 {
+		curComponentName := symbolCollection2.Config.ForeachComponent
+		scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+
+		for i, curs := range scd.SymbolCodes {
+			for _, cc := range symbolCollection2.Config.Children {
+
+			}
+			componentNum := 0
+			for {
+				next, err := gameProp.ProcEachSymbol(curComponentName, curpr, gp, plugin, ps, stake, prs, i, curs)
+				if err != nil {
+					if err == ErrComponentDoNothing {
+						if next == "" {
+							break
+						}
+					} else {
+						goutils.Error("SymbolCollection2.ForeachSymbols:ProcEachSymbol",
+							zap.Error(err))
+
+						return err
+					}
+				}
+
+				curComponentName = next
+
+				componentNum++
+
+				if componentNum > MaxComponentNumInStep {
+					break
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// OnGameInited - on game inited
+func (symbolCollection2 *SymbolCollection2) OnGameInited(components *ComponentList) error {
+	if symbolCollection2.Config.ForeachComponent != "" {
+		symbolCollection2.Config.Children = components.GetAllLinkComponents(symbolCollection2.Config.ForeachComponent)
+	}
+
+	return nil
+}
+
+// GetAllLinkComponents - get all link components
+func (symbolCollection2 *SymbolCollection2) GetAllLinkComponents() []string {
+	return []string{symbolCollection2.Config.DefaultNextComponent, symbolCollection2.Config.ForeachComponent}
 }
 
 func NewSymbolCollection2(name string) IComponent {

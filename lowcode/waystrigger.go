@@ -676,6 +676,11 @@ func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 	return waysTrigger.Config.WinMulti
 }
 
+// GetAllLinkComponents - get all link components
+func (waysTrigger *WaysTrigger) GetAllLinkComponents() []string {
+	return []string{waysTrigger.Config.DefaultNextComponent, waysTrigger.Config.JumpToComponent}
+}
+
 func NewWaysTrigger(name string) IComponent {
 	return &WaysTrigger{
 		BasicComponent: NewBasicComponent(name, 1),

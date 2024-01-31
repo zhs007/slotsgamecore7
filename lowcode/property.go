@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/zhs007/goutils"
@@ -44,6 +45,11 @@ func String2Property(str string) (int, error) {
 	return 0, ErrInvalidGamePropertyString
 }
 
+type HistoryComponentData struct {
+	Component    IComponent
+	ForeachIndex int
+}
+
 type GameProperty struct {
 	CurBetMul              int
 	Pool                   *GamePropertyPool
@@ -61,7 +67,7 @@ type GameProperty struct {
 	mapComponentScene      map[string]*sgc7game.GameScene
 	mapComponentOtherScene map[string]*sgc7game.GameScene
 	MapComponentData       map[string]IComponentData
-	HistoryComponents      []IComponent
+	HistoryComponents      []*HistoryComponentData
 	RespinComponents       []string
 	PoolScene              *sgc7game.GameScenePoolEx
 	Components             *ComponentList
@@ -244,14 +250,14 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 	}
 }
 
-func (gameProp *GameProperty) AddComponent2History(component IComponent, gp *GameParams) {
-	for _, c := range gameProp.HistoryComponents {
-		if c.GetName() == component.GetName() {
-			return
-		}
-	}
+func (gameProp *GameProperty) AddComponent2History(component IComponent, index int, gp *GameParams) {
+	// for _, c := range gameProp.HistoryComponents {
+	// 	if c.Component.GetName() == component.GetName() {
+	// 		return
+	// 	}
+	// }
 
-	gameProp.HistoryComponents = append(gameProp.HistoryComponents, component)
+	gameProp.HistoryComponents = append(gameProp.HistoryComponents, &HistoryComponentData{Component: component, ForeachIndex: index})
 	gp.HistoryComponents = append(gp.HistoryComponents, component.GetName())
 }
 
@@ -537,24 +543,24 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		}
 
 		gameProp.TagInt(award.StrParams[1], cr.Int())
-	} else if award.Type == AwardPushSymbolCollection {
-		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		if isok {
-			symbolCollection, isok := component.(*SymbolCollection)
-			if isok {
-				for i := 0; i < award.Vals[0]; i++ {
-					err := symbolCollection.Push(plugin, gameProp, gp)
-					if err != nil {
-						goutils.Error("GameProperty.procAward:AwardPushSymbolCollection:Push",
-							zap.Error(err))
+		// } else if award.Type == AwardPushSymbolCollection {
+		// 	component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
+		// 	if isok {
+		// 		symbolCollection, isok := component.(*SymbolCollection)
+		// 		if isok {
+		// 			for i := 0; i < award.Vals[0]; i++ {
+		// 				err := symbolCollection.Push(plugin, gameProp, gp)
+		// 				if err != nil {
+		// 					goutils.Error("GameProperty.procAward:AwardPushSymbolCollection:Push",
+		// 						zap.Error(err))
 
-						return
-					}
-				}
+		// 					return
+		// 				}
+		// 			}
 
-				gameProp.AddComponent2History(component, gp)
-			}
-		}
+		// 			gameProp.AddComponent2History(component, gp)
+		// 		}
+		// 	}
 	} else if award.Type == AwardGameCoinMulti {
 		gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
 	} else if award.Type == AwardStepCoinMulti {
@@ -731,7 +737,7 @@ func (gameProp *GameProperty) CanTrigger(componentName string, gs *sgc7game.Game
 
 func (gameProp *GameProperty) InHistoryComponents(componentName string) bool {
 	for _, ic := range gameProp.HistoryComponents {
-		if ic.GetName() == componentName {
+		if ic.Component.GetName() == componentName {
 			return true
 		}
 	}
@@ -912,6 +918,85 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 
 	return mask, nil
 }
+
+// ForEachSymbols - foreach symbols
+func (gameProp *GameProperty) ProcEachSymbol(componentName string, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	prs []*sgc7game.PlayResult, si int, symbol int) (string, error) {
+
+	ic, isok := gameProp.Components.MapComponents[componentName]
+	if !isok || !ic.IsMask() {
+		goutils.Error("GameProperty.ProcEachSymbol",
+			zap.String("name", componentName),
+			zap.Error(ErrIvalidComponentName))
+
+		return "", ErrIvalidComponentName
+	}
+
+	cd := ic.NewComponentData()
+	mainkey := fmt.Sprintf("%v:%v", componentName, si)
+
+	next, err := ic.OnEachSymbol(gameProp, curpr, gp, plugin, ps, stake, prs, symbol, cd)
+	if err != nil {
+		if err == ErrComponentDoNothing {
+			return next, ErrComponentDoNothing
+		}
+
+		goutils.Error("GameProperty.ProcEachSymbol:OnEachSymbol",
+			zap.String("name", componentName),
+			zap.Error(err))
+
+		return "", err
+	}
+
+	gameProp.MapComponentData[mainkey] = cd
+	// gameProp.HistoryComponents = append(gameProp.HistoryComponents, )
+
+	return next, err
+}
+
+func (gameProp *GameProperty) NewComponentDataWithForeachSymbol(componentName string, symbolCode int, index int) error {
+	ic, isok := gameProp.Components.MapComponents[componentName]
+	if !isok {
+		goutils.Error("GameProperty.NewComponentDataWithForeachSymbol",
+			zap.String("name", componentName),
+			zap.Error(ErrIvalidComponentName))
+
+		return ErrIvalidComponentName
+	}
+
+	mainkey := fmt.Sprintf("%v:%v", componentName, index)
+	gameProp.MapComponentData[mainkey] = ic.NewComponentData()
+
+	ic.SetForeachSymbolData(&ForeachSymbolData{
+		SymbolCode: symbolCode,
+		Index:      index,
+	})
+
+	return nil
+}
+
+// // GetAllLinkComponents - get all link components
+// func (gameProp *GameProperty) GetAllLinkComponents(componentName string) []string {
+// 	ic, isok := gameProp.Components.MapComponents[componentName]
+// 	if !isok || !ic.IsMask() {
+// 		goutils.Error("GameProperty.GetAllLinkComponents",
+// 			zap.String("name", componentName),
+// 			zap.Error(ErrIvalidComponentName))
+
+// 		return nil
+// 	}
+
+// 	lst := []string{componentName}
+
+// 	curlst := ic.GetAllLinkComponents()
+// 	for _, v := range curlst {
+// 		lst = append(lst, v)
+// 		children := gameProp.GetAllLinkComponents(v)
+// 		lst = append(lst, children...)
+// 	}
+
+// 	return lst
+// }
 
 func init() {
 	MapProperty = make(map[string]int)

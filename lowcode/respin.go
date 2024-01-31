@@ -435,6 +435,11 @@ func (respin *Respin) IsStarted(gameProp *GameProperty) bool {
 	return cd.CurRespinNum > 0
 }
 
+// GetAllLinkComponents - get all link components
+func (respin *Respin) GetAllLinkComponents() []string {
+	return []string{respin.Config.DefaultNextComponent, respin.Config.MainComponent}
+}
+
 func NewRespin(name string) IComponent {
 	return &Respin{
 		BasicComponent: NewBasicComponent(name, 0),

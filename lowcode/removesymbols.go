@@ -197,6 +197,11 @@ func (removeSymbols *RemoveSymbols) NewComponentData() IComponentData {
 func (removeSymbols *RemoveSymbols) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
 }
 
+// GetAllLinkComponents - get all link components
+func (removeSymbols *RemoveSymbols) GetAllLinkComponents() []string {
+	return []string{removeSymbols.Config.DefaultNextComponent, removeSymbols.Config.JumpToComponent}
+}
+
 func NewRemoveSymbols(name string) IComponent {
 	return &RemoveSymbols{
 		BasicComponent: NewBasicComponent(name, 1),

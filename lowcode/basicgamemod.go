@@ -124,8 +124,17 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		if !isComponentDoNothing {
-			gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
-			gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
+			gameProp.AddComponent2History(curComponent, -1, gp)
+
+			err := curComponent.ForeachSymbols(gameProp, pr, gp, plugin, ps, stake, prs)
+			if err != nil {
+				goutils.Error("BasicGameMod.OnPlay:ForeachSymbols",
+					zap.Error(err))
+
+				return nil, err
+			}
+			// gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
+			// gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
 		}
 
 		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
@@ -166,21 +175,23 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.BuildGameParam(gp)
 
 	for _, v := range gameProp.HistoryComponents {
-		err := v.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
-		if err != nil {
-			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
-				zap.Error(err))
+		if v.ForeachIndex < 0 {
+			err := v.Component.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+			if err != nil {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
+					zap.Error(err))
 
-			return nil, err
-		}
+				return nil, err
+			}
 
-		cn := v.GetName()
-		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
+			cn := v.Component.GetName()
+			gp.AddComponentData(cn, gameProp.MapComponentData[cn])
 
-		if gAllowStats2 {
-			v.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
-			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
-			gameProp.stats2SpinData.OnStepTrigger(cn)
+			if gAllowStats2 {
+				v.Component.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
+				// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
+				gameProp.stats2SpinData.OnStepTrigger(cn)
+			}
 		}
 	}
 
@@ -236,7 +247,7 @@ func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
 // OnAsciiGame - outpur to asciigame
 func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
 	for _, v := range gameProp.HistoryComponents {
-		v.OnAsciiGame(gameProp, pr, lst, gameProp.Pool.MapSymbolColor)
+		v.Component.OnAsciiGame(gameProp, pr, lst, gameProp.Pool.MapSymbolColor)
 	}
 
 	return nil

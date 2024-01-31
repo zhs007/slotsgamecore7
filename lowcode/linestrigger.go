@@ -874,6 +874,11 @@ func (linesTrigger *LinesTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 	return linesTrigger.Config.WinMulti
 }
 
+// GetAllLinkComponents - get all link components
+func (linesTrigger *LinesTrigger) GetAllLinkComponents() []string {
+	return []string{linesTrigger.Config.DefaultNextComponent, linesTrigger.Config.JumpToComponent}
+}
+
 func NewLinesTrigger(name string) IComponent {
 	return &LinesTrigger{
 		BasicComponent: NewBasicComponent(name, 1),

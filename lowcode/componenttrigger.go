@@ -71,7 +71,6 @@ func (componentTrigger *ComponentTrigger) OnPlayGame(gameProp *GameProperty, cur
 	isTrigger := false
 	for _, cn := range componentTrigger.Config.CheckRunComponents {
 		if gameProp.InHistoryComponents(cn) {
-
 			isTrigger = true
 			break
 		}
