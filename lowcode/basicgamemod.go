@@ -163,9 +163,10 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		curComponent = c
 
-		if len(gameProp.HistoryComponents) >= MaxComponentNumInStep {
+		curComponentNum := gameProp.callStack.GetComponentNum()
+		if curComponentNum >= MaxComponentNumInStep {
 			goutils.Error("BasicGameMod.OnPlay",
-				zap.Int("components", len(gameProp.HistoryComponents)),
+				zap.Int("components", curComponentNum),
 				zap.Error(ErrTooManyComponentsInStep))
 
 			return nil, ErrTooManyComponentsInStep

@@ -1,9 +1,8 @@
 package lowcode
 
 import (
-	"fmt"
-
 	"github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -30,13 +29,13 @@ type BasicComponentData struct {
 }
 
 // OnNewGame -
-func (basicComponentData *BasicComponentData) OnNewGame() {
+func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	basicComponentData.MapConfigVals = make(map[string]string)
 	basicComponentData.MapConfigIntVals = make(map[string]int)
 }
 
 // OnNewStep -
-func (basicComponentData *BasicComponentData) OnNewStep() {
+func (basicComponentData *BasicComponentData) OnNewStep(gameProp *GameProperty, component IComponent) {
 	basicComponentData.UsedScenes = nil
 	basicComponentData.UsedOtherScenes = nil
 	basicComponentData.UsedResults = nil
@@ -166,6 +165,32 @@ type BasicComponent struct {
 	dataForeachSymbol *ForeachSymbolData
 }
 
+// Init -
+func (basicComponent *BasicComponent) Init(fn string, pool *GamePropertyPool) error {
+	return nil
+}
+
+// InitEx -
+func (basicComponent *BasicComponent) InitEx(cfg any, pool *GamePropertyPool) error {
+	return nil
+}
+
+// OnAsciiGame - outpur to asciigame
+func (basicComponent *BasicComponent) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+	return nil
+}
+
+// OnPlayGame - on playgame
+func (basicComponent *BasicComponent) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	return nil
+}
+
+// OnStats -
+func (basicComponent *BasicComponent) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
+}
+
 // onInit -
 func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -203,23 +228,23 @@ func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *s
 	gameProp.SetStrVal(GamePropNextComponent, nextComponent)
 }
 
-// OnNewGame -
-func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[basicComponent.Name]
+// // OnNewGame -
+// func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.GetCurComponentData(basicComponent)
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
-// OnNewStep -
-func (basicComponent *BasicComponent) OnNewStep(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[basicComponent.Name]
+// // OnNewStep -
+// func (basicComponent *BasicComponent) OnNewStep(gameProp *GameProperty) error {
+// 	cd := gameProp.GetCurComponentData(basicComponent)
 
-	cd.OnNewStep()
+// 	cd.OnNewStep()
 
-	return nil
-}
+// 	return nil
+// }
 
 // AddScene -
 func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
@@ -539,14 +564,16 @@ func (basicComponent *BasicComponent) ForeachSymbols(gameProp *GameProperty, cur
 	return nil
 }
 
-// GetComponentData -
-func (basicComponent *BasicComponent) GetComponentData(gameProp *GameProperty) IComponentData {
-	if basicComponent.dataForeachSymbol != nil {
-		return gameProp.MapComponentData[fmt.Sprintf("%v:%v", basicComponent.Name, basicComponent.dataForeachSymbol.Index)]
-	}
+// // GetComponentData -
+// func (basicComponent *BasicComponent) GetComponentData(gameProp *GameProperty) IComponentData {
+// 	return gameProp.GetCurComponentData(basicComponent)
 
-	return gameProp.MapComponentData[basicComponent.Name]
-}
+// 	if basicComponent.dataForeachSymbol != nil {
+// 		return gameProp.MapComponentData[fmt.Sprintf("%v:%v", basicComponent.Name, basicComponent.dataForeachSymbol.Index)]
+// 	}
+
+// 	return gameProp.MapComponentData[basicComponent.Name]
+// }
 
 // SetForeachSymbolData -
 func (basicComponent *BasicComponent) SetForeachSymbolData(data *ForeachSymbolData) {

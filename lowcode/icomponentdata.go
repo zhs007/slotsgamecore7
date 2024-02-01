@@ -9,9 +9,9 @@ type FuncOnEachUsedResult func(*sgc7game.Result)
 
 type IComponentData interface {
 	// OnNewGame -
-	OnNewGame()
+	OnNewGame(gameProp *GameProperty, component IComponent)
 	// OnNewStep -
-	OnNewStep()
+	OnNewStep(gameProp *GameProperty, component IComponent)
 	// BuildPBComponentData
 	BuildPBComponentData() proto.Message
 	// GetVal -

@@ -23,10 +23,10 @@ type IComponent interface {
 	InitEx(cfg any, pool *GamePropertyPool) error
 	// OnGameInited - on game inited
 	OnGameInited(components *ComponentList) error
-	// OnNewGame - 这个一定要注意处理正确，为了节省cpu，没有主动处理componentData的该接口，如果确定需要，要自己调用
-	OnNewGame(gameProp *GameProperty) error
-	// OnNewStep -
-	OnNewStep(gameProp *GameProperty) error
+	// // OnNewGame - 这个一定要注意处理正确，为了节省cpu，没有主动处理componentData的该接口，如果确定需要，要自己调用
+	// OnNewGame(gameProp *GameProperty) error
+	// // OnNewStep -
+	// OnNewStep(gameProp *GameProperty) error
 	// OnPlayGame - on playgame
 	OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error
@@ -36,8 +36,8 @@ type IComponent interface {
 	OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64)
 	// NewComponentData -
 	NewComponentData() IComponentData
-	// GetComponentData -
-	GetComponentData(gameProp *GameProperty) IComponentData
+	// // GetComponentData -
+	// GetComponentData(gameProp *GameProperty) IComponentData
 	// EachUsedResults -
 	EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult)
 	// OnPlayGame - on playgame
