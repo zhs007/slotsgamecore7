@@ -25,13 +25,13 @@ type RemoveSymbolsData struct {
 }
 
 // OnNewGame -
-func (removeSymbolsData *RemoveSymbolsData) OnNewGame() {
-	removeSymbolsData.BasicComponentData.OnNewGame()
+func (removeSymbolsData *RemoveSymbolsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	removeSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (removeSymbolsData *RemoveSymbolsData) OnNewStep() {
-	removeSymbolsData.BasicComponentData.OnNewStep()
+func (removeSymbolsData *RemoveSymbolsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	removeSymbolsData.RemovedNum = 0
 }

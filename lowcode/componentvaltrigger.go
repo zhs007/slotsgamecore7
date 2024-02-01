@@ -125,7 +125,7 @@ func (componentValTrigger *ComponentValTrigger) check(gameProp *GameProperty, va
 
 // playgame
 func (componentValTrigger *ComponentValTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	componentValTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -149,7 +149,7 @@ func (componentValTrigger *ComponentValTrigger) OnPlayGame(gameProp *GamePropert
 }
 
 // OnAsciiGame - outpur to asciigame
-func (componentTrigger *ComponentValTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (componentTrigger *ComponentValTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 	return nil
 }
 

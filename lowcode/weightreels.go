@@ -24,13 +24,13 @@ type WeightReelsData struct {
 }
 
 // OnNewGame -
-func (weightReelsData *WeightReelsData) OnNewGame() {
-	weightReelsData.BasicComponentData.OnNewGame()
+func (weightReelsData *WeightReelsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	weightReelsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (weightReelsData *WeightReelsData) OnNewStep() {
-	weightReelsData.BasicComponentData.OnNewStep()
+func (weightReelsData *WeightReelsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	weightReelsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	weightReelsData.ReelSetIndex = -1
 }

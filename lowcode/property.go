@@ -77,7 +77,7 @@ type GameProperty struct {
 }
 
 func (gameProp *GameProperty) GetCurComponentData(ic IComponent) IComponentData {
-	return gameProp.callStack.GetCurComponentData(ic)
+	return gameProp.callStack.GetCurComponentData(gameProp, ic)
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
@@ -112,6 +112,8 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 	gameProp.mapComponentScene = make(map[string]*sgc7game.GameScene)
 	gameProp.mapComponentOtherScene = make(map[string]*sgc7game.GameScene)
 
+	gameProp.callStack.OnNewGame()
+
 	return nil
 }
 
@@ -125,7 +127,8 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.SetVal(GamePropStepMulti, 1)
 	gameProp.SetVal(GamePropStepCoinMulti, 1)
 
-	gameProp.HistoryComponents = nil
+	// gameProp.HistoryComponents = nil
+	gameProp.callStack.OnNewStep()
 
 	return nil
 }

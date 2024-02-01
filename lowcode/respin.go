@@ -35,8 +35,8 @@ type RespinData struct {
 }
 
 // OnNewGame -
-func (respinData *RespinData) OnNewGame() {
-	respinData.BasicComponentData.OnNewGame()
+func (respinData *RespinData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	respinData.BasicComponentData.OnNewGame(gameProp, component)
 
 	respinData.LastRespinNum = 0
 	respinData.CurRespinNum = 0
@@ -50,8 +50,8 @@ func (respinData *RespinData) OnNewGame() {
 }
 
 // OnNewStep -
-func (respinData *RespinData) OnNewStep() {
-	respinData.BasicComponentData.OnNewStep()
+func (respinData *RespinData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	respinData.BasicComponentData.OnNewStep(gameProp, component)
 
 	respinData.CurAddRespinNum = 0
 }
@@ -313,18 +313,18 @@ func (respin *Respin) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 
 // OnPlayGame - on playgame
 func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+	rcd := cd.(*RespinData)
 
-	cd.TotalCashWin += curpr.CashWin
-	cd.TotalCoinWin += int64(curpr.CoinWin)
+	rcd.TotalCashWin += curpr.CashWin
+	rcd.TotalCoinWin += int64(curpr.CoinWin)
 
-	if respin.Config.IsWinBreak && cd.TotalCoinWin > 0 {
-		cd.LastRespinNum = 0
+	if respin.Config.IsWinBreak && rcd.TotalCoinWin > 0 {
+		rcd.LastRespinNum = 0
 	}
 
-	if cd.LastRespinNum == 0 && cd.LastTriggerNum == 0 {
+	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
 		gameProp.removeRespin(respin.Name)
 	}
 

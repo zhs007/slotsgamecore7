@@ -30,13 +30,13 @@ type WinResultMultiData struct {
 }
 
 // OnNewGame -
-func (winResultMultiData *WinResultMultiData) OnNewGame() {
-	winResultMultiData.BasicComponentData.OnNewGame()
+func (winResultMultiData *WinResultMultiData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	winResultMultiData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (winResultMultiData *WinResultMultiData) OnNewStep() {
-	winResultMultiData.BasicComponentData.OnNewStep()
+func (winResultMultiData *WinResultMultiData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	winResultMultiData.BasicComponentData.OnNewStep(gameProp, component)
 
 	winResultMultiData.Wins = 0
 	winResultMultiData.WinMulti = 1

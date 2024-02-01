@@ -34,13 +34,13 @@ type ClusterTriggerData struct {
 }
 
 // OnNewGame -
-func (clusterTriggerData *ClusterTriggerData) OnNewGame() {
-	clusterTriggerData.BasicComponentData.OnNewGame()
+func (clusterTriggerData *ClusterTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	clusterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (clusterTriggerData *ClusterTriggerData) OnNewStep() {
-	clusterTriggerData.BasicComponentData.OnNewStep()
+func (clusterTriggerData *ClusterTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	clusterTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	clusterTriggerData.NextComponent = ""
 	clusterTriggerData.SymbolNum = 0
@@ -397,11 +397,11 @@ func (clusterTrigger *ClusterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 
 // playgame
 func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	clusterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
+	std := cd.(*ClusterTriggerData)
 
 	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, clusterTrigger.Name, "", 0)
 
@@ -546,9 +546,9 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 }
 
 // OnAsciiGame - outpur to asciigame
-func (clusterTrigger *ClusterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (clusterTrigger *ClusterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
+	std := cd.(*ClusterTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0

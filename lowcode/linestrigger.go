@@ -34,13 +34,13 @@ type LinesTriggerData struct {
 }
 
 // OnNewGame -
-func (linesTriggerData *LinesTriggerData) OnNewGame() {
-	linesTriggerData.BasicComponentData.OnNewGame()
+func (linesTriggerData *LinesTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	linesTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (linesTriggerData *LinesTriggerData) OnNewStep() {
-	linesTriggerData.BasicComponentData.OnNewStep()
+func (linesTriggerData *LinesTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	linesTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	linesTriggerData.NextComponent = ""
 	linesTriggerData.SymbolNum = 0
@@ -278,8 +278,8 @@ func (linesTrigger *LinesTrigger) procMask(gs *sgc7game.GameScene, gameProp *Gam
 }
 
 // CanTrigger -
-func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	std := gameProp.MapComponentData[linesTrigger.Name].(*LinesTriggerData)
+func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool, cd IComponentData) (bool, []*sgc7game.Result) {
+	std := cd.(*LinesTriggerData)
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
@@ -644,15 +644,15 @@ func (linesTrigger *LinesTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *
 
 // playgame
 func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	linesTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[linesTrigger.Name].(*LinesTriggerData)
+	std := cd.(*LinesTriggerData)
 
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, linesTrigger.Name, "", 0)
 
-	isTrigger, lst := linesTrigger.CanTrigger(gameProp, gs, curpr, stake, !linesTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := linesTrigger.CanTrigger(gameProp, gs, curpr, stake, !linesTrigger.Config.NeedDiscardResults, cd)
 
 	if isTrigger {
 		linesTrigger.procWins(std, lst)
@@ -793,9 +793,9 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 }
 
 // OnAsciiGame - outpur to asciigame
-func (linesTrigger *LinesTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (linesTrigger *LinesTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	std := gameProp.MapComponentData[linesTrigger.Name].(*LinesTriggerData)
+	std := cd.(*LinesTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0

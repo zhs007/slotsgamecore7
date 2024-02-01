@@ -25,15 +25,15 @@ type SymbolCollection2Data struct {
 }
 
 // OnNewGame -
-func (symbolCollection2Data *SymbolCollection2Data) OnNewGame() {
-	symbolCollection2Data.BasicComponentData.OnNewGame()
+func (symbolCollection2Data *SymbolCollection2Data) OnNewGame(gameProp *GameProperty, component IComponent) {
+	symbolCollection2Data.BasicComponentData.OnNewGame(gameProp, component)
 
 	symbolCollection2Data.SymbolCodes = nil
 }
 
 // OnNewStep -
-func (symbolCollection2Data *SymbolCollection2Data) OnNewStep() {
-	symbolCollection2Data.BasicComponentData.OnNewStep()
+func (symbolCollection2Data *SymbolCollection2Data) OnNewStep(gameProp *GameProperty, component IComponent) {
+	symbolCollection2Data.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData
@@ -184,6 +184,7 @@ func (symbolCollection2 *SymbolCollection2) ForeachSymbols(gameProp *GamePropert
 			for _, cc := range symbolCollection2.Config.Children {
 
 			}
+
 			componentNum := 0
 			for {
 				next, err := gameProp.ProcEachSymbol(curComponentName, curpr, gp, plugin, ps, stake, prs, i, curs)

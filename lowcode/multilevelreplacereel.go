@@ -23,15 +23,15 @@ type MultiLevelReplaceReelData struct {
 }
 
 // OnNewGame -
-func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewGame() {
-	multiLevelReplaceReelData.BasicComponentData.OnNewGame()
+func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	multiLevelReplaceReelData.BasicComponentData.OnNewGame(gameProp, component)
 
 	multiLevelReplaceReelData.CurLevel = 0
 }
 
 // OnNewStep -
-func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewStep() {
-	multiLevelReplaceReelData.BasicComponentData.OnNewStep()
+func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	multiLevelReplaceReelData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData
@@ -146,30 +146,30 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewStep(gameProp *GameProp
 
 // playgame
 func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	multiLevelReplaceReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
+	mcd := cd.(*MultiLevelReplaceReelData)
 
-	if multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels != nil {
-		gs := multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
+	if multiLevelReplaceReel.Config.Levels[mcd.CurLevel].SymbolCodeReels != nil {
+		gs := multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &mcd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
 
 		// sc := gs.Clone()
 		sc := gs.CloneEx(gameProp.PoolScene)
 
-		for x, reel := range multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels {
+		for x, reel := range multiLevelReplaceReel.Config.Levels[mcd.CurLevel].SymbolCodeReels {
 			copy(sc.Arr[x], reel)
 			// for y, s := range reel {
 			// 	sc.Arr[x][y] = s
 			// }
 		}
 
-		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
+		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &mcd.BasicComponentData)
 	} else {
-		multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
+		multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &mcd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
 
-		multiLevelReplaceReel.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
+		multiLevelReplaceReel.ReTagScene(gameProp, curpr, mcd.TargetSceneIndex, &mcd.BasicComponentData)
 	}
 
 	multiLevelReplaceReel.onStepEnd(gameProp, curpr, gp, "")
@@ -180,12 +180,12 @@ func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GamePro
 }
 
 // OnAsciiGame - outpur to asciigame
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (multiLevelReplaceReel *MultiLevelReplaceReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
+	mcd := cd.(*MultiLevelReplaceReelData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after replaceReel symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(mcd.UsedScenes) > 0 {
+		asciigame.OutputScene("after replaceReel symbols", pr.Scenes[mcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

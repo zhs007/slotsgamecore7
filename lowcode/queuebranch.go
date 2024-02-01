@@ -29,13 +29,13 @@ type QueueBranchData struct {
 }
 
 // OnNewGame -
-func (queueBranchData *QueueBranchData) OnNewGame() {
-	queueBranchData.BasicComponentData.OnNewGame()
+func (queueBranchData *QueueBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	queueBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (queueBranchData *QueueBranchData) OnNewStep() {
-	queueBranchData.BasicComponentData.OnNewStep()
+func (queueBranchData *QueueBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	queueBranchData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData

@@ -88,13 +88,13 @@ type SymbolTriggerData struct {
 }
 
 // OnNewGame -
-func (symbolTriggerData *SymbolTriggerData) OnNewGame() {
-	symbolTriggerData.BasicComponentData.OnNewGame()
+func (symbolTriggerData *SymbolTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	symbolTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (symbolTriggerData *SymbolTriggerData) OnNewStep() {
-	symbolTriggerData.BasicComponentData.OnNewStep()
+func (symbolTriggerData *SymbolTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	symbolTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	symbolTriggerData.NextComponent = ""
 	symbolTriggerData.SymbolNum = 0

@@ -23,15 +23,15 @@ type MultiWeightAwardsData struct {
 }
 
 // OnNewGame -
-func (multiWeightAwardsData *MultiWeightAwardsData) OnNewGame() {
-	multiWeightAwardsData.BasicComponentData.OnNewGame()
+func (multiWeightAwardsData *MultiWeightAwardsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	multiWeightAwardsData.BasicComponentData.OnNewGame(gameProp, component)
 
 	multiWeightAwardsData.HasGot = nil
 }
 
 // OnNewStep -
-func (multiWeightAwardsData *MultiWeightAwardsData) OnNewStep() {
-	multiWeightAwardsData.BasicComponentData.OnNewStep()
+func (multiWeightAwardsData *MultiWeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	multiWeightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData
@@ -139,11 +139,11 @@ func (multiWeightAwards *MultiWeightAwards) buildMask(plugin sgc7plugin.IPlugin,
 
 // playgame
 func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	multiWeightAwards.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	mwad := gameProp.MapComponentData[multiWeightAwards.Name].(*MultiWeightAwardsData)
+	mwad := cd.(*MultiWeightAwardsData)
 
 	mwad.HasGot = nil
 
@@ -220,11 +220,11 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 }
 
 // OnAsciiGame - outpur to asciigame
-func (multiWeightAwards *MultiWeightAwards) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[multiWeightAwards.Name].(*MultiWeightAwardsData)
+func (multiWeightAwards *MultiWeightAwards) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	mcd := cd.(*MultiWeightAwardsData)
 
-	if len(cd.HasGot) > 0 {
-		fmt.Printf("MultiWeightAwards result is %v\n", cd.HasGot)
+	if len(mcd.HasGot) > 0 {
+		fmt.Printf("MultiWeightAwards result is %v\n", mcd.HasGot)
 	}
 
 	return nil

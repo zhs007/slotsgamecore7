@@ -25,15 +25,15 @@ type MultiLevelMysteryData struct {
 }
 
 // OnNewGame -
-func (multiLevelMysteryData *MultiLevelMysteryData) OnNewGame() {
-	multiLevelMysteryData.BasicComponentData.OnNewGame()
+func (multiLevelMysteryData *MultiLevelMysteryData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	multiLevelMysteryData.BasicComponentData.OnNewGame(gameProp, component)
 
 	multiLevelMysteryData.CurLevel = 0
 }
 
 // OnNewStep -
-func (multiLevelMysteryData *MultiLevelMysteryData) OnNewStep() {
-	multiLevelMysteryData.BasicComponentData.OnNewStep()
+func (multiLevelMysteryData *MultiLevelMysteryData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	multiLevelMysteryData.BasicComponentData.OnNewStep(gameProp, component)
 
 	multiLevelMysteryData.CurMysteryCode = -1
 }
@@ -186,16 +186,16 @@ func (multiLevelMystery *MultiLevelMystery) OnNewStep(gameProp *GameProperty) er
 
 // playgame
 func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	multiLevelMystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
+	mlmcd := cd.(*MultiLevelMysteryData)
 
-	gs := multiLevelMystery.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, multiLevelMystery.Name, "", 0)
+	gs := multiLevelMystery.GetTargetScene3(gameProp, curpr, prs, &mlmcd.BasicComponentData, multiLevelMystery.Name, "", 0)
 
 	if gs.HasSymbols(multiLevelMystery.MysterySymbols) {
-		curm, err := multiLevelMystery.LevelMysteryWeights[cd.CurLevel].RandVal(plugin)
+		curm, err := multiLevelMystery.LevelMysteryWeights[mlmcd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelMystery.OnPlayGame:RandVal",
 				zap.Error(err))
@@ -204,7 +204,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 		}
 
 		curmcode := curm.Int()
-		cd.CurMysteryCode = curmcode
+		mlmcd.CurMysteryCode = curmcode
 
 		// gameProp.SetVal(GamePropCurMystery, curm.Int())
 
@@ -214,7 +214,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 			sc2.ReplaceSymbol(v, curm.Int())
 		}
 
-		multiLevelMystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+		multiLevelMystery.AddScene(gameProp, curpr, sc2, &mlmcd.BasicComponentData)
 
 		v, isok := multiLevelMystery.MapMysteryTriggerFeature[curmcode]
 		if isok {
@@ -227,7 +227,7 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 			}
 		}
 	} else {
-		multiLevelMystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
+		multiLevelMystery.ReTagScene(gameProp, curpr, mlmcd.TargetSceneIndex, &mlmcd.BasicComponentData)
 	}
 
 	multiLevelMystery.onStepEnd(gameProp, curpr, gp, "")
@@ -239,13 +239,13 @@ func (multiLevelMystery *MultiLevelMystery) OnPlayGame(gameProp *GameProperty, c
 }
 
 // OnAsciiGame - outpur to asciigame
-func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (multiLevelMystery *MultiLevelMystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[multiLevelMystery.Name].(*MultiLevelMysteryData)
+	mlmcd := cd.(*MultiLevelMysteryData)
 
-	if len(cd.UsedScenes) > 0 {
-		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(cd.CurMysteryCode))
-		asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(mlmcd.UsedScenes) > 0 {
+		fmt.Printf("mystery is %v\n", gameProp.GetStrVal(mlmcd.CurMysteryCode))
+		asciigame.OutputScene("after symbols", pr.Scenes[mlmcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

@@ -34,13 +34,13 @@ type WaysTriggerData struct {
 }
 
 // OnNewGame -
-func (waysTriggerData *WaysTriggerData) OnNewGame() {
-	waysTriggerData.BasicComponentData.OnNewGame()
+func (waysTriggerData *WaysTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	waysTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (waysTriggerData *WaysTriggerData) OnNewStep() {
-	waysTriggerData.BasicComponentData.OnNewStep()
+func (waysTriggerData *WaysTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	waysTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	waysTriggerData.NextComponent = ""
 	waysTriggerData.SymbolNum = 0

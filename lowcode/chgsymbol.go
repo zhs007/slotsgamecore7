@@ -74,13 +74,13 @@ func (chgSymbol *ChgSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	chgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[chgSymbol.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs := chgSymbol.GetTargetScene3(gameProp, curpr, prs, cd, chgSymbol.Name, "", 0)
+	gs := chgSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, chgSymbol.Name, "", 0)
 
 	cgs := gs.CloneEx(gameProp.PoolScene)
 	// cgs := gs.Clone()
@@ -89,7 +89,7 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		cgs.Arr[v.X][v.Y] = v.SymbolCode
 	}
 
-	chgSymbol.AddScene(gameProp, curpr, cgs, cd)
+	chgSymbol.AddScene(gameProp, curpr, cgs, bcd)
 
 	chgSymbol.onStepEnd(gameProp, curpr, gp, "")
 
@@ -100,12 +100,12 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 }
 
 // OnAsciiGame - outpur to asciigame
-func (chgSymbol *ChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (chgSymbol *ChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[chgSymbol.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("The value of the symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("The value of the symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

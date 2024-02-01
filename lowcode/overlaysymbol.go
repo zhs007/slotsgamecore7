@@ -23,15 +23,15 @@ type OverlaySymbolData struct {
 }
 
 // OnNewGame -
-func (overlaySymbolData *OverlaySymbolData) OnNewGame() {
-	overlaySymbolData.BasicComponentData.OnNewGame()
+func (overlaySymbolData *OverlaySymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	overlaySymbolData.BasicComponentData.OnNewGame(gameProp, component)
 
 	overlaySymbolData.CurLevel = 0
 }
 
 // OnNewStep -
-func (overlaySymbolData *OverlaySymbolData) OnNewStep() {
-	overlaySymbolData.BasicComponentData.OnNewStep()
+func (overlaySymbolData *OverlaySymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	overlaySymbolData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData

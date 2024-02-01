@@ -56,8 +56,8 @@ type MaskData struct {
 }
 
 // OnNewGame -
-func (maskData *MaskData) OnNewGame() {
-	maskData.BasicComponentData.OnNewGame()
+func (maskData *MaskData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	maskData.BasicComponentData.OnNewGame(gameProp, component)
 
 	maskData.Vals = make([]bool, maskData.Num)
 	maskData.NewVals = make([]bool, maskData.Num)
@@ -65,8 +65,8 @@ func (maskData *MaskData) OnNewGame() {
 }
 
 // OnNewStep -
-func (maskData *MaskData) OnNewStep() {
-	maskData.BasicComponentData.OnNewStep()
+func (maskData *MaskData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	maskData.BasicComponentData.OnNewStep(gameProp, component)
 
 	if maskData.NewChged > 0 {
 		maskData.NewVals = make([]bool, maskData.Num)
@@ -249,7 +249,7 @@ func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cu
 
 // playgame
 func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -263,14 +263,14 @@ func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 }
 
 // OnAsciiGame - outpur to asciigame
-func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+	mcd := cd.(*MaskData)
 
-	if cd.NewChged <= 0 {
-		fmt.Printf("%v dose not collect new value, the mask value is %v\n", mask.Name, cd.Vals)
+	if mcd.NewChged <= 0 {
+		fmt.Printf("%v dose not collect new value, the mask value is %v\n", mask.Name, mcd.Vals)
 	} else {
-		fmt.Printf("%v collect %v. the mask value is %v\n", mask.Name, cd.NewChged, cd.Vals)
+		fmt.Printf("%v collect %v. the mask value is %v\n", mask.Name, mcd.NewChged, mcd.Vals)
 	}
 
 	return nil
@@ -343,32 +343,32 @@ func (mask *Mask) NewComponentData() IComponentData {
 func (mask *Mask) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
 }
 
-// OnPlayGame - on playgame
-func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+// // OnPlayGame - on playgame
+// func (mask *Mask) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+// 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
-	// 因为respin一定在最前面触发，所以可以在这里判断是否结束
-	if mask.Config.EndingSPAward != "" {
-		icd := gameProp.MapComponentData[mask.Config.EndingSPAward]
-		if icd != nil {
-			cd := icd.(*RespinData)
-			if cd.LastRespinNum == 0 {
-				md := gameProp.MapComponentData[mask.Name].(*MaskData)
+// 	// 因为respin一定在最前面触发，所以可以在这里判断是否结束
+// 	if mask.Config.EndingSPAward != "" {
+// 		icd := gameProp.MapComponentData[mask.Config.EndingSPAward]
+// 		if icd != nil {
+// 			cd := icd.(*RespinData)
+// 			if cd.LastRespinNum == 0 {
+// 				md := gameProp.MapComponentData[mask.Name].(*MaskData)
 
-				fullAward := mask.Config.MapSPMaskAwards[-1]
-				if fullAward != nil {
-					if md.IsFull() {
-						for _, v := range fullAward {
-							gameProp.procAward(plugin, v, curpr, gp, false)
-						}
-					}
-				}
-			}
-		}
-	}
+// 				fullAward := mask.Config.MapSPMaskAwards[-1]
+// 				if fullAward != nil {
+// 					if md.IsFull() {
+// 						for _, v := range fullAward {
+// 							gameProp.procAward(plugin, v, curpr, gp, false)
+// 						}
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // IsMask -
 func (mask *Mask) IsMask() bool {
@@ -376,23 +376,23 @@ func (mask *Mask) IsMask() bool {
 }
 
 // SetMaskVal -
-func (mask *Mask) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, index int, val bool) error {
+func (mask *Mask) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, val bool) error {
 	// if mask.MaskType == MaskTypeSymbolInReel {
-	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+	mcd := cd.(*MaskData)
 
-	mask.ChgMask(plugin, gameProp, cd, curpr, gp, index, val, mask.Config.EndingSPAward != "")
+	mask.ChgMask(plugin, gameProp, mcd, curpr, gp, index, val, mask.Config.EndingSPAward != "")
 	// }
 
 	return nil
 }
 
 // SetMask -
-func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, arrMask []bool) error {
+func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, arrMask []bool) error {
 	// if mask.MaskType == MaskTypeSymbolInReel {
-	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+	mcd := cd.(*MaskData)
 
 	for x, v := range arrMask {
-		mask.ChgMask(plugin, gameProp, cd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
+		mask.ChgMask(plugin, gameProp, mcd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
 	}
 	// }
 
@@ -400,13 +400,13 @@ func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cur
 }
 
 // SetMaskOnlyTrue -
-func (mask *Mask) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, arrMask []bool) error {
+func (mask *Mask) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, arrMask []bool) error {
 	// if mask.MaskType == MaskTypeSymbolInReel {
-	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+	mcd := cd.(*MaskData)
 
 	for x, v := range arrMask {
 		if v {
-			mask.ChgMask(plugin, gameProp, cd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
+			mask.ChgMask(plugin, gameProp, mcd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
 		}
 	}
 	// }
@@ -415,10 +415,10 @@ func (mask *Mask) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GamePrope
 }
 
 // GetMask -
-func (mask *Mask) GetMask(gameProp *GameProperty) []bool {
-	cd := gameProp.MapComponentData[mask.Name].(*MaskData)
+func (mask *Mask) GetMask(gameProp *GameProperty, cd IComponentData) []bool {
+	mcd := cd.(*MaskData)
 
-	return cd.Vals
+	return mcd.Vals
 }
 
 func NewMask(name string) IComponent {

@@ -77,7 +77,7 @@ func (maskBranch *MaskBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	maskBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -111,7 +111,7 @@ func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 }
 
 // OnAsciiGame - outpur to asciigame
-func (maskBranch *MaskBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (maskBranch *MaskBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 	maskdata, err := gameProp.Pool.GetMask(maskBranch.Config.Mask, gameProp)
 	if err != nil {
 		goutils.Error("MaskBranch.OnPlayGame:GetMask",

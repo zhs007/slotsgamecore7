@@ -24,13 +24,13 @@ type ReelSetMysteryData struct {
 }
 
 // OnNewGame -
-func (reelSetMysteryData *ReelSetMysteryData) OnNewGame() {
-	reelSetMysteryData.BasicComponentData.OnNewGame()
+func (reelSetMysteryData *ReelSetMysteryData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	reelSetMysteryData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (reelSetMysteryData *ReelSetMysteryData) OnNewStep() {
-	reelSetMysteryData.BasicComponentData.OnNewStep()
+func (reelSetMysteryData *ReelSetMysteryData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	reelSetMysteryData.BasicComponentData.OnNewStep(gameProp, component)
 
 	reelSetMysteryData.CurMysteryCode = -1
 }

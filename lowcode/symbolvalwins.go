@@ -30,13 +30,13 @@ type SymbolValWinsData struct {
 }
 
 // OnNewGame -
-func (symbolValWinsData *SymbolValWinsData) OnNewGame() {
-	symbolValWinsData.BasicComponentData.OnNewGame()
+func (symbolValWinsData *SymbolValWinsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	symbolValWinsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (symbolValWinsData *SymbolValWinsData) OnNewStep() {
-	symbolValWinsData.BasicComponentData.OnNewStep()
+func (symbolValWinsData *SymbolValWinsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	symbolValWinsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	// symbolValWinsData.SymbolNum = 0
 	// symbolValWinsData.Wins = 0

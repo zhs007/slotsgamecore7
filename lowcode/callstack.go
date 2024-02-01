@@ -1,11 +1,16 @@
 package lowcode
 
+import (
+	"github.com/zhs007/goutils"
+	"go.uber.org/zap"
+)
+
 // 关于 onNewGame 和 onNewStep
 // 1. callstack不会跨game的保留数据，所以每次新游戏，callstack都会是一个空的
 // 2. callstack只会保留主调用堆栈的数据，且当componentData第一次被获取时，执行OnNewStep
 
-// FuncOnEachHistoryComponent - if return false then break
-type FuncOnEachHistoryComponent func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) bool
+// FuncOnEachHistoryComponent -
+type FuncOnEachHistoryComponent func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error
 
 type callStackNode struct {
 	Name             string
@@ -77,10 +82,20 @@ func (cs *CallStack) OnNewStep() {
 	cs.nodes[0].OnNewStep()
 }
 
-func (cs *CallStack) Each(gameProp *GameProperty, onEach FuncOnEachHistoryComponent) {
-	for _, node := range cs.historyNodes {
-		onEach(node.tag, gameProp, node.component, node.cd)
+func (cs *CallStack) Each(gameProp *GameProperty, onEach FuncOnEachHistoryComponent) error {
+	for i, node := range cs.historyNodes {
+		err := onEach(node.tag, gameProp, node.component, node.cd)
+		if err != nil {
+			goutils.Error("CallStack.Each",
+				zap.Int("i", i),
+				zap.String("tag", node.tag),
+				zap.Error(err))
+
+			return err
+		}
 	}
+
+	return nil
 }
 
 func (cs *CallStack) genTag(component IComponent) string {

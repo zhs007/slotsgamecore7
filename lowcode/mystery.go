@@ -24,13 +24,13 @@ type MysteryData struct {
 }
 
 // OnNewGame -
-func (mysteryData *MysteryData) OnNewGame() {
-	mysteryData.BasicComponentData.OnNewGame()
+func (mysteryData *MysteryData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	mysteryData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (mysteryData *MysteryData) OnNewStep() {
-	mysteryData.BasicComponentData.OnNewStep()
+func (mysteryData *MysteryData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	mysteryData.BasicComponentData.OnNewStep(gameProp, component)
 
 	mysteryData.CurMysteryCode = -1
 }
@@ -151,15 +151,15 @@ func (mystery *Mystery) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	mystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
+	mcd := cd.(*MysteryData)
 
-	gs := mystery.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, mystery.Name, "", 0)
+	gs := mystery.GetTargetScene3(gameProp, curpr, prs, &mcd.BasicComponentData, mystery.Name, "", 0)
 	if !gs.HasSymbols(mystery.MysterySymbols) {
-		mystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
+		mystery.ReTagScene(gameProp, curpr, mcd.TargetSceneIndex, &mcd.BasicComponentData)
 	} else {
 		if mystery.MysteryWeights != nil {
 			if mystery.Config.MysteryRNG != "" {
@@ -167,7 +167,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 				cs := mystery.MysteryWeights.Vals[rng]
 
 				curmcode := cs.Int()
-				cd.CurMysteryCode = curmcode
+				mcd.CurMysteryCode = curmcode
 
 				// gameProp.SetVal(GamePropCurMystery, curmcode)
 
@@ -177,7 +177,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 					sc2.ReplaceSymbol(v, curmcode)
 				}
 
-				mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+				mystery.AddScene(gameProp, curpr, sc2, &mcd.BasicComponentData)
 
 				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 				if isok {
@@ -208,7 +208,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 					sc2.ReplaceSymbol(v, curm.Int())
 				}
 
-				mystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+				mystery.AddScene(gameProp, curpr, sc2, &mcd.BasicComponentData)
 
 				v, isok := mystery.MapMysteryTriggerFeature[curmcode]
 				if isok {
@@ -232,13 +232,13 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 }
 
 // OnAsciiGame - outpur to asciigame
-func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[mystery.Name].(*MysteryData)
+func (mystery *Mystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	mcd := cd.(*MysteryData)
 
-	if len(cd.UsedScenes) > 0 {
+	if len(mcd.UsedScenes) > 0 {
 		if mystery.MysteryWeights != nil {
-			fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(cd.CurMysteryCode))
-			asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+			fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(mcd.CurMysteryCode))
+			asciigame.OutputScene("after symbols", pr.Scenes[mcd.UsedScenes[0]], mapSymbolColor)
 		}
 	}
 

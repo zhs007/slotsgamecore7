@@ -23,15 +23,15 @@ type MultiLevelReelsData struct {
 }
 
 // OnNewGame -
-func (multiLevelReelsData *MultiLevelReelsData) OnNewGame() {
-	multiLevelReelsData.BasicComponentData.OnNewGame()
+func (multiLevelReelsData *MultiLevelReelsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	multiLevelReelsData.BasicComponentData.OnNewGame(gameProp, component)
 
 	multiLevelReelsData.CurLevel = 0
 }
 
 // OnNewStep -
-func (multiLevelReelsData *MultiLevelReelsData) OnNewStep() {
-	multiLevelReelsData.BasicComponentData.OnNewStep()
+func (multiLevelReelsData *MultiLevelReelsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	multiLevelReelsData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData
@@ -156,18 +156,18 @@ func (multiLevelReels *MultiLevelReels) OnNewStep(gameProp *GameProperty) error 
 
 // playgame
 func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	multiLevelReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
+	mlrcd := cd.(*MultiLevelReelsData)
 
 	reelname := ""
 	if multiLevelReels.LevelReelSetWeights != nil {
-		val, err := multiLevelReels.LevelReelSetWeights[cd.CurLevel].RandVal(plugin)
+		val, err := multiLevelReels.LevelReelSetWeights[mlrcd.CurLevel].RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiLevelReels.OnPlayGame:ReelSetWeights.RandVal",
-				zap.Int("curLevel", cd.CurLevel),
+				zap.Int("curLevel", mlrcd.CurLevel),
 				zap.Error(err))
 
 			return err
@@ -179,7 +179,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		rd, isok := gameProp.Pool.Config.MapReels[curreels]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
-				zap.Int("curLevel", cd.CurLevel),
+				zap.Int("curLevel", mlrcd.CurLevel),
 				zap.String("reelset", val.String()),
 				zap.Error(ErrInvalidReels))
 
@@ -189,20 +189,20 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 		gameProp.CurReels = rd
 		reelname = curreels
 	} else {
-		rd, isok := gameProp.Pool.Config.MapReels[multiLevelReels.Config.Levels[cd.CurLevel].Reel]
+		rd, isok := gameProp.Pool.Config.MapReels[multiLevelReels.Config.Levels[mlrcd.CurLevel].Reel]
 		if !isok {
 			goutils.Error("MultiLevelReels.OnPlayGame:MapReels",
-				zap.Int("curLevel", cd.CurLevel),
-				zap.String("reelset", multiLevelReels.Config.Levels[cd.CurLevel].Reel),
+				zap.Int("curLevel", mlrcd.CurLevel),
+				zap.String("reelset", multiLevelReels.Config.Levels[mlrcd.CurLevel].Reel),
 				zap.Error(ErrInvalidReels))
 
 			return ErrInvalidReels
 		}
 
-		gameProp.TagStr(TagCurReels, multiLevelReels.Config.Levels[cd.CurLevel].Reel)
+		gameProp.TagStr(TagCurReels, multiLevelReels.Config.Levels[mlrcd.CurLevel].Reel)
 
 		gameProp.CurReels = rd
-		reelname = multiLevelReels.Config.Levels[cd.CurLevel].Reel
+		reelname = multiLevelReels.Config.Levels[mlrcd.CurLevel].Reel
 	}
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
@@ -217,7 +217,7 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 
 	sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 
-	multiLevelReels.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
+	multiLevelReels.AddScene(gameProp, curpr, sc, &mlrcd.BasicComponentData)
 
 	multiLevelReels.onStepEnd(gameProp, curpr, gp, "")
 
@@ -228,12 +228,12 @@ func (multiLevelReels *MultiLevelReels) OnPlayGame(gameProp *GameProperty, curpr
 }
 
 // OnAsciiGame - outpur to asciigame
-func (multiLevelReels *MultiLevelReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (multiLevelReels *MultiLevelReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[multiLevelReels.Name].(*MultiLevelReelsData)
+	mlrcd := cd.(*MultiLevelReelsData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("initial symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(mlrcd.UsedScenes) > 0 {
+		asciigame.OutputScene("initial symbols", pr.Scenes[mlrcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

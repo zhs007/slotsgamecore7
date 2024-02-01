@@ -29,13 +29,13 @@ type RollSymbolData struct {
 }
 
 // OnNewGame -
-func (rollSymbolData *RollSymbolData) OnNewGame() {
-	rollSymbolData.BasicComponentData.OnNewGame()
+func (rollSymbolData *RollSymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	rollSymbolData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (rollSymbolData *RollSymbolData) OnNewStep() {
-	rollSymbolData.BasicComponentData.OnNewStep()
+func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData

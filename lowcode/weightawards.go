@@ -23,15 +23,15 @@ type WeightAwardsData struct {
 }
 
 // OnNewGame -
-func (weightAwardsData *WeightAwardsData) OnNewGame() {
-	weightAwardsData.BasicComponentData.OnNewGame()
+func (weightAwardsData *WeightAwardsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	weightAwardsData.BasicComponentData.OnNewGame(gameProp, component)
 
 	weightAwardsData.GotIndex = nil
 }
 
 // OnNewStep -
-func (weightAwardsData *WeightAwardsData) OnNewStep() {
-	weightAwardsData.BasicComponentData.OnNewStep()
+func (weightAwardsData *WeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	weightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData

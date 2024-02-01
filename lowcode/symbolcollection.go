@@ -24,15 +24,15 @@ type SymbolCollectionData struct {
 }
 
 // OnNewGame -
-func (symbolCollectionData *SymbolCollectionData) OnNewGame() {
-	symbolCollectionData.BasicComponentData.OnNewGame()
+func (symbolCollectionData *SymbolCollectionData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	symbolCollectionData.BasicComponentData.OnNewGame(gameProp, component)
 
 	symbolCollectionData.SymbolCodes = nil
 }
 
 // OnNewStep -
-func (symbolCollectionData *SymbolCollectionData) OnNewStep() {
-	symbolCollectionData.BasicComponentData.OnNewStep()
+func (symbolCollectionData *SymbolCollectionData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	symbolCollectionData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData

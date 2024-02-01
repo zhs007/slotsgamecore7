@@ -27,13 +27,13 @@ type WeightBranchData struct {
 }
 
 // OnNewGame -
-func (weightBranchData *WeightBranchData) OnNewGame() {
-	weightBranchData.BasicComponentData.OnNewGame()
+func (weightBranchData *WeightBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	weightBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (weightBranchData *WeightBranchData) OnNewStep() {
-	weightBranchData.BasicComponentData.OnNewStep()
+func (weightBranchData *WeightBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	weightBranchData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData

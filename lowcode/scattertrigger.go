@@ -34,13 +34,13 @@ type ScatterTriggerData struct {
 }
 
 // OnNewGame -
-func (scatterTriggerData *ScatterTriggerData) OnNewGame() {
-	scatterTriggerData.BasicComponentData.OnNewGame()
+func (scatterTriggerData *ScatterTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	scatterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (scatterTriggerData *ScatterTriggerData) OnNewStep() {
-	scatterTriggerData.BasicComponentData.OnNewStep()
+func (scatterTriggerData *ScatterTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	scatterTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	scatterTriggerData.NextComponent = ""
 	scatterTriggerData.SymbolNum = 0
