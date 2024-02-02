@@ -780,11 +780,11 @@ func (symbolTrigger *SymbolTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret
 
 // playgame
 func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	symbolTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
+	std := icd.(*SymbolTriggerData)
 
 	gs := symbolTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, symbolTrigger.Name, "", 0)
 
@@ -923,9 +923,9 @@ func (symbolTrigger *SymbolTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolTrigger *SymbolTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (symbolTrigger *SymbolTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	std := gameProp.MapComponentData[symbolTrigger.Name].(*SymbolTriggerData)
+	std := icd.(*SymbolTriggerData)
 
 	if std.NextComponent != "" {
 		fmt.Printf("%v triggered, jump to %v \n", symbolTrigger.Name, std.NextComponent)

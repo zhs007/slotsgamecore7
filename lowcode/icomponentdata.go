@@ -30,4 +30,34 @@ type IComponentData interface {
 	ChgConfigIntVal(key string, off int)
 	// GetResults -
 	GetResults() []int
+
+	//----------------------------
+	// SymbolCollection
+
+	// GetSymbols -
+	GetSymbols() []int
+	// AddSymbol -
+	AddSymbol(symbolCode int)
+
+	//----------------------------
+	// Respin
+
+	// GetLastRespinNum -
+	GetLastRespinNum() int
+	// IsRespinEnding -
+	IsRespinEnding() bool
+	// IsRespinStarted -
+	IsRespinStarted() bool
+	// AddRetriggerRespinNum -
+	AddRetriggerRespinNum(num int)
+	// AddTriggerRespinAward -
+	AddTriggerRespinAward(award *Award)
+	// AddRespinTimes -
+	AddRespinTimes(num int)
+
+	//----------------------------
+	// Mask
+
+	// GetMask -
+	GetMask() []bool
 }

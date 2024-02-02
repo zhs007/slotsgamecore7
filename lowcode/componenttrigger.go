@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 这个组件只会检查当前调用堆栈里是否有组件运行过
+
 const ComponentTriggerTypeName = "componentTrigger"
 
 // ComponentTriggerConfig - configuration for ComponentTrigger
@@ -70,7 +72,7 @@ func (componentTrigger *ComponentTrigger) OnPlayGame(gameProp *GameProperty, cur
 
 	isTrigger := false
 	for _, cn := range componentTrigger.Config.CheckRunComponents {
-		if gameProp.InHistoryComponents(cn) {
+		if gameProp.IsInCurCallStack(cn) {
 			isTrigger = true
 			break
 		}

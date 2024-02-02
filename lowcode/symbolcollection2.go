@@ -28,7 +28,11 @@ type SymbolCollection2Data struct {
 func (symbolCollection2Data *SymbolCollection2Data) OnNewGame(gameProp *GameProperty, component IComponent) {
 	symbolCollection2Data.BasicComponentData.OnNewGame(gameProp, component)
 
+	symbolCollection2 := component.(*SymbolCollection2)
+
 	symbolCollection2Data.SymbolCodes = nil
+
+	symbolCollection2Data.SymbolCodes = append(symbolCollection2Data.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
 }
 
 // OnNewStep -
@@ -47,6 +51,16 @@ func (symbolCollection2Data *SymbolCollection2Data) BuildPBComponentData() proto
 	}
 
 	return pbcd
+}
+
+// GetSymbols -
+func (symbolCollection2Data *SymbolCollection2Data) GetSymbols() []int {
+	return symbolCollection2Data.SymbolCodes
+}
+
+// AddSymbol -
+func (symbolCollection2Data *SymbolCollection2Data) AddSymbol(symbolCode int) {
+	symbolCollection2Data.SymbolCodes = append(symbolCollection2Data.SymbolCodes, symbolCode)
 }
 
 // SymbolCollection2Config - configuration for SymbolCollection2 feature
@@ -113,20 +127,20 @@ func (symbolCollection2 *SymbolCollection2) InitEx(cfg any, pool *GamePropertyPo
 	return nil
 }
 
-// OnNewGame -
-func (symbolCollection2 *SymbolCollection2) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+// // OnNewGame -
+// func (symbolCollection2 *SymbolCollection2) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	cd.SymbolCodes = append(cd.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
+// 	cd.SymbolCodes = append(cd.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
 
-	return nil
-}
+// 	return nil
+// }
 
 // playgame
 func (symbolCollection2 *SymbolCollection2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	symbolCollection2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -136,8 +150,10 @@ func (symbolCollection2 *SymbolCollection2) OnPlayGame(gameProp *GameProperty, c
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolCollection2 *SymbolCollection2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+func (symbolCollection2 *SymbolCollection2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult,
+	mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+
+	cd := icd.(*SymbolCollection2Data)
 
 	if len(cd.SymbolCodes) > 0 {
 		fmt.Printf("Symbols is %v\n", cd.SymbolCodes)
@@ -156,61 +172,61 @@ func (symbolCollection2 *SymbolCollection2) NewComponentData() IComponentData {
 	return &SymbolCollection2Data{}
 }
 
-// GetSymbols -
-func (symbolCollection2 *SymbolCollection2) GetSymbols(gameProp *GameProperty) []int {
-	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+// // GetSymbols -
+// func (symbolCollection2 *SymbolCollection2) GetSymbols(gameProp *GameProperty) []int {
+// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
 
-	return scd.SymbolCodes
-}
+// 	return scd.SymbolCodes
+// }
 
-// AddSymbol -
-func (symbolCollection2 *SymbolCollection2) AddSymbol(gameProp *GameProperty, symbolCode int) {
-	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+// // AddSymbol -
+// func (symbolCollection2 *SymbolCollection2) AddSymbol(gameProp *GameProperty, symbolCode int) {
+// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
 
-	if symbolCollection2.Config.MaxSymbolNum <= 0 || len(scd.SymbolCodes) < symbolCollection2.Config.MaxSymbolNum {
-		scd.SymbolCodes = append(scd.SymbolCodes, symbolCode)
-	}
-}
+// 	if symbolCollection2.Config.MaxSymbolNum <= 0 || len(scd.SymbolCodes) < symbolCollection2.Config.MaxSymbolNum {
+// 		scd.SymbolCodes = append(scd.SymbolCodes, symbolCode)
+// 	}
+// }
 
 // ForEachSymbols - foreach symbols
 func (symbolCollection2 *SymbolCollection2) ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
 	prs []*sgc7game.PlayResult) error {
 
-	if len(symbolCollection2.Config.Children) > 0 {
-		curComponentName := symbolCollection2.Config.ForeachComponent
-		scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
+	// if len(symbolCollection2.Config.Children) > 0 {
+	// 	curComponentName := symbolCollection2.Config.ForeachComponent
+	// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
 
-		for i, curs := range scd.SymbolCodes {
-			for _, cc := range symbolCollection2.Config.Children {
+	// 	for i, curs := range scd.SymbolCodes {
+	// 		for _, cc := range symbolCollection2.Config.Children {
 
-			}
+	// 		}
 
-			componentNum := 0
-			for {
-				next, err := gameProp.ProcEachSymbol(curComponentName, curpr, gp, plugin, ps, stake, prs, i, curs)
-				if err != nil {
-					if err == ErrComponentDoNothing {
-						if next == "" {
-							break
-						}
-					} else {
-						goutils.Error("SymbolCollection2.ForeachSymbols:ProcEachSymbol",
-							zap.Error(err))
+	// 		componentNum := 0
+	// 		for {
+	// 			next, err := gameProp.ProcEachSymbol(curComponentName, curpr, gp, plugin, ps, stake, prs, i, curs)
+	// 			if err != nil {
+	// 				if err == ErrComponentDoNothing {
+	// 					if next == "" {
+	// 						break
+	// 					}
+	// 				} else {
+	// 					goutils.Error("SymbolCollection2.ForeachSymbols:ProcEachSymbol",
+	// 						zap.Error(err))
 
-						return err
-					}
-				}
+	// 					return err
+	// 				}
+	// 			}
 
-				curComponentName = next
+	// 			curComponentName = next
 
-				componentNum++
+	// 			componentNum++
 
-				if componentNum > MaxComponentNumInStep {
-					break
-				}
-			}
-		}
-	}
+	// 			if componentNum > MaxComponentNumInStep {
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }

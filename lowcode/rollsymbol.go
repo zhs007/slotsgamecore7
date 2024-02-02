@@ -166,11 +166,11 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 
 // playgame
 func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	rollSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	rsd := gameProp.MapComponentData[rollSymbol.Name].(*RollSymbolData)
+	rsd := icd.(*RollSymbolData)
 
 	vw := rollSymbol.getValWeight(gameProp)
 	if vw == nil {
@@ -199,8 +199,8 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 }
 
 // OnAsciiGame - outpur to asciigame
-func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	rsd := gameProp.MapComponentData[rollSymbol.Name].(*RollSymbolData)
+func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	rsd := icd.(*RollSymbolData)
 
 	fmt.Printf("rollSymbol %v, got %v \n", rollSymbol.GetName(), gameProp.Pool.DefaultPaytables.GetStringFromInt(rsd.SymbolCode))
 

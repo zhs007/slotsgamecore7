@@ -124,15 +124,15 @@ func (reelSetMystery *ReelSetMystery) hasMystery(gs *sgc7game.GameScene) bool {
 
 // playgame
 func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	reelSetMystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[reelSetMystery.Name].(*ReelSetMysteryData)
+	bcd := cd.(*ReelSetMysteryData)
 
-	gs := reelSetMystery.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, reelSetMystery.Name, "", 0)
+	gs := reelSetMystery.GetTargetScene3(gameProp, curpr, prs, &bcd.BasicComponentData, reelSetMystery.Name, "", 0)
 	if !reelSetMystery.hasMystery(gs) {
-		reelSetMystery.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
+		reelSetMystery.ReTagScene(gameProp, curpr, bcd.TargetSceneIndex, &bcd.BasicComponentData)
 	} else {
 		vw2, isok := reelSetMystery.MapMysteryWeights[gameProp.GetTagStr(TagCurReels)]
 		if !isok {
@@ -148,7 +148,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 			cs := vw2.Vals[rng]
 
 			curmcode := cs.Int()
-			cd.CurMysteryCode = curmcode
+			bcd.CurMysteryCode = curmcode
 
 			// gameProp.SetVal(GamePropCurMystery, curmcode)
 
@@ -158,7 +158,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 				sc2.ReplaceSymbol(v, curmcode)
 			}
 
-			reelSetMystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+			reelSetMystery.AddScene(gameProp, curpr, sc2, &bcd.BasicComponentData)
 		} else {
 			curm, err := vw2.RandVal(plugin)
 			if err != nil {
@@ -169,7 +169,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 			}
 
 			curmcode := curm.Int()
-			cd.CurMysteryCode = curmcode
+			bcd.CurMysteryCode = curmcode
 
 			// gameProp.SetVal(GamePropCurMystery, curmcode)
 
@@ -179,7 +179,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 				sc2.ReplaceSymbol(v, curmcode)
 			}
 
-			reelSetMystery.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+			reelSetMystery.AddScene(gameProp, curpr, sc2, &bcd.BasicComponentData)
 		}
 	}
 
@@ -191,12 +191,12 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 }
 
 // OnAsciiGame - outpur to asciigame
-func (reelSetMystery *ReelSetMystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[reelSetMystery.Name].(*ReelSetMysteryData)
+func (reelSetMystery *ReelSetMystery) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*ReelSetMysteryData)
 
-	if len(cd.UsedScenes) > 0 {
-		fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(cd.CurMysteryCode))
-		asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		fmt.Printf("mystery is %v\n", gameProp.CurPaytables.GetStringFromInt(bcd.CurMysteryCode))
+		asciigame.OutputScene("after symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

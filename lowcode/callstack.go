@@ -9,6 +9,12 @@ import (
 // 1. callstack不会跨game的保留数据，所以每次新游戏，callstack都会是一个空的
 // 2. callstack只会保留主调用堆栈的数据，且当componentData第一次被获取时，执行OnNewStep
 
+// 关于 callstack 层级
+// 1. 至少有一个 global，所有component都会有一个global对象
+// 2. 可能会有 foreach 层，一个循环体，同时只会有一层（i = 0; i < 10;）这种，同时也只会有一层，这个 foreach 层，只会有当前子组件对象（只可能是连线对象）
+//  这些对象在一开始构造，其它的component对象在这一层是找不到的
+// 3. respin 不能出现在 foreach 层
+
 // FuncOnEachHistoryComponent -
 type FuncOnEachHistoryComponent func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error
 
@@ -16,6 +22,12 @@ type callStackNode struct {
 	Name             string
 	MapComponentData map[string]IComponentData
 	mapHistory       map[string]IComponentData
+}
+
+func (csn *callStackNode) IsInCallStack(componentName string) bool {
+	_, isok := csn.mapHistory[componentName]
+
+	return isok
 }
 
 func (csn *callStackNode) GetComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
@@ -62,8 +74,26 @@ type CallStack struct {
 	historyNodes []*callStackHistoryNode
 }
 
+// GetGlobalComponentData -
+func (cs *CallStack) GetGlobalComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
+	return cs.nodes[0].GetComponentData(gameProp, ic)
+}
+
 func (cs *CallStack) GetCurComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
 	return cs.nodes[len(cs.nodes)-1].GetComponentData(gameProp, ic)
+}
+
+func (cs *CallStack) GetComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
+	if len(cs.nodes) == 1 {
+		return cs.nodes[0].GetComponentData(gameProp, ic)
+	}
+
+	cd := cs.nodes[len(cs.nodes)-1].GetComponentData(gameProp, ic)
+	if cd == nil {
+		return cs.nodes[0].GetComponentData(gameProp, ic)
+	}
+
+	return cd
 }
 
 func (cs *CallStack) GetComponentNum() int {
@@ -125,6 +155,10 @@ func (cs *CallStack) ComponentDone(gameProp *GameProperty, component IComponent,
 		component: component,
 		cd:        cd,
 	})
+}
+
+func (cs *CallStack) IsInCurCallStack(componentName string) bool {
+	return cs.nodes[len(cs.nodes)-1].IsInCallStack(componentName)
 }
 
 func NewCallStack(name string) *CallStack {

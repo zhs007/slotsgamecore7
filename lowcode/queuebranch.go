@@ -121,11 +121,11 @@ func (queueBranch *QueueBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	queueBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	qbd := gameProp.MapComponentData[queueBranch.Name].(*QueueBranchData)
+	qbd := cd.(*QueueBranchData)
 
 	if qbd.Queue > 0 {
 		qbd.Queue--
@@ -139,8 +139,8 @@ func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 }
 
 // OnAsciiGame - outpur to asciigame
-func (queueBranch *QueueBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	qbd := gameProp.MapComponentData[queueBranch.Name].(*QueueBranchData)
+func (queueBranch *QueueBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	qbd := cd.(*QueueBranchData)
 
 	fmt.Printf("queueBranch %v, got %v\n", queueBranch.GetName(), qbd.Queue)
 

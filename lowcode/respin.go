@@ -77,6 +77,39 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
+// GetLastRespinNum -
+func (respinData *RespinData) GetLastRespinNum() int {
+	return respinData.LastRespinNum
+}
+
+// IsEnding -
+func (respinData *RespinData) IsRespinEnding() bool {
+	return respinData.LastRespinNum == 0 && respinData.LastTriggerNum == 0
+}
+
+// IsStarted -
+func (respinData *RespinData) IsRespinStarted() bool {
+	return respinData.CurRespinNum > 0
+}
+
+// AddRetriggerRespinNum -
+func (respinData *RespinData) AddRetriggerRespinNum(num int) {
+	respinData.RetriggerAddRespinNum += num
+}
+
+// AddTriggerRespinAward -
+func (respinData *RespinData) AddTriggerRespinAward(award *Award) {
+	award.TriggerIndex = respinData.CurTriggerNum + respinData.LastTriggerNum
+
+	respinData.Awards = append(respinData.Awards, award)
+}
+
+// AddRespinTimes -
+func (respinData *RespinData) AddRespinTimes(num int) {
+	respinData.LastRespinNum += num
+	respinData.CurAddRespinNum += num
+}
+
 // RespinLevelConfig - configuration for Respin Level
 type RespinLevelConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -126,13 +159,13 @@ func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData
 	return false
 }
 
-// OnPlayGame - on playgame
-func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) {
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+// // OnPlayGame - on playgame
+// func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) {
+// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	cd.LastRespinNum += num
-	cd.CurAddRespinNum += num
-}
+// 	cd.LastRespinNum += num
+// 	cd.CurAddRespinNum += num
+// }
 
 // Init -
 func (respin *Respin) Init(fn string, pool *GamePropertyPool) error {
@@ -171,11 +204,11 @@ func (respin *Respin) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	respin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+	cd := icd.(*RespinData)
 
 	if cd.CurRespinNum == 0 && cd.LastRespinNum == 0 && respin.Config.InitRespinNum > 0 {
 		cd.LastRespinNum = respin.Config.InitRespinNum
@@ -216,8 +249,8 @@ recheck:
 }
 
 // OnAsciiGame - outpur to asciigame
-func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	cd := icd.(*RespinData)
 
 	if cd.CurAddRespinNum > 0 {
 		fmt.Printf("%v last %v, current %v, retrigger %v\n", respin.Name, cd.LastRespinNum, cd.CurRespinNum, cd.CurAddRespinNum)
@@ -414,26 +447,26 @@ func (respin *Respin) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlu
 	}
 }
 
-// GetLastRespinNum -
-func (respin *Respin) GetLastRespinNum(gameProp *GameProperty) int {
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+// // GetLastRespinNum -
+// func (respin *Respin) GetLastRespinNum(gameProp *GameProperty) int {
+// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	return cd.LastRespinNum
-}
+// 	return cd.LastRespinNum
+// }
 
-// IsEnding -
-func (respin *Respin) IsEnding(gameProp *GameProperty) bool {
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+// // IsEnding -
+// func (respin *Respin) IsEnding(gameProp *GameProperty) bool {
+// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	return cd.LastRespinNum == 0 && cd.LastTriggerNum == 0
-}
+// 	return cd.LastRespinNum == 0 && cd.LastTriggerNum == 0
+// }
 
-// IsStarted -
-func (respin *Respin) IsStarted(gameProp *GameProperty) bool {
-	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+// // IsStarted -
+// func (respin *Respin) IsStarted(gameProp *GameProperty) bool {
+// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
 
-	return cd.CurRespinNum > 0
-}
+// 	return cd.CurRespinNum > 0
+// }
 
 // GetAllLinkComponents - get all link components
 func (respin *Respin) GetAllLinkComponents() []string {

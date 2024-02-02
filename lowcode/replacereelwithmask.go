@@ -84,11 +84,11 @@ func (replaceReelWithMask *ReplaceReelWithMask) InitEx(cfg any, pool *GameProper
 
 // playgame
 func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	replaceReelWithMask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[replaceReelWithMask.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := replaceReelWithMask.GetTargetScene3(gameProp, curpr, prs, cd, replaceReelWithMask.Name, "", 0)
 	ngs := gs
@@ -128,8 +128,8 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 }
 
 // OnAsciiGame - outpur to asciigame
-func (replaceReel *ReplaceReelWithMask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[replaceReel.Name].(*BasicComponentData)
+func (replaceReel *ReplaceReelWithMask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after replaceReelWithMask", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

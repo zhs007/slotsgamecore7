@@ -61,11 +61,11 @@ func (reRollReel *ReRollReel) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (reRollReel *ReRollReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	reRollReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[reRollReel.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := reRollReel.GetTargetScene3(gameProp, curpr, prs, cd, reRollReel.Name, "", 0)
 
@@ -81,8 +81,8 @@ func (reRollReel *ReRollReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 }
 
 // OnAsciiGame - outpur to asciigame
-func (reRollReel *ReRollReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[reRollReel.Name].(*BasicComponentData)
+func (reRollReel *ReRollReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after reRollReel", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

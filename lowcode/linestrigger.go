@@ -277,15 +277,15 @@ func (linesTrigger *LinesTrigger) procMask(gs *sgc7game.GameScene, gameProp *Gam
 	return nil
 }
 
-// CanTrigger -
-func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool, cd IComponentData) (bool, []*sgc7game.Result) {
-	std := cd.(*LinesTriggerData)
+// canTrigger -
+func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	// std := cd.(*LinesTriggerData)
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
 	if linesTrigger.Config.TriggerType == STTypeLines {
-		os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
+		// os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
 
 		if os != nil {
 			if linesTrigger.Config.CheckWinType != CheckWinTypeCount {
@@ -308,7 +308,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 						if ret != nil {
 							ret.LineIndex = i
 
-							gameProp.ProcMulti(ret)
+							// gameProp.ProcMulti(ret)
 
 							lst = append(lst, ret)
 						}
@@ -337,7 +337,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 						if ret != nil {
 							ret.LineIndex = i
 
-							gameProp.ProcMulti(ret)
+							// gameProp.ProcMulti(ret)
 
 							lst = append(lst, ret)
 
@@ -371,7 +371,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 						if ret != nil {
 							ret.LineIndex = i
 
-							gameProp.ProcMulti(ret)
+							// gameProp.ProcMulti(ret)
 
 							lst = append(lst, ret)
 
@@ -403,7 +403,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 						if ret != nil {
 							ret.LineIndex = i
 
-							gameProp.ProcMulti(ret)
+							// gameProp.ProcMulti(ret)
 
 							lst = append(lst, ret)
 						}
@@ -431,7 +431,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 						if ret != nil {
 							ret.LineIndex = i
 
-							gameProp.ProcMulti(ret)
+							// gameProp.ProcMulti(ret)
 
 							lst = append(lst, ret)
 
@@ -461,7 +461,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 						if ret != nil {
 							ret.LineIndex = i
 
-							gameProp.ProcMulti(ret)
+							// gameProp.ProcMulti(ret)
 
 							lst = append(lst, ret)
 
@@ -498,7 +498,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 					if ret != nil {
 						ret.LineIndex = i
 
-						gameProp.ProcMulti(ret)
+						// gameProp.ProcMulti(ret)
 
 						lst = append(lst, ret)
 					}
@@ -524,7 +524,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 					if ret != nil {
 						ret.LineIndex = i
 
-						gameProp.ProcMulti(ret)
+						// gameProp.ProcMulti(ret)
 
 						lst = append(lst, ret)
 
@@ -552,7 +552,7 @@ func (linesTrigger *LinesTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7gam
 					if ret != nil {
 						ret.LineIndex = i
 
-						gameProp.ProcMulti(ret)
+						// gameProp.ProcMulti(ret)
 
 						lst = append(lst, ret)
 
@@ -651,8 +651,9 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	std := cd.(*LinesTriggerData)
 
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, linesTrigger.Name, "", 0)
+	os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
 
-	isTrigger, lst := linesTrigger.CanTrigger(gameProp, gs, curpr, stake, !linesTrigger.Config.NeedDiscardResults, cd)
+	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
 		linesTrigger.procWins(std, lst)
@@ -877,6 +878,11 @@ func (linesTrigger *LinesTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 // GetAllLinkComponents - get all link components
 func (linesTrigger *LinesTrigger) GetAllLinkComponents() []string {
 	return []string{linesTrigger.Config.DefaultNextComponent, linesTrigger.Config.JumpToComponent}
+}
+
+// CanTriggerWithScene -
+func (linesTrigger *LinesTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	return linesTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
 }
 
 func NewLinesTrigger(name string) IComponent {

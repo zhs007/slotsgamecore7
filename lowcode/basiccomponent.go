@@ -135,6 +135,51 @@ func (basicComponentData *BasicComponentData) GetResults() []int {
 	return basicComponentData.UsedResults
 }
 
+// GetSymbols -
+func (basicComponentData *BasicComponentData) GetSymbols() []int {
+	return nil
+}
+
+// AddSymbol -
+func (basicComponentData *BasicComponentData) AddSymbol(symbolCode int) {
+
+}
+
+// GetLastRespinNum -
+func (basicComponentData *BasicComponentData) GetLastRespinNum() int {
+	return 0
+}
+
+// IsRespinEnding -
+func (basicComponentData *BasicComponentData) IsRespinEnding() bool {
+	return false
+}
+
+// IsRespinStarted -
+func (basicComponentData *BasicComponentData) IsRespinStarted() bool {
+	return false
+}
+
+// AddRetriggerRespinNum -
+func (basicComponentData *BasicComponentData) AddRetriggerRespinNum(num int) {
+
+}
+
+// AddTriggerRespinAward -
+func (basicComponentData *BasicComponentData) AddTriggerRespinAward(award *Award) {
+
+}
+
+// AddRespinTimes -
+func (basicComponentData *BasicComponentData) AddRespinTimes(num int) {
+
+}
+
+// GetMask -
+func (basicComponentData *BasicComponentData) GetMask() []bool {
+	return nil
+}
+
 // 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
 	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
@@ -542,15 +587,15 @@ func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.St
 
 // }
 
-// GetSymbols -
-func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
-	return nil
-}
+// // GetSymbols -
+// func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
+// 	return nil
+// }
 
-// AddSymbol -
-func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
+// // AddSymbol -
+// func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
 
-}
+// }
 
 // OnEachSymbol - on foreach symbol
 func (basicComponent *BasicComponent) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState,
@@ -588,6 +633,11 @@ func (basicComponent *BasicComponent) OnGameInited(components *ComponentList) er
 // GetAllLinkComponents - get all link components
 func (basicComponent *BasicComponent) GetAllLinkComponents() []string {
 	return []string{basicComponent.Config.DefaultNextComponent}
+}
+
+// CanTriggerWithScene -
+func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	return false, nil
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {

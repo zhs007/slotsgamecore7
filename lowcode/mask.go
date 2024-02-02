@@ -34,18 +34,18 @@ func boolArr2Int(vals []bool) int {
 	return iv
 }
 
-const (
-	MaskTypeNone         int = 0
-	MaskTypeSymbolInReel int = 1
-)
+// const (
+// 	MaskTypeNone         int = 0
+// 	MaskTypeSymbolInReel int = 1
+// )
 
-func parserMaskType(str string) int {
-	if str == "symbolInReel" {
-		return MaskTypeSymbolInReel
-	}
+// func parserMaskType(str string) int {
+// 	if str == "symbolInReel" {
+// 		return MaskTypeSymbolInReel
+// 	}
 
-	return MaskTypeNone
-}
+// 	return MaskTypeNone
+// }
 
 type MaskData struct {
 	BasicComponentData
@@ -100,6 +100,11 @@ func (maskData *MaskData) IsFull() bool {
 	return true
 }
 
+// GetMask -
+func (maskData *MaskData) GetMask() []bool {
+	return maskData.Vals
+}
+
 func newMaskData(num int) *MaskData {
 	return &MaskData{
 		Num:      num,
@@ -112,12 +117,12 @@ func newMaskData(num int) *MaskData {
 // MaskConfig - configuration for Mask
 type MaskConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	MaskType             string           `yaml:"maskType" json:"maskType"`
-	Symbol               string           `yaml:"symbol" json:"symbol"`
-	Num                  int              `yaml:"num" json:"num"`
-	PerMaskAwards        []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
-	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
-	EndingSPAward        string           `yaml:"endingSPAward" json:"endingSPAward"`
+	// MaskType             string           `yaml:"maskType" json:"maskType"`
+	// Symbol          string           `yaml:"symbol" json:"symbol"`
+	Num             int              `yaml:"num" json:"num"`
+	PerMaskAwards   []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
+	MapSPMaskAwards map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
+	EndingSPAward   string           `yaml:"endingSPAward" json:"endingSPAward"`
 }
 
 // SetLinkComponent
@@ -130,8 +135,8 @@ func (cfg *MaskConfig) SetLinkComponent(link string, componentName string) {
 type Mask struct {
 	*BasicComponent `json:"-"`
 	Config          *MaskConfig `json:"config"`
-	MaskType        int         `json:"-"`
-	SymbolCode      int         `json:"-"`
+	// MaskType        int         `json:"-"`
+	// SymbolCode int `json:"-"`
 }
 
 // Init -
@@ -164,8 +169,8 @@ func (mask *Mask) InitEx(cfg any, pool *GamePropertyPool) error {
 	mask.Config = cfg.(*MaskConfig)
 	mask.Config.ComponentType = MaskTypeName
 
-	mask.MaskType = parserMaskType(mask.Config.MaskType)
-	mask.SymbolCode = pool.DefaultPaytables.MapSymbols[mask.Config.Symbol]
+	// mask.MaskType = parserMaskType(mask.Config.MaskType)
+	// mask.SymbolCode = pool.DefaultPaytables.MapSymbols[mask.Config.Symbol]
 
 	if mask.Config.PerMaskAwards != nil {
 		for _, v := range mask.Config.PerMaskAwards {
@@ -278,58 +283,58 @@ func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, l
 
 // OnStats
 func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	if feature != nil && len(lst) > 0 {
-		if feature.RespinEndingStatus != nil {
-			pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, mask.Name)
+	// if feature != nil && len(lst) > 0 {
+	// 	if feature.RespinEndingStatus != nil {
+	// 		pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, mask.Name)
 
-			if pbcd != nil {
-				mask.OnStatsWithPB(feature, pbcd, lastpr)
-			}
-		}
+	// 		if pbcd != nil {
+	// 			mask.OnStatsWithPB(feature, pbcd, lastpr)
+	// 		}
+	// 	}
 
-		if feature.RespinStartStatus != nil {
-			pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, mask.Name)
+	// 	if feature.RespinStartStatus != nil {
+	// 		pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, mask.Name)
 
-			if pbcd != nil {
-				mask.OnStatsWithPB(feature, pbcd, lastpr)
-			}
-		}
+	// 		if pbcd != nil {
+	// 			mask.OnStatsWithPB(feature, pbcd, lastpr)
+	// 		}
+	// 	}
 
-		if feature.RespinStartStatusEx != nil {
-			pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, mask.Name)
+	// 	if feature.RespinStartStatusEx != nil {
+	// 		pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, mask.Name)
 
-			if len(pbs) > 0 {
-				for i, v := range pbs {
-					mask.OnStatsWithPB(feature, v, prs[i])
-				}
-			}
-		}
-	}
+	// 		if len(pbs) > 0 {
+	// 			for i, v := range pbs {
+	// 				mask.OnStatsWithPB(feature, v, prs[i])
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return false, 0, 0
 }
 
 // OnStatsWithPB -
 func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.MaskData)
-	if !isok {
-		goutils.Error("Mask.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+	// pbcd, isok := pbComponentData.(*sgc7pb.MaskData)
+	// if !isok {
+	// 	goutils.Error("Mask.OnStatsWithPB",
+	// 		zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+	// 	return 0, ErrIvalidProto
+	// }
 
-	if feature.RespinEndingStatus != nil {
-		feature.RespinEndingStatus.AddStatus(boolArr2Int(pbcd.Vals))
-	}
+	// if feature.RespinEndingStatus != nil {
+	// 	feature.RespinEndingStatus.AddStatus(boolArr2Int(pbcd.Vals))
+	// }
 
-	if feature.RespinStartStatus != nil {
-		feature.RespinStartStatus.AddStatus(boolArr2Int(pbcd.Vals))
-	}
+	// if feature.RespinStartStatus != nil {
+	// 	feature.RespinStartStatus.AddStatus(boolArr2Int(pbcd.Vals))
+	// }
 
-	if feature.RespinStartStatusEx != nil {
-		feature.RespinStartStatusEx.AddStatus(boolArr2Int(pbcd.Vals))
-	}
+	// if feature.RespinStartStatusEx != nil {
+	// 	feature.RespinStartStatusEx.AddStatus(boolArr2Int(pbcd.Vals))
+	// }
 
 	return 0, nil
 }
@@ -438,8 +443,8 @@ type jsonMask struct {
 
 func (jcfg *jsonMask) build() *MaskConfig {
 	cfg := &MaskConfig{
-		Num:      jcfg.Length,
-		MaskType: "symbolInReel",
+		Num: jcfg.Length,
+		// MaskType: "symbolInReel",
 	}
 
 	cfg.UseSceneV3 = true

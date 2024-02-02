@@ -92,7 +92,7 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) InitEx(cfg any, pool *GameProperty
 
 // playgame
 func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	replaceSymbolGroup.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -102,7 +102,7 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty,
 		return ErrComponentDoNothing
 	}
 
-	cd := gameProp.MapComponentData[replaceSymbolGroup.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := replaceSymbolGroup.GetTargetScene3(gameProp, curpr, prs, cd, replaceSymbolGroup.Name, "", 0)
 	ngs := gs
@@ -134,8 +134,8 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty,
 }
 
 // OnAsciiGame - outpur to asciigame
-func (replaceSymbolGroup *ReplaceSymbolGroup) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[replaceSymbolGroup.Name].(*BasicComponentData)
+func (replaceSymbolGroup *ReplaceSymbolGroup) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after replaceSymbolGroup", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

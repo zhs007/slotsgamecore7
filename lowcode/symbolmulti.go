@@ -112,11 +112,11 @@ func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	symbolMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := symbolMulti.GetTargetScene3(gameProp, curpr, prs, cd, symbolMulti.Name, "", 0)
 
@@ -177,9 +177,9 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolMulti *SymbolMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (symbolMulti *SymbolMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := gameProp.MapComponentData[symbolMulti.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
 		asciigame.OutputOtherScene("The multi of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])

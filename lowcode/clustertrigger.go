@@ -107,14 +107,10 @@ type ClusterTriggerConfig struct {
 	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
 	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
 	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
-	StrCheckWinType                 string                        `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
-	CheckWinType                    CheckWinType                  `yaml:"-" json:"-"`                                                         //
 	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
-	SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
-	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
@@ -211,13 +207,13 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		award.Init()
 	}
 
-	if clusterTrigger.Config.SymbolAwardsWeights != nil {
-		clusterTrigger.Config.SymbolAwardsWeights.Init()
-	}
+	// if clusterTrigger.Config.SymbolAwardsWeights != nil {
+	// 	clusterTrigger.Config.SymbolAwardsWeights.Init()
+	// }
 
 	clusterTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, clusterTrigger.Config.SymbolCodes)
 
-	clusterTrigger.Config.CheckWinType = ParseCheckWinType(clusterTrigger.Config.StrCheckWinType)
+	// clusterTrigger.Config.CheckWinType = ParseCheckWinType(clusterTrigger.Config.StrCheckWinType)
 
 	if clusterTrigger.Config.RespinNumWeight != "" {
 		vw2, err := pool.LoadIntWeights(clusterTrigger.Config.RespinNumWeight, clusterTrigger.Config.UseFileMapping)
@@ -260,74 +256,74 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	return nil
 }
 
-// playgame
-func (clusterTrigger *ClusterTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
-	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
+// // playgame
+// func (clusterTrigger *ClusterTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+// 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
 
-	if clusterTrigger.Config.TargetMask != "" {
-		mask := make([]bool, gs.Width)
+// 	if clusterTrigger.Config.TargetMask != "" {
+// 		mask := make([]bool, gs.Width)
 
-		for i := 0; i < len(ret.Pos)/2; i++ {
-			mask[ret.Pos[i*2]] = true
-		}
+// 		for i := 0; i < len(ret.Pos)/2; i++ {
+// 			mask[ret.Pos[i*2]] = true
+// 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, clusterTrigger.Config.TargetMask, mask, false)
-	}
+// 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, clusterTrigger.Config.TargetMask, mask, false)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-// CanTrigger -
-func (clusterTrigger *ClusterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	// std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
+// // CanTrigger -
+// func (clusterTrigger *ClusterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
+// 	// std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
 
-	isTrigger := false
-	lst := []*sgc7game.Result{}
+// 	isTrigger := false
+// 	lst := []*sgc7game.Result{}
 
-	if clusterTrigger.Config.TriggerType == STTypeCluster {
+// 	if clusterTrigger.Config.TriggerType == STTypeCluster {
 
-		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
-			func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(clusterTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
-			}, func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			}, func(cursymbol int, startsymbol int) bool {
-				if cursymbol == startsymbol {
-					return true
-				}
+// 		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
+// 			func(cursymbol int) bool {
+// 				return goutils.IndexOfIntSlice(clusterTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+// 			}, func(cursymbol int) bool {
+// 				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+// 			}, func(cursymbol int, startsymbol int) bool {
+// 				if cursymbol == startsymbol {
+// 					return true
+// 				}
 
-				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			}, func(cursymbol int) int {
-				return cursymbol
-			})
-		if err != nil {
-			goutils.Error("ClusterTrigger.CanTrigger:CalcClusterResult",
-				zap.Error(err))
+// 				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+// 			}, func(cursymbol int) int {
+// 				return cursymbol
+// 			})
+// 		if err != nil {
+// 			goutils.Error("ClusterTrigger.CanTrigger:CalcClusterResult",
+// 				zap.Error(err))
 
-			return false, nil
-		}
+// 			return false, nil
+// 		}
 
-		for _, v := range currets {
-			gameProp.ProcMulti(v)
+// 		for _, v := range currets {
+// 			gameProp.ProcMulti(v)
 
-			// if isSaveResult {
-			// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-			// }
-		}
+// 			// if isSaveResult {
+// 			// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+// 			// }
+// 		}
 
-		lst = append(lst, currets...)
+// 		lst = append(lst, currets...)
 
-		if len(lst) > 0 {
-			isTrigger = true
-		}
-	}
+// 		if len(lst) > 0 {
+// 			isTrigger = true
+// 		}
+// 	}
 
-	if clusterTrigger.Config.IsReverse {
-		isTrigger = !isTrigger
-	}
+// 	if clusterTrigger.Config.IsReverse {
+// 		isTrigger = !isTrigger
+// 	}
 
-	return isTrigger, lst
-}
+// 	return isTrigger, lst
+// }
 
 // procWins
 func (clusterTrigger *ClusterTrigger) procWins(std *ClusterTriggerData, lst []*sgc7game.Result) (int, error) {
@@ -335,6 +331,7 @@ func (clusterTrigger *ClusterTrigger) procWins(std *ClusterTriggerData, lst []*s
 
 	for _, v := range lst {
 		v.OtherMul = std.WinMulti
+
 		v.CoinWin *= std.WinMulti
 		v.CashWin *= std.WinMulti
 
@@ -405,7 +402,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, clusterTrigger.Name, "", 0)
 
-	isTrigger, lst := clusterTrigger.CanTrigger(gameProp, gs, curpr, stake, !clusterTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := clusterTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake)
 
 	if isTrigger {
 		clusterTrigger.procWins(std, lst)
@@ -429,13 +426,13 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 		std.RespinNum = respinNum
 
-		err = clusterTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
-		if err != nil {
-			goutils.Error("ClusterTrigger.OnPlayGame:procMask",
-				zap.Error(err))
+		// err = clusterTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
+		// if err != nil {
+		// 	goutils.Error("ClusterTrigger.OnPlayGame:procMask",
+		// 		zap.Error(err))
 
-			return err
-		}
+		// 	return err
+		// }
 
 		// if symbolTrigger.Config.TagSymbolNum != "" {
 		// 	gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
@@ -445,19 +442,19 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			gameProp.procAwards(plugin, clusterTrigger.Config.Awards, curpr, gp)
 		}
 
-		if clusterTrigger.Config.SymbolAwardsWeights != nil {
-			for i := 0; i < lst[0].SymbolNums; i++ {
-				node, err := clusterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
-				if err != nil {
-					goutils.Error("ClusterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-						zap.Error(err))
+		// if clusterTrigger.Config.SymbolAwardsWeights != nil {
+		// 	for i := 0; i < lst[0].SymbolNums; i++ {
+		// 		node, err := clusterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
+		// 		if err != nil {
+		// 			goutils.Error("ClusterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
+		// 				zap.Error(err))
 
-					return err
-				}
+		// 			return err
+		// 		}
 
-				gameProp.procAwards(plugin, node.Awards, curpr, gp)
-			}
-		}
+		// 		gameProp.procAwards(plugin, node.Awards, curpr, gp)
+		// 	}
+		// }
 
 		if clusterTrigger.Config.JumpToComponent != "" {
 			if gameProp.IsRespin(clusterTrigger.Config.JumpToComponent) {
@@ -630,6 +627,52 @@ func (clusterTrigger *ClusterTrigger) GetWinMulti(basicCD *BasicComponentData) i
 // GetAllLinkComponents - get all link components
 func (clusterTrigger *ClusterTrigger) GetAllLinkComponents() []string {
 	return []string{clusterTrigger.Config.DefaultNextComponent, clusterTrigger.Config.JumpToComponent}
+}
+
+// CanTriggerWithScene -
+func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	isTrigger := false
+	lst := []*sgc7game.Result{}
+
+	if clusterTrigger.Config.TriggerType == STTypeCluster {
+
+		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
+			func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(clusterTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+			}, func(cursymbol int) bool {
+				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, func(cursymbol int, startsymbol int) bool {
+				if cursymbol == startsymbol {
+					return true
+				}
+
+				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, func(cursymbol int) int {
+				return cursymbol
+			})
+		if err != nil {
+			goutils.Error("ClusterTrigger.CanTriggerWithScene:CalcClusterResult",
+				zap.Error(err))
+
+			return false, nil
+		}
+
+		// for _, v := range currets {
+		// 	gameProp.ProcMulti(v)
+		// }
+
+		lst = append(lst, currets...)
+
+		if len(lst) > 0 {
+			isTrigger = true
+		}
+	}
+
+	if clusterTrigger.Config.IsReverse {
+		isTrigger = !isTrigger
+	}
+
+	return isTrigger, lst
 }
 
 func NewClusterTrigger(name string) IComponent {

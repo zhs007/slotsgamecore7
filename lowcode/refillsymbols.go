@@ -81,13 +81,13 @@ func (refillSymbols *RefillSymbols) getSymbol(rd *sgc7game.ReelsData, x int, ind
 
 // playgame
 func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	refillSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[refillSymbols.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs := refillSymbols.GetTargetScene3(gameProp, curpr, prs, cd, refillSymbols.Name, "", 0)
+	gs := refillSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, refillSymbols.Name, "", 0)
 	ngs := gs
 
 	for x := 0; x < gs.Width; x++ {
@@ -111,7 +111,7 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return ErrComponentDoNothing
 	}
 
-	refillSymbols.AddScene(gameProp, curpr, ngs, cd)
+	refillSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
 	refillSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -119,11 +119,11 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 }
 
 // OnAsciiGame - outpur to asciigame
-func (refillSymbols *RefillSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[refillSymbols.Name].(*BasicComponentData)
+func (refillSymbols *RefillSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after refillSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("after refillSymbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

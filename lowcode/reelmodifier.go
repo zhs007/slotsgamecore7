@@ -185,25 +185,25 @@ func (reelModifier *ReelModifier) chgReelWithMask(gameProp *GameProperty, plugin
 
 // playgame
 func (reelModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
 	reelModifier.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[reelModifier.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
 	if reelModifier.Config.Mask != "" {
-		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, cd, reelModifier.Name, "", 0)
+		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, bcd, reelModifier.Name, "", 0)
 		gs1 := gs.CloneEx(gameProp.PoolScene)
 
 		if reelModifier.chgReelWithMask(gameProp, plugin, gs, gs1, curpr, stake, reelModifier.Config.Mask) {
-			reelModifier.AddScene(gameProp, curpr, gs1, cd)
+			reelModifier.AddScene(gameProp, curpr, gs1, bcd)
 		}
 	} else {
-		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, cd, reelModifier.Name, "", 0)
+		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, bcd, reelModifier.Name, "", 0)
 		gs1 := gs.CloneEx(gameProp.PoolScene)
 
 		if reelModifier.chgReel(gameProp, plugin, gs, gs1, curpr, stake) {
-			reelModifier.AddScene(gameProp, curpr, gs1, cd)
+			reelModifier.AddScene(gameProp, curpr, gs1, bcd)
 		}
 	}
 
@@ -213,12 +213,12 @@ func (reelModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 }
 
 // OnAsciiGame - outpur to asciigame
-func (reelModifier *ReelModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (reelModifier *ReelModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[reelModifier.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("reelModifier symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("reelModifier symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
