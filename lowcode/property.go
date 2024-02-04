@@ -268,19 +268,25 @@ func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7g
 	// if respinNum > 0 {
 	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {
-		respin, isok := component.(*Respin)
-		if isok {
-			if usePushTrigger {
-				respin.PushTrigger(gameProp, plugin, pr, gp, respinNum)
-			} else {
-				respin.AddRespinTimes(gameProp, respinNum)
-			}
-
-			gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
-			gameProp.onTriggerRespin(respinComponent)
-
-			gp.NextStepFirstComponent = respinComponent
+		cd := gameProp.GetGlobalComponentData(component)
+		if usePushTrigger {
+			cd.PushTriggerRespin(gameProp, plugin, pr, gp, respinNum)
+		} else {
+			cd.AddRespinTimes(respinNum)
 		}
+		// respin, isok := component.(*Respin)
+		// if isok {
+		// 	if usePushTrigger {
+		// 		respin.PushTrigger(gameProp, plugin, pr, gp, respinNum)
+		// 	} else {
+		// 		respin.AddRespinTimes(gameProp, respinNum)
+		// 	}
+
+		gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
+		gameProp.onTriggerRespin(respinComponent)
+
+		gp.NextStepFirstComponent = respinComponent
+		// }
 	}
 	// }
 
@@ -486,10 +492,13 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	if award.Type == AwardRespinTimes {
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
-			respin, isok := component.(IRespin)
-			if isok {
-				respin.AddRespinTimes(gameProp, award.Vals[0])
-			}
+			cd := gameProp.GetGlobalComponentData(component)
+
+			cd.AddRespinTimes(award.Vals[0])
+			// respin, isok := component.(IRespin)
+			// if isok {
+			// 	respin.AddRespinTimes(gameProp, award.Vals[0])
+			// }
 		}
 	} else if award.Type == AwardGameMulti {
 		gameProp.SetVal(GamePropGameMulti, award.Vals[0])
@@ -576,16 +585,19 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	} else if award.Type == AwardRetriggerRespin {
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
-			respin, isok := component.(IRespin)
-			if isok {
-				respin.Trigger(gameProp, plugin, curpr, gp)
-			}
+			cd := gameProp.GetGlobalComponentData(component)
+			cd.TriggerRespin(gameProp, plugin, curpr, gp)
+			// respin, isok := component.(IRespin)
+			// if isok {
+			// 	respin.Trigger(gameProp, plugin, curpr, gp)
+			// }
 		}
 	} else if award.Type == AwardAddRetriggerRespinNum {
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			cd := gameProp.GetGlobalComponentData(component)
-			cd.AddRetriggerRespinNum(award.Vals[0])
+			cd.ChgConfigIntVal(CCVRetriggerRespinNum, award.Vals[0])
+			// cd.AddRetriggerRespinNum(award.Vals[0])
 			// respin, isok := component.(IRespin)
 			// if isok {
 			// 	respin.AddRetriggerRespinNum(gameProp, award.Vals[0])
@@ -706,17 +718,17 @@ func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 	return 0
 }
 
-func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) error {
-	component, isok := gameProp.Components.MapComponents[respinComponent]
-	if isok {
-		respin, isok := component.(IRespin)
-		if isok {
-			respin.SaveRetriggerRespinNum(gameProp)
-		}
-	}
+// func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) error {
+// 	component, isok := gameProp.Components.MapComponents[respinComponent]
+// 	if isok {
+// 		respin, isok := component.(IRespin)
+// 		if isok {
+// 			respin.SaveRetriggerRespinNum(gameProp)
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
 	component, isok := gameProp.Components.MapComponents[respinComponent]

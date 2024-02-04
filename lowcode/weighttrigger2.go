@@ -14,9 +14,9 @@ import (
 
 const WeightTrigger2TypeName = "weightTrigger2"
 
-const (
-	WT2CVTriggerWeight string = "triggerWeight" // 可以修改配置项里的triggerWeight
-)
+// const (
+// 	WT2CVTriggerWeight string = "triggerWeight" // 可以修改配置项里的triggerWeight
+// )
 
 // WeightTrigger2Config - configuration for WeightTrigger2
 type WeightTrigger2Config struct {
@@ -80,7 +80,7 @@ func (weightTrigger2 *WeightTrigger2) InitEx(cfg any, pool *GamePropertyPool) er
 }
 
 func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(WT2CVTriggerWeight)
+	str := basicCD.GetConfigVal(CCVTriggerWeight)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadIntWeights(str, weightTrigger2.Config.UseFileMapping)
 

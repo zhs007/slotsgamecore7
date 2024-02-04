@@ -16,9 +16,9 @@ import (
 
 const BasicReelsTypeName = "basicReels"
 
-const (
-	BRCVReelSet string = "reelSet" // 可以修改配置项里的ReelSet
-)
+// const (
+// 	BRCVReelSet string = "reelSet" // 可以修改配置项里的ReelSet
+// )
 
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
@@ -90,7 +90,7 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 }
 
 func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
-	str := basicCD.GetConfigVal(BRCVReelSet)
+	str := basicCD.GetConfigVal(CCVReelSet)
 	if str != "" {
 		return str
 	}

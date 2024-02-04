@@ -14,9 +14,9 @@ import (
 
 const WeightChgSymbolTypeName = "weightChgSymbol"
 
-const (
-	WCSCVMapChgWeight string = "mapChgWeight" // 可以修改配置项里的mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
-)
+// const (
+// 	WCSCVMapChgWeight string = "mapChgWeight" // 可以修改配置项里的mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
+// )
 
 // WeightChgSymbolConfig - configuration for WeightChgSymbol feature
 type WeightChgSymbolConfig struct {
@@ -83,7 +83,7 @@ func (weightChgSymbol *WeightChgSymbol) InitEx(cfg any, pool *GamePropertyPool) 
 }
 
 func (weightChgSymbol *WeightChgSymbol) getChgWeight(gameProp *GameProperty, basicCD *BasicComponentData, symbol int) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(WCSCVMapChgWeight + ":" + gameProp.Pool.Config.GetDefaultPaytables().GetStringFromInt(symbol))
+	str := basicCD.GetConfigVal(CCVMapChgWeight + ":" + gameProp.Pool.Config.GetDefaultPaytables().GetStringFromInt(symbol))
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadSymbolWeights(str, "val", "weight", gameProp.Pool.DefaultPaytables, weightChgSymbol.Config.UseFileMapping)
 

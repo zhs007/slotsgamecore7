@@ -14,9 +14,9 @@ import (
 
 const SymbolValTypeName = "symbolVal"
 
-const (
-	SVCVWeightVal string = "weightVal" // 可以修改配置项里的 weightVal
-)
+// const (
+// 	SVCVWeightVal string = "weightVal" // 可以修改配置项里的 weightVal
+// )
 
 // SymbolValConfig - configuration for SymbolMulti feature
 type SymbolValConfig struct {
@@ -91,7 +91,7 @@ func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
 }
 
 func (symbolVal *SymbolVal) GetWeightVal(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(SVCVWeightVal)
+	str := basicCD.GetConfigVal(CCVWeightVal)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadIntWeights(str, symbolVal.Config.UseFileMapping)
 

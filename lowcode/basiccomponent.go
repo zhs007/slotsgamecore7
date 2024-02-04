@@ -160,10 +160,10 @@ func (basicComponentData *BasicComponentData) IsRespinStarted() bool {
 	return false
 }
 
-// AddRetriggerRespinNum -
-func (basicComponentData *BasicComponentData) AddRetriggerRespinNum(num int) {
+// // AddRetriggerRespinNum -
+// func (basicComponentData *BasicComponentData) AddRetriggerRespinNum(num int) {
 
-}
+// }
 
 // AddTriggerRespinAward -
 func (basicComponentData *BasicComponentData) AddTriggerRespinAward(award *Award) {
@@ -174,6 +174,19 @@ func (basicComponentData *BasicComponentData) AddTriggerRespinAward(award *Award
 func (basicComponentData *BasicComponentData) AddRespinTimes(num int) {
 
 }
+
+// TriggerRespin
+func (basicComponentData *BasicComponentData) TriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
+
+}
+
+// PushTrigger -
+func (basicComponentData *BasicComponentData) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
+
+}
+
+// // SaveRetriggerRespinNum -
+// func (basicComponentData *BasicComponentData) SaveRetriggerRespinNum()
 
 // GetMask -
 func (basicComponentData *BasicComponentData) GetMask() []bool {
