@@ -103,11 +103,11 @@ func (symbolVal2 *SymbolVal2) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[symbolVal2.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := symbolVal2.GetTargetScene3(gameProp, curpr, prs, cd, symbolVal2.Name, "", 0)
 
@@ -175,9 +175,9 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolVal2 *SymbolVal2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (symbolVal2 *SymbolVal2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := gameProp.MapComponentData[symbolVal2.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
 		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])

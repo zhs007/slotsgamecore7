@@ -135,11 +135,11 @@ func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error 
 
 // playgame
 func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	weightBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	wbd := gameProp.MapComponentData[weightBranch.Name].(*WeightBranchData)
+	wbd := icd.(*WeightBranchData)
 
 	cr, err := weightBranch.Config.WeightVW.RandVal(plugin)
 	if err != nil {
@@ -168,8 +168,8 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightBranch *WeightBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	wbd := gameProp.MapComponentData[weightBranch.Name].(*WeightBranchData)
+func (weightBranch *WeightBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	wbd := icd.(*WeightBranchData)
 
 	fmt.Printf("weightBranch %v, got %v\n", weightBranch.GetName(), wbd.Value)
 

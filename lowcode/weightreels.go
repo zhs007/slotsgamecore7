@@ -124,11 +124,11 @@ func (weightReels *WeightReels) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	weightReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	wrd := gameProp.MapComponentData[weightReels.Name].(*WeightReelsData)
+	wrd := icd.(*WeightReelsData)
 
 	reelname := ""
 	if weightReels.Config.ReelSetsWeightVW != nil {
@@ -200,8 +200,8 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightReels *WeightReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	wrd := gameProp.MapComponentData[weightReels.Name].(*WeightReelsData)
+func (weightReels *WeightReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	wrd := icd.(*WeightReelsData)
 
 	if len(wrd.UsedScenes) > 0 {
 		asciigame.OutputScene("initial symbols", pr.Scenes[wrd.UsedScenes[0]], mapSymbolColor)

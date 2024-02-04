@@ -286,10 +286,26 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 // 		}, false)
 // }
 
+func (scatterTrigger *ScatterTrigger) getSymbols(gameProp *GameProperty) []int {
+	s := gameProp.GetCurCallStackSymbol()
+	if s >= 0 {
+		return []int{s}
+	}
+
+	return scatterTrigger.Config.SymbolCodes
+}
+
+// CanTriggerWithScene -
+func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	return scatterTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+}
+
 // CanTrigger -
-func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, symbols []int) (bool, []*sgc7game.Result) {
+func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	isTrigger := false
 	lst := []*sgc7game.Result{}
+
+	symbols := scatterTrigger.getSymbols(gameProp)
 
 	if scatterTrigger.Config.TriggerType == STTypeScatters {
 		for _, s := range symbols {
@@ -303,7 +319,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 					ret.CoinWin = 0
 					ret.CashWin = 0
 				} else {
-					gameProp.ProcMulti(ret)
+					// gameProp.ProcMulti(ret)
 				}
 
 				isTrigger = true
@@ -327,7 +343,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
 				}
 
-				gameProp.ProcMulti(ret)
+				// gameProp.ProcMulti(ret)
 			}
 
 			isTrigger = true
@@ -354,7 +370,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
 				}
 
-				gameProp.ProcMulti(ret)
+				// gameProp.ProcMulti(ret)
 			}
 
 			isTrigger = true
@@ -370,10 +386,10 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 	return isTrigger, lst
 }
 
-// CanTrigger -
-func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	return scatterTrigger.canTrigger(gameProp, gs, curpr, stake, isSaveResult, scatterTrigger.getSymbols())
-}
+// // CanTrigger -
+// func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
+// 	return scatterTrigger.canTrigger(gameProp, gs, curpr, stake, isSaveResult, scatterTrigger.getSymbols())
+// }
 
 // procWins
 func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
@@ -450,8 +466,9 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	std := icd.(*ScatterTriggerData)
 
 	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, scatterTrigger.Name, "", 0)
+	os := scatterTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, scatterTrigger.Name, "")
 
-	isTrigger, lst := scatterTrigger.CanTrigger(gameProp, gs, curpr, stake, !scatterTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
 		scatterTrigger.procWins(std, lst)
@@ -678,18 +695,18 @@ func (scatterTrigger *ScatterTrigger) GetAllLinkComponents() []string {
 	return []string{scatterTrigger.Config.DefaultNextComponent, scatterTrigger.Config.JumpToComponent}
 }
 
-func (scatterTrigger *ScatterTrigger) getSymbols() []int {
-	if scatterTrigger.dataForeachSymbol != nil {
-		return []int{scatterTrigger.dataForeachSymbol.SymbolCode}
-	}
+// func (scatterTrigger *ScatterTrigger) getSymbols() []int {
+// 	if scatterTrigger.dataForeachSymbol != nil {
+// 		return []int{scatterTrigger.dataForeachSymbol.SymbolCode}
+// 	}
 
-	return scatterTrigger.Config.SymbolCodes
-}
+// 	return scatterTrigger.Config.SymbolCodes
+// }
 
-// CanTriggerWithScene -
-func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
-	return scatterTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
-}
+// // CanTriggerWithScene -
+// func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+// 	return scatterTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+// }
 
 // // OnEachSymbol - on foreach symbol
 // func (scatterTrigger *ScatterTrigger) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,

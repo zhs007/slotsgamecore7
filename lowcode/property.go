@@ -1076,6 +1076,10 @@ func (gameProp *GameProperty) GetComponentData(icomponent IComponent) IComponent
 	return gameProp.callStack.GetComponentData(gameProp, icomponent)
 }
 
+func (gameProp *GameProperty) GetCurCallStackSymbol() int {
+	return gameProp.callStack.GetCurCallStackSymbol()
+}
+
 // // GetAllLinkComponents - get all link components
 // func (gameProp *GameProperty) GetAllLinkComponents(componentName string) []string {
 // 	ic, isok := gameProp.Components.MapComponents[componentName]

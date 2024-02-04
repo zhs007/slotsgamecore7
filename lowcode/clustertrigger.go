@@ -96,10 +96,10 @@ func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
 // ClusterTriggerConfig - configuration for ClusterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ClusterTriggerConfig struct {
-	BasicComponentConfig            `yaml:",inline" json:",inline"`
-	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
-	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
-	ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbols              []string `yaml:"symbols" json:"symbols"` // like scatter
+	SymbolCodes          []int    `yaml:"-" json:"-"`             // like scatter
+	// ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
 	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
 	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
 	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
@@ -211,7 +211,7 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	// 	clusterTrigger.Config.SymbolAwardsWeights.Init()
 	// }
 
-	clusterTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, clusterTrigger.Config.SymbolCodes)
+	// clusterTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, clusterTrigger.Config.SymbolCodes)
 
 	// clusterTrigger.Config.CheckWinType = ParseCheckWinType(clusterTrigger.Config.StrCheckWinType)
 
@@ -629,6 +629,15 @@ func (clusterTrigger *ClusterTrigger) GetAllLinkComponents() []string {
 	return []string{clusterTrigger.Config.DefaultNextComponent, clusterTrigger.Config.JumpToComponent}
 }
 
+func (clusterTrigger *ClusterTrigger) getSymbols(gameProp *GameProperty) []int {
+	s := gameProp.GetCurCallStackSymbol()
+	if s >= 0 {
+		return []int{s}
+	}
+
+	return clusterTrigger.Config.SymbolCodes
+}
+
 // CanTriggerWithScene -
 func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	isTrigger := false
@@ -636,9 +645,11 @@ func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty
 
 	if clusterTrigger.Config.TriggerType == STTypeCluster {
 
+		symbols := clusterTrigger.getSymbols(gameProp)
+
 		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
 			func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(clusterTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 			}, func(cursymbol int) bool {
 				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			}, func(cursymbol int, startsymbol int) bool {

@@ -95,11 +95,11 @@ func (weightChgSymbol *WeightChgSymbol) getChgWeight(gameProp *GameProperty, bas
 
 // playgame
 func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	weightChgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[weightChgSymbol.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := weightChgSymbol.GetTargetScene3(gameProp, curpr, prs, cd, weightChgSymbol.Name, "", 0)
 
@@ -131,9 +131,9 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightChgSymbol *WeightChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (weightChgSymbol *WeightChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := gameProp.MapComponentData[weightChgSymbol.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("After WeightChgSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

@@ -140,11 +140,11 @@ func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp 
 
 // playgame
 func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	weightAwards.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	mwad := gameProp.MapComponentData[weightAwards.Name].(*WeightAwardsData)
+	mwad := icd.(*WeightAwardsData)
 
 	mwad.GotIndex = nil
 
@@ -213,8 +213,8 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightAwards *WeightAwards) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[weightAwards.Name].(*WeightAwardsData)
+func (weightAwards *WeightAwards) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	cd := icd.(*WeightAwardsData)
 
 	if len(cd.GotIndex) > 0 {
 		fmt.Printf("WeightAwards result is %v\n", cd.GotIndex)

@@ -92,11 +92,11 @@ func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, b
 
 // playgame
 func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[weightTrigger2.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	vw := weightTrigger2.getTriggerWeight(gameProp, cd)
 
@@ -118,7 +118,7 @@ func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightTrigger2 *WeightTrigger2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (weightTrigger2 *WeightTrigger2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
 }
 

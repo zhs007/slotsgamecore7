@@ -130,11 +130,11 @@ func (winResultMulti *WinResultMulti) InitEx(cfg any, pool *GamePropertyPool) er
 
 // playgame
 func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
 
 	winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[winResultMulti.Name].(*WinResultMultiData)
+	std := icd.(*WinResultMultiData)
 
 	winMulti := winResultMulti.GetWinMulti(&std.BasicComponentData)
 
@@ -148,7 +148,8 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 	}
 
 	for _, cn := range winResultMulti.Config.TargetComponents {
-		ccd := gameProp.MapComponentData[cn]
+		ccd := gameProp.GetComponentDataWithName(cn)
+		// ccd := gameProp.MapComponentData[cn]
 		lst := ccd.GetResults()
 		for _, ri := range lst {
 			curpr.Results[ri].CashWin *= winMulti
@@ -165,9 +166,9 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 }
 
 // OnAsciiGame - outpur to asciigame
-func (winResultMulti *WinResultMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (winResultMulti *WinResultMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	std := gameProp.MapComponentData[winResultMulti.Name].(*WinResultMultiData)
+	std := icd.(*WinResultMultiData)
 
 	fmt.Printf("winResultMulti x %v, ending wins = %v \n", std.WinMulti, std.Wins)
 

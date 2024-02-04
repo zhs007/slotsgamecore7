@@ -1,7 +1,10 @@
 package lowcode
 
 import (
+	"fmt"
+
 	"github.com/zhs007/goutils"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
 )
 
@@ -22,6 +25,8 @@ type callStackNode struct {
 	Name             string
 	MapComponentData map[string]IComponentData
 	mapHistory       map[string]IComponentData
+	SymbolCode       int
+	CurIndex         int
 }
 
 func (csn *callStackNode) IsInCallStack(componentName string) bool {
@@ -55,11 +60,20 @@ func (csn *callStackNode) OnNewStep() {
 	csn.mapHistory = make(map[string]IComponentData)
 }
 
-func newCallStackNode(name string) *callStackNode {
+func newGlobalCallStackNode() *callStackNode {
 	return &callStackNode{
-		Name:             name,
 		mapHistory:       make(map[string]IComponentData),
 		MapComponentData: make(map[string]IComponentData),
+	}
+}
+
+func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, pt *sgc7game.PayTables) *callStackNode {
+	return &callStackNode{
+		Name:             fmt.Sprintf("%v:%v>%v", component.GetName(), i, pt.GetStringFromInt(symbolCode)),
+		mapHistory:       make(map[string]IComponentData),
+		MapComponentData: make(map[string]IComponentData),
+		SymbolCode:       symbolCode,
+		CurIndex:         i,
 	}
 }
 
@@ -103,7 +117,7 @@ func (cs *CallStack) GetComponentNum() int {
 func (cs *CallStack) OnNewGame() {
 	cs.nodes = cs.nodes[:0]
 
-	cs.nodes = append(cs.nodes, newCallStackNode(""))
+	cs.nodes = append(cs.nodes, newGlobalCallStackNode())
 }
 
 func (cs *CallStack) OnNewStep() {
@@ -159,6 +173,14 @@ func (cs *CallStack) ComponentDone(gameProp *GameProperty, component IComponent,
 
 func (cs *CallStack) IsInCurCallStack(componentName string) bool {
 	return cs.nodes[len(cs.nodes)-1].IsInCallStack(componentName)
+}
+
+func (cs *CallStack) GetCurCallStackSymbol() int {
+	if len(cs.nodes) == 1 {
+		return -1
+	}
+
+	return cs.nodes[len(cs.nodes)-1].SymbolCode
 }
 
 func NewCallStack(name string) *CallStack {
