@@ -246,7 +246,9 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 		pr.IsFinish = false
 
 		if goutils.IndexOfStringSlice(gp.HistoryComponents, gp.NextStepFirstComponent, 0) < 0 {
-			gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
+			cd := gameProp.GetGlobalComponentDataWithName(gp.NextStepFirstComponent)
+			gp.AddComponentData(gp.NextStepFirstComponent, cd)
+			// gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
 		}
 	} else if !pr.IsWait {
 		pr.IsFinish = true
@@ -749,12 +751,15 @@ func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
 func (gameProp *GameProperty) CanTrigger(componentName string, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
 	component, isok := gameProp.Components.MapComponents[componentName]
 	if isok {
-		st, isok := component.(ISymbolTrigger)
-		if isok {
-			isTrigger, _ := st.CanTrigger(gameProp, gs, curpr, stake, false)
+		isTrigger, _ := component.CanTriggerWithScene(gameProp, gs, curpr, stake)
 
-			return isTrigger
-		}
+		return isTrigger
+		// st, isok := component.(ISymbolTrigger)
+		// if isok {
+		// 	isTrigger, _ := st.CanTrigger(gameProp, gs, curpr, stake, false)
+
+		// 	return isTrigger
+		// }
 	}
 
 	return false

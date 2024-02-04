@@ -42,9 +42,6 @@ type IComponent interface {
 	// GetName -
 	GetName() string
 
-	// IsMask -
-	IsMask() bool
-
 	// IsRespin -
 	IsRespin() bool
 
@@ -60,17 +57,29 @@ type IComponent interface {
 	CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result)
 
 	//----------------------------
+	// for mask
+
+	// IsMask -
+	IsMask() bool
+	// SetMask -
+	SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error
+	// SetMaskVal -
+	SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, mask bool) error
+	// SetMaskOnlyTrue -
+	SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error
+
+	//----------------------------
 	// for foreach symbols
 
 	// // SetEachSymbol -
 	// SetEachSymbol(gameProp *GameProperty) []int
 
-	// OnEachSymbol - on foreach symbol
-	OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
-		prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error)
+	// // OnEachSymbol - on foreach symbol
+	// OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	// 	prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error)
 	// ForEachSymbols - foreach symbols
 	ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
 		prs []*sgc7game.PlayResult) error
-	// SetForeachSymbolData -
-	SetForeachSymbolData(data *ForeachSymbolData)
+	// // SetForeachSymbolData -
+	// SetForeachSymbolData(data *ForeachSymbolData)
 }

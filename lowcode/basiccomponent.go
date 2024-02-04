@@ -193,6 +193,11 @@ func (basicComponentData *BasicComponentData) GetMask() []bool {
 	return nil
 }
 
+// ChgMask -
+func (basicComponentData *BasicComponentData) ChgMask(curMask int, val bool) bool {
+	return false
+}
+
 // 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
 	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
@@ -217,10 +222,10 @@ type BasicComponentConfig struct {
 }
 
 type BasicComponent struct {
-	Config            *BasicComponentConfig
-	Name              string
-	SrcSceneNum       int
-	dataForeachSymbol *ForeachSymbolData
+	Config      *BasicComponentConfig
+	Name        string
+	SrcSceneNum int
+	// dataForeachSymbol *ForeachSymbolData
 }
 
 // Init -
@@ -610,11 +615,11 @@ func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.St
 
 // }
 
-// OnEachSymbol - on foreach symbol
-func (basicComponent *BasicComponent) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState,
-	stake *sgc7game.Stake, prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error) {
-	return "", nil
-}
+// // OnEachSymbol - on foreach symbol
+// func (basicComponent *BasicComponent) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState,
+// 	stake *sgc7game.Stake, prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error) {
+// 	return "", nil
+// }
 
 // ForEachSymbols - foreach symbols
 func (basicComponent *BasicComponent) ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
@@ -633,10 +638,10 @@ func (basicComponent *BasicComponent) ForeachSymbols(gameProp *GameProperty, cur
 // 	return gameProp.MapComponentData[basicComponent.Name]
 // }
 
-// SetForeachSymbolData -
-func (basicComponent *BasicComponent) SetForeachSymbolData(data *ForeachSymbolData) {
-	basicComponent.dataForeachSymbol = data
-}
+// // SetForeachSymbolData -
+// func (basicComponent *BasicComponent) SetForeachSymbolData(data *ForeachSymbolData) {
+// 	basicComponent.dataForeachSymbol = data
+// }
 
 // OnGameInited - on game inited
 func (basicComponent *BasicComponent) OnGameInited(components *ComponentList) error {
@@ -650,7 +655,34 @@ func (basicComponent *BasicComponent) GetAllLinkComponents() []string {
 
 // CanTriggerWithScene -
 func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	goutils.Error("BasicComponent.CanTriggerWithScene",
+		zap.Error(ErrInvalidComponent))
+
 	return false, nil
+}
+
+// SetMask -
+func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
+	goutils.Error("BasicComponent.SetMask",
+		zap.Error(ErrInvalidComponent))
+
+	return ErrInvalidComponent
+}
+
+// SetMaskVal -
+func (basicComponent *BasicComponent) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, mask bool) error {
+	goutils.Error("BasicComponent.SetMaskVal",
+		zap.Error(ErrInvalidComponent))
+
+	return ErrInvalidComponent
+}
+
+// SetMaskOnlyTrue -
+func (basicComponent *BasicComponent) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
+	goutils.Error("BasicComponent.SetMaskOnlyTrue",
+		zap.Error(ErrInvalidComponent))
+
+	return ErrInvalidComponent
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {

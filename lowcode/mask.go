@@ -105,6 +105,19 @@ func (maskData *MaskData) GetMask() []bool {
 	return maskData.Vals
 }
 
+// ChgMask -
+func (maskData *MaskData) ChgMask(curMask int, val bool) bool {
+	if maskData.Vals[curMask] != val {
+		maskData.Vals[curMask] = val
+		maskData.NewVals[curMask] = val
+		maskData.NewChged++
+
+		return true
+	}
+
+	return false
+}
+
 func newMaskData(num int) *MaskData {
 	return &MaskData{
 		Num:      num,
@@ -122,7 +135,7 @@ type MaskConfig struct {
 	Num             int              `yaml:"num" json:"num"`
 	PerMaskAwards   []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
 	MapSPMaskAwards map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
-	EndingSPAward   string           `yaml:"endingSPAward" json:"endingSPAward"`
+	// EndingSPAward   string           `yaml:"endingSPAward" json:"endingSPAward"`
 }
 
 // SetLinkComponent
@@ -200,28 +213,28 @@ func (mask *Mask) InitEx(cfg any, pool *GamePropertyPool) error {
 // 	return nil
 // }
 
-// onMaskChg -
-func (mask *Mask) ChgMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, md *MaskData, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, val bool, noProcSPLevel bool) {
-	if md.Vals[curMask] != val {
-		md.Vals[curMask] = val
-		md.NewVals[curMask] = val
-		md.NewChged++
+// // onMaskChg -
+// func (mask *Mask) ChgMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, md *MaskData, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, val bool, noProcSPLevel bool) {
+// 	if md.Vals[curMask] != val {
+// 		md.Vals[curMask] = val
+// 		md.NewVals[curMask] = val
+// 		md.NewChged++
 
-		mask.onMaskChg(plugin, gameProp, curpr, gp, curMask, noProcSPLevel)
-	}
-}
+// 		mask.onMaskChg(plugin, gameProp, curpr, gp, curMask, noProcSPLevel)
+// 	}
+// }
 
 // onMaskChg -
-func (mask *Mask) onMaskChg(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, curMask int, noProcSPLevel bool) {
+func (mask *Mask) onMaskChg(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, curMask int) {
 	if mask.Config.PerMaskAwards != nil {
 		for _, v := range mask.Config.PerMaskAwards {
 			gameProp.procAward(plugin, v, curpr, gp, false)
 		}
 	}
 
-	if noProcSPLevel {
-		return
-	}
+	// if noProcSPLevel {
+	// 	return
+	// }
 
 	sp, isok := mask.Config.MapSPMaskAwards[curMask-1]
 	if isok {
@@ -385,7 +398,11 @@ func (mask *Mask) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, 
 	// if mask.MaskType == MaskTypeSymbolInReel {
 	mcd := cd.(*MaskData)
 
-	mask.ChgMask(plugin, gameProp, mcd, curpr, gp, index, val, mask.Config.EndingSPAward != "")
+	if mcd.ChgMask(index, val) {
+		mask.onMaskChg(plugin, gameProp, curpr, gp, index)
+	}
+
+	// mask.ChgMask(plugin, gameProp, mcd, curpr, gp, index, val, mask.Config.EndingSPAward != "")
 	// }
 
 	return nil
@@ -397,7 +414,10 @@ func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cur
 	mcd := cd.(*MaskData)
 
 	for x, v := range arrMask {
-		mask.ChgMask(plugin, gameProp, mcd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
+		if mcd.ChgMask(x, v) {
+			mask.onMaskChg(plugin, gameProp, curpr, gp, x)
+		}
+		// mask.ChgMask(plugin, gameProp, mcd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
 	}
 	// }
 
@@ -410,8 +430,9 @@ func (mask *Mask) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GamePrope
 	mcd := cd.(*MaskData)
 
 	for x, v := range arrMask {
-		if v {
-			mask.ChgMask(plugin, gameProp, mcd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
+		if v && mcd.ChgMask(x, v) {
+			mask.onMaskChg(plugin, gameProp, curpr, gp, x)
+			// mask.ChgMask(plugin, gameProp, mcd, curpr, gp, x, v, mask.Config.EndingSPAward != "")
 		}
 	}
 	// }
@@ -419,12 +440,12 @@ func (mask *Mask) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GamePrope
 	return nil
 }
 
-// GetMask -
-func (mask *Mask) GetMask(gameProp *GameProperty, cd IComponentData) []bool {
-	mcd := cd.(*MaskData)
+// // GetMask -
+// func (mask *Mask) GetMask(gameProp *GameProperty, cd IComponentData) []bool {
+// 	mcd := cd.(*MaskData)
 
-	return mcd.Vals
-}
+// 	return mcd.Vals
+// }
 
 func NewMask(name string) IComponent {
 	mask := &Mask{
