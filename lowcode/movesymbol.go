@@ -217,13 +217,13 @@ func (moveSymbol *MoveSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	moveSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[moveSymbol.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs := moveSymbol.GetTargetScene3(gameProp, curpr, prs, cd, moveSymbol.Name, "", 0)
+	gs := moveSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, moveSymbol.Name, "", 0)
 
 	sc2 := gs
 
@@ -263,23 +263,23 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	}
 
 	if sc2 == gs {
-		moveSymbol.onStepEnd(gameProp, curpr, gp, "")
+		nc := moveSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
-	moveSymbol.AddScene(gameProp, curpr, sc2, cd)
+	moveSymbol.AddScene(gameProp, curpr, sc2, bcd)
 
-	moveSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := moveSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (moveSymbol *MoveSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[moveSymbol.Name].(*BasicComponentData)
+func (moveSymbol *MoveSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*BasicComponentData)
 
-	asciigame.OutputScene("after moveSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	asciigame.OutputScene("after moveSymbol", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 
 	return nil
 }

@@ -75,6 +75,8 @@ func main() {
 		bet = i64
 	}
 
+	lowcode.SetJsonMode()
+
 	if isAllowStats2 {
 		lowcode.SetAllowStatsV2()
 	}

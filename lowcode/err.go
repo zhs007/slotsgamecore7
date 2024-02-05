@@ -34,8 +34,8 @@ var (
 	// ErrWrongFunctionInScript - wrong function in script
 	ErrWrongFunctionInScript = errors.New("wrong function in script")
 
-	// ErrIvalidComponentName - invalid component name
-	ErrIvalidComponentName = errors.New("invalid component name")
+	// ErrInvalidComponentName - invalid component name
+	ErrInvalidComponentName = errors.New("invalid component name")
 
 	// ErrIvalidCurGameModParams - invalid CurGameModParams
 	ErrIvalidCurGameModParams = errors.New("invalid CurGameModParams")
@@ -130,4 +130,7 @@ var (
 
 	// ErrCannotForceOutcome - cannot force outcome
 	ErrCannotForceOutcome = errors.New("cannot force outcome")
+
+	// ErrInvalidCallStackNode - invalid callstack node
+	ErrInvalidCallStackNode = errors.New("invalid callstack node")
 )

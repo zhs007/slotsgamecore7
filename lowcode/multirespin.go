@@ -170,7 +170,7 @@ func (multiRespin *MultiRespin) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	multiRespin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -186,7 +186,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 				goutils.Error("MultiRespin.OnPlayGame:genCmdParam",
 					zap.Error(err))
 
-				return err
+				return "", err
 			}
 
 			buf, err := sonic.Marshal(curparam)
@@ -194,7 +194,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 				goutils.Error("MultiRespin.OnPlayGame:Marshal",
 					zap.Error(err))
 
-				return err
+				return "", err
 			}
 
 			lstcmd = append(lstcmd, curcmd)
@@ -206,28 +206,30 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		curpr.IsFinish = false
 		curpr.IsWait = true
 
-		multiRespin.onStepEnd(gameProp, curpr, gp, "")
-	} else {
-		cmdparam, err := multiRespin.parseCmdParam(cmd, param)
-		if err != nil {
-			goutils.Error("MultiFG.OnPlayGame:parseCmdParam",
-				zap.String("cmd", cmd),
-				zap.String("param", param),
-				zap.Error(err))
+		nc := multiRespin.onStepEnd(gameProp, curpr, gp, "")
 
-			return err
-		}
-
-		gameProp.TriggerRespin(plugin, curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent, multiRespin.Config.IsUseTriggerRespin2)
-
-		multiRespin.onStepEnd(gameProp, curpr, gp, cmdparam.RespinComponent)
+		return nc, nil
 	}
 
-	return nil
+	cmdparam, err := multiRespin.parseCmdParam(cmd, param)
+	if err != nil {
+		goutils.Error("MultiFG.OnPlayGame:parseCmdParam",
+			zap.String("cmd", cmd),
+			zap.String("param", param),
+			zap.Error(err))
+
+		return "", err
+	}
+
+	gameProp.TriggerRespin(plugin, curpr, gp, cmdparam.RespinNum, cmdparam.RespinComponent, multiRespin.Config.IsUseTriggerRespin2)
+
+	nc := multiRespin.onStepEnd(gameProp, curpr, gp, cmdparam.RespinComponent)
+
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (multiRespin *MultiRespin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (multiRespin *MultiRespin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 	return nil
 }
 

@@ -81,11 +81,11 @@ func (replaceSymbol *ReplaceSymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // playgame
 func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	replaceSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[replaceSymbol.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := replaceSymbol.GetTargetScene3(gameProp, curpr, prs, cd, replaceSymbol.Name, "", 0)
 
@@ -96,7 +96,8 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		sc2 := gs.CloneEx(gameProp.PoolScene)
 
 		if replaceSymbol.Config.Mask != "" {
-			md := gameProp.MapComponentData[replaceSymbol.Config.Mask].(*MaskData)
+			md := gameProp.GetCurComponentDataWithName(replaceSymbol.Config.Mask).(*MaskData)
+			// md := gameProp.MapComponentData[replaceSymbol.Config.Mask].(*MaskData)
 			if md != nil {
 				for x, arr := range sc2.Arr {
 					if md.Vals[x] {
@@ -127,16 +128,16 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		replaceSymbol.AddScene(gameProp, curpr, sc2, cd)
 	}
 
-	replaceSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := replaceSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(replaceSymbol.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (replaceSymbol *ReplaceSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[replaceSymbol.Name].(*BasicComponentData)
+func (replaceSymbol *ReplaceSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

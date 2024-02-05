@@ -70,9 +70,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 				zap.String("FirstComponent", gp.FirstComponent),
-				zap.Error(ErrIvalidComponentName))
+				zap.Error(ErrInvalidComponentName))
 
-			return nil, ErrIvalidComponentName
+			return nil, ErrInvalidComponentName
 		}
 
 		curComponent = c
@@ -85,9 +85,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 						zap.String("cmd", cmd),
 						zap.String("MapCmdComponent", cn),
-						zap.Error(ErrIvalidComponentName))
+						zap.Error(ErrInvalidComponentName))
 
-					return nil, ErrIvalidComponentName
+					return nil, ErrInvalidComponentName
 				}
 
 				curComponent = c
@@ -99,9 +99,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				if !isok {
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 						zap.String("FirstComponent", startComponent),
-						zap.Error(ErrIvalidComponentName))
+						zap.Error(ErrInvalidComponentName))
 
-					return nil, ErrIvalidComponentName
+					return nil, ErrInvalidComponentName
 				}
 
 				curComponent = c
@@ -111,7 +111,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	for {
 		isComponentDoNothing := false
-		err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+		cd := gameProp.callStack.GetCurComponentData(gameProp, curComponent)
+		nextComponentName, err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
 		if err != nil {
 			if err != ErrComponentDoNothing {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
@@ -124,39 +125,63 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		if !isComponentDoNothing {
-			gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
-			gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
-		}
+			gameProp.OnCallEnd(curComponent, cd, gp)
+			// gameProp.AddComponent2History(curComponent, -1, gp)
 
-		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
-		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
-		if respinComponent != "" {
-			// 一般来说，第一次触发respin才走这个分支
-			pr.IsFinish = false
+			err := curComponent.EachSymbols(gameProp, pr, gp, plugin, ps, stake, prs, cd)
+			if err != nil {
+				goutils.Error("BasicGameMod.OnPlay:EachSymbols",
+					zap.Error(err))
 
-			if nextComponentName == "" {
-				break
+				return nil, err
 			}
+			// gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
+			// gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
 		}
 
 		if nextComponentName == "" {
 			break
 		}
 
+		if gameProp.IsRespin(nextComponentName) {
+			gameProp.onTriggerRespin(nextComponentName)
+			gp.NextStepFirstComponent = nextComponentName
+
+			pr.IsFinish = false
+
+			break
+		}
+
+		// respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
+		// nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
+		// if respinComponent != "" {
+		// 	// 一般来说，第一次触发respin才走这个分支
+		// 	pr.IsFinish = false
+
+		// 	if nextComponentName == "" {
+		// 		break
+		// 	}
+		// }
+
+		// if nextComponentName == "" {
+		// 	break
+		// }
+
 		c, isok := components.MapComponents[nextComponentName]
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:MapComponents",
 				zap.String("nextComponentName", nextComponentName),
-				zap.Error(ErrIvalidComponentName))
+				zap.Error(ErrInvalidComponentName))
 
-			return nil, ErrIvalidComponentName
+			return nil, ErrInvalidComponentName
 		}
 
 		curComponent = c
 
-		if len(gameProp.HistoryComponents) >= MaxComponentNumInStep {
+		curComponentNum := gameProp.callStack.GetComponentNum()
+		if curComponentNum >= MaxComponentNumInStep {
 			goutils.Error("BasicGameMod.OnPlay",
-				zap.Int("components", len(gameProp.HistoryComponents)),
+				zap.Int("components", curComponentNum),
 				zap.Error(ErrTooManyComponentsInStep))
 
 			return nil, ErrTooManyComponentsInStep
@@ -165,24 +190,46 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	gameProp.BuildGameParam(gp)
 
-	for _, v := range gameProp.HistoryComponents {
-		err := v.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+	err := gameProp.callStack.Each(gameProp, func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error {
+		err := ic.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
 		if err != nil {
 			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
 				zap.Error(err))
 
-			return nil, err
+			return err
 		}
 
-		cn := v.GetName()
-		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
+		gp.AddComponentData(tag, cd)
 
-		if gAllowStats2 {
-			v.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
-			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
-			gameProp.stats2SpinData.OnStepTrigger(cn)
-		}
+		return nil
+	})
+	if err != nil {
+		goutils.Error("BasicGameMod.OnPlay:gameProp.callStack.Each",
+			zap.Error(err))
+
+		return nil, err
 	}
+
+	// for _, v := range gameProp.HistoryComponents {
+	// 	if v.ForeachIndex < 0 {
+	// 		err := v.Component.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
+	// 		if err != nil {
+	// 			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
+	// 				zap.Error(err))
+
+	// 			return nil, err
+	// 		}
+
+	// 		cn := v.Component.GetName()
+	// 		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
+
+	// 		if gAllowStats2 {
+	// 			v.Component.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
+	// 			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
+	// 			gameProp.stats2SpinData.OnStepTrigger(cn)
+	// 		}
+	// 	}
+	// }
 
 	gameProp.ProcRespin(pr, gp)
 
@@ -235,11 +282,11 @@ func (bgm *BasicGameMod) ResetConfig(cfg *Config) {
 
 // OnAsciiGame - outpur to asciigame
 func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
-	for _, v := range gameProp.HistoryComponents {
-		v.OnAsciiGame(gameProp, pr, lst, gameProp.Pool.MapSymbolColor)
-	}
+	return gameProp.callStack.Each(gameProp, func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error {
+		ic.OnAsciiGame(gameProp, pr, lst, gameProp.Pool.MapSymbolColor, cd)
 
-	return nil
+		return nil
+	})
 }
 
 // OnNewGame -
@@ -258,16 +305,16 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 
 	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
 
-	for i, v := range gameProp.Components.Components {
-		err := v.OnNewGame(gameProp)
-		if err != nil {
-			goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
-				zap.Int("i", i),
-				zap.Error(err))
+	// for i, v := range gameProp.Components.Components {
+	// 	err := v.OnNewGame(gameProp)
+	// 	if err != nil {
+	// 		goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
+	// 			zap.Int("i", i),
+	// 			zap.Error(err))
 
-			return err
-		}
-	}
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }
@@ -282,16 +329,16 @@ func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake
 
 	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
 
-	for i, v := range gameProp.Components.Components {
-		err := v.OnNewStep(gameProp)
-		if err != nil {
-			goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
-				zap.Int("i", i),
-				zap.Error(err))
+	// for i, v := range gameProp.Components.Components {
+	// 	err := v.OnNewStep(gameProp)
+	// 	if err != nil {
+	// 		goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
+	// 			zap.Int("i", i),
+	// 			zap.Error(err))
 
-			return err
-		}
-	}
+	// 		return err
+	// 	}
+	// }
 
 	return nil
 }

@@ -256,11 +256,11 @@ func (symbolModifier *SymbolModifier) procSymbols(gameProp *GameProperty, plugin
 
 // playgame
 func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	symbolModifier.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[symbolModifier.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(symbolModifier.Config.TargetSymbolCodes) > 0 {
 		gs := symbolModifier.GetTargetScene3(gameProp, curpr, prs, cd, symbolModifier.Name, "", 0)
@@ -294,15 +294,15 @@ func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 	}
 
-	symbolModifier.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolModifier.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolModifier *SymbolModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (symbolModifier *SymbolModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := gameProp.MapComponentData[symbolModifier.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("symbolModifier symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

@@ -382,18 +382,49 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapReelSetWeights[name] = vw2
+		} else if t == "SymbolWeight" {
+			vw2, err := parseSymbolWeights(v.Get("fileJson"), cfg.GetDefaultPaytables())
+			if err != nil {
+				goutils.Error("loadOtherList:parseSymbolWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapValWeights[name] = vw2
 		}
 	}
 
 	return nil
 }
 
+type linkData struct {
+	mapLinks map[string][][]string
+}
+
+func (ld *linkData) add(linktype string, src string, target string) {
+	_, isok := ld.mapLinks[linktype]
+	if !isok {
+		ld.mapLinks[linktype] = [][]string{}
+	}
+
+	ld.mapLinks[linktype] = append(ld.mapLinks[linktype], []string{src, target})
+}
+
+func newLinkData() *linkData {
+	return &linkData{
+		mapLinks: make(map[string][][]string),
+	}
+}
+
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	// linkScene := [][]string{}
 	// linkOtherScene := [][]string{}
-	linkComponent := [][]string{}
-	jumpComponent := [][]string{}
-	loopComponent := [][]string{}
+	// linkComponent := [][]string{}
+	// jumpComponent := [][]string{}
+	// loopComponent := [][]string{}
+	ld := newLinkData()
 	lstStart := []string{}
 	// mapTrigger := make(map[string]*TriggerFeatureConfig)
 	// mapTriggerID := make(map[string]*TriggerFeatureConfig)
@@ -597,6 +628,39 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
+			} else if componentType == "rollsymbol" {
+				componentName, err := parseRollSymbol(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseRollSymbol",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "mask" {
+				componentName, err := parseMask(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseMask",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "replacereelwithmask" {
+				componentName, err := parseReplaceReelWithMask(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseReplaceReelWithMask",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
 			} else {
 				goutils.Error("loadCells:ErrUnsupportedComponentType",
 					zap.String("componentType", componentType),
@@ -633,11 +697,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				lstStart = append(lstStart, mapComponentName[target])
 			} else {
 				if sourcePort == "jump-component-groups-out" {
-					jumpComponent = append(jumpComponent, []string{mapComponentName[source], mapComponentName[target]})
+					ld.add("jump", mapComponentName[source], mapComponentName[target])
+					// jumpComponent = append(jumpComponent, []string{mapComponentName[source], mapComponentName[target]})
 				} else if sourcePort == "component-groups-out" {
-					linkComponent = append(linkComponent, []string{mapComponentName[source], mapComponentName[target]})
+					ld.add("next", mapComponentName[source], mapComponentName[target])
+					// linkComponent = append(linkComponent, []string{mapComponentName[source], mapComponentName[target]})
 				} else if sourcePort == "loop-component-groups-out" {
-					loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
+					ld.add("loop", mapComponentName[source], mapComponentName[target])
+					// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
+				} else if sourcePort == "foreach-component-groups-out" {
+					ld.add("foreach", mapComponentName[source], mapComponentName[target])
+					// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
 				} else {
 					goutils.Error("loadCells:sourcePort",
 						zap.String("sourcePort", sourcePort),
@@ -653,26 +723,35 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 		cfg.StartComponents[bet] = lstStart[0]
 	}
 
-	for _, arr := range linkComponent {
-		icfg, isok := cfg.mapConfig[arr[0]]
-		if isok {
-			icfg.SetLinkComponent("next", arr[1])
+	for lt, arr := range ld.mapLinks {
+		for _, cld := range arr {
+			icfg, isok := cfg.mapConfig[cld[0]]
+			if isok {
+				icfg.SetLinkComponent(lt, cld[1])
+			}
 		}
 	}
 
-	for _, arr := range jumpComponent {
-		icfg, isok := cfg.mapConfig[arr[0]]
-		if isok {
-			icfg.SetLinkComponent("jump", arr[1])
-		}
-	}
+	// for _, arr := range linkComponent {
+	// 	icfg, isok := cfg.mapConfig[arr[0]]
+	// 	if isok {
+	// 		icfg.SetLinkComponent("next", arr[1])
+	// 	}
+	// }
 
-	for _, arr := range loopComponent {
-		icfg, isok := cfg.mapConfig[arr[0]]
-		if isok {
-			icfg.SetLinkComponent("loop", arr[1])
-		}
-	}
+	// for _, arr := range jumpComponent {
+	// 	icfg, isok := cfg.mapConfig[arr[0]]
+	// 	if isok {
+	// 		icfg.SetLinkComponent("jump", arr[1])
+	// 	}
+	// }
+
+	// for _, arr := range loopComponent {
+	// 	icfg, isok := cfg.mapConfig[arr[0]]
+	// 	if isok {
+	// 		icfg.SetLinkComponent("loop", arr[1])
+	// 	}
+	// }
 
 	// for _, arr := range linkScene {
 	// 	sourceCfg, isok0 := cfg.mapBasicConfig[arr[0]]

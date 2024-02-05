@@ -78,13 +78,13 @@ func (dropDownSymbols *DropDownSymbols) InitEx(cfg any, pool *GamePropertyPool) 
 
 // playgame
 func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	dropDownSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[dropDownSymbols.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, cd, dropDownSymbols.Name, "", 0)
+	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, dropDownSymbols.Name, "", 0)
 	ngs := gs
 
 	for x, arr := range ngs.Arr {
@@ -118,24 +118,24 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 	}
 
 	if ngs == gs {
-		dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
-	dropDownSymbols.AddScene(gameProp, curpr, ngs, cd)
+	dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
-	dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (dropDownSymbols *DropDownSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[dropDownSymbols.Name].(*BasicComponentData)
+func (dropDownSymbols *DropDownSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after dropDownSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("after dropDownSymbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

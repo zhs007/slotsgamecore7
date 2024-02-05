@@ -38,27 +38,28 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		mapInt:           make(map[string]int),
 		CurPaytables:     pool.DefaultPaytables,
 		CurLineData:      pool.DefaultLineData,
-		MapComponentData: make(map[string]IComponentData),
-		PoolScene:        sgc7game.NewGameScenePoolEx(),
-		SceneStack:       NewSceneStack(),
+		// MapComponentData: make(map[string]IComponentData),
+		PoolScene:  sgc7game.NewGameScenePoolEx(),
+		SceneStack: NewSceneStack(),
+		callStack:  NewCallStack(),
 	}
 
 	if gameProp.CurLineData != nil {
 		gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
 	}
 
-	mapc, isok := pool.mapComponents[betMul]
-	if !isok {
-		goutils.Error("GamePropertyPool.newGameProp:mapComponents",
-			zap.Int("betMul", betMul),
-			zap.Error(ErrInvalidBet))
+	// mapc, isok := pool.mapComponents[betMul]
+	// if !isok {
+	// 	goutils.Error("GamePropertyPool.newGameProp:mapComponents",
+	// 		zap.Int("betMul", betMul),
+	// 		zap.Error(ErrInvalidBet))
 
-		return nil
-	}
+	// 	return nil
+	// }
 
-	for k, v := range mapc.MapComponents {
-		gameProp.MapComponentData[k] = v.NewComponentData()
-	}
+	// for k, v := range mapc.MapComponents {
+	// 	gameProp.MapComponentData[k] = v.NewComponentData()
+	// }
 
 	gameProp.SetVal(GamePropWidth, pool.Config.Width)
 	gameProp.SetVal(GamePropHeight, pool.Config.Height)
@@ -373,6 +374,10 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 
 // LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	if gJsonMode {
+		return pool.mapIntValWeights[fn], nil
+	}
+
 	pool.lock.RLock()
 	vw, isok := pool.mapSymbolValWeights[fn]
 	if isok {
@@ -427,23 +432,32 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMaskVal",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return ErrIvalidComponentName
+		return ErrInvalidComponentName
 	}
 
-	im, isok := ic.(IMask)
-	if !isok {
-		goutils.Error("GamePropertyPool.SetMaskVal",
-			zap.String("name", name),
-			zap.Error(ErrNotMask))
+	cd := gameProp.GetComponentData(ic)
+	// im, isok := ic.(IMask)
+	// if !isok {
+	// 	goutils.Error("GamePropertyPool.SetMaskVal",
+	// 		zap.String("name", name),
+	// 		zap.Error(ErrNotMask))
 
-		return ErrNotMask
+	// 	return ErrNotMask
+	// }
+
+	if cd != nil {
+		ic.SetMaskVal(plugin, gameProp, curpr, gp, cd, index, mask)
+
+		return nil
 	}
 
-	im.SetMaskVal(plugin, gameProp, curpr, gp, index, mask)
+	goutils.Error("GamePropertyPool.GetMask",
+		zap.String("name", name),
+		zap.Error(ErrInvalidComponent))
 
-	return nil
+	return ErrInvalidComponent
 }
 
 func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, mask []bool, isOnlyTrue bool) error {
@@ -451,27 +465,53 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMask",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return ErrIvalidComponentName
+		return ErrInvalidComponentName
 	}
 
-	im, isok := ic.(IMask)
-	if !isok {
-		goutils.Error("GamePropertyPool.SetMask",
-			zap.String("name", name),
-			zap.Error(ErrNotMask))
+	cd := gameProp.GetComponentData(ic)
+	// im, isok := ic.(IMask)
+	// if !isok {
+	// 	goutils.Error("GamePropertyPool.SetMaskVal",
+	// 		zap.String("name", name),
+	// 		zap.Error(ErrNotMask))
 
-		return ErrNotMask
+	// 	return ErrNotMask
+	// }
+
+	if cd != nil {
+		if isOnlyTrue {
+			ic.SetMaskOnlyTrue(plugin, gameProp, curpr, gp, cd, mask)
+		} else {
+			ic.SetMask(plugin, gameProp, curpr, gp, cd, mask)
+		}
+
+		return nil
 	}
 
-	if isOnlyTrue {
-		im.SetMaskOnlyTrue(plugin, gameProp, curpr, gp, mask)
-	} else {
-		im.SetMask(plugin, gameProp, curpr, gp, mask)
-	}
+	goutils.Error("GamePropertyPool.GetMask",
+		zap.String("name", name),
+		zap.Error(ErrInvalidComponent))
 
-	return nil
+	return ErrInvalidComponent
+
+	// im, isok := ic.(IMask)
+	// if !isok {
+	// 	goutils.Error("GamePropertyPool.SetMask",
+	// 		zap.String("name", name),
+	// 		zap.Error(ErrNotMask))
+
+	// 	return ErrNotMask
+	// }
+
+	// if isOnlyTrue {
+	// 	im.SetMaskOnlyTrue(plugin, gameProp, curpr, gp, mask)
+	// } else {
+	// 	im.SetMask(plugin, gameProp, curpr, gp, mask)
+	// }
+
+	// return nil
 }
 
 func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bool, error) {
@@ -479,23 +519,32 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.GetMask",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return nil, ErrIvalidComponentName
+		return nil, ErrInvalidComponentName
 	}
 
-	im, isok := ic.(IMask)
-	if !isok {
-		goutils.Error("GamePropertyPool.GetMask",
-			zap.String("name", name),
-			zap.Error(ErrNotMask))
-
-		return nil, ErrNotMask
+	cd := gameProp.GetComponentData(ic)
+	if cd != nil {
+		return cd.GetMask(), nil
 	}
 
-	mask := im.GetMask(gameProp)
+	goutils.Error("GamePropertyPool.GetMask",
+		zap.String("name", name),
+		zap.Error(ErrInvalidComponent))
 
-	return mask, nil
+	// im, isok := ic.(IMask)
+	// if !isok {
+	// 	goutils.Error("GamePropertyPool.GetMask",
+	// 		zap.String("name", name),
+	// 		zap.Error(ErrNotMask))
+
+	// 	return nil, ErrNotMask
+	// }
+
+	// mask := im.GetMask(gameProp)
+
+	return nil, ErrInvalidComponent
 }
 
 func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, name string, num int) error {
@@ -503,21 +552,24 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plu
 	if !isok || !ic.IsRespin() {
 		goutils.Error("GamePropertyPool.PushTrigger",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return ErrIvalidComponentName
+		return ErrInvalidComponentName
 	}
 
-	ir, isok := ic.(IRespin)
-	if !isok {
-		goutils.Error("GamePropertyPool.PushTrigger",
-			zap.String("name", name),
-			zap.Error(ErrNotRespin))
+	cd := gameProp.GetGlobalComponentData(ic)
+	cd.PushTriggerRespin(gameProp, plugin, curpr, gp, num)
 
-		return ErrNotRespin
-	}
+	// ir, isok := ic.(IRespin)
+	// if !isok {
+	// 	goutils.Error("GamePropertyPool.PushTrigger",
+	// 		zap.String("name", name),
+	// 		zap.Error(ErrNotRespin))
 
-	ir.PushTrigger(gameProp, plugin, curpr, gp, num)
+	// 	return ErrNotRespin
+	// }
+
+	// ir.PushTrigger(gameProp, plugin, curpr, gp, num)
 
 	return nil
 }

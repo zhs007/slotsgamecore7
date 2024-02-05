@@ -25,13 +25,13 @@ type RemoveSymbolsData struct {
 }
 
 // OnNewGame -
-func (removeSymbolsData *RemoveSymbolsData) OnNewGame() {
-	removeSymbolsData.BasicComponentData.OnNewGame()
+func (removeSymbolsData *RemoveSymbolsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	removeSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (removeSymbolsData *RemoveSymbolsData) OnNewStep() {
-	removeSymbolsData.BasicComponentData.OnNewStep()
+func (removeSymbolsData *RemoveSymbolsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	removeSymbolsData.RemovedNum = 0
 }
@@ -123,19 +123,19 @@ func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) 
 
 // playgame
 func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	removeSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[removeSymbols.Name].(*RemoveSymbolsData)
+	bcd := cd.(*RemoveSymbolsData)
 
-	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, removeSymbols.Name, "", 0)
+	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, &bcd.BasicComponentData, removeSymbols.Name, "", 0)
 	ngs := gs
 
-	cd.RemovedNum = 0
+	bcd.RemovedNum = 0
 
 	for _, cn := range removeSymbols.Config.TargetComponents {
-		ccd := gameProp.MapComponentData[cn]
+		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
 		lst := ccd.GetResults()
 		for _, ri := range lst {
 			for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
@@ -148,31 +148,31 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 					ngs.Arr[x][y] = -1
 
-					cd.RemovedNum++
+					bcd.RemovedNum++
 				}
 			}
 		}
 	}
 
 	if ngs == gs {
-		removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
-	removeSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+	removeSymbols.AddScene(gameProp, curpr, ngs, &bcd.BasicComponentData)
 
-	removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
+	nc := removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (removeSymbols *RemoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[removeSymbols.Name].(*RemoveSymbolsData)
+func (removeSymbols *RemoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*RemoveSymbolsData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after removedSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("after removedSymbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
@@ -195,6 +195,11 @@ func (removeSymbols *RemoveSymbols) NewComponentData() IComponentData {
 
 // EachUsedResults -
 func (removeSymbols *RemoveSymbols) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+}
+
+// GetAllLinkComponents - get all link components
+func (removeSymbols *RemoveSymbols) GetAllLinkComponents() []string {
+	return []string{removeSymbols.Config.DefaultNextComponent, removeSymbols.Config.JumpToComponent}
 }
 
 func NewRemoveSymbols(name string) IComponent {

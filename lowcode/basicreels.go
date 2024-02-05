@@ -16,9 +16,9 @@ import (
 
 const BasicReelsTypeName = "basicReels"
 
-const (
-	BRCVReelSet string = "reelSet" // 可以修改配置项里的ReelSet
-)
+// const (
+// 	BRCVReelSet string = "reelSet" // 可以修改配置项里的ReelSet
+// )
 
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
@@ -90,7 +90,7 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 }
 
 func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
-	str := basicCD.GetConfigVal(BRCVReelSet)
+	str := basicCD.GetConfigVal(CCVReelSet)
 	if str != "" {
 		return str
 	}
@@ -100,11 +100,11 @@ func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
 
 // playgame
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	basicReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[basicReels.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
 	reelname := ""
 	if basicReels.ReelSetWeights != nil {
@@ -113,10 +113,10 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
-		basicReels.AddRNG(gameProp, si, cd)
+		basicReels.AddRNG(gameProp, si, bcd)
 
 		curreels := val.String()
 		gameProp.TagStr(TagCurReels, curreels)
@@ -126,19 +126,19 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
 
-			return ErrInvalidReels
+			return "", ErrInvalidReels
 		}
 
 		gameProp.CurReels = rd
 		reelname = curreels
 	} else {
-		reelname = basicReels.GetReelSet(cd)
+		reelname = basicReels.GetReelSet(bcd)
 		rd, isok := gameProp.Pool.Config.MapReels[reelname]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
 
-			return ErrInvalidReels
+			return "", ErrInvalidReels
 		}
 
 		gameProp.TagStr(TagCurReels, reelname)
@@ -163,21 +163,21 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		sc.RandReelsWithReelData(gameProp.CurReels, plugin)
 	}
 
-	basicReels.AddScene(gameProp, curpr, sc, cd)
+	basicReels.AddScene(gameProp, curpr, sc, bcd)
 
-	basicReels.onStepEnd(gameProp, curpr, gp, "")
+	nc := basicReels.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(basicReels.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (basicReels *BasicReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[basicReels.Name].(*BasicComponentData)
+func (basicReels *BasicReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("initial symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("initial symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

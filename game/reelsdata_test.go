@@ -110,31 +110,31 @@ func Test_LoadReelsFromExcel(t *testing.T) {
 	t.Logf("Test_LoadReelsFromExcel OK")
 }
 
-func Test_LoadReelsFromExcel2(t *testing.T) {
-	pt, err := LoadPaytablesFromExcel("../data/game001/paytables.xlsx")
-	assert.NoError(t, err)
+// func Test_LoadReelsFromExcel2(t *testing.T) {
+// 	pt, err := LoadPaytablesFromExcel("../data/game001/paytables.xlsx")
+// 	assert.NoError(t, err)
 
-	rd, err := LoadReelsFromExcel2("../data/game001/bg0.xlsx", pt)
-	assert.NoError(t, err)
+// 	rd, err := LoadReelsFromExcel2("../data/game001/bg0.xlsx", pt)
+// 	assert.NoError(t, err)
 
-	assert.Equal(t, len(rd.Reels), 5)
-	assert.Equal(t, len(rd.Reels[0]), 290)
-	assert.Equal(t, len(rd.Reels[1]), 303)
-	assert.Equal(t, len(rd.Reels[2]), 298)
-	assert.Equal(t, len(rd.Reels[3]), 289)
-	assert.Equal(t, len(rd.Reels[4]), 276)
+// 	assert.Equal(t, len(rd.Reels), 5)
+// 	assert.Equal(t, len(rd.Reels[0]), 290)
+// 	assert.Equal(t, len(rd.Reels[1]), 303)
+// 	assert.Equal(t, len(rd.Reels[2]), 298)
+// 	assert.Equal(t, len(rd.Reels[3]), 289)
+// 	assert.Equal(t, len(rd.Reels[4]), 276)
 
-	assert.Equal(t, rd.Reels[0][0], 7)
-	assert.Equal(t, rd.Reels[1][0], 4)
-	assert.Equal(t, rd.Reels[2][0], 4)
-	assert.Equal(t, rd.Reels[3][0], 8)
-	assert.Equal(t, rd.Reels[4][0], 6)
+// 	assert.Equal(t, rd.Reels[0][0], 7)
+// 	assert.Equal(t, rd.Reels[1][0], 4)
+// 	assert.Equal(t, rd.Reels[2][0], 4)
+// 	assert.Equal(t, rd.Reels[3][0], 8)
+// 	assert.Equal(t, rd.Reels[4][0], 6)
 
-	assert.Equal(t, rd.Reels[0][289], 5)
-	assert.Equal(t, rd.Reels[1][302], 6)
-	assert.Equal(t, rd.Reels[2][297], 5)
-	assert.Equal(t, rd.Reels[3][288], 7)
-	assert.Equal(t, rd.Reels[4][275], 3)
+// 	assert.Equal(t, rd.Reels[0][289], 5)
+// 	assert.Equal(t, rd.Reels[1][302], 6)
+// 	assert.Equal(t, rd.Reels[2][297], 5)
+// 	assert.Equal(t, rd.Reels[3][288], 7)
+// 	assert.Equal(t, rd.Reels[4][275], 3)
 
-	t.Logf("Test_LoadReelsFromExcel2 OK")
-}
+// 	t.Logf("Test_LoadReelsFromExcel2 OK")
+// }

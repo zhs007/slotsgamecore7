@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -28,13 +29,13 @@ type BasicComponentData struct {
 }
 
 // OnNewGame -
-func (basicComponentData *BasicComponentData) OnNewGame() {
+func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	basicComponentData.MapConfigVals = make(map[string]string)
 	basicComponentData.MapConfigIntVals = make(map[string]int)
 }
 
 // OnNewStep -
-func (basicComponentData *BasicComponentData) OnNewStep() {
+func (basicComponentData *BasicComponentData) OnNewStep(gameProp *GameProperty, component IComponent) {
 	basicComponentData.UsedScenes = nil
 	basicComponentData.UsedOtherScenes = nil
 	basicComponentData.UsedResults = nil
@@ -134,6 +135,69 @@ func (basicComponentData *BasicComponentData) GetResults() []int {
 	return basicComponentData.UsedResults
 }
 
+// GetSymbols -
+func (basicComponentData *BasicComponentData) GetSymbols() []int {
+	return nil
+}
+
+// AddSymbol -
+func (basicComponentData *BasicComponentData) AddSymbol(symbolCode int) {
+
+}
+
+// GetLastRespinNum -
+func (basicComponentData *BasicComponentData) GetLastRespinNum() int {
+	return 0
+}
+
+// IsRespinEnding -
+func (basicComponentData *BasicComponentData) IsRespinEnding() bool {
+	return false
+}
+
+// IsRespinStarted -
+func (basicComponentData *BasicComponentData) IsRespinStarted() bool {
+	return false
+}
+
+// // AddRetriggerRespinNum -
+// func (basicComponentData *BasicComponentData) AddRetriggerRespinNum(num int) {
+
+// }
+
+// AddTriggerRespinAward -
+func (basicComponentData *BasicComponentData) AddTriggerRespinAward(award *Award) {
+
+}
+
+// AddRespinTimes -
+func (basicComponentData *BasicComponentData) AddRespinTimes(num int) {
+
+}
+
+// TriggerRespin
+func (basicComponentData *BasicComponentData) TriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
+
+}
+
+// PushTrigger -
+func (basicComponentData *BasicComponentData) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
+
+}
+
+// // SaveRetriggerRespinNum -
+// func (basicComponentData *BasicComponentData) SaveRetriggerRespinNum()
+
+// GetMask -
+func (basicComponentData *BasicComponentData) GetMask() []bool {
+	return nil
+}
+
+// ChgMask -
+func (basicComponentData *BasicComponentData) ChgMask(curMask int, val bool) bool {
+	return false
+}
+
 // 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
 	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
@@ -161,6 +225,33 @@ type BasicComponent struct {
 	Config      *BasicComponentConfig
 	Name        string
 	SrcSceneNum int
+	// dataForeachSymbol *ForeachSymbolData
+}
+
+// Init -
+func (basicComponent *BasicComponent) Init(fn string, pool *GamePropertyPool) error {
+	return nil
+}
+
+// InitEx -
+func (basicComponent *BasicComponent) InitEx(cfg any, pool *GamePropertyPool) error {
+	return nil
+}
+
+// OnAsciiGame - outpur to asciigame
+func (basicComponent *BasicComponent) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+	return nil
+}
+
+// OnPlayGame - on playgame
+func (basicComponent *BasicComponent) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	return nil
+}
+
+// OnStats -
+func (basicComponent *BasicComponent) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+	return false, 0, 0
 }
 
 // onInit -
@@ -180,43 +271,45 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 }
 
 // onStepEnd -
-func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) {
+func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) string {
 	if nextComponent == "" {
 		nextComponent = basicComponent.Config.DefaultNextComponent
 	}
 
-	component, isok := gameProp.Components.MapComponents[nextComponent]
-	if isok && component.IsRespin() {
-		gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
-		gameProp.onTriggerRespin(nextComponent)
+	// component, isok := gameProp.Components.MapComponents[nextComponent]
+	// if isok && component.IsRespin() {
+	// 	// gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
+	// 	// gameProp.onTriggerRespin(nextComponent)
 
-		gp.NextStepFirstComponent = nextComponent
+	// 	// gp.NextStepFirstComponent = nextComponent
 
-		gameProp.SetStrVal(GamePropNextComponent, "")
+	// 	// gameProp.SetStrVal(GamePropNextComponent, "")
 
-		return
-	}
+	// 	return nextComponent
+	// }
 
-	gameProp.SetStrVal(GamePropNextComponent, nextComponent)
+	// gameProp.SetStrVal(GamePropNextComponent, nextComponent)
+
+	return nextComponent
 }
 
-// OnNewGame -
-func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[basicComponent.Name]
+// // OnNewGame -
+// func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
+// 	cd := gameProp.GetCurComponentData(basicComponent)
 
-	cd.OnNewGame()
+// 	cd.OnNewGame()
 
-	return nil
-}
+// 	return nil
+// }
 
-// OnNewStep -
-func (basicComponent *BasicComponent) OnNewStep(gameProp *GameProperty) error {
-	cd := gameProp.MapComponentData[basicComponent.Name]
+// // OnNewStep -
+// func (basicComponent *BasicComponent) OnNewStep(gameProp *GameProperty) error {
+// 	cd := gameProp.GetCurComponentData(basicComponent)
 
-	cd.OnNewStep()
+// 	cd.OnNewStep()
 
-	return nil
-}
+// 	return nil
+// }
 
 // AddScene -
 func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
@@ -409,7 +502,7 @@ func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, p
 
 // OnPlayGame - on playgame
 func (basicComponent *BasicComponent) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 	return nil
 }
 
@@ -514,14 +607,84 @@ func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.St
 
 // }
 
-// GetSymbols -
-func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
+// // GetSymbols -
+// func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
+// 	return nil
+// }
+
+// // AddSymbol -
+// func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
+
+// }
+
+// // OnEachSymbol - on foreach symbol
+// func (basicComponent *BasicComponent) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState,
+// 	stake *sgc7game.Stake, prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error) {
+// 	return "", nil
+// }
+
+// EachSymbols - foreach symbols
+func (basicComponent *BasicComponent) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	prs []*sgc7game.PlayResult, cd IComponentData) error {
 	return nil
 }
 
-// AddSymbol -
-func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
+// // GetComponentData -
+// func (basicComponent *BasicComponent) GetComponentData(gameProp *GameProperty) IComponentData {
+// 	return gameProp.GetCurComponentData(basicComponent)
 
+// 	if basicComponent.dataForeachSymbol != nil {
+// 		return gameProp.MapComponentData[fmt.Sprintf("%v:%v", basicComponent.Name, basicComponent.dataForeachSymbol.Index)]
+// 	}
+
+// 	return gameProp.MapComponentData[basicComponent.Name]
+// }
+
+// // SetForeachSymbolData -
+// func (basicComponent *BasicComponent) SetForeachSymbolData(data *ForeachSymbolData) {
+// 	basicComponent.dataForeachSymbol = data
+// }
+
+// OnGameInited - on game inited
+func (basicComponent *BasicComponent) OnGameInited(components *ComponentList) error {
+	return nil
+}
+
+// GetAllLinkComponents - get all link components
+func (basicComponent *BasicComponent) GetAllLinkComponents() []string {
+	return []string{basicComponent.Config.DefaultNextComponent}
+}
+
+// CanTriggerWithScene -
+func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	goutils.Error("BasicComponent.CanTriggerWithScene",
+		zap.Error(ErrInvalidComponent))
+
+	return false, nil
+}
+
+// SetMask -
+func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
+	goutils.Error("BasicComponent.SetMask",
+		zap.Error(ErrInvalidComponent))
+
+	return ErrInvalidComponent
+}
+
+// SetMaskVal -
+func (basicComponent *BasicComponent) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, mask bool) error {
+	goutils.Error("BasicComponent.SetMaskVal",
+		zap.Error(ErrInvalidComponent))
+
+	return ErrInvalidComponent
+}
+
+// SetMaskOnlyTrue -
+func (basicComponent *BasicComponent) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
+	goutils.Error("BasicComponent.SetMaskOnlyTrue",
+		zap.Error(ErrInvalidComponent))
+
+	return ErrInvalidComponent
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {

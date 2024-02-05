@@ -34,13 +34,13 @@ type WaysTriggerData struct {
 }
 
 // OnNewGame -
-func (waysTriggerData *WaysTriggerData) OnNewGame() {
-	waysTriggerData.BasicComponentData.OnNewGame()
+func (waysTriggerData *WaysTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	waysTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (waysTriggerData *WaysTriggerData) OnNewStep() {
-	waysTriggerData.BasicComponentData.OnNewStep()
+func (waysTriggerData *WaysTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	waysTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	waysTriggerData.NextComponent = ""
 	waysTriggerData.SymbolNum = 0
@@ -96,10 +96,10 @@ func (waysTriggerData *WaysTriggerData) SetVal(key string, val int) {
 // WaysTriggerConfig - configuration for WaysTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type WaysTriggerConfig struct {
-	BasicComponentConfig            `yaml:",inline" json:",inline"`
-	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
-	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
-	ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbols              []string `yaml:"symbols" json:"symbols"` // like scatter
+	SymbolCodes          []int    `yaml:"-" json:"-"`             // like scatter
+	// ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
 	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
 	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
 	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
@@ -215,7 +215,7 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		waysTrigger.Config.SymbolAwardsWeights.Init()
 	}
 
-	waysTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, waysTrigger.Config.SymbolCodes)
+	// waysTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, waysTrigger.Config.SymbolCodes)
 
 	waysTrigger.Config.CheckWinType = ParseCheckWinType(waysTrigger.Config.StrCheckWinType)
 
@@ -277,20 +277,36 @@ func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameP
 	return nil
 }
 
+func (waysTrigger *WaysTrigger) getSymbols(gameProp *GameProperty) []int {
+	s := gameProp.GetCurCallStackSymbol()
+	if s >= 0 {
+		return []int{s}
+	}
+
+	return waysTrigger.Config.SymbolCodes
+}
+
+// CanTriggerWithScene -
+func (waysTrigger *WaysTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	return waysTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+}
+
 // CanTrigger -
-func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
+func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	// std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
+	symbols := waysTrigger.getSymbols(gameProp)
 
 	if waysTrigger.Config.TriggerType == STTypeWays {
-		os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")
+		// os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")
 
 		if os != nil {
 			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, waysTrigger.Config.BetType),
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-					return goutils.IndexOfIntSlice(waysTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+					// return true
+					return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 				}, func(cursymbol int) bool {
 					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 				}, func(cursymbol int, startsymbol int) bool {
@@ -303,19 +319,19 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 					return os.Arr[x][y]
 				})
 
-			for _, v := range currets {
-				gameProp.ProcMulti(v)
+			// for _, v := range currets {
+			// 	gameProp.ProcMulti(v)
 
-				// if isSaveResult {
-				// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-				// }
-			}
+			// 	// if isSaveResult {
+			// 	// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			// 	// }
+			// }
 
 			lst = append(lst, currets...)
 		} else {
 			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, waysTrigger.Config.BetType),
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-					return goutils.IndexOfIntSlice(waysTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+					return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 				}, func(cursymbol int) bool {
 					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 				}, func(cursymbol int, startsymbol int) bool {
@@ -328,13 +344,13 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 					return 1
 				})
 
-			for _, v := range currets {
-				gameProp.ProcMulti(v)
+			// for _, v := range currets {
+			// 	gameProp.ProcMulti(v)
 
-				// if isSaveResult {
-				// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-				// }
-			}
+			// 	// if isSaveResult {
+			// 	// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+			// 	// }
+			// }
 
 			lst = append(lst, currets...)
 		}
@@ -345,7 +361,7 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 	} else if waysTrigger.Config.TriggerType == STTypeCheckWays {
 		currets := sgc7game.CheckWays(gs, waysTrigger.Config.MinNum,
 			func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-				return goutils.IndexOfIntSlice(waysTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
+				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 			}, func(cursymbol int) bool {
 				return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			}, func(cursymbol int, startsymbol int) bool {
@@ -356,13 +372,13 @@ func (waysTrigger *WaysTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.
 				return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			})
 
-		for _, v := range currets {
-			gameProp.ProcMulti(v)
+		// for _, v := range currets {
+		// 	// gameProp.ProcMulti(v)
 
-			// if isSaveResult {
-			// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-			// }
-		}
+		// 	// if isSaveResult {
+		// 	// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+		// 	// }
+		// }
 
 		lst = append(lst, currets...)
 
@@ -446,15 +462,16 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 
 // playgame
 func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	waysTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
+	std := icd.(*WaysTriggerData)
 
 	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, waysTrigger.Name, "", 0)
+	os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")
 
-	isTrigger, lst := waysTrigger.CanTrigger(gameProp, gs, curpr, stake, !waysTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
 		waysTrigger.procWins(std, lst)
@@ -473,7 +490,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WaysTrigger.OnPlayGame:calcRespinNum",
 				zap.Error(err))
 
-			return nil
+			return "", nil
 		}
 
 		std.RespinNum = respinNum
@@ -483,7 +500,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WaysTrigger.OnPlayGame:procMask",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		// if symbolTrigger.Config.TagSymbolNum != "" {
@@ -501,7 +518,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 					goutils.Error("WaysTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				gameProp.procAwards(plugin, node.Awards, curpr, gp)
@@ -583,21 +600,21 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 			std.NextComponent = waysTrigger.Config.JumpToComponent
 
-			waysTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+			nc := waysTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
 
-			return nil
+			return nc, nil
 		}
 	}
 
-	waysTrigger.onStepEnd(gameProp, curpr, gp, "")
+	nc := waysTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
+	std := icd.(*WaysTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
@@ -674,6 +691,11 @@ func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 	}
 
 	return waysTrigger.Config.WinMulti
+}
+
+// GetAllLinkComponents - get all link components
+func (waysTrigger *WaysTrigger) GetAllLinkComponents() []string {
+	return []string{waysTrigger.Config.DefaultNextComponent, waysTrigger.Config.JumpToComponent}
 }
 
 func NewWaysTrigger(name string) IComponent {

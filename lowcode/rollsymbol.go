@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -27,13 +29,13 @@ type RollSymbolData struct {
 }
 
 // OnNewGame -
-func (rollSymbolData *RollSymbolData) OnNewGame() {
-	rollSymbolData.BasicComponentData.OnNewGame()
+func (rollSymbolData *RollSymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	rollSymbolData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (rollSymbolData *RollSymbolData) OnNewStep() {
-	rollSymbolData.BasicComponentData.OnNewStep()
+func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData
@@ -63,6 +65,13 @@ type RollSymbolConfig struct {
 	SrcSymbolCollection    string                `yaml:"srcSymbolCollection" json:"srcSymbolCollection"`
 	IgnoreSymbolCollection string                `yaml:"ignoreSymbolCollection" json:"ignoreSymbolCollection"`
 	TargetSymbolCollection string                `yaml:"targetSymbolCollection" json:"targetSymbolCollection"`
+}
+
+// SetLinkComponent
+func (cfg *RollSymbolConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type RollSymbol struct {
@@ -157,17 +166,17 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 
 // playgame
 func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	rollSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	rsd := gameProp.MapComponentData[rollSymbol.Name].(*RollSymbolData)
+	rsd := icd.(*RollSymbolData)
 
 	vw := rollSymbol.getValWeight(gameProp)
 	if vw == nil {
-		rollSymbol.onStepEnd(gameProp, curpr, gp, "")
+		nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	cr, err := vw.RandVal(plugin)
@@ -175,7 +184,7 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		goutils.Error("RollSymbol.OnPlayGame:RandVal",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	rsd.SymbolCode = cr.Int()
@@ -184,14 +193,14 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.AddComponentSymbol(rollSymbol.Config.TargetSymbolCollection, rsd.SymbolCode)
 	}
 
-	rollSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	rsd := gameProp.MapComponentData[rollSymbol.Name].(*RollSymbolData)
+func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	rsd := icd.(*RollSymbolData)
 
 	fmt.Printf("rollSymbol %v, got %v \n", rollSymbol.GetName(), gameProp.Pool.DefaultPaytables.GetStringFromInt(rsd.SymbolCode))
 
@@ -203,8 +212,80 @@ func (rollSymbol *RollSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 	return false, 0, 0
 }
 
+// NewComponentData -
+func (rollSymbol *RollSymbol) NewComponentData() IComponentData {
+	return &RollSymbolData{}
+}
+
 func NewRollSymbol(name string) IComponent {
 	return &RollSymbol{
 		BasicComponent: NewBasicComponent(name, 0),
 	}
+}
+
+//	"configuration": {
+//		"weight": "fgbookofsymbol",
+//		"ignoreSymbolCollection": "fg-syms",
+//		"targetSymbolCollection": "fg-syms"
+//	},
+type jsonRollSymbol struct {
+	Weight                 string `json:"weight"`
+	SrcSymbolCollection    string `json:"srcSymbolCollection"`
+	IgnoreSymbolCollection string `json:"ignoreSymbolCollection"`
+	TargetSymbolCollection string `json:"targetSymbolCollection"`
+}
+
+func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
+	cfg := &RollSymbolConfig{
+		Weight:                 jcfg.Weight,
+		SrcSymbolCollection:    jcfg.SrcSymbolCollection,
+		IgnoreSymbolCollection: jcfg.IgnoreSymbolCollection,
+		TargetSymbolCollection: jcfg.TargetSymbolCollection,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseRollSymbol:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseRollSymbol:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonRollSymbol{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseRollSymbol:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: RollSymbolTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

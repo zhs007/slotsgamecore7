@@ -14,9 +14,9 @@ import (
 
 const WeightTrigger2TypeName = "weightTrigger2"
 
-const (
-	WT2CVTriggerWeight string = "triggerWeight" // 可以修改配置项里的triggerWeight
-)
+// const (
+// 	WT2CVTriggerWeight string = "triggerWeight" // 可以修改配置项里的triggerWeight
+// )
 
 // WeightTrigger2Config - configuration for WeightTrigger2
 type WeightTrigger2Config struct {
@@ -80,7 +80,7 @@ func (weightTrigger2 *WeightTrigger2) InitEx(cfg any, pool *GamePropertyPool) er
 }
 
 func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(WT2CVTriggerWeight)
+	str := basicCD.GetConfigVal(CCVTriggerWeight)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadIntWeights(str, weightTrigger2.Config.UseFileMapping)
 
@@ -92,11 +92,11 @@ func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, b
 
 // playgame
 func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[weightTrigger2.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	vw := weightTrigger2.getTriggerWeight(gameProp, cd)
 
@@ -105,20 +105,22 @@ func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *
 		goutils.Error("WeightTrigger2.OnPlayGame:RandVal",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	if rv.Int() != 0 {
-		weightTrigger2.onStepEnd(gameProp, curpr, gp, weightTrigger2.Config.JumpToComponent)
-	} else {
-		weightTrigger2.onStepEnd(gameProp, curpr, gp, "")
+		nc := weightTrigger2.onStepEnd(gameProp, curpr, gp, weightTrigger2.Config.JumpToComponent)
+
+		return nc, nil
 	}
 
-	return nil
+	nc := weightTrigger2.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightTrigger2 *WeightTrigger2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (weightTrigger2 *WeightTrigger2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
 }
 

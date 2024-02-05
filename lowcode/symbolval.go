@@ -14,9 +14,9 @@ import (
 
 const SymbolValTypeName = "symbolVal"
 
-const (
-	SVCVWeightVal string = "weightVal" // 可以修改配置项里的 weightVal
-)
+// const (
+// 	SVCVWeightVal string = "weightVal" // 可以修改配置项里的 weightVal
+// )
 
 // SymbolValConfig - configuration for SymbolMulti feature
 type SymbolValConfig struct {
@@ -91,7 +91,7 @@ func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
 }
 
 func (symbolVal *SymbolVal) GetWeightVal(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(SVCVWeightVal)
+	str := basicCD.GetConfigVal(CCVWeightVal)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadIntWeights(str, symbolVal.Config.UseFileMapping)
 
@@ -103,11 +103,11 @@ func (symbolVal *SymbolVal) GetWeightVal(gameProp *GameProperty, basicCD *BasicC
 
 // playgame
 func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	symbolVal.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[symbolVal.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := symbolVal.GetTargetScene3(gameProp, curpr, prs, cd, symbolVal.Name, "", 0)
 
@@ -126,7 +126,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
 								zap.Error(err))
 
-							return err
+							return "", err
 						}
 
 						os.Arr[x][y] = cv.Int()
@@ -156,7 +156,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
 								zap.Error(err))
 
-							return err
+							return "", err
 						}
 
 						os.Arr[x][y] = cv.Int()
@@ -176,18 +176,18 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		symbolVal.ClearOtherScene(gameProp)
 	}
 
-	symbolVal.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolVal.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(symbolVal.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolVal *SymbolVal) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (symbolVal *SymbolVal) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := gameProp.MapComponentData[symbolVal.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
 		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])

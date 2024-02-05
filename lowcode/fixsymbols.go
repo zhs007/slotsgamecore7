@@ -123,13 +123,13 @@ func (fixSymbols *FixSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	fixSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[fixSymbols.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs := fixSymbols.GetTargetScene3(gameProp, curpr, prs, cd, fixSymbols.Name, "", 0)
+	gs := fixSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, fixSymbols.Name, "", 0)
 
 	needReTag := true
 	if fixSymbols.Type == FixSymbolsTypeMergeDown {
@@ -146,28 +146,28 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				}
 			}
 
-			fixSymbols.AddScene(gameProp, curpr, ngs, cd)
+			fixSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
 			needReTag = false
 		}
 	}
 
 	if needReTag {
-		fixSymbols.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)
+		fixSymbols.ReTagScene(gameProp, curpr, bcd.TargetSceneIndex, bcd)
 	}
 
-	fixSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := fixSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (fixSymbols *FixSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (fixSymbols *FixSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[fixSymbols.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("The value of the symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("The value of the symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

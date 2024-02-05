@@ -27,15 +27,15 @@ type CollectorData struct {
 }
 
 // OnNewGame -
-func (collectorData *CollectorData) OnNewGame() {
-	collectorData.BasicComponentData.OnNewGame()
+func (collectorData *CollectorData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	collectorData.BasicComponentData.OnNewGame(gameProp, component)
 
 	collectorData.Val = 0
 }
 
 // OnNewStep -
-func (collectorData *CollectorData) OnNewStep() {
-	collectorData.BasicComponentData.OnNewStep()
+func (collectorData *CollectorData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	collectorData.BasicComponentData.OnNewStep(gameProp, component)
 
 	collectorData.NewCollector = 0
 }
@@ -131,15 +131,15 @@ func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
 // 	return nil
 // }
 
-// Add -
-func (collector *Collector) Add(plugin sgc7plugin.IPlugin, num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
+// add -
+func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
 	if num <= 0 {
 		return nil
 	}
 
-	if cd == nil {
-		cd = gameProp.MapComponentData[collector.Name].(*CollectorData)
-	}
+	// if cd == nil {
+	// 	cd = gameProp.MapComponentData[collector.Name].(*CollectorData)
+	// }
 
 	cd.NewCollector += num
 	oldval := cd.Val
@@ -188,13 +188,13 @@ func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameP
 
 // playgame
 func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
+	ccd := cd.(*CollectorData)
 
-	gs := collector.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, collector.Name, "", 0)
+	gs := collector.GetTargetScene3(gameProp, curpr, prs, &ccd.BasicComponentData, collector.Name, "", 0)
 
 	nn := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
 		return cursymbol == collector.SymbolCode
@@ -203,7 +203,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	// oldval := cd.Val
 	// cd.NewCollector = nn
 
-	collector.Add(plugin, nn, cd, gameProp, curpr, gp, false)
+	collector.add(plugin, nn, ccd, gameProp, curpr, gp, false)
 	// cd.Val += nn
 	// if collector.Config.MaxVal > 0 {
 	// 	if cd.Val > collector.Config.MaxVal {
@@ -224,22 +224,22 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	// gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
-	collector.onStepEnd(gameProp, curpr, gp, "")
+	nc := collector.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	cd := gameProp.MapComponentData[collector.Name].(*CollectorData)
+	ccd := cd.(*CollectorData)
 
-	if cd.NewCollector <= 0 {
-		fmt.Printf("%v dose not collect new value, the collector value is %v\n", collector.Name, cd.Val)
+	if ccd.NewCollector <= 0 {
+		fmt.Printf("%v dose not collect new value, the collector value is %v\n", collector.Name, ccd.Val)
 	} else {
-		fmt.Printf("%v collect %v. the collector value is %v\n", collector.Name, cd.NewCollector, cd.Val)
+		fmt.Printf("%v collect %v. the collector value is %v\n", collector.Name, ccd.NewCollector, ccd.Val)
 	}
 
 	return nil

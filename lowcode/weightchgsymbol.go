@@ -14,9 +14,9 @@ import (
 
 const WeightChgSymbolTypeName = "weightChgSymbol"
 
-const (
-	WCSCVMapChgWeight string = "mapChgWeight" // 可以修改配置项里的mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
-)
+// const (
+// 	WCSCVMapChgWeight string = "mapChgWeight" // 可以修改配置项里的mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
+// )
 
 // WeightChgSymbolConfig - configuration for WeightChgSymbol feature
 type WeightChgSymbolConfig struct {
@@ -83,7 +83,7 @@ func (weightChgSymbol *WeightChgSymbol) InitEx(cfg any, pool *GamePropertyPool) 
 }
 
 func (weightChgSymbol *WeightChgSymbol) getChgWeight(gameProp *GameProperty, basicCD *BasicComponentData, symbol int) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(WCSCVMapChgWeight + ":" + gameProp.Pool.Config.GetDefaultPaytables().GetStringFromInt(symbol))
+	str := basicCD.GetConfigVal(CCVMapChgWeight + ":" + gameProp.Pool.Config.GetDefaultPaytables().GetStringFromInt(symbol))
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadSymbolWeights(str, "val", "weight", gameProp.Pool.DefaultPaytables, weightChgSymbol.Config.UseFileMapping)
 
@@ -95,11 +95,11 @@ func (weightChgSymbol *WeightChgSymbol) getChgWeight(gameProp *GameProperty, bas
 
 // playgame
 func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightChgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[weightChgSymbol.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	gs := weightChgSymbol.GetTargetScene3(gameProp, curpr, prs, cd, weightChgSymbol.Name, "", 0)
 
@@ -115,7 +115,7 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 					goutils.Error("WeightChgSymbol.OnPlayGame:RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				cgs.Arr[x][y] = cr.Int()
@@ -125,15 +125,15 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 
 	weightChgSymbol.AddScene(gameProp, curpr, cgs, cd)
 
-	weightChgSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := weightChgSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightChgSymbol *WeightChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (weightChgSymbol *WeightChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := gameProp.MapComponentData[weightChgSymbol.Name].(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("After WeightChgSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)

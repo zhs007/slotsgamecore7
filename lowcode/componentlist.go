@@ -1,6 +1,10 @@
 package lowcode
 
-import "github.com/zhs007/slotsgamecore7/stats2"
+import (
+	"github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/stats2"
+	"go.uber.org/zap"
+)
 
 type ComponentList struct {
 	Components    []IComponent
@@ -20,6 +24,39 @@ func (lst *ComponentList) onInit() {
 
 		lst.Stats2.Start()
 	}
+
+	for _, v := range lst.MapComponents {
+		v.OnGameInited(lst)
+	}
+}
+
+// GetAllLinkComponents - get all link components
+func (lst *ComponentList) GetAllLinkComponents(componentName string) []string {
+	ic, isok := lst.MapComponents[componentName]
+	if !isok {
+		goutils.Error("ComponentList.GetAllLinkComponents",
+			zap.String("name", componentName),
+			zap.Error(ErrInvalidComponentName))
+
+		return nil
+	}
+
+	allcomponents := []string{componentName}
+
+	curlst := ic.GetAllLinkComponents()
+	for _, v := range curlst {
+		if v == "" {
+			continue
+		}
+
+		allcomponents = InsStringSliceNonRep(allcomponents, v)
+		// allcomponents = append(allcomponents, v)
+		children := lst.GetAllLinkComponents(v)
+		allcomponents = InsSliceNonRep(allcomponents, children)
+		// allcomponents = append(allcomponents, children...)
+	}
+
+	return allcomponents
 }
 
 func NewComponentList() *ComponentList {

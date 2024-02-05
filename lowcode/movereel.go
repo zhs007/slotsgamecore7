@@ -63,13 +63,13 @@ func (moveReel *MoveReel) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	moveReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[moveReel.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs := moveReel.GetTargetScene3(gameProp, curpr, prs, cd, moveReel.Name, "", 0)
+	gs := moveReel.GetTargetScene3(gameProp, curpr, prs, bcd, moveReel.Name, "", 0)
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 
@@ -77,9 +77,9 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 		sc2.ResetReelIndex2(gameProp.Pool.Config.MapReels[sc2.ReelName], x, sc2.Indexes[x]+v)
 	}
 
-	moveReel.AddScene(gameProp, curpr, sc2, cd)
+	moveReel.AddScene(gameProp, curpr, sc2, bcd)
 
-	os := moveReel.GetTargetOtherScene2(gameProp, curpr, cd, moveReel.Name, "")
+	os := moveReel.GetTargetOtherScene2(gameProp, curpr, bcd, moveReel.Name, "")
 
 	if os != nil {
 		os2 := os.CloneEx(gameProp.PoolScene)
@@ -110,20 +110,20 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 			}
 		}
 
-		moveReel.AddOtherScene(gameProp, curpr, os2, cd)
+		moveReel.AddOtherScene(gameProp, curpr, os2, bcd)
 	}
 
-	moveReel.onStepEnd(gameProp, curpr, gp, "")
+	nc := moveReel.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (moveReel *MoveReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[moveReel.Name].(*BasicComponentData)
+func (moveReel *MoveReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after moveReel", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("after moveReel", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

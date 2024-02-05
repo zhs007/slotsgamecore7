@@ -29,13 +29,13 @@ type QueueBranchData struct {
 }
 
 // OnNewGame -
-func (queueBranchData *QueueBranchData) OnNewGame() {
-	queueBranchData.BasicComponentData.OnNewGame()
+func (queueBranchData *QueueBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	queueBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (queueBranchData *QueueBranchData) OnNewStep() {
-	queueBranchData.BasicComponentData.OnNewStep()
+func (queueBranchData *QueueBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	queueBranchData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
 // BuildPBComponentData
@@ -121,26 +121,28 @@ func (queueBranch *QueueBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	queueBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	qbd := gameProp.MapComponentData[queueBranch.Name].(*QueueBranchData)
+	qbd := cd.(*QueueBranchData)
 
 	if qbd.Queue > 0 {
 		qbd.Queue--
 
-		queueBranch.onStepEnd(gameProp, curpr, gp, queueBranch.Config.JumpToComponent)
-	} else {
-		queueBranch.onStepEnd(gameProp, curpr, gp, "")
+		nc := queueBranch.onStepEnd(gameProp, curpr, gp, queueBranch.Config.JumpToComponent)
+
+		return nc, nil
 	}
 
-	return nil
+	nc := queueBranch.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (queueBranch *QueueBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	qbd := gameProp.MapComponentData[queueBranch.Name].(*QueueBranchData)
+func (queueBranch *QueueBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	qbd := cd.(*QueueBranchData)
 
 	fmt.Printf("queueBranch %v, got %v\n", queueBranch.GetName(), qbd.Queue)
 
@@ -155,6 +157,11 @@ func (queueBranch *QueueBranch) OnStats(feature *sgc7stats.Feature, stake *sgc7g
 // NewComponentData -
 func (queueBranch *QueueBranch) NewComponentData() IComponentData {
 	return &QueueBranchData{}
+}
+
+// GetAllLinkComponents - get all link components
+func (queueBranch *QueueBranch) GetAllLinkComponents() []string {
+	return []string{queueBranch.Config.DefaultNextComponent, queueBranch.Config.JumpToComponent}
 }
 
 func NewQueueBranch(name string) IComponent {

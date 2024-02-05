@@ -30,13 +30,13 @@ type WinResultMultiData struct {
 }
 
 // OnNewGame -
-func (winResultMultiData *WinResultMultiData) OnNewGame() {
-	winResultMultiData.BasicComponentData.OnNewGame()
+func (winResultMultiData *WinResultMultiData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	winResultMultiData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (winResultMultiData *WinResultMultiData) OnNewStep() {
-	winResultMultiData.BasicComponentData.OnNewStep()
+func (winResultMultiData *WinResultMultiData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	winResultMultiData.BasicComponentData.OnNewStep(gameProp, component)
 
 	winResultMultiData.Wins = 0
 	winResultMultiData.WinMulti = 1
@@ -130,11 +130,11 @@ func (winResultMulti *WinResultMulti) InitEx(cfg any, pool *GamePropertyPool) er
 
 // playgame
 func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[winResultMulti.Name].(*WinResultMultiData)
+	std := icd.(*WinResultMultiData)
 
 	winMulti := winResultMulti.GetWinMulti(&std.BasicComponentData)
 
@@ -142,13 +142,14 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 	std.Wins = 0
 
 	if winMulti == 1 {
-		winResultMulti.onStepEnd(gameProp, curpr, gp, "")
+		nc := winResultMulti.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	for _, cn := range winResultMulti.Config.TargetComponents {
-		ccd := gameProp.MapComponentData[cn]
+		ccd := gameProp.GetComponentDataWithName(cn)
+		// ccd := gameProp.MapComponentData[cn]
 		lst := ccd.GetResults()
 		for _, ri := range lst {
 			curpr.Results[ri].CashWin *= winMulti
@@ -159,15 +160,15 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 	}
 
-	winResultMulti.onStepEnd(gameProp, curpr, gp, "")
+	nc := winResultMulti.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (winResultMulti *WinResultMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (winResultMulti *WinResultMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	std := gameProp.MapComponentData[winResultMulti.Name].(*WinResultMultiData)
+	std := icd.(*WinResultMultiData)
 
 	fmt.Printf("winResultMulti x %v, ending wins = %v \n", std.WinMulti, std.Wins)
 

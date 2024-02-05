@@ -34,13 +34,13 @@ type ScatterTriggerData struct {
 }
 
 // OnNewGame -
-func (scatterTriggerData *ScatterTriggerData) OnNewGame() {
-	scatterTriggerData.BasicComponentData.OnNewGame()
+func (scatterTriggerData *ScatterTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	scatterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (scatterTriggerData *ScatterTriggerData) OnNewStep() {
-	scatterTriggerData.BasicComponentData.OnNewStep()
+func (scatterTriggerData *ScatterTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	scatterTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
 	scatterTriggerData.NextComponent = ""
 	scatterTriggerData.SymbolNum = 0
@@ -118,6 +118,7 @@ type ScatterTriggerConfig struct {
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
+	RespinComponent                 string                        `yaml:"respinComponent" json:"respinComponent"`                             // respin component
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
 	RespinNumWeightVW               *sgc7game.ValWeights2         `yaml:"-" json:"-"`                                                         // respin number weight
@@ -286,16 +287,29 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 // 		}, false)
 // }
 
-// CanTrigger -
-func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-	// std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
+func (scatterTrigger *ScatterTrigger) getSymbols(gameProp *GameProperty) []int {
+	s := gameProp.GetCurCallStackSymbol()
+	if s >= 0 {
+		return []int{s}
+	}
 
+	return scatterTrigger.Config.SymbolCodes
+}
+
+// CanTriggerWithScene -
+func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+	return scatterTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+}
+
+// CanTrigger -
+func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
+	symbols := scatterTrigger.getSymbols(gameProp)
+
 	if scatterTrigger.Config.TriggerType == STTypeScatters {
-		// ret := scatterTrigger.triggerScatter(gameProp, stake, gs)
-		for _, s := range scatterTrigger.Config.SymbolCodes {
+		for _, s := range symbols {
 			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
 					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -306,23 +320,17 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 					ret.CoinWin = 0
 					ret.CashWin = 0
 				} else {
-					gameProp.ProcMulti(ret)
+					// gameProp.ProcMulti(ret)
 				}
-
-				// if isSaveResult {
-				// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-				// }
 
 				isTrigger = true
 
 				lst = append(lst, ret)
 			}
 		}
-		// }
 	} else if scatterTrigger.Config.TriggerType == STTypeCountScatter {
-		// for _, s := range symbolTrigger.Config.SymbolCodes {
-		ret := sgc7game.CalcScatterEx(gs, scatterTrigger.Config.SymbolCodes[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
-			return goutils.IndexOfIntSlice(scatterTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+		ret := sgc7game.CalcScatterEx(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
+			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 		})
 
 		if ret != nil {
@@ -336,26 +344,20 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
 				}
 
-				gameProp.ProcMulti(ret)
+				// gameProp.ProcMulti(ret)
 			}
-
-			// if isSaveResult {
-			// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			// }
 
 			isTrigger = true
 
 			lst = append(lst, ret)
 		}
-		// }
 	} else if scatterTrigger.Config.TriggerType == STTypeCountScatterInArea {
-		// for _, s := range symbolTrigger.Config.SymbolCodes {
-		ret := sgc7game.CountScatterInArea(gs, scatterTrigger.Config.SymbolCodes[0], scatterTrigger.Config.MinNum,
+		ret := sgc7game.CountScatterInArea(gs, symbols[0], scatterTrigger.Config.MinNum,
 			func(x, y int) bool {
 				return IsInPosArea(x, y, scatterTrigger.Config.PosArea)
 			},
 			func(scatter int, cursymbol int) bool {
-				return goutils.IndexOfIntSlice(scatterTrigger.Config.SymbolCodes, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 			})
 
 		if ret != nil {
@@ -369,18 +371,13 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
 				}
 
-				gameProp.ProcMulti(ret)
+				// gameProp.ProcMulti(ret)
 			}
-
-			// if isSaveResult {
-			// 	scatterTrigger.AddResult(curpr, ret, &std.BasicComponentData)
-			// }
 
 			isTrigger = true
 
 			lst = append(lst, ret)
 		}
-		// }
 	}
 
 	if scatterTrigger.Config.IsReverse {
@@ -389,6 +386,11 @@ func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc
 
 	return isTrigger, lst
 }
+
+// // CanTrigger -
+// func (scatterTrigger *ScatterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
+// 	return scatterTrigger.canTrigger(gameProp, gs, curpr, stake, isSaveResult, scatterTrigger.getSymbols())
+// }
 
 // procWins
 func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
@@ -458,15 +460,16 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 
 // playgame
 func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	scatterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
+	std := icd.(*ScatterTriggerData)
 
 	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, scatterTrigger.Name, "", 0)
+	os := scatterTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, scatterTrigger.Name, "")
 
-	isTrigger, lst := scatterTrigger.CanTrigger(gameProp, gs, curpr, stake, !scatterTrigger.Config.NeedDiscardResults)
+	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
 		scatterTrigger.procWins(std, lst)
@@ -485,7 +488,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			goutils.Error("ScatterTrigger.OnPlayGame:calcRespinNum",
 				zap.Error(err))
 
-			return nil
+			return "", nil
 		}
 
 		std.RespinNum = respinNum
@@ -495,7 +498,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			goutils.Error("ScatterTrigger.OnPlayGame:procMask",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		// if scatterTrigger.Config.TagSymbolNum != "" {
@@ -513,23 +516,23 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 					goutils.Error("ScatterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				gameProp.procAwards(plugin, node.Awards, curpr, gp)
 			}
 		}
 
-		if scatterTrigger.Config.JumpToComponent != "" {
-			if gameProp.IsRespin(scatterTrigger.Config.JumpToComponent) {
+		if scatterTrigger.Config.RespinComponent != "" {
+			if gameProp.IsRespin(scatterTrigger.Config.RespinComponent) {
 				// 如果jumpto是一个respin，那么就需要trigger respin
 				if std.RespinNum == 0 {
 					if scatterTrigger.Config.ForceToNext {
 						std.NextComponent = scatterTrigger.Config.DefaultNextComponent
 					} else {
-						rn := gameProp.GetLastRespinNum(scatterTrigger.Config.JumpToComponent)
+						rn := gameProp.GetLastRespinNum(scatterTrigger.Config.RespinComponent)
 						if rn > 0 {
-							gameProp.TriggerRespin(plugin, curpr, gp, 0, scatterTrigger.Config.JumpToComponent, !scatterTrigger.Config.IsAddRespinMode)
+							gameProp.TriggerRespin(plugin, curpr, gp, 0, scatterTrigger.Config.RespinComponent, !scatterTrigger.Config.IsAddRespinMode)
 
 							lst[0].Type = sgc7game.RTFreeGame
 							lst[0].Value = rn
@@ -537,7 +540,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 					}
 				} else {
 					// 如果jumpto是respin，需要treigger这个respin
-					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, scatterTrigger.Config.JumpToComponent, !scatterTrigger.Config.IsAddRespinMode)
+					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, scatterTrigger.Config.RespinComponent, !scatterTrigger.Config.IsAddRespinMode)
 
 					lst[0].Type = sgc7game.RTFreeGame
 					lst[0].Value = std.RespinNum
@@ -592,24 +595,26 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			// 		lst[0].Value = rn
 			// 	}
 			// }
+		}
 
+		if scatterTrigger.Config.JumpToComponent != "" {
 			std.NextComponent = scatterTrigger.Config.JumpToComponent
 
-			scatterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+			nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
 
-			return nil
+			return nc, nil
 		}
 	}
 
-	scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
+	nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (scatterTrigger *ScatterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (scatterTrigger *ScatterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	std := gameProp.MapComponentData[scatterTrigger.Name].(*ScatterTriggerData)
+	std := icd.(*ScatterTriggerData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(std.UsedResults, i, 0) >= 0
@@ -688,6 +693,170 @@ func (scatterTrigger *ScatterTrigger) GetWinMulti(basicCD *BasicComponentData) i
 	return scatterTrigger.Config.WinMulti
 }
 
+// GetAllLinkComponents - get all link components
+func (scatterTrigger *ScatterTrigger) GetAllLinkComponents() []string {
+	return []string{scatterTrigger.Config.DefaultNextComponent, scatterTrigger.Config.JumpToComponent}
+}
+
+// func (scatterTrigger *ScatterTrigger) getSymbols() []int {
+// 	if scatterTrigger.dataForeachSymbol != nil {
+// 		return []int{scatterTrigger.dataForeachSymbol.SymbolCode}
+// 	}
+
+// 	return scatterTrigger.Config.SymbolCodes
+// }
+
+// // CanTriggerWithScene -
+// func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+// 	return scatterTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+// }
+
+// // OnEachSymbol - on foreach symbol
+// func (scatterTrigger *ScatterTrigger) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+// 	prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error) {
+
+// 	std := cd.(*ScatterTriggerData)
+
+// 	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, scatterTrigger.Name, "", 0)
+
+// 	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, curpr, stake, !scatterTrigger.Config.NeedDiscardResults, []int{symbol})
+
+// 	if isTrigger {
+// 		scatterTrigger.procWins(std, lst)
+
+// 		if !scatterTrigger.Config.NeedDiscardResults {
+// 			for _, v := range lst {
+// 				scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+// 			}
+// 		}
+
+// 		std.SymbolNum = lst[0].SymbolNums
+// 		std.WildNum = lst[0].Wilds
+
+// 		respinNum, err := scatterTrigger.calcRespinNum(plugin, lst[0])
+// 		if err != nil {
+// 			goutils.Error("ScatterTrigger.OnEachSymbol:calcRespinNum",
+// 				zap.Error(err))
+
+// 			return "", nil
+// 		}
+
+// 		std.RespinNum = respinNum
+
+// 		err = scatterTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
+// 		if err != nil {
+// 			goutils.Error("ScatterTrigger.OnPlayGame:procMask",
+// 				zap.Error(err))
+
+// 			return "", err
+// 		}
+
+// 		// if scatterTrigger.Config.TagSymbolNum != "" {
+// 		// 	gameProp.TagInt(spSymbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
+// 		// }
+
+// 		if len(scatterTrigger.Config.Awards) > 0 {
+// 			gameProp.procAwards(plugin, scatterTrigger.Config.Awards, curpr, gp)
+// 		}
+
+// 		if scatterTrigger.Config.SymbolAwardsWeights != nil {
+// 			for i := 0; i < lst[0].SymbolNums; i++ {
+// 				node, err := scatterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
+// 				if err != nil {
+// 					goutils.Error("ScatterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
+// 						zap.Error(err))
+
+// 					return err
+// 				}
+
+// 				gameProp.procAwards(plugin, node.Awards, curpr, gp)
+// 			}
+// 		}
+
+// 		if scatterTrigger.Config.JumpToComponent != "" {
+// 			if gameProp.IsRespin(scatterTrigger.Config.JumpToComponent) {
+// 				// 如果jumpto是一个respin，那么就需要trigger respin
+// 				if std.RespinNum == 0 {
+// 					if scatterTrigger.Config.ForceToNext {
+// 						std.NextComponent = scatterTrigger.Config.DefaultNextComponent
+// 					} else {
+// 						rn := gameProp.GetLastRespinNum(scatterTrigger.Config.JumpToComponent)
+// 						if rn > 0 {
+// 							gameProp.TriggerRespin(plugin, curpr, gp, 0, scatterTrigger.Config.JumpToComponent, !scatterTrigger.Config.IsAddRespinMode)
+
+// 							lst[0].Type = sgc7game.RTFreeGame
+// 							lst[0].Value = rn
+// 						}
+// 					}
+// 				} else {
+// 					// 如果jumpto是respin，需要treigger这个respin
+// 					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, scatterTrigger.Config.JumpToComponent, !scatterTrigger.Config.IsAddRespinMode)
+
+// 					lst[0].Type = sgc7game.RTFreeGame
+// 					lst[0].Value = std.RespinNum
+// 				}
+// 			}
+
+// 			// if symbolTrigger.Config.RespinNumWeightWithScatterNum != nil {
+// 			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeightWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
+// 			// 	if err != nil {
+// 			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
+// 			// 			zap.Error(err))
+
+// 			// 		return nil
+// 			// 	}
+
+// 			// 	lst[0].Type = sgc7game.RTFreeGame
+// 			// 	lst[0].Value = v
+// 			// } else if len(symbolTrigger.Config.RespinNumWithScatterNum) > 0 {
+// 			// 	gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.JumpToComponent, true)
+
+// 			// 	lst[0].Type = sgc7game.RTFreeGame
+// 			// 	lst[0].Value = symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums]
+// 			// } else if symbolTrigger.Config.RespinNumWeight != "" {
+// 			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeight, symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
+// 			// 	if err != nil {
+// 			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
+// 			// 			zap.Error(err))
+
+// 			// 		return nil
+// 			// 	}
+
+// 			// 	lst[0].Type = sgc7game.RTFreeGame
+// 			// 	lst[0].Value = v
+// 			// } else if symbolTrigger.Config.RespinNum > 0 {
+// 			// 	gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNum, symbolTrigger.Config.JumpToComponent, true)
+
+// 			// 	lst[0].Type = sgc7game.RTFreeGame
+// 			// 	lst[0].Value = symbolTrigger.Config.RespinNum
+// 			// } else {
+// 			// 	lst[0].Type = sgc7game.RTFreeGame
+// 			// 	lst[0].Value = -1
+// 			// }
+
+// 			// if symbolTrigger.Config.ForceToNext {
+// 			// 	std.NextComponent = symbolTrigger.Config.DefaultNextComponent
+// 			// } else {
+// 			// 	rn := gameProp.GetLastRespinNum(symbolTrigger.Config.JumpToComponent)
+// 			// 	if rn > 0 {
+// 			// 		gameProp.TriggerRespin(plugin, curpr, gp, 0, symbolTrigger.Config.JumpToComponent, true)
+
+// 			// 		lst[0].Type = sgc7game.RTFreeGame
+// 			// 		lst[0].Value = rn
+// 			// 	}
+// 			// }
+
+// 			std.NextComponent = scatterTrigger.Config.JumpToComponent
+
+// 			scatterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+
+// 			return nil
+// 		}
+// 	}
+
+// 	scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
+// }
+
 func NewScatterTrigger(name string) IComponent {
 	return &ScatterTrigger{
 		BasicComponent: NewBasicComponent(name, 1),
@@ -695,19 +864,18 @@ func NewScatterTrigger(name string) IComponent {
 }
 
 //	"configuration": {
-//		"triggerType": "countscatterInArea",
-//		"betType": "noPay",
-//		"genRespinType": "none",
-//		"posArea": [
-//			1,
-//			1,
-//			1,
-//			3
-//		],
+//		"triggerType": "countscatter",
+//		"betType": "bet",
+//		"triggerRespinType": "respinNum",
+//		"winMulti": 1,
 //		"minNum": 3,
+//		"countScatterPayAs": "S",
 //		"symbols": [
-//			"SC"
-//		]
+//			"W"
+//		],
+//		"respinComponent": "fg-start",
+//		"genRespinType": "number",
+//		"respinNum": 10
 //	},
 type jsonScatterTrigger struct {
 	Symbols                       []string       `json:"symbols"`
@@ -718,6 +886,9 @@ type jsonScatterTrigger struct {
 	PosArea                       []int          `json:"posArea"`
 	CountScatterPayAs             string         `json:"countScatterPayAs"`
 	WinMulti                      int            `json:"winMulti"`
+	TargetMask                    string         `json:"targetMask"`
+	TriggerRespinType             string         `json:"triggerRespinType"`
+	RespinComponent               string         `json:"respinComponent"`
 	GenRespinType                 string         `json:"genRespinType"`
 	RespinNum                     int            `json:"respinNum"`
 	RespinNumWeight               string         `json:"respinNumWeight"`
@@ -725,20 +896,23 @@ type jsonScatterTrigger struct {
 	RespinNumWeightWithScatterNum map[int]string `json:"respinNumWeightWithScatterNum"`
 }
 
-func (jst *jsonScatterTrigger) build() *ScatterTriggerConfig {
+func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 	cfg := &ScatterTriggerConfig{
-		Symbols:                       jst.Symbols,
-		Type:                          jst.TriggerType,
-		BetTypeString:                 jst.BetType,
-		MinNum:                        jst.MinNum,
-		WildSymbols:                   jst.WildSymbols,
-		PosArea:                       jst.PosArea,
-		CountScatterPayAs:             jst.CountScatterPayAs,
-		WinMulti:                      jst.WinMulti,
-		RespinNum:                     jst.RespinNum,
-		RespinNumWeight:               jst.RespinNumWeight,
-		RespinNumWithScatterNum:       jst.RespinNumWithScatterNum,
-		RespinNumWeightWithScatterNum: jst.RespinNumWeightWithScatterNum,
+		Symbols:                       jcfg.Symbols,
+		Type:                          jcfg.TriggerType,
+		BetTypeString:                 jcfg.BetType,
+		MinNum:                        jcfg.MinNum,
+		WildSymbols:                   jcfg.WildSymbols,
+		PosArea:                       jcfg.PosArea,
+		CountScatterPayAs:             jcfg.CountScatterPayAs,
+		WinMulti:                      jcfg.WinMulti,
+		TargetMask:                    jcfg.TargetMask,
+		IsAddRespinMode:               jcfg.TriggerRespinType == "respinNum",
+		RespinComponent:               jcfg.RespinComponent,
+		RespinNum:                     jcfg.RespinNum,
+		RespinNumWeight:               jcfg.RespinNumWeight,
+		RespinNumWithScatterNum:       jcfg.RespinNumWithScatterNum,
+		RespinNumWeightWithScatterNum: jcfg.RespinNumWeightWithScatterNum,
 	}
 
 	for i := range cfg.PosArea {

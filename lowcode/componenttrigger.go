@@ -12,6 +12,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 这个组件只会检查当前调用堆栈里是否有组件运行过
+
 const ComponentTriggerTypeName = "componentTrigger"
 
 // ComponentTriggerConfig - configuration for ComponentTrigger
@@ -64,14 +66,13 @@ func (componentTrigger *ComponentTrigger) InitEx(cfg any, pool *GamePropertyPool
 
 // playgame
 func (componentTrigger *ComponentTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	componentTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	isTrigger := false
 	for _, cn := range componentTrigger.Config.CheckRunComponents {
-		if gameProp.InHistoryComponents(cn) {
-
+		if gameProp.IsInCurCallStack(cn) {
 			isTrigger = true
 			break
 		}
@@ -81,17 +82,18 @@ func (componentTrigger *ComponentTrigger) OnPlayGame(gameProp *GameProperty, cur
 		isTrigger = !isTrigger
 	}
 
+	nc := ""
 	if isTrigger {
-		componentTrigger.onStepEnd(gameProp, curpr, gp, componentTrigger.Config.JumpToComponent)
+		nc = componentTrigger.onStepEnd(gameProp, curpr, gp, componentTrigger.Config.JumpToComponent)
 	} else {
-		componentTrigger.onStepEnd(gameProp, curpr, gp, "")
+		nc = componentTrigger.onStepEnd(gameProp, curpr, gp, "")
 	}
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (componentTrigger *ComponentTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (componentTrigger *ComponentTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 	return nil
 }
 

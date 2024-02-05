@@ -23,15 +23,29 @@ type OverlaySymbolData struct {
 }
 
 // OnNewGame -
-func (overlaySymbolData *OverlaySymbolData) OnNewGame() {
-	overlaySymbolData.BasicComponentData.OnNewGame()
+func (overlaySymbolData *OverlaySymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	overlaySymbolData.BasicComponentData.OnNewGame(gameProp, component)
 
-	overlaySymbolData.CurLevel = 0
+	overlaySymbol := component.(*OverlaySymbol)
+
+	overlaySymbolData.CurLevel = overlaySymbol.Config.DefaultLevel
 }
 
 // OnNewStep -
-func (overlaySymbolData *OverlaySymbolData) OnNewStep() {
-	overlaySymbolData.BasicComponentData.OnNewStep()
+func (overlaySymbolData *OverlaySymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	overlaySymbolData.BasicComponentData.OnNewStep(gameProp, component)
+
+	overlaySymbol := component.(*OverlaySymbol)
+
+	if overlaySymbol.Config.Collector != "" {
+		collectorData, isok := gameProp.GetCurComponentDataWithName(overlaySymbol.Config.Collector).(*CollectorData)
+		if !isok {
+			goutils.Error("OverlaySymbolData.OnNewStep:GetCurComponentDataWithName",
+				zap.String("collector", overlaySymbol.Config.Collector))
+		} else {
+			overlaySymbolData.CurLevel = collectorData.Val
+		}
+	}
 }
 
 // BuildPBComponentData
@@ -61,32 +75,32 @@ type OverlaySymbol struct {
 	MapPosition     *sgc7game.ValMapping2 `json:"-"`
 }
 
-// OnNewGame -
-func (overlaySymbol *OverlaySymbol) OnNewGame(gameProp *GameProperty) error {
-	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
+// // OnNewGame -
+// func (overlaySymbol *OverlaySymbol) OnNewGame(gameProp *GameProperty) error {
+// 	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
 
-	osd.OnNewGame()
+// 	osd.OnNewGame()
 
-	osd.CurLevel = overlaySymbol.Config.DefaultLevel
+// 	osd.CurLevel = overlaySymbol.Config.DefaultLevel
 
-	return nil
-}
+// 	return nil
+// }
 
-// OnNewStep -
-func (overlaySymbol *OverlaySymbol) OnNewStep(gameProp *GameProperty) error {
-	overlaySymbol.BasicComponent.OnNewStep(gameProp)
+// // OnNewStep -
+// func (overlaySymbol *OverlaySymbol) OnNewStep(gameProp *GameProperty) error {
+// 	overlaySymbol.BasicComponent.OnNewStep(gameProp)
 
-	cd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
+// 	cd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
 
-	if overlaySymbol.Config.Collector != "" {
-		collectorData, isok := gameProp.MapComponentData[overlaySymbol.Config.Collector].(*CollectorData)
-		if isok {
-			cd.CurLevel = collectorData.Val
-		}
-	}
+// 	if overlaySymbol.Config.Collector != "" {
+// 		collectorData, isok := gameProp.MapComponentData[overlaySymbol.Config.Collector].(*CollectorData)
+// 		if isok {
+// 			cd.CurLevel = collectorData.Val
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // Init -
 func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) error {
@@ -140,11 +154,11 @@ func (overlaySymbol *OverlaySymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // playgame
 func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	overlaySymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
+	osd := cd.(*OverlaySymbolData)
 
 	_, hasVal := overlaySymbol.MapPosition.MapVals[osd.CurLevel]
 	if hasVal {
@@ -167,17 +181,17 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		overlaySymbol.ReTagScene(gameProp, curpr, osd.TargetSceneIndex, &osd.BasicComponentData)
 	}
 
-	overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(overlaySymbol.Name, &osd.BasicComponentData)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (overlaySymbol *OverlaySymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+func (overlaySymbol *OverlaySymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-	osd := gameProp.MapComponentData[overlaySymbol.Name].(*OverlaySymbolData)
+	osd := cd.(*OverlaySymbolData)
 
 	if len(osd.UsedScenes) > 0 {
 		asciigame.OutputScene("The symbols after the symbol overlay", pr.Scenes[osd.UsedScenes[0]], mapSymbolColor)

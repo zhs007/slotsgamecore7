@@ -24,13 +24,13 @@ type WeightReelsData struct {
 }
 
 // OnNewGame -
-func (weightReelsData *WeightReelsData) OnNewGame() {
-	weightReelsData.BasicComponentData.OnNewGame()
+func (weightReelsData *WeightReelsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	weightReelsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
 // OnNewStep -
-func (weightReelsData *WeightReelsData) OnNewStep() {
-	weightReelsData.BasicComponentData.OnNewStep()
+func (weightReelsData *WeightReelsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	weightReelsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	weightReelsData.ReelSetIndex = -1
 }
@@ -124,11 +124,11 @@ func (weightReels *WeightReels) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	wrd := gameProp.MapComponentData[weightReels.Name].(*WeightReelsData)
+	wrd := icd.(*WeightReelsData)
 
 	reelname := ""
 	if weightReels.Config.ReelSetsWeightVW != nil {
@@ -137,7 +137,7 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WeightReels.OnPlayGame:ReelSetWeights.RandVal",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		wrd.ReelSetIndex = si
@@ -152,7 +152,7 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WeightReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
 
-			return ErrInvalidReels
+			return "", ErrInvalidReels
 		}
 
 		gameProp.CurReels = rd
@@ -192,16 +192,16 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	weightReels.AddScene(gameProp, curpr, sc, &wrd.BasicComponentData)
 
-	weightReels.onStepEnd(gameProp, curpr, gp, "")
+	nc := weightReels.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(basicReels.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (weightReels *WeightReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	wrd := gameProp.MapComponentData[weightReels.Name].(*WeightReelsData)
+func (weightReels *WeightReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	wrd := icd.(*WeightReelsData)
 
 	if len(wrd.UsedScenes) > 0 {
 		asciigame.OutputScene("initial symbols", pr.Scenes[wrd.UsedScenes[0]], mapSymbolColor)

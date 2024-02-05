@@ -1,240 +1,240 @@
 package lowcode
 
-import (
-	"os"
+// import (
+// 	"os"
 
-	"github.com/zhs007/goutils"
-	"github.com/zhs007/slotsgamecore7/asciigame"
-	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
-	"go.uber.org/zap"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
-	"gopkg.in/yaml.v2"
-)
+// 	"github.com/zhs007/goutils"
+// 	"github.com/zhs007/slotsgamecore7/asciigame"
+// 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+// 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+// 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+// 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+// 	"go.uber.org/zap"
+// 	"google.golang.org/protobuf/proto"
+// 	"google.golang.org/protobuf/types/known/anypb"
+// 	"gopkg.in/yaml.v2"
+// )
 
-const MultiLevelReplaceReelTypeName = "multiLevelReplaceReel"
+// const MultiLevelReplaceReelTypeName = "multiLevelReplaceReel"
 
-type MultiLevelReplaceReelData struct {
-	BasicComponentData
-	CurLevel int
-}
-
-// OnNewGame -
-func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewGame() {
-	multiLevelReplaceReelData.BasicComponentData.OnNewGame()
-
-	multiLevelReplaceReelData.CurLevel = 0
-}
-
-// OnNewStep -
-func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewStep() {
-	multiLevelReplaceReelData.BasicComponentData.OnNewStep()
-}
-
-// BuildPBComponentData
-func (multiLevelReplaceReelData *MultiLevelReplaceReelData) BuildPBComponentData() proto.Message {
-	pbcd := &sgc7pb.MultiLevelReplaceReelData{
-		BasicComponentData: multiLevelReplaceReelData.BuildPBBasicComponentData(),
-		CurLevel:           int32(multiLevelReplaceReelData.CurLevel),
-	}
-
-	return pbcd
-}
-
-// MultiLevelReplaceReelLevelConfig - configuration for MultiLevelReplaceReelData's Level
-type MultiLevelReplaceReelLevelConfig struct {
-	Reels           map[int][]string `yaml:"reels" json:"reels"` // x - [0, width)
-	SymbolCodeReels map[int][]int    `yaml:"-" json:"-"`
-	Collector       string           `yaml:"collector" json:"collector"`
-	CollectorVal    int              `yaml:"collectorVal" json:"collectorVal"`
-}
-
-// MultiLevelReplaceReelDataConfig - configuration for MultiLevelReplaceReelData
-type MultiLevelReplaceReelDataConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Levels               []*MultiLevelReplaceReelLevelConfig `yaml:"levels" json:"levels"`
-}
-
-type MultiLevelReplaceReel struct {
-	*BasicComponent `json:"-"`
-	Config          *MultiLevelReplaceReelDataConfig `json:"config"`
-}
-
-// Init -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) Init(fn string, pool *GamePropertyPool) error {
-	data, err := os.ReadFile(fn)
-	if err != nil {
-		goutils.Error("MultiLevelReplaceReel.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
-
-		return err
-	}
-
-	cfg := &MultiLevelReplaceReelDataConfig{}
-
-	err = yaml.Unmarshal(data, cfg)
-	if err != nil {
-		goutils.Error("MultiLevelReplaceReel.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
-
-		return err
-	}
-
-	return multiLevelReplaceReel.InitEx(cfg, pool)
-}
-
-// InitEx -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
-	multiLevelReplaceReel.Config = cfg.(*MultiLevelReplaceReelDataConfig)
-	multiLevelReplaceReel.Config.ComponentType = MultiLevelReplaceReelTypeName
-
-	for _, v := range multiLevelReplaceReel.Config.Levels {
-		if v.Reels != nil {
-			v.SymbolCodeReels = make(map[int][]int)
-
-			for ri, symbols := range v.Reels {
-				scs := []int{}
-				for _, s := range symbols {
-					scs = append(scs, pool.DefaultPaytables.MapSymbols[s])
-				}
-
-				v.SymbolCodeReels[ri] = scs
-			}
-		}
-	}
-
-	multiLevelReplaceReel.onInit(&multiLevelReplaceReel.Config.BasicComponentConfig)
-
-	return nil
-}
+// type MultiLevelReplaceReelData struct {
+// 	BasicComponentData
+// 	CurLevel int
+// }
 
 // // OnNewGame -
-// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name]
+// func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewGame(gameProp *GameProperty, component IComponent) {
+// 	multiLevelReplaceReelData.BasicComponentData.OnNewGame(gameProp, component)
 
-// 	cd.OnNewGame()
+// 	multiLevelReplaceReelData.CurLevel = 0
+// }
+
+// // OnNewStep -
+// func (multiLevelReplaceReelData *MultiLevelReplaceReelData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	multiLevelReplaceReelData.BasicComponentData.OnNewStep(gameProp, component)
+// }
+
+// // BuildPBComponentData
+// func (multiLevelReplaceReelData *MultiLevelReplaceReelData) BuildPBComponentData() proto.Message {
+// 	pbcd := &sgc7pb.MultiLevelReplaceReelData{
+// 		BasicComponentData: multiLevelReplaceReelData.BuildPBBasicComponentData(),
+// 		CurLevel:           int32(multiLevelReplaceReelData.CurLevel),
+// 	}
+
+// 	return pbcd
+// }
+
+// // MultiLevelReplaceReelLevelConfig - configuration for MultiLevelReplaceReelData's Level
+// type MultiLevelReplaceReelLevelConfig struct {
+// 	Reels           map[int][]string `yaml:"reels" json:"reels"` // x - [0, width)
+// 	SymbolCodeReels map[int][]int    `yaml:"-" json:"-"`
+// 	Collector       string           `yaml:"collector" json:"collector"`
+// 	CollectorVal    int              `yaml:"collectorVal" json:"collectorVal"`
+// }
+
+// // MultiLevelReplaceReelDataConfig - configuration for MultiLevelReplaceReelData
+// type MultiLevelReplaceReelDataConfig struct {
+// 	BasicComponentConfig `yaml:",inline" json:",inline"`
+// 	Levels               []*MultiLevelReplaceReelLevelConfig `yaml:"levels" json:"levels"`
+// }
+
+// type MultiLevelReplaceReel struct {
+// 	*BasicComponent `json:"-"`
+// 	Config          *MultiLevelReplaceReelDataConfig `json:"config"`
+// }
+
+// // Init -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) Init(fn string, pool *GamePropertyPool) error {
+// 	data, err := os.ReadFile(fn)
+// 	if err != nil {
+// 		goutils.Error("MultiLevelReplaceReel.Init:ReadFile",
+// 			zap.String("fn", fn),
+// 			zap.Error(err))
+
+// 		return err
+// 	}
+
+// 	cfg := &MultiLevelReplaceReelDataConfig{}
+
+// 	err = yaml.Unmarshal(data, cfg)
+// 	if err != nil {
+// 		goutils.Error("MultiLevelReplaceReel.Init:Unmarshal",
+// 			zap.String("fn", fn),
+// 			zap.Error(err))
+
+// 		return err
+// 	}
+
+// 	return multiLevelReplaceReel.InitEx(cfg, pool)
+// }
+
+// // InitEx -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
+// 	multiLevelReplaceReel.Config = cfg.(*MultiLevelReplaceReelDataConfig)
+// 	multiLevelReplaceReel.Config.ComponentType = MultiLevelReplaceReelTypeName
+
+// 	for _, v := range multiLevelReplaceReel.Config.Levels {
+// 		if v.Reels != nil {
+// 			v.SymbolCodeReels = make(map[int][]int)
+
+// 			for ri, symbols := range v.Reels {
+// 				scs := []int{}
+// 				for _, s := range symbols {
+// 					scs = append(scs, pool.DefaultPaytables.MapSymbols[s])
+// 				}
+
+// 				v.SymbolCodeReels[ri] = scs
+// 			}
+// 		}
+// 	}
+
+// 	multiLevelReplaceReel.onInit(&multiLevelReplaceReel.Config.BasicComponentConfig)
 
 // 	return nil
 // }
 
-// OnNewStep -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewStep(gameProp *GameProperty) error {
-	multiLevelReplaceReel.BasicComponent.OnNewStep(gameProp)
+// // // OnNewGame -
+// // func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewGame(gameProp *GameProperty) error {
+// // 	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name]
 
-	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
+// // 	cd.OnNewGame()
 
-	for i := cd.CurLevel + 1; i < len(multiLevelReplaceReel.Config.Levels); i++ {
-		v := multiLevelReplaceReel.Config.Levels[i]
+// // 	return nil
+// // }
 
-		collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
-		if isok {
-			if collectorData.Val >= v.CollectorVal {
-				cd.CurLevel = i
-			} else {
-				break
-			}
-		}
-	}
+// // OnNewStep -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnNewStep(gameProp *GameProperty) error {
+// 	multiLevelReplaceReel.BasicComponent.OnNewStep(gameProp)
 
-	return nil
-}
+// 	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
 
-// playgame
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+// 	for i := cd.CurLevel + 1; i < len(multiLevelReplaceReel.Config.Levels); i++ {
+// 		v := multiLevelReplaceReel.Config.Levels[i]
 
-	multiLevelReplaceReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+// 		collectorData, isok := gameProp.MapComponentData[v.Collector].(*CollectorData)
+// 		if isok {
+// 			if collectorData.Val >= v.CollectorVal {
+// 				cd.CurLevel = i
+// 			} else {
+// 				break
+// 			}
+// 		}
+// 	}
 
-	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
+// 	return nil
+// }
 
-	if multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels != nil {
-		gs := multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
+// // playgame
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+// 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
 
-		// sc := gs.Clone()
-		sc := gs.CloneEx(gameProp.PoolScene)
+// 	multiLevelReplaceReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-		for x, reel := range multiLevelReplaceReel.Config.Levels[cd.CurLevel].SymbolCodeReels {
-			copy(sc.Arr[x], reel)
-			// for y, s := range reel {
-			// 	sc.Arr[x][y] = s
-			// }
-		}
+// 	mcd := cd.(*MultiLevelReplaceReelData)
 
-		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &cd.BasicComponentData)
-	} else {
-		multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &cd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
+// 	if multiLevelReplaceReel.Config.Levels[mcd.CurLevel].SymbolCodeReels != nil {
+// 		gs := multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &mcd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
 
-		multiLevelReplaceReel.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, &cd.BasicComponentData)
-	}
+// 		// sc := gs.Clone()
+// 		sc := gs.CloneEx(gameProp.PoolScene)
 
-	multiLevelReplaceReel.onStepEnd(gameProp, curpr, gp, "")
+// 		for x, reel := range multiLevelReplaceReel.Config.Levels[mcd.CurLevel].SymbolCodeReels {
+// 			copy(sc.Arr[x], reel)
+// 			// for y, s := range reel {
+// 			// 	sc.Arr[x][y] = s
+// 			// }
+// 		}
 
-	// gp.AddComponentData(multiLevelReplaceReel.Name, cd)
+// 		multiLevelReplaceReel.AddScene(gameProp, curpr, sc, &mcd.BasicComponentData)
+// 	} else {
+// 		multiLevelReplaceReel.GetTargetScene3(gameProp, curpr, prs, &mcd.BasicComponentData, multiLevelReplaceReel.Name, "", 0)
 
-	return nil
-}
+// 		multiLevelReplaceReel.ReTagScene(gameProp, curpr, mcd.TargetSceneIndex, &mcd.BasicComponentData)
+// 	}
 
-// OnAsciiGame - outpur to asciigame
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
+// 	multiLevelReplaceReel.onStepEnd(gameProp, curpr, gp, "")
 
-	cd := gameProp.MapComponentData[multiLevelReplaceReel.Name].(*MultiLevelReplaceReelData)
+// 	// gp.AddComponentData(multiLevelReplaceReel.Name, cd)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after replaceReel symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
-	}
+// 	return nil
+// }
 
-	return nil
-}
+// // OnAsciiGame - outpur to asciigame
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 
-// OnStats
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// 	mcd := cd.(*MultiLevelReplaceReelData)
 
-// OnStatsWithPB -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.MultiLevelReplaceReelData)
-	if !isok {
-		goutils.Error("MultiLevelReplaceReel.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// 	if len(mcd.UsedScenes) > 0 {
+// 		asciigame.OutputScene("after replaceReel symbols", pr.Scenes[mcd.UsedScenes[0]], mapSymbolColor)
+// 	}
 
-		return 0, ErrIvalidProto
-	}
+// 	return nil
+// }
 
-	return multiLevelReplaceReel.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-}
+// // OnStats
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
-// NewComponentData -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) NewComponentData() IComponentData {
-	return &MultiLevelReplaceReelData{}
-}
+// // OnStatsWithPB -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.MultiLevelReplaceReelData)
+// 	if !isok {
+// 		goutils.Error("MultiLevelReplaceReel.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-// EachUsedResults -
-func (multiLevelReplaceReel *MultiLevelReplaceReel) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
-	pbcd := &sgc7pb.MultiLevelReplaceReelData{}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	err := pbComponentData.UnmarshalTo(pbcd)
-	if err != nil {
-		goutils.Error("multiLevelReplaceReel.EachUsedResults:UnmarshalTo",
-			zap.Error(err))
+// 	return multiLevelReplaceReel.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+// }
 
-		return
-	}
+// // NewComponentData -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) NewComponentData() IComponentData {
+// 	return &MultiLevelReplaceReelData{}
+// }
 
-	for _, v := range pbcd.BasicComponentData.UsedResults {
-		oneach(pr.Results[v])
-	}
-}
+// // EachUsedResults -
+// func (multiLevelReplaceReel *MultiLevelReplaceReel) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+// 	pbcd := &sgc7pb.MultiLevelReplaceReelData{}
 
-func NewMultiLevelReplaceReel(name string) IComponent {
-	multiLevelReplaceReel := &MultiLevelReplaceReel{
-		BasicComponent: NewBasicComponent(name, 1),
-	}
+// 	err := pbComponentData.UnmarshalTo(pbcd)
+// 	if err != nil {
+// 		goutils.Error("multiLevelReplaceReel.EachUsedResults:UnmarshalTo",
+// 			zap.Error(err))
 
-	return multiLevelReplaceReel
-}
+// 		return
+// 	}
+
+// 	for _, v := range pbcd.BasicComponentData.UsedResults {
+// 		oneach(pr.Results[v])
+// 	}
+// }
+
+// func NewMultiLevelReplaceReel(name string) IComponent {
+// 	multiLevelReplaceReel := &MultiLevelReplaceReel{
+// 		BasicComponent: NewBasicComponent(name, 1),
+// 	}
+
+// 	return multiLevelReplaceReel
+// }

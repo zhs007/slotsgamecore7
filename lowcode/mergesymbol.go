@@ -64,14 +64,14 @@ func (mergeSymbol *MergeSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	mergeSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := gameProp.MapComponentData[mergeSymbol.Name].(*BasicComponentData)
+	bcd := cd.(*BasicComponentData)
 
-	gs1 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, cd, mergeSymbol.Name, mergeSymbol.Config.SrcScene[0], 0)
-	gs2 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, cd, mergeSymbol.Name+":1", mergeSymbol.Config.SrcScene[1], 1)
+	gs1 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, mergeSymbol.Name, mergeSymbol.Config.SrcScene[0], 0)
+	gs2 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, mergeSymbol.Name+":1", mergeSymbol.Config.SrcScene[1], 1)
 
 	sc2 := gs1.CloneEx(gameProp.PoolScene)
 
@@ -80,7 +80,7 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		goutils.Error("MergeSymbol.OnPlayGame:GetMask",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	for x, arr := range gs2.Arr {
@@ -94,10 +94,10 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 	}
 
-	mergeSymbol.AddScene(gameProp, curpr, sc2, cd)
+	mergeSymbol.AddScene(gameProp, curpr, sc2, bcd)
 
-	os1 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, cd, mergeSymbol.Name, "")
-	os2 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, cd, mergeSymbol.Name+":1", "")
+	os1 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, bcd, mergeSymbol.Name, "")
+	os2 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, bcd, mergeSymbol.Name+":1", "")
 	if os1 != nil || os2 != nil {
 		var os3 *sgc7game.GameScene
 
@@ -106,7 +106,7 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("MergeSymbol.OnPlayGame:GetMask",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		if os1 == nil {
@@ -139,20 +139,20 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			}
 		}
 
-		mergeSymbol.AddOtherScene(gameProp, curpr, os3, cd)
+		mergeSymbol.AddOtherScene(gameProp, curpr, os3, bcd)
 	}
 
-	mergeSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := mergeSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (mergeSymbol *MergeSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap) error {
-	cd := gameProp.MapComponentData[mergeSymbol.Name].(*BasicComponentData)
+func (mergeSymbol *MergeSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	bcd := cd.(*BasicComponentData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after mergeSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(bcd.UsedScenes) > 0 {
+		asciigame.OutputScene("after mergeSymbol", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
