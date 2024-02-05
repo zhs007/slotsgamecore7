@@ -81,7 +81,7 @@ func (replaceSymbol *ReplaceSymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // playgame
 func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	replaceSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -128,11 +128,11 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		replaceSymbol.AddScene(gameProp, curpr, sc2, cd)
 	}
 
-	replaceSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := replaceSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(replaceSymbol.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

@@ -100,7 +100,7 @@ func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
 
 // playgame
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	basicReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -113,7 +113,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		basicReels.AddRNG(gameProp, si, bcd)
@@ -126,7 +126,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
 
-			return ErrInvalidReels
+			return "", ErrInvalidReels
 		}
 
 		gameProp.CurReels = rd
@@ -138,7 +138,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
 
-			return ErrInvalidReels
+			return "", ErrInvalidReels
 		}
 
 		gameProp.TagStr(TagCurReels, reelname)
@@ -165,11 +165,11 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	basicReels.AddScene(gameProp, curpr, sc, bcd)
 
-	basicReels.onStepEnd(gameProp, curpr, gp, "")
+	nc := basicReels.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(basicReels.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

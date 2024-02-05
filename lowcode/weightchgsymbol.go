@@ -95,7 +95,7 @@ func (weightChgSymbol *WeightChgSymbol) getChgWeight(gameProp *GameProperty, bas
 
 // playgame
 func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightChgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -115,7 +115,7 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 					goutils.Error("WeightChgSymbol.OnPlayGame:RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				cgs.Arr[x][y] = cr.Int()
@@ -125,9 +125,9 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 
 	weightChgSymbol.AddScene(gameProp, curpr, cgs, cd)
 
-	weightChgSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := weightChgSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

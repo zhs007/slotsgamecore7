@@ -185,7 +185,7 @@ func (reelModifier *ReelModifier) chgReelWithMask(gameProp *GameProperty, plugin
 
 // playgame
 func (reelModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	reelModifier.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -207,9 +207,9 @@ func (reelModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		}
 	}
 
-	reelModifier.onStepEnd(gameProp, curpr, gp, "")
+	nc := reelModifier.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

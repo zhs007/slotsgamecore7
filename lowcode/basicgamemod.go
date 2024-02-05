@@ -112,7 +112,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	for {
 		isComponentDoNothing := false
 		cd := gameProp.callStack.GetCurComponentData(gameProp, curComponent)
-		err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
+		nextComponentName, err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
 		if err != nil {
 			if err != ErrComponentDoNothing {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
@@ -139,20 +139,33 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			// gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
 		}
 
-		respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
-		nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
-		if respinComponent != "" {
-			// 一般来说，第一次触发respin才走这个分支
-			pr.IsFinish = false
-
-			if nextComponentName == "" {
-				break
-			}
-		}
-
 		if nextComponentName == "" {
 			break
 		}
+
+		if gameProp.IsRespin(nextComponentName) {
+			gameProp.onTriggerRespin(nextComponentName)
+			gp.NextStepFirstComponent = nextComponentName
+
+			pr.IsFinish = false
+
+			break
+		}
+
+		// respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
+		// nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
+		// if respinComponent != "" {
+		// 	// 一般来说，第一次触发respin才走这个分支
+		// 	pr.IsFinish = false
+
+		// 	if nextComponentName == "" {
+		// 		break
+		// 	}
+		// }
+
+		// if nextComponentName == "" {
+		// 	break
+		// }
 
 		c, isok := components.MapComponents[nextComponentName]
 		if !isok {

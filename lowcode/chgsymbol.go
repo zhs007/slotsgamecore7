@@ -74,7 +74,7 @@ func (chgSymbol *ChgSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	chgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -91,12 +91,12 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	chgSymbol.AddScene(gameProp, curpr, cgs, bcd)
 
-	chgSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := chgSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(chgSymbol.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

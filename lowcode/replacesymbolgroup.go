@@ -92,14 +92,14 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) InitEx(cfg any, pool *GameProperty
 
 // playgame
 func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	replaceSymbolGroup.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	if len(replaceSymbolGroup.Config.SrcSymbolCodes) == 0 {
-		replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")
+		nc := replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	cd := icd.(*BasicComponentData)
@@ -121,16 +121,16 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty,
 	}
 
 	if ngs == gs {
-		replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")
+		nc := replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	replaceSymbolGroup.AddScene(gameProp, curpr, ngs, cd)
 
-	replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")
+	nc := replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

@@ -112,7 +112,7 @@ func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	symbolMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -148,7 +148,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 							goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
 								zap.Error(err))
 
-							return err
+							return "", err
 						}
 
 						os.Arr[x][y] = cv.Int()
@@ -168,12 +168,12 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		symbolMulti.ClearOtherScene(gameProp)
 	}
 
-	symbolMulti.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolMulti.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(symbolMulti.Name, cd)
 	// symbolMulti.BuildPBComponent(gp)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

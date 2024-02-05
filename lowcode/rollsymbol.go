@@ -166,7 +166,7 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 
 // playgame
 func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	rollSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -174,9 +174,9 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	vw := rollSymbol.getValWeight(gameProp)
 	if vw == nil {
-		rollSymbol.onStepEnd(gameProp, curpr, gp, "")
+		nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	cr, err := vw.RandVal(plugin)
@@ -184,7 +184,7 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		goutils.Error("RollSymbol.OnPlayGame:RandVal",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	rsd.SymbolCode = cr.Int()
@@ -193,9 +193,9 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.AddComponentSymbol(rollSymbol.Config.TargetSymbolCollection, rsd.SymbolCode)
 	}
 
-	rollSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -210,6 +210,11 @@ func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 // OnStats
 func (rollSymbol *RollSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
 	return false, 0, 0
+}
+
+// NewComponentData -
+func (rollSymbol *RollSymbol) NewComponentData() IComponentData {
+	return &RollSymbolData{}
 }
 
 func NewRollSymbol(name string) IComponent {

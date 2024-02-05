@@ -256,7 +256,7 @@ func (symbolModifier *SymbolModifier) procSymbols(gameProp *GameProperty, plugin
 
 // playgame
 func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	symbolModifier.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -294,9 +294,9 @@ func (symbolModifier *SymbolModifier) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 	}
 
-	symbolModifier.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolModifier.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

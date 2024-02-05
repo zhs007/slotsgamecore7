@@ -145,7 +145,7 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // playgame
 func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	symbolValWins.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -223,11 +223,11 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 	// }
 
-	symbolValWins.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolValWins.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(symbolValWins.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

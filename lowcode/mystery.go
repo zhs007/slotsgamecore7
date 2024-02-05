@@ -151,7 +151,7 @@ func (mystery *Mystery) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	mystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -186,7 +186,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 						gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 
-						return nil
+						return v.RespinFirstComponent, nil
 					}
 				}
 			} else {
@@ -195,7 +195,7 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 					goutils.Error("Mystery.OnPlayGame:RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				curmcode := curm.Int()
@@ -217,18 +217,18 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 						gameProp.Respin(curpr, gp, v.RespinFirstComponent, sc2, os)
 
-						return nil
+						return v.RespinFirstComponent, nil
 					}
 				}
 			}
 		}
 	}
 
-	mystery.onStepEnd(gameProp, curpr, gp, "")
+	nc := mystery.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(mystery.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

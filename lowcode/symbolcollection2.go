@@ -140,13 +140,13 @@ func (symbolCollection2 *SymbolCollection2) InitEx(cfg any, pool *GamePropertyPo
 
 // playgame
 func (symbolCollection2 *SymbolCollection2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	symbolCollection2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	symbolCollection2.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolCollection2.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -201,7 +201,7 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		}
 
 		ccd := gameProp.GetCurComponentData(curComponent)
-		err := curComponent.OnPlayGame(gameProp, curpr, gp, plugin, "", "", ps, stake, prs, ccd)
+		nc, err := curComponent.OnPlayGame(gameProp, curpr, gp, plugin, "", "", ps, stake, prs, ccd)
 		if err != nil {
 			if err != ErrComponentDoNothing {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
@@ -216,6 +216,8 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		if !isComponentDoNothing {
 			gameProp.OnCallEnd(curComponent, ccd, gp)
 		}
+
+		ccn = nc
 
 		if ccn == "" {
 			break

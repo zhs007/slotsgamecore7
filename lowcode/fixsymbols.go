@@ -123,7 +123,7 @@ func (fixSymbols *FixSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	fixSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -156,9 +156,9 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		fixSymbols.ReTagScene(gameProp, curpr, bcd.TargetSceneIndex, bcd)
 	}
 
-	fixSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := fixSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

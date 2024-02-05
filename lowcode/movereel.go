@@ -63,7 +63,7 @@ func (moveReel *MoveReel) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	moveReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -113,9 +113,9 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 		moveReel.AddOtherScene(gameProp, curpr, os2, bcd)
 	}
 
-	moveReel.onStepEnd(gameProp, curpr, gp, "")
+	nc := moveReel.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

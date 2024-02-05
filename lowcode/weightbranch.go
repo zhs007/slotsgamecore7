@@ -135,7 +135,7 @@ func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error 
 
 // playgame
 func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -146,7 +146,7 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		goutils.Error("WeightBranch.OnPlayGame:RandVal",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	wbd.Value = cr.String()
@@ -162,9 +162,9 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		nextComponent = branch.JumpToComponent
 	}
 
-	weightBranch.onStepEnd(gameProp, curpr, gp, nextComponent)
+	nc := weightBranch.onStepEnd(gameProp, curpr, gp, nextComponent)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

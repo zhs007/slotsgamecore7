@@ -217,7 +217,7 @@ func (moveSymbol *MoveSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	moveSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -263,16 +263,16 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	}
 
 	if sc2 == gs {
-		moveSymbol.onStepEnd(gameProp, curpr, gp, "")
+		nc := moveSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	moveSymbol.AddScene(gameProp, curpr, sc2, bcd)
 
-	moveSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := moveSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

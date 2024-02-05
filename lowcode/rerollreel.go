@@ -61,7 +61,7 @@ func (reRollReel *ReRollReel) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (reRollReel *ReRollReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	reRollReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -75,9 +75,9 @@ func (reRollReel *ReRollReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	reRollReel.AddScene(gameProp, curpr, sc2, cd)
 
-	reRollReel.onStepEnd(gameProp, curpr, gp, "")
+	nc := reRollReel.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

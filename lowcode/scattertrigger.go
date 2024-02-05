@@ -118,6 +118,7 @@ type ScatterTriggerConfig struct {
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
+	RespinComponent                 string                        `yaml:"respinComponent" json:"respinComponent"`                             // respin component
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
 	RespinNumWeightVW               *sgc7game.ValWeights2         `yaml:"-" json:"-"`                                                         // respin number weight
@@ -459,7 +460,7 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 
 // playgame
 func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	scatterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -487,7 +488,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			goutils.Error("ScatterTrigger.OnPlayGame:calcRespinNum",
 				zap.Error(err))
 
-			return nil
+			return "", nil
 		}
 
 		std.RespinNum = respinNum
@@ -497,7 +498,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			goutils.Error("ScatterTrigger.OnPlayGame:procMask",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		// if scatterTrigger.Config.TagSymbolNum != "" {
@@ -515,23 +516,23 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 					goutils.Error("ScatterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				gameProp.procAwards(plugin, node.Awards, curpr, gp)
 			}
 		}
 
-		if scatterTrigger.Config.JumpToComponent != "" {
-			if gameProp.IsRespin(scatterTrigger.Config.JumpToComponent) {
+		if scatterTrigger.Config.RespinComponent != "" {
+			if gameProp.IsRespin(scatterTrigger.Config.RespinComponent) {
 				// 如果jumpto是一个respin，那么就需要trigger respin
 				if std.RespinNum == 0 {
 					if scatterTrigger.Config.ForceToNext {
 						std.NextComponent = scatterTrigger.Config.DefaultNextComponent
 					} else {
-						rn := gameProp.GetLastRespinNum(scatterTrigger.Config.JumpToComponent)
+						rn := gameProp.GetLastRespinNum(scatterTrigger.Config.RespinComponent)
 						if rn > 0 {
-							gameProp.TriggerRespin(plugin, curpr, gp, 0, scatterTrigger.Config.JumpToComponent, !scatterTrigger.Config.IsAddRespinMode)
+							gameProp.TriggerRespin(plugin, curpr, gp, 0, scatterTrigger.Config.RespinComponent, !scatterTrigger.Config.IsAddRespinMode)
 
 							lst[0].Type = sgc7game.RTFreeGame
 							lst[0].Value = rn
@@ -539,7 +540,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 					}
 				} else {
 					// 如果jumpto是respin，需要treigger这个respin
-					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, scatterTrigger.Config.JumpToComponent, !scatterTrigger.Config.IsAddRespinMode)
+					gameProp.TriggerRespin(plugin, curpr, gp, std.RespinNum, scatterTrigger.Config.RespinComponent, !scatterTrigger.Config.IsAddRespinMode)
 
 					lst[0].Type = sgc7game.RTFreeGame
 					lst[0].Value = std.RespinNum
@@ -594,18 +595,20 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			// 		lst[0].Value = rn
 			// 	}
 			// }
+		}
 
+		if scatterTrigger.Config.JumpToComponent != "" {
 			std.NextComponent = scatterTrigger.Config.JumpToComponent
 
-			scatterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+			nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
 
-			return nil
+			return nc, nil
 		}
 	}
 
-	scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
+	nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -861,20 +864,18 @@ func NewScatterTrigger(name string) IComponent {
 }
 
 //	"configuration": {
-//		"triggerType": "countscatterInArea",
-//		"betType": "noPay",
-//		"genRespinType": "none",
-//		"posArea": [
-//			1,
-//			1,
-//			1,
-//			3
-//		],
+//		"triggerType": "countscatter",
+//		"betType": "bet",
+//		"triggerRespinType": "respinNum",
+//		"winMulti": 1,
 //		"minNum": 3,
-//		"targetMask": "fg-bookof",
+//		"countScatterPayAs": "S",
 //		"symbols": [
-//			"SC"
-//		]
+//			"W"
+//		],
+//		"respinComponent": "fg-start",
+//		"genRespinType": "number",
+//		"respinNum": 10
 //	},
 type jsonScatterTrigger struct {
 	Symbols                       []string       `json:"symbols"`
@@ -886,6 +887,8 @@ type jsonScatterTrigger struct {
 	CountScatterPayAs             string         `json:"countScatterPayAs"`
 	WinMulti                      int            `json:"winMulti"`
 	TargetMask                    string         `json:"targetMask"`
+	TriggerRespinType             string         `json:"triggerRespinType"`
+	RespinComponent               string         `json:"respinComponent"`
 	GenRespinType                 string         `json:"genRespinType"`
 	RespinNum                     int            `json:"respinNum"`
 	RespinNumWeight               string         `json:"respinNumWeight"`
@@ -904,6 +907,8 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		CountScatterPayAs:             jcfg.CountScatterPayAs,
 		WinMulti:                      jcfg.WinMulti,
 		TargetMask:                    jcfg.TargetMask,
+		IsAddRespinMode:               jcfg.TriggerRespinType == "respinNum",
+		RespinComponent:               jcfg.RespinComponent,
 		RespinNum:                     jcfg.RespinNum,
 		RespinNumWeight:               jcfg.RespinNumWeight,
 		RespinNumWithScatterNum:       jcfg.RespinNumWithScatterNum,

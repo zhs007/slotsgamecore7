@@ -124,7 +124,7 @@ func (weightReels *WeightReels) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -137,7 +137,7 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WeightReels.OnPlayGame:ReelSetWeights.RandVal",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		wrd.ReelSetIndex = si
@@ -152,7 +152,7 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WeightReels.OnPlayGame:MapReels",
 				zap.Error(ErrInvalidReels))
 
-			return ErrInvalidReels
+			return "", ErrInvalidReels
 		}
 
 		gameProp.CurReels = rd
@@ -192,11 +192,11 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	weightReels.AddScene(gameProp, curpr, sc, &wrd.BasicComponentData)
 
-	weightReels.onStepEnd(gameProp, curpr, gp, "")
+	nc := weightReels.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(basicReels.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

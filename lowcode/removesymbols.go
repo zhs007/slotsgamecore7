@@ -123,7 +123,7 @@ func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) 
 
 // playgame
 func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	removeSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -155,16 +155,16 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	if ngs == gs {
-		removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &bcd.BasicComponentData)
 
-	removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
+	nc := removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

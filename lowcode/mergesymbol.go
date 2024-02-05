@@ -64,7 +64,7 @@ func (mergeSymbol *MergeSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	mergeSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -80,7 +80,7 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		goutils.Error("MergeSymbol.OnPlayGame:GetMask",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	for x, arr := range gs2.Arr {
@@ -106,7 +106,7 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("MergeSymbol.OnPlayGame:GetMask",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		if os1 == nil {
@@ -142,9 +142,9 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		mergeSymbol.AddOtherScene(gameProp, curpr, os3, bcd)
 	}
 
-	mergeSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := mergeSymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

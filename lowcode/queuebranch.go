@@ -121,7 +121,7 @@ func (queueBranch *QueueBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	queueBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -130,12 +130,14 @@ func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	if qbd.Queue > 0 {
 		qbd.Queue--
 
-		queueBranch.onStepEnd(gameProp, curpr, gp, queueBranch.Config.JumpToComponent)
-	} else {
-		queueBranch.onStepEnd(gameProp, curpr, gp, "")
+		nc := queueBranch.onStepEnd(gameProp, curpr, gp, queueBranch.Config.JumpToComponent)
+
+		return nc, nil
 	}
 
-	return nil
+	nc := queueBranch.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

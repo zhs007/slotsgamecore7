@@ -81,7 +81,7 @@ func (refillSymbols *RefillSymbols) getSymbol(rd *sgc7game.ReelsData, x int, ind
 
 // playgame
 func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	refillSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -106,16 +106,16 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	if ngs == gs {
-		refillSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := refillSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	refillSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
-	refillSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := refillSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

@@ -1,5 +1,0 @@
-defaultNextComponent: bg-pay
-# defaultNextComponent: bg-mystery
-tagScenes:
-  - init-symbols
-reelSetWeight: ../data/game001/bgreelsetweight.xlsx

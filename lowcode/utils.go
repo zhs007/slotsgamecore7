@@ -258,3 +258,19 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 
 	return nil, ErrCannotForceOutcome
 }
+
+func InsStringSliceNonRep(arr []string, str string) []string {
+	if goutils.IndexOfStringSlice(arr, str, 0) >= 0 {
+		return arr
+	}
+
+	return append(arr, str)
+}
+
+func InsSliceNonRep(arr []string, src []string) []string {
+	for _, v := range src {
+		arr = InsStringSliceNonRep(arr, v)
+	}
+
+	return arr
+}

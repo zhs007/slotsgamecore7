@@ -130,7 +130,7 @@ func (winResultMulti *WinResultMulti) InitEx(cfg any, pool *GamePropertyPool) er
 
 // playgame
 func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -142,9 +142,9 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 	std.Wins = 0
 
 	if winMulti == 1 {
-		winResultMulti.onStepEnd(gameProp, curpr, gp, "")
+		nc := winResultMulti.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	for _, cn := range winResultMulti.Config.TargetComponents {
@@ -160,9 +160,9 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 	}
 
-	winResultMulti.onStepEnd(gameProp, curpr, gp, "")
+	nc := winResultMulti.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

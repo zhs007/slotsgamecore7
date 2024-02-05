@@ -24273,17 +24273,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 30,
                         "componentValues": {
                             "labelIsError": false,
@@ -24309,6 +24298,19 @@
                                 "targetMask": "fg-bookof"
                             },
                             "label": "fg-checkbookof"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -24320,6 +24322,13 @@
                             }
                         },
                         "id": "62dd358e-89dc-45a1-a6e0-0bfac3ffe6fa",
+                        "zIndex": 31,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "2bc6b664-8d7e-4532-a68f-21205a5084b3",
                             "port": "foreach-component-groups-out"
@@ -24327,8 +24336,7 @@
                         "target": {
                             "cell": "78dfac79-3b85-4d3d-9deb-56c10cf825be",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 31
+                        }
                     },
                     {
                         "shape": "edge",
@@ -24339,6 +24347,13 @@
                             }
                         },
                         "id": "d6098fbd-8d03-4b61-acdf-71485f92734f",
+                        "zIndex": 32,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "78dfac79-3b85-4d3d-9deb-56c10cf825be",
                             "port": "jump-component-groups-out"
@@ -24346,8 +24361,7 @@
                         "target": {
                             "cell": "aa1c7d0f-bada-4308-b5b6-3f89e4dffb44",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 32
+                        }
                     },
                     {
                         "position": {
@@ -24570,6 +24584,18 @@
                                 }
                             ]
                         },
+                        "zIndex": 33,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "targetSymbols": "J",
+                                "srcMask": "fg-bookof"
+                            },
+                            "label": "fg-replacereel",
+                            "configurationExpand": false
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -24580,16 +24606,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 33,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "targetSymbols": "J",
-                                "srcMask": "fg-bookof"
-                            },
-                            "label": "fg-replacereel",
-                            "configurationExpand": false
                         }
                     },
                     {
@@ -24601,6 +24617,13 @@
                             }
                         },
                         "id": "1d60cc27-0c05-437c-a372-1969e8b50c9b",
+                        "zIndex": 34,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "aa1c7d0f-bada-4308-b5b6-3f89e4dffb44",
                             "port": "component-groups-out"
@@ -24608,8 +24631,7 @@
                         "target": {
                             "cell": "714e5d29-c05c-48e1-a345-ff4082161aea",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 34
+                        }
                     },
                     {
                         "position": {
@@ -24921,17 +24943,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 35,
                         "componentValues": {
                             "labelIsError": false,
@@ -24957,6 +24968,19 @@
                                 ]
                             },
                             "label": "fg-paybookof"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -24968,6 +24992,13 @@
                             }
                         },
                         "id": "9571dda4-8d18-40c8-96bf-f7e883349797",
+                        "zIndex": 36,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "714e5d29-c05c-48e1-a345-ff4082161aea",
                             "port": "component-groups-out"
@@ -24975,8 +25006,7 @@
                         "target": {
                             "cell": "52cd2cf2-98a4-406d-b457-d915967bb5ef",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 36
+                        }
                     }
                 ]
             }

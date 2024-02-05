@@ -154,7 +154,7 @@ func (overlaySymbol *OverlaySymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // playgame
 func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	overlaySymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -181,11 +181,11 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		overlaySymbol.ReTagScene(gameProp, curpr, osd.TargetSceneIndex, &osd.BasicComponentData)
 	}
 
-	overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(overlaySymbol.Name, &osd.BasicComponentData)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

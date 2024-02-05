@@ -148,12 +148,16 @@ func (cs *CallStack) OnNewGame() {
 	cs.nodes = cs.nodes[:0]
 
 	cs.nodes = append(cs.nodes, newGlobalCallStackNode())
+
+	cs.historyNodes = nil
 }
 
 func (cs *CallStack) OnNewStep() {
 	cs.nodes = cs.nodes[0:1]
 
 	cs.nodes[0].OnNewStep()
+
+	cs.historyNodes = nil
 }
 
 func (cs *CallStack) Each(gameProp *GameProperty, onEach FuncOnEachHistoryComponent) error {
@@ -264,7 +268,7 @@ func (cs *CallStack) onEachSymbolsEnd(component IComponent, symbolCode int, i in
 	return ErrInvalidCallStackNode
 }
 
-func NewCallStack(name string) *CallStack {
+func NewCallStack() *CallStack {
 	cs := &CallStack{}
 
 	return cs

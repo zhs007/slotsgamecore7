@@ -79,7 +79,7 @@ func (weightTrigger *WeightTrigger) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // playgame
 func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -90,7 +90,7 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 		goutils.Error("WeightTrigger.OnPlayGame:RandVal",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	setIndex := rv.Int()
@@ -105,11 +105,11 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 		// }
 	}
 
-	weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
+	nc := weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
 
 	// gp.AddComponentData(weightTrigger.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

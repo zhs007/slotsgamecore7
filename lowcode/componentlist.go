@@ -45,9 +45,15 @@ func (lst *ComponentList) GetAllLinkComponents(componentName string) []string {
 
 	curlst := ic.GetAllLinkComponents()
 	for _, v := range curlst {
-		allcomponents = append(allcomponents, v)
+		if v == "" {
+			continue
+		}
+
+		allcomponents = InsStringSliceNonRep(allcomponents, v)
+		// allcomponents = append(allcomponents, v)
 		children := lst.GetAllLinkComponents(v)
-		allcomponents = append(allcomponents, children...)
+		allcomponents = InsSliceNonRep(allcomponents, children)
+		// allcomponents = append(allcomponents, children...)
 	}
 
 	return allcomponents

@@ -92,7 +92,7 @@ func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, b
 
 // playgame
 func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -105,16 +105,18 @@ func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *
 		goutils.Error("WeightTrigger2.OnPlayGame:RandVal",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	if rv.Int() != 0 {
-		weightTrigger2.onStepEnd(gameProp, curpr, gp, weightTrigger2.Config.JumpToComponent)
-	} else {
-		weightTrigger2.onStepEnd(gameProp, curpr, gp, "")
+		nc := weightTrigger2.onStepEnd(gameProp, curpr, gp, weightTrigger2.Config.JumpToComponent)
+
+		return nc, nil
 	}
 
-	return nil
+	nc := weightTrigger2.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

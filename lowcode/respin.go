@@ -241,7 +241,7 @@ func (respin *Respin) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	respin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -259,30 +259,32 @@ recheck:
 			goto recheck
 		}
 
-		respin.onStepEnd(gameProp, curpr, gp, respin.Config.DefaultNextComponent)
-	} else {
-		nextComponent := respin.Config.MainComponent
+		nc := respin.onStepEnd(gameProp, curpr, gp, respin.Config.DefaultNextComponent)
 
-		// for _, v := range respin.Config.Levels {
-		// 	if respin.procLevel(v, cd, gameProp) {
-		// 		nextComponent = v.JumpComponent
-
-		// 		break
-		// 	}
-		// }
-
-		if cd.LastRespinNum > 0 {
-			cd.LastRespinNum--
-		}
-
-		cd.CurRespinNum++
-
-		respin.onStepEnd(gameProp, curpr, gp, nextComponent)
+		return nc, nil
 	}
+
+	nextComponent := respin.Config.MainComponent
+
+	// for _, v := range respin.Config.Levels {
+	// 	if respin.procLevel(v, cd, gameProp) {
+	// 		nextComponent = v.JumpComponent
+
+	// 		break
+	// 	}
+	// }
+
+	if cd.LastRespinNum > 0 {
+		cd.LastRespinNum--
+	}
+
+	cd.CurRespinNum++
+
+	nc := respin.onStepEnd(gameProp, curpr, gp, nextComponent)
 
 	// gp.AddComponentData(respin.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

@@ -78,7 +78,7 @@ func (dropDownSymbols *DropDownSymbols) InitEx(cfg any, pool *GamePropertyPool) 
 
 // playgame
 func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	dropDownSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -118,16 +118,16 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 	}
 
 	if ngs == gs {
-		dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
-	dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

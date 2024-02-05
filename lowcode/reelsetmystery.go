@@ -124,7 +124,7 @@ func (reelSetMystery *ReelSetMystery) hasMystery(gs *sgc7game.GameScene) bool {
 
 // playgame
 func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	reelSetMystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -140,7 +140,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 				zap.String("TagCurReels", gameProp.GetTagStr(TagCurReels)),
 				zap.Error(ErrIvalidTagCurReels))
 
-			return ErrIvalidTagCurReels
+			return "", ErrIvalidTagCurReels
 		}
 
 		if reelSetMystery.Config.MysteryRNG != "" {
@@ -165,7 +165,7 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 				goutils.Error("ReelSetMystery.OnPlayGame:RandVal",
 					zap.Error(err))
 
-				return err
+				return "", err
 			}
 
 			curmcode := curm.Int()
@@ -183,11 +183,11 @@ func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 	}
 
-	reelSetMystery.onStepEnd(gameProp, curpr, gp, "")
+	nc := reelSetMystery.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(reelSetMystery.Name, cd)
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

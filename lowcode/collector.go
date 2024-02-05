@@ -188,7 +188,7 @@ func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameP
 
 // playgame
 func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -224,11 +224,11 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	// gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
-	collector.onStepEnd(gameProp, curpr, gp, "")
+	nc := collector.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

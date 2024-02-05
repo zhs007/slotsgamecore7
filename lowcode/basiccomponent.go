@@ -271,24 +271,26 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 }
 
 // onStepEnd -
-func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) {
+func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) string {
 	if nextComponent == "" {
 		nextComponent = basicComponent.Config.DefaultNextComponent
 	}
 
-	component, isok := gameProp.Components.MapComponents[nextComponent]
-	if isok && component.IsRespin() {
-		gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
-		gameProp.onTriggerRespin(nextComponent)
+	// component, isok := gameProp.Components.MapComponents[nextComponent]
+	// if isok && component.IsRespin() {
+	// 	// gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
+	// 	// gameProp.onTriggerRespin(nextComponent)
 
-		gp.NextStepFirstComponent = nextComponent
+	// 	// gp.NextStepFirstComponent = nextComponent
 
-		gameProp.SetStrVal(GamePropNextComponent, "")
+	// 	// gameProp.SetStrVal(GamePropNextComponent, "")
 
-		return
-	}
+	// 	return nextComponent
+	// }
 
-	gameProp.SetStrVal(GamePropNextComponent, nextComponent)
+	// gameProp.SetStrVal(GamePropNextComponent, nextComponent)
+
+	return nextComponent
 }
 
 // // OnNewGame -

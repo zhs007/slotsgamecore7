@@ -139,7 +139,7 @@ func (multiWeightAwards *MultiWeightAwards) buildMask(plugin sgc7plugin.IPlugin,
 
 // playgame
 func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
 	multiWeightAwards.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -154,7 +154,7 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 				zap.String("mask", multiWeightAwards.Config.InitMask),
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		for i, maskv := range mask {
@@ -165,7 +165,7 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 					goutils.Error("MultiWeightAwards.OnPlayGame:RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				if cv.Int() != 0 {
@@ -188,7 +188,7 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 				goutils.Error("MultiWeightAwards.OnPlayGame:RandVal",
 					zap.Error(err))
 
-				return err
+				return "", err
 			}
 
 			if cv.Int() != 0 {
@@ -210,13 +210,13 @@ func (multiWeightAwards *MultiWeightAwards) OnPlayGame(gameProp *GameProperty, c
 				zap.String("mask", multiWeightAwards.Config.TargetMask),
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 	}
 
-	multiWeightAwards.onStepEnd(gameProp, curpr, gp, "")
+	nc := multiWeightAwards.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

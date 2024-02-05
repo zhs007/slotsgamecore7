@@ -78,7 +78,7 @@ func (replaceReel *ReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (replaceReel *ReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	replaceReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -97,9 +97,9 @@ func (replaceReel *ReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	replaceReel.AddScene(gameProp, curpr, sc2, cd)
 
-	replaceReel.onStepEnd(gameProp, curpr, gp, "")
+	nc := replaceReel.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

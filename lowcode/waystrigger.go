@@ -462,7 +462,7 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 
 // playgame
 func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	waysTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
@@ -490,7 +490,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WaysTrigger.OnPlayGame:calcRespinNum",
 				zap.Error(err))
 
-			return nil
+			return "", nil
 		}
 
 		std.RespinNum = respinNum
@@ -500,7 +500,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			goutils.Error("WaysTrigger.OnPlayGame:procMask",
 				zap.Error(err))
 
-			return err
+			return "", err
 		}
 
 		// if symbolTrigger.Config.TagSymbolNum != "" {
@@ -518,7 +518,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 					goutils.Error("WaysTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
 						zap.Error(err))
 
-					return err
+					return "", err
 				}
 
 				gameProp.procAwards(plugin, node.Awards, curpr, gp)
@@ -600,15 +600,15 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 			std.NextComponent = waysTrigger.Config.JumpToComponent
 
-			waysTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
+			nc := waysTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
 
-			return nil
+			return nc, nil
 		}
 	}
 
-	waysTrigger.onStepEnd(gameProp, curpr, gp, "")
+	nc := waysTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

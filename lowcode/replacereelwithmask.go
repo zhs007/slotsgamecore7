@@ -84,11 +84,13 @@ func (replaceReelWithMask *ReplaceReelWithMask) InitEx(cfg any, pool *GameProper
 
 // playgame
 func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) error {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	replaceReelWithMask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*BasicComponentData)
+
+	cd.UsedScenes = nil
 
 	gs := replaceReelWithMask.GetTargetScene3(gameProp, curpr, prs, cd, replaceReelWithMask.Name, "", 0)
 	ngs := gs
@@ -98,7 +100,7 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 		goutils.Error("ReplaceReelWithMask.OnPlayGame:GetMask",
 			zap.Error(err))
 
-		return err
+		return "", err
 	}
 
 	for x, v := range maskVal {
@@ -115,16 +117,16 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 	}
 
 	if ngs == gs {
-		replaceReelWithMask.onStepEnd(gameProp, curpr, gp, "")
+		nc := replaceReelWithMask.onStepEnd(gameProp, curpr, gp, "")
 
-		return ErrComponentDoNothing
+		return nc, ErrComponentDoNothing
 	}
 
 	replaceReelWithMask.AddScene(gameProp, curpr, ngs, cd)
 
-	replaceReelWithMask.onStepEnd(gameProp, curpr, gp, "")
+	nc := replaceReelWithMask.onStepEnd(gameProp, curpr, gp, "")
 
-	return nil
+	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame

@@ -25,8 +25,8 @@ const (
 	GamePropGameCoinMulti = 102 // 这次spin的全部step都生效，是只有coin玩法才生效的倍数
 	GamePropStepCoinMulti = 103 // 这次spin的step才生效，是只有coin玩法才生效的倍数
 
-	GamePropNextComponent   = 200
-	GamePropRespinComponent = 201
+	// GamePropNextComponent   = 200
+	// GamePropRespinComponent = 201
 )
 
 var MapProperty map[string]int
@@ -116,8 +116,8 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.mapInt = make(map[string]int)
 	gameProp.mapStr = make(map[string]string)
 
-	gameProp.SetStrVal(GamePropNextComponent, "")
-	gameProp.SetStrVal(GamePropRespinComponent, "")
+	// gameProp.SetStrVal(GamePropNextComponent, "")
+	// gameProp.SetStrVal(GamePropRespinComponent, "")
 
 	gameProp.SetVal(GamePropStepMulti, 1)
 	gameProp.SetVal(GamePropStepCoinMulti, 1)
@@ -216,9 +216,9 @@ func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, re
 		gp.LastOtherScene = os.CloneEx(gameProp.PoolScene)
 	}
 
-	gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
+	// gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
 
-	gp.NextStepFirstComponent = respinComponent
+	// gp.NextStepFirstComponent = respinComponent
 }
 
 func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
@@ -289,10 +289,10 @@ func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7g
 		// 		respin.AddRespinTimes(gameProp, respinNum)
 		// 	}
 
-		gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
-		gameProp.onTriggerRespin(respinComponent)
+		// gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
+		// gameProp.onTriggerRespin(respinComponent)
 
-		gp.NextStepFirstComponent = respinComponent
+		// gp.NextStepFirstComponent = respinComponent
 		// }
 	}
 	// }
