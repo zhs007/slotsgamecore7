@@ -66,6 +66,6 @@ type IComponentData interface {
 
 	// GetMask -
 	GetMask() []bool
-	// onMaskChg -
+	// ChgMask -
 	ChgMask(curMask int, val bool) bool
 }

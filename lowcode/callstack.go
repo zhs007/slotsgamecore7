@@ -22,11 +22,17 @@ import (
 type FuncOnEachHistoryComponent func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error
 
 type callStackNode struct {
+	CoreComponent    IComponent
 	Name             string
 	MapComponentData map[string]IComponentData
 	mapHistory       map[string]IComponentData
 	SymbolCode       int
 	CurIndex         int
+	isNoAutoNew      bool
+}
+
+func (csn *callStackNode) IsSame(component IComponent, symbolCode int, i int) bool {
+	return csn.CoreComponent == component && csn.SymbolCode == symbolCode && csn.CurIndex == i
 }
 
 func (csn *callStackNode) IsInCallStack(componentName string) bool {
@@ -35,23 +41,45 @@ func (csn *callStackNode) IsInCallStack(componentName string) bool {
 	return isok
 }
 
+func (csn *callStackNode) addComponentData(ic IComponent) {
+	cd := ic.NewComponentData()
+	csn.MapComponentData[ic.GetName()] = cd
+}
+
+func (csn *callStackNode) onCallEnd(ic IComponent, cd IComponentData) {
+	csn.mapHistory[ic.GetName()] = cd
+}
+
+func (csn *callStackNode) genTag(ic IComponent) string {
+	if csn.Name == "" {
+		return ic.GetName()
+	}
+
+	return fmt.Sprintf("%v/%v", csn.Name, ic.GetName())
+}
+
 func (csn *callStackNode) GetComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
 	name := ic.GetName()
 	cd, isok := csn.MapComponentData[name]
 	if !isok {
+		if csn.isNoAutoNew {
+			return nil
+		}
+
 		cd = ic.NewComponentData()
 
 		csn.MapComponentData[name] = cd
 
 		csn.mapHistory[name] = cd
-	} else {
-		_, isok := csn.mapHistory[name]
-		if !isok {
-			cd.OnNewStep(gameProp, ic)
-
-			csn.mapHistory[name] = cd
-		}
 	}
+	// else {
+	// 	_, isok := csn.mapHistory[name]
+	// 	if !isok {
+	// 		cd.OnNewStep(gameProp, ic)
+
+	// 		csn.mapHistory[name] = cd
+	// 	}
+	// }
 
 	return cd
 }
@@ -69,11 +97,13 @@ func newGlobalCallStackNode() *callStackNode {
 
 func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, pt *sgc7game.PayTables) *callStackNode {
 	return &callStackNode{
+		CoreComponent:    component,
 		Name:             fmt.Sprintf("%v:%v>%v", component.GetName(), i, pt.GetStringFromInt(symbolCode)),
 		mapHistory:       make(map[string]IComponentData),
 		MapComponentData: make(map[string]IComponentData),
 		SymbolCode:       symbolCode,
 		CurIndex:         i,
+		isNoAutoNew:      true,
 	}
 }
 
@@ -181,6 +211,57 @@ func (cs *CallStack) GetCurCallStackSymbol() int {
 	}
 
 	return cs.nodes[len(cs.nodes)-1].SymbolCode
+}
+
+func (cs *CallStack) OnCallEnd(ic IComponent, cd IComponentData) string {
+	cs.nodes[len(cs.nodes)-1].onCallEnd(ic, cd)
+
+	tag := cs.nodes[len(cs.nodes)-1].genTag(ic)
+	cs.historyNodes = append(cs.historyNodes, &callStackHistoryNode{
+		tag:       tag,
+		component: ic,
+		cd:        cd,
+	})
+
+	return tag
+}
+
+func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component IComponent, children []string, symbolCode int, i int) error {
+	node := newEachSymbolCallStackNode(component, symbolCode, i, gameProp.Pool.DefaultPaytables)
+
+	components := gameProp.Components
+
+	for _, v := range children {
+		ic, isok := components.MapComponents[v]
+		if !isok {
+			goutils.Error("CallStack.StartEachSymbols:children",
+				zap.Error(ErrInvalidComponentName))
+
+			return ErrInvalidComponentName
+		}
+
+		node.addComponentData(ic)
+	}
+
+	cs.nodes = append(cs.nodes, node)
+
+	return nil
+}
+
+func (cs *CallStack) onEachSymbolsEnd(component IComponent, symbolCode int, i int) error {
+	if len(cs.nodes) > 1 && cs.nodes[len(cs.nodes)-1].IsSame(component, symbolCode, i) {
+		cs.nodes = cs.nodes[:len(cs.nodes)-1]
+
+		return nil
+	}
+
+	goutils.Error("CallStack.onEachSymbolsEnd",
+		zap.String("component", component.GetName()),
+		zap.Int("symbolCode", symbolCode),
+		zap.Int("i", i),
+		zap.Error(ErrInvalidCallStackNode))
+
+	return ErrInvalidCallStackNode
 }
 
 func NewCallStack(name string) *CallStack {

@@ -431,9 +431,9 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMaskVal",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return ErrIvalidComponentName
+		return ErrInvalidComponentName
 	}
 
 	cd := gameProp.GetComponentData(ic)
@@ -464,9 +464,9 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMask",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return ErrIvalidComponentName
+		return ErrInvalidComponentName
 	}
 
 	cd := gameProp.GetComponentData(ic)
@@ -518,9 +518,9 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.GetMask",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return nil, ErrIvalidComponentName
+		return nil, ErrInvalidComponentName
 	}
 
 	cd := gameProp.GetComponentData(ic)
@@ -551,9 +551,9 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plu
 	if !isok || !ic.IsRespin() {
 		goutils.Error("GamePropertyPool.PushTrigger",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return ErrIvalidComponentName
+		return ErrInvalidComponentName
 	}
 
 	cd := gameProp.GetGlobalComponentData(ic)

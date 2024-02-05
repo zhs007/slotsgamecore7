@@ -70,9 +70,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 				zap.String("FirstComponent", gp.FirstComponent),
-				zap.Error(ErrIvalidComponentName))
+				zap.Error(ErrInvalidComponentName))
 
-			return nil, ErrIvalidComponentName
+			return nil, ErrInvalidComponentName
 		}
 
 		curComponent = c
@@ -85,9 +85,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 						zap.String("cmd", cmd),
 						zap.String("MapCmdComponent", cn),
-						zap.Error(ErrIvalidComponentName))
+						zap.Error(ErrInvalidComponentName))
 
-					return nil, ErrIvalidComponentName
+					return nil, ErrInvalidComponentName
 				}
 
 				curComponent = c
@@ -99,9 +99,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				if !isok {
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
 						zap.String("FirstComponent", startComponent),
-						zap.Error(ErrIvalidComponentName))
+						zap.Error(ErrInvalidComponentName))
 
-					return nil, ErrIvalidComponentName
+					return nil, ErrInvalidComponentName
 				}
 
 				curComponent = c
@@ -125,11 +125,12 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		if !isComponentDoNothing {
-			gameProp.AddComponent2History(curComponent, -1, gp)
+			gameProp.OnCallEnd(curComponent, cd, gp)
+			// gameProp.AddComponent2History(curComponent, -1, gp)
 
-			err := curComponent.ForeachSymbols(gameProp, pr, gp, plugin, ps, stake, prs)
+			err := curComponent.EachSymbols(gameProp, pr, gp, plugin, ps, stake, prs, cd)
 			if err != nil {
-				goutils.Error("BasicGameMod.OnPlay:ForeachSymbols",
+				goutils.Error("BasicGameMod.OnPlay:EachSymbols",
 					zap.Error(err))
 
 				return nil, err
@@ -157,9 +158,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:MapComponents",
 				zap.String("nextComponentName", nextComponentName),
-				zap.Error(ErrIvalidComponentName))
+				zap.Error(ErrInvalidComponentName))
 
-			return nil, ErrIvalidComponentName
+			return nil, ErrInvalidComponentName
 		}
 
 		curComponent = c

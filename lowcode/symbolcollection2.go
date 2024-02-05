@@ -188,11 +188,76 @@ func (symbolCollection2 *SymbolCollection2) NewComponentData() IComponentData {
 // 	}
 // }
 
-// ForEachSymbols - foreach symbols
-func (symbolCollection2 *SymbolCollection2) ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
-	prs []*sgc7game.PlayResult) error {
+func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	// if len(symbolCollection2.Config.Children) > 0 {
+	ccn := symbolCollection2.Config.ForeachComponent
+
+	for {
+		isComponentDoNothing := false
+		curComponent := gameProp.Components.MapComponents[ccn]
+		if curComponent == nil {
+			break
+		}
+
+		ccd := gameProp.GetCurComponentData(curComponent)
+		err := curComponent.OnPlayGame(gameProp, curpr, gp, plugin, "", "", ps, stake, prs, ccd)
+		if err != nil {
+			if err != ErrComponentDoNothing {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					zap.Error(err))
+
+				return err
+			}
+
+			isComponentDoNothing = true
+		}
+
+		if !isComponentDoNothing {
+			gameProp.OnCallEnd(curComponent, ccd, gp)
+		}
+
+		if ccn == "" {
+			break
+		}
+	}
+
+	return nil
+}
+
+// EachSymbols - foreach symbols
+func (symbolCollection2 *SymbolCollection2) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	prs []*sgc7game.PlayResult, cd IComponentData) error {
+
+	if len(symbolCollection2.Config.Children) > 0 {
+		scd := cd.(*SymbolCollection2Data)
+
+		for i, curs := range scd.SymbolCodes {
+			err := gameProp.callStack.StartEachSymbols(gameProp, symbolCollection2, symbolCollection2.Config.Children, curs, i)
+			if err != nil {
+				goutils.Error("SymbolCollection2.EachSymbols:StartEachSymbols",
+					zap.Error(err))
+
+				return err
+			}
+
+			err = symbolCollection2.runInEach(gameProp, curpr, gp, plugin, ps, stake, prs)
+			if err != nil {
+				goutils.Error("SymbolCollection2.EachSymbols:runInEach",
+					zap.Error(err))
+
+				return err
+			}
+
+			err = gameProp.callStack.onEachSymbolsEnd(symbolCollection2, curs, i)
+			if err != nil {
+				goutils.Error("SymbolCollection2.EachSymbols:onEachSymbolsEnd",
+					zap.Error(err))
+
+				return err
+			}
+		}
+	}
 	// 	curComponentName := symbolCollection2.Config.ForeachComponent
 	// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
 
@@ -210,7 +275,7 @@ func (symbolCollection2 *SymbolCollection2) ForeachSymbols(gameProp *GamePropert
 	// 						break
 	// 					}
 	// 				} else {
-	// 					goutils.Error("SymbolCollection2.ForeachSymbols:ProcEachSymbol",
+	// 					goutils.Error("SymbolCollection2.EachSymbols:ProcEachSymbol",
 	// 						zap.Error(err))
 
 	// 					return err

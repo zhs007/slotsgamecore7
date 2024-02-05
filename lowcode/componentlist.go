@@ -36,7 +36,7 @@ func (lst *ComponentList) GetAllLinkComponents(componentName string) []string {
 	if !isok {
 		goutils.Error("ComponentList.GetAllLinkComponents",
 			zap.String("name", componentName),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
 		return nil
 	}

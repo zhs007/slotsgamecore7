@@ -255,16 +255,21 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 	}
 }
 
-func (gameProp *GameProperty) AddComponent2History(component IComponent, index int, gp *GameParams) {
-	// for _, c := range gameProp.HistoryComponents {
-	// 	if c.Component.GetName() == component.GetName() {
-	// 		return
-	// 	}
-	// }
-
-	gameProp.HistoryComponents = append(gameProp.HistoryComponents, &HistoryComponentData{Component: component, ForeachIndex: index})
-	gp.HistoryComponents = append(gp.HistoryComponents, component.GetName())
+func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData, gp *GameParams) {
+	tag := gameProp.callStack.OnCallEnd(component, cd)
+	gp.HistoryComponents = append(gp.HistoryComponents, tag)
 }
+
+// func (gameProp *GameProperty) AddComponent2History(component IComponent, index int, gp *GameParams) {
+// 	// for _, c := range gameProp.HistoryComponents {
+// 	// 	if c.Component.GetName() == component.GetName() {
+// 	// 		return
+// 	// 	}
+// 	// }
+
+// 	gameProp.HistoryComponents = append(gameProp.HistoryComponents, &HistoryComponentData{Component: component, ForeachIndex: index})
+// 	gp.HistoryComponents = append(gp.HistoryComponents, component.GetName())
+// }
 
 func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string, usePushTrigger bool) error {
 	// if respinNum > 0 {
@@ -972,9 +977,9 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 	if !isok || !ic.IsMask() {
 		goutils.Error("GameProperty.GetMask",
 			zap.String("name", name),
-			zap.Error(ErrIvalidComponentName))
+			zap.Error(ErrInvalidComponentName))
 
-		return nil, ErrIvalidComponentName
+		return nil, ErrInvalidComponentName
 	}
 
 	cd := gameProp.GetComponentData(ic)

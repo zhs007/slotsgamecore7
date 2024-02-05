@@ -621,9 +621,9 @@ func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.St
 // 	return "", nil
 // }
 
-// ForEachSymbols - foreach symbols
-func (basicComponent *BasicComponent) ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
-	prs []*sgc7game.PlayResult) error {
+// EachSymbols - foreach symbols
+func (basicComponent *BasicComponent) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+	prs []*sgc7game.PlayResult, cd IComponentData) error {
 	return nil
 }
 

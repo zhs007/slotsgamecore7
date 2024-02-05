@@ -77,9 +77,9 @@ type IComponent interface {
 	// // OnEachSymbol - on foreach symbol
 	// OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
 	// 	prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error)
-	// ForEachSymbols - foreach symbols
-	ForeachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
-		prs []*sgc7game.PlayResult) error
+	// EachSymbols - each symbols
+	EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
+		prs []*sgc7game.PlayResult, cd IComponentData) error
 	// // SetForeachSymbolData -
 	// SetForeachSymbolData(data *ForeachSymbolData)
 }
