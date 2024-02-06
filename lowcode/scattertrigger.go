@@ -478,11 +478,16 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 		if !scatterTrigger.Config.NeedDiscardResults {
 			for _, v := range lst {
 				scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+				std.SymbolNum += v.SymbolNums
+				std.WildNum += v.Wilds
+			}
+		} else {
+			for _, v := range lst {
+				std.SymbolNum += v.SymbolNums
+				std.WildNum += v.Wilds
 			}
 		}
-
-		std.SymbolNum = lst[0].SymbolNums
-		std.WildNum = lst[0].Wilds
 
 		respinNum, err := scatterTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
