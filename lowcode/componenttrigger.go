@@ -68,7 +68,7 @@ func (componentTrigger *ComponentTrigger) InitEx(cfg any, pool *GamePropertyPool
 func (componentTrigger *ComponentTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	componentTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// componentTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	isTrigger := false
 	for _, cn := range componentTrigger.Config.CheckRunComponents {

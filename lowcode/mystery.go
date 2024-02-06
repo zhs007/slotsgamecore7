@@ -153,7 +153,7 @@ func (mystery *Mystery) InitEx(cfg any, pool *GamePropertyPool) error {
 func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	mystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// mystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	mcd := cd.(*MysteryData)
 

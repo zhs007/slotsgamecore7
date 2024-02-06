@@ -80,7 +80,7 @@ func (replaceReel *ReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
 func (replaceReel *ReplaceReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	replaceReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// replaceReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*BasicComponentData)
 

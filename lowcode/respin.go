@@ -243,7 +243,7 @@ func (respin *Respin) InitEx(cfg any, pool *GamePropertyPool) error {
 func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	respin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// respin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*RespinData)
 

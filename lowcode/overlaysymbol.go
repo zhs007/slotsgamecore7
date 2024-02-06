@@ -156,7 +156,7 @@ func (overlaySymbol *OverlaySymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	overlaySymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// overlaySymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	osd := cd.(*OverlaySymbolData)
 

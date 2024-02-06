@@ -123,7 +123,7 @@ func (queueBranch *QueueBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	queueBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// queueBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	qbd := cd.(*QueueBranchData)
 

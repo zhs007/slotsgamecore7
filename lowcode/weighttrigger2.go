@@ -94,7 +94,7 @@ func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, b
 func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*BasicComponentData)
 

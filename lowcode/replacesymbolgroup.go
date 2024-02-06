@@ -94,7 +94,7 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) InitEx(cfg any, pool *GameProperty
 func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	replaceSymbolGroup.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// replaceSymbolGroup.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	if len(replaceSymbolGroup.Config.SrcSymbolCodes) == 0 {
 		nc := replaceSymbolGroup.onStepEnd(gameProp, curpr, gp, "")

@@ -464,9 +464,10 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	waysTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// waysTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := icd.(*WaysTriggerData)
+	std.OnNewStep(gameProp, waysTrigger)
 
 	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, waysTrigger.Name, "", 0)
 	os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")

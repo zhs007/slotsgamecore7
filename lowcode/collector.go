@@ -190,7 +190,7 @@ func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameP
 func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	ccd := cd.(*CollectorData)
 

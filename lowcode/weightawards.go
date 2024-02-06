@@ -142,7 +142,7 @@ func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp 
 func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	weightAwards.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// weightAwards.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	mwad := icd.(*WeightAwardsData)
 

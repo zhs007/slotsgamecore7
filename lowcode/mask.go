@@ -269,7 +269,7 @@ func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cu
 func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	// mask.ProcMask(plugin, gameProp, curpr, prs, gp, "")
 

@@ -102,9 +102,11 @@ func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	basicReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// basicReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	bcd := cd.(*BasicComponentData)
+
+	// bcd.OnNewStep()
 
 	reelname := ""
 	if basicReels.ReelSetWeights != nil {

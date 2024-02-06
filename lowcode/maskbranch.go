@@ -79,7 +79,7 @@ func (maskBranch *MaskBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	maskBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// maskBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	// cd := gameProp.MapComponentData[maskBranch.Name].(*BasicComponentData)
 

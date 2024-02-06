@@ -126,7 +126,7 @@ func (reelSetMystery *ReelSetMystery) hasMystery(gs *sgc7game.GameScene) bool {
 func (reelSetMystery *ReelSetMystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	reelSetMystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// reelSetMystery.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	bcd := cd.(*ReelSetMysteryData)
 
