@@ -480,11 +480,16 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		if !waysTrigger.Config.NeedDiscardResults {
 			for _, v := range lst {
 				waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+				std.SymbolNum += v.SymbolNums
+				std.WildNum += v.Wilds
+			}
+		} else {
+			for _, v := range lst {
+				std.SymbolNum += v.SymbolNums
+				std.WildNum += v.Wilds
 			}
 		}
-
-		std.SymbolNum = lst[0].SymbolNums
-		std.WildNum = lst[0].Wilds
 
 		respinNum, err := waysTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {

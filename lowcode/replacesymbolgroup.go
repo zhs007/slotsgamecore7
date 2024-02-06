@@ -112,7 +112,7 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty,
 			si := goutils.IndexOfIntSlice(replaceSymbolGroup.Config.SrcSymbolCodes, srcSymbol, 0)
 			if si >= 0 {
 				if ngs == gs {
-					ngs = gs.Clone()
+					ngs = gs.CloneEx(gameProp.PoolScene)
 				}
 
 				ngs.Arr[x][y] = replaceSymbolGroup.Config.TargetSymbolCodes[si]

@@ -143,7 +143,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 				y := curpr.Results[ri].Pos[pi*2+1]
 				if removeSymbols.canRemove(x, y, ngs) {
 					if ngs == gs {
-						ngs = gs.Clone()
+						ngs = gs.CloneEx(gameProp.PoolScene)
 					}
 
 					ngs.Arr[x][y] = -1

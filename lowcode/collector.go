@@ -322,14 +322,14 @@ func NewCollector(name string) IComponent {
 
 // "configuration": {},
 type jsonCollector struct {
-	MaxVal  int  `json:"maxVal"`
-	IsCycle bool `json:"isCycle"`
+	MaxVal  int    `json:"maxVal"`
+	IsCycle string `json:"isCycle"`
 }
 
 func (jcfg *jsonCollector) build() *CollectorConfig {
 	cfg := &CollectorConfig{
 		MaxVal:  jcfg.MaxVal,
-		IsCycle: jcfg.IsCycle,
+		IsCycle: jcfg.IsCycle == "true",
 	}
 
 	cfg.UseSceneV3 = true

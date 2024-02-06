@@ -136,7 +136,6 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		xarr, _ := fixSymbols.isNeedMergeDown(gs)
 		if len(xarr) > 0 {
 			ngs := gs.CloneEx(gameProp.PoolScene)
-			// ngs := gs.Clone()
 
 			// 3可以是个特例
 			if len(gs.Arr[0]) == 3 {

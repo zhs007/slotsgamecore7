@@ -94,7 +94,7 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 				for y1 := y - 1; y1 >= 0; y1-- {
 					if arr[y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
 						if ngs == gs {
-							ngs = gs.Clone()
+							ngs = gs.CloneEx(gameProp.PoolScene)
 
 							arr = ngs.Arr[x]
 						}
