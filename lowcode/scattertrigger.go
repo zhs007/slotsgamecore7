@@ -111,6 +111,7 @@ type ScatterTriggerConfig struct {
 	SymbolCodeCountScatterPayAs     int                           `yaml:"-" json:"-"`                                                         // countscatter时，按什么符号赔付
 	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
+	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
 	SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
@@ -881,7 +882,8 @@ func NewScatterTrigger(name string) IComponent {
 //		],
 //		"respinComponent": "fg-start",
 //		"genRespinType": "number",
-//		"respinNum": 10
+//		"respinNum": 10,
+//		"putMoneyInPiggyBank": "bg-piggybank"
 //	},
 type jsonScatterTrigger struct {
 	Symbols                       []string       `json:"symbols"`
@@ -895,6 +897,7 @@ type jsonScatterTrigger struct {
 	TargetMask                    string         `json:"targetMask"`
 	TriggerRespinType             string         `json:"triggerRespinType"`
 	RespinComponent               string         `json:"respinComponent"`
+	PutMoneyInPiggyBank           string         `json:"putMoneyInPiggyBank"`
 	GenRespinType                 string         `json:"genRespinType"`
 	RespinNum                     int            `json:"respinNum"`
 	RespinNumWeight               string         `json:"respinNumWeight"`
@@ -913,6 +916,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		CountScatterPayAs:             jcfg.CountScatterPayAs,
 		WinMulti:                      jcfg.WinMulti,
 		TargetMask:                    jcfg.TargetMask,
+		PiggyBankComponent:            jcfg.PutMoneyInPiggyBank,
 		IsAddRespinMode:               jcfg.TriggerRespinType == "respinNum",
 		RespinComponent:               jcfg.RespinComponent,
 		RespinNum:                     jcfg.RespinNum,
