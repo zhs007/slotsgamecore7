@@ -3,6 +3,7 @@ package lowcode
 import (
 	"strings"
 
+	any1 "github.com/golang/protobuf/ptypes/any"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"go.uber.org/zap"
@@ -24,6 +25,53 @@ func cmpVal(srcVal int, op string, targetVal int) bool {
 	return false
 }
 
+func isComponent(target string, src string) bool {
+	if src == target {
+		return true
+	}
+
+	arr0 := strings.Split(target, ":")
+	if len(arr0) > 1 {
+		if arr0[0] == src {
+			return true
+		}
+	}
+
+	arr1 := strings.Split(target, "/")
+	if len(arr1) > 1 {
+		if arr1[len(arr1)-1] == src {
+			return true
+		}
+	}
+
+	return false
+}
+
+func hasComponentInHistory(lst []string, component string) bool {
+	for _, v := range lst {
+		if isComponent(v, component) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func checkComponentVal(mapComponent map[string]*any1.Any, component string, val string, op string, targetVal int) bool {
+	for k, v := range mapComponent {
+		if isComponent(k, component) {
+			curval, isok2 := GetComponentDataVal(v, val)
+			if isok2 {
+				if cmpVal(curval, op, targetVal) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
 type FOData struct {
 	Component   string
 	Value       string
@@ -35,22 +83,26 @@ func (fod *FOData) IsValid(lst []*sgc7game.PlayResult) bool {
 	if fod.Value == "" {
 		for _, pr := range lst {
 			gp := pr.CurGameModParams.(*GameParams)
-			if goutils.IndexOfStringSlice(gp.HistoryComponents, fod.Component, 0) >= 0 {
+			if hasComponentInHistory(gp.HistoryComponents, fod.Component) {
 				return true
 			}
 		}
 	} else {
 		for _, pr := range lst {
 			gp := pr.CurGameModParams.(*GameParams)
-			cdpb, isok := gp.MapComponents[fod.Component]
-			if isok {
-				val, isok2 := GetComponentDataVal(cdpb, fod.Value)
-				if isok2 {
-					if cmpVal(val, fod.Operator, fod.TargetValue) {
-						return true
-					}
-				}
+			if checkComponentVal(gp.MapComponents, fod.Component, fod.Value, fod.Operator, fod.TargetValue) {
+				return true
 			}
+
+			// cdpb, isok := gp.MapComponents[fod.Component]
+			// if isok {
+			// 	val, isok2 := GetComponentDataVal(cdpb, fod.Value)
+			// 	if isok2 {
+			// 		if cmpVal(val, fod.Operator, fod.TargetValue) {
+			// 			return true
+			// 		}
+			// 	}
+			// }
 		}
 	}
 

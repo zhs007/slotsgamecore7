@@ -96,10 +96,9 @@ func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
 // LinesTriggerConfig - configuration for LinesTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type LinesTriggerConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbols              []string `yaml:"symbols" json:"symbols"` // like scatter
-	SymbolCodes          []int    `yaml:"-" json:"-"`             // like scatter
-	// ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
+	BasicComponentConfig            `yaml:",inline" json:",inline"`
+	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
+	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
 	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
 	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
 	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
