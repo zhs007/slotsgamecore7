@@ -68,4 +68,9 @@ type IComponentData interface {
 	GetMask() []bool
 	// ChgMask -
 	ChgMask(curMask int, val bool) bool
+
+	//----------------------------
+	// PiggyBank
+
+	PutInMoney(coins int)
 }

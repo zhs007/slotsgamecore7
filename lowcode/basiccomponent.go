@@ -198,6 +198,10 @@ func (basicComponentData *BasicComponentData) ChgMask(curMask int, val bool) boo
 	return false
 }
 
+func (basicComponentData *BasicComponentData) PutInMoney(coins int) {
+
+}
+
 // 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
 	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
