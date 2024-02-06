@@ -96,6 +96,10 @@ func (stack *SceneStack) PopTo(scene string) {
 	}
 }
 
+func (stack *SceneStack) PopEx(num int) {
+	stack.Scenes = stack.Scenes[:num]
+}
+
 func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *BasicComponentConfig, si int, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) *sgc7game.GameScene {
 	if len(basicCfg.TargetScenes3) > si {
 		for i := len(stack.Scenes) - 1; i >= 0; i-- {

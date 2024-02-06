@@ -251,7 +251,7 @@ func (symbolCollection2 *SymbolCollection2) EachSymbols(gameProp *GameProperty, 
 				return err
 			}
 
-			err = gameProp.callStack.onEachSymbolsEnd(symbolCollection2, curs, i)
+			err = gameProp.callStack.onEachSymbolsEnd(gameProp, symbolCollection2, curs, i)
 			if err != nil {
 				goutils.Error("SymbolCollection2.EachSymbols:onEachSymbolsEnd",
 					zap.Error(err))

@@ -29,6 +29,7 @@ type callStackNode struct {
 	SymbolCode       int
 	CurIndex         int
 	isNoAutoNew      bool
+	cacheSceneIndex  int
 }
 
 func (csn *callStackNode) IsSame(component IComponent, symbolCode int, i int) bool {
@@ -95,7 +96,7 @@ func newGlobalCallStackNode() *callStackNode {
 	}
 }
 
-func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, pt *sgc7game.PayTables) *callStackNode {
+func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, cacheSceneIndex int, pt *sgc7game.PayTables) *callStackNode {
 	return &callStackNode{
 		CoreComponent:    component,
 		Name:             fmt.Sprintf("%v:%v>%v", component.GetName(), i, pt.GetStringFromInt(symbolCode)),
@@ -104,6 +105,7 @@ func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, pt 
 		SymbolCode:       symbolCode,
 		CurIndex:         i,
 		isNoAutoNew:      true,
+		cacheSceneIndex:  cacheSceneIndex,
 	}
 }
 
@@ -231,7 +233,7 @@ func (cs *CallStack) OnCallEnd(ic IComponent, cd IComponentData) string {
 }
 
 func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component IComponent, children []string, symbolCode int, i int) error {
-	node := newEachSymbolCallStackNode(component, symbolCode, i, gameProp.Pool.DefaultPaytables)
+	node := newEachSymbolCallStackNode(component, symbolCode, i, len(gameProp.SceneStack.Scenes), gameProp.Pool.DefaultPaytables)
 
 	components := gameProp.Components
 
@@ -252,8 +254,10 @@ func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component ICompone
 	return nil
 }
 
-func (cs *CallStack) onEachSymbolsEnd(component IComponent, symbolCode int, i int) error {
+func (cs *CallStack) onEachSymbolsEnd(gameProp *GameProperty, component IComponent, symbolCode int, i int) error {
 	if len(cs.nodes) > 1 && cs.nodes[len(cs.nodes)-1].IsSame(component, symbolCode, i) {
+		gameProp.SceneStack.PopEx(cs.nodes[len(cs.nodes)-1].cacheSceneIndex)
+
 		cs.nodes = cs.nodes[:len(cs.nodes)-1]
 
 		return nil
