@@ -462,9 +462,10 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	scatterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// scatterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := icd.(*ScatterTriggerData)
+	std.OnNewStep(gameProp, scatterTrigger)
 
 	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, scatterTrigger.Name, "", 0)
 	os := scatterTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, scatterTrigger.Name, "")

@@ -76,7 +76,7 @@ func (chgSymbol *ChgSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	chgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// chgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	bcd := cd.(*BasicComponentData)
 

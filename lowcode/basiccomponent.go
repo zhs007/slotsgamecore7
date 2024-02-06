@@ -254,16 +254,16 @@ func (basicComponent *BasicComponent) OnStats(feature *sgc7stats.Feature, stake 
 	return false, 0, 0
 }
 
-// onInit -
-func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
+// // onInit -
+// func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+// 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
-	for k, v := range basicComponent.Config.InitStrVals {
-		gameProp.TagGlobalStr(k, v)
-	}
+// 	// for k, v := range basicComponent.Config.InitStrVals {
+// 	// 	gameProp.TagGlobalStr(k, v)
+// 	// }
 
-	return nil
-}
+// 	return nil
+// }
 
 // onInit -
 func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {

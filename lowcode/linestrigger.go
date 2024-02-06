@@ -663,9 +663,10 @@ func (linesTrigger *LinesTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *
 func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	linesTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// linesTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := cd.(*LinesTriggerData)
+	std.OnNewStep(gameProp, linesTrigger)
 
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, linesTrigger.Name, "", 0)
 	os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")

@@ -396,9 +396,10 @@ func (clusterTrigger *ClusterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	clusterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	// clusterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := cd.(*ClusterTriggerData)
+	std.OnNewStep(gameProp, clusterTrigger)
 
 	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, clusterTrigger.Name, "", 0)
 
