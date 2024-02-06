@@ -373,6 +373,8 @@ func CountSymbolOnLine(scene *GameScene, pt *PayTables, ld []int, bet int, symbo
 	otherMul := 1
 
 	if isSameSymbol(s0, symbol) {
+		nums++
+
 		pos = append(pos, 0, ld[sx])
 		otherMul = getMulti(sx, ld[sx])
 
