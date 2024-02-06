@@ -96,10 +96,9 @@ func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
 // LinesTriggerConfig - configuration for LinesTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type LinesTriggerConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbols              []string `yaml:"symbols" json:"symbols"` // like scatter
-	SymbolCodes          []int    `yaml:"-" json:"-"`             // like scatter
-	// ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
+	BasicComponentConfig            `yaml:",inline" json:",inline"`
+	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
+	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
 	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
 	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
 	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
@@ -297,7 +296,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 		// os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
 
 		if os != nil {
-			if linesTrigger.Config.CheckWinType != CheckWinTypeCount {
+			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				// for _, cs := range linesTrigger.Config.SymbolCodes {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
 					for i, v := range gameProp.CurLineData.Lines {
@@ -395,7 +394,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 				}
 			}
 		} else {
-			if linesTrigger.Config.CheckWinType != CheckWinTypeCount {
+			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				// for _, cs := range linesTrigger.Config.SymbolCodes {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
 					for i, v := range gameProp.CurLineData.Lines {
@@ -493,7 +492,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 			isTrigger = true
 		}
 	} else if linesTrigger.Config.TriggerType == STTypeCheckLines {
-		if linesTrigger.Config.CheckWinType != CheckWinTypeCount {
+		if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 			// for _, cs := range linesTrigger.Config.SymbolCodes {
 			for _, cs := range linesTrigger.getSymbols(gameProp) {
 				for i, v := range gameProp.CurLineData.Lines {
@@ -909,45 +908,48 @@ func NewLinesTrigger(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"triggerType": "lines",
-//		"betType": "bet",
-//		"checkWinType": "left2right",
-//		"symbols": [
-//			"WL",
-//			"A",
-//			"B",
-//			"C",
-//			"D",
-//			"E",
-//			"F",
-//			"G",
-//			"H",
-//			"J",
-//			"K",
-//			"L"
-//		],
-//		"wildSymbols": [
-//			"WL"
-//		]
-//	},
+// "triggerType": "lines",
+// "betType": "bet",
+// "checkWinType": "left2right",
+// "winMulti": 1,
+// "symbols": [
+//
+//	"J",
+//	"H",
+//	"G",
+//	"F",
+//	"E",
+//	"D",
+//	"C",
+//	"B",
+//	"A",
+//	"W"
+//
+// ],
+// "wildSymbols": [
+//
+//	"W"
+//
+// ]
 type jsonLinesTrigger struct {
-	Symbols     []string `json:"symbols"`
-	TriggerType string   `json:"triggerType"`
-	BetType     string   `json:"betType"`
-	MinNum      int      `json:"minNum"`
-	WildSymbols []string `json:"wildSymbols"`
-	WinMulti    int      `json:"winMulti"`
+	Symbols      []string `json:"symbols"`
+	TriggerType  string   `json:"triggerType"`
+	CheckWinType string   `json:"checkWinType"`
+	BetType      string   `json:"betType"`
+	MinNum       int      `json:"minNum"`
+	WildSymbols  []string `json:"wildSymbols"`
+	WinMulti     int      `json:"winMulti"`
 }
 
 func (jlt *jsonLinesTrigger) build() *LinesTriggerConfig {
 	cfg := &LinesTriggerConfig{
-		Symbols:       jlt.Symbols,
-		Type:          jlt.TriggerType,
-		BetTypeString: jlt.BetType,
-		MinNum:        jlt.MinNum,
-		WildSymbols:   jlt.WildSymbols,
-		WinMulti:      jlt.WinMulti,
+		Symbols:         jlt.Symbols,
+		Type:            jlt.TriggerType,
+		BetTypeString:   jlt.BetType,
+		StrCheckWinType: jlt.CheckWinType,
+		MinNum:          jlt.MinNum,
+		WildSymbols:     jlt.WildSymbols,
+		WinMulti:        jlt.WinMulti,
 	}
 
 	cfg.UseSceneV3 = true
