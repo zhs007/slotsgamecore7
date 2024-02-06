@@ -69,6 +69,19 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 //			"queue"
 //		],
 //		"value": 1
+//	},
+//
+//	{
+//		"type": "chgComponentConfigIntVal",
+//		"targetArr": [
+//			"bg-blue",
+//			"valueNum"
+//		],
+//		"valueNum": 0,
+//		"source": [
+//			"bg-payblue",
+//			"symbolNum"
+//		]
 //	}
 //
 // ]
@@ -81,6 +94,8 @@ type jsonControllerData struct {
 	TargetArr  []string `json:"targetArr"`
 	Value      int      `json:"value"`
 	Times      int      `json:"times"`
+	ValueNum   int      `json:"valueNum"`
+	Source     []string `json:"source"`
 }
 
 func (jcd *jsonControllerData) build() *Award {
@@ -91,10 +106,18 @@ func (jcd *jsonControllerData) build() *Award {
 			StrParams: []string{jcd.Target},
 		}
 	} else if jcd.Type == "chgComponentConfigIntVal" {
+		if len(jcd.Source) == 0 {
+			return &Award{
+				AwardType: "chgComponentConfigIntVal",
+				Vals:      []int{jcd.ValueNum},
+				StrParams: []string{strings.Join(jcd.TargetArr, ".")},
+			}
+		}
+
 		return &Award{
-			AwardType: "chgComponentConfigIntVal",
-			Vals:      []int{jcd.Value},
-			StrParams: []string{strings.Join(jcd.TargetArr, ".")},
+			AwardType:     "chgComponentConfigIntVal",
+			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
+			ComponentVals: []string{strings.Join(jcd.Source, ".")},
 		}
 	}
 
