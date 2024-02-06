@@ -82,6 +82,15 @@ func (replaceReelWithMask *ReplaceReelWithMask) InitEx(cfg any, pool *GameProper
 	return nil
 }
 
+func (replaceReelWithMask *ReplaceReelWithMask) getSymbol(gameProp *GameProperty) int {
+	s := gameProp.GetCurCallStackSymbol()
+	if s >= 0 {
+		return s
+	}
+
+	return replaceReelWithMask.Config.SymbolCode
+}
+
 // playgame
 func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -111,7 +120,7 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 
 			arr := ngs.Arr[x]
 			for y := range arr {
-				ngs.Arr[x][y] = replaceReelWithMask.Config.SymbolCode
+				ngs.Arr[x][y] = replaceReelWithMask.getSymbol(gameProp)
 			}
 		}
 	}
