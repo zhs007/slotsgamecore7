@@ -635,7 +635,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	} else if award.Type == AwardSetComponentConfigIntVal {
-		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.Vals[0])
+		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardSetComponentConfigIntVal",
 				zap.Error(err))
@@ -643,7 +643,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	} else if award.Type == AwardChgComponentConfigIntVal {
-		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.Vals[0])
+		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardChgComponentConfigIntVal",
 				zap.Error(err))

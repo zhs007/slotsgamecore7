@@ -69,6 +69,8 @@ func (csn *callStackNode) GetComponentData(gameProp *GameProperty, ic IComponent
 
 		cd = ic.NewComponentData()
 
+		cd.OnNewGame(gameProp, ic)
+
 		csn.MapComponentData[name] = cd
 
 		csn.mapHistory[name] = cd
