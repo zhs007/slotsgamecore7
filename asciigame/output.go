@@ -63,7 +63,11 @@ func OutputScene(str string, scene *sgc7game.GameScene, mapSymbolColor *SymbolCo
 
 	for y := 0; y < scene.Height; y++ {
 		for x := 0; x < scene.Width; x++ {
-			fmt.Printf("%v ", mapSymbolColor.GetSymbolString(scene.Arr[x][y]))
+			if scene.Arr[x][y] < 0 {
+				fmt.Print("  ")
+			} else {
+				fmt.Printf("%v ", mapSymbolColor.GetSymbolString(scene.Arr[x][y]))
+			}
 		}
 
 		fmt.Print("\n")
