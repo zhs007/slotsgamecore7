@@ -192,9 +192,7 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	for i := 0; i < sn; i++ {
 		vw := rollSymbol.getValWeight(gameProp)
 		if vw == nil {
-			nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
+			break
 		}
 
 		cr, err := vw.RandVal(plugin)
