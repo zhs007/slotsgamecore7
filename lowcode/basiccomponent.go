@@ -530,6 +530,11 @@ func (basicComponent *BasicComponent) IsRespin() bool {
 	return false
 }
 
+// // IsTriggerRespin -
+// func (basicComponent *BasicComponent) IsTriggerRespin() bool {
+// 	return false
+// }
+
 // IsMask -
 func (basicComponent *BasicComponent) IsMask() bool {
 	return false

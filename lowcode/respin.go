@@ -259,6 +259,12 @@ recheck:
 			goto recheck
 		}
 
+		if respin.Config.DefaultNextComponent == "" {
+			nc := respin.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
 		nc := respin.onStepEnd(gameProp, curpr, gp, respin.Config.DefaultNextComponent)
 
 		return nc, nil
@@ -407,6 +413,13 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 func (respin *Respin) IsRespin() bool {
 	return true
 }
+
+// // IsTriggerRespin -
+// func (respin *Respin) IsTriggerRespin() bool {
+// 	rcd := cd.(*RespinData)
+
+// 	return false
+// }
 
 // // SaveRetriggerRespinNum -
 // func (respin *Respin) SaveRetriggerRespinNum(gameProp *GameProperty) {
