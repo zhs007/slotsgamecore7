@@ -143,7 +143,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			break
 		}
 
-		if gameProp.IsRespin(nextComponentName) {
+		if gameProp.IsRespin(nextComponentName) && !gameProp.IsEndingRespin(nextComponentName) {
 			gameProp.onTriggerRespin(nextComponentName)
 			gp.NextStepFirstComponent = nextComponentName
 
@@ -244,6 +244,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		// 	curpr.
 		// }
 	}
+
 	// if pr.IsFinish {
 	// 	for _, curpr := range prs {
 	// 		for _, s := range curpr.Scenes {
