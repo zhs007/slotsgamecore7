@@ -27322,13 +27322,19 @@
                         "zIndex": 59,
                         "componentValues": {
                             "labelIsError": false,
-                            "configuration": {},
+                            "configuration": {
+                                "targetComponents": [
+                                    "bg-payblue",
+                                    "bg-payred",
+                                    "bg-paygreen"
+                                ]
+                            },
                             "label": "bg-remove",
                             "controller": [
                                 {
-                                    "type": "triggerRespin2",
+                                    "type": "addRespinTimes",
                                     "target": "bg-respin",
-                                    "valueNum": 10
+                                    "times": 1
                                 }
                             ]
                         },
@@ -28788,6 +28794,14 @@
                                 "queue"
                             ]
                         },
+                        "zIndex": 75,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {},
+                            "label": "bg-blueeffect"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -28798,12 +28812,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 75,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {},
-                            "label": "bg-blueeffect"
                         }
                     },
                     {
@@ -28815,6 +28823,13 @@
                             }
                         },
                         "id": "c893c62d-5eca-4b03-afd8-ba69474e4e0c",
+                        "zIndex": 76,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "98e7be9b-a876-4262-81f2-6606cda14063",
                             "port": "component-groups-out"
@@ -28822,8 +28837,7 @@
                         "target": {
                             "cell": "b86c9cdb-d651-4d5e-a2bc-b42456b79667",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 76
+                        }
                     },
                     {
                         "shape": "edge",
@@ -28834,6 +28848,13 @@
                             }
                         },
                         "id": "4736e1ad-253c-4a61-b539-adb01aed5fa1",
+                        "zIndex": 77,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "b86c9cdb-d651-4d5e-a2bc-b42456b79667",
                             "port": "jump-component-groups-out"
@@ -28841,8 +28862,7 @@
                         "target": {
                             "cell": "54191f14-2184-4ceb-95c9-12b91b0115c5",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 77
+                        }
                     },
                     {
                         "position": {
@@ -29063,6 +29083,14 @@
                                 "queue"
                             ]
                         },
+                        "zIndex": 78,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {},
+                            "label": "bg-greeneffect"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -29073,12 +29101,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 78,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {},
-                            "label": "bg-greeneffect"
                         }
                     },
                     {
@@ -29090,6 +29112,13 @@
                             }
                         },
                         "id": "fbff7c93-58af-4214-8e01-27c30e1a5036",
+                        "zIndex": 79,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "54191f14-2184-4ceb-95c9-12b91b0115c5",
                             "port": "component-groups-out"
@@ -29097,8 +29126,7 @@
                         "target": {
                             "cell": "25a2bd45-1786-413b-bb7e-8c9f4debf363",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 79
+                        }
                     },
                     {
                         "shape": "edge",
@@ -29109,6 +29137,13 @@
                             }
                         },
                         "id": "7efd5928-15da-4353-9347-1988c37758e2",
+                        "zIndex": 80,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "b86c9cdb-d651-4d5e-a2bc-b42456b79667",
                             "port": "component-groups-out"
@@ -29116,8 +29151,7 @@
                         "target": {
                             "cell": "25a2bd45-1786-413b-bb7e-8c9f4debf363",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 80
+                        }
                     },
                     {
                         "shape": "edge",
@@ -29128,6 +29162,13 @@
                             }
                         },
                         "id": "0dd3a59b-ec2b-498c-ab55-6e5b07f78de3",
+                        "zIndex": 81,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "25a2bd45-1786-413b-bb7e-8c9f4debf363",
                             "port": "jump-component-groups-out"
@@ -29135,8 +29176,7 @@
                         "target": {
                             "cell": "2541e835-723a-40ee-931d-792c07822887",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 81
+                        }
                     },
                     {
                         "shape": "edge",
@@ -29147,6 +29187,13 @@
                             }
                         },
                         "id": "023869b1-4b3d-4da1-8342-dd642b62c9be",
+                        "zIndex": 82,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "25a2bd45-1786-413b-bb7e-8c9f4debf363",
                             "port": "component-groups-out"
@@ -29154,8 +29201,7 @@
                         "target": {
                             "cell": "7b9bc2ef-95e9-4387-bb3b-1104284c3c0b",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 82
+                        }
                     },
                     {
                         "position": {
@@ -29629,17 +29675,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 83,
                         "componentValues": {
                             "labelIsError": false,
@@ -29674,6 +29709,19 @@
                                     ]
                                 }
                             ]
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -29685,6 +29733,13 @@
                             }
                         },
                         "id": "5d7fd675-2214-4a33-ab72-950009922670",
+                        "zIndex": 84,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "1b50edb2-9825-4421-9e1c-f16c5afb8d95",
                             "port": "component-groups-out"
@@ -29692,8 +29747,7 @@
                         "target": {
                             "cell": "77ac0014-1109-4c32-8f19-077bcde38ffd",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 84
+                        }
                     },
                     {
                         "shape": "edge",
@@ -29704,6 +29758,13 @@
                             }
                         },
                         "id": "5b282262-74d6-4a30-ae6b-04ef46a3ed9f",
+                        "zIndex": 85,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "77ac0014-1109-4c32-8f19-077bcde38ffd",
                             "port": "component-groups-out"
@@ -29711,8 +29772,7 @@
                         "target": {
                             "cell": "b0efc8fa-52fc-40a2-8ba5-ba58abfa2d9e",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 85
+                        }
                     },
                     {
                         "position": {
@@ -30186,17 +30246,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 86,
                         "componentValues": {
                             "labelIsError": false,
@@ -30231,6 +30280,19 @@
                                     ]
                                 }
                             ]
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -30242,6 +30304,13 @@
                             }
                         },
                         "id": "a135b9f1-749e-4c6e-a670-7b417fc9cf6b",
+                        "zIndex": 87,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "b0efc8fa-52fc-40a2-8ba5-ba58abfa2d9e",
                             "port": "component-groups-out"
@@ -30249,8 +30318,7 @@
                         "target": {
                             "cell": "407105af-2c86-409d-b718-315e6e71771c",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 87
+                        }
                     },
                     {
                         "shape": "edge",
@@ -30261,6 +30329,13 @@
                             }
                         },
                         "id": "04c65eab-1ee7-404c-ab80-44a7cd9c601d",
+                        "zIndex": 88,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "407105af-2c86-409d-b718-315e6e71771c",
                             "port": "component-groups-out"
@@ -30268,8 +30343,7 @@
                         "target": {
                             "cell": "3821966e-940f-4e48-89cf-b471062fd7c8",
                             "port": "component-groups-in"
-                        },
-                        "zIndex": 88
+                        }
                     }
                 ]
             }

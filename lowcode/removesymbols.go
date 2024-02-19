@@ -53,6 +53,7 @@ type RemoveSymbolsConfig struct {
 	TargetComponents     []string `yaml:"targetComponents" json:"targetComponents"` // 这些组件的中奖会需要参与remove
 	IgnoreSymbols        []string `yaml:"ignoreSymbols" json:"ignoreSymbols"`       // 忽略的symbol
 	IgnoreSymbolCodes    []int    `yaml:"-" json:"-"`                               // 忽略的symbol
+	Awards               []*Award `yaml:"awards" json:"awards"`                     // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -101,6 +102,10 @@ func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) erro
 
 	for _, v := range removeSymbols.Config.IgnoreSymbols {
 		removeSymbols.Config.IgnoreSymbolCodes = append(removeSymbols.Config.IgnoreSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
+	}
+
+	for _, v := range removeSymbols.Config.Awards {
+		v.Init()
 	}
 
 	removeSymbols.onInit(&removeSymbols.Config.BasicComponentConfig)
@@ -161,6 +166,10 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &bcd.BasicComponentData)
+
+	if len(removeSymbols.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, removeSymbols.Config.Awards, curpr, gp)
+	}
 
 	nc := removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
 
@@ -230,7 +239,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 }
 
 func parseRemoveSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRemoveSymbols:getConfigInCell",
 			zap.Error(err))
@@ -257,6 +266,18 @@ func parseRemoveSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(gamecfg, ctrls)
+		if err != nil {
+			goutils.Error("parseRemoveSymbols:parseControllers",
+				zap.Error(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
