@@ -25,7 +25,7 @@ const (
 
 type RollSymbolData struct {
 	BasicComponentData
-	SymbolCode int
+	SymbolCodes []int
 }
 
 // OnNewGame -
@@ -42,7 +42,11 @@ func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, componen
 func (rollSymbolData *RollSymbolData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RollSymbolData{
 		BasicComponentData: rollSymbolData.BuildPBBasicComponentData(),
-		SymbolCode:         int32(rollSymbolData.SymbolCode),
+		// SymbolCode:         int32(rollSymbolData.SymbolCode),
+	}
+
+	for _, v := range rollSymbolData.SymbolCodes {
+		pbcd.SymbolCodes = append(pbcd.SymbolCodes, int32(v))
 	}
 
 	return pbcd
@@ -60,6 +64,7 @@ func (rollSymbolData *RollSymbolData) SetVal(key string, val int) {
 // RollSymbolConfig - configuration for RollSymbol
 type RollSymbolConfig struct {
 	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	SymbolNum              int                   `yaml:"symbolNum" json:"symbolNum"`
 	Weight                 string                `yaml:"weight" json:"weight"`
 	WeightVW               *sgc7game.ValWeights2 `json:"-"`
 	SrcSymbolCollection    string                `yaml:"srcSymbolCollection" json:"srcSymbolCollection"`
@@ -164,6 +169,15 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 	return vw
 }
 
+func (rollSymbol *RollSymbol) GetSymbolNum(basicCD *BasicComponentData) int {
+	v, isok := basicCD.GetConfigIntVal(CCVSymbolNum)
+	if isok {
+		return v
+	}
+
+	return rollSymbol.Config.SymbolNum
+}
+
 // playgame
 func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -172,25 +186,38 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	rsd := icd.(*RollSymbolData)
 
-	vw := rollSymbol.getValWeight(gameProp)
-	if vw == nil {
+	rsd.SymbolCodes = nil
+
+	sn := rollSymbol.GetSymbolNum(&rsd.BasicComponentData)
+	for i := 0; i < sn; i++ {
+		vw := rollSymbol.getValWeight(gameProp)
+		if vw == nil {
+			nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
+		cr, err := vw.RandVal(plugin)
+		if err != nil {
+			goutils.Error("RollSymbol.OnPlayGame:RandVal",
+				zap.Error(err))
+
+			return "", err
+		}
+
+		sc := cr.Int()
+
+		rsd.SymbolCodes = append(rsd.SymbolCodes, sc)
+
+		if rollSymbol.Config.TargetSymbolCollection != "" {
+			gameProp.AddComponentSymbol(rollSymbol.Config.TargetSymbolCollection, sc)
+		}
+	}
+
+	if len(rsd.SymbolCodes) == 0 {
 		nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, ErrComponentDoNothing
-	}
-
-	cr, err := vw.RandVal(plugin)
-	if err != nil {
-		goutils.Error("RollSymbol.OnPlayGame:RandVal",
-			zap.Error(err))
-
-		return "", err
-	}
-
-	rsd.SymbolCode = cr.Int()
-
-	if rollSymbol.Config.TargetSymbolCollection != "" {
-		gameProp.AddComponentSymbol(rollSymbol.Config.TargetSymbolCollection, rsd.SymbolCode)
 	}
 
 	nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
@@ -202,7 +229,13 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	rsd := icd.(*RollSymbolData)
 
-	fmt.Printf("rollSymbol %v, got %v \n", rollSymbol.GetName(), gameProp.Pool.DefaultPaytables.GetStringFromInt(rsd.SymbolCode))
+	fmt.Printf("rollSymbol %v, got ", rollSymbol.GetName())
+
+	for _, v := range rsd.SymbolCodes {
+		fmt.Printf("%v ", gameProp.Pool.DefaultPaytables.GetStringFromInt(v))
+	}
+
+	fmt.Print("\n")
 
 	return nil
 }
@@ -225,11 +258,13 @@ func NewRollSymbol(name string) IComponent {
 
 //	"configuration": {
 //		"weight": "fgbookofsymbol",
+//		"symbolNum": 3,
 //		"ignoreSymbolCollection": "fg-syms",
 //		"targetSymbolCollection": "fg-syms"
 //	},
 type jsonRollSymbol struct {
 	Weight                 string `json:"weight"`
+	SymbolNum              int    `json:"symbolNum"`
 	SrcSymbolCollection    string `json:"srcSymbolCollection"`
 	IgnoreSymbolCollection string `json:"ignoreSymbolCollection"`
 	TargetSymbolCollection string `json:"targetSymbolCollection"`
@@ -238,6 +273,7 @@ type jsonRollSymbol struct {
 func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
 	cfg := &RollSymbolConfig{
 		Weight:                 jcfg.Weight,
+		SymbolNum:              jcfg.SymbolNum,
 		SrcSymbolCollection:    jcfg.SrcSymbolCollection,
 		IgnoreSymbolCollection: jcfg.IgnoreSymbolCollection,
 		TargetSymbolCollection: jcfg.TargetSymbolCollection,

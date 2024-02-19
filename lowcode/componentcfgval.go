@@ -8,6 +8,7 @@ const (
 	CCVRetriggerRespinNum string = "retriggerRespinNum" // 可以修改配置项里的 retriggerRespinNum
 	CCVWinMulti           string = "winMulti"           // 可以修改配置项里的 winMulti
 	CCVSavedMoney         string = "savedMoney"         // 可以修改配置项里的 savedMoney
+	CCVSymbolNum          string = "symbolNum"          // 可以修改配置项里的 symbolNum
 )
 
 const (

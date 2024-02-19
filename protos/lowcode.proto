@@ -238,7 +238,8 @@ message WeightBranchData {
 // RollSymbolData
 message RollSymbolData {
     ComponentData basicComponentData = 1;
-	int32 symbolCode = 2;
+	// int32 symbolCode = 2;
+    repeated int32 symbolCodes = 3;
 }
 
 // QueueBranchData
