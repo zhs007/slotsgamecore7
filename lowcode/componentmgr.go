@@ -87,6 +87,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ReplaceReelWithMaskTypeName, NewReplaceReelWithMask)
 	mgr.Reg(PiggyBankTypeName, NewPiggyBank)
 	mgr.Reg(AddSymbolsTypeName, NewAddSymbols)
+	mgr.Reg(IntValMappingTypeName, NewIntValMapping)
 
 	return mgr
 }

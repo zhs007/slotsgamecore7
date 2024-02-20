@@ -117,6 +117,11 @@ var (
 	// ErrInvalidBet - invalid Bet
 	ErrInvalidBet = errors.New("invalid Bet")
 
+	// ErrInvalidIntValMappingFile - invalid IntValMappingFile
+	ErrInvalidIntValMappingFile = errors.New("invalid IntValMappingFile")
+	// ErrInvalidIntValMappingValue - invalid IntValMapping value
+	ErrInvalidIntValMappingValue = errors.New("invalid IntValMapping value")
+
 	// ErrInvalidWeightVal - invalid weight value
 	ErrInvalidWeightVal = errors.New("invalid weight value")
 

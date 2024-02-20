@@ -26,6 +26,8 @@ type BasicComponentData struct {
 	MapConfigVals         map[string]string
 	MapConfigIntVals      map[string]int
 	SrcScenes             []int
+	Output                int
+	StrOutput             string
 }
 
 // OnNewGame -
@@ -106,6 +108,8 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 	pbcd.CashWin = basicComponentData.CashWin
 	pbcd.CoinWin = int32(basicComponentData.CoinWin)
 	pbcd.TargetScene = int32(basicComponentData.TargetSceneIndex)
+	pbcd.Output = int32(basicComponentData.Output)
+	pbcd.StrOutput = basicComponentData.StrOutput
 
 	for _, v := range basicComponentData.UsedOtherScenes {
 		pbcd.UsedOtherScenes = append(pbcd.UsedOtherScenes, int32(v))
@@ -133,6 +137,16 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 // GetResults -
 func (basicComponentData *BasicComponentData) GetResults() []int {
 	return basicComponentData.UsedResults
+}
+
+// GetOutput -
+func (basicComponentData *BasicComponentData) GetOutput() int {
+	return basicComponentData.Output
+}
+
+// GetStringOutput -
+func (basicComponentData *BasicComponentData) GetStringOutput() string {
+	return basicComponentData.StrOutput
 }
 
 // GetSymbols -
