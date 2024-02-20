@@ -25,6 +25,7 @@ type GamePropertyPool struct {
 	mapStrValWeights    map[string]*sgc7game.ValWeights2
 	mapIntValWeights    map[string]*sgc7game.ValWeights2
 	mapSymbolValWeights map[string]*sgc7game.ValWeights2
+	mapIntMapping       map[string]*sgc7game.ValMapping2
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -373,6 +374,11 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 }
 
 // LoadSymbolWeights - load xlsx file
+func (pool *GamePropertyPool) LoadIntMapping(fn string) *sgc7game.ValMapping2 {
+	return pool.mapIntMapping[fn]
+}
+
+// LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
 	if gJsonMode {
 		return pool.mapIntValWeights[fn], nil
@@ -601,6 +607,7 @@ func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 		mapStrValWeights:    make(map[string]*sgc7game.ValWeights2),
 		mapIntValWeights:    make(map[string]*sgc7game.ValWeights2),
 		mapSymbolValWeights: make(map[string]*sgc7game.ValWeights2),
+		mapIntMapping:       make(map[string]*sgc7game.ValMapping2),
 	}
 
 	if cfg.SymbolsViewer == "" {

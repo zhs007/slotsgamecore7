@@ -19975,6 +19975,72 @@
                     }
                 ],
                 "name": "fgbookofsymbol (1).xlsx"
+            },
+            {
+                "type": "IntValMappingFile",
+                "fileName": "valmapping",
+                "file": {
+                    "file": {
+                        "uid": "rc-upload-1708409201411-2"
+                    },
+                    "fileList": [
+                        {
+                            "uid": "rc-upload-1708409201411-2",
+                            "fileJson": [
+                                {
+                                    "in": "3",
+                                    "out": "1"
+                                },
+                                {
+                                    "in": "4",
+                                    "out": "2"
+                                },
+                                {
+                                    "in": "5",
+                                    "out": "3"
+                                }
+                            ],
+                            "lastModified": 1708332874573,
+                            "lastModifiedDate": "2024-02-19T08:54:34.573Z",
+                            "name": "valmapping.xlsx",
+                            "size": 5809,
+                            "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "percent": 0,
+                            "originFileObj": {
+                                "uid": "rc-upload-1708409201411-2",
+                                "fileJson": [
+                                    {
+                                        "in": "3",
+                                        "out": "1"
+                                    },
+                                    {
+                                        "in": "4",
+                                        "out": "2"
+                                    },
+                                    {
+                                        "in": "5",
+                                        "out": "3"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "fileJson": [
+                    {
+                        "in": "3",
+                        "out": "1"
+                    },
+                    {
+                        "in": "4",
+                        "out": "2"
+                    },
+                    {
+                        "in": "5",
+                        "out": "3"
+                    }
+                ],
+                "name": "valmapping.xlsx"
             }
         ]
     },
@@ -20743,7 +20809,7 @@
                         },
                         "size": {
                             "width": 400,
-                            "height": 818
+                            "height": 848
                         },
                         "view": "react-shape-view",
                         "shape": "custom-node",
@@ -21212,7 +21278,21 @@
                                 "genRespinType": "number",
                                 "respinNum": 10
                             },
-                            "label": "bg-paysc"
+                            "label": "bg-paysc",
+                            "controller": [
+                                {
+                                    "type": "setComponentConfigIntVal",
+                                    "targetArr": [
+                                        "bg-symnum",
+                                        "inputVal"
+                                    ],
+                                    "valueNum": 1,
+                                    "source": [
+                                        "bg-paysc",
+                                        "symbolNum"
+                                    ]
+                                }
+                            ]
                         },
                         "basicComponentData": null,
                         "data": null,
@@ -24705,8 +24785,8 @@
                     },
                     {
                         "position": {
-                            "x": 1910,
-                            "y": -220
+                            "x": 2000,
+                            "y": -230
                         },
                         "size": {
                             "width": 400,
@@ -24934,17 +25014,6 @@
                                 }
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 48,
                         "componentValues": {
                             "labelIsError": false,
@@ -24955,26 +25024,20 @@
                                 "targetSymbolCollection": "fg-syms"
                             },
                             "label": "bg-rollsym"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#008000",
-                                "strokeWidth": 1
-                            }
-                        },
-                        "id": "9b0e7648-370c-49cc-8803-b7ae32693310",
-                        "source": {
-                            "cell": "287d1991-a2c8-4ef7-8616-568003c027db",
-                            "port": "jump-component-groups-out"
-                        },
-                        "target": {
-                            "cell": "b4e6c852-9249-47f1-a044-f4c5d57c0fc7",
-                            "port": "component-groups-in"
-                        },
-                        "zIndex": 49
                     },
                     {
                         "shape": "edge",
@@ -24985,6 +25048,13 @@
                             }
                         },
                         "id": "5a70037e-b8fb-4d03-ac51-b209ab6a90b4",
+                        "zIndex": 50,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "b4e6c852-9249-47f1-a044-f4c5d57c0fc7",
                             "port": "component-groups-out"
@@ -24992,8 +25062,302 @@
                         "target": {
                             "cell": "0d4efa33-0ec8-4d16-8ff4-97a9f0414fcd",
                             "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 1830,
+                            "y": 250
                         },
-                        "zIndex": 50
+                        "size": {
+                            "width": 400,
+                            "height": 217
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                }
+                            ]
+                        },
+                        "id": "94fb65a4-1c76-4ce3-8c8d-5c099673f02d",
+                        "label": "IntValMapping",
+                        "item": {
+                            "key": "IntValMapping",
+                            "label": "IntValMapping",
+                            "out": [
+                                "outputVal"
+                            ],
+                            "configuration": [
+                                {
+                                    "label": "valMapping",
+                                    "type": "selectIntValMappingFile"
+                                },
+                                {
+                                    "label": "inputVal",
+                                    "type": "inputNumber1"
+                                }
+                            ],
+                            "componentval": [
+                                "inputVal"
+                            ]
+                        },
+                        "zIndex": 51,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "valMapping": "valmapping",
+                                "inputVal": 3
+                            },
+                            "label": "bg-symnum"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#008000",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "fce253e9-4fb4-4964-9f9d-fbdca7264059",
+                        "zIndex": 52,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
+                        "source": {
+                            "cell": "287d1991-a2c8-4ef7-8616-568003c027db",
+                            "port": "jump-component-groups-out"
+                        },
+                        "target": {
+                            "cell": "94fb65a4-1c76-4ce3-8c8d-5c099673f02d",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 1
+                            }
+                        },
+                        "id": "11971e47-b422-4c2d-9648-887f591b3930",
+                        "zIndex": 53,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
+                        "source": {
+                            "cell": "94fb65a4-1c76-4ce3-8c8d-5c099673f02d",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "b4e6c852-9249-47f1-a044-f4c5d57c0fc7",
+                            "port": "component-groups-in"
+                        }
                     }
                 ]
             }
