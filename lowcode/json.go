@@ -393,6 +393,17 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapValWeights[name] = vw2
+		} else if t == "IntValMappingFile" {
+			vm2, err := parseIntValMappingFile(v.Get("fileJson"))
+			if err != nil {
+				goutils.Error("loadOtherList:parseSymbolWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapIntMapping[name] = vm2
 		}
 	}
 
@@ -683,6 +694,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
+			} else if componentType == "intvalmapping" {
+				componentName, err := parseIntValMapping(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseIntValMapping",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
 			} else {
 				goutils.Error("loadCells:ErrUnsupportedComponentType",
 					zap.String("componentType", componentType),
@@ -919,6 +941,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 		mapValWeights:     make(map[string]*sgc7game.ValWeights2),
 		mapReelSetWeights: make(map[string]*sgc7game.ValWeights2),
 		mapStrWeights:     make(map[string]*sgc7game.ValWeights2),
+		mapIntMapping:     make(map[string]*sgc7game.ValMapping2),
 		// mapBetConfig:    make(map[int]*BetDataConfig),
 	}
 

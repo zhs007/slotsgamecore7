@@ -68,6 +68,7 @@ type Config struct {
 	mapValWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
 	mapReelSetWeights map[string]*sgc7game.ValWeights2 `yaml:"-"`
 	mapStrWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
+	mapIntMapping     map[string]*sgc7game.ValMapping2 `yaml:"-"`
 	// mapBetConfig      map[int]*BetDataConfig           `yaml:"-"`
 }
 

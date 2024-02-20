@@ -119,6 +119,20 @@ func (jcd *jsonControllerData) build() *Award {
 			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
 			ComponentVals: []string{strings.Join(jcd.Source, ".")},
 		}
+	} else if jcd.Type == "setComponentConfigIntVal" {
+		if len(jcd.Source) == 0 {
+			return &Award{
+				AwardType: "setComponentConfigIntVal",
+				Vals:      []int{jcd.ValueNum},
+				StrParams: []string{strings.Join(jcd.TargetArr, ".")},
+			}
+		}
+
+		return &Award{
+			AwardType:     "setComponentConfigIntVal",
+			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
+			ComponentVals: []string{strings.Join(jcd.Source, ".")},
+		}
 	}
 
 	goutils.Error("jsonControllerData.build",

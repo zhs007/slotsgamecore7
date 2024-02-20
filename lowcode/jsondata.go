@@ -11,6 +11,11 @@ type weightData struct {
 	Weight int    `json:"weight"`
 }
 
+type mappingData struct {
+	In  string `json:"in"`
+	Out string `json:"out"`
+}
+
 type basicReelsData struct {
 	ReelSet       string `json:"reelSet"`
 	ReelSetWeight string `json:"reelSetWeight"`

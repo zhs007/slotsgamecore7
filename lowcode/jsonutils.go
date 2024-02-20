@@ -138,3 +138,51 @@ func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.V
 
 	return sgc7game.NewValWeights2(vals, weights)
 }
+
+func parseIntValMappingFile(n *ast.Node) (*sgc7game.ValMapping2, error) {
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseIntValMappingFile:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	lst := []*mappingData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseIntValMappingFile:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	invals := []int{}
+	outvals := []sgc7game.IVal{}
+
+	for _, v := range lst {
+		inv, err := goutils.String2Int64(v.In)
+		if err != nil {
+			goutils.Error("parseIntValMappingFile:String2Int64",
+				zap.String("in", v.In),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		outv, err := goutils.String2Int64(v.Out)
+		if err != nil {
+			goutils.Error("parseIntValMappingFile:String2Int64",
+				zap.String("out", v.Out),
+				zap.Error(err))
+
+			return nil, err
+		}
+
+		outvals = append(outvals, sgc7game.NewIntValEx(outv))
+		invals = append(invals, int(inv))
+	}
+
+	return sgc7game.NewValMapping2(invals, outvals)
+}

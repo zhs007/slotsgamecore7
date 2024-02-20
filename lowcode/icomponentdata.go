@@ -34,6 +34,10 @@ type IComponentData interface {
 
 	// GetResults -
 	GetResults() []int
+	// GetOutput -
+	GetOutput() int
+	// GetStringOutput -
+	GetStringOutput() string
 
 	//----------------------------
 	// SymbolCollection
