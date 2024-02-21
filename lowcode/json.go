@@ -435,8 +435,9 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	// linkComponent := [][]string{}
 	// jumpComponent := [][]string{}
 	// loopComponent := [][]string{}
-	ld := newLinkData()
-	lstStart := []string{}
+	ldid := newLinkData()
+	// lstStart := []string{}
+	lstStartID := []string{}
 	// mapTrigger := make(map[string]*TriggerFeatureConfig)
 	// mapTriggerID := make(map[string]*TriggerFeatureConfig)
 	// lstBasicWins := []*BasicWinsConfig{}
@@ -450,7 +451,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 		return err
 	}
 
-	startid := ""
+	// startid := ""
 
 	for i, cell := range lst {
 		shape, err := cell.Get("shape").String()
@@ -471,9 +472,10 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			return err
 		}
 
-		if shape == "custom-node-width-start" {
-			startid = id
-		} else if shape == "custom-node" {
+		// if shape == "custom-node-width-start" {
+		// 	startid = id
+		// } else
+		if shape == "custom-node" {
 			componentType, err := cell.Get("label").String()
 			if err != nil {
 				goutils.Error("loadCells:Get:label",
@@ -737,41 +739,45 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				return err
 			}
 
-			if source == startid {
-				lstStart = append(lstStart, mapComponentName[target])
+			// if source == startid {
+			// 	lstStart = append(lstStart, mapComponentName[target])
+			// } else {
+			if sourcePort == "jump-component-groups-out" {
+				ldid.add("jump", source, target)
+				// jumpComponent = append(jumpComponent, []string{mapComponentName[source], mapComponentName[target]})
+			} else if sourcePort == "component-groups-out" {
+				ldid.add("next", source, target)
+				// linkComponent = append(linkComponent, []string{mapComponentName[source], mapComponentName[target]})
+			} else if sourcePort == "loop-component-groups-out" {
+				ldid.add("loop", source, target)
+				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
+			} else if sourcePort == "foreach-component-groups-out" {
+				ldid.add("foreach", source, target)
+				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
+			} else if sourcePort == "start-out" {
+				lstStartID = append(lstStartID, target)
+				// ld.add("foreach", mapComponentName[source], mapComponentName[target])
+				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else {
-				if sourcePort == "jump-component-groups-out" {
-					ld.add("jump", mapComponentName[source], mapComponentName[target])
-					// jumpComponent = append(jumpComponent, []string{mapComponentName[source], mapComponentName[target]})
-				} else if sourcePort == "component-groups-out" {
-					ld.add("next", mapComponentName[source], mapComponentName[target])
-					// linkComponent = append(linkComponent, []string{mapComponentName[source], mapComponentName[target]})
-				} else if sourcePort == "loop-component-groups-out" {
-					ld.add("loop", mapComponentName[source], mapComponentName[target])
-					// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
-				} else if sourcePort == "foreach-component-groups-out" {
-					ld.add("foreach", mapComponentName[source], mapComponentName[target])
-					// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
-				} else {
-					goutils.Error("loadCells:sourcePort",
-						zap.String("sourcePort", sourcePort),
-						zap.Error(ErrUnsupportedLinkType))
+				goutils.Error("loadCells:sourcePort",
+					zap.String("sourcePort", sourcePort),
+					zap.Error(ErrUnsupportedLinkType))
 
-					return ErrUnsupportedLinkType
-				}
+				return ErrUnsupportedLinkType
 			}
+			// }
 		}
 	}
 
-	if len(lstStart) > 0 {
-		cfg.StartComponents[bet] = lstStart[0]
+	if len(lstStartID) > 0 {
+		cfg.StartComponents[bet] = mapComponentName[lstStartID[0]]
 	}
 
-	for lt, arr := range ld.mapLinks {
+	for lt, arr := range ldid.mapLinks {
 		for _, cld := range arr {
-			icfg, isok := cfg.mapConfig[cld[0]]
+			icfg, isok := cfg.mapConfig[mapComponentName[cld[0]]]
 			if isok {
-				icfg.SetLinkComponent(lt, cld[1])
+				icfg.SetLinkComponent(lt, mapComponentName[cld[1]])
 			}
 		}
 	}
