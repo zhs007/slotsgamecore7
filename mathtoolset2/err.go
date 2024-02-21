@@ -62,4 +62,10 @@ var (
 	ErrInvalidReelsStats2File = errors.New("invalid reelsstats2 file")
 	// ErrGenStackReel - genStackReel error
 	ErrGenStackReel = errors.New("genStackReel error")
+
+	// ErrReturnNotOK -
+	ErrReturnNotOK = errors.New("return not ok")
+
+	// ErrRunError -
+	ErrRunError = errors.New("run error")
 )
