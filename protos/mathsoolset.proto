@@ -1,0 +1,21 @@
+syntax = "proto3";
+package sgc7pb;
+option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
+
+// RunScript - run script
+message RunScript {
+    string script = 1;
+    string mapFiles = 2;
+}
+
+// ReplyRunScript - reply run script
+message ReplyRunScript {
+    repeated string scriptErrs = 1;
+    string mapFiles = 2;
+}
+
+// MathToolset - Math Toolset Service
+service MathToolset {
+	// RunScript - run script
+    rpc runScript(RunScript) returns (ReplyRunScript) {}
+}
