@@ -1,6 +1,7 @@
 package mathtoolset2
 
 import (
+	"io"
 	"strings"
 
 	"github.com/zhs007/goutils"
@@ -49,11 +50,11 @@ func getReelID(str string) (int, error) {
 	return -1, nil
 }
 
-func LoadReelsStats2(fn string) (*ReelsStats2, error) {
+func LoadReelsStats2(reader io.Reader) (*ReelsStats2, error) {
 	mapSymbols := make(map[string][]int)
 	reelnum := 0
 	curSymbol := ""
-	err := sgc7game.LoadExcel(fn, "", func(x int, str string) string {
+	err := sgc7game.LoadExcelWithReader(reader, "", func(x int, str string) string {
 		head := strings.ToLower(strings.TrimSpace(str))
 		rn, err := getReelID(head)
 		if err != nil {
@@ -103,7 +104,6 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 	})
 	if err != nil {
 		goutils.Error("LoadReelsStats2:LoadExcel",
-			zap.String("fn", fn),
 			zap.Error(err))
 
 		return nil, err

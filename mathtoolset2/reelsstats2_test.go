@@ -1,13 +1,17 @@
 package mathtoolset2
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_LoadReelsStats2(t *testing.T) {
-	reels, err := LoadReelsStats2("../unittestdata/reelsstats2.xlsx")
+	file, err := os.Open("../unittestdata/reelsstats2.xlsx")
+	assert.NoError(t, err)
+
+	reels, err := LoadReelsStats2(file)
 	assert.NoError(t, err)
 	assert.NotNil(t, reels)
 

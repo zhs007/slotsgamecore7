@@ -9,9 +9,11 @@ import (
 )
 
 type ScriptCore struct {
-	Cel      *cel.Env
-	JsonData string
-	ErrInRun []error
+	Cel            *cel.Env
+	FileData       string
+	MapFiles       *FileDataMap
+	ErrInRun       []error
+	MapOutputFiles *FileDataMap
 }
 
 func (sc *ScriptCore) pushError(err error) {
@@ -66,60 +68,61 @@ func (sc *ScriptCore) Run(code string) error {
 	return nil
 }
 
+// newGenStackReels - genStackReels(targetfn string, sourcefn string, stack []int, excludeSymbol []string)
 func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 	return cel.Function("genStackReels",
-		cel.Overload("genStackReels_string_string_string_list_int",
-			[]*cel.Type{cel.StringType, cel.StringType, cel.StringType, cel.ListType(cel.StringType), cel.IntType},
+		cel.Overload("genStackReels_string_string_list_list",
+			[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.StringType)},
 			cel.BoolType,
 			cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 
-				// if len(params) != 5 {
-				// 	goutils.Error("genReelsMainSymbolsDistance",
-				// 		zap.Error(ErrInvalidFunctionParams))
+				if len(params) != 4 {
+					goutils.Error("genStackReels",
+						zap.Error(ErrInvalidFunctionParams))
 
-				// 	return types.Double(0)
-				// }
+					sc.pushError(ErrInvalidFunctionParams)
 
-				// targetfn := params[0].Value().(string)
-				// paytablefn := params[1].Value().(string)
-				// rssfn := params[2].Value().(string)
+					return types.Bool(false)
+				}
 
-				// err := mgrGenMath.LoadPaytables(paytablefn)
-				// if err != nil {
-				// 	goutils.Error("calcWaysRTP2:LoadPaytables",
-				// 		zap.Error(err))
+				targetfn := params[0].Value().(string)
+				srcfn := params[1].Value().(string)
+				stack := List2IntSlice(params[2])
+				excludeSymbol := List2StrSlice(params[3])
 
-				// 	return types.Double(0)
-				// }
+				fd := sc.MapFiles.GetReader(srcfn)
+				if fd == nil {
+					goutils.Error("genStackReels:GetReader",
+						zap.Error(ErrInvalidFileData))
 
-				// rss, err := LoadReelsStats(rssfn)
-				// if err != nil {
-				// 	goutils.Error("genReelsMainSymbolsDistance:LoadReelsStats",
-				// 		zap.Error(err))
+					sc.pushError(ErrInvalidFileData)
 
-				// 	return types.Double(0)
-				// }
+					return types.Bool(false)
+				}
 
-				// mainSymbolsWithStr := array2StrSlice(params[3])
-				// offset := int(params[4].Value().(int64))
+				rd, err := GenStackReels(fd, stack, excludeSymbol)
+				if err != nil {
+					goutils.Error("genStackReels:GenStackReels",
+						zap.Error(err))
 
-				// mainSymbols := GetSymbols(mainSymbolsWithStr, mgrGenMath.Paytables)
+					sc.pushError(err)
 
-				// reels, err := GenReelsMainSymbolsDistance(rss, mainSymbols, offset, 100)
-				// if err != nil {
-				// 	goutils.Error("genReelsMainSymbolsDistance:GenReelsMainSymbolsDistance",
-				// 		zap.Error(err))
+					return types.Bool(false)
+				}
 
-				// 	return types.Double(0)
-				// }
+				f := NewExcelFile(rd)
 
-				// err = reels.SaveExcelEx(targetfn, mgrGenMath.Paytables)
-				// if err != nil {
-				// 	goutils.Error("genReelsMainSymbolsDistance:SaveExcelEx",
-				// 		zap.Error(err))
+				buf, err := f.WriteToBuffer()
+				if err != nil {
+					goutils.Error("genStackReels:WriteToBuffer",
+						zap.Error(err))
 
-				// 	return types.Double(0)
-				// }
+					sc.pushError(err)
+
+					return types.Bool(false)
+				}
+
+				sc.MapOutputFiles.AddBuffer(targetfn, buf)
 
 				return types.Bool(true)
 			},
@@ -134,9 +137,27 @@ func (sc *ScriptCore) newBasicScriptFuncs() []cel.EnvOption {
 	}
 }
 
-func NewScriptCore(jsonData string) (*ScriptCore, error) {
+func NewScriptCore(fileData string) (*ScriptCore, error) {
+	mapfd, err := NewFileDataMap(fileData)
+	if err != nil {
+		goutils.Error("NewScriptCore:NewFileDataMap",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	out, err := NewFileDataMap("")
+	if err != nil {
+		goutils.Error("NewScriptCore:NewFileDataMap:output",
+			zap.Error(err))
+
+		return nil, err
+	}
+
 	scriptCore := &ScriptCore{
-		JsonData: jsonData,
+		FileData:       fileData,
+		MapFiles:       mapfd,
+		MapOutputFiles: out,
 	}
 
 	options := []cel.EnvOption{}

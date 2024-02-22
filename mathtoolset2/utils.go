@@ -59,7 +59,7 @@ func CountSymbolInReel(symbol SymbolType, reel []int, stop int, height int) int 
 	return num
 }
 
-func SaveReels(fn string, reels [][]string) error {
+func NewExcelFile(reels [][]string) *excelize.File {
 	f := excelize.NewFile()
 
 	sheet := f.GetSheetName(0)
@@ -84,6 +84,12 @@ func SaveReels(fn string, reels [][]string) error {
 	for i := 0; i < maxj; i++ {
 		f.SetCellInt(sheet, goutils.Pos2Cell(0, i+1), i)
 	}
+
+	return f
+}
+
+func SaveReels(fn string, reels [][]string) error {
+	f := NewExcelFile(reels)
 
 	return f.SaveAs(fn)
 }

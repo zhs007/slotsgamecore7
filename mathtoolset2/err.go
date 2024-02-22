@@ -68,4 +68,7 @@ var (
 
 	// ErrRunError -
 	ErrRunError = errors.New("run error")
+
+	// ErrInvalidFileData - invalid filedata
+	ErrInvalidFileData = errors.New("invalid filedata")
 )

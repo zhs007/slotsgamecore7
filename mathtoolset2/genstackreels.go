@@ -1,6 +1,7 @@
 package mathtoolset2
 
 import (
+	"io"
 	"math/rand"
 
 	"github.com/zhs007/goutils"
@@ -234,8 +235,8 @@ func genStackReel(rs2 *ReelStats2, stack []int, excludeSymbol []string) ([]strin
 	return nil, ErrGenStackReel
 }
 
-func GenStackReels(fn string, stack []int, excludeSymbol []string) ([][]string, error) {
-	rss2, err := LoadReelsStats2(fn)
+func GenStackReels(reader io.Reader, stack []int, excludeSymbol []string) ([][]string, error) {
+	rss2, err := LoadReelsStats2(reader)
 	if err != nil {
 		goutils.Error("GenStackReels:LoadReelsStats2",
 			zap.Error(err))
