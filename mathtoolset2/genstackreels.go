@@ -135,8 +135,6 @@ func chooseMore(ssds []*stackSymbolData) int {
 	return -1
 }
 
-const maxretryssd = 9999
-
 func genReelSSD(ssds []*stackSymbolData, pres string) ([]string, bool) {
 	assds := []*stackSymbolData{}
 	nssds := []*stackSymbolData{}
