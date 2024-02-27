@@ -65,6 +65,7 @@ func (rollSymbolData *RollSymbolData) SetVal(key string, val int) {
 type RollSymbolConfig struct {
 	BasicComponentConfig   `yaml:",inline" json:",inline"`
 	SymbolNum              int                   `yaml:"symbolNum" json:"symbolNum"`
+	SymbolNumComponent     string                `json:"symbolNumComponent"`
 	Weight                 string                `yaml:"weight" json:"weight"`
 	WeightVW               *sgc7game.ValWeights2 `json:"-"`
 	SrcSymbolCollection    string                `yaml:"srcSymbolCollection" json:"srcSymbolCollection"`
@@ -169,10 +170,17 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 	return vw
 }
 
-func (rollSymbol *RollSymbol) GetSymbolNum(basicCD *BasicComponentData) int {
+func (rollSymbol *RollSymbol) getSymbolNum(gameProp *GameProperty, basicCD *BasicComponentData) int {
 	v, isok := basicCD.GetConfigIntVal(CCVSymbolNum)
 	if isok {
 		return v
+	}
+
+	if rollSymbol.Config.SymbolNumComponent != "" {
+		cd := gameProp.GetComponentDataWithName(rollSymbol.Config.SymbolNumComponent)
+		if cd != nil {
+			return cd.GetOutput()
+		}
 	}
 
 	return rollSymbol.Config.SymbolNum
@@ -188,7 +196,7 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	rsd.SymbolCodes = nil
 
-	sn := rollSymbol.GetSymbolNum(&rsd.BasicComponentData)
+	sn := rollSymbol.getSymbolNum(gameProp, &rsd.BasicComponentData)
 	for i := 0; i < sn; i++ {
 		vw := rollSymbol.getValWeight(gameProp)
 		if vw == nil {
@@ -257,12 +265,14 @@ func NewRollSymbol(name string) IComponent {
 //	"configuration": {
 //		"weight": "fgbookofsymbol",
 //		"symbolNum": 3,
+//	    "symbolNumComponent": "bg-symnum",
 //		"ignoreSymbolCollection": "fg-syms",
 //		"targetSymbolCollection": "fg-syms"
 //	},
 type jsonRollSymbol struct {
 	Weight                 string `json:"weight"`
 	SymbolNum              int    `json:"symbolNum"`
+	SymbolNumComponent     string `json:"symbolNumComponent"`
 	SrcSymbolCollection    string `json:"srcSymbolCollection"`
 	IgnoreSymbolCollection string `json:"ignoreSymbolCollection"`
 	TargetSymbolCollection string `json:"targetSymbolCollection"`
@@ -272,6 +282,7 @@ func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
 	cfg := &RollSymbolConfig{
 		Weight:                 jcfg.Weight,
 		SymbolNum:              jcfg.SymbolNum,
+		SymbolNumComponent:     jcfg.SymbolNumComponent,
 		SrcSymbolCollection:    jcfg.SrcSymbolCollection,
 		IgnoreSymbolCollection: jcfg.IgnoreSymbolCollection,
 		TargetSymbolCollection: jcfg.TargetSymbolCollection,

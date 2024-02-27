@@ -92,7 +92,7 @@ func (intValMapping *IntValMapping) InitEx(cfg any, pool *GamePropertyPool) erro
 }
 
 func (intValMapping *IntValMapping) getInput(basicCD *BasicComponentData) int {
-	v, isok := basicCD.GetConfigIntVal(CCVReelSet)
+	v, isok := basicCD.GetConfigIntVal(CCVInputVal)
 	if isok {
 		return v
 	}
