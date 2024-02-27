@@ -85,7 +85,13 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 	bcd := cd.(*BasicComponentData)
 
 	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, dropDownSymbols.Name, "", 0)
-	ngs := gs
+	if !gs.HasSymbol(-1) {
+		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
+	ngs := gs.CloneEx(gameProp.PoolScene)
 
 	for x, arr := range ngs.Arr {
 		for y := len(arr) - 1; y >= 0; {
@@ -93,12 +99,6 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 				hass := false
 				for y1 := y - 1; y1 >= 0; y1-- {
 					if arr[y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
-
-							arr = ngs.Arr[x]
-						}
-
 						arr[y] = arr[y1]
 						arr[y1] = -1
 
@@ -115,12 +115,6 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 				y--
 			}
 		}
-	}
-
-	if ngs == gs {
-		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-		return nc, ErrComponentDoNothing
 	}
 
 	dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
