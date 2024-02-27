@@ -619,7 +619,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
-			} else if componentType == "queuebranch" {
+			} else if componentType == "queuebranch" || componentType == "delayqueue" {
 				componentName, err := parseQueueBranch(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseQueueBranch",

@@ -10,6 +10,8 @@ const (
 	CCVSavedMoney         string = "savedMoney"         // 可以修改配置项里的 savedMoney
 	CCVSymbolNum          string = "symbolNum"          // 可以修改配置项里的 symbolNum
 	CCVInputVal           string = "inputVal"           // 可以修改配置项里的 inputVal
+	CCVValueNum           string = "valueNum"           // 可以修改配置项里的 valueNum
+	CCVQueue              string = "queue"              // 可以修改配置项里的 queue
 )
 
 const (

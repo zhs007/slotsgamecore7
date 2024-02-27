@@ -19,9 +19,9 @@ import (
 
 const QueueBranchTypeName = "queueBranch"
 
-const (
-	QBDVQueue string = "queue" // 队列数量
-)
+// const (
+// 	QBDVQueue string = "queue" // 队列数量
+// )
 
 type QueueBranchData struct {
 	BasicComponentData
@@ -38,6 +38,20 @@ func (queueBranchData *QueueBranchData) OnNewStep(gameProp *GameProperty, compon
 	queueBranchData.BasicComponentData.OnNewStep(gameProp, component)
 }
 
+// SetConfigIntVal -
+func (queueBranchData *QueueBranchData) SetConfigIntVal(key string, val int) {
+	if key == CCVQueue {
+		queueBranchData.Queue = val
+	}
+}
+
+// ChgConfigIntVal -
+func (queueBranchData *QueueBranchData) ChgConfigIntVal(key string, off int) {
+	if key == CCVQueue {
+		queueBranchData.Queue += off
+	}
+}
+
 // BuildPBComponentData
 func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.QueueBranchData{
@@ -48,21 +62,21 @@ func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (queueBranchData *QueueBranchData) GetVal(key string) int {
-	if key == QBDVQueue {
-		return queueBranchData.Queue
-	}
+// // GetVal -
+// func (queueBranchData *QueueBranchData) GetVal(key string) int {
+// 	if key == QBDVQueue {
+// 		return queueBranchData.Queue
+// 	}
 
-	return 0
-}
+// 	return 0
+// }
 
-// SetVal -
-func (queueBranchData *QueueBranchData) SetVal(key string, val int) {
-	if key == QBDVQueue {
-		queueBranchData.Queue = val
-	}
-}
+// // SetVal -
+// func (queueBranchData *QueueBranchData) SetVal(key string, val int) {
+// 	if key == QBDVQueue {
+// 		queueBranchData.Queue = val
+// 	}
+// }
 
 // QueueBranchConfig - configuration for QueueBranch
 type QueueBranchConfig struct {
