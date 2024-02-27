@@ -40,6 +40,13 @@ func (collectorData *CollectorData) OnNewStep(gameProp *GameProperty, component 
 	collectorData.NewCollector = 0
 }
 
+// // ChgConfigIntVal -
+// func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
+// 	if key == CCVValueNum {
+// 		collectorData.Val += off
+// 	}
+// }
+
 // BuildPBComponentData
 func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 	return &sgc7pb.CollectorData{
@@ -154,7 +161,9 @@ func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 		for i := 1; i <= num; i++ {
 			cl := oldval + i
 			if cl > collector.Config.MaxVal {
-				collector.onLevelUp(plugin, gameProp, curpr, gp, collector.Config.MaxVal, true)
+				collector.onLevelUp(plugin, gameProp, curpr, gp, -1, false)
+
+				break
 			} else {
 				collector.onLevelUp(plugin, gameProp, curpr, gp, cl, false)
 			}
@@ -193,6 +202,19 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	// collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	ccd := cd.(*CollectorData)
+
+	off, isok := ccd.GetConfigIntVal(CCVValueNum)
+	if isok {
+		err := collector.add(plugin, off, ccd, gameProp, curpr, gp, false)
+		if err != nil {
+			goutils.Error("Collector.OnPlayGame:add:off",
+				zap.Error(err))
+
+			return "", err
+		}
+
+		ccd.ClearConfigIntVal(CCVValueNum)
+	}
 
 	gs := collector.GetTargetScene3(gameProp, curpr, prs, &ccd.BasicComponentData, collector.Name, "", 0)
 

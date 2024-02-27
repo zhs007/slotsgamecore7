@@ -87,6 +87,11 @@ func (basicComponentData *BasicComponentData) ChgConfigIntVal(key string, off in
 	basicComponentData.MapConfigIntVals[key] += off
 }
 
+// ClearConfigIntVal -
+func (basicComponentData *BasicComponentData) ClearConfigIntVal(key string) {
+	delete(basicComponentData.MapConfigIntVals, key)
+}
+
 // InitSrcScenes -
 func (basicComponentData *BasicComponentData) initSrcScenes() {
 	for i := range basicComponentData.SrcScenes {

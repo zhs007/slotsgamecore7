@@ -89,7 +89,7 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (basicReels *BasicReels) GetReelSet(basicCD *BasicComponentData) string {
+func (basicReels *BasicReels) getReelSet(basicCD *BasicComponentData) string {
 	str := basicCD.GetConfigVal(CCVReelSet)
 	if str != "" {
 		return str
@@ -134,7 +134,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		gameProp.CurReels = rd
 		reelname = curreels
 	} else {
-		reelname = basicReels.GetReelSet(bcd)
+		reelname = basicReels.getReelSet(bcd)
 		rd, isok := gameProp.Pool.Config.MapReels[reelname]
 		if !isok {
 			goutils.Error("BasicReels.OnPlayGame:MapReels",
