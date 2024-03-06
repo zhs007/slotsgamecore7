@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -67,6 +69,35 @@ type WeightBranchConfig struct {
 	Weight               string                 `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2  `json:"-"`
 	MapBranchs           map[string]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"` // 可以不用配置全，如果没有配置的，就跳转默认的next
+}
+
+// SetLinkComponent
+func (cfg *WeightBranchConfig) hasValWeight(val string) bool {
+	for _, v := range cfg.WeightVW.Vals {
+		if v.String() == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+// SetLinkComponent
+func (cfg *WeightBranchConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	} else {
+		if cfg.MapBranchs == nil {
+			cfg.MapBranchs = make(map[string]*BranchNode)
+		}
+
+		cfg.MapBranchs[link] = &BranchNode{
+			JumpToComponent: componentName,
+		}
+	}
+
+	// if cfg.hasValWeight(link) {
+	// }
 }
 
 type WeightBranch struct {
@@ -185,4 +216,63 @@ func NewWeightBranch(name string) IComponent {
 	return &WeightBranch{
 		BasicComponent: NewBasicComponent(name, 0),
 	}
+}
+
+// "configuration": {
+// "weight": "greenweight"
+// }
+type jsonWeightBranch struct {
+	Weight string `json:"weight"`
+}
+
+func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
+	cfg := &WeightBranchConfig{
+		Weight: jwr.Weight,
+	}
+
+	cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseWeightBranch(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("WeightBranch:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("WeightBranch:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonWeightBranch{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("WeightBranch:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: WeightBranchTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }
