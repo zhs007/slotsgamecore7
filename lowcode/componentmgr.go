@@ -88,6 +88,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(PiggyBankTypeName, NewPiggyBank)
 	mgr.Reg(AddSymbolsTypeName, NewAddSymbols)
 	mgr.Reg(IntValMappingTypeName, NewIntValMapping)
+	mgr.Reg(WeightBranchTypeName, NewWeightBranch)
 
 	return mgr
 }

@@ -707,6 +707,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
+			} else if componentType == "weightbranch" {
+				componentName, err := parseWeightBranch(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseWeightBranch",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
 			} else {
 				goutils.Error("loadCells:ErrUnsupportedComponentType",
 					zap.String("componentType", componentType),
@@ -759,11 +770,16 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				// ld.add("foreach", mapComponentName[source], mapComponentName[target])
 				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else {
-				goutils.Error("loadCells:sourcePort",
-					zap.String("sourcePort", sourcePort),
-					zap.Error(ErrUnsupportedLinkType))
+				arr := strings.Split(sourcePort, "vals-component-groups-out-")
+				if len(arr) == 2 {
+					ldid.add(arr[1], source, target)
+				} else {
+					goutils.Error("loadCells:sourcePort",
+						zap.String("sourcePort", sourcePort),
+						zap.Error(ErrUnsupportedLinkType))
 
-				return ErrUnsupportedLinkType
+					return ErrUnsupportedLinkType
+				}
 			}
 			// }
 		}
