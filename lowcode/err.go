@@ -88,6 +88,8 @@ var (
 	ErrInvalidJsonNode = errors.New("invalid json node")
 	// ErrIvalidReels - invalid reels
 	ErrIvalidReels = errors.New("invalid reels")
+	// ErrUnsupportedOtherList - unsupported otherList
+	ErrUnsupportedOtherList = errors.New("unsupported otherList")
 
 	// ErrIvalidDefaultScene - invalid default scene
 	ErrIvalidDefaultScene = errors.New("invalid default scene")
