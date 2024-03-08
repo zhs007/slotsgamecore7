@@ -212,6 +212,11 @@ func (weightBranch *WeightBranch) OnStats(feature *sgc7stats.Feature, stake *sgc
 	return false, 0, 0
 }
 
+// NewComponentData -
+func (weightBranch *WeightBranch) NewComponentData() IComponentData {
+	return &WeightBranchData{}
+}
+
 func NewWeightBranch(name string) IComponent {
 	return &WeightBranch{
 		BasicComponent: NewBasicComponent(name, 0),
