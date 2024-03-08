@@ -139,6 +139,36 @@ func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.V
 	return sgc7game.NewValWeights2(vals, weights)
 }
 
+func parseStrWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseStrWeights:MarshalJSON",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	lst := []*weightData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseStrWeights:Unmarshal",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	vals := []sgc7game.IVal{}
+	weights := []int{}
+
+	for _, v := range lst {
+		vals = append(vals, sgc7game.NewStrValEx(v.Val))
+		weights = append(weights, v.Weight)
+	}
+
+	return sgc7game.NewValWeights2(vals, weights)
+}
+
 func parseIntValMappingFile(n *ast.Node) (*sgc7game.ValMapping2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
