@@ -53,7 +53,7 @@ message ReplyPlayGame {
     ReplyPlay play = 3;
 }
 
-// Rng - RNG Service
+// GameLogicCollection - GameLogicCollection Service
 service GameLogicCollection {
 	// initGame - initial game
     rpc initGame(RequestInitGame) returns (ReplyInitGame) {}
