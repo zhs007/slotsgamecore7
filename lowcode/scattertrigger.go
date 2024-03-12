@@ -886,43 +886,65 @@ func NewScatterTrigger(name string) IComponent {
 //		"putMoneyInPiggyBank": "bg-piggybank"
 //	},
 type jsonScatterTrigger struct {
-	Symbols                       []string       `json:"symbols"`
-	TriggerType                   string         `json:"triggerType"`
-	BetType                       string         `json:"betType"`
-	MinNum                        int            `json:"minNum"`
-	WildSymbols                   []string       `json:"wildSymbols"`
-	PosArea                       []int          `json:"posArea"`
-	CountScatterPayAs             string         `json:"countScatterPayAs"`
-	WinMulti                      int            `json:"winMulti"`
-	TargetMask                    string         `json:"targetMask"`
-	TriggerRespinType             string         `json:"triggerRespinType"`
-	RespinComponent               string         `json:"respinComponent"`
-	PutMoneyInPiggyBank           string         `json:"putMoneyInPiggyBank"`
-	GenRespinType                 string         `json:"genRespinType"`
-	RespinNum                     int            `json:"respinNum"`
-	RespinNumWeight               string         `json:"respinNumWeight"`
-	RespinNumWithScatterNum       map[int]int    `json:"respinNumWithScatterNum"`
-	RespinNumWeightWithScatterNum map[int]string `json:"respinNumWeightWithScatterNum"`
+	Symbols                       []string   `json:"symbols"`
+	TriggerType                   string     `json:"triggerType"`
+	BetType                       string     `json:"betType"`
+	MinNum                        int        `json:"minNum"`
+	WildSymbols                   []string   `json:"wildSymbols"`
+	PosArea                       []int      `json:"posArea"`
+	CountScatterPayAs             string     `json:"countScatterPayAs"`
+	WinMulti                      int        `json:"winMulti"`
+	TargetMask                    string     `json:"targetMask"`
+	TriggerRespinType             string     `json:"triggerRespinType"`
+	RespinComponent               string     `json:"respinComponent"`
+	PutMoneyInPiggyBank           string     `json:"putMoneyInPiggyBank"`
+	GenRespinType                 string     `json:"genRespinType"`
+	RespinNum                     int        `json:"respinNum"`
+	RespinNumWeight               string     `json:"respinNumWeight"`
+	RespinNumWithScatterNum       [][]int    `json:"respinNumWithScatterNum"`
+	RespinNumWeightWithScatterNum [][]string `json:"respinNumWeightWithScatterNum"`
 }
 
 func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 	cfg := &ScatterTriggerConfig{
-		Symbols:                       jcfg.Symbols,
-		Type:                          jcfg.TriggerType,
-		BetTypeString:                 jcfg.BetType,
-		MinNum:                        jcfg.MinNum,
-		WildSymbols:                   jcfg.WildSymbols,
-		PosArea:                       jcfg.PosArea,
-		CountScatterPayAs:             jcfg.CountScatterPayAs,
-		WinMulti:                      jcfg.WinMulti,
-		TargetMask:                    jcfg.TargetMask,
-		PiggyBankComponent:            jcfg.PutMoneyInPiggyBank,
-		IsAddRespinMode:               jcfg.TriggerRespinType == "respinNum",
-		RespinComponent:               jcfg.RespinComponent,
-		RespinNum:                     jcfg.RespinNum,
-		RespinNumWeight:               jcfg.RespinNumWeight,
-		RespinNumWithScatterNum:       jcfg.RespinNumWithScatterNum,
-		RespinNumWeightWithScatterNum: jcfg.RespinNumWeightWithScatterNum,
+		Symbols:            jcfg.Symbols,
+		Type:               jcfg.TriggerType,
+		BetTypeString:      jcfg.BetType,
+		MinNum:             jcfg.MinNum,
+		WildSymbols:        jcfg.WildSymbols,
+		PosArea:            jcfg.PosArea,
+		CountScatterPayAs:  jcfg.CountScatterPayAs,
+		WinMulti:           jcfg.WinMulti,
+		TargetMask:         jcfg.TargetMask,
+		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
+		IsAddRespinMode:    jcfg.TriggerRespinType == "respinNum",
+		RespinComponent:    jcfg.RespinComponent,
+		RespinNum:          jcfg.RespinNum,
+		RespinNumWeight:    jcfg.RespinNumWeight,
+		// RespinNumWithScatterNum:       jcfg.RespinNumWithScatterNum,
+		// RespinNumWeightWithScatterNum: jcfg.RespinNumWeightWithScatterNum,
+	}
+
+	if jcfg.RespinNumWithScatterNum != nil {
+		cfg.RespinNumWithScatterNum = make(map[int]int)
+		for _, arr := range jcfg.RespinNumWithScatterNum {
+			cfg.RespinNumWithScatterNum[arr[0]] = arr[1]
+		}
+	}
+
+	if jcfg.RespinNumWeightWithScatterNum != nil {
+		cfg.RespinNumWeightWithScatterNum = make(map[int]string)
+		for _, arr := range jcfg.RespinNumWeightWithScatterNum {
+			i64, err := goutils.String2Int64(arr[0])
+			if err != nil {
+				goutils.Error("jsonScatterTrigger:RespinNumWeightWithScatterNum:String2Int64",
+					zap.Error(err))
+
+				return nil
+			}
+
+			cfg.RespinNumWeightWithScatterNum[int(i64)] = arr[1]
+		}
 	}
 
 	for i := range cfg.PosArea {
