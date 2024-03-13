@@ -90,6 +90,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(IntValMappingTypeName, NewIntValMapping)
 	mgr.Reg(WeightBranchTypeName, NewWeightBranch)
 	mgr.Reg(GenGigaSymbolTypeName, NewGenGigaSymbol)
+	mgr.Reg(WinResultCacheTypeName, NewWinResultCache)
 
 	return mgr
 }

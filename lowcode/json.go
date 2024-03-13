@@ -758,6 +758,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
+			} else if componentType == "winresultcache" {
+				componentName, err := parseWinResultCache(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseWinResultCache",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
 			} else {
 				goutils.Error("loadCells:ErrUnsupportedComponentType",
 					zap.String("componentType", componentType),

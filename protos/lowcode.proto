@@ -264,6 +264,14 @@ message PiggyBankData {
     int32 savedMoney = 4;
 }
 
+// WinResultCacheData
+message WinResultCacheData {
+    ComponentData basicComponentData = 1;
+    int32 wins = 2;
+    int32 winMulti = 3;
+    int32 winResultNum = 4;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
