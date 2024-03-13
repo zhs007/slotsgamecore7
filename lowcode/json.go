@@ -747,6 +747,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				}
 
 				mapComponentName[id] = componentName
+			} else if componentType == "gengigasymbol" {
+				componentName, err := parseGenGigaSymbol(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseGenGigaSymbol",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
 			} else {
 				goutils.Error("loadCells:ErrUnsupportedComponentType",
 					zap.String("componentType", componentType),
