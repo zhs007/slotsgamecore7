@@ -91,6 +91,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WeightBranchTypeName, NewWeightBranch)
 	mgr.Reg(GenGigaSymbolTypeName, NewGenGigaSymbol)
 	mgr.Reg(WinResultCacheTypeName, NewWinResultCache)
+	mgr.Reg(GenSymbolValsWithPosTypeName, NewGenSymbolValsWithPos)
 
 	return mgr
 }

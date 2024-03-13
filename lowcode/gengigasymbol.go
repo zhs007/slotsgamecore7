@@ -86,18 +86,20 @@ func (genGigaSymbol *GenGigaSymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 	genGigaSymbol.Config = cfg.(*GenGigaSymbolConfig)
 	genGigaSymbol.Config.ComponentType = GenGigaSymbolTypeName
 
-	sc, isok := pool.DefaultPaytables.MapSymbols[genGigaSymbol.Config.Symbol]
-	if !isok {
-		goutils.Error("GenGigaSymbol.InitEx:Symbol",
-			zap.String("symbol", genGigaSymbol.Config.Symbol),
-			zap.Error(ErrInvalidSymbol))
-
-		return ErrInvalidSymbol
-	}
-
-	genGigaSymbol.Config.SymbolCode = sc
-
 	genGigaSymbol.Config.Type = parseGenGigaSymbolType(genGigaSymbol.Config.StrType)
+
+	if genGigaSymbol.Config.Type == GGSTypeOverwrite {
+		sc, isok := pool.DefaultPaytables.MapSymbols[genGigaSymbol.Config.Symbol]
+		if !isok {
+			goutils.Error("GenGigaSymbol.InitEx:Symbol",
+				zap.String("symbol", genGigaSymbol.Config.Symbol),
+				zap.Error(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		genGigaSymbol.Config.SymbolCode = sc
+	}
 
 	genGigaSymbol.onInit(&genGigaSymbol.Config.BasicComponentConfig)
 
