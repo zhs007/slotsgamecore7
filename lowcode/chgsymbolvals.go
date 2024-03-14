@@ -113,7 +113,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	// cd := icd.(*BasicComponentData)
+	cd := icd.(*BasicComponentData)
 
 	os := chgSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
@@ -181,6 +181,8 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 			return nc, ErrComponentDoNothing
 		}
+
+		chgSymbolVals.AddOtherScene(gameProp, curpr, nos, cd)
 
 		nc := chgSymbolVals.onStepEnd(gameProp, curpr, gp, "")
 
