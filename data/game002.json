@@ -18025,7 +18025,8 @@
                             "configuration": {
                                 "targetComponents": [
                                     "bg-pay",
-                                    "bg-cachewins"
+                                    "bg-cachewins",
+                                    "bg-firstcheckwins"
                                 ]
                             },
                             "label": "bg-rmsym",

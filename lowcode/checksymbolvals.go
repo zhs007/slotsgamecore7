@@ -147,8 +147,9 @@ func (checkSymbolVals *CheckSymbolVals) OnPlayGame(gameProp *GameProperty, curpr
 	os := checkSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
 		pc, isok := gameProp.Components.MapComponents[checkSymbolVals.Config.OutputToComponent]
-		pccd := gameProp.GetComponentData(pc)
 		if isok {
+			pccd := gameProp.GetComponentData(pc)
+
 			for x, arr := range os.Arr {
 				for y, v := range arr {
 					if checkSymbolVals.checkVal(v) {
