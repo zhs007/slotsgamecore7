@@ -96,6 +96,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(PositionCollectionTypeName, NewPositionCollection)
 	mgr.Reg(ChgSymbolValsTypeName, NewChgSymbolVals)
 	mgr.Reg(ChgSymbolsTypeName, NewChgSymbols)
+	mgr.Reg(GenSymbolValsWithSymbolTypeName, NewGenSymbolValsWithSymbol)
 
 	return mgr
 }

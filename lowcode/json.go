@@ -425,7 +425,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 				return err
 			}
 
-			cfg.mapStrWeights[name] = vm2
+			cfg.mapValWeights[name] = vm2
 		} else {
 			goutils.Error("loadOtherList",
 				zap.Int("i", i),
@@ -828,6 +828,17 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseChgSymbols(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseChgSymbols",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "gensymbolvalswithsymbol" {
+				componentName, err := parseGenSymbolValsWithSymbol(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseGenSymbolValsWithSymbol",
 						zap.Int("i", i),
 						zap.Error(err))
 

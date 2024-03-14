@@ -16,6 +16,21 @@ import (
 
 const SymbolValWinsTypeName = "symbolValWins"
 
+type SymbolValWinsType int
+
+const (
+	SVWTypeNormal    SymbolValWinsType = 0
+	SVWTypeCollector SymbolValWinsType = 1
+)
+
+func parseSymbolValWinsType(strType string) SymbolValWinsType {
+	if strType == "collector" {
+		return SVWTypeCollector
+	}
+
+	return SVWTypeNormal
+}
+
 const (
 	SVWDVWins      string = "wins"      // 中奖的数值，线注的倍数
 	SVWDVSymbolNum string = "symbolNum" // 符号数量
@@ -84,20 +99,18 @@ func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
 // SymbolValWinsConfig - configuration for SymbolValWins
 type SymbolValWinsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	BetTypeString        string  `yaml:"betType" json:"betType"`   // bet or totalBet or noPay
-	BetType              BetType `yaml:"-" json:"-"`               // bet or totalBet or noPay
-	WinMulti             int     `yaml:"winMulti" json:"winMulti"` // bet or totalBet
-	// TriggerSymbol        string `yaml:"triggerSymbol" json:"triggerSymbol"` // like collect
-	// TriggerSymbolCode    int    `json:"-"`                                  //
-	// Type                    string `yaml:"type" json:"type"`                                       // like scatters
-	// MinNum                  int  `yaml:"minNum" json:"minNum"`                                   // like 3
-	// IsTriggerSymbolNumMulti bool `yaml:"isTriggerSymbolNumMulti" json:"isTriggerSymbolNumMulti"` // totalwins = totalvals * triggetSymbol's num
+	BetTypeString        string            `yaml:"betType" json:"betType"`   // bet or totalBet or noPay
+	BetType              BetType           `yaml:"-" json:"-"`               // bet or totalBet or noPay
+	WinMulti             int               `yaml:"winMulti" json:"winMulti"` // bet or totalBet
+	Symbols              []string          `yaml:"symbols" json:"symbols"`   // like collect
+	SymbolCodes          []int             `json:"-"`                        //
+	StrType              string            `yaml:"type" json:"type"`
+	Type                 SymbolValWinsType `yaml:"-" json:"-"`
 }
 
 type SymbolValWins struct {
 	*BasicComponent `json:"-"`
 	Config          *SymbolValWinsConfig `json:"config"`
-	// TriggerSymbolCode int                  `json:"-"`
 }
 
 // Init -
@@ -131,6 +144,7 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 	symbolValWins.Config.ComponentType = SymbolValWinsTypeName
 
 	symbolValWins.Config.BetType = ParseBetType(symbolValWins.Config.BetTypeString)
+	symbolValWins.Config.Type = parseSymbolValWinsType(symbolValWins.Config.StrType)
 
 	// if symbolValWins.Config.TriggerSymbol != "" {
 	// 	symbolValWins.TriggerSymbolCode = pool.DefaultPaytables.MapSymbols[symbolValWins.Config.TriggerSymbol]
