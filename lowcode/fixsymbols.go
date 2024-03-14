@@ -129,7 +129,7 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	bcd := cd.(*BasicComponentData)
 
-	gs := fixSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, fixSymbols.Name, "", 0)
+	gs := fixSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	// needReTag := true
 	if fixSymbols.Type == FixSymbolsTypeMergeDown {

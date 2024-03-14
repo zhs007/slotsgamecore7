@@ -67,7 +67,7 @@ func (reRollReel *ReRollReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := icd.(*BasicComponentData)
 
-	gs := reRollReel.GetTargetScene3(gameProp, curpr, prs, cd, reRollReel.Name, "", 0)
+	gs := reRollReel.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 

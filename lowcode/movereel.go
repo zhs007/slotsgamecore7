@@ -69,7 +69,7 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 
 	bcd := cd.(*BasicComponentData)
 
-	gs := moveReel.GetTargetScene3(gameProp, curpr, prs, bcd, moveReel.Name, "", 0)
+	gs := moveReel.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	sc2 := gs.CloneEx(gameProp.PoolScene)
 

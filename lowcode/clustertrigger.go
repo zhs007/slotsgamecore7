@@ -401,7 +401,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	std := cd.(*ClusterTriggerData)
 	std.OnNewStep(gameProp, clusterTrigger)
 
-	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, clusterTrigger.Name, "", 0)
+	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := clusterTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake)
 

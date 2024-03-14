@@ -223,7 +223,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	bcd := cd.(*BasicComponentData)
 
-	gs := moveSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, moveSymbol.Name, "", 0)
+	gs := moveSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	sc2 := gs
 

@@ -192,14 +192,14 @@ func (reelModifier *ReelModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	bcd := cd.(*BasicComponentData)
 
 	if reelModifier.Config.Mask != "" {
-		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, bcd, reelModifier.Name, "", 0)
+		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, 0)
 		gs1 := gs.CloneEx(gameProp.PoolScene)
 
 		if reelModifier.chgReelWithMask(gameProp, plugin, gs, gs1, curpr, stake, reelModifier.Config.Mask) {
 			reelModifier.AddScene(gameProp, curpr, gs1, bcd)
 		}
 	} else {
-		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, bcd, reelModifier.Name, "", 0)
+		gs := reelModifier.GetTargetScene3(gameProp, curpr, prs, 0)
 		gs1 := gs.CloneEx(gameProp.PoolScene)
 
 		if reelModifier.chgReel(gameProp, plugin, gs, gs1, curpr, stake) {

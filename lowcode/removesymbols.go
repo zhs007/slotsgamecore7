@@ -134,7 +134,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	bcd := cd.(*RemoveSymbolsData)
 
-	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, &bcd.BasicComponentData, removeSymbols.Name, "", 0)
+	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
 	bcd.RemovedNum = 0

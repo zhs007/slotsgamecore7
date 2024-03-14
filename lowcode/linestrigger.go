@@ -668,7 +668,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	std := cd.(*LinesTriggerData)
 	std.OnNewStep(gameProp, linesTrigger)
 
-	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, linesTrigger.Name, "", 0)
+	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := linesTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake)

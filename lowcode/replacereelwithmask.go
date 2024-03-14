@@ -101,7 +101,7 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 
 	cd.UsedScenes = nil
 
-	gs := replaceReelWithMask.GetTargetScene3(gameProp, curpr, prs, cd, replaceReelWithMask.Name, "", 0)
+	gs := replaceReelWithMask.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
 	maskVal, err := gameProp.GetMask(replaceReelWithMask.Config.Mask)

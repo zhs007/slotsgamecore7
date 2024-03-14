@@ -109,7 +109,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := icd.(*BasicComponentData)
 
-	gs := symbolVal.GetTargetScene3(gameProp, curpr, prs, cd, symbolVal.Name, "", 0)
+	gs := symbolVal.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if gs.HasSymbol(symbolVal.SymbolCode) {
 		vw := symbolVal.GetWeightVal(gameProp, cd)

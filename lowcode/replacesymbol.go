@@ -87,7 +87,7 @@ func (replaceSymbol *ReplaceSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd := icd.(*BasicComponentData)
 
-	gs := replaceSymbol.GetTargetScene3(gameProp, curpr, prs, cd, replaceSymbol.Name, "", 0)
+	gs := replaceSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if !gs.HasSymbols(replaceSymbol.Config.SymbolCodes) {
 		// replaceSymbol.ReTagScene(gameProp, curpr, cd.TargetSceneIndex, cd)

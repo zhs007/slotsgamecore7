@@ -109,7 +109,7 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := icd.(*BasicComponentData)
 
-	gs := symbolVal2.GetTargetScene3(gameProp, curpr, prs, cd, symbolVal2.Name, "", 0)
+	gs := symbolVal2.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if gs.HasSymbol(symbolVal2.SymbolCode) {
 		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)

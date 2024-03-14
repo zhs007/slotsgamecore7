@@ -469,7 +469,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	std := icd.(*WaysTriggerData)
 	std.OnNewStep(gameProp, waysTrigger)
 
-	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, waysTrigger.Name, "", 0)
+	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := waysTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake)

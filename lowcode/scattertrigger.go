@@ -468,7 +468,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	std := icd.(*ScatterTriggerData)
 	std.OnNewStep(gameProp, scatterTrigger)
 
-	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, scatterTrigger.Name, "", 0)
+	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := scatterTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, os, curpr, stake)
