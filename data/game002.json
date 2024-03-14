@@ -20976,7 +20976,13 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "type": "nonRepeatable"
+                                "type": "nonRepeatable",
+                                "initPositions": [
+                                    [
+                                        1,
+                                        1
+                                    ]
+                                ]
                             },
                             "label": "bg-mulpos"
                         }

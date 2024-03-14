@@ -164,6 +164,20 @@ func (basicComponentData *BasicComponentData) AddSymbol(symbolCode int) {
 
 }
 
+// GetPos -
+func (basicComponentData *BasicComponentData) GetPos() []int {
+	return nil
+}
+
+// HasPos -
+func (basicComponentData *BasicComponentData) HasPos(x int, y int) bool {
+	return false
+}
+
+// AddPos -
+func (basicComponentData *BasicComponentData) AddPos(x int, y int) {
+}
+
 // GetLastRespinNum -
 func (basicComponentData *BasicComponentData) GetLastRespinNum() int {
 	return 0
@@ -598,6 +612,11 @@ func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.St
 func (basicComponent *BasicComponent) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
 	prs []*sgc7game.PlayResult, cd IComponentData) error {
 	return nil
+}
+
+// AddPos -
+func (basicComponent *BasicComponent) AddPos(cd IComponentData, x int, y int) {
+
 }
 
 // // GetComponentData -

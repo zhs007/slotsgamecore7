@@ -37,7 +37,7 @@ func parseGenSymbolValsWithPosType(strType string) GenSymbolValsWithPosType {
 // GenSymbolValsWithPosConfig - configuration for GenSymbolValsWithPos
 type GenSymbolValsWithPosConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	TargetComponents     []string                 `yaml:"TargetComponents" json:"TargetComponents"`
+	TargetComponents     []string                 `yaml:"targetComponents" json:"targetComponents"`
 	StrType              string                   `yaml:"genType" json:"genType"`
 	Type                 GenSymbolValsWithPosType `yaml:"-" json:"-"`
 	ValMapping           string                   `yaml:"valMapping" json:"valMapping"`
@@ -218,7 +218,7 @@ func NewGenSymbolValsWithPos(name string) IComponent {
 // ],
 // "genType": "add"
 type jsonGenSymbolValsWithPos struct {
-	TargetComponents []string `json:"TargetComponents"`
+	TargetComponents []string `json:"targetComponents"`
 	StrType          string   `json:"genType"`
 	ValMapping       string   `json:"valMapping"`
 	IsUseSource      string   `json:"isUseSource"`
