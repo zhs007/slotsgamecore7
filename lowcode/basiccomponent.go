@@ -339,28 +339,12 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
 
 	si := len(curpr.Scenes)
-	usi := len(basicCD.UsedScenes)
+	// usi := len(basicCD.UsedScenes)
 	basicCD.UsedScenes = append(basicCD.UsedScenes, si)
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
-	if basicComponent.Config.UseSceneV3 {
-		gameProp.SceneStack.Push(basicComponent.Name, si, sc, basicComponent.Config.IsNeedCacheScene3)
-	} else if basicComponent.Config.UseSceneV2 {
-		if len(basicComponent.Config.Scene2Components) > 0 {
-			for _, v := range basicComponent.Config.Scene2Components {
-				gameProp.SetComponentScene(v, sc)
-			}
-		}
-	} else {
-		if usi < len(basicComponent.Config.TagScenes) {
-			gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
-		}
-
-		if usi < len(basicComponent.Config.TagGlobalScenes) {
-			gameProp.TagGlobalScene(basicComponent.Config.TagGlobalScenes[usi], sc)
-		}
-	}
+	gameProp.SceneStack.Push(basicComponent.Name, si, sc, basicComponent.Config.IsNeedCacheScene3)
 }
 
 // ReTagScene -
@@ -380,22 +364,12 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
 
 	si := len(curpr.OtherScenes)
-	usi := len(basicCD.UsedOtherScenes)
+	// usi := len(basicCD.UsedOtherScenes)
 	basicCD.UsedOtherScenes = append(basicCD.UsedOtherScenes, si)
 
 	curpr.OtherScenes = append(curpr.OtherScenes, sc)
 
-	if basicComponent.Config.UseSceneV2 {
-		if len(basicComponent.Config.OtherScene2Components) > 0 {
-			for _, v := range basicComponent.Config.OtherScene2Components {
-				gameProp.SetComponentOtherScene(v, sc)
-			}
-		}
-	} else {
-		if usi < len(basicComponent.Config.TagOtherScenes) {
-			gameProp.TagOtherScene(curpr, basicComponent.Config.TagOtherScenes[usi], si)
-		}
-	}
+	gameProp.OtherSceneStack.Push(basicComponent.Name, si, sc, basicComponent.Config.IsNeedCacheScene3)
 }
 
 // ClearOtherScene -
@@ -582,29 +556,7 @@ func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, cu
 }
 
 func (basicComponent *BasicComponent) GetTargetScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
-	if basicComponent.Config.UseSceneV3 {
-		return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
-	}
-
-	if basicComponent.Config.UseSceneV2 {
-		return gameProp.GetComponentScene(component)
-	}
-
-	if tag == "" {
-		if basicComponent.Config.TargetGlobalScene != "" {
-			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
-		} else {
-			tag = basicComponent.Config.TargetScene
-		}
-	}
-
-	gs, si := gameProp.GetScene(curpr, tag)
-
-	if si >= 0 {
-		basicCD.TargetSceneIndex = si
-	}
-
-	return gs
+	return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
 }
 
 func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
@@ -619,6 +571,10 @@ func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GamePropert
 	gs, _ := gameProp.GetOtherScene(curpr, tag)
 
 	return gs
+}
+
+func (basicComponent *BasicComponent) GetTargetOtherScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
+	return gameProp.OtherSceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
 }
 
 // NewStats2 -

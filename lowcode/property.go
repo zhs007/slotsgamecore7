@@ -65,14 +65,13 @@ type GameProperty struct {
 	mapGlobalScene         map[string]*sgc7game.GameScene // v0.13开始弃用
 	mapComponentScene      map[string]*sgc7game.GameScene
 	mapComponentOtherScene map[string]*sgc7game.GameScene
-	// MapComponentData       map[string]IComponentData
-	// HistoryComponents      []*HistoryComponentData
-	callStack        *CallStack
-	RespinComponents []string
-	PoolScene        *sgc7game.GameScenePoolEx
-	Components       *ComponentList
-	SceneStack       *SceneStack
-	stats2SpinData   *stats2.SpinCache
+	callStack              *CallStack
+	RespinComponents       []string
+	PoolScene              *sgc7game.GameScenePoolEx
+	Components             *ComponentList
+	SceneStack             *SceneStack
+	OtherSceneStack        *SceneStack
+	stats2SpinData         *stats2.SpinCache
 }
 
 func (gameProp *GameProperty) GetBetMul() int {

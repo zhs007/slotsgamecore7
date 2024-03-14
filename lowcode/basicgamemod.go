@@ -62,6 +62,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	pr, gp := bgm.newPlayResult(prs)
 
 	gameProp.SceneStack.onStepStart(pr)
+	gameProp.OtherSceneStack.onStepStart(pr)
 
 	curComponent := components.Components[0]
 

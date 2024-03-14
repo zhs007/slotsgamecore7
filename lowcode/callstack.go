@@ -22,14 +22,15 @@ import (
 type FuncOnEachHistoryComponent func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error
 
 type callStackNode struct {
-	CoreComponent    IComponent
-	Name             string
-	MapComponentData map[string]IComponentData
-	mapHistory       map[string]IComponentData
-	SymbolCode       int
-	CurIndex         int
-	isNoAutoNew      bool
-	cacheSceneIndex  int
+	CoreComponent        IComponent
+	Name                 string
+	MapComponentData     map[string]IComponentData
+	mapHistory           map[string]IComponentData
+	SymbolCode           int
+	CurIndex             int
+	isNoAutoNew          bool
+	cacheSceneIndex      int
+	cacheOtherSceneIndex int
 }
 
 func (csn *callStackNode) IsSame(component IComponent, symbolCode int, i int) bool {
@@ -98,16 +99,17 @@ func newGlobalCallStackNode() *callStackNode {
 	}
 }
 
-func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, cacheSceneIndex int, pt *sgc7game.PayTables) *callStackNode {
+func newEachSymbolCallStackNode(component IComponent, symbolCode int, i int, cacheSceneIndex int, cacheOtherSceneIndex int, pt *sgc7game.PayTables) *callStackNode {
 	return &callStackNode{
-		CoreComponent:    component,
-		Name:             fmt.Sprintf("%v:%v>%v", component.GetName(), i, pt.GetStringFromInt(symbolCode)),
-		mapHistory:       make(map[string]IComponentData),
-		MapComponentData: make(map[string]IComponentData),
-		SymbolCode:       symbolCode,
-		CurIndex:         i,
-		isNoAutoNew:      true,
-		cacheSceneIndex:  cacheSceneIndex,
+		CoreComponent:        component,
+		Name:                 fmt.Sprintf("%v:%v>%v", component.GetName(), i, pt.GetStringFromInt(symbolCode)),
+		mapHistory:           make(map[string]IComponentData),
+		MapComponentData:     make(map[string]IComponentData),
+		SymbolCode:           symbolCode,
+		CurIndex:             i,
+		isNoAutoNew:          true,
+		cacheSceneIndex:      cacheSceneIndex,
+		cacheOtherSceneIndex: cacheOtherSceneIndex,
 	}
 }
 
@@ -235,7 +237,7 @@ func (cs *CallStack) OnCallEnd(ic IComponent, cd IComponentData) string {
 }
 
 func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component IComponent, children []string, symbolCode int, i int) error {
-	node := newEachSymbolCallStackNode(component, symbolCode, i, len(gameProp.SceneStack.Scenes), gameProp.Pool.DefaultPaytables)
+	node := newEachSymbolCallStackNode(component, symbolCode, i, len(gameProp.SceneStack.Scenes), len(gameProp.OtherSceneStack.Scenes), gameProp.Pool.DefaultPaytables)
 
 	components := gameProp.Components
 
@@ -259,6 +261,7 @@ func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component ICompone
 func (cs *CallStack) onEachSymbolsEnd(gameProp *GameProperty, component IComponent, symbolCode int, i int) error {
 	if len(cs.nodes) > 1 && cs.nodes[len(cs.nodes)-1].IsSame(component, symbolCode, i) {
 		gameProp.SceneStack.PopEx(cs.nodes[len(cs.nodes)-1].cacheSceneIndex)
+		gameProp.OtherSceneStack.PopEx(cs.nodes[len(cs.nodes)-1].cacheOtherSceneIndex)
 
 		cs.nodes = cs.nodes[:len(cs.nodes)-1]
 
