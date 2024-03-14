@@ -415,6 +415,17 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapStrWeights[name] = vm2
+		} else if t == "IntValWeight" {
+			vm2, err := parseIntValWeights(v.Get("fileJson"))
+			if err != nil {
+				goutils.Error("loadOtherList:parseIntValWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapStrWeights[name] = vm2
 		} else {
 			goutils.Error("loadOtherList",
 				zap.Int("i", i),
