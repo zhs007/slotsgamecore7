@@ -119,7 +119,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 	var os *sgc7game.GameScene
 
 	if genSymbolValsWithPos.Config.IsUseSource {
-		os = genSymbolValsWithPos.GetTargetOtherScene3(gameProp, curpr, prs, cd, genSymbolValsWithPos.Name, "", 0)
+		os = genSymbolValsWithPos.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	}
 
 	nos := os
@@ -234,7 +234,7 @@ func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
 		IsAlwaysGen:      jcfg.IsAlwaysGen == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

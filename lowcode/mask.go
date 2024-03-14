@@ -468,7 +468,7 @@ func (jcfg *jsonMask) build() *MaskConfig {
 		// MaskType: "symbolInReel",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

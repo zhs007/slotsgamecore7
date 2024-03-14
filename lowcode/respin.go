@@ -552,7 +552,7 @@ func (jr *jsonRespin) build() *RespinConfig {
 		// IsWinBreak: jr.IsWinBreak == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

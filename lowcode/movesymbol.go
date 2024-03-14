@@ -415,7 +415,7 @@ func (jms *jsonMoveSymbol) build() *MoveSymbolConfig {
 		cfg.MoveData = append(cfg.MoveData, cmd)
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

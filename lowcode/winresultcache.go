@@ -221,7 +221,7 @@ func (jwt *jsonWinResultCache) build() *WinResultCacheConfig {
 		WinMulti: jwt.WinMulti,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

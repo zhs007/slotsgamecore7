@@ -79,7 +79,7 @@ func (moveReel *MoveReel) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 
 	moveReel.AddScene(gameProp, curpr, sc2, bcd)
 
-	os := moveReel.GetTargetOtherScene2(gameProp, curpr, bcd, moveReel.Name, "")
+	os := moveReel.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	if os != nil {
 		os2 := os.CloneEx(gameProp.PoolScene)

@@ -288,7 +288,7 @@ func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
 		TargetSymbolCollection: jcfg.TargetSymbolCollection,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

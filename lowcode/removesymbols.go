@@ -233,7 +233,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 		IgnoreSymbols:    jcfg.IgnoreSymbols,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

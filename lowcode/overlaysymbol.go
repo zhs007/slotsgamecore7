@@ -178,7 +178,7 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 	} else {
 		overlaySymbol.GetTargetScene3(gameProp, curpr, prs, &osd.BasicComponentData, overlaySymbol.Name, "", 0)
 
-		overlaySymbol.ReTagScene(gameProp, curpr, osd.TargetSceneIndex, &osd.BasicComponentData)
+		// overlaySymbol.ReTagScene(gameProp, curpr, osd.TargetSceneIndex, &osd.BasicComponentData)
 	}
 
 	nc := overlaySymbol.onStepEnd(gameProp, curpr, gp, "")

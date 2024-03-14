@@ -739,7 +739,7 @@ func (jwt *jsonClusterTrigger) build() *ClusterTriggerConfig {
 		WinMulti:      jwt.WinMulti,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

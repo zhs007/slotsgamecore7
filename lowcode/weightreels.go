@@ -243,7 +243,7 @@ func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 		IsExpandReel:   jwr.IsExpandReel == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -213,7 +213,7 @@ func (jbr *jsonBasicReels) build() *BasicReelsConfig {
 		IsExpandReel: jbr.IsExpandReel == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

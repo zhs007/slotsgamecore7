@@ -114,7 +114,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	if gs.HasSymbol(symbolVal.SymbolCode) {
 		vw := symbolVal.GetWeightVal(gameProp, cd)
 
-		os1 := symbolVal.GetTargetOtherScene2(gameProp, curpr, cd, symbolVal.Name, "")
+		os1 := symbolVal.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 		if os1 == nil {
 			os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
 

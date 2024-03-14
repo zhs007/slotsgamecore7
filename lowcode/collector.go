@@ -358,7 +358,7 @@ func (jcfg *jsonCollector) build() *CollectorConfig {
 		IsCycle: jcfg.IsCycle == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

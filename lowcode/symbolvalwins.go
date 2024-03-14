@@ -178,7 +178,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// if isTrigger {
 	// svwd.CollectorNum = symbolnum
 
-	os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, &svwd.BasicComponentData, symbolValWins.Name, "")
+	os := symbolValWins.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	if os != nil {
 		totalvals := 0

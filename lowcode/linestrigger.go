@@ -669,7 +669,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	std.OnNewStep(gameProp, linesTrigger)
 
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, linesTrigger.Name, "", 0)
-	os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
+	os := linesTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
@@ -958,7 +958,7 @@ func (jlt *jsonLinesTrigger) build() *LinesTriggerConfig {
 		WinMulti:        jlt.WinMulti,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

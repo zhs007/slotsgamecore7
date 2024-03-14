@@ -188,7 +188,7 @@ func (jcfg *jsonReplaceSymbolGroup) build() *ReplaceSymbolGroupConfig {
 		cfg.TargetSymbols = append(cfg.TargetSymbols, s.TargetSymbol)
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

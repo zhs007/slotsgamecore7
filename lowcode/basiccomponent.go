@@ -223,25 +223,12 @@ func (basicComponentData *BasicComponentData) PutInMoney(coins int) {
 
 // 新思路：尽量弱化变量的概念，所有变量都放到component里面去，譬如循环、scene、分支等，这样逻辑会更清晰
 type BasicComponentConfig struct {
-	DefaultNextComponent   string            `yaml:"defaultNextComponent" json:"defaultNextComponent"`     // next component, if it is empty jump to ending
-	TagScenes              []string          `yaml:"tagScenes" json:"tagScenes"`                           // tag scenes，v0.13开始弃用
-	TagOtherScenes         []string          `yaml:"tagOtherScenes" json:"tagOtherScenes"`                 // tag otherScenes，v0.13开始弃用
-	TargetScene            string            `yaml:"targetScene" json:"targetScene"`                       // target scenes，v0.13开始弃用
-	TargetOtherScene       string            `yaml:"targetOtherScene" json:"targetOtherScene"`             // target otherscenes，v0.13开始弃用
-	TagGlobalScenes        []string          `yaml:"tagGlobalScenes" json:"tagGlobalScenes"`               // tag global scenes，v0.13开始弃用
-	TargetGlobalScene      string            `yaml:"targetGlobalScene" json:"targetGlobalScene"`           // target global scenes，v0.13开始弃用
-	TagGlobalOtherScenes   []string          `yaml:"tagGlobalOtherScenes" json:"tagGlobalOtherScenes"`     // tag global other scenes，v0.13开始弃用
-	TargetGlobalOtherScene string            `yaml:"targetGlobalOtherScene" json:"targetGlobalOtherScene"` // target global other scenes，v0.13开始弃用
-	Scene2Components       []string          `yaml:"scene2Components" json:"scene2Components"`             // 新版本，关于scene换了个思路，用目标对象来驱动
-	OtherScene2Components  []string          `yaml:"otherScene2Components" json:"otherScene2Components"`   // 新版本，关于other scene换了个思路，用目标对象来驱动
-	TagRNG                 []string          `yaml:"tagRNG" json:"tagRNG"`                                 // tag RNG
-	InitStrVals            map[string]string `yaml:"initStrVals" json:"initStrVals"`                       // 只要这个组件被执行，就会初始化这些strvals
-	UseFileMapping         bool              `yaml:"useFileMapping" json:"useFileMapping"`                 // 兼容性配置，新配置应该一定用filemapping
-	ComponentType          string            `yaml:"-" json:"componentType"`                               // 组件类型
-	UseSceneV2             bool              `yaml:"useSceneV2" json:"useSceneV2"`                         // 新版本的scene
-	TargetScenes3          [][]string        `yaml:"targetScenes3" json:"targetScenes3"`                   // target scenes V3
-	UseSceneV3             bool              `yaml:"useSceneV3" json:"useSceneV3"`                         // 新版本的scene
-	IsNeedCacheScene3      bool              `yaml:"isNeedCacheScene3" json:"isNeedCacheScene3"`           // 是否需要缓存scene
+	DefaultNextComponent string            `yaml:"defaultNextComponent" json:"defaultNextComponent"` // next component, if it is empty jump to ending
+	TagRNG               []string          `yaml:"tagRNG" json:"tagRNG"`                             // tag RNG
+	InitStrVals          map[string]string `yaml:"initStrVals" json:"initStrVals"`                   // 只要这个组件被执行，就会初始化这些strvals
+	UseFileMapping       bool              `yaml:"useFileMapping" json:"useFileMapping"`             // 兼容性配置，新配置应该一定用filemapping
+	ComponentType        string            `yaml:"-" json:"componentType"`                           // 组件类型
+	TargetScenes3        [][]string        `yaml:"targetScenes3" json:"targetScenes3"`               // target scenes V3
 }
 
 type BasicComponent struct {
@@ -344,20 +331,20 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
-	gameProp.SceneStack.Push(basicComponent.Name, si, sc, basicComponent.Config.IsNeedCacheScene3)
+	gameProp.SceneStack.Push(basicComponent.Name, si, sc)
 }
 
-// ReTagScene -
-func (basicComponent *BasicComponent) ReTagScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
-	si int, basicCD *BasicComponentData) {
+// // ReTagScene -
+// func (basicComponent *BasicComponent) ReTagScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+// 	si int, basicCD *BasicComponentData) {
 
-	usi := len(basicCD.UsedScenes)
-	basicCD.UsedScenes = append(basicCD.UsedScenes, si)
+// 	usi := len(basicCD.UsedScenes)
+// 	basicCD.UsedScenes = append(basicCD.UsedScenes, si)
 
-	if usi < len(basicComponent.Config.TagScenes) {
-		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
-	}
-}
+// 	if usi < len(basicComponent.Config.TagScenes) {
+// 		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
+// 	}
+// }
 
 // AddOtherScene -
 func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
@@ -369,18 +356,18 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 
 	curpr.OtherScenes = append(curpr.OtherScenes, sc)
 
-	gameProp.OtherSceneStack.Push(basicComponent.Name, si, sc, basicComponent.Config.IsNeedCacheScene3)
+	gameProp.OtherSceneStack.Push(basicComponent.Name, si, sc)
 }
 
 // ClearOtherScene -
 func (basicComponent *BasicComponent) ClearOtherScene(gameProp *GameProperty) {
-	if basicComponent.Config.UseSceneV2 {
-		if len(basicComponent.Config.OtherScene2Components) > 0 {
-			for _, v := range basicComponent.Config.OtherScene2Components {
-				gameProp.ClearComponentOtherScene(v)
-			}
-		}
-	}
+	// if basicComponent.Config.UseSceneV2 {
+	// 	if len(basicComponent.Config.OtherScene2Components) > 0 {
+	// 		for _, v := range basicComponent.Config.OtherScene2Components {
+	// 			gameProp.ClearComponentOtherScene(v)
+	// 		}
+	// 	}
+	// }
 }
 
 // AddResult -
@@ -439,35 +426,35 @@ func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *s
 	return wins
 }
 
-// GetTargetScene -
-func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, targetScene string) *sgc7game.GameScene {
-	if targetScene == "" {
-		if basicComponent.Config.TargetGlobalScene != "" {
-			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
-		} else {
-			targetScene = basicComponent.Config.TargetScene
-		}
-	}
+// // GetTargetScene -
+// func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, targetScene string) *sgc7game.GameScene {
+// 	if targetScene == "" {
+// 		if basicComponent.Config.TargetGlobalScene != "" {
+// 			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
+// 		} else {
+// 			targetScene = basicComponent.Config.TargetScene
+// 		}
+// 	}
 
-	gs, si := gameProp.GetScene(curpr, targetScene)
+// 	gs, si := gameProp.GetScene(curpr, targetScene)
 
-	if si >= 0 {
-		basicCD.TargetSceneIndex = si
-	}
+// 	if si >= 0 {
+// 		basicCD.TargetSceneIndex = si
+// 	}
 
-	return gs
-}
+// 	return gs
+// }
 
-// GetTargetOtherScene -
-func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
-	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
+// // GetTargetOtherScene -
+// func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
+// 	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
 
-	if si >= 0 {
-		basicCD.TargetOtherSceneIndex = si
-	}
+// 	if si >= 0 {
+// 		basicCD.TargetOtherSceneIndex = si
+// 	}
 
-	return gs
-}
+// 	return gs
+// }
 
 // NewComponentData -
 func (basicComponent *BasicComponent) NewComponentData() IComponentData {
@@ -533,47 +520,47 @@ func (basicComponent *BasicComponent) IsMask() bool {
 	return false
 }
 
-func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
-	if basicComponent.Config.UseSceneV2 {
-		return gameProp.GetComponentScene(component)
-	}
+// func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
+// 	if basicComponent.Config.UseSceneV2 {
+// 		return gameProp.GetComponentScene(component)
+// 	}
 
-	if tag == "" {
-		if basicComponent.Config.TargetGlobalScene != "" {
-			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
-		} else {
-			tag = basicComponent.Config.TargetScene
-		}
-	}
+// 	if tag == "" {
+// 		if basicComponent.Config.TargetGlobalScene != "" {
+// 			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
+// 		} else {
+// 			tag = basicComponent.Config.TargetScene
+// 		}
+// 	}
 
-	gs, si := gameProp.GetScene(curpr, tag)
+// 	gs, si := gameProp.GetScene(curpr, tag)
 
-	if si >= 0 {
-		basicCD.TargetSceneIndex = si
-	}
+// 	if si >= 0 {
+// 		basicCD.TargetSceneIndex = si
+// 	}
 
-	return gs
-}
+// 	return gs
+// }
 
 func (basicComponent *BasicComponent) GetTargetScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
 	return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
 }
 
-func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
-	if basicComponent.Config.UseSceneV2 {
-		return gameProp.GetComponentOtherScene(component)
-	}
+// func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
+// 	if basicComponent.Config.UseSceneV2 {
+// 		return gameProp.GetComponentOtherScene(component)
+// 	}
 
-	if tag == "" {
-		tag = basicComponent.Config.TargetOtherScene
-	}
+// 	if tag == "" {
+// 		tag = basicComponent.Config.TargetOtherScene
+// 	}
 
-	gs, _ := gameProp.GetOtherScene(curpr, tag)
+// 	gs, _ := gameProp.GetOtherScene(curpr, tag)
 
-	return gs
-}
+// 	return gs
+// }
 
-func (basicComponent *BasicComponent) GetTargetOtherScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string, si int) *sgc7game.GameScene {
+func (basicComponent *BasicComponent) GetTargetOtherScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, si int) *sgc7game.GameScene {
 	return gameProp.OtherSceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
 }
 

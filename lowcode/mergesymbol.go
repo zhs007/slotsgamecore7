@@ -96,8 +96,8 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	mergeSymbol.AddScene(gameProp, curpr, sc2, bcd)
 
-	os1 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, bcd, mergeSymbol.Name, "")
-	os2 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, bcd, mergeSymbol.Name+":1", "")
+	os1 := mergeSymbol.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	os2 := mergeSymbol.GetTargetOtherScene3(gameProp, curpr, prs, 1)
 	if os1 != nil || os2 != nil {
 		var os3 *sgc7game.GameScene
 

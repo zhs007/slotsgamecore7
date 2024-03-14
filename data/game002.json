@@ -16348,60 +16348,14 @@
                                 "strokeDasharray": 0
                             }
                         },
-                        "id": "fa71b4fe-1217-4dd7-9f21-0ba2cc644a36",
-                        "zIndex": -1,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "4b2c0c4d-f480-4b4f-94ad-4b7e2d675199",
-                            "port": "vals-component-groups-out-upgrade"
-                        },
-                        "target": {
-                            "cell": "9fab3b3f-2c5c-4a69-8716-f5cc50004659",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#696969",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
-                        "id": "072177ee-bdb5-4ff1-80c7-6484ce3ba734",
-                        "zIndex": -1,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "4b2c0c4d-f480-4b4f-94ad-4b7e2d675199",
-                            "port": "vals-component-groups-out-new"
-                        },
-                        "target": {
-                            "cell": "9fab3b3f-2c5c-4a69-8716-f5cc50004659",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#696969",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
                         "id": "dbcab3c9-d17b-4e63-9fca-55fe27168009",
                         "zIndex": -1,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "19058635-0c25-425d-a9c7-3dde07ca70f8",
                             "port": "vals-component-groups-out-giga"
@@ -16422,6 +16376,12 @@
                         },
                         "id": "1e6d7b00-a05c-4ac4-aadf-d09b042088da",
                         "zIndex": -1,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "baa4a290-9427-4a21-8de3-e691e0c80bc6",
                             "port": "component-groups-out"
@@ -16442,32 +16402,18 @@
                         },
                         "id": "87c32614-3dd2-42e5-9323-45ed0d31c896",
                         "zIndex": -1,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "ecd23a01-534b-48d1-9b4a-bfe1d802778d",
                             "port": "component-groups-out"
                         },
                         "target": {
                             "cell": "0687b723-b18d-463a-b233-ef4d7d0fdd57",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#008000",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
-                        "id": "c51df126-991d-4635-a0fa-7bbf795398bc",
-                        "zIndex": -1,
-                        "source": {
-                            "cell": "0687b723-b18d-463a-b233-ef4d7d0fdd57",
-                            "port": "jump-component-groups-out"
-                        },
-                        "target": {
-                            "cell": "460c5108-9488-4240-aaac-5067c2356b55",
                             "port": "component-groups-in"
                         }
                     },
@@ -16482,32 +16428,18 @@
                         },
                         "id": "6c892964-bac3-47a2-b214-8ef022047c9e",
                         "zIndex": -1,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "0687b723-b18d-463a-b233-ef4d7d0fdd57",
                             "port": "component-groups-out"
                         },
                         "target": {
                             "cell": "19058635-0c25-425d-a9c7-3dde07ca70f8",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
-                        "id": "ac011423-5fd6-476e-b95e-1d3b6a8c26ad",
-                        "zIndex": -1,
-                        "source": {
-                            "cell": "460c5108-9488-4240-aaac-5067c2356b55",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "e5dc93e9-b5b1-4505-8cdb-94235c5afb04",
                             "port": "component-groups-in"
                         }
                     },
@@ -16522,6 +16454,12 @@
                         },
                         "id": "b58111cd-5ec4-470c-93d8-334bdc138a72",
                         "zIndex": -1,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "e5dc93e9-b5b1-4505-8cdb-94235c5afb04",
                             "port": "jump-component-groups-out"
@@ -16542,12 +16480,178 @@
                         },
                         "id": "bebc8618-34d2-4455-848b-3f99ec005c3e",
                         "zIndex": -1,
+                        "labels": [
+                            {
+                                "position": 0.5,
+                                "data": null
+                            }
+                        ],
                         "source": {
                             "cell": "5a68f009-e94e-4611-a34c-2f69566f63a3",
                             "port": "component-groups-out"
                         },
                         "target": {
                             "cell": "4b2c0c4d-f480-4b4f-94ad-4b7e2d675199",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#008000",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "72c6787f-9eed-423a-9854-b681ea76f6e2",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "0687b723-b18d-463a-b233-ef4d7d0fdd57",
+                            "port": "jump-component-groups-out"
+                        },
+                        "target": {
+                            "cell": "e5dc93e9-b5b1-4505-8cdb-94235c5afb04",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#696969",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "98d2816d-117a-4e3b-9138-f15220ee0a90",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "19058635-0c25-425d-a9c7-3dde07ca70f8",
+                            "port": "vals-component-groups-out-none"
+                        },
+                        "target": {
+                            "cell": "48d8fa4e-d7a5-4060-a83c-9b0eeaa43de5",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#696969",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "5853968d-3c36-4795-8870-8e9be55f3c30",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "4b2c0c4d-f480-4b4f-94ad-4b7e2d675199",
+                            "port": "vals-component-groups-out-upgrade"
+                        },
+                        "target": {
+                            "cell": "a48bf32b-0ac7-4078-b062-1b581c61f16f",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "3145e0de-b2b4-4fb3-958f-ae1cc4459ef6",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "a48bf32b-0ac7-4078-b062-1b581c61f16f",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "e50eef33-c7c2-4716-8fc2-c65cc39b7ecf",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "4ccdcf5a-f968-4114-80c9-a22ecaedc494",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "e50eef33-c7c2-4716-8fc2-c65cc39b7ecf",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "84fbf272-f788-4f02-8519-11c58d8f4b5d",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#696969",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "08e1e978-b7d8-42be-a00c-9b8d355a1e67",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "4b2c0c4d-f480-4b4f-94ad-4b7e2d675199",
+                            "port": "vals-component-groups-out-new"
+                        },
+                        "target": {
+                            "cell": "bd886016-dc6a-448e-8083-f1e6fce6f574",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "0d4e4ed1-7c8c-4799-a6cb-5fef8fb906d0",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "bd886016-dc6a-448e-8083-f1e6fce6f574",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "e50eef33-c7c2-4716-8fc2-c65cc39b7ecf",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "9823d498-ec6c-452e-a088-83373eea0ee3",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "84fbf272-f788-4f02-8519-11c58d8f4b5d",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "9fab3b3f-2c5c-4a69-8716-f5cc50004659",
                             "port": "component-groups-in"
                         }
                     },
@@ -18179,8 +18283,8 @@
                     },
                     {
                         "position": {
-                            "x": 4330,
-                            "y": 10
+                            "x": 5920,
+                            "y": 160
                         },
                         "size": {
                             "width": 400,
@@ -18415,8 +18519,8 @@
                     },
                     {
                         "position": {
-                            "x": 4810,
-                            "y": 190
+                            "x": 6450,
+                            "y": 100
                         },
                         "size": {
                             "width": 400,
@@ -18647,8 +18751,8 @@
                     },
                     {
                         "position": {
-                            "x": 5300,
-                            "y": 350
+                            "x": 7000,
+                            "y": 30
                         },
                         "size": {
                             "width": 400,
@@ -19631,17 +19735,6 @@
                                 "symbol"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 13,
                         "componentValues": {
                             "labelIsError": false,
@@ -19652,6 +19745,19 @@
                                 "number": 1
                             },
                             "label": "bg-giga"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
                         }
                     },
                     {
@@ -19970,17 +20076,6 @@
                                 "winMulti"
                             ]
                         },
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        },
                         "zIndex": 14,
                         "componentValues": {
                             "labelIsError": false,
@@ -20000,235 +20095,9 @@
                                 "cacheWinResult": "bg-cachewins"
                             },
                             "label": "bg-firstcheckwins"
-                        }
-                    },
-                    {
-                        "position": {
-                            "x": 1700,
-                            "y": 110
                         },
-                        "size": {
-                            "width": 400,
-                            "height": 165
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": -5,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "jumpout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "loopout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "foreachout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "valsout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": "rightPortPosition",
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                },
-                                {
-                                    "id": "jump-component-groups-out",
-                                    "group": "jumpout",
-                                    "attrs": {
-                                        "text": {
-                                            "text": "jumpTo"
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "id": "460c5108-9488-4240-aaac-5067c2356b55",
-                        "label": "WinResultCache",
-                        "item": {
-                            "key": "WinResultCache",
-                            "label": "WinResultCache",
-                            "out": [
-                                "winResult"
-                            ],
-                            "configuration": [
-                                {
-                                    "label": "winMulti",
-                                    "type": "inputNumber1"
-                                }
-                            ],
-                            "componentval": [
-                                "winMulti"
-                            ]
-                        },
+                        "basicComponentData": null,
+                        "data": null,
                         "tools": {
                             "items": [
                                 {
@@ -20239,14 +20108,6 @@
                                     }
                                 }
                             ]
-                        },
-                        "zIndex": 15,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "winMulti": 1
-                            },
-                            "label": "bg-cachewins"
                         }
                     },
                     {
@@ -20506,6 +20367,342 @@
                                 }
                             ]
                         },
+                        "zIndex": 16,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "isAlwaysGen": "false",
+                                "isUseSource": "true",
+                                "targetComponents": [
+                                    "bg-pay",
+                                    "bg-firstcheckwins"
+                                ],
+                                "genType": "add"
+                            },
+                            "label": "bg-procmulti"
+                        },
+                        "basicComponentData": null,
+                        "data": null,
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 4270,
+                            "y": 400
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 269
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "foreach-component-groups-out",
+                                    "group": "foreachout",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "foreach"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "a48bf32b-0ac7-4078-b062-1b581c61f16f",
+                        "label": "CheckSymbolVals",
+                        "item": {
+                            "key": "CheckSymbolVals",
+                            "label": "CheckSymbolVals",
+                            "configuration": [
+                                {
+                                    "label": "type",
+                                    "type": "select",
+                                    "association": [
+                                        "value",
+                                        "min",
+                                        "max"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "In[min,max]",
+                                            "value": "In[min,max]"
+                                        },
+                                        {
+                                            "label": "In(min,max]",
+                                            "value": "In(min,max]"
+                                        },
+                                        {
+                                            "label": "In[min,max)",
+                                            "value": "In[min,max)"
+                                        },
+                                        {
+                                            "label": "In(min,max)",
+                                            "value": "In(min,max)"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "value",
+                                    "type": "inputNumberInteger",
+                                    "show": {
+                                        "label": "type",
+                                        "value": [
+                                            "==",
+                                            ">=",
+                                            "<=",
+                                            ">",
+                                            "<"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "min",
+                                    "type": "inputNumberInteger",
+                                    "show": {
+                                        "label": "type",
+                                        "value": [
+                                            "In[min,max]",
+                                            "In(min,max]",
+                                            "In[min,max)",
+                                            "In(min,max)"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "max",
+                                    "type": "inputNumberInteger",
+                                    "show": {
+                                        "label": "type",
+                                        "value": [
+                                            "In[min,max]",
+                                            "In(min,max]",
+                                            "In[min,max)",
+                                            "In(min,max)"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "outputToComponent",
+                                    "type": "selectPositionCollectionNode"
+                                }
+                            ]
+                        },
                         "tools": {
                             "items": [
                                 {
@@ -20517,19 +20714,882 @@
                                 }
                             ]
                         },
-                        "zIndex": 16,
+                        "zIndex": 17,
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "true",
-                                "isUseSource": "true",
-                                "targetComponents": [
-                                    "bg-pay",
-                                    "bg-firstcheckwins"
-                                ],
-                                "genType": "add"
+                                "type": ">",
+                                "outputToComponent": "bg-upmulpos",
+                                "value": 0
                             },
-                            "label": "bg-procmulti"
+                            "label": "bg-genupmul"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 4830,
+                            "y": 590
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 199
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "foreach-component-groups-out",
+                                    "group": "foreachout",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "foreach"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "e50eef33-c7c2-4716-8fc2-c65cc39b7ecf",
+                        "label": "PositionCollection",
+                        "item": {
+                            "key": "PositionCollection",
+                            "label": "PositionCollection",
+                            "configuration": [
+                                {
+                                    "label": "type",
+                                    "type": "select",
+                                    "defaultValue": "normal",
+                                    "option": [
+                                        {
+                                            "label": "normal",
+                                            "value": "normal"
+                                        },
+                                        {
+                                            "label": "nonRepeatable",
+                                            "value": "nonRepeatable"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "initPositions",
+                                    "type": "initPosition"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 18,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "type": "nonRepeatable"
+                            },
+                            "label": "bg-mulpos"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 5410,
+                            "y": 590
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 269
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                }
+                            ]
+                        },
+                        "id": "84fbf272-f788-4f02-8519-11c58d8f4b5d",
+                        "label": "ChgSymbolVals",
+                        "item": {
+                            "key": "ChgSymbolVals",
+                            "label": "ChgSymbolVals",
+                            "configuration": [
+                                {
+                                    "label": "type",
+                                    "type": "select",
+                                    "option": [
+                                        {
+                                            "label": "inc",
+                                            "value": "inc"
+                                        },
+                                        {
+                                            "label": "dec",
+                                            "value": "dec"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "sourceType",
+                                    "type": "select",
+                                    "association": [
+                                        "positionCollection",
+                                        "winResultComponents"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "PositionCollection",
+                                            "value": "PositionCollection"
+                                        },
+                                        {
+                                            "label": "winResultComponents",
+                                            "value": "winResultComponents"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "positionCollection",
+                                    "type": "selectPositionCollectionNode",
+                                    "show": {
+                                        "label": "sourceType",
+                                        "value": [
+                                            "PositionCollection"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "winResultComponents",
+                                    "type": "selectWinResultNode",
+                                    "show": {
+                                        "label": "sourceType",
+                                        "value": [
+                                            "winResultComponents"
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 19,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "type": "inc",
+                                "sourceType": "PositionCollection",
+                                "positionCollection": "bg-mulpos"
+                            },
+                            "label": "bg-procmul"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 4270,
+                            "y": 800
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 269
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                },
+                                {
+                                    "id": "foreach-component-groups-out",
+                                    "group": "foreachout",
+                                    "attrs": {
+                                        "text": {
+                                            "text": "foreach"
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        "id": "bd886016-dc6a-448e-8083-f1e6fce6f574",
+                        "label": "CheckSymbolVals",
+                        "item": {
+                            "key": "CheckSymbolVals",
+                            "label": "CheckSymbolVals",
+                            "configuration": [
+                                {
+                                    "label": "type",
+                                    "type": "select",
+                                    "association": [
+                                        "value",
+                                        "min",
+                                        "max"
+                                    ],
+                                    "option": [
+                                        {
+                                            "label": "==",
+                                            "value": "=="
+                                        },
+                                        {
+                                            "label": ">=",
+                                            "value": ">="
+                                        },
+                                        {
+                                            "label": "<=",
+                                            "value": "<="
+                                        },
+                                        {
+                                            "label": ">",
+                                            "value": ">"
+                                        },
+                                        {
+                                            "label": "<",
+                                            "value": "<"
+                                        },
+                                        {
+                                            "label": "In[min,max]",
+                                            "value": "In[min,max]"
+                                        },
+                                        {
+                                            "label": "In(min,max]",
+                                            "value": "In(min,max]"
+                                        },
+                                        {
+                                            "label": "In[min,max)",
+                                            "value": "In[min,max)"
+                                        },
+                                        {
+                                            "label": "In(min,max)",
+                                            "value": "In(min,max)"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "value",
+                                    "type": "inputNumberInteger",
+                                    "show": {
+                                        "label": "type",
+                                        "value": [
+                                            "==",
+                                            ">=",
+                                            "<=",
+                                            ">",
+                                            "<"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "min",
+                                    "type": "inputNumberInteger",
+                                    "show": {
+                                        "label": "type",
+                                        "value": [
+                                            "In[min,max]",
+                                            "In(min,max]",
+                                            "In[min,max)",
+                                            "In(min,max)"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "max",
+                                    "type": "inputNumberInteger",
+                                    "show": {
+                                        "label": "type",
+                                        "value": [
+                                            "In[min,max]",
+                                            "In(min,max]",
+                                            "In[min,max)",
+                                            "In(min,max)"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "outputToComponent",
+                                    "type": "selectPositionCollectionNode"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 20,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "type": "==",
+                                "value": 0
+                            },
+                            "label": "bg-genaddmul"
                         }
                     }
                 ]

@@ -256,7 +256,7 @@ func (jcfg *jsonGenGigaSymbol) build() *GenGigaSymbolConfig {
 		Symbol:     jcfg.Symbol,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

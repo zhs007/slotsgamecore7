@@ -175,7 +175,7 @@ func (jcfg *jsonReplaceReelWithMask) build() *ReplaceReelWithMaskConfig {
 		Mask:   jcfg.SrcMask,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

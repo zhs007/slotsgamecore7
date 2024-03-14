@@ -158,7 +158,7 @@ type jsonRefillSymbols struct {
 func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
 	cfg := &RefillSymbolsConfig{}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

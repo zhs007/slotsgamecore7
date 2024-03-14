@@ -165,7 +165,7 @@ func (jcfg *jsonDropDownSymbols) build() *DropDownSymbolsConfig {
 		HoldSymbols: jcfg.HoldSymbols,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }
