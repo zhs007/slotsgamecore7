@@ -60,7 +60,7 @@ func (stack *SceneStack) GetTopScene(curpr *sgc7game.PlayResult, prs []*sgc7game
 		}
 
 		stack.Push("", 0, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
-		curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		// curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
 		// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
 
 		return stack.GetTopScene(curpr, prs)

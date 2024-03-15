@@ -92,6 +92,15 @@ func (respinData *RespinData) IsRespinStarted() bool {
 	return respinData.CurRespinNum > 0
 }
 
+// ChgConfigIntVal -
+func (respinData *RespinData) ChgConfigIntVal(key string, off int) {
+	if key == "lastRespinNum" {
+		respinData.AddRespinTimes(off)
+	} else {
+		respinData.BasicComponentData.ChgConfigIntVal(key, off)
+	}
+}
+
 // // AddRetriggerRespinNum -
 // func (respinData *RespinData) AddRetriggerRespinNum(num int) {
 // 	respinData.RetriggerAddRespinNum += num
