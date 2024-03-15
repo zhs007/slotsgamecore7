@@ -105,7 +105,7 @@ func (chgSymbol *ChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	bcd := cd.(*BasicComponentData)
 
 	if len(bcd.UsedScenes) > 0 {
-		asciigame.OutputScene("The value of the symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
+		asciigame.OutputScene("after ChgSymbol", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

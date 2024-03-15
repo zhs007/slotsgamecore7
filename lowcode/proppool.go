@@ -643,7 +643,12 @@ func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	}
 
 	pool.MapSymbolColor.OnGetSymbolString = func(s int) string {
-		return pool.SymbolsViewer.MapSymbols[s].Output
+		obj, isok := pool.SymbolsViewer.MapSymbols[s]
+		if isok {
+			return obj.Output
+		}
+
+		return " "
 	}
 
 	for _, bet := range cfg.Bets {

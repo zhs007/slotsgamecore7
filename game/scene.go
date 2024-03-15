@@ -47,6 +47,18 @@ func NewGameScene(width int, height int) (*GameScene, error) {
 	return gs, nil
 }
 
+// NewGameScene2 - new a GameScene
+func NewGameScene2(width int, height int, v int) (*GameScene, error) {
+	gs := &GameScene{}
+
+	err := gs.Init2(width, height, v)
+	if err != nil {
+		return nil, err
+	}
+
+	return gs, nil
+}
+
 // NewGameSceneEx - new a GameScene
 func NewGameSceneEx(heights []int) (*GameScene, error) {
 	gs := &GameScene{}
@@ -117,6 +129,30 @@ func (gs *GameScene) Init(w int, h int) error {
 
 		for y := 0; y < h; y++ {
 			gs.Arr[x] = append(gs.Arr[x], -1)
+		}
+	}
+
+	gs.Width = w
+	gs.Height = h
+
+	return nil
+}
+
+// Init2 - init scene v2
+func (gs *GameScene) Init2(w int, h int, v int) error {
+	gs.Arr = nil
+
+	if v == 0 {
+		for x := 0; x < w; x++ {
+			gs.Arr = append(gs.Arr, make([]int, h))
+		}
+	} else {
+		for x := 0; x < w; x++ {
+			gs.Arr = append(gs.Arr, make([]int, h))
+
+			for y := 0; y < h; y++ {
+				gs.Arr[x][y] = v
+			}
 		}
 	}
 
@@ -692,7 +728,7 @@ func (gs *GameScene) Clone() *GameScene {
 
 // Clone - clone
 func (gs *GameScene) CloneEx(pool *GameScenePoolEx) *GameScene {
-	ngs := pool.New(gs.Width, gs.Height, false)
+	ngs := pool.New(gs.Width, gs.Height)
 
 	for i := 0; i < gs.Width; i++ {
 		ngs.Arr[i] = make([]int, len(gs.Arr[i]))

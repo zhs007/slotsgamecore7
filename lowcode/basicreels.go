@@ -149,7 +149,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		// reelname = basicReels.Config.ReelSet
 	}
 
-	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
+	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	sc.ReelName = reelname
 	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	// if err != nil {

@@ -156,7 +156,11 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, cd)
 
-		nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
+		if len(chgSymbols.Config.Controllers) > 0 {
+			gameProp.procAwards(plugin, chgSymbols.Config.Controllers, curpr, gp)
+		}
+
+		nc := chgSymbols.onStepEnd(gameProp, curpr, gp, chgSymbols.Config.JumpToComponent)
 
 		return nc, nil
 	}
@@ -172,7 +176,7 @@ func (chgSymbols *ChgSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("The value of the symbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+		asciigame.OutputScene("after ChgSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

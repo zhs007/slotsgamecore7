@@ -149,12 +149,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 								return "", err
 							}
 
-							if genSymbolValsWithSymbol.Config.DefaultVal == 0 {
-								nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), true)
-							} else {
-								nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
-								nos.Clear(genSymbolValsWithSymbol.Config.DefaultVal)
-							}
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
 
 							nos.Arr[x][y] = curv.Int()
 						} else if nos != nil && nos.Arr[x][y] != genSymbolValsWithSymbol.Config.DefaultVal {
@@ -196,12 +191,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 								return "", err
 							}
 
-							if genSymbolValsWithSymbol.Config.DefaultVal == 0 {
-								nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), true)
-							} else {
-								nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), false)
-								nos.Clear(genSymbolValsWithSymbol.Config.DefaultVal)
-							}
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
 
 							nos.Arr[x][y] = curv.Int()
 						} else if nos != nil && nos.Arr[x][y] != genSymbolValsWithSymbol.Config.DefaultVal {
@@ -248,7 +238,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithSymbol) OnAsciiGame(gameProp *GameP
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
-		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
+		asciigame.OutputOtherScene("after GenSymbolValsWithSymbol", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil

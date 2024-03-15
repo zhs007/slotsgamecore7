@@ -60,6 +60,18 @@ func (pool *GameScenePoolEx) new(w, h int) *GameScene {
 	return s
 }
 
+func (pool *GameScenePoolEx) new2(w, h int, v int) *GameScene {
+	s, err := NewGameScene2(w, h, v)
+	if err != nil {
+		goutils.Error("GameScenePoolEx.new2:NewGameScene2",
+			zap.Error(err))
+
+		return nil
+	}
+
+	return s
+}
+
 func (pool *GameScenePoolEx) Put(scene *GameScene) {
 	// pool.Lock.Lock()
 	// defer pool.Lock.Unlock()
@@ -75,7 +87,7 @@ func (pool *GameScenePoolEx) Reset() {
 	}
 }
 
-func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
+func (pool *GameScenePoolEx) New(w, h int) *GameScene {
 	// pool.Lock.Lock()
 	// defer pool.Lock.Unlock()
 
@@ -90,9 +102,37 @@ func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
 		gs := p.get()
 
 		if gs != nil {
-			if isNeedClear {
-				gs.Clear(0)
-			}
+			p.inUsed(gs)
+
+			return gs
+		}
+	} else {
+		p = newGameScenePool()
+
+		mps[h] = p
+	}
+
+	gs := pool.new2(w, h, 0)
+	p.inUsed(gs)
+	return gs
+}
+
+func (pool *GameScenePoolEx) New2(w, h int, v int) *GameScene {
+	// pool.Lock.Lock()
+	// defer pool.Lock.Unlock()
+
+	mps, isok := pool.MapPools[w]
+	if !isok {
+		mps = make(map[int]*gameScenePool)
+		pool.MapPools[w] = mps
+	}
+
+	p, isok := mps[h]
+	if isok {
+		gs := p.get()
+
+		if gs != nil {
+			gs.Clear(v)
 
 			p.inUsed(gs)
 
@@ -104,7 +144,7 @@ func (pool *GameScenePoolEx) New(w, h int, isNeedClear bool) *GameScene {
 		mps[h] = p
 	}
 
-	gs := pool.new(w, h)
+	gs := pool.new2(w, h, v)
 	p.inUsed(gs)
 	return gs
 }

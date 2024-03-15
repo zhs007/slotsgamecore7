@@ -137,7 +137,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						if os != nil {
 							nos = os.CloneEx(gameProp.PoolScene)
 						} else {
-							nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), true)
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
 						}
 					}
 
@@ -162,7 +162,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						if os != nil {
 							nos = os.CloneEx(gameProp.PoolScene)
 						} else {
-							nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), true)
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
 						}
 					}
 
@@ -191,7 +191,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnAsciiGame(gameProp *GameProp
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
-		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
+		asciigame.OutputOtherScene("after GenSymbolValsWithPos", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil

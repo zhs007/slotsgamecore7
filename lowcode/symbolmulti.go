@@ -121,7 +121,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	gs := symbolMulti.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if gs.HasSymbols(symbolMulti.SymbolCodes) {
-		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
+		os := gameProp.PoolScene.New(gs.Width, gs.Height)
 
 		if symbolMulti.WeightMulti == nil {
 			for x, arr := range gs.Arr {
