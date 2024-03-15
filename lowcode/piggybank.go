@@ -220,7 +220,7 @@ func (jwt *jsonPiggyBank) build() *PiggyBankConfig {
 		WinMulti: jwt.WinMulti,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

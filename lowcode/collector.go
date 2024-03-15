@@ -220,7 +220,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		ccd.ClearConfigIntVal(CCVValueNum)
 	}
 
-	gs := collector.GetTargetScene3(gameProp, curpr, prs, &ccd.BasicComponentData, collector.Name, "", 0)
+	gs := collector.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	nn := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
 		return cursymbol == collector.SymbolCode
@@ -358,7 +358,7 @@ func (jcfg *jsonCollector) build() *CollectorConfig {
 		IsCycle: jcfg.IsCycle == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

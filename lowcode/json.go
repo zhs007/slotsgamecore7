@@ -415,6 +415,17 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapStrWeights[name] = vm2
+		} else if t == "IntValWeight" {
+			vm2, err := parseIntValWeights(v.Get("fileJson"))
+			if err != nil {
+				goutils.Error("loadOtherList:parseIntValWeights",
+					zap.Int("i", i),
+					zap.Error(err))
+
+				return err
+			}
+
+			cfg.mapValWeights[name] = vm2
 		} else {
 			goutils.Error("loadOtherList",
 				zap.Int("i", i),
@@ -773,6 +784,72 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseGenSymbolValsWithPos(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseGenSymbolValsWithPos",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "checksymbolvals" {
+				componentName, err := parseCheckSymbolVals(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseCheckSymbolVals",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "positioncollection" {
+				componentName, err := parsePositionCollection(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parsePositionCollection",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "chgsymbolvals" {
+				componentName, err := parseChgSymbolVals(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseChgSymbolVals",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "chgsymbols" {
+				componentName, err := parseChgSymbols(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseChgSymbols",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "gensymbolvalswithsymbol" {
+				componentName, err := parseGenSymbolValsWithSymbol(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseGenSymbolValsWithSymbol",
+						zap.Int("i", i),
+						zap.Error(err))
+
+					return err
+				}
+
+				mapComponentName[id] = componentName
+			} else if componentType == "symbolvalswins" {
+				componentName, err := parseSymbolValWins(cfg, &cell)
+				if err != nil {
+					goutils.Error("loadCells:parseSymbolValWins",
 						zap.Int("i", i),
 						zap.Error(err))
 

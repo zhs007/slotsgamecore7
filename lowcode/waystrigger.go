@@ -469,8 +469,8 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	std := icd.(*WaysTriggerData)
 	std.OnNewStep(gameProp, waysTrigger)
 
-	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, waysTrigger.Name, "", 0)
-	os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")
+	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
+	os := waysTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
@@ -751,7 +751,7 @@ func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
 		WinMulti:      jwt.WinMulti,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

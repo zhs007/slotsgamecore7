@@ -109,10 +109,10 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := icd.(*BasicComponentData)
 
-	gs := symbolVal2.GetTargetScene3(gameProp, curpr, prs, cd, symbolVal2.Name, "", 0)
+	gs := symbolVal2.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if gs.HasSymbol(symbolVal2.SymbolCode) {
-		os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
+		os := gameProp.PoolScene.New(gs.Width, gs.Height)
 		// os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
 		// if err != nil {
 		// 	goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
@@ -180,7 +180,7 @@ func (symbolVal2 *SymbolVal2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
-		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
+		asciigame.OutputOtherScene("after SymbolVal2", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil

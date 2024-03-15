@@ -37,7 +37,7 @@ func parseGenSymbolValsWithPosType(strType string) GenSymbolValsWithPosType {
 // GenSymbolValsWithPosConfig - configuration for GenSymbolValsWithPos
 type GenSymbolValsWithPosConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	TargetComponents     []string                 `yaml:"TargetComponents" json:"TargetComponents"`
+	TargetComponents     []string                 `yaml:"targetComponents" json:"targetComponents"`
 	StrType              string                   `yaml:"genType" json:"genType"`
 	Type                 GenSymbolValsWithPosType `yaml:"-" json:"-"`
 	ValMapping           string                   `yaml:"valMapping" json:"valMapping"`
@@ -119,7 +119,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 	var os *sgc7game.GameScene
 
 	if genSymbolValsWithPos.Config.IsUseSource {
-		os = genSymbolValsWithPos.GetTargetOtherScene3(gameProp, curpr, prs, cd, genSymbolValsWithPos.Name, "", 0)
+		os = genSymbolValsWithPos.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	}
 
 	nos := os
@@ -137,7 +137,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						if os != nil {
 							nos = os.CloneEx(gameProp.PoolScene)
 						} else {
-							nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), true)
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
 						}
 					}
 
@@ -162,7 +162,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						if os != nil {
 							nos = os.CloneEx(gameProp.PoolScene)
 						} else {
-							nos = gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), true)
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
 						}
 					}
 
@@ -191,7 +191,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnAsciiGame(gameProp *GameProp
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
-		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
+		asciigame.OutputOtherScene("after GenSymbolValsWithPos", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil
@@ -218,7 +218,7 @@ func NewGenSymbolValsWithPos(name string) IComponent {
 // ],
 // "genType": "add"
 type jsonGenSymbolValsWithPos struct {
-	TargetComponents []string `json:"TargetComponents"`
+	TargetComponents []string `json:"targetComponents"`
 	StrType          string   `json:"genType"`
 	ValMapping       string   `json:"valMapping"`
 	IsUseSource      string   `json:"isUseSource"`
@@ -234,7 +234,7 @@ func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
 		IsAlwaysGen:      jcfg.IsAlwaysGen == "true",
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

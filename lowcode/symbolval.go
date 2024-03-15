@@ -109,14 +109,14 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := icd.(*BasicComponentData)
 
-	gs := symbolVal.GetTargetScene3(gameProp, curpr, prs, cd, symbolVal.Name, "", 0)
+	gs := symbolVal.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if gs.HasSymbol(symbolVal.SymbolCode) {
 		vw := symbolVal.GetWeightVal(gameProp, cd)
 
-		os1 := symbolVal.GetTargetOtherScene2(gameProp, curpr, cd, symbolVal.Name, "")
+		os1 := symbolVal.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 		if os1 == nil {
-			os := gameProp.PoolScene.New(gs.Width, gs.Height, false)
+			os := gameProp.PoolScene.New(gs.Width, gs.Height)
 
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
@@ -190,7 +190,7 @@ func (symbolVal *SymbolVal) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedOtherScenes) > 0 {
-		asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
+		asciigame.OutputOtherScene("after SymbolVal", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil

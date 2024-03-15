@@ -134,26 +134,28 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	bcd := cd.(*RemoveSymbolsData)
 
-	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, &bcd.BasicComponentData, removeSymbols.Name, "", 0)
+	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
 	bcd.RemovedNum = 0
 
 	for _, cn := range removeSymbols.Config.TargetComponents {
 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
-		lst := ccd.GetResults()
-		for _, ri := range lst {
-			for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-				x := curpr.Results[ri].Pos[pi*2]
-				y := curpr.Results[ri].Pos[pi*2+1]
-				if removeSymbols.canRemove(x, y, ngs) {
-					if ngs == gs {
-						ngs = gs.CloneEx(gameProp.PoolScene)
+		if ccd != nil {
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+					x := curpr.Results[ri].Pos[pi*2]
+					y := curpr.Results[ri].Pos[pi*2+1]
+					if removeSymbols.canRemove(x, y, ngs) {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = -1
+
+						bcd.RemovedNum++
 					}
-
-					ngs.Arr[x][y] = -1
-
-					bcd.RemovedNum++
 				}
 			}
 		}
@@ -233,7 +235,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 		IgnoreSymbols:    jcfg.IgnoreSymbols,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

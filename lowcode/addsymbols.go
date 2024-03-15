@@ -123,7 +123,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd.UsedScenes = nil
 
-	gs := addSymbols.GetTargetScene3(gameProp, curpr, prs, cd, addSymbols.Name, "", 0)
+	gs := addSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	num := addSymbols.Config.SymbolNum
 
@@ -233,7 +233,7 @@ func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
 		IgnoreSymbols:   jcfg.IgnoreSymbols,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -104,7 +104,7 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) OnPlayGame(gameProp *GameProperty,
 
 	cd := icd.(*BasicComponentData)
 
-	gs := replaceSymbolGroup.GetTargetScene3(gameProp, curpr, prs, cd, replaceSymbolGroup.Name, "", 0)
+	gs := replaceSymbolGroup.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
 	for x, arr := range gs.Arr {
@@ -188,7 +188,7 @@ func (jcfg *jsonReplaceSymbolGroup) build() *ReplaceSymbolGroupConfig {
 		cfg.TargetSymbols = append(cfg.TargetSymbols, s.TargetSymbol)
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

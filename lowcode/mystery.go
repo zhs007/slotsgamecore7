@@ -157,9 +157,9 @@ func (mystery *Mystery) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	mcd := cd.(*MysteryData)
 
-	gs := mystery.GetTargetScene3(gameProp, curpr, prs, &mcd.BasicComponentData, mystery.Name, "", 0)
+	gs := mystery.GetTargetScene3(gameProp, curpr, prs, 0)
 	if !gs.HasSymbols(mystery.MysterySymbols) {
-		mystery.ReTagScene(gameProp, curpr, mcd.TargetSceneIndex, &mcd.BasicComponentData)
+		// mystery.ReTagScene(gameProp, curpr, mcd.TargetSceneIndex, &mcd.BasicComponentData)
 	} else {
 		if mystery.MysteryWeights != nil {
 			if mystery.Config.MysteryRNG != "" {

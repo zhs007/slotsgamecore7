@@ -272,6 +272,12 @@ message WinResultCacheData {
     int32 winResultNum = 4;
 }
 
+// PositionCollectionData
+message PositionCollectionData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

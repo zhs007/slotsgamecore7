@@ -70,8 +70,8 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	bcd := cd.(*BasicComponentData)
 
-	gs1 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, mergeSymbol.Name, mergeSymbol.Config.SrcScene[0], 0)
-	gs2 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, bcd, mergeSymbol.Name+":1", mergeSymbol.Config.SrcScene[1], 1)
+	gs1 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
+	gs2 := mergeSymbol.GetTargetScene3(gameProp, curpr, prs, 1)
 
 	sc2 := gs1.CloneEx(gameProp.PoolScene)
 
@@ -96,8 +96,8 @@ func (mergeSymbol *MergeSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	mergeSymbol.AddScene(gameProp, curpr, sc2, bcd)
 
-	os1 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, bcd, mergeSymbol.Name, "")
-	os2 := mergeSymbol.GetTargetOtherScene2(gameProp, curpr, bcd, mergeSymbol.Name+":1", "")
+	os1 := mergeSymbol.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	os2 := mergeSymbol.GetTargetOtherScene3(gameProp, curpr, prs, 1)
 	if os1 != nil || os2 != nil {
 		var os3 *sgc7game.GameScene
 

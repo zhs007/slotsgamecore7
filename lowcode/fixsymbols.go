@@ -129,9 +129,9 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	bcd := cd.(*BasicComponentData)
 
-	gs := fixSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, fixSymbols.Name, "", 0)
+	gs := fixSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	needReTag := true
+	// needReTag := true
 	if fixSymbols.Type == FixSymbolsTypeMergeDown {
 		xarr, _ := fixSymbols.isNeedMergeDown(gs)
 		if len(xarr) > 0 {
@@ -147,13 +147,13 @@ func (fixSymbols *FixSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			fixSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
-			needReTag = false
+			// needReTag = false
 		}
 	}
 
-	if needReTag {
-		fixSymbols.ReTagScene(gameProp, curpr, bcd.TargetSceneIndex, bcd)
-	}
+	// if needReTag {
+	// 	fixSymbols.ReTagScene(gameProp, curpr, bcd.TargetSceneIndex, bcd)
+	// }
 
 	nc := fixSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -166,7 +166,7 @@ func (fixSymbols *FixSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	bcd := cd.(*BasicComponentData)
 
 	if len(bcd.UsedScenes) > 0 {
-		asciigame.OutputScene("The value of the symbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
+		asciigame.OutputScene("after FixSymbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil

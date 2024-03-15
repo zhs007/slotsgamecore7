@@ -160,7 +160,7 @@ func (jcfg *jsonIntValMapping) build() *IntValMappingConfig {
 		InputVal:   jcfg.InputVal,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

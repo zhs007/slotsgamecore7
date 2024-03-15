@@ -84,7 +84,7 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 
 	bcd := cd.(*BasicComponentData)
 
-	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, bcd, dropDownSymbols.Name, "", 0)
+	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	if !gs.HasSymbol(-1) {
 		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -165,7 +165,7 @@ func (jcfg *jsonDropDownSymbols) build() *DropDownSymbolsConfig {
 		HoldSymbols: jcfg.HoldSymbols,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -3,6 +3,8 @@ package lowcode
 import (
 	"os"
 
+	"github.com/bytedance/sonic"
+	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -15,6 +17,21 @@ import (
 )
 
 const SymbolValWinsTypeName = "symbolValWins"
+
+type SymbolValWinsType int
+
+const (
+	SVWTypeNormal    SymbolValWinsType = 0
+	SVWTypeCollector SymbolValWinsType = 1
+)
+
+func parseSymbolValWinsType(strType string) SymbolValWinsType {
+	if strType == "collector" {
+		return SVWTypeCollector
+	}
+
+	return SVWTypeNormal
+}
 
 const (
 	SVWDVWins      string = "wins"      // 中奖的数值，线注的倍数
@@ -84,20 +101,25 @@ func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
 // SymbolValWinsConfig - configuration for SymbolValWins
 type SymbolValWinsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	BetTypeString        string  `yaml:"betType" json:"betType"`   // bet or totalBet or noPay
-	BetType              BetType `yaml:"-" json:"-"`               // bet or totalBet or noPay
-	WinMulti             int     `yaml:"winMulti" json:"winMulti"` // bet or totalBet
-	// TriggerSymbol        string `yaml:"triggerSymbol" json:"triggerSymbol"` // like collect
-	// TriggerSymbolCode    int    `json:"-"`                                  //
-	// Type                    string `yaml:"type" json:"type"`                                       // like scatters
-	// MinNum                  int  `yaml:"minNum" json:"minNum"`                                   // like 3
-	// IsTriggerSymbolNumMulti bool `yaml:"isTriggerSymbolNumMulti" json:"isTriggerSymbolNumMulti"` // totalwins = totalvals * triggetSymbol's num
+	BetTypeString        string            `yaml:"betType" json:"betType"`   // bet or totalBet or noPay
+	BetType              BetType           `yaml:"-" json:"-"`               // bet or totalBet or noPay
+	WinMulti             int               `yaml:"winMulti" json:"winMulti"` // bet or totalBet
+	Symbols              []string          `yaml:"symbols" json:"symbols"`   // like collect
+	SymbolCodes          []int             `json:"-"`                        //
+	StrType              string            `yaml:"type" json:"type"`
+	Type                 SymbolValWinsType `yaml:"-" json:"-"`
+}
+
+// SetLinkComponent
+func (cfg *SymbolValWinsConfig) SetLinkComponent(link string, componentName string) {
+	if link == "next" {
+		cfg.DefaultNextComponent = componentName
+	}
 }
 
 type SymbolValWins struct {
 	*BasicComponent `json:"-"`
 	Config          *SymbolValWinsConfig `json:"config"`
-	// TriggerSymbolCode int                  `json:"-"`
 }
 
 // Init -
@@ -131,12 +153,18 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 	symbolValWins.Config.ComponentType = SymbolValWinsTypeName
 
 	symbolValWins.Config.BetType = ParseBetType(symbolValWins.Config.BetTypeString)
+	symbolValWins.Config.Type = parseSymbolValWinsType(symbolValWins.Config.StrType)
 
-	// if symbolValWins.Config.TriggerSymbol != "" {
-	// 	symbolValWins.TriggerSymbolCode = pool.DefaultPaytables.MapSymbols[symbolValWins.Config.TriggerSymbol]
-	// } else {
-	// 	symbolValWins.TriggerSymbolCode = -1
-	// }
+	for _, s := range symbolValWins.Config.Symbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("SymbolValWins.InitEx:Symbol",
+				zap.String("symbol", s),
+				zap.Error(ErrIvalidSymbol))
+		}
+
+		symbolValWins.Config.SymbolCodes = append(symbolValWins.Config.SymbolCodes, sc)
+	}
 
 	symbolValWins.onInit(&symbolValWins.Config.BasicComponentConfig)
 
@@ -178,9 +206,25 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// if isTrigger {
 	// svwd.CollectorNum = symbolnum
 
-	os := symbolValWins.GetTargetOtherScene2(gameProp, curpr, &svwd.BasicComponentData, symbolValWins.Name, "")
+	os := symbolValWins.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	if os != nil {
+		mul := 0
+		if symbolValWins.Config.Type == SVWTypeCollector {
+			gs := symbolValWins.GetTargetScene3(gameProp, curpr, prs, 0)
+			if gs != nil {
+				for _, arr := range gs.Arr {
+					for _, s := range arr {
+						if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
+							mul++
+						}
+					}
+				}
+			}
+		} else {
+			mul = 1
+		}
+
 		totalvals := 0
 		pos := make([]int, 0, len(os.Arr)*len(os.Arr[0])*2)
 
@@ -195,25 +239,27 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 			}
 		}
 
-		if totalvals > 0 {
+		if totalvals > 0 && mul > 0 {
 			ret := &sgc7game.Result{
 				Symbol:     -1, //gs.Arr[pos[0]][pos[1]],
 				Type:       sgc7game.RTSymbolVal,
 				LineIndex:  -1,
 				Pos:        pos,
 				SymbolNums: len(pos) / 2,
+				Mul:        mul,
 			}
 
 			bet := gameProp.GetBet2(stake, symbolValWins.Config.BetType)
 
-			mul := symbolValWins.GetWinMulti(&svwd.BasicComponentData) //1 //gameProp.GetVal(GamePropGameCoinMulti) * gameProp.GetVal(GamePropStepCoinMulti)
+			othermul := symbolValWins.GetWinMulti(&svwd.BasicComponentData) //1 //gameProp.GetVal(GamePropGameCoinMulti) * gameProp.GetVal(GamePropStepCoinMulti)
 
 			// if symbolValWins.Config.IsTriggerSymbolNumMulti {
 			// 	ret.CoinWin = totalvals * symbolnum * mul
 			// 	ret.CashWin = ret.CoinWin * bet
 			// } else {
-			ret.CoinWin = totalvals * mul
+			ret.CoinWin = totalvals * mul * othermul
 			ret.CashWin = ret.CoinWin * bet
+			ret.OtherMul = othermul
 			// }
 
 			svwd.Wins = ret.CoinWin
@@ -313,4 +359,66 @@ func NewSymbolValWins(name string) IComponent {
 	return &SymbolValWins{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
+}
+
+type jsonSymbolValWins struct {
+	BetType  string   `json:"betType"`  // bet or totalBet or noPay
+	WinMulti int      `json:"winMulti"` // bet or totalBet
+	Symbols  []string `json:"symbols"`  // like collect
+	Type     string   `yaml:"type" json:"type"`
+}
+
+func (jcfg *jsonSymbolValWins) build() *SymbolValWinsConfig {
+	cfg := &SymbolValWinsConfig{
+		BetTypeString: jcfg.BetType,
+		WinMulti:      jcfg.WinMulti,
+		Symbols:       jcfg.Symbols,
+		StrType:       jcfg.Type,
+	}
+
+	// cfg.UseSceneV3 = true
+
+	return cfg
+}
+
+func parseSymbolValWins(gamecfg *Config, cell *ast.Node) (string, error) {
+	cfg, label, _, err := getConfigInCell(cell)
+	if err != nil {
+		goutils.Error("parseSymbolValWins:getConfigInCell",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	buf, err := cfg.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseSymbolValWins:MarshalJSON",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	data := &jsonSymbolValWins{}
+
+	err = sonic.Unmarshal(buf, data)
+	if err != nil {
+		goutils.Error("parseSymbolValWins:Unmarshal",
+			zap.Error(err))
+
+		return "", err
+	}
+
+	cfgd := data.build()
+
+	gamecfg.mapConfig[label] = cfgd
+	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
+	ccfg := &ComponentConfig{
+		Name: label,
+		Type: SymbolValWinsTypeName,
+	}
+
+	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+
+	return label, nil
 }

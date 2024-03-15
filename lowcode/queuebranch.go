@@ -191,7 +191,7 @@ type jsonQueueBranch struct {
 func (jcfg *jsonQueueBranch) build() *QueueBranchConfig {
 	cfg := &QueueBranchConfig{}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

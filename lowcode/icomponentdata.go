@@ -50,6 +50,16 @@ type IComponentData interface {
 	AddSymbol(symbolCode int)
 
 	//----------------------------
+	// PositionCollection
+
+	// GetPos -
+	GetPos() []int
+	// HasPos -
+	HasPos(x int, y int) bool
+	// AddPos -
+	AddPos(x int, y int)
+
+	//----------------------------
 	// Respin
 
 	// GetLastRespinNum -

@@ -235,7 +235,7 @@ func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 		Weight: jwr.Weight,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -116,7 +116,7 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd.UsedScenes = nil
 
-	gs := genGigaSymbol.GetTargetScene3(gameProp, curpr, prs, cd, genGigaSymbol.Name, "", 0)
+	gs := genGigaSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
 	w := gs.Width - genGigaSymbol.Config.GigaWidth + 1
@@ -256,7 +256,7 @@ func (jcfg *jsonGenGigaSymbol) build() *GenGigaSymbolConfig {
 		Symbol:     jcfg.Symbol,
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

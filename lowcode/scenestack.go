@@ -6,15 +6,14 @@ import (
 )
 
 type SceneStackData struct {
-	Component   string
-	SceneIndex  int
-	Scene       *sgc7game.GameScene
-	IsNeedCache bool
+	Component  string
+	SceneIndex int
+	Scene      *sgc7game.GameScene
 }
 
 type SceneStack struct {
-	Scenes      []*SceneStackData
-	CacheScenes []*SceneStackData
+	Scenes []*SceneStackData
+	// CacheScenes []*SceneStackData
 }
 
 // func (stack *SceneStack) Push(scene string, index int) {
@@ -24,19 +23,18 @@ type SceneStack struct {
 // 	})
 // }
 
-func (stack *SceneStack) Push(scene string, index int, gs *sgc7game.GameScene, isNeedCache bool) {
+func (stack *SceneStack) Push(scene string, index int, gs *sgc7game.GameScene) {
 	ssd := &SceneStackData{
-		Component:   scene,
-		SceneIndex:  index,
-		Scene:       gs,
-		IsNeedCache: isNeedCache,
+		Component:  scene,
+		SceneIndex: index,
+		Scene:      gs,
 	}
 
 	stack.Scenes = append(stack.Scenes, ssd)
 
-	if isNeedCache {
-		stack.CacheScenes = append(stack.CacheScenes, ssd)
-	}
+	// if isNeedCache {
+	// 	stack.CacheScenes = append(stack.CacheScenes, ssd)
+	// }
 }
 
 func (stack *SceneStack) Pop() *SceneStackData {
@@ -61,8 +59,8 @@ func (stack *SceneStack) GetTopScene(curpr *sgc7game.PlayResult, prs []*sgc7game
 			return nil
 		}
 
-		stack.Push("", 0, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1], false)
-		curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		stack.Push("", 0, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		// curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
 		// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
 
 		return stack.GetTopScene(curpr, prs)
@@ -121,15 +119,15 @@ func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *Basic
 func (stack *SceneStack) onStepStart(pr *sgc7game.PlayResult) {
 	stack.Scenes = nil
 
-	for _, v := range stack.CacheScenes {
-		v.SceneIndex = len(pr.Scenes)
+	// for _, v := range stack.CacheScenes {
+	// 	v.SceneIndex = len(pr.Scenes)
 
-		pr.Scenes = append(pr.Scenes, v.Scene)
+	// 	pr.Scenes = append(pr.Scenes, v.Scene)
 
-		stack.Scenes = append(stack.Scenes, v)
-	}
+	// 	stack.Scenes = append(stack.Scenes, v)
+	// }
 
-	stack.CacheScenes = nil
+	// stack.CacheScenes = nil
 }
 
 func NewSceneStack() *SceneStack {

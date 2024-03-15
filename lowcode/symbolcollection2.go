@@ -326,7 +326,7 @@ type jsonSymbolCollection2 struct {
 func (jr *jsonSymbolCollection2) build() *SymbolCollection2Config {
 	cfg := &SymbolCollection2Config{}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }

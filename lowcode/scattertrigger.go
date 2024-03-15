@@ -468,8 +468,8 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	std := icd.(*ScatterTriggerData)
 	std.OnNewStep(gameProp, scatterTrigger)
 
-	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, &std.BasicComponentData, scatterTrigger.Name, "", 0)
-	os := scatterTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, scatterTrigger.Name, "")
+	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
+	os := scatterTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
@@ -951,7 +951,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		cfg.PosArea[i]--
 	}
 
-	cfg.UseSceneV3 = true
+	// cfg.UseSceneV3 = true
 
 	return cfg
 }
