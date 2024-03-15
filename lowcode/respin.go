@@ -94,7 +94,7 @@ func (respinData *RespinData) IsRespinStarted() bool {
 
 // ChgConfigIntVal -
 func (respinData *RespinData) ChgConfigIntVal(key string, off int) {
-	if key == "lastRespinNum" {
+	if key == CCVLastRespinNum {
 		respinData.AddRespinTimes(off)
 	} else {
 		respinData.BasicComponentData.ChgConfigIntVal(key, off)

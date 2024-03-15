@@ -562,19 +562,14 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plu
 		return ErrInvalidComponentName
 	}
 
+	pool.pushTrigger(gameProp, plugin, curpr, gp, ic, num)
+
+	return nil
+}
+
+func (pool *GamePropertyPool) pushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, ic IComponent, num int) error {
 	cd := gameProp.GetGlobalComponentData(ic)
 	cd.PushTriggerRespin(gameProp, plugin, curpr, gp, num)
-
-	// ir, isok := ic.(IRespin)
-	// if !isok {
-	// 	goutils.Error("GamePropertyPool.PushTrigger",
-	// 		zap.String("name", name),
-	// 		zap.Error(ErrNotRespin))
-
-	// 	return ErrNotRespin
-	// }
-
-	// ir.PushTrigger(gameProp, plugin, curpr, gp, num)
 
 	return nil
 }
