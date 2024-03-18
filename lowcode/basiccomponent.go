@@ -645,6 +645,16 @@ func (basicComponent *BasicComponent) GetAllLinkComponents() []string {
 	return []string{basicComponent.Config.DefaultNextComponent}
 }
 
+// GetNextLinkComponents - get next link components
+func (basicComponent *BasicComponent) GetNextLinkComponents() []string {
+	return []string{basicComponent.Config.DefaultNextComponent}
+}
+
+// GetChildLinkComponents - get child link components
+func (basicComponent *BasicComponent) GetChildLinkComponents() []string {
+	return nil
+}
+
 // CanTriggerWithScene -
 func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	goutils.Error("BasicComponent.CanTriggerWithScene",

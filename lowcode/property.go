@@ -1101,29 +1101,6 @@ func (gameProp *GameProperty) GetCurCallStackSymbol() int {
 	return gameProp.callStack.GetCurCallStackSymbol()
 }
 
-// // GetAllLinkComponents - get all link components
-// func (gameProp *GameProperty) GetAllLinkComponents(componentName string) []string {
-// 	ic, isok := gameProp.Components.MapComponents[componentName]
-// 	if !isok || !ic.IsMask() {
-// 		goutils.Error("GameProperty.GetAllLinkComponents",
-// 			zap.String("name", componentName),
-// 			zap.Error(ErrIvalidComponentName))
-
-// 		return nil
-// 	}
-
-// 	lst := []string{componentName}
-
-// 	curlst := ic.GetAllLinkComponents()
-// 	for _, v := range curlst {
-// 		lst = append(lst, v)
-// 		children := gameProp.GetAllLinkComponents(v)
-// 		lst = append(lst, children...)
-// 	}
-
-// 	return lst
-// }
-
 func init() {
 	MapProperty = make(map[string]int)
 

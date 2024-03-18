@@ -635,6 +635,11 @@ func (clusterTrigger *ClusterTrigger) GetAllLinkComponents() []string {
 	return []string{clusterTrigger.Config.DefaultNextComponent, clusterTrigger.Config.JumpToComponent}
 }
 
+// GetNextLinkComponents - get next link components
+func (clusterTrigger *ClusterTrigger) GetNextLinkComponents() []string {
+	return []string{clusterTrigger.Config.DefaultNextComponent, clusterTrigger.Config.JumpToComponent}
+}
+
 func (clusterTrigger *ClusterTrigger) getSymbols(gameProp *GameProperty) []int {
 	s := gameProp.GetCurCallStackSymbol()
 	if s >= 0 {

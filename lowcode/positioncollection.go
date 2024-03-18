@@ -215,6 +215,11 @@ func (positionCollection *PositionCollection) GetAllLinkComponents() []string {
 	return []string{positionCollection.Config.DefaultNextComponent, positionCollection.Config.ForeachComponent}
 }
 
+// GetChildLinkComponents - get next link components
+func (positionCollection *PositionCollection) GetChildLinkComponents() []string {
+	return []string{positionCollection.Config.ForeachComponent}
+}
+
 func NewPositionCollection(name string) IComponent {
 	return &PositionCollection{
 		BasicComponent: NewBasicComponent(name, 0),

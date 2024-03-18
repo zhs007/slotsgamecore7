@@ -543,6 +543,11 @@ func (respin *Respin) GetAllLinkComponents() []string {
 	return []string{respin.Config.DefaultNextComponent, respin.Config.MainComponent}
 }
 
+// GetChildLinkComponents - get child link components
+func (respin *Respin) GetChildLinkComponents() []string {
+	return []string{respin.Config.MainComponent}
+}
+
 func NewRespin(name string) IComponent {
 	return &Respin{
 		BasicComponent: NewBasicComponent(name, 0),

@@ -903,6 +903,11 @@ func (linesTrigger *LinesTrigger) GetAllLinkComponents() []string {
 	return []string{linesTrigger.Config.DefaultNextComponent, linesTrigger.Config.JumpToComponent}
 }
 
+// GetNextLinkComponents - get next link components
+func (linesTrigger *LinesTrigger) GetNextLinkComponents() []string {
+	return []string{linesTrigger.Config.DefaultNextComponent, linesTrigger.Config.JumpToComponent}
+}
+
 // CanTriggerWithScene -
 func (linesTrigger *LinesTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	return linesTrigger.canTrigger(gameProp, gs, nil, curpr, stake)

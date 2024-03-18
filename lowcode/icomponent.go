@@ -53,6 +53,11 @@ type IComponent interface {
 	// GetAllLinkComponents - get all link components
 	GetAllLinkComponents() []string
 
+	// GetNextLinkComponents - get next link components
+	GetNextLinkComponents() []string
+	// GetChildLinkComponents - get child link components
+	GetChildLinkComponents() []string
+
 	// CanTriggerWithScene -
 	CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result)
 

@@ -38,6 +38,7 @@ func main() {
 	}
 
 	lowcode.SetJsonMode()
+	lowcode.SetAllowStatsV2()
 
 	game, err := lowcode.NewGame3(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
