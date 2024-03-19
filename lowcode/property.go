@@ -945,7 +945,7 @@ func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult,
 			ic, isok := gameProp.Components.MapComponents[v]
 			if isok {
 				if !gameProp.stats2Cache.HasFeature(v) {
-					ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v))
+					gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
 				}
 
 				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)

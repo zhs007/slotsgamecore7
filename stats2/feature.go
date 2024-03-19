@@ -13,6 +13,16 @@ type Feature struct {
 	Wins        *StatsWins        // wins
 }
 
+func (f2 *Feature) onStatsGame(bet int) {
+	if f2.Trigger != nil {
+		f2.Trigger.TotalTimes++
+	}
+
+	if f2.RootTrigger != nil {
+		f2.RootTrigger.TotalTimes++
+	}
+}
+
 func (f2 *Feature) procCacheStatsWins(win int64) {
 	if f2.Wins != nil {
 		f2.Wins.TotalWin += win
