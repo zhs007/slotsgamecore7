@@ -44,6 +44,8 @@ type IComponent interface {
 
 	// IsRespin -
 	IsRespin() bool
+	// IsForeach -
+	IsForeach() bool
 
 	// NewStats2 -
 	NewStats2() *stats2.Feature

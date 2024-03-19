@@ -140,4 +140,7 @@ var (
 
 	// ErrInvalidCallStackNode - invalid callstack node
 	ErrInvalidCallStackNode = errors.New("invalid callstack node")
+
+	// ErrInvalidComponentChildren - invalid component children
+	ErrInvalidComponentChildren = errors.New("invalid component children")
 )

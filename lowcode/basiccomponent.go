@@ -524,6 +524,11 @@ func (basicComponent *BasicComponent) IsRespin() bool {
 	return false
 }
 
+// IsForeach -
+func (basicComponent *BasicComponent) IsForeach() bool {
+	return false
+}
+
 // // IsTriggerRespin -
 // func (basicComponent *BasicComponent) IsTriggerRespin() bool {
 // 	return false
