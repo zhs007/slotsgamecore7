@@ -5,15 +5,11 @@ import (
 	"go.uber.org/zap"
 )
 
-type SPCSPNode struct {
-	Component string
-	Children  *SPCNode
-}
-
 type SPCNode struct {
 	Parent           *SPCNode
 	NormalComponents []string
-	Children         []*SPCSPNode
+	Children         []*SPCNode
+	Root             string
 }
 
 func (node *SPCNode) CountComponentNum() int {
@@ -23,7 +19,7 @@ func (node *SPCNode) CountComponentNum() int {
 	num += len(node.Children)
 
 	for _, c := range node.Children {
-		num += c.Children.CountComponentNum()
+		num += c.CountComponentNum()
 	}
 
 	return num
@@ -35,7 +31,7 @@ func (node *SPCNode) CountParentNum() int {
 	num += len(node.Children)
 
 	for _, c := range node.Children {
-		num += c.Children.CountParentNum()
+		num += c.CountParentNum()
 	}
 
 	return num
@@ -46,7 +42,7 @@ func (node *SPCNode) CountDeep() int {
 		num := 1
 
 		for _, c := range node.Children {
-			num += c.Children.CountDeep()
+			num += c.CountDeep()
 		}
 
 		return num
@@ -61,8 +57,10 @@ func (node *SPCNode) AddNormal(componentName string) {
 	}
 }
 
-func (node *SPCNode) AddChild(child *SPCSPNode) {
-	if !node.IsChildren(child.Component) {
+func (node *SPCNode) AddChild(child *SPCNode) {
+	if !node.IsChildren(child.Root) {
+		child.Parent = node
+
 		node.Children = append(node.Children, child)
 	}
 }
@@ -78,7 +76,7 @@ func (node *SPCNode) Format() {
 	node.NormalComponents = lst
 
 	for _, c := range node.Children {
-		c.Children.Format()
+		c.Format()
 	}
 }
 
@@ -88,7 +86,7 @@ func (node *SPCNode) IsInNormal(componentName string) bool {
 
 func (node *SPCNode) IsChildren(componentName string) bool {
 	for _, v := range node.Children {
-		if v.Component == componentName {
+		if v.Root == componentName {
 			return true
 		}
 	}
@@ -98,17 +96,17 @@ func (node *SPCNode) IsChildren(componentName string) bool {
 
 func (node *SPCNode) IsInChildren(componentName string) bool {
 	for _, v := range node.Children {
-		if v.Component == componentName {
+		if v.Root == componentName {
 			return true
 		}
 
-		for _, n := range v.Children.NormalComponents {
+		for _, n := range v.NormalComponents {
 			for n == componentName {
 				return true
 			}
 		}
 
-		if v.Children.IsInChildren(componentName) {
+		if v.IsInChildren(componentName) {
 			return true
 		}
 	}
@@ -149,12 +147,9 @@ func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
 				return nil, err
 			}
 
-			cp := &SPCSPNode{
-				Component: cn,
-				Children:  childNode,
-			}
+			childNode.Root = cn
 
-			node.Children = append(node.Children, cp)
+			node.AddChild(childNode)
 		} else if len(children) > 1 {
 			goutils.Error("parseNextComponents",
 				zap.String("name", cn),
