@@ -584,12 +584,13 @@ func (basicComponent *BasicComponent) GetTargetOtherScene3(gameProp *GamePropert
 }
 
 // NewStats2 -
-func (basicComponent *BasicComponent) NewStats2() *stats2.Feature {
-	return nil
+func (basicComponent *BasicComponent) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, nil)
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Stats) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	s2.ProcStatsTrigger(basicComponent.Name)
 }
 
 // // OnStats2Trigger

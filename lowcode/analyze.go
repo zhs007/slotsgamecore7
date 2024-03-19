@@ -12,6 +12,21 @@ type SPCNode struct {
 	Root             string
 }
 
+func (node *SPCNode) GetParent(component string) string {
+	if goutils.IndexOfStringSlice(node.NormalComponents, component, 0) >= 0 {
+		return node.Root
+	}
+
+	for _, v := range node.Children {
+		p := v.GetParent(component)
+		if p != "" {
+			return p
+		}
+	}
+
+	return ""
+}
+
 func (node *SPCNode) CountComponentNum() int {
 	num := 0
 

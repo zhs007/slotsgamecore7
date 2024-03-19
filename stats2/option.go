@@ -5,7 +5,7 @@ type Option int
 const (
 	OptWins        Option = 1
 	OptSymbolWins  Option = 2
-	OptStepTrigger Option = 3
+	OptRootTrigger Option = 3
 )
 
 type Options []Option

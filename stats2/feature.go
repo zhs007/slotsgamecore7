@@ -7,48 +7,75 @@ import (
 )
 
 type Feature struct {
-	Trigger     *StatsTrigger
-	StepTrigger *StatsTrigger
-	Wins        *StatsWins
+	Parent      string
+	RootTrigger *StatsRootTrigger // 只有respin和foreach才需要这个
+	Trigger     *StatsTrigger     // 普通的trigger，如果在respin或foreach下面，则需要配合它们才能得到正确的统计
+	Wins        *StatsWins        // wins
 }
 
-func (f2 *Feature) OnWins(win int64) {
+func (f2 *Feature) procCacheStatsWins(win int64) {
 	if f2.Wins != nil {
 		f2.Wins.TotalWin += win
 	}
 }
 
-func (f2 *Feature) OnBet(bet int64) {
-	if f2.Wins != nil {
-		f2.Wins.TotalBet += bet
-	}
-
-	if f2.Trigger != nil {
-		f2.Trigger.TotalTimes++
-	}
+func (f2 *Feature) procCacheStatsTrigger() {
+	f2.Trigger.TriggerTimes++
 }
 
-func (f2 *Feature) OnStep() {
-	if f2.StepTrigger != nil {
-		f2.StepTrigger.TotalTimes++
-	}
-}
-
-func (f2 *Feature) OnStepTrigger(isTrigger bool) {
-	if isTrigger {
-		if f2.StepTrigger != nil {
-			f2.StepTrigger.TriggerTimes++
+func (f2 *Feature) procCacheStatsRootTrigger() {
+	if f2.RootTrigger != nil {
+		if f2.RootTrigger.TriggerTimes == 0 {
+			f2.RootTrigger.TriggerTimes++
 		}
+
+		f2.RootTrigger.RunTimes++
 	}
 }
 
-func (f2 *Feature) OnTrigger(isTrigger bool) {
-	if isTrigger {
-		if f2.Trigger != nil {
-			f2.Trigger.TriggerTimes++
-		}
+func (f2 *Feature) procCacheStatsRootTriggerWins(win int64) {
+	if f2.RootTrigger != nil {
+		f2.RootTrigger.TotalWins += win
 	}
 }
+
+// func (f2 *Feature) OnWins(win int64) {
+// 	if f2.Wins != nil {
+// 		f2.Wins.TotalWin += win
+// 	}
+// }
+
+// func (f2 *Feature) OnBet(bet int64) {
+// 	if f2.Wins != nil {
+// 		f2.Wins.TotalBet += bet
+// 	}
+
+// 	if f2.Trigger != nil {
+// 		f2.Trigger.TotalTimes++
+// 	}
+// }
+
+// func (f2 *Feature) OnStep() {
+// 	if f2.StepTrigger != nil {
+// 		f2.StepTrigger.TotalTimes++
+// 	}
+// }
+
+// func (f2 *Feature) OnStepTrigger(isTrigger bool) {
+// 	if isTrigger {
+// 		if f2.StepTrigger != nil {
+// 			f2.StepTrigger.TriggerTimes++
+// 		}
+// 	}
+// }
+
+// func (f2 *Feature) OnTrigger(td *triggerData) {
+// 	// if isTrigger {
+// 	if f2.Trigger != nil {
+// 		f2.Trigger.TriggerTimes++
+// 	}
+// 	// }
+// }
 
 func (f2 *Feature) Clone() *Feature {
 	target := &Feature{}
@@ -57,8 +84,8 @@ func (f2 *Feature) Clone() *Feature {
 		target.Trigger = f2.Trigger.Clone()
 	}
 
-	if f2.StepTrigger != nil {
-		target.StepTrigger = f2.StepTrigger.Clone()
+	if f2.RootTrigger != nil {
+		target.RootTrigger = f2.RootTrigger.Clone()
 	}
 
 	if f2.Wins != nil {
@@ -73,8 +100,8 @@ func (f2 *Feature) Merge(src *Feature) {
 		f2.Trigger.Merge(src.Trigger)
 	}
 
-	if f2.StepTrigger != nil && src.StepTrigger != nil {
-		f2.StepTrigger.Merge(src.StepTrigger)
+	if f2.RootTrigger != nil && src.RootTrigger != nil {
+		f2.RootTrigger.Merge(src.RootTrigger)
 	}
 
 	if f2.Wins != nil && src.Wins != nil {
@@ -90,11 +117,11 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string) {
 		f2.Trigger.SaveSheet(f, sn)
 	}
 
-	if f2.StepTrigger != nil {
-		sn := fmt.Sprintf("%v - stepTrigger", sheet)
+	if f2.RootTrigger != nil {
+		sn := fmt.Sprintf("%v - root trigger", sheet)
 		f.NewSheet(sn)
 
-		f2.StepTrigger.SaveSheet(f, sn)
+		f2.RootTrigger.SaveSheet(f, sn)
 	}
 
 	if f2.Wins != nil {
@@ -105,8 +132,9 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string) {
 	}
 }
 
-func NewFeature(opts Options) *Feature {
+func NewFeature(parent string, opts Options) *Feature {
 	f2 := &Feature{
+		Parent:  parent,
 		Trigger: &StatsTrigger{},
 	}
 
@@ -114,8 +142,8 @@ func NewFeature(opts Options) *Feature {
 		f2.Wins = &StatsWins{}
 	}
 
-	if opts.Has(OptStepTrigger) {
-		f2.StepTrigger = &StatsTrigger{}
+	if opts.Has(OptRootTrigger) {
+		f2.RootTrigger = &StatsRootTrigger{}
 	}
 
 	return f2

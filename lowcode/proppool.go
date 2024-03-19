@@ -226,8 +226,8 @@ func (pool *GamePropertyPool) loadAllWeights() {
 }
 
 func (pool *GamePropertyPool) onInit() {
-	for _, v := range pool.mapComponents {
-		v.onInit()
+	for bet, v := range pool.mapComponents {
+		v.onInit(pool.Config.StartComponents[bet])
 	}
 }
 

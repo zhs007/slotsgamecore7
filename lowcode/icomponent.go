@@ -48,9 +48,9 @@ type IComponent interface {
 	IsForeach() bool
 
 	// NewStats2 -
-	NewStats2() *stats2.Feature
+	NewStats2(parent string) *stats2.Feature
 	// OnStats2
-	OnStats2(icd IComponentData, s2 *stats2.Stats)
+	OnStats2(icd IComponentData, s2 *stats2.Cache)
 
 	// GetAllLinkComponents - get all link components
 	GetAllLinkComponents() []string

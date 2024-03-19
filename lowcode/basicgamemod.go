@@ -234,12 +234,12 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	gameProp.ProcRespin(pr, gp)
 
-	gameProp.onStepEnd(pr, prs)
+	gameProp.onStepEnd(gp, pr, prs)
 
 	if gAllowStats2 && pr.IsFinish {
-		components.Stats2.PushBetEnding()
+		components.Stats2.PushCache(gameProp.stats2Cache)
 
-		gameProp.stats2SpinData.OnBetEnding(components.Stats2)
+		// gameProp.stats2SpinData.OnBetEnding(components.Stats2)
 
 		// for _, curpr := range prs {
 		// 	curpr.
@@ -294,13 +294,14 @@ func (bgm *BasicGameMod) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 // OnNewGame -
 func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake) error {
 	if gAllowStats2 {
-		gameProp.Components.Stats2.PushBet(stake.CashBet / stake.CoinBet)
+		gameProp.Components.Stats2.PushBet(int(stake.CashBet / stake.CoinBet))
 
-		if gameProp.stats2SpinData == nil {
-			gameProp.stats2SpinData = stats2.NewSpinCache()
-		} else {
-			gameProp.stats2SpinData.Clear()
-		}
+		gameProp.stats2Cache = stats2.NewCache(int(stake.CashBet / stake.CoinBet))
+		// if gameProp.stats2SpinData == nil {
+		// 	gameProp.stats2SpinData = stats2.NewSpinCache()
+		// } else {
+		// 	gameProp.stats2SpinData.Clear()
+		// }
 	}
 
 	gameProp.OnNewGame(stake)
@@ -323,9 +324,9 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
-	if gAllowStats2 {
-		gameProp.Components.Stats2.PushStep()
-	}
+	// if gAllowStats2 {
+	// 	gameProp.Components.Stats2.PushStep()
+	// }
 
 	gameProp.OnNewStep()
 

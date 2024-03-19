@@ -71,7 +71,7 @@ type GameProperty struct {
 	Components             *ComponentList
 	SceneStack             *SceneStack
 	OtherSceneStack        *SceneStack
-	stats2SpinData         *stats2.SpinCache
+	stats2Cache            *stats2.Cache
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
@@ -933,12 +933,25 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 	cd.AddSymbol(symbolCode)
 }
 
-func (gameProp *GameProperty) onStepEnd(pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
+func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
 	// // scene v3
 	// if len(gameProp.SceneStack.Scenes) > 0 {
 
 	// 	return
 	// }
+
+	if gAllowStats2 {
+		for _, v := range gp.HistoryComponents {
+			ic, isok := gameProp.Components.MapComponents[v]
+			if isok {
+				if !gameProp.stats2Cache.HasFeature(v) {
+					ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v))
+				}
+
+				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
+			}
+		}
+	}
 
 	if pr.IsFinish {
 		gameProp.PoolScene.Reset()

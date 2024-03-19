@@ -12,6 +12,7 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -421,6 +422,16 @@ func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.Play
 // IsRespin -
 func (respin *Respin) IsRespin() bool {
 	return true
+}
+
+// NewStats2 -
+func (respin *Respin) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptRootTrigger})
+}
+
+// OnStats2
+func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	s2.ProcStatsRootTrigger(respin.Name)
 }
 
 // // IsTriggerRespin -

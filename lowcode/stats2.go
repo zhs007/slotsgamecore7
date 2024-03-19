@@ -140,7 +140,8 @@ func NewStats2(components *ComponentList) *stats2.Stats {
 	s2 := stats2.NewStats()
 
 	for key, ic := range components.MapComponents {
-		sd2 := ic.NewStats2()
+		p := components.statsNodeData.GetParent(key)
+		sd2 := ic.NewStats2(p)
 		if sd2 != nil {
 			s2.AddFeature(key, sd2)
 		}

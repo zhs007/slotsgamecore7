@@ -20,19 +20,19 @@ import (
 
 const MaskTypeName = "mask"
 
-func boolArr2Int(vals []bool) int {
-	iv := 0
+// func boolArr2Int(vals []bool) int {
+// 	iv := 0
 
-	for _, v := range vals {
-		if v {
-			iv = iv*10 + 1
-		} else {
-			iv *= 10
-		}
-	}
+// 	for _, v := range vals {
+// 		if v {
+// 			iv = iv*10 + 1
+// 		} else {
+// 			iv *= 10
+// 		}
+// 	}
 
-	return iv
-}
+// 	return iv
+// }
 
 // const (
 // 	MaskTypeNone         int = 0
