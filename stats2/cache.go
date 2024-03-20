@@ -6,6 +6,10 @@ type Cache struct {
 	TotalWin int64
 }
 
+func (s2 *Cache) GetFeature(name string) *Feature {
+	return s2.MapStats[name]
+}
+
 func (s2 *Cache) HasFeature(name string) bool {
 	_, isok := s2.MapStats[name]
 

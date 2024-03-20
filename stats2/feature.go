@@ -13,7 +13,23 @@ type Feature struct {
 	Wins        *StatsWins        // wins
 }
 
-func (f2 *Feature) onStatsGame(bet int) {
+func (f2 *Feature) onStatsGame(cache *Cache) {
+	if f2.Parent != "" {
+		p := cache.GetFeature(f2.Parent)
+
+		if p != nil && p.RootTrigger != nil {
+			if f2.Trigger != nil {
+				f2.Trigger.TotalTimes += p.RootTrigger.RunTimes
+			}
+
+			if f2.RootTrigger != nil {
+				f2.RootTrigger.TotalTimes += p.RootTrigger.RunTimes
+			}
+
+			return
+		}
+	}
+
 	if f2.Trigger != nil {
 		f2.Trigger.TotalTimes++
 	}
@@ -48,44 +64,6 @@ func (f2 *Feature) procCacheStatsRootTriggerWins(win int64) {
 		f2.RootTrigger.TotalWins += win
 	}
 }
-
-// func (f2 *Feature) OnWins(win int64) {
-// 	if f2.Wins != nil {
-// 		f2.Wins.TotalWin += win
-// 	}
-// }
-
-// func (f2 *Feature) OnBet(bet int64) {
-// 	if f2.Wins != nil {
-// 		f2.Wins.TotalBet += bet
-// 	}
-
-// 	if f2.Trigger != nil {
-// 		f2.Trigger.TotalTimes++
-// 	}
-// }
-
-// func (f2 *Feature) OnStep() {
-// 	if f2.StepTrigger != nil {
-// 		f2.StepTrigger.TotalTimes++
-// 	}
-// }
-
-// func (f2 *Feature) OnStepTrigger(isTrigger bool) {
-// 	if isTrigger {
-// 		if f2.StepTrigger != nil {
-// 			f2.StepTrigger.TriggerTimes++
-// 		}
-// 	}
-// }
-
-// func (f2 *Feature) OnTrigger(td *triggerData) {
-// 	// if isTrigger {
-// 	if f2.Trigger != nil {
-// 		f2.Trigger.TriggerTimes++
-// 	}
-// 	// }
-// }
 
 func (f2 *Feature) Clone() *Feature {
 	target := &Feature{}
