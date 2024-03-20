@@ -25,8 +25,6 @@ func (s2 *Stats) PushCache(cache *Cache) {
 
 func (s2 *Stats) onCache(cache *Cache) {
 	for k, v := range cache.MapStats {
-		// v.onStatsGame(cache)
-
 		s, isok := s2.MapStats[k]
 		if isok {
 			s.Merge(v)

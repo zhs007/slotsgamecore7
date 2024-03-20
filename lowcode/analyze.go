@@ -31,6 +31,10 @@ func (node *SPCNode) GetComponents() []string {
 }
 
 func (node *SPCNode) GetParent(component string) string {
+	if node.Root == component {
+		return node.Parent.Root
+	}
+
 	if goutils.IndexOfStringSlice(node.NormalComponents, component, 0) >= 0 {
 		return node.Root
 	}
