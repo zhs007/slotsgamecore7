@@ -127,7 +127,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		if !isComponentDoNothing {
 			gameProp.OnCallEnd(curComponent, cd, gp)
-			// gameProp.AddComponent2History(curComponent, -1, gp)
 
 			err := curComponent.EachSymbols(gameProp, pr, gp, plugin, ps, stake, prs, cd)
 			if err != nil {
@@ -136,12 +135,22 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 				return nil, err
 			}
-			// gameProp.HistoryComponents = append(gameProp.HistoryComponents, curComponent)
-			// gp.HistoryComponents = append(gp.HistoryComponents, curComponent.GetName())
 		}
 
 		if nextComponentName == "" {
-			break
+			nc, err := gameProp.procRespinBeforeStepEnding(pr, gp)
+			if err != nil {
+				goutils.Error("BasicGameMod.OnPlay:procRespinBeforeStepEnding",
+					zap.Error(err))
+
+				return nil, err
+			}
+
+			if nc == "" {
+				break
+			}
+
+			nextComponentName = nc
 		}
 
 		if gameProp.IsRespin(nextComponentName) && !gameProp.IsEndingRespin(nextComponentName) {
@@ -152,21 +161,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 			break
 		}
-
-		// respinComponent := gameProp.GetStrVal(GamePropRespinComponent)
-		// nextComponentName := gameProp.GetStrVal(GamePropNextComponent)
-		// if respinComponent != "" {
-		// 	// 一般来说，第一次触发respin才走这个分支
-		// 	pr.IsFinish = false
-
-		// 	if nextComponentName == "" {
-		// 		break
-		// 	}
-		// }
-
-		// if nextComponentName == "" {
-		// 	break
-		// }
 
 		c, isok := components.MapComponents[nextComponentName]
 		if !isok {
@@ -192,13 +186,13 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.BuildGameParam(gp)
 
 	err := gameProp.callStack.Each(gameProp, func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error {
-		err := ic.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
-		if err != nil {
-			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
-				zap.Error(err))
+		// err := ic.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
+		// if err != nil {
+		// 	goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
+		// 		zap.Error(err))
 
-			return err
-		}
+		// 	return err
+		// }
 
 		gp.AddComponentData(tag, cd)
 

@@ -254,6 +254,37 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 	}
 }
 
+// procRespinBeforeStepEnding - 这里用来处理当前respin结束后，继续next的流程
+func (gameProp *GameProperty) procRespinBeforeStepEnding(pr *sgc7game.PlayResult, gp *GameParams) (string, error) {
+	if len(gameProp.RespinComponents) > 0 {
+		nextComponent := ""
+		for i := len(gameProp.RespinComponents) - 1; i >= 0; i-- {
+			curRespin := gameProp.RespinComponents[i]
+
+			cr, isok := gameProp.Components.MapComponents[curRespin]
+			if isok {
+				cd := gameProp.GetGlobalComponentData(cr)
+				nc, err := cr.ProcRespinOnStepEnd(gameProp, pr, gp, cd, nextComponent == "")
+				if err != nil {
+					goutils.Error("GameProperty.procRespinBeforeStepEnding:ProcRespinOnStepEnd",
+						zap.String("respin", curRespin),
+						zap.Error(err))
+
+					return "", err
+				}
+
+				if nextComponent == "" {
+					nextComponent = nc
+				}
+			}
+		}
+
+		return nextComponent, nil
+	}
+
+	return "", nil
+}
+
 func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData, gp *GameParams) {
 	tag := gameProp.callStack.OnCallEnd(component, cd)
 	gp.HistoryComponents = append(gp.HistoryComponents, tag)

@@ -9,6 +9,7 @@ type StatsRootTrigger struct {
 	RunTimes     int64
 	TriggerTimes int64
 	TotalWins    int64
+	IsStarted    bool
 }
 
 func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {

@@ -49,13 +49,18 @@ func (f2 *Feature) procCacheStatsTrigger() {
 	f2.Trigger.TriggerTimes++
 }
 
-func (f2 *Feature) procCacheStatsRootTrigger() {
+func (f2 *Feature) procCacheStatsRootTrigger(isEnding bool) {
 	if f2.RootTrigger != nil {
-		if f2.RootTrigger.TriggerTimes == 0 {
+		if !f2.RootTrigger.IsStarted {
 			f2.RootTrigger.TriggerTimes++
+			f2.RootTrigger.IsStarted = true
 		}
 
 		f2.RootTrigger.RunTimes++
+
+		if isEnding {
+			f2.RootTrigger.IsStarted = false
+		}
 	}
 }
 

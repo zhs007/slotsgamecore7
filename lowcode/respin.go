@@ -399,24 +399,23 @@ func (respin *Respin) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 	}
 }
 
-// OnPlayGame - on playgame
-func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+// ProcRespinOnStepEnd - 现在只有respin需要特殊处理结束，如果多层respin嵌套时，只要新的有next，就不会继续结束respin
+func (respin *Respin) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, canRemove bool) (string, error) {
 
 	rcd := cd.(*RespinData)
 
 	rcd.TotalCashWin += curpr.CashWin
 	rcd.TotalCoinWin += int64(curpr.CoinWin)
 
-	// if respin.Config.IsWinBreak && rcd.TotalCoinWin > 0 {
-	// 	rcd.LastRespinNum = 0
-	// }
-
-	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
+	if canRemove && rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
 		gameProp.removeRespin(respin.Name)
+
+		if respin.Config.DefaultNextComponent != "" {
+			return respin.Config.DefaultNextComponent, nil
+		}
 	}
 
-	return nil
+	return "", nil
 }
 
 // IsRespin -
@@ -431,7 +430,13 @@ func (respin *Respin) NewStats2(parent string) *stats2.Feature {
 
 // OnStats2
 func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-	s2.ProcStatsRootTrigger(respin.Name)
+	rcd := icd.(*RespinData)
+
+	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
+		s2.ProcStatsRootTrigger(respin.Name, true)
+	} else {
+		s2.ProcStatsRootTrigger(respin.Name, false)
+	}
 }
 
 // // IsTriggerRespin -
