@@ -7,7 +7,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -142,10 +141,10 @@ func (weightChgSymbol *WeightChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *
 	return nil
 }
 
-// OnStats
-func (weightChgSymbol *WeightChgSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (weightChgSymbol *WeightChgSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
 func NewWeightChgSymbol(name string) IComponent {
 	return &WeightChgSymbol{

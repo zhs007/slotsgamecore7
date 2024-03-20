@@ -7,7 +7,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -223,10 +222,10 @@ func (reelModifier *ReelModifier) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 	return nil
 }
 
-// OnStats
-func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
 // // NewStats2 -
 // func (reelModifier *ReelModifier) NewStats2(parent string) *stats2.Feature {

@@ -11,7 +11,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -294,63 +293,63 @@ func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, l
 	return nil
 }
 
-// OnStats
-func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	// if feature != nil && len(lst) > 0 {
-	// 	if feature.RespinEndingStatus != nil {
-	// 		pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, mask.Name)
+// // OnStats
+// func (mask *Mask) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	// if feature != nil && len(lst) > 0 {
+// 	// 	if feature.RespinEndingStatus != nil {
+// 	// 		pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, mask.Name)
 
-	// 		if pbcd != nil {
-	// 			mask.OnStatsWithPB(feature, pbcd, lastpr)
-	// 		}
-	// 	}
+// 	// 		if pbcd != nil {
+// 	// 			mask.OnStatsWithPB(feature, pbcd, lastpr)
+// 	// 		}
+// 	// 	}
 
-	// 	if feature.RespinStartStatus != nil {
-	// 		pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, mask.Name)
+// 	// 	if feature.RespinStartStatus != nil {
+// 	// 		pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, mask.Name)
 
-	// 		if pbcd != nil {
-	// 			mask.OnStatsWithPB(feature, pbcd, lastpr)
-	// 		}
-	// 	}
+// 	// 		if pbcd != nil {
+// 	// 			mask.OnStatsWithPB(feature, pbcd, lastpr)
+// 	// 		}
+// 	// 	}
 
-	// 	if feature.RespinStartStatusEx != nil {
-	// 		pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, mask.Name)
+// 	// 	if feature.RespinStartStatusEx != nil {
+// 	// 		pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, mask.Name)
 
-	// 		if len(pbs) > 0 {
-	// 			for i, v := range pbs {
-	// 				mask.OnStatsWithPB(feature, v, prs[i])
-	// 			}
-	// 		}
-	// 	}
-	// }
+// 	// 		if len(pbs) > 0 {
+// 	// 			for i, v := range pbs {
+// 	// 				mask.OnStatsWithPB(feature, v, prs[i])
+// 	// 			}
+// 	// 		}
+// 	// 	}
+// 	// }
 
-	return false, 0, 0
-}
+// 	return false, 0, 0
+// }
 
-// OnStatsWithPB -
-func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	// pbcd, isok := pbComponentData.(*sgc7pb.MaskData)
-	// if !isok {
-	// 	goutils.Error("Mask.OnStatsWithPB",
-	// 		zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (mask *Mask) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	// pbcd, isok := pbComponentData.(*sgc7pb.MaskData)
+// 	// if !isok {
+// 	// 	goutils.Error("Mask.OnStatsWithPB",
+// 	// 		zap.Error(ErrIvalidProto))
 
-	// 	return 0, ErrIvalidProto
-	// }
+// 	// 	return 0, ErrIvalidProto
+// 	// }
 
-	// if feature.RespinEndingStatus != nil {
-	// 	feature.RespinEndingStatus.AddStatus(boolArr2Int(pbcd.Vals))
-	// }
+// 	// if feature.RespinEndingStatus != nil {
+// 	// 	feature.RespinEndingStatus.AddStatus(boolArr2Int(pbcd.Vals))
+// 	// }
 
-	// if feature.RespinStartStatus != nil {
-	// 	feature.RespinStartStatus.AddStatus(boolArr2Int(pbcd.Vals))
-	// }
+// 	// if feature.RespinStartStatus != nil {
+// 	// 	feature.RespinStartStatus.AddStatus(boolArr2Int(pbcd.Vals))
+// 	// }
 
-	// if feature.RespinStartStatusEx != nil {
-	// 	feature.RespinStartStatusEx.AddStatus(boolArr2Int(pbcd.Vals))
-	// }
+// 	// if feature.RespinStartStatusEx != nil {
+// 	// 	feature.RespinStartStatusEx.AddStatus(boolArr2Int(pbcd.Vals))
+// 	// }
 
-	return 0, nil
-}
+// 	return 0, nil
+// }
 
 // NewComponentData -
 func (mask *Mask) NewComponentData() IComponentData {

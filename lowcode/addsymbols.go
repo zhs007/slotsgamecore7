@@ -10,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -198,10 +197,10 @@ func (addSymbols *AddSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	return nil
 }
 
-// OnStats
-func (addSymbols *AddSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (addSymbols *AddSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
 func NewAddSymbols(name string) IComponent {
 	return &AddSymbols{

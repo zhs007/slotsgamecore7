@@ -10,7 +10,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -189,15 +188,15 @@ func (removeSymbols *RemoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
-// OnStats
-func (removeSymbols *RemoveSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (removeSymbols *RemoveSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
-// OnStatsWithPB -
-func (removeSymbols *RemoveSymbols) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	return 0, nil
-}
+// // OnStatsWithPB -
+// func (removeSymbols *RemoveSymbols) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	return 0, nil
+// }
 
 // NewComponentData -
 func (removeSymbols *RemoveSymbols) NewComponentData() IComponentData {

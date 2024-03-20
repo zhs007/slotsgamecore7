@@ -10,7 +10,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -210,10 +209,10 @@ func (weightReels *WeightReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 	return nil
 }
 
-// OnStats
-func (weightReels *WeightReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (weightReels *WeightReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
 // NewComponentData -
 func (weightReels *WeightReels) NewComponentData() IComponentData {

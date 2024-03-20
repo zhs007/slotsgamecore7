@@ -45,10 +45,10 @@ func (s2 *Cache) ProcStatsTrigger(name string) {
 	}
 }
 
-func (s2 *Cache) ProcStatsRootTrigger(name string, isEnding bool) {
+func (s2 *Cache) ProcStatsRootTrigger(name string, wins int64, isEnding bool) {
 	f2, isok := s2.MapStats[name]
 	if isok {
-		f2.procCacheStatsRootTrigger(isEnding)
+		f2.procCacheStatsRootTrigger(wins, isEnding)
 	}
 }
 
