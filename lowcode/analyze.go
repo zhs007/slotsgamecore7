@@ -12,6 +12,24 @@ type SPCNode struct {
 	Root             string
 }
 
+func (node *SPCNode) GetComponents() []string {
+	lst := []string{}
+
+	if node.Root != "" {
+		lst = append(lst, node.Root)
+	}
+
+	lst = append(lst, node.NormalComponents...)
+
+	for _, v := range node.Children {
+		curlst := v.GetComponents()
+
+		lst = append(lst, curlst...)
+	}
+
+	return lst
+}
+
 func (node *SPCNode) GetParent(component string) string {
 	if goutils.IndexOfStringSlice(node.NormalComponents, component, 0) >= 0 {
 		return node.Root

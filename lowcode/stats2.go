@@ -137,7 +137,7 @@ import (
 // }
 
 func NewStats2(components *ComponentList) *stats2.Stats {
-	s2 := stats2.NewStats()
+	s2 := stats2.NewStats(components.statsNodeData.GetComponents())
 
 	for key, ic := range components.MapComponents {
 		p := components.statsNodeData.GetParent(key)

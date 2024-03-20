@@ -12,6 +12,7 @@ type Stats struct {
 	chanCache      chan *Cache
 	BetTimes       int64
 	BetEndingTimes int64
+	Components     []string
 }
 
 func (s2 *Stats) PushBet(bet int) {
@@ -36,8 +37,11 @@ func (s2 *Stats) onCache(cache *Cache) {
 func (s2 *Stats) SaveExcel(fn string) error {
 	f := excelize.NewFile()
 
-	for k, v := range s2.MapStats {
-		v.SaveSheet(f, k)
+	for _, cn := range s2.Components {
+		f2, isok := s2.MapStats[cn]
+		if isok {
+			f2.SaveSheet(f, cn)
+		}
 	}
 
 	return f.SaveAs(fn)
@@ -77,11 +81,12 @@ func (s2 *Stats) AddFeature(name string, feature *Feature) {
 	s2.MapStats[name] = feature
 }
 
-func NewStats() *Stats {
+func NewStats(components []string) *Stats {
 	s2 := &Stats{
-		MapStats:  make(map[string]*Feature),
-		chanBet:   make(chan int, 1024),
-		chanCache: make(chan *Cache, 1024),
+		MapStats:   make(map[string]*Feature),
+		chanBet:    make(chan int, 1024),
+		chanCache:  make(chan *Cache, 1024),
+		Components: components,
 	}
 
 	return s2

@@ -1148,7 +1148,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 		return nil, err
 	}
 
-	cfg.RTP = &RTPConfig{}
+	// cfg.RTP = &RTPConfig{}
 
 	err = game.Init2(cfg)
 	if err != nil {

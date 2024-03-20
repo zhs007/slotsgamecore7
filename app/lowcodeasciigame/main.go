@@ -75,8 +75,8 @@ func main() {
 		game.OnAsciiGame(gameProp, stake, pr, lst)
 	}, int(autospin), isSkipGetChar, isBreakAtFeature)
 
-	if game.Pool.Stats != nil {
-		game.Pool.Stats.Wait()
-		game.Pool.Stats.Root.SaveExcel("stats.xlsx")
-	}
+	// if game.Pool.Stats != nil {
+	// 	game.Pool.Stats.Wait()
+	// 	game.Pool.Stats.Root.SaveExcel("stats.xlsx")
+	// }
 }

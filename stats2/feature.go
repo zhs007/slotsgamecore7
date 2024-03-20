@@ -122,8 +122,7 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string) {
 
 func NewFeature(parent string, opts Options) *Feature {
 	f2 := &Feature{
-		Parent:  parent,
-		Trigger: &StatsTrigger{},
+		Parent: parent,
 	}
 
 	if opts.Has(OptWins) {
@@ -132,6 +131,8 @@ func NewFeature(parent string, opts Options) *Feature {
 
 	if opts.Has(OptRootTrigger) {
 		f2.RootTrigger = &StatsRootTrigger{}
+	} else {
+		f2.Trigger = &StatsTrigger{}
 	}
 
 	return f2
