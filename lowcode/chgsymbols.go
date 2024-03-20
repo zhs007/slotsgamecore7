@@ -187,6 +187,16 @@ func (chgSymbols *ChgSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 	return false, 0, 0
 }
 
+// GetAllLinkComponents - get all link components
+func (chgSymbols *ChgSymbols) GetAllLinkComponents() []string {
+	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
+}
+
+// GetNextLinkComponents - get next link components
+func (chgSymbols *ChgSymbols) GetNextLinkComponents() []string {
+	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
+}
+
 func NewChgSymbols(name string) IComponent {
 	return &ChgSymbols{
 		BasicComponent: NewBasicComponent(name, 1),

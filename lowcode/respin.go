@@ -12,6 +12,7 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -94,7 +95,7 @@ func (respinData *RespinData) IsRespinStarted() bool {
 
 // ChgConfigIntVal -
 func (respinData *RespinData) ChgConfigIntVal(key string, off int) {
-	if key == "lastRespinNum" {
+	if key == CCVLastRespinNum {
 		respinData.AddRespinTimes(off)
 	} else {
 		respinData.BasicComponentData.ChgConfigIntVal(key, off)
@@ -398,29 +399,44 @@ func (respin *Respin) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 	}
 }
 
-// OnPlayGame - on playgame
-func (respin *Respin) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+// ProcRespinOnStepEnd - 现在只有respin需要特殊处理结束，如果多层respin嵌套时，只要新的有next，就不会继续结束respin
+func (respin *Respin) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, canRemove bool) (string, error) {
 
 	rcd := cd.(*RespinData)
 
 	rcd.TotalCashWin += curpr.CashWin
 	rcd.TotalCoinWin += int64(curpr.CoinWin)
 
-	// if respin.Config.IsWinBreak && rcd.TotalCoinWin > 0 {
-	// 	rcd.LastRespinNum = 0
-	// }
-
-	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
+	if canRemove && rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
 		gameProp.removeRespin(respin.Name)
+
+		if respin.Config.DefaultNextComponent != "" {
+			return respin.Config.DefaultNextComponent, nil
+		}
 	}
 
-	return nil
+	return "", nil
 }
 
 // IsRespin -
 func (respin *Respin) IsRespin() bool {
 	return true
+}
+
+// NewStats2 -
+func (respin *Respin) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptRootTrigger})
+}
+
+// OnStats2
+func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	rcd := icd.(*RespinData)
+
+	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
+		s2.ProcStatsRootTrigger(respin.Name, true)
+	} else {
+		s2.ProcStatsRootTrigger(respin.Name, false)
+	}
 }
 
 // // IsTriggerRespin -
@@ -541,6 +557,11 @@ func (respin *Respin) getRetriggerRespinNum(basicCD *BasicComponentData) int {
 // GetAllLinkComponents - get all link components
 func (respin *Respin) GetAllLinkComponents() []string {
 	return []string{respin.Config.DefaultNextComponent, respin.Config.MainComponent}
+}
+
+// GetChildLinkComponents - get child link components
+func (respin *Respin) GetChildLinkComponents() []string {
+	return []string{respin.Config.MainComponent}
 }
 
 func NewRespin(name string) IComponent {

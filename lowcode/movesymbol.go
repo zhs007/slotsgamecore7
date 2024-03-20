@@ -10,7 +10,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
-	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -289,15 +288,16 @@ func (moveSymbol *MoveSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7gam
 	return false, 0, 0
 }
 
-// NewStats2 -
-func (moveSymbol *MoveSymbol) NewStats2() *stats2.Feature {
-	return stats2.NewFeature(stats2.Options{stats2.OptStepTrigger})
-}
+// // NewStats2 -
+// func (moveSymbol *MoveSymbol) NewStats2(parent string) *stats2.Feature {
+// 	return stats2.NewFeature(parent, nil)
+// }
 
-// OnStats2
-func (moveSymbol *MoveSymbol) OnStats2(icd IComponentData, s2 *stats2.Stats) {
-	s2.PushStepTrigger(moveSymbol.Name, true)
-}
+// // OnStats2
+// func (moveSymbol *MoveSymbol) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+// 	s2.ProcStatsTrigger(moveSymbol.Name)
+// 	// s2.PushStepTrigger(moveSymbol.Name, true)
+// }
 
 // // OnStats2Trigger
 // func (moveSymbol *MoveSymbol) OnStats2Trigger(s2 *Stats2) {

@@ -71,7 +71,7 @@ type GameProperty struct {
 	Components             *ComponentList
 	SceneStack             *SceneStack
 	OtherSceneStack        *SceneStack
-	stats2SpinData         *stats2.SpinCache
+	stats2Cache            *stats2.Cache
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
@@ -252,6 +252,37 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 	} else if !pr.IsWait {
 		pr.IsFinish = true
 	}
+}
+
+// procRespinBeforeStepEnding - 这里用来处理当前respin结束后，继续next的流程
+func (gameProp *GameProperty) procRespinBeforeStepEnding(pr *sgc7game.PlayResult, gp *GameParams) (string, error) {
+	if len(gameProp.RespinComponents) > 0 {
+		nextComponent := ""
+		for i := len(gameProp.RespinComponents) - 1; i >= 0; i-- {
+			curRespin := gameProp.RespinComponents[i]
+
+			cr, isok := gameProp.Components.MapComponents[curRespin]
+			if isok {
+				cd := gameProp.GetGlobalComponentData(cr)
+				nc, err := cr.ProcRespinOnStepEnd(gameProp, pr, gp, cd, nextComponent == "")
+				if err != nil {
+					goutils.Error("GameProperty.procRespinBeforeStepEnding:ProcRespinOnStepEnd",
+						zap.String("respin", curRespin),
+						zap.Error(err))
+
+					return "", err
+				}
+
+				if nextComponent == "" {
+					nextComponent = nc
+				}
+			}
+		}
+
+		return nextComponent, nil
+	}
+
+	return "", nil
 }
 
 func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData, gp *GameParams) {
@@ -933,12 +964,25 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 	cd.AddSymbol(symbolCode)
 }
 
-func (gameProp *GameProperty) onStepEnd(pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
+func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
 	// // scene v3
 	// if len(gameProp.SceneStack.Scenes) > 0 {
 
 	// 	return
 	// }
+
+	if gAllowStats2 {
+		for _, v := range gp.HistoryComponents {
+			ic, isok := gameProp.Components.MapComponents[v]
+			if isok {
+				if !gameProp.stats2Cache.HasFeature(v) {
+					gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
+				}
+
+				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
+			}
+		}
+	}
 
 	if pr.IsFinish {
 		gameProp.PoolScene.Reset()
@@ -1100,29 +1144,6 @@ func (gameProp *GameProperty) GetComponentData(icomponent IComponent) IComponent
 func (gameProp *GameProperty) GetCurCallStackSymbol() int {
 	return gameProp.callStack.GetCurCallStackSymbol()
 }
-
-// // GetAllLinkComponents - get all link components
-// func (gameProp *GameProperty) GetAllLinkComponents(componentName string) []string {
-// 	ic, isok := gameProp.Components.MapComponents[componentName]
-// 	if !isok || !ic.IsMask() {
-// 		goutils.Error("GameProperty.GetAllLinkComponents",
-// 			zap.String("name", componentName),
-// 			zap.Error(ErrIvalidComponentName))
-
-// 		return nil
-// 	}
-
-// 	lst := []string{componentName}
-
-// 	curlst := ic.GetAllLinkComponents()
-// 	for _, v := range curlst {
-// 		lst = append(lst, v)
-// 		children := gameProp.GetAllLinkComponents(v)
-// 		lst = append(lst, children...)
-// 	}
-
-// 	return lst
-// }
 
 func init() {
 	MapProperty = make(map[string]int)

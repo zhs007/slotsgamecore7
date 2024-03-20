@@ -705,6 +705,11 @@ func (scatterTrigger *ScatterTrigger) GetAllLinkComponents() []string {
 	return []string{scatterTrigger.Config.DefaultNextComponent, scatterTrigger.Config.JumpToComponent}
 }
 
+// GetNextLinkComponents - get next link components
+func (scatterTrigger *ScatterTrigger) GetNextLinkComponents() []string {
+	return []string{scatterTrigger.Config.DefaultNextComponent, scatterTrigger.Config.JumpToComponent}
+}
+
 // func (scatterTrigger *ScatterTrigger) getSymbols() []int {
 // 	if scatterTrigger.dataForeachSymbol != nil {
 // 		return []int{scatterTrigger.dataForeachSymbol.SymbolCode}

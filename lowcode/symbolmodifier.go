@@ -8,7 +8,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
@@ -311,19 +310,20 @@ func (symbolModifier *SymbolModifier) OnAsciiGame(gameProp *GameProperty, pr *sg
 	return nil
 }
 
-// OnStats
-func (symbolModifier *SymbolModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (symbolModifier *SymbolModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
-// NewStats2 -
-func (symbolModifier *SymbolModifier) NewStats2() *stats2.Feature {
-	return stats2.NewFeature(stats2.Options{stats2.OptStepTrigger})
-}
+// // NewStats2 -
+// func (symbolModifier *SymbolModifier) NewStats2(parent string) *stats2.Feature {
+// 	return stats2.NewFeature(parent, nil)
+// }
 
 // OnStats2
-func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *stats2.Stats) {
-	s2.PushStepTrigger(symbolModifier.Name, true)
+func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	// s2.PushTrigger(symbolModifier.Name, true)
+	s2.ProcStatsTrigger(symbolModifier.Name)
 }
 
 // // OnStats2Trigger

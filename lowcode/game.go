@@ -238,9 +238,9 @@ func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr 
 	}
 
 	if pr.IsFinish {
-		if game.Pool.Stats != nil {
-			game.Pool.Stats.Push(stake, lst)
-		}
+		// if game.Pool.Stats != nil {
+		// 	game.Pool.Stats.Push(stake, lst)
+		// }
 
 		// game.Pool.Pool.Put(gameProp)
 	}

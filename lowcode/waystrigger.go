@@ -704,6 +704,11 @@ func (waysTrigger *WaysTrigger) GetAllLinkComponents() []string {
 	return []string{waysTrigger.Config.DefaultNextComponent, waysTrigger.Config.JumpToComponent}
 }
 
+// GetNextLinkComponents - get next link components
+func (waysTrigger *WaysTrigger) GetNextLinkComponents() []string {
+	return []string{waysTrigger.Config.DefaultNextComponent, waysTrigger.Config.JumpToComponent}
+}
+
 func NewWaysTrigger(name string) IComponent {
 	return &WaysTrigger{
 		BasicComponent: NewBasicComponent(name, 1),

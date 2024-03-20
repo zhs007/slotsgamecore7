@@ -498,10 +498,9 @@ func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, p
 	}
 }
 
-// OnPlayGame - on playgame
-func (basicComponent *BasicComponent) OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
-	return nil
+// ProcRespinOnStepEnd - 现在只有respin需要特殊处理结束，如果多层respin嵌套时，只要新的有next，就不会继续结束respin
+func (basicComponent *BasicComponent) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, canRemove bool) (string, error) {
+	return "", nil
 }
 
 // GetName -
@@ -521,6 +520,11 @@ func (basicComponent *BasicComponent) GetName() string {
 
 // IsRespin -
 func (basicComponent *BasicComponent) IsRespin() bool {
+	return false
+}
+
+// IsForeach -
+func (basicComponent *BasicComponent) IsForeach() bool {
 	return false
 }
 
@@ -579,12 +583,13 @@ func (basicComponent *BasicComponent) GetTargetOtherScene3(gameProp *GamePropert
 }
 
 // NewStats2 -
-func (basicComponent *BasicComponent) NewStats2() *stats2.Feature {
-	return nil
+func (basicComponent *BasicComponent) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, nil)
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Stats) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	s2.ProcStatsTrigger(basicComponent.Name)
 }
 
 // // OnStats2Trigger
@@ -643,6 +648,16 @@ func (basicComponent *BasicComponent) OnGameInited(components *ComponentList) er
 // GetAllLinkComponents - get all link components
 func (basicComponent *BasicComponent) GetAllLinkComponents() []string {
 	return []string{basicComponent.Config.DefaultNextComponent}
+}
+
+// GetNextLinkComponents - get next link components
+func (basicComponent *BasicComponent) GetNextLinkComponents() []string {
+	return []string{basicComponent.Config.DefaultNextComponent}
+}
+
+// GetChildLinkComponents - get child link components
+func (basicComponent *BasicComponent) GetChildLinkComponents() []string {
+	return nil
 }
 
 // CanTriggerWithScene -

@@ -217,6 +217,32 @@ func (weightBranch *WeightBranch) NewComponentData() IComponentData {
 	return &WeightBranchData{}
 }
 
+// GetAllLinkComponents - get all link components
+func (weightBranch *WeightBranch) GetAllLinkComponents() []string {
+	lst := []string{}
+
+	if weightBranch.Config.MapBranchs != nil {
+		for k := range weightBranch.Config.MapBranchs {
+			lst = append(lst, k)
+		}
+	}
+
+	return lst
+}
+
+// GetNextLinkComponents - get next link components
+func (weightBranch *WeightBranch) GetNextLinkComponents() []string {
+	lst := []string{}
+
+	if weightBranch.Config.MapBranchs != nil {
+		for _, v := range weightBranch.Config.MapBranchs {
+			lst = append(lst, v.JumpToComponent)
+		}
+	}
+
+	return lst
+}
+
 func NewWeightBranch(name string) IComponent {
 	return &WeightBranch{
 		BasicComponent: NewBasicComponent(name, 0),

@@ -307,9 +307,19 @@ func (symbolCollection2 *SymbolCollection2) OnGameInited(components *ComponentLi
 	return nil
 }
 
+// IsForeach -
+func (symbolCollection2 *SymbolCollection2) IsForeach() bool {
+	return true
+}
+
 // GetAllLinkComponents - get all link components
 func (symbolCollection2 *SymbolCollection2) GetAllLinkComponents() []string {
 	return []string{symbolCollection2.Config.DefaultNextComponent, symbolCollection2.Config.ForeachComponent}
+}
+
+// GetChildLinkComponents - get next link components
+func (symbolCollection2 *SymbolCollection2) GetChildLinkComponents() []string {
+	return []string{symbolCollection2.Config.ForeachComponent}
 }
 
 func NewSymbolCollection2(name string) IComponent {

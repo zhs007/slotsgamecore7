@@ -36,22 +36,28 @@ type IComponent interface {
 
 	// EachUsedResults -
 	EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult)
-	// OnPlayGame - on playgame
-	OnPlayGameEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error
+	// ProcRespinOnStepEnd - 现在只有respin需要特殊处理结束，如果多层respin嵌套时，只要新的有next，就不会继续结束respin
+	ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, canRemove bool) (string, error)
 	// GetName -
 	GetName() string
 
 	// IsRespin -
 	IsRespin() bool
+	// IsForeach -
+	IsForeach() bool
 
 	// NewStats2 -
-	NewStats2() *stats2.Feature
+	NewStats2(parent string) *stats2.Feature
 	// OnStats2
-	OnStats2(icd IComponentData, s2 *stats2.Stats)
+	OnStats2(icd IComponentData, s2 *stats2.Cache)
 
 	// GetAllLinkComponents - get all link components
 	GetAllLinkComponents() []string
+
+	// GetNextLinkComponents - get next link components
+	GetNextLinkComponents() []string
+	// GetChildLinkComponents - get child link components
+	GetChildLinkComponents() []string
 
 	// CanTriggerWithScene -
 	CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result)

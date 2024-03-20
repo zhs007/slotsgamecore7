@@ -213,6 +213,11 @@ func (removeSymbols *RemoveSymbols) GetAllLinkComponents() []string {
 	return []string{removeSymbols.Config.DefaultNextComponent, removeSymbols.Config.JumpToComponent}
 }
 
+// GetNextLinkComponents - get next link components
+func (removeSymbols *RemoveSymbols) GetNextLinkComponents() []string {
+	return []string{removeSymbols.Config.DefaultNextComponent, removeSymbols.Config.JumpToComponent}
+}
+
 func NewRemoveSymbols(name string) IComponent {
 	return &RemoveSymbols{
 		BasicComponent: NewBasicComponent(name, 1),

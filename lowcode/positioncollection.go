@@ -210,9 +210,19 @@ func (positionCollection *PositionCollection) OnGameInited(components *Component
 	return nil
 }
 
+// IsForeach -
+func (positionCollection *PositionCollection) IsForeach() bool {
+	return true
+}
+
 // GetAllLinkComponents - get all link components
 func (positionCollection *PositionCollection) GetAllLinkComponents() []string {
 	return []string{positionCollection.Config.DefaultNextComponent, positionCollection.Config.ForeachComponent}
+}
+
+// GetChildLinkComponents - get next link components
+func (positionCollection *PositionCollection) GetChildLinkComponents() []string {
+	return []string{positionCollection.Config.ForeachComponent}
 }
 
 func NewPositionCollection(name string) IComponent {

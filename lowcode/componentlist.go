@@ -10,6 +10,7 @@ type ComponentList struct {
 	Components    []IComponent
 	MapComponents map[string]IComponent
 	Stats2        *stats2.Stats
+	statsNodeData *SPCNode
 }
 
 func (lst *ComponentList) AddComponent(name string, component IComponent) {
@@ -18,8 +19,19 @@ func (lst *ComponentList) AddComponent(name string, component IComponent) {
 	lst.MapComponents[name] = component
 }
 
-func (lst *ComponentList) onInit() {
+func (lst *ComponentList) onInit(start string) error {
 	if gAllowStats2 {
+		node, err := ParseStepParentChildren(lst, start)
+		if err != nil {
+			goutils.Error("ComponentList.onInit:ParseStepParentChildren",
+				zap.String("start", start),
+				zap.Error(err))
+
+			return err
+		}
+
+		lst.statsNodeData = node
+
 		lst.Stats2 = NewStats2(lst)
 
 		lst.Stats2.Start()
@@ -28,6 +40,8 @@ func (lst *ComponentList) onInit() {
 	for _, v := range lst.MapComponents {
 		v.OnGameInited(lst)
 	}
+
+	return nil
 }
 
 // GetAllLinkComponents - get all link components

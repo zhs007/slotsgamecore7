@@ -58,8 +58,6 @@ type Config struct {
 	GameMods          []*GameModConfig                 `yaml:"gamemods"`
 	StatsSymbols      []string                         `yaml:"statsSymbols"`
 	StatsSymbolCodes  []mathtoolset.SymbolType         `yaml:"-"`
-	Stats             *StatsConfig                     `yaml:"stats"`
-	RTP               *RTPConfig                       `yaml:"rtp"`
 	MainPath          string                           `yaml:"mainPath"`
 	MapCmdComponent   map[string]string                `yaml:"mapCmdComponent"`
 	ComponentsMapping map[int]map[string]string        `yaml:"componentsMapping"`

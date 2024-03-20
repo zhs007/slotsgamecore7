@@ -459,17 +459,8 @@ func newLinkData() *linkData {
 }
 
 func loadCells(cfg *Config, bet int, cells *ast.Node) error {
-	// linkScene := [][]string{}
-	// linkOtherScene := [][]string{}
-	// linkComponent := [][]string{}
-	// jumpComponent := [][]string{}
-	// loopComponent := [][]string{}
 	ldid := newLinkData()
-	// lstStart := []string{}
 	lstStartID := []string{}
-	// mapTrigger := make(map[string]*TriggerFeatureConfig)
-	// mapTriggerID := make(map[string]*TriggerFeatureConfig)
-	// lstBasicWins := []*BasicWinsConfig{}
 	mapComponentName := make(map[string]string)
 
 	lst, err := cells.ArrayUseNode()
@@ -479,8 +470,6 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 
 		return err
 	}
-
-	// startid := ""
 
 	for i, cell := range lst {
 		shape, err := cell.Get("shape").String()
@@ -889,25 +878,16 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				return err
 			}
 
-			// if source == startid {
-			// 	lstStart = append(lstStart, mapComponentName[target])
-			// } else {
 			if sourcePort == "jump-component-groups-out" {
 				ldid.add("jump", source, target)
-				// jumpComponent = append(jumpComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else if sourcePort == "component-groups-out" {
 				ldid.add("next", source, target)
-				// linkComponent = append(linkComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else if sourcePort == "loop-component-groups-out" {
 				ldid.add("loop", source, target)
-				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else if sourcePort == "foreach-component-groups-out" {
 				ldid.add("foreach", source, target)
-				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else if sourcePort == "start-out" {
 				lstStartID = append(lstStartID, target)
-				// ld.add("foreach", mapComponentName[source], mapComponentName[target])
-				// loopComponent = append(loopComponent, []string{mapComponentName[source], mapComponentName[target]})
 			} else {
 				arr := strings.Split(sourcePort, "vals-component-groups-out-")
 				if len(arr) == 2 {
@@ -920,7 +900,6 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 					return ErrUnsupportedLinkType
 				}
 			}
-			// }
 		}
 	}
 
@@ -1169,7 +1148,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 		return nil, err
 	}
 
-	cfg.RTP = &RTPConfig{}
+	// cfg.RTP = &RTPConfig{}
 
 	err = game.Init2(cfg)
 	if err != nil {

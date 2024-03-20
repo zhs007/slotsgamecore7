@@ -38,6 +38,7 @@ func main() {
 	}
 
 	lowcode.SetJsonMode()
+	lowcode.SetAllowStatsV2()
 
 	game, err := lowcode.NewGame3(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
@@ -74,8 +75,8 @@ func main() {
 		game.OnAsciiGame(gameProp, stake, pr, lst)
 	}, int(autospin), isSkipGetChar, isBreakAtFeature)
 
-	if game.Pool.Stats != nil {
-		game.Pool.Stats.Wait()
-		game.Pool.Stats.Root.SaveExcel("stats.xlsx")
-	}
+	// if game.Pool.Stats != nil {
+	// 	game.Pool.Stats.Wait()
+	// 	game.Pool.Stats.Root.SaveExcel("stats.xlsx")
+	// }
 }
