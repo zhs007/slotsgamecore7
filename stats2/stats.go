@@ -25,7 +25,7 @@ func (s2 *Stats) PushCache(cache *Cache) {
 
 func (s2 *Stats) onCache(cache *Cache) {
 	for k, v := range cache.MapStats {
-		v.onStatsGame(cache)
+		// v.onStatsGame(cache)
 
 		s, isok := s2.MapStats[k]
 		if isok {
@@ -40,7 +40,7 @@ func (s2 *Stats) SaveExcel(fn string) error {
 	for _, cn := range s2.Components {
 		f2, isok := s2.MapStats[cn]
 		if isok {
-			f2.SaveSheet(f, cn)
+			f2.SaveSheet(f, cn, s2)
 		}
 	}
 
@@ -79,6 +79,19 @@ func (s2 *Stats) WaitEnding() {
 
 func (s2 *Stats) AddFeature(name string, feature *Feature) {
 	s2.MapStats[name] = feature
+}
+
+func (s2 *Stats) GetRunTimes(name string) int64 {
+	if name == "" {
+		return s2.BetTimes
+	}
+
+	f2, isok := s2.MapStats[name]
+	if isok {
+		return f2.RootTrigger.RunTimes
+	}
+
+	return 0
 }
 
 func NewStats(components []string) *Stats {

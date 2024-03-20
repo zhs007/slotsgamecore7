@@ -8,14 +8,12 @@ import (
 type StatsRootTrigger struct {
 	RunTimes     int64
 	TriggerTimes int64
-	TotalTimes   int64
 	TotalWins    int64
 }
 
 func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {
 	return &StatsRootTrigger{
 		RunTimes:     trigger.RunTimes,
-		TotalTimes:   trigger.TotalTimes,
 		TriggerTimes: trigger.TriggerTimes,
 		TotalWins:    trigger.TotalWins,
 	}
@@ -23,13 +21,12 @@ func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {
 
 func (trigger *StatsRootTrigger) Merge(src *StatsRootTrigger) {
 	trigger.RunTimes += src.RunTimes
-	trigger.TotalTimes += src.TotalTimes
 	trigger.TriggerTimes += src.TriggerTimes
 	trigger.TotalWins += src.TotalWins
 }
 
-func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string) {
-	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "spin times")
+func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, parent string, s2 *Stats) {
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "root run times")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 1), "trigger times")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 2), "percent")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 3), "total run times")
@@ -38,11 +35,13 @@ func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string) {
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 6), "avg wins for per trigger")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 7), "avg wins for per running")
 
-	f.SetCellValue(sheet, goutils.Pos2Cell(1, 0), trigger.TotalTimes)
+	totaltimes := s2.GetRunTimes(parent)
+
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 0), totaltimes)
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 1), trigger.TriggerTimes)
 
-	if trigger.TotalTimes > 0 {
-		f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), float64(trigger.TriggerTimes)/float64(trigger.TotalTimes))
+	if totaltimes > 0 {
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), float64(trigger.TriggerTimes)/float64(totaltimes))
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), 0)
 	}

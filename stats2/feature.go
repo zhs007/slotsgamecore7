@@ -13,31 +13,31 @@ type Feature struct {
 	Wins        *StatsWins        // wins
 }
 
-func (f2 *Feature) onStatsGame(cache *Cache) {
-	if f2.Parent != "" {
-		p := cache.GetFeature(f2.Parent)
+// func (f2 *Feature) onStatsGame(cache *Cache) {
+// 	if f2.Parent != "" {
+// 		p := cache.GetFeature(f2.Parent)
 
-		if p != nil && p.RootTrigger != nil {
-			if f2.Trigger != nil {
-				f2.Trigger.TotalTimes += p.RootTrigger.RunTimes
-			}
+// 		if p != nil && p.RootTrigger != nil {
+// 			if f2.Trigger != nil {
+// 				f2.Trigger.TotalTimes += p.RootTrigger.RunTimes
+// 			}
 
-			if f2.RootTrigger != nil {
-				f2.RootTrigger.TotalTimes += p.RootTrigger.RunTimes
-			}
+// 			if f2.RootTrigger != nil {
+// 				f2.RootTrigger.TotalTimes += p.RootTrigger.RunTimes
+// 			}
 
-			return
-		}
-	}
+// 			return
+// 		}
+// 	}
 
-	if f2.Trigger != nil {
-		f2.Trigger.TotalTimes++
-	}
+// 	if f2.Trigger != nil {
+// 		f2.Trigger.TotalTimes++
+// 	}
 
-	if f2.RootTrigger != nil {
-		f2.RootTrigger.TotalTimes++
-	}
-}
+// 	if f2.RootTrigger != nil {
+// 		f2.RootTrigger.TotalTimes++
+// 	}
+// }
 
 func (f2 *Feature) procCacheStatsWins(win int64) {
 	if f2.Wins != nil {
@@ -97,19 +97,19 @@ func (f2 *Feature) Merge(src *Feature) {
 	}
 }
 
-func (f2 *Feature) SaveSheet(f *excelize.File, sheet string) {
+func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
 	if f2.Trigger != nil {
 		sn := fmt.Sprintf("%v - trigger", sheet)
 		f.NewSheet(sn)
 
-		f2.Trigger.SaveSheet(f, sn)
+		f2.Trigger.SaveSheet(f, sn, f2.Parent, s2)
 	}
 
 	if f2.RootTrigger != nil {
 		sn := fmt.Sprintf("%v - root trigger", sheet)
 		f.NewSheet(sn)
 
-		f2.RootTrigger.SaveSheet(f, sn)
+		f2.RootTrigger.SaveSheet(f, sn, f2.Parent, s2)
 	}
 
 	if f2.Wins != nil {
