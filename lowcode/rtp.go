@@ -9,6 +9,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7rtp "github.com/zhs007/slotsgamecore7/rtp"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 )
 
@@ -33,60 +34,60 @@ type RTPConfig struct {
 	HitRateFeatures []*RTPHitRateFeature `yaml:"hitRateFeatures"`
 }
 
-func buildRTPSymbolsData(pool *GamePropertyPool) ([]int, []int) {
-	symbols := []int{}
-	nums := []int{}
+// func buildRTPSymbolsData(pool *GamePropertyPool) ([]int, []int) {
+// 	symbols := []int{}
+// 	nums := []int{}
 
-	for _, v := range pool.Config.StatsSymbolCodes {
-		symbols = append(symbols, int(v))
-	}
+// 	for _, v := range pool.Config.StatsSymbolCodes {
+// 		symbols = append(symbols, int(v))
+// 	}
 
-	for i := range pool.DefaultPaytables.MapPay[0] {
-		nums = append(nums, i+1)
-	}
+// 	for i := range pool.DefaultPaytables.MapPay[0] {
+// 		nums = append(nums, i+1)
+// 	}
 
-	return symbols, nums
-}
+// 	return symbols, nums
+// }
 
-func newFuncOnGameMod(cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
-		if len(cfgGameMod.Components) == 0 {
-			return true
-		}
+// func newFuncOnGameMod(cfgGameMod *RTPSymbolModule) sgc7rtp.FuncOnResult {
+// 	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
+// 		if len(cfgGameMod.Components) == 0 {
+// 			return true
+// 		}
 
-		gp, isok := pr.CurGameModParams.(*GameParams)
-		if isok {
-			for _, v := range cfgGameMod.Components {
-				_, hasComponent := gp.MapComponentMsgs[v]
-				if hasComponent {
-					return true
-				}
-			}
-		}
+// 		gp, isok := pr.CurGameModParams.(*GameParams)
+// 		if isok {
+// 			for _, v := range cfgGameMod.Components {
+// 				_, hasComponent := gp.MapComponentMsgs[v]
+// 				if hasComponent {
+// 					return true
+// 				}
+// 			}
+// 		}
 
-		return false
-	}
-}
+// 		return false
+// 	}
+// }
 
-func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
-	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
-		if len(cfgSymbolFeature.Components) == 0 {
-			return true
-		}
+// func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
+// 	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
+// 		if len(cfgSymbolFeature.Components) == 0 {
+// 			return true
+// 		}
 
-		gp, isok := pr.CurGameModParams.(*GameParams)
-		if isok {
-			for _, v := range cfgSymbolFeature.Components {
-				_, hasComponent := gp.MapComponentMsgs[v]
-				if hasComponent {
-					return true
-				}
-			}
-		}
+// 		gp, isok := pr.CurGameModParams.(*GameParams)
+// 		if isok {
+// 			for _, v := range cfgSymbolFeature.Components {
+// 				_, hasComponent := gp.MapComponentMsgs[v]
+// 				if hasComponent {
+// 					return true
+// 				}
+// 			}
+// 		}
 
-		return false
-	}
-}
+// 		return false
+// 	}
+// }
 
 // func newFuncSymbolOnResult(pool *GamePropertyPool, cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
 // 	return func(node *sgc7rtp.RTPNode, pr *sgc7game.PlayResult, gameData any) bool {
@@ -226,43 +227,43 @@ func newFuncOnResult(cfgSymbolFeature *RTPSymbolFeature) sgc7rtp.FuncOnResult {
 // 	return false
 // }
 
-func hasComponentEx(i int, prs []*sgc7game.PlayResult, components []string) bool {
-	gp, isok := prs[i].CurGameModParams.(*GameParams)
-	if isok {
-		for _, v := range components {
-			_, hasComponent := gp.MapComponentMsgs[v]
-			if hasComponent {
-				return true
-			}
-		}
-	}
+// func hasComponentEx(i int, prs []*sgc7game.PlayResult, components []string) bool {
+// 	gp, isok := prs[i].CurGameModParams.(*GameParams)
+// 	if isok {
+// 		for _, v := range components {
+// 			_, hasComponent := gp.MapComponentMsgs[v]
+// 			if hasComponent {
+// 				return true
+// 			}
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
-func newFuncHitRate(cfgHitRateFeature *RTPHitRateFeature) sgc7rtp.FuncHROnResult {
-	return func(rtp *sgc7rtp.RTP, node *sgc7rtp.HitRateNode, i int, prs []*sgc7game.PlayResult) bool {
-		if len(cfgHitRateFeature.Components) == 0 {
-			return true
-		}
+// func newFuncHitRate(cfgHitRateFeature *RTPHitRateFeature) sgc7rtp.FuncHROnResult {
+// 	return func(rtp *sgc7rtp.RTP, node *sgc7rtp.HitRateNode, i int, prs []*sgc7game.PlayResult) bool {
+// 		if len(cfgHitRateFeature.Components) == 0 {
+// 			return true
+// 		}
 
-		if hasComponentEx(i, prs, cfgHitRateFeature.Components) {
-			node.TotalNums++
-		} else {
-			if i < len(prs)-1 && hasComponentEx(i+1, prs, cfgHitRateFeature.Components) {
-				node.TriggerNums++
+// 		if hasComponentEx(i, prs, cfgHitRateFeature.Components) {
+// 			node.TotalNums++
+// 		} else {
+// 			if i < len(prs)-1 && hasComponentEx(i+1, prs, cfgHitRateFeature.Components) {
+// 				node.TriggerNums++
 
-				return true
-			}
-		}
+// 				return true
+// 			}
+// 		}
 
-		return false
-	}
-}
+// 		return false
+// 	}
+// }
 
-func procHitRate(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgHitRateFeature *RTPHitRateFeature) {
-	rtp.AddHitRateNode(cfgHitRateFeature.Name, newFuncHitRate(cfgHitRateFeature))
-}
+// func procHitRate(rtp *sgc7rtp.RTP, pool *GamePropertyPool, cfgHitRateFeature *RTPHitRateFeature) {
+// 	rtp.AddHitRateNode(cfgHitRateFeature.Name, newFuncHitRate(cfgHitRateFeature))
+// }
 
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64) error {
 	IsStatsComponentMsg = true
@@ -343,4 +344,79 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	}
 
 	return nil
+}
+
+func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer) (*stats2.Stats, error) {
+	IsStatsComponentMsg = true
+	sgc7plugin.IsNoRNGCache = true
+
+	game, err := NewGame2WithData(gamecfg, func() sgc7plugin.IPlugin {
+		return sgc7plugin.NewFastPlugin()
+	})
+	if err != nil {
+		goutils.Error("StartRTPWithData:NewGame3",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	rtp := sgc7rtp.NewRTP()
+
+	if bet <= 0 {
+		bet = int64(game.Pool.Config.Bets[0])
+	}
+
+	stake := &sgc7game.Stake{
+		CoinBet:  1,
+		CashBet:  int64(bet),
+		Currency: "EUR",
+	}
+
+	// if game.Pool.Stats != nil {
+	// 	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData any) {
+	// 		game.Pool.Stats.Push(stake, lst)
+	// 	}
+	// }
+
+	// if game.Pool.Config.RTP != nil {
+	// 	for _, m := range game.Pool.Config.RTP.Modules {
+	// 		newRTPGameModule(rtp, game.Pool, m)
+	// 	}
+
+	// 	for _, hr := range game.Pool.Config.RTP.HitRateFeatures {
+	// 		procHitRate(rtp, game.Pool, hr)
+	// 	}
+	// }
+
+	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, 0)
+
+	goutils.Info("finish.",
+		zap.Int64("total nums", ispinnums),
+		zap.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
+		zap.Duration("cost time", d))
+
+	// curtime := time.Now()
+
+	// rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
+
+	// if game.Pool.Stats != nil {
+	// 	game.Pool.Stats.Wait()
+
+	// 	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
+
+	// 	goutils.Info("finish.",
+	// 		zap.Int64("total nums", game.Pool.Stats.TotalNum))
+	// }
+
+	// if gAllowStats2 {
+	components := game.Pool.mapComponents[int(bet)]
+	components.Stats2.WaitEnding()
+
+	// components.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-%v-stats-%v.xlsx", game.Pool.Config.Name, bet, curtime.Format("2006-01-02_15_04_05"))))
+
+	// goutils.Info("finish.",
+	// 	zap.Int64("total nums", components.Stats2.BetTimes))
+	// }
+
+	return components.Stats2, nil
 }
