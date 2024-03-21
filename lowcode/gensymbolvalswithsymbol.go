@@ -151,7 +151,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
 
 							nos.Arr[x][y] = curv.Int()
-						} else if nos != nil && nos.Arr[x][y] != genSymbolValsWithSymbol.Config.DefaultVal {
+						} else if nos != nil && nos.Arr[x][y] == genSymbolValsWithSymbol.Config.DefaultVal {
 							if nos == os {
 								nos = os.CloneEx(gameProp.PoolScene)
 							}
@@ -193,7 +193,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
 
 							nos.Arr[x][y] = curv.Int()
-						} else if nos != nil && nos.Arr[x][y] != genSymbolValsWithSymbol.Config.DefaultVal {
+						} else if nos != nil && nos.Arr[x][y] == genSymbolValsWithSymbol.Config.DefaultVal {
 							if nos == os {
 								nos = os.CloneEx(gameProp.PoolScene)
 							}
