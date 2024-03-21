@@ -41,7 +41,7 @@ type Feature struct {
 
 func (f2 *Feature) procCacheStatsWins(win int64) {
 	if f2.Wins != nil {
-		f2.Wins.TotalWin += win
+		f2.Wins.AddWin(win)
 	}
 }
 
@@ -71,23 +71,23 @@ func (f2 *Feature) procCacheStatsRootTriggerWins(win int64) {
 	}
 }
 
-func (f2 *Feature) Clone() *Feature {
-	target := &Feature{}
+// func (f2 *Feature) Clone() *Feature {
+// 	target := &Feature{}
 
-	if f2.Trigger != nil {
-		target.Trigger = f2.Trigger.Clone()
-	}
+// 	if f2.Trigger != nil {
+// 		target.Trigger = f2.Trigger.Clone()
+// 	}
 
-	if f2.RootTrigger != nil {
-		target.RootTrigger = f2.RootTrigger.Clone()
-	}
+// 	if f2.RootTrigger != nil {
+// 		target.RootTrigger = f2.RootTrigger.Clone()
+// 	}
 
-	if f2.Wins != nil {
-		target.Wins = f2.Wins.Clone()
-	}
+// 	if f2.Wins != nil {
+// 		target.Wins = f2.Wins.Clone()
+// 	}
 
-	return target
-}
+// 	return target
+// }
 
 func (f2 *Feature) Merge(src *Feature) {
 	if f2.Trigger != nil && src.Trigger != nil {
@@ -122,7 +122,7 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
 		sn := fmt.Sprintf("%v - wins", sheet)
 		f.NewSheet(sn)
 
-		f2.Wins.SaveSheet(f, sn)
+		f2.Wins.SaveSheet(f, sn, s2.TotalBet)
 	}
 }
 
@@ -132,13 +132,13 @@ func NewFeature(parent string, opts Options) *Feature {
 	}
 
 	if opts.Has(OptWins) {
-		f2.Wins = &StatsWins{}
+		f2.Wins = NewStatsWins()
 	}
 
 	if opts.Has(OptRootTrigger) {
-		f2.RootTrigger = &StatsRootTrigger{}
+		f2.RootTrigger = NewStatsRootTrigger()
 	} else {
-		f2.Trigger = &StatsTrigger{}
+		f2.Trigger = NewStatsTrigger()
 	}
 
 	return f2

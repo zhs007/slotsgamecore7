@@ -9,11 +9,11 @@ type StatsTrigger struct {
 	TriggerTimes int64
 }
 
-func (trigger *StatsTrigger) Clone() *StatsTrigger {
-	return &StatsTrigger{
-		TriggerTimes: trigger.TriggerTimes,
-	}
-}
+// func (trigger *StatsTrigger) Clone() *StatsTrigger {
+// 	return &StatsTrigger{
+// 		TriggerTimes: trigger.TriggerTimes,
+// 	}
+// }
 
 func (trigger *StatsTrigger) Merge(src *StatsTrigger) {
 	trigger.TriggerTimes += src.TriggerTimes
@@ -33,4 +33,8 @@ func (trigger *StatsTrigger) SaveSheet(f *excelize.File, sheet string, parent st
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), 0)
 	}
+}
+
+func NewStatsTrigger() *StatsTrigger {
+	return &StatsTrigger{}
 }

@@ -12,13 +12,13 @@ type StatsRootTrigger struct {
 	IsStarted    bool
 }
 
-func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {
-	return &StatsRootTrigger{
-		RunTimes:     trigger.RunTimes,
-		TriggerTimes: trigger.TriggerTimes,
-		TotalWins:    trigger.TotalWins,
-	}
-}
+// func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {
+// 	return &StatsRootTrigger{
+// 		RunTimes:     trigger.RunTimes,
+// 		TriggerTimes: trigger.TriggerTimes,
+// 		TotalWins:    trigger.TotalWins,
+// 	}
+// }
 
 func (trigger *StatsRootTrigger) Merge(src *StatsRootTrigger) {
 	trigger.RunTimes += src.RunTimes
@@ -68,4 +68,8 @@ func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, paren
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 7), 0)
 	}
+}
+
+func NewStatsRootTrigger() *StatsRootTrigger {
+	return &StatsRootTrigger{}
 }

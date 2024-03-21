@@ -10,6 +10,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -345,6 +346,20 @@ func (symbolValWins *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 // NewComponentData -
 func (symbolValWins *SymbolValWins) NewComponentData() IComponentData {
 	return &SymbolValWinsData{}
+}
+
+// NewStats2 -
+func (symbolValWins *SymbolValWins) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins})
+}
+
+// OnStats2
+func (symbolValWins *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	symbolValWins.BasicComponent.OnStats2(icd, s2)
+
+	svwd := icd.(*SymbolValWinsData)
+
+	s2.ProcStatsWins(symbolValWins.Name, int64(svwd.Wins), true)
 }
 
 func (symbolValWins *SymbolValWins) GetWinMulti(basicCD *BasicComponentData) int {

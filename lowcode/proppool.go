@@ -38,8 +38,8 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		CurPaytables:     pool.DefaultPaytables,
 		CurLineData:      pool.DefaultLineData,
 		PoolScene:        sgc7game.NewGameScenePoolEx(),
-		SceneStack:       NewSceneStack(),
-		OtherSceneStack:  NewSceneStack(),
+		SceneStack:       NewSceneStack(false),
+		OtherSceneStack:  NewSceneStack(true),
 		callStack:        NewCallStack(),
 	}
 

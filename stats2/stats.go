@@ -10,6 +10,7 @@ type Stats struct {
 	MapStats       map[string]*Feature
 	chanBet        chan int
 	chanCache      chan *Cache
+	TotalBet       int64
 	BetTimes       int64
 	BetEndingTimes int64
 	Components     []string
@@ -48,9 +49,10 @@ func (s2 *Stats) SaveExcel(fn string) error {
 func (s2 *Stats) Start() {
 	go func() {
 		for {
-			<-s2.chanBet
+			bet := <-s2.chanBet
 
 			s2.BetTimes++
+			s2.TotalBet += int64(bet)
 		}
 	}()
 

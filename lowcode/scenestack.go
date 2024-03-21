@@ -12,7 +12,8 @@ type SceneStackData struct {
 }
 
 type SceneStack struct {
-	Scenes []*SceneStackData
+	Scenes       []*SceneStackData
+	IsOtherScene bool
 	// CacheScenes []*SceneStackData
 }
 
@@ -53,6 +54,18 @@ func (stack *SceneStack) GetTopScene(curpr *sgc7game.PlayResult, prs []*sgc7game
 	if len(stack.Scenes) == 0 {
 		if len(prs) == 0 {
 			return nil
+		}
+
+		if stack.IsOtherScene {
+			if len(prs[len(prs)-1].OtherScenes) == 0 {
+				return nil
+			}
+
+			stack.Push("", 0, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			// curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+			// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
+
+			return stack.GetTopScene(curpr, prs)
 		}
 
 		if len(prs[len(prs)-1].Scenes) == 0 {
@@ -99,11 +112,22 @@ func (stack *SceneStack) PopEx(num int) {
 }
 
 func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *BasicComponentConfig, si int, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) *sgc7game.GameScene {
-	if len(basicCfg.TargetScenes3) > si {
-		for i := len(stack.Scenes) - 1; i >= 0; i-- {
-			ci := goutils.IndexOfStringSlice(basicCfg.TargetScenes3[si], stack.Scenes[i].Component, 0)
-			if ci >= 0 {
-				return stack.Scenes[i].Scene
+	if stack.IsOtherScene {
+		if len(basicCfg.TargetOtherScenes3) > si {
+			for i := len(stack.Scenes) - 1; i >= 0; i-- {
+				ci := goutils.IndexOfStringSlice(basicCfg.TargetOtherScenes3[si], stack.Scenes[i].Component, 0)
+				if ci >= 0 {
+					return stack.Scenes[i].Scene
+				}
+			}
+		}
+	} else {
+		if len(basicCfg.TargetScenes3) > si {
+			for i := len(stack.Scenes) - 1; i >= 0; i-- {
+				ci := goutils.IndexOfStringSlice(basicCfg.TargetScenes3[si], stack.Scenes[i].Component, 0)
+				if ci >= 0 {
+					return stack.Scenes[i].Scene
+				}
 			}
 		}
 	}
@@ -130,6 +154,8 @@ func (stack *SceneStack) onStepStart(pr *sgc7game.PlayResult) {
 	// stack.CacheScenes = nil
 }
 
-func NewSceneStack() *SceneStack {
-	return &SceneStack{}
+func NewSceneStack(isOtherScene bool) *SceneStack {
+	return &SceneStack{
+		IsOtherScene: isOtherScene,
+	}
 }

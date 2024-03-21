@@ -242,6 +242,7 @@ type BasicComponentConfig struct {
 	UseFileMapping       bool              `yaml:"useFileMapping" json:"useFileMapping"`             // 兼容性配置，新配置应该一定用filemapping
 	ComponentType        string            `yaml:"-" json:"componentType"`                           // 组件类型
 	TargetScenes3        [][]string        `yaml:"targetScenes3" json:"targetScenes3"`               // target scenes V3
+	TargetOtherScenes3   [][]string        `yaml:"targetOtherScenes3" json:"targetOtherScenes3"`     // target scenes V3
 }
 
 type BasicComponent struct {
