@@ -31,13 +31,13 @@ func (winResultCacheData *WinResultCacheData) OnNewGame(gameProp *GameProperty, 
 	winResultCacheData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (winResultCacheData *WinResultCacheData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	winResultCacheData.BasicComponentData.OnNewStep(gameProp, component)
+// // OnNewStep -
+// func (winResultCacheData *WinResultCacheData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	winResultCacheData.BasicComponentData.OnNewStep(gameProp, component)
 
-	winResultCacheData.Wins = 0
-	winResultCacheData.WinMulti = 1
-}
+// 	winResultCacheData.Wins = 0
+// 	winResultCacheData.WinMulti = 1
+// }
 
 // BuildPBComponentData
 func (winResultCacheData *WinResultCacheData) BuildPBComponentData() proto.Message {

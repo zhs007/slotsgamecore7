@@ -35,20 +35,20 @@ func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, 
 	basicComponentData.MapConfigIntVals = make(map[string]int)
 }
 
-// OnNewStep -
-func (basicComponentData *BasicComponentData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	basicComponentData.UsedScenes = nil
-	basicComponentData.UsedOtherScenes = nil
-	basicComponentData.UsedResults = nil
-	basicComponentData.UsedPrizeScenes = nil
-	basicComponentData.CashWin = 0
-	basicComponentData.CoinWin = 0
-	basicComponentData.TargetSceneIndex = -1
-	basicComponentData.TargetOtherSceneIndex = -1
-	basicComponentData.RNG = nil
+// // OnNewStep -
+// func (basicComponentData *BasicComponentData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	basicComponentData.UsedScenes = nil
+// 	basicComponentData.UsedOtherScenes = nil
+// 	basicComponentData.UsedResults = nil
+// 	basicComponentData.UsedPrizeScenes = nil
+// 	basicComponentData.CashWin = 0
+// 	basicComponentData.CoinWin = 0
+// 	basicComponentData.TargetSceneIndex = -1
+// 	basicComponentData.TargetOtherSceneIndex = -1
+// 	basicComponentData.RNG = nil
 
-	basicComponentData.initSrcScenes()
-}
+// 	basicComponentData.initSrcScenes()
+// }
 
 // GetVal -
 func (basicComponentData *BasicComponentData) GetVal(key string) int {
@@ -397,16 +397,16 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 	curpr.Results = append(curpr.Results, ret)
 }
 
-// AddRNG -
-func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, basicCD *BasicComponentData) {
-	i := len(basicCD.RNG)
+// // AddRNG -
+// func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, basicCD *BasicComponentData) {
+// 	i := len(basicCD.RNG)
 
-	basicCD.RNG = append(basicCD.RNG, rng)
+// 	basicCD.RNG = append(basicCD.RNG, rng)
 
-	if len(basicComponent.Config.TagRNG) > i {
-		gameProp.TagInt(basicComponent.Config.TagRNG[i], rng)
-	}
-}
+// 	if len(basicComponent.Config.TagRNG) > i {
+// 		gameProp.TagInt(basicComponent.Config.TagRNG[i], rng)
+// 	}
+// }
 
 // // OnStatsWithPB -
 // func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {

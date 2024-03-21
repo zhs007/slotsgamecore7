@@ -32,10 +32,10 @@ func (queueBranchData *QueueBranchData) OnNewGame(gameProp *GameProperty, compon
 	queueBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (queueBranchData *QueueBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	queueBranchData.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (queueBranchData *QueueBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	queueBranchData.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // SetConfigIntVal -
 func (queueBranchData *QueueBranchData) SetConfigIntVal(key string, val int) {

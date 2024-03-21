@@ -38,10 +38,11 @@ func (linesTriggerData *LinesTriggerData) OnNewGame(gameProp *GameProperty, comp
 	linesTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (linesTriggerData *LinesTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	linesTriggerData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (linesTriggerData *LinesTriggerData) onNewStep() {
+	// linesTriggerData.BasicComponentData.OnNewStep(gameProp, component)
 
+	linesTriggerData.UsedResults = nil
 	linesTriggerData.NextComponent = ""
 	linesTriggerData.SymbolNum = 0
 	linesTriggerData.WildNum = 0
@@ -675,7 +676,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	// linesTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := cd.(*LinesTriggerData)
-	std.OnNewStep(gameProp, linesTrigger)
+	std.onNewStep()
 
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := linesTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)

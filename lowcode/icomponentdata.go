@@ -11,8 +11,8 @@ type FuncOnEachUsedResult func(*sgc7game.Result)
 type IComponentData interface {
 	// OnNewGame -
 	OnNewGame(gameProp *GameProperty, component IComponent)
-	// OnNewStep -
-	OnNewStep(gameProp *GameProperty, component IComponent)
+	// // OnNewStep -
+	// OnNewStep(gameProp *GameProperty, component IComponent)
 	// BuildPBComponentData
 	BuildPBComponentData() proto.Message
 

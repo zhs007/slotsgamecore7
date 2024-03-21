@@ -28,10 +28,10 @@ func (weightAwardsData *WeightAwardsData) OnNewGame(gameProp *GameProperty, comp
 	weightAwardsData.GotIndex = nil
 }
 
-// OnNewStep -
-func (weightAwardsData *WeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	weightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (weightAwardsData *WeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	weightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // BuildPBComponentData
 func (weightAwardsData *WeightAwardsData) BuildPBComponentData() proto.Message {

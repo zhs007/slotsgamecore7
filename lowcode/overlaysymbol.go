@@ -30,9 +30,9 @@ func (overlaySymbolData *OverlaySymbolData) OnNewGame(gameProp *GameProperty, co
 	overlaySymbolData.CurLevel = overlaySymbol.Config.DefaultLevel
 }
 
-// OnNewStep -
-func (overlaySymbolData *OverlaySymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	overlaySymbolData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (overlaySymbolData *OverlaySymbolData) onNewStep(gameProp *GameProperty, component IComponent) {
+	// overlaySymbolData.BasicComponentData.OnNewStep(gameProp, component)
 
 	overlaySymbol := component.(*OverlaySymbol)
 

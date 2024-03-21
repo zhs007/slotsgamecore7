@@ -22,9 +22,9 @@ const BasicReelsTypeName = "basicReels"
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	ReelSetsWeight       string `yaml:"reelSetWeight" json:"reelSetWeight"`
-	ReelSet              string `yaml:"reelSet" json:"reelSet"`
-	IsExpandReel         bool   `yaml:"isExpandReel" json:"isExpandReel"`
+	// ReelSetsWeight       string `yaml:"reelSetWeight" json:"reelSetWeight"`
+	ReelSet      string `yaml:"reelSet" json:"reelSet"`
+	IsExpandReel bool   `yaml:"isExpandReel" json:"isExpandReel"`
 }
 
 // SetLinkComponent
@@ -36,8 +36,8 @@ func (cfg *BasicReelsConfig) SetLinkComponent(link string, componentName string)
 
 type BasicReels struct {
 	*BasicComponent `json:"-"`
-	Config          *BasicReelsConfig     `json:"config"`
-	ReelSetWeights  *sgc7game.ValWeights2 `json:"-"`
+	Config          *BasicReelsConfig `json:"config"`
+	// ReelSetWeights  *sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -
@@ -70,18 +70,18 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	basicReels.Config = cfg.(*BasicReelsConfig)
 	basicReels.Config.ComponentType = BasicReelsTypeName
 
-	if basicReels.Config.ReelSetsWeight != "" {
-		vw2, err := pool.LoadStrWeights(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping)
-		if err != nil {
-			goutils.Error("BasicReels.Init:LoadValWeights",
-				zap.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
-				zap.Error(err))
+	// if basicReels.Config.ReelSetsWeight != "" {
+	// 	vw2, err := pool.LoadStrWeights(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping)
+	// 	if err != nil {
+	// 		goutils.Error("BasicReels.Init:LoadValWeights",
+	// 			zap.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
+	// 			zap.Error(err))
 
-			return err
-		}
+	// 		return err
+	// 	}
 
-		basicReels.ReelSetWeights = vw2
-	}
+	// 	basicReels.ReelSetWeights = vw2
+	// }
 
 	basicReels.onInit(&basicReels.Config.BasicComponentConfig)
 
@@ -105,48 +105,50 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	bcd := cd.(*BasicComponentData)
 
+	bcd.UsedScenes = nil
+
 	// bcd.OnNewStep()
 
-	reelname := ""
-	if basicReels.ReelSetWeights != nil {
-		val, si, err := basicReels.ReelSetWeights.RandValEx(plugin)
-		if err != nil {
-			goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
-				zap.Error(err))
+	// reelname := ""
+	// if basicReels.ReelSetWeights != nil {
+	// 	val, _, err := basicReels.ReelSetWeights.RandValEx(plugin)
+	// 	if err != nil {
+	// 		goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
+	// 			zap.Error(err))
 
-			return "", err
-		}
+	// 		return "", err
+	// 	}
 
-		basicReels.AddRNG(gameProp, si, bcd)
+	// 	// basicReels.AddRNG(gameProp, si, bcd)
 
-		curreels := val.String()
-		gameProp.TagStr(TagCurReels, curreels)
+	// 	curreels := val.String()
+	// 	gameProp.TagStr(TagCurReels, curreels)
 
-		rd, isok := gameProp.Pool.Config.MapReels[curreels]
-		if !isok {
-			goutils.Error("BasicReels.OnPlayGame:MapReels",
-				zap.Error(ErrInvalidReels))
+	// 	rd, isok := gameProp.Pool.Config.MapReels[curreels]
+	// 	if !isok {
+	// 		goutils.Error("BasicReels.OnPlayGame:MapReels",
+	// 			zap.Error(ErrInvalidReels))
 
-			return "", ErrInvalidReels
-		}
+	// 		return "", ErrInvalidReels
+	// 	}
 
-		gameProp.CurReels = rd
-		reelname = curreels
-	} else {
-		reelname = basicReels.getReelSet(bcd)
-		rd, isok := gameProp.Pool.Config.MapReels[reelname]
-		if !isok {
-			goutils.Error("BasicReels.OnPlayGame:MapReels",
-				zap.Error(ErrInvalidReels))
+	// 	gameProp.CurReels = rd
+	// 	reelname = curreels
+	// } else {
+	reelname := basicReels.getReelSet(bcd)
+	rd, isok := gameProp.Pool.Config.MapReels[reelname]
+	if !isok {
+		goutils.Error("BasicReels.OnPlayGame:MapReels",
+			zap.Error(ErrInvalidReels))
 
-			return "", ErrInvalidReels
-		}
-
-		gameProp.TagStr(TagCurReels, reelname)
-
-		gameProp.CurReels = rd
-		// reelname = basicReels.Config.ReelSet
+		return "", ErrInvalidReels
 	}
+
+	gameProp.TagStr(TagCurReels, reelname)
+
+	gameProp.CurReels = rd
+	// reelname = basicReels.Config.ReelSet
+	// }
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	sc.ReelName = reelname

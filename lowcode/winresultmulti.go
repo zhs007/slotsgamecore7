@@ -33,9 +33,9 @@ func (winResultMultiData *WinResultMultiData) OnNewGame(gameProp *GameProperty, 
 	winResultMultiData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (winResultMultiData *WinResultMultiData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	winResultMultiData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (winResultMultiData *WinResultMultiData) onNewStep() {
+	// winResultMultiData.BasicComponentData.OnNewStep(gameProp, component)
 
 	winResultMultiData.Wins = 0
 	winResultMultiData.WinMulti = 1
@@ -134,6 +134,7 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := icd.(*WinResultMultiData)
+	std.onNewStep()
 
 	winMulti := winResultMulti.GetWinMulti(&std.BasicComponentData)
 
