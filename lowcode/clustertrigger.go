@@ -11,7 +11,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -67,13 +66,13 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 
 // GetVal -
 func (clusterTriggerData *ClusterTriggerData) GetVal(key string) int {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		return clusterTriggerData.SymbolNum
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		return clusterTriggerData.WildNum
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		return clusterTriggerData.RespinNum
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		return clusterTriggerData.Wins
 	}
 
@@ -82,13 +81,13 @@ func (clusterTriggerData *ClusterTriggerData) GetVal(key string) int {
 
 // SetVal -
 func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		clusterTriggerData.SymbolNum = val
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		clusterTriggerData.WildNum = val
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		clusterTriggerData.RespinNum = val
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		clusterTriggerData.Wins = val
 	}
 }
@@ -247,9 +246,9 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		clusterTrigger.Config.WinMulti = 1
 	}
 
-	if clusterTrigger.Config.BetType == BTypeNoPay {
-		clusterTrigger.Config.NeedDiscardResults = true
-	}
+	// if clusterTrigger.Config.BetType == BTypeNoPay {
+	// 	clusterTrigger.Config.NeedDiscardResults = true
+	// }
 
 	clusterTrigger.onInit(&clusterTrigger.Config.BasicComponentConfig)
 
@@ -327,6 +326,15 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 
 // procWins
 func (clusterTrigger *ClusterTrigger) procWins(std *ClusterTriggerData, lst []*sgc7game.Result) (int, error) {
+	if clusterTrigger.Config.BetType == BTypeNoPay {
+		for _, v := range lst {
+			v.CoinWin = 0
+			v.CashWin = 0
+		}
+
+		return 0, nil
+	}
+
 	std.WinMulti = clusterTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {
@@ -541,11 +549,15 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 			return nc, nil
 		}
+
+		nc := clusterTrigger.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
 	}
 
 	nc := clusterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -564,57 +576,57 @@ func (clusterTrigger *ClusterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sg
 	return nil
 }
 
-// OnStatsWithPB -
-func (clusterTrigger *ClusterTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.ClusterTriggerData)
-	if !isok {
-		goutils.Error("ClusterTrigger.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (clusterTrigger *ClusterTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.ClusterTriggerData)
+// 	if !isok {
+// 		goutils.Error("ClusterTrigger.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	return clusterTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-}
+// 	return clusterTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+// }
 
-// OnStats
-func (clusterTrigger *ClusterTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	wins := int64(0)
-	isTrigger := false
+// // OnStats
+// func (clusterTrigger *ClusterTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	wins := int64(0)
+// 	isTrigger := false
 
-	for _, v := range lst {
-		gp, isok := v.CurGameModParams.(*GameParams)
-		if isok {
-			curComponent, isok := gp.MapComponentMsgs[clusterTrigger.Name]
-			if isok {
-				curwins, err := clusterTrigger.OnStatsWithPB(feature, curComponent, v)
-				if err != nil {
-					goutils.Error("ClusterTrigger.OnStats",
-						zap.Error(err))
+// 	for _, v := range lst {
+// 		gp, isok := v.CurGameModParams.(*GameParams)
+// 		if isok {
+// 			curComponent, isok := gp.MapComponentMsgs[clusterTrigger.Name]
+// 			if isok {
+// 				curwins, err := clusterTrigger.OnStatsWithPB(feature, curComponent, v)
+// 				if err != nil {
+// 					goutils.Error("ClusterTrigger.OnStats",
+// 						zap.Error(err))
 
-					continue
-				}
+// 					continue
+// 				}
 
-				isTrigger = true
-				wins += curwins
-			}
-		}
-	}
+// 				isTrigger = true
+// 				wins += curwins
+// 			}
+// 		}
+// 	}
 
-	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
+// 	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
 
-	if feature.Parent != nil {
-		totalwins := int64(0)
+// 	if feature.Parent != nil {
+// 		totalwins := int64(0)
 
-		for _, v := range lst {
-			totalwins += v.CashWin
-		}
+// 		for _, v := range lst {
+// 			totalwins += v.CashWin
+// 		}
 
-		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
-	}
+// 		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
+// 	}
 
-	return isTrigger, stake.CashBet, wins
-}
+// 	return isTrigger, stake.CashBet, wins
+// }
 
 // NewComponentData -
 func (clusterTrigger *ClusterTrigger) NewComponentData() IComponentData {

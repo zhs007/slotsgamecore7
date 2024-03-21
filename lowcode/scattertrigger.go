@@ -11,7 +11,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -67,13 +66,13 @@ func (scatterTriggerData *ScatterTriggerData) BuildPBComponentData() proto.Messa
 
 // GetVal -
 func (scatterTriggerData *ScatterTriggerData) GetVal(key string) int {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		return scatterTriggerData.SymbolNum
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		return scatterTriggerData.WildNum
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		return scatterTriggerData.RespinNum
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		return scatterTriggerData.Wins
 	}
 
@@ -82,13 +81,13 @@ func (scatterTriggerData *ScatterTriggerData) GetVal(key string) int {
 
 // SetVal -
 func (scatterTriggerData *ScatterTriggerData) SetVal(key string, val int) {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		scatterTriggerData.SymbolNum = val
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		scatterTriggerData.WildNum = val
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		scatterTriggerData.RespinNum = val
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		scatterTriggerData.Wins = val
 	}
 }
@@ -254,9 +253,9 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		scatterTrigger.Config.WinMulti = 1
 	}
 
-	if scatterTrigger.Config.BetType == BTypeNoPay {
-		scatterTrigger.Config.NeedDiscardResults = true
-	}
+	// if scatterTrigger.Config.BetType == BTypeNoPay {
+	// 	scatterTrigger.Config.NeedDiscardResults = true
+	// }
 
 	scatterTrigger.onInit(&scatterTrigger.Config.BasicComponentConfig)
 
@@ -317,12 +316,12 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				}, false)
 
 			if ret != nil {
-				if scatterTrigger.Config.BetType == BTypeNoPay {
-					ret.CoinWin = 0
-					ret.CashWin = 0
-				} else {
-					// gameProp.ProcMulti(ret)
-				}
+				// if scatterTrigger.Config.BetType == BTypeNoPay {
+				// 	ret.CoinWin = 0
+				// 	ret.CashWin = 0
+				// } else {
+				// 	// gameProp.ProcMulti(ret)
+				// }
 
 				isTrigger = true
 
@@ -335,10 +334,10 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 		})
 
 		if ret != nil {
-			if scatterTrigger.Config.BetType == BTypeNoPay {
-				ret.CoinWin = 0
-				ret.CashWin = 0
-			} else {
+			if scatterTrigger.Config.BetType != BTypeNoPay {
+				// 	ret.CoinWin = 0
+				// 	ret.CashWin = 0
+				// } else {
 				if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
 					ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
 					ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
@@ -362,10 +361,10 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 			})
 
 		if ret != nil {
-			if scatterTrigger.Config.BetType == BTypeNoPay {
-				ret.CoinWin = 0
-				ret.CashWin = 0
-			} else {
+			if scatterTrigger.Config.BetType != BTypeNoPay {
+				// 	ret.CoinWin = 0
+				// 	ret.CashWin = 0
+				// } else {
 				if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
 					ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
 					ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
@@ -395,6 +394,15 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 
 // procWins
 func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
+	if scatterTrigger.Config.BetType == BTypeNoPay {
+		for _, v := range lst {
+			v.CoinWin = 0
+			v.CashWin = 0
+		}
+
+		return 0, nil
+	}
+
 	std.WinMulti = scatterTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {
@@ -611,11 +619,15 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 			return nc, nil
 		}
+
+		nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
 	}
 
 	nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -634,57 +646,57 @@ func (scatterTrigger *ScatterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sg
 	return nil
 }
 
-// OnStatsWithPB -
-func (scatterTrigger *ScatterTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.ScatterTriggerData)
-	if !isok {
-		goutils.Error("ScatterTrigger.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (scatterTrigger *ScatterTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.ScatterTriggerData)
+// 	if !isok {
+// 		goutils.Error("ScatterTrigger.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	return scatterTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-}
+// 	return scatterTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+// }
 
-// OnStats
-func (scatterTrigger *ScatterTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	wins := int64(0)
-	isTrigger := false
+// // OnStats
+// func (scatterTrigger *ScatterTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	wins := int64(0)
+// 	isTrigger := false
 
-	for _, v := range lst {
-		gp, isok := v.CurGameModParams.(*GameParams)
-		if isok {
-			curComponent, isok := gp.MapComponentMsgs[scatterTrigger.Name]
-			if isok {
-				curwins, err := scatterTrigger.OnStatsWithPB(feature, curComponent, v)
-				if err != nil {
-					goutils.Error("ScatterTrigger.OnStats",
-						zap.Error(err))
+// 	for _, v := range lst {
+// 		gp, isok := v.CurGameModParams.(*GameParams)
+// 		if isok {
+// 			curComponent, isok := gp.MapComponentMsgs[scatterTrigger.Name]
+// 			if isok {
+// 				curwins, err := scatterTrigger.OnStatsWithPB(feature, curComponent, v)
+// 				if err != nil {
+// 					goutils.Error("ScatterTrigger.OnStats",
+// 						zap.Error(err))
 
-					continue
-				}
+// 					continue
+// 				}
 
-				isTrigger = true
-				wins += curwins
-			}
-		}
-	}
+// 				isTrigger = true
+// 				wins += curwins
+// 			}
+// 		}
+// 	}
 
-	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
+// 	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
 
-	if feature.Parent != nil {
-		totalwins := int64(0)
+// 	if feature.Parent != nil {
+// 		totalwins := int64(0)
 
-		for _, v := range lst {
-			totalwins += v.CashWin
-		}
+// 		for _, v := range lst {
+// 			totalwins += v.CashWin
+// 		}
 
-		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
-	}
+// 		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
+// 	}
 
-	return isTrigger, stake.CashBet, wins
-}
+// 	return isTrigger, stake.CashBet, wins
+// }
 
 // NewComponentData -
 func (scatterTrigger *ScatterTrigger) NewComponentData() IComponentData {

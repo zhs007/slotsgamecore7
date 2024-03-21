@@ -11,7 +11,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -67,13 +66,13 @@ func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 
 // GetVal -
 func (linesTriggerData *LinesTriggerData) GetVal(key string) int {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		return linesTriggerData.SymbolNum
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		return linesTriggerData.WildNum
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		return linesTriggerData.RespinNum
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		return linesTriggerData.Wins
 	}
 
@@ -82,13 +81,13 @@ func (linesTriggerData *LinesTriggerData) GetVal(key string) int {
 
 // SetVal -
 func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		linesTriggerData.SymbolNum = val
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		linesTriggerData.WildNum = val
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		linesTriggerData.RespinNum = val
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		linesTriggerData.Wins = val
 	}
 }
@@ -250,9 +249,9 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		linesTrigger.Config.WinMulti = 1
 	}
 
-	if linesTrigger.Config.BetType == BTypeNoPay {
-		linesTrigger.Config.NeedDiscardResults = true
-	}
+	// if linesTrigger.Config.BetType == BTypeNoPay {
+	// 	linesTrigger.Config.NeedDiscardResults = true
+	// }
 
 	linesTrigger.onInit(&linesTrigger.Config.BasicComponentConfig)
 
@@ -595,6 +594,15 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 
 // procWins
 func (linesTrigger *LinesTrigger) procWins(std *LinesTriggerData, lst []*sgc7game.Result) (int, error) {
+	if linesTrigger.Config.BetType == BTypeNoPay {
+		for _, v := range lst {
+			v.CoinWin = 0
+			v.CashWin = 0
+		}
+
+		return 0, nil
+	}
+
 	std.WinMulti = linesTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {
@@ -809,11 +817,15 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 			return nc, nil
 		}
+
+		nc := linesTrigger.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
 	}
 
 	nc := linesTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -832,57 +844,57 @@ func (linesTrigger *LinesTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 	return nil
 }
 
-// OnStatsWithPB -
-func (linesTrigger *LinesTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.LinesTriggerData)
-	if !isok {
-		goutils.Error("LinesTrigger.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (linesTrigger *LinesTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.LinesTriggerData)
+// 	if !isok {
+// 		goutils.Error("LinesTrigger.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	return linesTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-}
+// 	return linesTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+// }
 
-// OnStats
-func (linesTrigger *LinesTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	wins := int64(0)
-	isTrigger := false
+// // OnStats
+// func (linesTrigger *LinesTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	wins := int64(0)
+// 	isTrigger := false
 
-	for _, v := range lst {
-		gp, isok := v.CurGameModParams.(*GameParams)
-		if isok {
-			curComponent, isok := gp.MapComponentMsgs[linesTrigger.Name]
-			if isok {
-				curwins, err := linesTrigger.OnStatsWithPB(feature, curComponent, v)
-				if err != nil {
-					goutils.Error("LinesTrigger.OnStats",
-						zap.Error(err))
+// 	for _, v := range lst {
+// 		gp, isok := v.CurGameModParams.(*GameParams)
+// 		if isok {
+// 			curComponent, isok := gp.MapComponentMsgs[linesTrigger.Name]
+// 			if isok {
+// 				curwins, err := linesTrigger.OnStatsWithPB(feature, curComponent, v)
+// 				if err != nil {
+// 					goutils.Error("LinesTrigger.OnStats",
+// 						zap.Error(err))
 
-					continue
-				}
+// 					continue
+// 				}
 
-				isTrigger = true
-				wins += curwins
-			}
-		}
-	}
+// 				isTrigger = true
+// 				wins += curwins
+// 			}
+// 		}
+// 	}
 
-	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
+// 	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
 
-	if feature.Parent != nil {
-		totalwins := int64(0)
+// 	if feature.Parent != nil {
+// 		totalwins := int64(0)
 
-		for _, v := range lst {
-			totalwins += v.CashWin
-		}
+// 		for _, v := range lst {
+// 			totalwins += v.CashWin
+// 		}
 
-		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
-	}
+// 		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
+// 	}
 
-	return isTrigger, stake.CashBet, wins
-}
+// 	return isTrigger, stake.CashBet, wins
+// }
 
 // NewComponentData -
 func (linesTrigger *LinesTrigger) NewComponentData() IComponentData {

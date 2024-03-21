@@ -11,7 +11,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -271,63 +270,63 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	return nil
 }
 
-// OnStats
-func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	if feature != nil && len(lst) > 0 {
-		if feature.RespinEndingStatus != nil {
-			pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, collector.Name)
+// // OnStats
+// func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	if feature != nil && len(lst) > 0 {
+// 		if feature.RespinEndingStatus != nil {
+// 			pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, collector.Name)
 
-			if pbcd != nil {
-				collector.OnStatsWithPB(feature, pbcd, lastpr)
-			}
-		}
+// 			if pbcd != nil {
+// 				collector.OnStatsWithPB(feature, pbcd, lastpr)
+// 			}
+// 		}
 
-		if feature.RespinStartStatus != nil {
-			pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, collector.Name)
+// 		if feature.RespinStartStatus != nil {
+// 			pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, collector.Name)
 
-			if pbcd != nil {
-				collector.OnStatsWithPB(feature, pbcd, lastpr)
-			}
-		}
+// 			if pbcd != nil {
+// 				collector.OnStatsWithPB(feature, pbcd, lastpr)
+// 			}
+// 		}
 
-		if feature.RespinStartStatusEx != nil {
-			pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, collector.Name)
+// 		if feature.RespinStartStatusEx != nil {
+// 			pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, collector.Name)
 
-			if len(pbs) > 0 {
-				for i, v := range pbs {
-					collector.OnStatsWithPB(feature, v, prs[i])
-				}
-			}
-		}
-	}
+// 			if len(pbs) > 0 {
+// 				for i, v := range pbs {
+// 					collector.OnStatsWithPB(feature, v, prs[i])
+// 				}
+// 			}
+// 		}
+// 	}
 
-	return false, 0, 0
-}
+// 	return false, 0, 0
+// }
 
-// OnStatsWithPB -
-func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.CollectorData)
-	if !isok {
-		goutils.Error("Collector.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.CollectorData)
+// 	if !isok {
+// 		goutils.Error("Collector.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	if feature.RespinEndingStatus != nil {
-		feature.RespinEndingStatus.AddStatus(int(pbcd.Val))
-	}
+// 	if feature.RespinEndingStatus != nil {
+// 		feature.RespinEndingStatus.AddStatus(int(pbcd.Val))
+// 	}
 
-	if feature.RespinStartStatus != nil {
-		feature.RespinStartStatus.AddStatus(int(pbcd.Val - pbcd.NewCollector))
-	}
+// 	if feature.RespinStartStatus != nil {
+// 		feature.RespinStartStatus.AddStatus(int(pbcd.Val - pbcd.NewCollector))
+// 	}
 
-	if feature.RespinStartStatusEx != nil {
-		feature.RespinStartStatusEx.AddStatus(int(pbcd.Val - pbcd.NewCollector))
-	}
+// 	if feature.RespinStartStatusEx != nil {
+// 		feature.RespinStartStatusEx.AddStatus(int(pbcd.Val - pbcd.NewCollector))
+// 	}
 
-	return 0, nil
-}
+// 	return 0, nil
+// }
 
 // NewComponentData -
 func (collector *Collector) NewComponentData() IComponentData {

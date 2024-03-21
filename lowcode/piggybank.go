@@ -11,7 +11,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -173,23 +172,23 @@ func (piggyBank *PiggyBank) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	return nil
 }
 
-// OnStatsWithPB -
-func (piggyBank *PiggyBank) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.PiggyBankData)
-	if !isok {
-		goutils.Error("PiggyBank.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (piggyBank *PiggyBank) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.PiggyBankData)
+// 	if !isok {
+// 		goutils.Error("PiggyBank.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	return piggyBank.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-}
+// 	return piggyBank.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+// }
 
-// OnStats
-func (piggyBank *PiggyBank) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats
+// func (piggyBank *PiggyBank) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
 // NewComponentData -
 func (piggyBank *PiggyBank) NewComponentData() IComponentData {

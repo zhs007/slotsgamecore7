@@ -6,7 +6,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
@@ -273,10 +272,10 @@ func (basicComponent *BasicComponent) OnPlayGame(gameProp *GameProperty, curpr *
 	return nil
 }
 
-// OnStats -
-func (basicComponent *BasicComponent) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	return false, 0, 0
-}
+// // OnStats -
+// func (basicComponent *BasicComponent) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	return false, 0, 0
+// }
 
 // // onInit -
 // func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -408,37 +407,37 @@ func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, ba
 	}
 }
 
-// OnStatsWithPB -
-func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-	pbcd, isok := pbComponentData.(*sgc7pb.BasicComponentData)
-	if !isok {
-		goutils.Error("BasicComponent.OnStatsWithPB",
-			zap.Error(ErrIvalidProto))
+// // OnStatsWithPB -
+// func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.BasicComponentData)
+// 	if !isok {
+// 		goutils.Error("BasicComponent.OnStatsWithPB",
+// 			zap.Error(ErrIvalidProto))
 
-		return 0, ErrIvalidProto
-	}
+// 		return 0, ErrIvalidProto
+// 	}
 
-	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-}
+// 	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
+// }
 
-// OnStatsWithComponent -
-func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
-	wins := int64(0)
+// // OnStatsWithComponent -
+// func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
+// 	wins := int64(0)
 
-	for _, v := range pbComponent.UsedResults {
-		ret := pr.Results[v]
+// 	for _, v := range pbComponent.UsedResults {
+// 		ret := pr.Results[v]
 
-		feature.Symbols.OnWin(ret)
+// 		feature.Symbols.OnWin(ret)
 
-		wins += int64(ret.CashWin)
-	}
+// 		wins += int64(ret.CashWin)
+// 	}
 
-	if pbComponent.TargetScene >= 0 {
-		feature.Reels.OnScene(pr.Scenes[pbComponent.TargetScene])
-	}
+// 	if pbComponent.TargetScene >= 0 {
+// 		feature.Reels.OnScene(pr.Scenes[pbComponent.TargetScene])
+// 	}
 
-	return wins
-}
+// 	return wins
+// }
 
 // // GetTargetScene -
 // func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, targetScene string) *sgc7game.GameScene {

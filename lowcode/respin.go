@@ -433,9 +433,9 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache) {
 	rcd := icd.(*RespinData)
 
 	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
-		s2.ProcStatsRootTrigger(respin.Name, true)
+		s2.ProcStatsRootTrigger(respin.Name, rcd.TotalCashWin, true)
 	} else {
-		s2.ProcStatsRootTrigger(respin.Name, false)
+		s2.ProcStatsRootTrigger(respin.Name, 0, false)
 	}
 }
 
