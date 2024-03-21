@@ -6,10 +6,10 @@ import (
 )
 
 type StatsRootTrigger struct {
-	RunTimes     int64
-	TriggerTimes int64
-	TotalWins    int64
-	IsStarted    bool
+	RunTimes     int64 `json:"runTimes"`
+	TriggerTimes int64 `json:"triggerTimes"`
+	TotalWins    int64 `json:"totalWins"`
+	IsStarted    bool  `json:"-"`
 }
 
 // func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {

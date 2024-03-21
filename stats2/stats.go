@@ -3,17 +3,20 @@ package stats2
 import (
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
+	"github.com/zhs007/goutils"
+	"go.uber.org/zap"
 )
 
 type Stats struct {
-	MapStats       map[string]*Feature
-	chanBet        chan int
-	chanCache      chan *Cache
-	TotalBet       int64
-	BetTimes       int64
-	BetEndingTimes int64
-	Components     []string
+	MapStats       map[string]*Feature `json:"mapStats"`
+	chanBet        chan int            `json:"-"`
+	chanCache      chan *Cache         `json:"-"`
+	TotalBet       int64               `json:"totalBet"`
+	BetTimes       int64               `json:"betTimes"`
+	BetEndingTimes int64               `json:"-"`
+	Components     []string            `json:"components"`
 }
 
 func (s2 *Stats) PushBet(bet int) {
@@ -94,6 +97,21 @@ func (s2 *Stats) GetRunTimes(name string) int64 {
 	return 0
 }
 
+func (s2 *Stats) Merge(src *Stats) {
+	for k, v := range src.MapStats {
+		cv, isok := s2.MapStats[k]
+		if isok {
+			cv.Merge(v)
+		}
+	}
+}
+
+func (s2 *Stats) ToJson() string {
+	str, _ := sonic.MarshalString(s2)
+
+	return str
+}
+
 func NewStats(components []string) *Stats {
 	s2 := &Stats{
 		MapStats:   make(map[string]*Feature),
@@ -103,4 +121,19 @@ func NewStats(components []string) *Stats {
 	}
 
 	return s2
+}
+
+func LoadStats(str string) (*Stats, error) {
+	s2 := &Stats{}
+
+	err := sonic.UnmarshalString(str, s2)
+	if err != nil {
+		goutils.Error("LoadStats:UnmarshalString",
+			zap.String("str", str),
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return s2, nil
 }
