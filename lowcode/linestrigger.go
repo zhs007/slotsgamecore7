@@ -817,11 +817,15 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 			return nc, nil
 		}
+
+		nc := linesTrigger.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
 	}
 
 	nc := linesTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame

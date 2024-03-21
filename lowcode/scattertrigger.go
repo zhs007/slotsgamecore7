@@ -619,11 +619,15 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 			return nc, nil
 		}
+
+		nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
 	}
 
 	nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame

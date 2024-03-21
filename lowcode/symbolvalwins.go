@@ -264,15 +264,17 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 			svwd.Wins = ret.CoinWin
 
 			symbolValWins.AddResult(curpr, ret, &svwd.BasicComponentData)
+
+			nc := symbolValWins.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
 		}
 	}
 	// }
 
 	nc := symbolValWins.onStepEnd(gameProp, curpr, gp, "")
 
-	// gp.AddComponentData(symbolValWins.Name, cd)
-
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame

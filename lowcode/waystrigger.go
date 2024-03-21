@@ -618,11 +618,15 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 			return nc, nil
 		}
+
+		nc := waysTrigger.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
 	}
 
 	nc := waysTrigger.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame
