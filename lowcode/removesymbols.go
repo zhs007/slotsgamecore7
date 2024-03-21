@@ -28,9 +28,9 @@ func (removeSymbolsData *RemoveSymbolsData) OnNewGame(gameProp *GameProperty, co
 	removeSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (removeSymbolsData *RemoveSymbolsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
+	// removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	removeSymbolsData.RemovedNum = 0
 }
@@ -132,6 +132,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// removeSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	bcd := cd.(*RemoveSymbolsData)
+	bcd.onNewStep()
 
 	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs

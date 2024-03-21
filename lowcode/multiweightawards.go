@@ -28,10 +28,10 @@ func (multiWeightAwardsData *MultiWeightAwardsData) OnNewGame(gameProp *GameProp
 	multiWeightAwardsData.HasGot = nil
 }
 
-// OnNewStep -
-func (multiWeightAwardsData *MultiWeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	multiWeightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (multiWeightAwardsData *MultiWeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	multiWeightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // BuildPBComponentData
 func (multiWeightAwardsData *MultiWeightAwardsData) BuildPBComponentData() proto.Message {

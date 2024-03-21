@@ -32,9 +32,9 @@ func (collectorData *CollectorData) OnNewGame(gameProp *GameProperty, component 
 	collectorData.Val = 0
 }
 
-// OnNewStep -
-func (collectorData *CollectorData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	collectorData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (collectorData *CollectorData) onNewStep() {
+	// collectorData.BasicComponentData.OnNewStep(gameProp, component)
 
 	collectorData.NewCollector = 0
 }
@@ -205,6 +205,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	// collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	ccd := cd.(*CollectorData)
+	ccd.onNewStep()
 
 	off, isok := ccd.GetConfigIntVal(CCVValueNum)
 	if isok {

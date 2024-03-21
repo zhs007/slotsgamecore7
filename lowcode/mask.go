@@ -63,9 +63,9 @@ func (maskData *MaskData) OnNewGame(gameProp *GameProperty, component IComponent
 	maskData.NewChged = 0
 }
 
-// OnNewStep -
-func (maskData *MaskData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	maskData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (maskData *MaskData) onNewStep() {
+	// maskData.BasicComponentData.OnNewStep(gameProp, component)
 
 	if maskData.NewChged > 0 {
 		maskData.NewVals = make([]bool, maskData.Num)
@@ -268,6 +268,8 @@ func (mask *Mask) ProcMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, cu
 func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
+	mcd := cd.(*MaskData)
+	mcd.onNewStep()
 	// mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	// mask.ProcMask(plugin, gameProp, curpr, prs, gp, "")

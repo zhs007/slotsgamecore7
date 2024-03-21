@@ -38,9 +38,11 @@ func (waysTriggerData *WaysTriggerData) OnNewGame(gameProp *GameProperty, compon
 	waysTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (waysTriggerData *WaysTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	waysTriggerData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (waysTriggerData *WaysTriggerData) onNewStep() {
+	// waysTriggerData.BasicComponentData.OnNewStep(gameProp, component)
+
+	waysTriggerData.UsedResults = nil
 
 	waysTriggerData.NextComponent = ""
 	waysTriggerData.SymbolNum = 0
@@ -476,7 +478,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	// waysTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := icd.(*WaysTriggerData)
-	std.OnNewStep(gameProp, waysTrigger)
+	std.onNewStep()
 
 	gs := waysTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := waysTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)

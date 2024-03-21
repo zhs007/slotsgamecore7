@@ -27,12 +27,12 @@ func (weightReelsData *WeightReelsData) OnNewGame(gameProp *GameProperty, compon
 	weightReelsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (weightReelsData *WeightReelsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	weightReelsData.BasicComponentData.OnNewStep(gameProp, component)
+// // OnNewStep -
+// func (weightReelsData *WeightReelsData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	weightReelsData.BasicComponentData.OnNewStep(gameProp, component)
 
-	weightReelsData.ReelSetIndex = -1
-}
+// 	weightReelsData.ReelSetIndex = -1
+// }
 
 // BuildPBComponentData
 func (weightReelsData *WeightReelsData) BuildPBComponentData() proto.Message {
@@ -128,6 +128,9 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	// weightReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	wrd := icd.(*WeightReelsData)
+
+	wrd.UsedScenes = nil
+	wrd.ReelSetIndex = -1
 
 	reelname := ""
 	if weightReels.Config.ReelSetsWeightVW != nil {

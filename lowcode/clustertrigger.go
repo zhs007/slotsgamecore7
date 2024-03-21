@@ -38,10 +38,9 @@ func (clusterTriggerData *ClusterTriggerData) OnNewGame(gameProp *GameProperty, 
 	clusterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (clusterTriggerData *ClusterTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	clusterTriggerData.BasicComponentData.OnNewStep(gameProp, component)
-
+// onNewStep -
+func (clusterTriggerData *ClusterTriggerData) onNewStep() {
+	clusterTriggerData.UsedResults = nil
 	clusterTriggerData.NextComponent = ""
 	clusterTriggerData.SymbolNum = 0
 	clusterTriggerData.WildNum = 0
@@ -408,7 +407,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	// clusterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := cd.(*ClusterTriggerData)
-	std.OnNewStep(gameProp, clusterTrigger)
+	std.onNewStep()
 
 	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 

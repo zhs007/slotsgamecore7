@@ -50,9 +50,9 @@ func (respinData *RespinData) OnNewGame(gameProp *GameProperty, component ICompo
 	respinData.Awards = nil
 }
 
-// OnNewStep -
-func (respinData *RespinData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	respinData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (respinData *RespinData) onNewStep() {
+	// respinData.BasicComponentData.OnNewStep(gameProp, component)
 
 	respinData.CurAddRespinNum = 0
 }
@@ -256,6 +256,8 @@ func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 	// respin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*RespinData)
+
+	cd.onNewStep()
 
 	// if cd.CurRespinNum == 0 && cd.LastRespinNum == 0 && respin.Config.InitRespinNum > 0 {
 	// 	cd.LastRespinNum = respin.Config.InitRespinNum

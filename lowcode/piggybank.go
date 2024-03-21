@@ -30,9 +30,9 @@ func (piggyBankData *PiggyBankData) OnNewGame(gameProp *GameProperty, component 
 	piggyBankData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (piggyBankData *PiggyBankData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	piggyBankData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (piggyBankData *PiggyBankData) onNewStep() {
+	// piggyBankData.BasicComponentData.OnNewStep(gameProp, component)
 
 	piggyBankData.Wins = 0
 	piggyBankData.WinMulti = 1
@@ -131,7 +131,7 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := icd.(*PiggyBankData)
 
-	cd.OnNewStep(gameProp, piggyBank)
+	cd.onNewStep()
 
 	winMulti := piggyBank.GetWinMulti(&cd.BasicComponentData)
 

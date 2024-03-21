@@ -49,10 +49,10 @@ func (positionCollectionData *PositionCollectionData) OnNewGame(gameProp *GamePr
 	positionCollectionData.Pos = append(positionCollectionData.Pos, positionCollection.Config.InitPositions...)
 }
 
-// OnNewStep -
-func (positionCollectionData *PositionCollectionData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	positionCollectionData.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (positionCollectionData *PositionCollectionData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	positionCollectionData.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // BuildPBComponentData
 func (positionCollectionData *PositionCollectionData) BuildPBComponentData() proto.Message {

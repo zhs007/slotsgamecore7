@@ -51,9 +51,11 @@ func (symbolValWinsData *SymbolValWinsData) OnNewGame(gameProp *GameProperty, co
 	symbolValWinsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (symbolValWinsData *SymbolValWinsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	symbolValWinsData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (symbolValWinsData *SymbolValWinsData) onNewStep() {
+	// symbolValWinsData.BasicComponentData.OnNewStep(gameProp, component)
+
+	symbolValWinsData.UsedResults = nil
 
 	// symbolValWinsData.SymbolNum = 0
 	// symbolValWinsData.Wins = 0
@@ -178,6 +180,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// symbolValWins.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	svwd := icd.(*SymbolValWinsData)
+	svwd.onNewStep()
 
 	// gs := symbolValWins.GetTargetScene3(gameProp, curpr, prs, &svwd.BasicComponentData, symbolValWins.Name, "", 0)
 	// isTrigger := true

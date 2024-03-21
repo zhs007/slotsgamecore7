@@ -32,10 +32,10 @@ func (weightBranchData *WeightBranchData) OnNewGame(gameProp *GameProperty, comp
 	weightBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (weightBranchData *WeightBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	weightBranchData.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (weightBranchData *WeightBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	weightBranchData.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // BuildPBComponentData
 func (weightBranchData *WeightBranchData) BuildPBComponentData() proto.Message {

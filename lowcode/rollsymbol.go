@@ -32,10 +32,10 @@ func (rollSymbolData *RollSymbolData) OnNewGame(gameProp *GameProperty, componen
 	rollSymbolData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // BuildPBComponentData
 func (rollSymbolData *RollSymbolData) BuildPBComponentData() proto.Message {

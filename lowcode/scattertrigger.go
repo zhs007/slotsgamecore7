@@ -38,9 +38,11 @@ func (scatterTriggerData *ScatterTriggerData) OnNewGame(gameProp *GameProperty, 
 	scatterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
-func (scatterTriggerData *ScatterTriggerData) OnNewStep(gameProp *GameProperty, component IComponent) {
-	scatterTriggerData.BasicComponentData.OnNewStep(gameProp, component)
+// onNewStep -
+func (scatterTriggerData *ScatterTriggerData) onNewStep() {
+	// scatterTriggerData.BasicComponentData.OnNewStep(gameProp, component)
+
+	scatterTriggerData.UsedResults = nil
 
 	scatterTriggerData.NextComponent = ""
 	scatterTriggerData.SymbolNum = 0
@@ -475,7 +477,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	// scatterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := icd.(*ScatterTriggerData)
-	std.OnNewStep(gameProp, scatterTrigger)
+	std.onNewStep()
 
 	gs := scatterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := scatterTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)

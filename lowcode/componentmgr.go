@@ -32,7 +32,7 @@ func NewComponentMgr() *ComponentMgr {
 	}
 
 	mgr.Reg(BasicReelsTypeName, NewBasicReels)
-	mgr.Reg(MysteryTypeName, NewMystery)
+	// mgr.Reg(MysteryTypeName, NewMystery)
 	// mgr.Reg(BasicWinsTypeName, NewBasicWins)
 	// mgr.Reg(LightningTypeName, NewLightning)
 	// mgr.Reg(MultiLevelReelsTypeName, NewMultiLevelReels)
@@ -44,7 +44,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(SymbolValWinsTypeName, NewSymbolValWins)
 	mgr.Reg(SymbolVal2TypeName, NewSymbolVal2)
 	mgr.Reg(OverlaySymbolTypeName, NewOverlaySymbol)
-	mgr.Reg(ReelSetMysteryTypeName, NewReelSetMystery)
+	// mgr.Reg(ReelSetMysteryTypeName, NewReelSetMystery)
 	mgr.Reg(WeightTriggerTypeName, NewWeightTrigger)
 	mgr.Reg(ChgSymbolTypeName, NewChgSymbol)
 	mgr.Reg(RespinTypeName, NewRespin)

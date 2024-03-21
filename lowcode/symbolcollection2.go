@@ -34,10 +34,10 @@ func (symbolCollection2Data *SymbolCollection2Data) OnNewGame(gameProp *GameProp
 	symbolCollection2Data.SymbolCodes = append(symbolCollection2Data.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
 }
 
-// OnNewStep -
-func (symbolCollection2Data *SymbolCollection2Data) OnNewStep(gameProp *GameProperty, component IComponent) {
-	symbolCollection2Data.BasicComponentData.OnNewStep(gameProp, component)
-}
+// // OnNewStep -
+// func (symbolCollection2Data *SymbolCollection2Data) OnNewStep(gameProp *GameProperty, component IComponent) {
+// 	symbolCollection2Data.BasicComponentData.OnNewStep(gameProp, component)
+// }
 
 // BuildPBComponentData
 func (symbolCollection2Data *SymbolCollection2Data) BuildPBComponentData() proto.Message {
