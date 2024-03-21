@@ -49,6 +49,27 @@ func (s2 *Stats) SaveExcel(fn string) error {
 	return f.SaveAs(fn)
 }
 
+func (s2 *Stats) ExportExcel() ([]byte, error) {
+	f := excelize.NewFile()
+
+	for _, cn := range s2.Components {
+		f2, isok := s2.MapStats[cn]
+		if isok {
+			f2.SaveSheet(f, cn, s2)
+		}
+	}
+
+	buf, err := f.WriteToBuffer()
+	if err != nil {
+		goutils.Error("Stats.ExportExcel:WriteToBuffer",
+			zap.Error(err))
+
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
 func (s2 *Stats) Start() {
 	go func() {
 		for {
