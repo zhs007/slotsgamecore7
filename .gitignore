@@ -26,3 +26,4 @@ app/stats.xlsx
 output/*.xlsx
 output/*.csv
 __debug_bin
+.DS_Store
