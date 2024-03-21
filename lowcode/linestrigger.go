@@ -66,13 +66,13 @@ func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 
 // GetVal -
 func (linesTriggerData *LinesTriggerData) GetVal(key string) int {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		return linesTriggerData.SymbolNum
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		return linesTriggerData.WildNum
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		return linesTriggerData.RespinNum
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		return linesTriggerData.Wins
 	}
 
@@ -81,13 +81,13 @@ func (linesTriggerData *LinesTriggerData) GetVal(key string) int {
 
 // SetVal -
 func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		linesTriggerData.SymbolNum = val
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		linesTriggerData.WildNum = val
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		linesTriggerData.RespinNum = val
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		linesTriggerData.Wins = val
 	}
 }
@@ -249,9 +249,9 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		linesTrigger.Config.WinMulti = 1
 	}
 
-	if linesTrigger.Config.BetType == BTypeNoPay {
-		linesTrigger.Config.NeedDiscardResults = true
-	}
+	// if linesTrigger.Config.BetType == BTypeNoPay {
+	// 	linesTrigger.Config.NeedDiscardResults = true
+	// }
 
 	linesTrigger.onInit(&linesTrigger.Config.BasicComponentConfig)
 
@@ -594,6 +594,15 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 
 // procWins
 func (linesTrigger *LinesTrigger) procWins(std *LinesTriggerData, lst []*sgc7game.Result) (int, error) {
+	if linesTrigger.Config.BetType == BTypeNoPay {
+		for _, v := range lst {
+			v.CoinWin = 0
+			v.CashWin = 0
+		}
+
+		return 0, nil
+	}
+
 	std.WinMulti = linesTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {

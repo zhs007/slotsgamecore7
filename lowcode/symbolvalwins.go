@@ -90,9 +90,9 @@ func (symbolValWinsData *SymbolValWinsData) GetVal(key string) int {
 
 // SetVal -
 func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
-	if key == STDVWins {
+	if key == CVWins {
 		symbolValWinsData.Wins = val
-	} else if key == SVWDVSymbolNum {
+	} else if key == CVSymbolNum {
 		symbolValWinsData.SymbolNum = val
 	}
 }

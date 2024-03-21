@@ -17,6 +17,60 @@ const (
 
 const DefaultCmd = "SPIN"
 
+type SymbolTriggerType int
+
+const (
+	STTypeUnknow             SymbolTriggerType = 0 // 非法
+	STTypeLines              SymbolTriggerType = 1 // 线中奖判断，一定是判断全部线，且读paytable来判断是否可以中奖
+	STTypeWays               SymbolTriggerType = 2 // ways中奖判断，且读paytable来判断是否可以中奖
+	STTypeScatters           SymbolTriggerType = 3 // scatter中奖判断，且读paytable来判断是否可以中奖
+	STTypeCountScatter       SymbolTriggerType = 4 // scatter判断，需要传入minnum，不读paytable
+	STTypeCountScatterInArea SymbolTriggerType = 5 // 区域内的scatter判断，需要传入minnum，不读paytable
+	STTypeCheckLines         SymbolTriggerType = 6 // 线判断，一定是判断全部线，需要传入minnum，不读paytable
+	STTypeCheckWays          SymbolTriggerType = 7 // ways判断，需要传入minnum，不读paytable
+	STTypeCluster            SymbolTriggerType = 8 // cluster，且读paytable来判断是否可以中奖
+)
+
+func ParseSymbolTriggerType(str string) SymbolTriggerType {
+	if str == "lines" {
+		return STTypeLines
+	} else if str == "ways" {
+		return STTypeWays
+	} else if str == "scatters" {
+		return STTypeScatters
+	} else if str == "countscatter" {
+		return STTypeCountScatter
+	} else if str == "countscatterInArea" {
+		return STTypeCountScatterInArea
+	} else if str == "checkLines" {
+		return STTypeCheckLines
+	} else if str == "checkWays" {
+		return STTypeCheckWays
+	} else if str == "cluster" {
+		return STTypeCluster
+	}
+
+	return STTypeUnknow
+}
+
+type BetType int
+
+const (
+	BTypeNoPay    BetType = 0
+	BTypeBet      BetType = 1
+	BTypeTotalBet BetType = 2
+)
+
+func ParseBetType(str string) BetType {
+	if str == "bet" {
+		return BTypeBet
+	} else if str == "totalBet" {
+		return BTypeTotalBet
+	}
+
+	return BTypeNoPay
+}
+
 type GameParams struct {
 	sgc7pb.GameParam `json:",inline"`
 	LastScene        *sgc7game.GameScene      `json:"-"`

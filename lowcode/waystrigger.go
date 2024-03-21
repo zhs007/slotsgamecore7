@@ -66,13 +66,13 @@ func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 
 // GetVal -
 func (waysTriggerData *WaysTriggerData) GetVal(key string) int {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		return waysTriggerData.SymbolNum
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		return waysTriggerData.WildNum
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		return waysTriggerData.RespinNum
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		return waysTriggerData.Wins
 	}
 
@@ -81,13 +81,13 @@ func (waysTriggerData *WaysTriggerData) GetVal(key string) int {
 
 // SetVal -
 func (waysTriggerData *WaysTriggerData) SetVal(key string, val int) {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		waysTriggerData.SymbolNum = val
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		waysTriggerData.WildNum = val
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		waysTriggerData.RespinNum = val
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		waysTriggerData.Wins = val
 	}
 }
@@ -250,9 +250,9 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		waysTrigger.Config.WinMulti = 1
 	}
 
-	if waysTrigger.Config.BetType == BTypeNoPay {
-		waysTrigger.Config.NeedDiscardResults = true
-	}
+	// if waysTrigger.Config.BetType == BTypeNoPay {
+	// 	waysTrigger.Config.NeedDiscardResults = true
+	// }
 
 	waysTrigger.onInit(&waysTrigger.Config.BasicComponentConfig)
 
@@ -395,6 +395,15 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 
 // procWins
 func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
+	if waysTrigger.Config.BetType == BTypeNoPay {
+		for _, v := range lst {
+			v.CoinWin = 0
+			v.CashWin = 0
+		}
+
+		return 0, nil
+	}
+
 	std.WinMulti = waysTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {

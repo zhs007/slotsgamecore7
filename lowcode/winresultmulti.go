@@ -54,7 +54,7 @@ func (winResultMultiData *WinResultMultiData) BuildPBComponentData() proto.Messa
 
 // GetVal -
 func (winResultMultiData *WinResultMultiData) GetVal(key string) int {
-	if key == STDVWins {
+	if key == CVWins {
 		return winResultMultiData.Wins
 	}
 
@@ -63,7 +63,7 @@ func (winResultMultiData *WinResultMultiData) GetVal(key string) int {
 
 // SetVal -
 func (winResultMultiData *WinResultMultiData) SetVal(key string, val int) {
-	if key == STDVWins {
+	if key == CVWins {
 		winResultMultiData.Wins = val
 	}
 }

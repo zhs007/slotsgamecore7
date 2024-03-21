@@ -66,13 +66,13 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 
 // GetVal -
 func (clusterTriggerData *ClusterTriggerData) GetVal(key string) int {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		return clusterTriggerData.SymbolNum
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		return clusterTriggerData.WildNum
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		return clusterTriggerData.RespinNum
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		return clusterTriggerData.Wins
 	}
 
@@ -81,13 +81,13 @@ func (clusterTriggerData *ClusterTriggerData) GetVal(key string) int {
 
 // SetVal -
 func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
-	if key == STDVSymbolNum {
+	if key == CVSymbolNum {
 		clusterTriggerData.SymbolNum = val
-	} else if key == STDVWildNum {
+	} else if key == CVWildNum {
 		clusterTriggerData.WildNum = val
-	} else if key == STDVRespinNum {
+	} else if key == CVRespinNum {
 		clusterTriggerData.RespinNum = val
-	} else if key == STDVWins {
+	} else if key == CVWins {
 		clusterTriggerData.Wins = val
 	}
 }
@@ -246,9 +246,9 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		clusterTrigger.Config.WinMulti = 1
 	}
 
-	if clusterTrigger.Config.BetType == BTypeNoPay {
-		clusterTrigger.Config.NeedDiscardResults = true
-	}
+	// if clusterTrigger.Config.BetType == BTypeNoPay {
+	// 	clusterTrigger.Config.NeedDiscardResults = true
+	// }
 
 	clusterTrigger.onInit(&clusterTrigger.Config.BasicComponentConfig)
 
@@ -326,6 +326,15 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 
 // procWins
 func (clusterTrigger *ClusterTrigger) procWins(std *ClusterTriggerData, lst []*sgc7game.Result) (int, error) {
+	if clusterTrigger.Config.BetType == BTypeNoPay {
+		for _, v := range lst {
+			v.CoinWin = 0
+			v.CashWin = 0
+		}
+
+		return 0, nil
+	}
+
 	std.WinMulti = clusterTrigger.GetWinMulti(&std.BasicComponentData)
 
 	for _, v := range lst {
