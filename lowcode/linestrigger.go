@@ -11,6 +11,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -679,6 +680,9 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := linesTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
+	// 临时应付一下
+	os = nil
+
 	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
@@ -908,6 +912,20 @@ func (linesTrigger *LinesTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 	}
 
 	return linesTrigger.Config.WinMulti
+}
+
+// NewStats2 -
+func (linesTrigger *LinesTrigger) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins})
+}
+
+// OnStats2
+func (linesTrigger *LinesTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	linesTrigger.BasicComponent.OnStats2(icd, s2)
+
+	cd := icd.(*LinesTriggerData)
+
+	s2.ProcStatsWins(linesTrigger.Name, int64(cd.Wins), true)
 }
 
 // GetAllLinkComponents - get all link components

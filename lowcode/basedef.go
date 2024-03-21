@@ -120,13 +120,13 @@ func NewGameParam() *GameParams {
 	}
 }
 
-// gIsForceDisableStats - disable stats
-var gIsForceDisableStats bool
+// // gIsForceDisableStats - disable stats
+// var gIsForceDisableStats bool
 
-// SetForceDisableStats - disable stats
-func SetForceDisableStats() {
-	gIsForceDisableStats = true
-}
+// // SetForceDisableStats - disable stats
+// func SetForceDisableStats() {
+// 	gIsForceDisableStats = true
+// }
 
 // gIsReleaseMode - release mode
 var gIsReleaseMode bool
@@ -197,5 +197,5 @@ const MaxComponentNumInStep = 100
 func init() {
 	initCheckWinType()
 
-	gIsForceDisableStats = true
+	// gIsForceDisableStats = true
 }

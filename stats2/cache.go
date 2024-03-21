@@ -25,12 +25,12 @@ func (s2 *Cache) ProcStatsWins(name string, win int64, isRealWin bool) {
 	if isok {
 		f2.procCacheStatsWins(win)
 
-		if isRealWin && f2.Parent != "" {
-			p2, isok := s2.MapStats[f2.Parent]
-			if isok {
-				p2.procCacheStatsRootTriggerWins(win)
-			}
-		}
+		// if isRealWin && f2.Parent != "" {
+		// 	p2, isok := s2.MapStats[f2.Parent]
+		// 	if isok {
+		// 		p2.procCacheStatsRootTriggerWins(win)
+		// 	}
+		// }
 	}
 
 	if isRealWin {

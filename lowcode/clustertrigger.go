@@ -11,6 +11,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
@@ -640,6 +641,20 @@ func (clusterTrigger *ClusterTrigger) GetWinMulti(basicCD *BasicComponentData) i
 	}
 
 	return clusterTrigger.Config.WinMulti
+}
+
+// NewStats2 -
+func (clusterTrigger *ClusterTrigger) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins})
+}
+
+// OnStats2
+func (clusterTrigger *ClusterTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	clusterTrigger.BasicComponent.OnStats2(icd, s2)
+
+	cd := icd.(*ClusterTriggerData)
+
+	s2.ProcStatsWins(clusterTrigger.Name, int64(cd.Wins), true)
 }
 
 // GetAllLinkComponents - get all link components
