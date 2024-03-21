@@ -8,8 +8,8 @@ import (
 )
 
 type StatsWins struct {
-	TotalWin    int64
-	MapWinTimes map[int]int
+	TotalWin    int64       `json:"totalWin"`
+	MapWinTimes map[int]int `json:"mapWinTimes"`
 }
 
 func (wins *StatsWins) AddWin(win int64) {

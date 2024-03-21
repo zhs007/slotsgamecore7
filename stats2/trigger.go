@@ -6,7 +6,7 @@ import (
 )
 
 type StatsTrigger struct {
-	TriggerTimes int64
+	TriggerTimes int64 `json:"triggerTimes"`
 }
 
 // func (trigger *StatsTrigger) Clone() *StatsTrigger {

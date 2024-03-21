@@ -7,10 +7,10 @@ import (
 )
 
 type Feature struct {
-	Parent      string
-	RootTrigger *StatsRootTrigger // 只有respin和foreach才需要这个
-	Trigger     *StatsTrigger     // 普通的trigger，如果在respin或foreach下面，则需要配合它们才能得到正确的统计
-	Wins        *StatsWins        // wins
+	Parent      string            `json:"parent"`
+	RootTrigger *StatsRootTrigger `json:"rootTrigger"` // 只有respin和foreach才需要这个
+	Trigger     *StatsTrigger     `json:"trigger"`     // 普通的trigger，如果在respin或foreach下面，则需要配合它们才能得到正确的统计
+	Wins        *StatsWins        `json:"wins"`        // wins
 }
 
 // func (f2 *Feature) onStatsGame(cache *Cache) {
