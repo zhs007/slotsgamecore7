@@ -1,8 +1,9 @@
 package sgc7pbutils
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -11,7 +12,7 @@ func PB2Json(msg proto.Message) ([]byte, error) {
 	result, err := protojson.Marshal(msg)
 	if err != nil {
 		goutils.Error("PB2Json:Marshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -19,15 +20,15 @@ func PB2Json(msg proto.Message) ([]byte, error) {
 	return result, nil
 }
 
-// JSON - It's like zap.String(name, str)
-func JSON(name string, msg proto.Message) zap.Field {
+// JSON - It's like slog.String(name, str)
+func JSON(name string, msg proto.Message) slog.Attr {
 	result, err := protojson.Marshal(msg)
 	if err != nil {
 		goutils.Error("JSON:Marshal",
-			zap.Error(err))
+			goutils.Err(err))
 
-		return zap.String(name, err.Error())
+		return slog.String(name, err.Error())
 	}
 
-	return zap.String(name, string(result))
+	return slog.String(name, string(result))
 }

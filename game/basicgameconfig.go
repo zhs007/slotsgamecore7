@@ -1,10 +1,10 @@
 package sgc7game
 
 import (
+	"log/slog"
 	"os"
 
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -35,7 +35,7 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 	cfg := ig.GetConfig()
 	if cfg == nil {
 		goutils.Error("BasicGameConfig.Init5:GetConfig",
-			zap.Error(ErrNullConfig))
+			goutils.Err(ErrNullConfig))
 
 		return ErrNullConfig
 	}
@@ -43,8 +43,8 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 	err := cfg.LoadLine5(bgc.LineData)
 	if err != nil {
 		goutils.Error("BasicGameConfig.Init5:LoadLine5",
-			zap.String("LineData", bgc.LineData),
-			zap.Error(err))
+			slog.String("LineData", bgc.LineData),
+			goutils.Err(err))
 
 		return err
 	}
@@ -52,8 +52,8 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 	err = cfg.LoadPayTables5(bgc.PayTables)
 	if err != nil {
 		goutils.Error("BasicGameConfig.Init5:LoadPayTables5",
-			zap.String("PayTables", bgc.PayTables),
-			zap.Error(err))
+			slog.String("PayTables", bgc.PayTables),
+			goutils.Err(err))
 
 		return err
 	}
@@ -62,8 +62,8 @@ func (bgc BasicGameConfig) Init5(ig IGame) error {
 		err = cfg.LoadReels5(k, v)
 		if err != nil {
 			goutils.Error("BasicGameConfig.Init5:LoadReels5",
-				zap.String("reels", v),
-				zap.Error(err))
+				slog.String("reels", v),
+				goutils.Err(err))
 
 			return err
 		}

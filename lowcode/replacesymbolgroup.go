@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -42,8 +42,8 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) Init(fn string, pool *GameProperty
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ReplaceSymbolGroup.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -53,8 +53,8 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) Init(fn string, pool *GameProperty
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("ReplaceSymbolGroup.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -77,9 +77,9 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) InitEx(cfg any, pool *GameProperty
 
 	if len(replaceSymbolGroup.Config.SrcSymbolCodes) > len(replaceSymbolGroup.Config.TargetSymbolCodes) {
 		goutils.Error("ReplaceSymbolGroup.InitEx:invalid symbols",
-			zap.Int("src", len(replaceSymbolGroup.Config.SrcSymbolCodes)),
-			zap.Int("target", len(replaceSymbolGroup.Config.TargetSymbolCodes)),
-			zap.Error(ErrIvalidComponentConfig))
+			slog.Int("src", len(replaceSymbolGroup.Config.SrcSymbolCodes)),
+			slog.Int("target", len(replaceSymbolGroup.Config.TargetSymbolCodes)),
+			goutils.Err(ErrIvalidComponentConfig))
 
 		return ErrIvalidComponentConfig
 	}
@@ -196,7 +196,7 @@ func parseReplaceSymbolGroup(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseReplaceSymbolGroup:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -204,7 +204,7 @@ func parseReplaceSymbolGroup(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseReplaceSymbolGroup:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -214,7 +214,7 @@ func parseReplaceSymbolGroup(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseReplaceSymbolGroup:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

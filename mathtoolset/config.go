@@ -1,10 +1,10 @@
 package mathtoolset
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -34,8 +34,8 @@ func LoadConfig(fn string) (*Config, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("LoadConfig:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func LoadConfig(fn string) (*Config, error) {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("LoadConfig:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

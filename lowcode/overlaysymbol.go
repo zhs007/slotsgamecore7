@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -8,7 +9,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
@@ -40,7 +40,7 @@ func (overlaySymbolData *OverlaySymbolData) onNewStep(gameProp *GameProperty, co
 		collectorData, isok := gameProp.GetCurComponentDataWithName(overlaySymbol.Config.Collector).(*CollectorData)
 		if !isok {
 			goutils.Error("OverlaySymbolData.OnNewStep:GetCurComponentDataWithName",
-				zap.String("collector", overlaySymbol.Config.Collector))
+				slog.String("collector", overlaySymbol.Config.Collector))
 		} else {
 			overlaySymbolData.CurLevel = collectorData.Val
 		}
@@ -106,8 +106,8 @@ func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) erro
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("OverlaySymbol.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -117,8 +117,8 @@ func (overlaySymbol *OverlaySymbol) Init(fn string, pool *GamePropertyPool) erro
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("OverlaySymbol.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -135,8 +135,8 @@ func (overlaySymbol *OverlaySymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 		vm2, err := sgc7game.LoadValMapping2FromExcel(pool.Config.GetPath(overlaySymbol.Config.MapPosition, overlaySymbol.Config.UseFileMapping), "index", "value", sgc7game.NewIntArrVal[int])
 		if err != nil {
 			goutils.Error("OverlaySymbol.Init:LoadValMapping2FromExcel",
-				zap.String("valmapping", overlaySymbol.Config.MapPosition),
-				zap.Error(err))
+				slog.String("valmapping", overlaySymbol.Config.MapPosition),
+				goutils.Err(err))
 
 			return err
 		}
@@ -209,7 +209,7 @@ func (overlaySymbol *OverlaySymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 // 	pbcd, isok := pbComponentData.(*sgc7pb.OverlaySymbolData)
 // 	if !isok {
 // 		goutils.Error("OverlaySymbol.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -229,7 +229,7 @@ func (overlaySymbol *OverlaySymbol) EachUsedResults(pr *sgc7game.PlayResult, pbC
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
 		goutils.Error("OverlaySymbol.EachUsedResults:UnmarshalTo",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return
 	}

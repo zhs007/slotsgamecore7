@@ -1,11 +1,11 @@
 package mathtoolset
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type ReelStats2 struct {
@@ -38,7 +38,7 @@ func getReelID(str string) (int, error) {
 		i64, err := goutils.String2Int64(arr[1])
 		if err != nil {
 			goutils.Error("getReelID",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return -1, err
 		}
@@ -58,7 +58,7 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 		rn, err := getReelID(head)
 		if err != nil {
 			goutils.Error("LoadReelsStats2:LoadExcel:onheader:getReelID",
-				zap.Error(err))
+				goutils.Err(err))
 		}
 
 		if rn > reelnum {
@@ -69,8 +69,8 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 	}, func(x int, y int, header string, data string) error {
 		if reelnum <= 0 {
 			goutils.Error("LoadReelsStats2:LoadExcel:ondata:reelnum",
-				zap.Int("reelnum", reelnum),
-				zap.Error(ErrInvalidReelsStats2File))
+				slog.Int("reelnum", reelnum),
+				goutils.Err(ErrInvalidReelsStats2File))
 
 			return ErrInvalidReelsStats2File
 		}
@@ -83,7 +83,7 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 			rn, err := getReelID(header)
 			if err != nil {
 				goutils.Error("LoadReelsStats2:LoadExcel:ondata:getReelID",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return err
 			}
@@ -91,7 +91,7 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 			i64, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadReelsStats2:LoadExcel:ondata:String2Int64",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return err
 			}
@@ -103,8 +103,8 @@ func LoadReelsStats2(fn string) (*ReelsStats2, error) {
 	})
 	if err != nil {
 		goutils.Error("LoadReelsStats2:LoadExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

@@ -1,9 +1,10 @@
 package sgc7game
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )
 
@@ -31,8 +32,8 @@ func (reelspos *ReelsPosData) AddPos(x, y int) {
 func (reelspos *ReelsPosData) RandReel(ctx context.Context, plugin sgc7plugin.IPlugin, x int) (int, error) {
 	if x < 0 || x > len(reelspos.ReelsPos) {
 		goutils.Error("ReelsPosData.RandReel",
-			zap.Int("x", x),
-			zap.Error(ErrInvalidSceneX))
+			slog.Int("x", x),
+			goutils.Err(ErrInvalidSceneX))
 
 		return -1, ErrInvalidSceneX
 	}
@@ -40,7 +41,7 @@ func (reelspos *ReelsPosData) RandReel(ctx context.Context, plugin sgc7plugin.IP
 	cr, err := plugin.Random(ctx, len(reelspos.ReelsPos[x]))
 	if err != nil {
 		goutils.Error("ReelsPosData.RandReel",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return -1, err
 	}

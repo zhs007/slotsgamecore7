@@ -1,12 +1,12 @@
 package stats2
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type Stats struct {
@@ -62,7 +62,7 @@ func (s2 *Stats) ExportExcel() ([]byte, error) {
 	buf, err := f.WriteToBuffer()
 	if err != nil {
 		goutils.Error("Stats.ExportExcel:WriteToBuffer",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -150,8 +150,8 @@ func LoadStats(str string) (*Stats, error) {
 	err := sonic.UnmarshalString(str, s2)
 	if err != nil {
 		goutils.Error("LoadStats:UnmarshalString",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return nil, err
 	}

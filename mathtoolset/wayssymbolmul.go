@@ -3,7 +3,6 @@ package mathtoolset
 import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type funcOnEachCWWIRSM func(float64)
@@ -97,7 +96,7 @@ func AnalyzeReelsWaysSymbolMulti(paytables *sgc7game.PayTables, rss *ReelsStats,
 							cw, err := calcWaysWinsInReelsSymbolMulti(paytables, rss, s, wilds, symbolMapping, symMul, i+1, height)
 							if err != nil {
 								goutils.Error("AnalyzeReelsWaysSymbolMulti:calcWaysWinsInReelsSymbolMulti",
-									zap.Error(err))
+									goutils.Err(err))
 
 								return nil, err
 							}
@@ -119,7 +118,7 @@ func AnalyzeReelsWaysSymbolMulti(paytables *sgc7game.PayTables, rss *ReelsStats,
 							cw, err := CalcWaysWinsInReels(paytables, rss, s, wilds, i+1, height)
 							if err != nil {
 								goutils.Error("AnalyzeReelsWaysSymbolMulti:CalcWaysWinsInReels",
-									zap.Error(err))
+									goutils.Err(err))
 
 								return nil, err
 							}
@@ -140,7 +139,7 @@ func AnalyzeReelsWaysSymbolMulti(paytables *sgc7game.PayTables, rss *ReelsStats,
 	}
 
 	goutils.Error("AnalyzeReelsWaysSymbolMulti",
-		zap.Error(ErrUnimplementedCode))
+		goutils.Err(ErrUnimplementedCode))
 
 	return nil, ErrUnimplementedCode
 }

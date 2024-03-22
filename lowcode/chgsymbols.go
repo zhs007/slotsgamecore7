@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -47,8 +47,8 @@ func (chgSymbols *ChgSymbols) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ChgSymbols.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -58,8 +58,8 @@ func (chgSymbols *ChgSymbols) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("ChgSymbols.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -76,8 +76,8 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("ChgSymbols.InitEx:Symbol",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 		}
 
 		chgSymbols.Config.SymbolCodes = append(chgSymbols.Config.SymbolCodes, sc)
@@ -94,8 +94,8 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		vw2, err := pool.LoadIntWeights(chgSymbols.Config.Weight, chgSymbols.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("ChgSymbols.InitEx:LoadIntWeights",
-				zap.String("Weight", chgSymbols.Config.Weight),
-				zap.Error(err))
+				slog.String("Weight", chgSymbols.Config.Weight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -130,7 +130,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 					curs, err := chgSymbols.Config.WeightVW2.RandVal(plugin)
 					if err != nil {
 						goutils.Error("ChgSymbols.OnPlayGame:RandVal",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return "", err
 					}
@@ -231,7 +231,7 @@ func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseChgSymbols:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -239,7 +239,7 @@ func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseChgSymbols:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -249,7 +249,7 @@ func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseChgSymbols:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -260,7 +260,7 @@ func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 		awards, err := parseControllers(gamecfg, ctrls)
 		if err != nil {
 			goutils.Error("parseClusterTrigger:parseControllers",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}

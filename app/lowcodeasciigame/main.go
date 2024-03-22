@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -9,11 +10,10 @@ import (
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
-	"go.uber.org/zap"
 )
 
 func main() {
-	goutils.InitLogger("lowcodegame", sgc7ver.Version,
+	goutils.InitLogger2("lowcodegame", sgc7ver.Version,
 		"info", true, "./logs")
 
 	gamecfg := os.Getenv("GAMECFG")
@@ -45,8 +45,8 @@ func main() {
 	})
 	if err != nil {
 		goutils.Error("NewGame3",
-			zap.String("gamecfg", gamecfg),
-			zap.Error(err))
+			slog.String("gamecfg", gamecfg),
+			goutils.Err(err))
 
 		return
 	}

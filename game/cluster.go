@@ -18,11 +18,11 @@ func CalcClusterResult(scene *GameScene, pt *PayTables, bet int,
 				cr := calcClusterResult(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol)
 				// if err != nil {
 				// 	goutils.Error("sgc7game.CalcClusterResult:calcClusterResult",
-				// 		zap.Int("x", x),
-				// 		zap.Int("y", y),
-				// 		goutils.JSON("scene", scene),
-				// 		goutils.JSON("scene0", scene0),
-				// 		zap.Error(err))
+				// 		slog.Int("x", x),
+				// 		slog.Int("y", y),
+				// 		slog.Any("scene", scene),
+				// 		slog.Any("scene0", scene0),
+				// 		goutils.Err(err))
 
 				// 	return nil, err
 				// }

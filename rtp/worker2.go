@@ -2,11 +2,11 @@ package sgc7rtp
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 	"gonum.org/v1/gonum/stat"
 )
 
@@ -45,8 +45,8 @@ func startWorker(game sgc7game.IGame, rtp *RTP, spinnums int64, stake *sgc7game.
 					iserrturn = true
 
 					goutils.Error("StartRTP.Play",
-						zap.Int("results", len(results)),
-						zap.Error(err))
+						slog.Int("results", len(results)),
+						goutils.Err(err))
 
 					break
 				}
@@ -74,7 +74,7 @@ func startWorker(game sgc7game.IGame, rtp *RTP, spinnums int64, stake *sgc7game.
 						cr, err := plugin.Random(context.Background(), len(pr.NextCmds))
 						if err != nil {
 							goutils.Error("StartRTP.Random",
-								zap.Error(err))
+								goutils.Err(err))
 
 							break
 						}

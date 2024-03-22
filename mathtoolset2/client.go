@@ -2,12 +2,12 @@ package mathtoolset2
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -46,8 +46,8 @@ func (client *Client) onRequest(ctx context.Context) error {
 			grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
 		if err != nil {
 			goutils.Error("Client.onRequest:grpc.Dial",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			return err
 		}
@@ -64,7 +64,7 @@ func (client *Client) RunScript(ctx context.Context, script string, mapFiles map
 	err := client.onRequest(ctx)
 	if err != nil {
 		goutils.Error("Client.RunScript:onRequest",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (client *Client) RunScript(ctx context.Context, script string, mapFiles map
 	mapfd, err := NewFileDataMap("")
 	if err != nil {
 		goutils.Error("Client.RunScript:NewFileDataMap",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func (client *Client) RunScript(ctx context.Context, script string, mapFiles map
 		file, err := os.Open(v)
 		if err != nil {
 			goutils.Error("Client.RunScript:Open",
-				zap.String("fn", v),
-				zap.Error(err))
+				slog.String("fn", v),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -93,7 +93,7 @@ func (client *Client) RunScript(ctx context.Context, script string, mapFiles map
 	jsondata, err := mapfd.ToJson()
 	if err != nil {
 		goutils.Error("Client.RunScript:ToJson",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -104,9 +104,9 @@ func (client *Client) RunScript(ctx context.Context, script string, mapFiles map
 	})
 	if err != nil {
 		goutils.Error("Client.InitGame:InitGame",
-			zap.String("server address", client.servAddr),
-			zap.String("script", script),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			slog.String("script", script),
+			goutils.Err(err))
 
 		client.reset()
 

@@ -1,11 +1,11 @@
 package lowcode
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type SymbolViewerData struct {
@@ -52,9 +52,9 @@ func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 			v, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadSymbolsViewer:LoadExcel:String2Int64",
-					zap.String("header", header),
-					zap.String("data", data),
-					zap.Error(err))
+					slog.String("header", header),
+					slog.String("data", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -72,8 +72,8 @@ func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 	})
 	if err != nil {
 		goutils.Error("LoadSymbolsViewer:LoadExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

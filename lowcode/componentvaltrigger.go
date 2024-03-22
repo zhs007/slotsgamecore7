@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -60,8 +60,8 @@ func (componentValTrigger *ComponentValTrigger) Init(fn string, pool *GameProper
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ComponentValTrigger.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -71,8 +71,8 @@ func (componentValTrigger *ComponentValTrigger) Init(fn string, pool *GameProper
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("ComponentValTrigger.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -98,8 +98,8 @@ func (componentValTrigger *ComponentValTrigger) check(gameProp *GameProperty, va
 	val, err := gameProp.GetComponentVal(valname)
 	if err != nil {
 		goutils.Error("ComponentValTrigger.check:GetComponentVal",
-			zap.String("ComponentVal", valname),
-			zap.Error(err))
+			slog.String("ComponentVal", valname),
+			goutils.Err(err))
 
 		return false
 	}

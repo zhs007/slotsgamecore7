@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -9,7 +10,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -67,8 +67,8 @@ func (weightAwards *WeightAwards) Init(fn string, pool *GamePropertyPool) error 
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("WeightAwards.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -78,8 +78,8 @@ func (weightAwards *WeightAwards) Init(fn string, pool *GamePropertyPool) error 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WeightAwards.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -102,8 +102,8 @@ func (weightAwards *WeightAwards) InitEx(cfg any, pool *GamePropertyPool) error 
 		vw2, err := pool.LoadIntWeights(weightAwards.Config.AwardWeight, weightAwards.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("WeightReels.Init:LoadIntWeights",
-				zap.String("AwardWeight", weightAwards.Config.AwardWeight),
-				zap.Error(err))
+				slog.String("AwardWeight", weightAwards.Config.AwardWeight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -153,15 +153,15 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 			cv, _, err := vw.RandValEx(plugin)
 			if err != nil {
 				goutils.Error("WeightAwards.OnPlayGame:RandValEx",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return "", err
 			}
 
 			if cv.Int() >= len(weightAwards.Config.Awards) {
 				goutils.Error("WeightAwards.OnPlayGame",
-					zap.Int("val", cv.Int()),
-					zap.Error(ErrInvalidWeightVal))
+					slog.Int("val", cv.Int()),
+					goutils.Err(ErrInvalidWeightVal))
 
 				return "", ErrInvalidWeightVal
 			}
@@ -178,15 +178,15 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		cv, i, err := vw.RandValEx(plugin)
 		if err != nil {
 			goutils.Error("WeightAwards.OnPlayGame:RandValEx",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
 
 		if cv.Int() >= len(weightAwards.Config.Awards) {
 			goutils.Error("WeightAwards.OnPlayGame",
-				zap.Int("val", cv.Int()),
-				zap.Error(ErrInvalidWeightVal))
+				slog.Int("val", cv.Int()),
+				goutils.Err(ErrInvalidWeightVal))
 
 			return "", ErrInvalidWeightVal
 		}
@@ -200,7 +200,7 @@ func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		err := weightAwards.buildMask(plugin, gameProp, curpr, gp, mwad)
 		if err != nil {
 			goutils.Error("WeightAwards.OnPlayGame:buildMask",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -232,7 +232,7 @@ func (weightAwards *WeightAwards) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 // 	pbcd, isok := pbComponentData.(*sgc7pb.MultiWeightAwardsData)
 // 	if !isok {
 // 		goutils.Error("MultiWeightAwards.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -252,7 +252,7 @@ func (weightAwards *WeightAwards) NewComponentData() IComponentData {
 // 	err := pbComponentData.UnmarshalTo(pbcd)
 // 	if err != nil {
 // 		goutils.Error("MultiWeightAwards.EachUsedResults:UnmarshalTo",
-// 			zap.Error(err))
+// 			goutils.Err(err))
 
 // 		return
 // 	}

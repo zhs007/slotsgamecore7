@@ -1,13 +1,14 @@
 package gatiserv
 
 import (
+	"log/slog"
+
 	"github.com/bytedance/sonic"
 	"github.com/valyala/fasthttp"
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	"go.uber.org/zap"
 )
 
 // Client - client
@@ -29,16 +30,16 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 		nil)
 	if err != nil {
 		goutils.Error("gatiserv.Client.GetConfig:HTTPGet",
-			zap.String("ServURL", client.ServURL),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			goutils.Err(err))
 
 		return nil, err
 	}
 
 	if sc != fasthttp.StatusOK {
 		goutils.Error("gatiserv.Client.GetConfig:HTTPGet",
-			zap.String("ServURL", client.ServURL),
-			zap.Int("status", sc))
+			slog.String("ServURL", client.ServURL),
+			slog.Int("status", sc))
 
 		return nil, ErrNonStatusOK
 	}
@@ -47,9 +48,9 @@ func (client *Client) GetConfig() (*sgc7game.Config, error) {
 	err = sonic.Unmarshal(buff, cfg)
 	if err != nil {
 		goutils.Error("gatiserv.Client.GetConfig:JSON",
-			zap.String("ServURL", client.ServURL),
-			zap.String("body", string(buff)),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			slog.String("body", string(buff)),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -65,16 +66,16 @@ func (client *Client) Initialize(ps *PlayerState) error {
 		nil)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Initialize:HTTPGet",
-			zap.String("ServURL", client.ServURL),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			goutils.Err(err))
 
 		return err
 	}
 
 	if sc != fasthttp.StatusOK {
 		goutils.Error("gatiserv.Client.Initialize:HTTPGet",
-			zap.String("ServURL", client.ServURL),
-			zap.Int("status", sc))
+			slog.String("ServURL", client.ServURL),
+			slog.Int("status", sc))
 
 		return ErrNonStatusOK
 	}
@@ -82,9 +83,9 @@ func (client *Client) Initialize(ps *PlayerState) error {
 	err = ParsePlayerState(string(buff), ps)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Initialize:ParsePlayerState",
-			zap.String("ServURL", client.ServURL),
-			zap.String("body", string(buff)),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			slog.String("body", string(buff)),
+			goutils.Err(err))
 
 		return err
 	}
@@ -101,16 +102,16 @@ func (client *Client) PlayEx(param string) (*PlayResult, error) {
 	)
 	if err != nil {
 		goutils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
-			zap.String("ServURL", client.ServURL),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			goutils.Err(err))
 
 		return nil, err
 	}
 
 	if sc != fasthttp.StatusOK {
 		goutils.Error("gatiserv.Client.PlayEx:HTTPPostEx",
-			zap.String("ServURL", client.ServURL),
-			zap.Int("status", sc))
+			slog.String("ServURL", client.ServURL),
+			slog.Int("status", sc))
 
 		return nil, ErrNonStatusOK
 	}
@@ -118,9 +119,9 @@ func (client *Client) PlayEx(param string) (*PlayResult, error) {
 	pr, err := ParsePlayResult(string(buff))
 	if err != nil {
 		goutils.Error("gatiserv.Client.PlayEx:ParsePlayResult",
-			zap.String("ServURL", client.ServURL),
-			zap.String("body", string(buff)),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			slog.String("body", string(buff)),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -133,9 +134,9 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	buf, err := sonic.Marshal(arr)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Checksum:Marshal",
-			zap.String("ServURL", client.ServURL),
-			zap.String("body", string(buf)),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			slog.String("body", string(buf)),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -147,16 +148,16 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Checksum:HTTPPostEx",
-			zap.String("ServURL", client.ServURL),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			goutils.Err(err))
 
 		return nil, err
 	}
 
 	if sc != fasthttp.StatusOK {
 		goutils.Error("gatiserv.Client.Checksum:HTTPPostEx",
-			zap.String("ServURL", client.ServURL),
-			zap.Int("status", sc))
+			slog.String("ServURL", client.ServURL),
+			slog.Int("status", sc))
 
 		return nil, ErrNonStatusOK
 	}
@@ -165,9 +166,9 @@ func (client *Client) Checksum(arr []*CriticalComponent) ([]*ComponentChecksum, 
 	err = sonic.Unmarshal(buff, &ret)
 	if err != nil {
 		goutils.Error("gatiserv.Client.Checksum:Unmarshal",
-			zap.String("ServURL", client.ServURL),
-			zap.String("body", string(buff)),
-			zap.Error(err))
+			slog.String("ServURL", client.ServURL),
+			slog.String("body", string(buff)),
+			goutils.Err(err))
 
 		return nil, err
 	}

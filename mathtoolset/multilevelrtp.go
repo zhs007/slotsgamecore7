@@ -5,7 +5,6 @@ import (
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type MultiLevelRTPNode struct {
@@ -182,7 +181,7 @@ func calcMulLevelRTP(prelevel int, levelRTPs []float64, levelUpProbs []float64, 
 		x := float64(levelUpAddSpinNum[prelevel]) * levelUpProbs[prelevel]
 		if x >= 1 {
 			goutils.Error("calcMulLevelRTP",
-				zap.Error(ErrCannotBeConverged))
+				goutils.Err(ErrCannotBeConverged))
 
 			return math.NaN()
 		}
@@ -240,7 +239,7 @@ func calcMulLevelRTP2(prelevel int, levelRTPs []float64, levelUpProbs []map[int]
 
 		if x >= 1 {
 			goutils.Error("calcMulLevelRTP2",
-				zap.Error(ErrCannotBeConverged))
+				goutils.Err(ErrCannotBeConverged))
 
 			return math.NaN()
 		}

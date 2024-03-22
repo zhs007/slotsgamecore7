@@ -1,8 +1,9 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type SPCNode struct {
@@ -166,8 +167,8 @@ func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
 	ic, isok := lst.MapComponents[cn]
 	if !isok {
 		goutils.Error("parseNextComponents:MapComponents",
-			zap.String("name", cn),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", cn),
+			goutils.Err(ErrInvalidComponentName))
 
 		return nil, ErrInvalidComponentName
 	}
@@ -178,8 +179,8 @@ func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
 			childNode, err := parseNextComponents(lst, children[0])
 			if err != nil {
 				goutils.Error("parseNextComponents:parseNextComponents",
-					zap.String("name", children[0]),
-					zap.Error(err))
+					slog.String("name", children[0]),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -189,9 +190,9 @@ func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
 			node.AddChild(childNode)
 		} else if len(children) > 1 {
 			goutils.Error("parseNextComponents",
-				zap.String("name", cn),
-				zap.Strings("children", children),
-				zap.Error(ErrInvalidComponentChildren))
+				slog.String("name", cn),
+				slog.Any("children", children),
+				goutils.Err(ErrInvalidComponentChildren))
 
 			return nil, ErrInvalidComponentChildren
 		}
@@ -205,8 +206,8 @@ func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
 			nextNode, err := parseNextComponents(lst, curcomponent)
 			if err != nil {
 				goutils.Error("parseNextComponents:nextComponents:parseNextComponents",
-					zap.String("name", curcomponent),
-					zap.Error(err))
+					slog.String("name", curcomponent),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -232,8 +233,8 @@ func ParseStepParentChildren(lst *ComponentList, start string) (*SPCNode, error)
 	node, err := parseNextComponents(lst, start)
 	if err != nil {
 		goutils.Error("ParseStepParentChildren:parseNextComponents",
-			zap.String("name", start),
-			zap.Error(err))
+			slog.String("name", start),
+			goutils.Err(err))
 
 		return nil, err
 	}

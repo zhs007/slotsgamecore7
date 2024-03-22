@@ -1,19 +1,19 @@
 package lowcode
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 	componentValues := cell.Get("componentValues")
 	if componentValues == nil {
 		goutils.Error("getConfigInCell:componentValues",
-			zap.Error(ErrNoComponentValues))
+			goutils.Err(ErrNoComponentValues))
 
 		return nil, "", nil, ErrNoComponentValues
 	}
@@ -21,7 +21,7 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 	cfg := componentValues.Get("configuration")
 	if cfg == nil {
 		goutils.Error("getConfigInCell:configuration",
-			zap.Error(ErrInvalidJsonNode))
+			goutils.Err(ErrInvalidJsonNode))
 
 		return nil, "", nil, ErrInvalidJsonNode
 	}
@@ -29,7 +29,7 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 	label := componentValues.Get("label")
 	if cfg == nil {
 		goutils.Error("getConfigInCell:label",
-			zap.Error(ErrInvalidJsonNode))
+			goutils.Err(ErrInvalidJsonNode))
 
 		return nil, "", nil, ErrInvalidJsonNode
 	}
@@ -37,7 +37,7 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 	str, err := label.String()
 	if cfg == nil {
 		goutils.Error("getConfigInCell:label.String",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, "", nil, err
 	}
@@ -136,8 +136,8 @@ func (jcd *jsonControllerData) build() *Award {
 	}
 
 	goutils.Error("jsonControllerData.build",
-		goutils.JSON("controller", jcd),
-		zap.Error(ErrUnsupportedControllerType))
+		slog.Any("controller", jcd),
+		goutils.Err(ErrUnsupportedControllerType))
 
 	return nil
 }
@@ -145,8 +145,8 @@ func (jcd *jsonControllerData) build() *Award {
 func (jcd *jsonControllerData) build4Collector() (string, *Award) {
 	if jcd.TriggerNum == "" {
 		goutils.Error("jsonControllerData.build4Collector",
-			goutils.JSON("triggerNum", jcd.TriggerNum),
-			zap.Error(ErrUnsupportedControllerType))
+			slog.Any("triggerNum", jcd.TriggerNum),
+			goutils.Err(ErrUnsupportedControllerType))
 
 		return "", nil
 	}
@@ -158,7 +158,7 @@ func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
 	buf, err := controller.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseControllers:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseControllers:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -181,8 +181,8 @@ func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
 			awards = append(awards, a)
 		} else {
 			goutils.Error("parseControllers:build",
-				zap.Int("i", i),
-				zap.Error(ErrUnsupportedControllerType))
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
 
 			return nil, ErrUnsupportedControllerType
 		}
@@ -195,7 +195,7 @@ func parseCollectorControllers(gamecfg *Config, controller *ast.Node) ([]*Award,
 	buf, err := controller.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseControllers:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, nil, err
 	}
@@ -205,7 +205,7 @@ func parseCollectorControllers(gamecfg *Config, controller *ast.Node) ([]*Award,
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseControllers:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, nil, err
 	}
@@ -224,9 +224,9 @@ func parseCollectorControllers(gamecfg *Config, controller *ast.Node) ([]*Award,
 				i64, err := goutils.String2Int64(str)
 				if err != nil {
 					goutils.Error("parseControllers:String2Int64",
-						zap.Int("i", i),
-						zap.String("str", str),
-						zap.Error(err))
+						slog.Int("i", i),
+						slog.String("str", str),
+						goutils.Err(err))
 
 					return nil, nil, err
 				}
@@ -235,8 +235,8 @@ func parseCollectorControllers(gamecfg *Config, controller *ast.Node) ([]*Award,
 			}
 		} else {
 			goutils.Error("parseControllers:build4Collector",
-				zap.Int("i", i),
-				zap.Error(ErrUnsupportedControllerType))
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
 
 			return nil, nil, ErrUnsupportedControllerType
 		}

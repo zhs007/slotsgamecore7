@@ -2,10 +2,10 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 // 关于 onNewGame 和 onNewStep
@@ -171,9 +171,9 @@ func (cs *CallStack) Each(gameProp *GameProperty, onEach FuncOnEachHistoryCompon
 		err := onEach(node.tag, gameProp, node.component, node.cd)
 		if err != nil {
 			goutils.Error("CallStack.Each",
-				zap.Int("i", i),
-				zap.String("tag", node.tag),
-				zap.Error(err))
+				slog.Int("i", i),
+				slog.String("tag", node.tag),
+				goutils.Err(err))
 
 			return err
 		}
@@ -245,7 +245,7 @@ func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component ICompone
 		ic, isok := components.MapComponents[v]
 		if !isok {
 			goutils.Error("CallStack.StartEachSymbols:children",
-				zap.Error(ErrInvalidComponentName))
+				goutils.Err(ErrInvalidComponentName))
 
 			return ErrInvalidComponentName
 		}
@@ -269,10 +269,10 @@ func (cs *CallStack) onEachSymbolsEnd(gameProp *GameProperty, component ICompone
 	}
 
 	goutils.Error("CallStack.onEachSymbolsEnd",
-		zap.String("component", component.GetName()),
-		zap.Int("symbolCode", symbolCode),
-		zap.Int("i", i),
-		zap.Error(ErrInvalidCallStackNode))
+		slog.String("component", component.GetName()),
+		slog.Int("symbolCode", symbolCode),
+		slog.Int("i", i),
+		goutils.Err(ErrInvalidCallStackNode))
 
 	return ErrInvalidCallStackNode
 }

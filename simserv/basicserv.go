@@ -4,7 +4,6 @@ import (
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -49,7 +48,7 @@ func (bs *BasicService) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *s
 		err := pspb.Public.UnmarshalTo(pub)
 		if err != nil {
 			goutils.Error("BasicService.BuildPlayerStateFromPB:Public.UnmarshalTo",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -61,7 +60,7 @@ func (bs *BasicService) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *s
 		err := pspb.Private.UnmarshalTo(pri)
 		if err != nil {
 			goutils.Error("BasicService.BuildPlayerStateFromPB:Private.UnmarshalTo",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -84,7 +83,7 @@ func (bs *BasicService) BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.Pl
 	pbpub, err := anypb.New(pub)
 	if err != nil {
 		goutils.Error("BasicService.BuildPBPlayerState:New(pub)",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -92,7 +91,7 @@ func (bs *BasicService) BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.Pl
 	pbpri, err := anypb.New(pri)
 	if err != nil {
 		goutils.Error("BasicService.BuildPBPlayerState:New(pri)",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

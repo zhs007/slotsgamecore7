@@ -1,11 +1,12 @@
 package mathtoolset2
 
 import (
+	"log/slog"
+
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type ScriptCore struct {
@@ -24,9 +25,9 @@ func (sc *ScriptCore) Run(code string) error {
 	ast, issues := sc.Cel.Compile(code)
 	if issues != nil {
 		goutils.Error("ScriptCore.Run:Compile",
-			zap.String("code", code),
-			goutils.JSON("issues", issues),
-			zap.Error(ErrInvalidCode))
+			slog.String("code", code),
+			slog.Any("issues", issues),
+			goutils.Err(ErrInvalidCode))
 
 		return ErrInvalidCode
 	}
@@ -34,8 +35,8 @@ func (sc *ScriptCore) Run(code string) error {
 	prg, err := sc.Cel.Program(ast)
 	if err != nil {
 		goutils.Error("ScriptCore.Run:Program",
-			zap.String("code", code),
-			zap.Error(err))
+			slog.String("code", code),
+			goutils.Err(err))
 
 		return err
 	}
@@ -44,14 +45,14 @@ func (sc *ScriptCore) Run(code string) error {
 	out, _, err := prg.Eval(map[string]any{})
 	if err != nil {
 		goutils.Error("ScriptCore.Run:Eval",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
 
 	if !out.Value().(bool) {
 		goutils.Error("ScriptCore.Run:result",
-			zap.Error(ErrReturnNotOK))
+			goutils.Err(ErrReturnNotOK))
 
 		return ErrReturnNotOK
 	}
@@ -59,7 +60,7 @@ func (sc *ScriptCore) Run(code string) error {
 	if len(sc.ErrInRun) > 0 {
 		for _, v := range sc.ErrInRun {
 			goutils.Error("ScriptCore.Run:check errors",
-				zap.Error(v))
+				goutils.Err(v))
 		}
 
 		return ErrRunError
@@ -78,7 +79,7 @@ func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 
 				if len(params) != 4 {
 					goutils.Error("genStackReels",
-						zap.Error(ErrInvalidFunctionParams))
+						goutils.Err(ErrInvalidFunctionParams))
 
 					sc.pushError(ErrInvalidFunctionParams)
 
@@ -93,7 +94,7 @@ func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 				fd := sc.MapFiles.GetReader(srcfn)
 				if fd == nil {
 					goutils.Error("genStackReels:GetReader",
-						zap.Error(ErrInvalidFileData))
+						goutils.Err(ErrInvalidFileData))
 
 					sc.pushError(ErrInvalidFileData)
 
@@ -103,7 +104,7 @@ func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 				rd, err := GenStackReels(fd, stack, excludeSymbol)
 				if err != nil {
 					goutils.Error("genStackReels:GenStackReels",
-						zap.Error(err))
+						goutils.Err(err))
 
 					sc.pushError(err)
 
@@ -115,7 +116,7 @@ func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 				buf, err := f.WriteToBuffer()
 				if err != nil {
 					goutils.Error("genStackReels:WriteToBuffer",
-						zap.Error(err))
+						goutils.Err(err))
 
 					sc.pushError(err)
 
@@ -141,7 +142,7 @@ func NewScriptCore(fileData string) (*ScriptCore, error) {
 	mapfd, err := NewFileDataMap(fileData)
 	if err != nil {
 		goutils.Error("NewScriptCore:NewFileDataMap",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -149,7 +150,7 @@ func NewScriptCore(fileData string) (*ScriptCore, error) {
 	out, err := NewFileDataMap("")
 	if err != nil {
 		goutils.Error("NewScriptCore:NewFileDataMap:output",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -166,7 +167,7 @@ func NewScriptCore(fileData string) (*ScriptCore, error) {
 	cel, err := cel.NewEnv(options...)
 	if err != nil {
 		goutils.Error("NewScriptCore:cel.NewEnv",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

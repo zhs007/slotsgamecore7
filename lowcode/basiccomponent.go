@@ -7,7 +7,6 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -413,7 +412,7 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 // 	pbcd, isok := pbComponentData.(*sgc7pb.BasicComponentData)
 // 	if !isok {
 // 		goutils.Error("BasicComponent.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -488,7 +487,7 @@ func (basicComponent *BasicComponent) EachUsedResults(pr *sgc7game.PlayResult, p
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
 		goutils.Error("BasicComponent.EachUsedResults:UnmarshalTo",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return
 	}
@@ -663,7 +662,7 @@ func (basicComponent *BasicComponent) GetChildLinkComponents() []string {
 // CanTriggerWithScene -
 func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	goutils.Error("BasicComponent.CanTriggerWithScene",
-		zap.Error(ErrInvalidComponent))
+		goutils.Err(ErrInvalidComponent))
 
 	return false, nil
 }
@@ -671,7 +670,7 @@ func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty
 // SetMask -
 func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
 	goutils.Error("BasicComponent.SetMask",
-		zap.Error(ErrInvalidComponent))
+		goutils.Err(ErrInvalidComponent))
 
 	return ErrInvalidComponent
 }
@@ -679,7 +678,7 @@ func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gamePro
 // SetMaskVal -
 func (basicComponent *BasicComponent) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, mask bool) error {
 	goutils.Error("BasicComponent.SetMaskVal",
-		zap.Error(ErrInvalidComponent))
+		goutils.Err(ErrInvalidComponent))
 
 	return ErrInvalidComponent
 }
@@ -687,7 +686,7 @@ func (basicComponent *BasicComponent) SetMaskVal(plugin sgc7plugin.IPlugin, game
 // SetMaskOnlyTrue -
 func (basicComponent *BasicComponent) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
 	goutils.Error("BasicComponent.SetMaskOnlyTrue",
-		zap.Error(ErrInvalidComponent))
+		goutils.Err(ErrInvalidComponent))
 
 	return ErrInvalidComponent
 }

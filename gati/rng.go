@@ -1,12 +1,12 @@
 package gati
 
 import (
+	"log/slog"
 	"strconv"
 
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	"go.uber.org/zap"
 )
 
 // GetRngs - get rngs
@@ -18,16 +18,16 @@ func GetRngs(rngURL string, gameID string, nums int) ([]int, error) {
 	code, body, err := sgc7http.HTTPGet(url, mapHeader)
 	if err != nil {
 		goutils.Error("gati.GetRngs:HTTPGet",
-			zap.Error(err),
-			zap.String("url", url))
+			goutils.Err(err),
+			slog.String("url", url))
 
 		return nil, err
 	}
 
 	if code != 200 {
 		goutils.Error("gati.GetRngs:HTTPGet",
-			zap.Int("code", code),
-			zap.String("url", url))
+			slog.Int("code", code),
+			slog.String("url", url))
 
 		return nil, err
 	}

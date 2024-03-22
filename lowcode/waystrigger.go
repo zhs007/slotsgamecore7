@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -12,7 +13,6 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -147,8 +147,8 @@ func (waysTrigger *WaysTrigger) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("WaysTrigger.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -158,8 +158,8 @@ func (waysTrigger *WaysTrigger) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WaysTrigger.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -176,8 +176,8 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("WaysTrigger.InitEx:Symbol",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 		}
 
 		waysTrigger.Config.SymbolCodes = append(waysTrigger.Config.SymbolCodes, sc)
@@ -187,8 +187,8 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("WaysTrigger.InitEx:WildSymbols",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 
 			return ErrIvalidSymbol
 		}
@@ -199,8 +199,8 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	stt := ParseSymbolTriggerType(waysTrigger.Config.Type)
 	if stt == STTypeUnknow {
 		goutils.Error("WaysTrigger.InitEx:ParseSymbolTriggerType",
-			zap.String("SymbolTriggerType", waysTrigger.Config.Type),
-			zap.Error(ErrIvalidSymbolTriggerType))
+			slog.String("SymbolTriggerType", waysTrigger.Config.Type),
+			goutils.Err(ErrIvalidSymbolTriggerType))
 
 		return ErrIvalidSymbolTriggerType
 	}
@@ -225,8 +225,8 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		vw2, err := pool.LoadIntWeights(waysTrigger.Config.RespinNumWeight, waysTrigger.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("WaysTrigger.InitEx:LoadIntWeights",
-				zap.String("Weight", waysTrigger.Config.RespinNumWeight),
-				zap.Error(err))
+				slog.String("Weight", waysTrigger.Config.RespinNumWeight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -239,8 +239,8 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 			vw2, err := pool.LoadIntWeights(v, waysTrigger.Config.UseFileMapping)
 			if err != nil {
 				goutils.Error("WaysTrigger.InitEx:LoadIntWeights",
-					zap.String("Weight", v),
-					zap.Error(err))
+					slog.String("Weight", v),
+					goutils.Err(err))
 
 				return err
 			}
@@ -429,8 +429,8 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 			cr, err := vw2.RandVal(plugin)
 			if err != nil {
 				goutils.Error("WaysTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
-					zap.Int("SymbolNum", ret.SymbolNums),
-					zap.Error(err))
+					slog.Int("SymbolNum", ret.SymbolNums),
+					goutils.Err(err))
 
 				return 0, err
 			}
@@ -438,8 +438,8 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 			return cr.Int(), nil
 		} else {
 			goutils.Error("WaysTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
-				zap.Int("SymbolNum", ret.SymbolNums),
-				zap.Error(ErrInvalidSymbolNum))
+				slog.Int("SymbolNum", ret.SymbolNums),
+				goutils.Err(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
 		}
@@ -447,8 +447,8 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 		v, isok := waysTrigger.Config.RespinNumWithScatterNum[ret.SymbolNums]
 		if !isok {
 			goutils.Error("WaysTrigger.calcRespinNum:RespinNumWithScatterNum",
-				zap.Int("SymbolNum", ret.SymbolNums),
-				zap.Error(ErrInvalidSymbolNum))
+				slog.Int("SymbolNum", ret.SymbolNums),
+				goutils.Err(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
 		}
@@ -458,7 +458,7 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 		cr, err := waysTrigger.Config.RespinNumWeightVW.RandVal(plugin)
 		if err != nil {
 			goutils.Error("WaysTrigger.calcRespinNum:RespinNumWeightVW",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, err
 		}
@@ -505,7 +505,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		respinNum, err := waysTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
 			goutils.Error("WaysTrigger.OnPlayGame:calcRespinNum",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", nil
 		}
@@ -515,7 +515,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		err = waysTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
 		if err != nil {
 			goutils.Error("WaysTrigger.OnPlayGame:procMask",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -533,7 +533,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 				node, err := waysTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
 				if err != nil {
 					goutils.Error("WaysTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-						zap.Error(err))
+						goutils.Err(err))
 
 					return "", err
 				}
@@ -570,7 +570,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeightWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
 			// 	if err != nil {
 			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			zap.Error(err))
+			// 			goutils.Err(err))
 
 			// 		return nil
 			// 	}
@@ -586,7 +586,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeight, symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
 			// 	if err != nil {
 			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			zap.Error(err))
+			// 			goutils.Err(err))
 
 			// 		return nil
 			// 	}
@@ -653,7 +653,7 @@ func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 // 	pbcd, isok := pbComponentData.(*sgc7pb.WaysTriggerData)
 // 	if !isok {
 // 		goutils.Error("WaysTrigger.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -674,7 +674,7 @@ func (waysTrigger *WaysTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 // 				curwins, err := waysTrigger.OnStatsWithPB(feature, curComponent, v)
 // 				if err != nil {
 // 					goutils.Error("WaysTrigger.OnStats",
-// 						zap.Error(err))
+// 						goutils.Err(err))
 
 // 					continue
 // 				}
@@ -794,7 +794,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWaysTrigger:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -802,7 +802,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseWaysTrigger:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -812,7 +812,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseWaysTrigger:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -823,7 +823,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 		awards, err := parseControllers(gamecfg, ctrls)
 		if err != nil {
 			goutils.Error("parseWaysTrigger:parseControllers",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}

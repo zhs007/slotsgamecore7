@@ -11,7 +11,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-	"go.uber.org/zap"
 )
 
 func ConfigureJaeger(ctx context.Context, appname string) (func(), error) {
@@ -25,7 +24,7 @@ func ConfigureJaeger(ctx context.Context, appname string) (func(), error) {
 	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint())
 	if err != nil {
 		goutils.Error("ConfigureJaeger",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -41,7 +40,7 @@ func ConfigureJaeger(ctx context.Context, appname string) (func(), error) {
 	return func() {
 		if err := tp.Shutdown(ctx); err != nil {
 			goutils.Error("ConfigureJaeger:Shutdown",
-				zap.Error(err))
+				goutils.Err(err))
 		}
 	}, nil
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // HTTPGet - get
@@ -46,7 +45,7 @@ func HTTPPost(url string, header map[string]string, bodyObj any) (int, []byte, e
 		bb, err := sonic.Marshal(bodyObj)
 		if err != nil {
 			goutils.Warn("sgc7http.HTTPPost:Marshal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return -1, nil, err
 		}

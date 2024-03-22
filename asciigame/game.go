@@ -2,12 +2,12 @@ package asciigame
 
 import (
 	"fmt"
+	"log/slog"
 
 	"devt.de/krotik/common/termutil/getch"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 var gKeys []getch.KeyCode
@@ -19,7 +19,7 @@ func getchar(onchar FuncOnGetChar) error {
 	err := getch.Start()
 	if err != nil {
 		goutils.Error("getchar:Start",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -29,7 +29,7 @@ func getchar(onchar FuncOnGetChar) error {
 		e, err := getch.Getch()
 		if err != nil {
 			goutils.Error("getchar:Start",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -133,8 +133,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 			pr, err := game.Play(plugin, cmd, cmdparam, ps, stake, results, gameData)
 			if err != nil {
 				goutils.Error("StartGame.Play",
-					zap.Int("results", len(results)),
-					zap.Error(err))
+					slog.Int("results", len(results)),
+					goutils.Err(err))
 
 				break
 			}

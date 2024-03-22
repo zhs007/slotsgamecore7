@@ -6,7 +6,6 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
@@ -130,7 +129,7 @@ func (sv *testService) Evaluate(params *EvaluateParams, id string) (*EvaluateRes
 }
 
 func Test_Serv(t *testing.T) {
-	goutils.InitLogger("", "", "debug", true, "")
+	goutils.InitLogger2("", "", "debug", true, "")
 
 	cfg := &Config{
 		GameID:      "1019",
@@ -157,7 +156,7 @@ func Test_Serv(t *testing.T) {
 		err := serv.Start()
 		if err != nil {
 			goutils.Error("Test_Serv Start error",
-				zap.Error(err))
+				goutils.Err(err))
 			// t.Fatalf("Test_Serv Start error %v",
 			// 	err)
 		}

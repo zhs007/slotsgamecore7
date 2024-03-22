@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -8,7 +9,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -54,7 +54,7 @@ func (multiRespin *MultiRespin) parseCmdParam(cmd string, cmdParam string) (*Res
 
 	if !hascmd {
 		goutils.Error("MultiRespin.parseCmdParam",
-			zap.Error(ErrIvalidCmd))
+			goutils.Err(ErrIvalidCmd))
 
 		return nil, ErrIvalidCmd
 	}
@@ -63,7 +63,7 @@ func (multiRespin *MultiRespin) parseCmdParam(cmd string, cmdParam string) (*Res
 	err := sonic.Unmarshal([]byte(cmdParam), param)
 	if err != nil {
 		goutils.Error("MultiRespin.parseCmdParam",
-			zap.Error(ErrIvalidCmdParam))
+			goutils.Err(ErrIvalidCmdParam))
 
 		return nil, err
 	}
@@ -78,8 +78,8 @@ func (multiRespin *MultiRespin) genCmdParam(gameProp *GameProperty, fgdata *Resp
 		vw2, err := gameProp.GetIntValWeights(fgdata.RespinNumWeightWithScatterNum[sn], multiRespin.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("MultiRespin.genCmdParam:GetIntValWeights",
-				zap.Int("symbolNum", sn),
-				zap.Error(err))
+				slog.Int("symbolNum", sn),
+				goutils.Err(err))
 
 			return "", nil, err
 		}
@@ -87,7 +87,7 @@ func (multiRespin *MultiRespin) genCmdParam(gameProp *GameProperty, fgdata *Resp
 		cr, err := vw2.RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiRespin.genCmdParam:RandVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", nil, err
 		}
@@ -107,7 +107,7 @@ func (multiRespin *MultiRespin) genCmdParam(gameProp *GameProperty, fgdata *Resp
 		vw2, err := gameProp.GetIntValWeights(fgdata.RespinNumWeight, multiRespin.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("MultiRespin.genCmdParam:GetIntValWeights",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", nil, err
 		}
@@ -115,7 +115,7 @@ func (multiRespin *MultiRespin) genCmdParam(gameProp *GameProperty, fgdata *Resp
 		cr, err := vw2.RandVal(plugin)
 		if err != nil {
 			goutils.Error("MultiFG.genCmdParam:RandVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", nil, err
 		}
@@ -137,8 +137,8 @@ func (multiRespin *MultiRespin) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("MultiRespin.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -148,8 +148,8 @@ func (multiRespin *MultiRespin) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("MultiRespin.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -183,7 +183,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			curcmd, curparam, err := multiRespin.genCmdParam(gameProp, v, plugin)
 			if err != nil {
 				goutils.Error("MultiRespin.OnPlayGame:genCmdParam",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return "", err
 			}
@@ -191,7 +191,7 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			buf, err := sonic.Marshal(curparam)
 			if err != nil {
 				goutils.Error("MultiRespin.OnPlayGame:Marshal",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return "", err
 			}
@@ -213,9 +213,9 @@ func (multiRespin *MultiRespin) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	cmdparam, err := multiRespin.parseCmdParam(cmd, param)
 	if err != nil {
 		goutils.Error("MultiFG.OnPlayGame:parseCmdParam",
-			zap.String("cmd", cmd),
-			zap.String("param", param),
-			zap.Error(err))
+			slog.String("cmd", cmd),
+			slog.String("param", param),
+			goutils.Err(err))
 
 		return "", err
 	}

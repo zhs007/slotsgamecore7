@@ -2,13 +2,13 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -38,8 +38,8 @@ func (maskBranch *MaskBranch) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("MaskBranch.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -49,8 +49,8 @@ func (maskBranch *MaskBranch) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("MaskBranch.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -85,7 +85,7 @@ func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	maskdata, err := gameProp.Pool.GetMask(maskBranch.Config.Mask, gameProp)
 	if err != nil {
 		goutils.Error("MaskBranch.OnPlayGame:GetMask",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -114,7 +114,7 @@ func (maskBranch *MaskBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	maskdata, err := gameProp.Pool.GetMask(maskBranch.Config.Mask, gameProp)
 	if err != nil {
 		goutils.Error("MaskBranch.OnPlayGame:GetMask",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

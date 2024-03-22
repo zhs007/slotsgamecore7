@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -13,7 +14,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
@@ -219,8 +219,8 @@ func (respin *Respin) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("Respin.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -230,8 +230,8 @@ func (respin *Respin) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("Respin.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -346,7 +346,7 @@ func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponen
 	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
 	if !isok {
 		goutils.Error("Respin.onStatsWithPBEnding",
-			zap.Error(ErrIvalidProto))
+			goutils.Err(ErrIvalidProto))
 
 		return ErrIvalidProto
 	}
@@ -367,7 +367,7 @@ func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponent
 	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
 	if !isok {
 		goutils.Error("Respin.onStatsWithPBStart",
-			zap.Error(ErrIvalidProto))
+			goutils.Err(ErrIvalidProto))
 
 		return ErrIvalidProto
 	}
@@ -391,7 +391,7 @@ func (respin *Respin) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *
 	err := pbComponentData.UnmarshalTo(pbcd)
 	if err != nil {
 		goutils.Error("Respin.EachUsedResults:UnmarshalTo",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return
 	}
@@ -593,7 +593,7 @@ func parseRespin(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRespin2:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -601,7 +601,7 @@ func parseRespin(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseRespin2:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -611,7 +611,7 @@ func parseRespin(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseRespin2:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

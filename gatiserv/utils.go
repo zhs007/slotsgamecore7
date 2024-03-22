@@ -1,12 +1,12 @@
 package gatiserv
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 // BuildIPlayerState - PlayerState => sgc7game.IPlayerState
@@ -33,7 +33,7 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 	dps, err := BuildPlayerState(ps)
 	if err != nil {
 		goutils.Warn("gatiserv.BuildPlayerStateString:BuildPlayerState",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -41,7 +41,7 @@ func BuildPlayerStateString(ps sgc7game.IPlayerState) (string, error) {
 	psfb, err := sonic.Marshal(dps)
 	if err != nil {
 		goutils.Warn("gatiserv.BuildPlayerStateString:Marshal PlayerState",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -66,8 +66,8 @@ func ParsePlayerState(str string, ps *PlayerState) error {
 	err := sonic.Unmarshal([]byte(str), ps)
 	if err != nil {
 		goutils.Error("gatiserv.ParsePlayerState:JSON",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return err
 	}
@@ -114,8 +114,8 @@ func ParsePlayParams(str string, ps *PlayerState) (*PlayParams, error) {
 	err := sonic.Unmarshal([]byte(str), pp)
 	if err != nil {
 		goutils.Error("gatiserv.ParsePlayParams:JSON",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -129,8 +129,8 @@ func ParsePlayResult(str string) (*PlayResult, error) {
 	err := sonic.Unmarshal([]byte(str), pr)
 	if err != nil {
 		goutils.Error("gatiserv.ParsePlayResult:JSON",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func LoadGATIGameConfig(fn string) (*GATIGameConfig, error) {
 	err = sonic.Unmarshal(data, ccs)
 	if err != nil {
 		goutils.Warn("gatiserv.LoadGATIGameConfig",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

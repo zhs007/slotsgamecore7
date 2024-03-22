@@ -4,7 +4,6 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -92,7 +91,7 @@ func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
 	pbany, err := anypb.New(pbmsg)
 	if err != nil {
 		goutils.Error("GameParams.AddComponentData:New",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

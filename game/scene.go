@@ -5,7 +5,6 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 // FuncCountSymbolExIsSymbol -
@@ -391,7 +390,7 @@ func (gs *GameScene) RandReelsEx(game IGame, plugin sgc7plugin.IPlugin, reelsNam
 		cr, err := plugin.Random(context.Background(), len(rarr))
 		if err != nil {
 			goutils.Error("GameScene.RandReelsEx:Random",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -463,7 +462,7 @@ func (gs *GameScene) RandReelsEx2(game IGame, plugin sgc7plugin.IPlugin, reelsNa
 		cr, err := plugin.Random(context.Background(), len(rarr))
 		if err != nil {
 			goutils.Error("GameScene.RandReelsEx:Random",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}

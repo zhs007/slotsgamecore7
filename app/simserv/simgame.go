@@ -5,7 +5,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	"github.com/zhs007/slotsgamecore7/simserv"
-	"go.uber.org/zap"
 	anypb "google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -19,7 +18,7 @@ func NewSimService(game sgc7game.IGame) (simserv.IService, error) {
 	bs, err := simserv.NewBasicService(game)
 	if err != nil {
 		goutils.Error("NewSimService:NewBasicService",
-			zap.Error(err))
+			goutils.Err(err))
 	}
 
 	return &SimService{bs}, nil

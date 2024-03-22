@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	goutils "github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	"github.com/zhs007/slotsgamecore7/simserv"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -21,14 +21,14 @@ func main() {
 		return
 	}
 
-	goutils.InitLogger(cfg.GameCode, sgc7ver.Version,
+	goutils.InitLogger2(cfg.GameCode, sgc7ver.Version,
 		cfg.LogLevel, true, "./logs")
 
 	game, err := lowcode.NewGame(gamecfg)
 	if err != nil {
 		goutils.Error("NewGame",
-			zap.String("gamecfg", gamecfg),
-			zap.Error(err))
+			slog.String("gamecfg", gamecfg),
+			goutils.Err(err))
 
 		return
 	}
@@ -36,7 +36,7 @@ func main() {
 	bs, err := NewSimService(game)
 	if err != nil {
 		goutils.Error("NewSimService",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return
 	}
@@ -44,10 +44,10 @@ func main() {
 	serv := simserv.NewServ(bs, cfg)
 
 	goutils.Info(cfg.GameCode+" starting ...",
-		zap.String("gameCode", cfg.GameCode),
-		zap.String("version", sgc7ver.Version),
-		zap.String("core version", sgc7ver.Version),
-		zap.String("servAddr", cfg.BindAddr))
+		slog.String("gameCode", cfg.GameCode),
+		slog.String("version", sgc7ver.Version),
+		slog.String("core version", sgc7ver.Version),
+		slog.String("servAddr", cfg.BindAddr))
 
 	serv.Start()
 }

@@ -2,10 +2,10 @@ package mathtoolset2
 
 import (
 	"io"
+	"log/slog"
 	"math/rand"
 
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type stackSymbolData struct {
@@ -213,7 +213,7 @@ func genStackReel(rs2 *ReelStats2, stack []int, excludeSymbol []string) ([]strin
 			nssds, isok := genStackSymbol(s, n, stack)
 			if !isok {
 				goutils.Error("GenStackReels:genStackReel",
-					zap.Error(ErrGenStackReel))
+					goutils.Err(ErrGenStackReel))
 
 				return nil, ErrGenStackReel
 			}
@@ -228,7 +228,7 @@ func genStackReel(rs2 *ReelStats2, stack []int, excludeSymbol []string) ([]strin
 	}
 
 	goutils.Error("GenStackReels:genReelSSD",
-		zap.Error(ErrGenStackReel))
+		goutils.Err(ErrGenStackReel))
 
 	return nil, ErrGenStackReel
 }
@@ -237,7 +237,7 @@ func GenStackReels(reader io.Reader, stack []int, excludeSymbol []string) ([][]s
 	rss2, err := LoadReelsStats2(reader)
 	if err != nil {
 		goutils.Error("GenStackReels:LoadReelsStats2",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -248,8 +248,8 @@ func GenStackReels(reader io.Reader, stack []int, excludeSymbol []string) ([][]s
 		reel, err := genStackReel(r, stack, excludeSymbol)
 		if err != nil {
 			goutils.Error("GenStackReels:genStackReel",
-				zap.Int("reelIndex", i),
-				zap.Error(err))
+				slog.Int("reelIndex", i),
+				goutils.Err(err))
 
 			return nil, err
 		}

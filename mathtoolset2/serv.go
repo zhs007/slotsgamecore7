@@ -2,6 +2,7 @@ package mathtoolset2
 
 import (
 	"context"
+	"log/slog"
 	"net"
 
 	goutils "github.com/zhs007/goutils"
@@ -9,7 +10,6 @@ import (
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -27,7 +27,7 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, err
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
 		goutils.Error("NewServ.Listen",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -53,9 +53,9 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, err
 	sgc7pb.RegisterMathToolsetServer(grpcServ, serv)
 
 	goutils.Info("NewServ OK.",
-		zap.String("addr", bindaddr),
-		zap.String("ver", version),
-		zap.String("corever", sgc7ver.Version))
+		slog.String("addr", bindaddr),
+		slog.String("ver", version),
+		slog.String("corever", sgc7ver.Version))
 
 	return serv, nil
 }
@@ -73,12 +73,12 @@ func (serv *Serv) Stop() {
 // initGame - initial game
 func (serv *Serv) RunScript(ctx context.Context, req *sgc7pb.RunScript) (*sgc7pb.ReplyRunScript, error) {
 	goutils.Debug("Serv.RunScript",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	sc, err := NewScriptCore(req.MapFiles)
 	if err != nil {
 		goutils.Error("Serv.RunScript:NewScriptCore",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (serv *Serv) RunScript(ctx context.Context, req *sgc7pb.RunScript) (*sgc7pb
 	err = sc.Run(req.Script)
 	if err != nil {
 		goutils.Error("Serv.RunScript:Run",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (serv *Serv) RunScript(ctx context.Context, req *sgc7pb.RunScript) (*sgc7pb
 	str, err := sc.MapOutputFiles.ToJson()
 	if err != nil {
 		goutils.Error("Serv.RunScript:ToJson",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

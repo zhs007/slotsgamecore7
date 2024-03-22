@@ -3,7 +3,6 @@ package sgc7game
 import (
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // FuncNewBasicPlayerState - new BasicPlayerState and set PlayerBoostData
@@ -82,7 +81,7 @@ func (ps *BasicPlayerState) SetPublicJson(pubjson string) error {
 	err := sonic.Unmarshal([]byte(pubjson), pub)
 	if err != nil {
 		goutils.Warn("BasicPlayerState.SetPublicJson",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -98,7 +97,7 @@ func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
 	err := sonic.Unmarshal([]byte(prijson), pub)
 	if err != nil {
 		goutils.Warn("BasicPlayerState.SetPrivateJson",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -113,7 +112,7 @@ func (ps *BasicPlayerState) GetPublicJson() string {
 	bpub, err := sonic.Marshal(ps.GetPublic())
 	if err != nil {
 		goutils.Warn("BasicPlayerState.GetPublicJson",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return ""
 	}
@@ -126,7 +125,7 @@ func (ps *BasicPlayerState) GetPrivateJson() string {
 	bpri, err := sonic.Marshal(ps.GetPrivate())
 	if err != nil {
 		goutils.Warn("BasicPlayerState.GetPrivateJson",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return ""
 	}

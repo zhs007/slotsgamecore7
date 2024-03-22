@@ -1,13 +1,14 @@
 package gamecollection
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/grpcserv"
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 )
 
 type GameData struct {
@@ -25,7 +26,7 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 		err := gameD.Service.BuildPlayerStateFromPB(ips, req.PlayerState)
 		if err != nil {
 			goutils.Error("GameData.Play:BuildPlayerStateFromPB",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -39,7 +40,7 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 	results, err := lowcode.Spin(gameD.Game, ips, plugin, stake, req.Command, req.ClientParams, req.Cheat)
 	if err != nil {
 		goutils.Error("GameData.Play:Spin",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -51,7 +52,7 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 	ps, err := gameD.Service.BuildPBPlayerState(ips)
 	if err != nil {
 		goutils.Error("GameData.Play:BuildPlayerState",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -77,9 +78,9 @@ func NewGameData(gameCode string, data []byte) (*GameData, error) {
 	})
 	if err != nil {
 		goutils.Error("NewGameData:NewGame2WithData",
-			zap.String("gameCode", gameCode),
-			zap.String("data", string(data)),
-			zap.Error(err))
+			slog.String("gameCode", gameCode),
+			slog.String("data", string(data)),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -102,9 +103,9 @@ func NewGameDataWithHash(gameCode string, data []byte, hash string) (*GameData, 
 	})
 	if err != nil {
 		goutils.Error("NewGameDataWithHash:NewGame2WithData",
-			zap.String("gameCode", gameCode),
-			zap.String("data", string(data)),
-			zap.Error(err))
+			slog.String("gameCode", gameCode),
+			slog.String("data", string(data)),
+			goutils.Err(err))
 
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -11,7 +12,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
@@ -156,8 +156,8 @@ func (mask *Mask) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("Mask.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -167,8 +167,8 @@ func (mask *Mask) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("Mask.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -333,7 +333,7 @@ func (mask *Mask) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, l
 // 	// pbcd, isok := pbComponentData.(*sgc7pb.MaskData)
 // 	// if !isok {
 // 	// 	goutils.Error("Mask.OnStatsWithPB",
-// 	// 		zap.Error(ErrIvalidProto))
+// 	// 		goutils.Err(ErrIvalidProto))
 
 // 	// 	return 0, ErrIvalidProto
 // 	// }
@@ -478,7 +478,7 @@ func parseMask(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseMask:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -486,7 +486,7 @@ func parseMask(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseMask:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -496,7 +496,7 @@ func parseMask(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseMask:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

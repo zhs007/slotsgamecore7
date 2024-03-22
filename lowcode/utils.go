@@ -1,11 +1,12 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/bytedance/sonic"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -175,8 +176,8 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 		pr, err := game.Play(plugin, cmd, params, ips, stake, results, gameData)
 		if err != nil {
 			goutils.Error("Spin:Play",
-				zap.Int("results", len(results)),
-				zap.Error(err))
+				slog.Int("results", len(results)),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -202,8 +203,8 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 
 		if len(results) >= MaxStepNum {
 			goutils.Error("procSpin",
-				zap.Int("steps", len(results)),
-				zap.Error(ErrTooManySteps))
+				slog.Int("steps", len(results)),
+				goutils.Err(ErrTooManySteps))
 
 			return nil, ErrTooManySteps
 		}
@@ -216,8 +217,8 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 	fo, err := ProcCheat(plugin, cheat)
 	if err != nil {
 		goutils.Error("Spin:ProcCheat",
-			zap.String("cheat", cheat),
-			zap.Error(err))
+			slog.String("cheat", cheat),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -225,8 +226,8 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 	err = game.CheckStake(stake)
 	if err != nil {
 		goutils.Error("Spin:CheckStake",
-			goutils.JSON("stake", stake),
-			zap.Error(err))
+			slog.Any("stake", stake),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -243,7 +244,7 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 		lst, err := procSpin(game, newips, plugin, stake, cmd, params)
 		if err != nil {
 			goutils.Error("Spin:procSpin",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -254,7 +255,7 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 	}
 
 	goutils.Error("Spin",
-		zap.Error(ErrCannotForceOutcome))
+		goutils.Err(ErrCannotForceOutcome))
 
 	return nil, ErrCannotForceOutcome
 }

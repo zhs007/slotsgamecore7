@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -62,8 +62,8 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) Init(fn string, pool *GameProp
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("GenSymbolValsWithPos.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -73,8 +73,8 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) Init(fn string, pool *GameProp
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("GenSymbolValsWithPos.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -93,8 +93,8 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) InitEx(cfg any, pool *GameProp
 		vm2 := pool.LoadIntMapping(genSymbolValsWithPos.Config.ValMapping)
 		if vm2 == nil {
 			goutils.Error("GenSymbolValsWithPos.Init:LoadIntMapping",
-				zap.String("ValMapping", genSymbolValsWithPos.Config.ValMapping),
-				zap.Error(ErrInvalidIntValMappingFile))
+				slog.String("ValMapping", genSymbolValsWithPos.Config.ValMapping),
+				goutils.Err(ErrInvalidIntValMappingFile))
 
 			return ErrInvalidIntValMappingFile
 		}
@@ -242,7 +242,7 @@ func parseGenSymbolValsWithPos(gamecfg *Config, cell *ast.Node) (string, error) 
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithPos:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -250,7 +250,7 @@ func parseGenSymbolValsWithPos(gamecfg *Config, cell *ast.Node) (string, error) 
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithPos:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -260,7 +260,7 @@ func parseGenSymbolValsWithPos(gamecfg *Config, cell *ast.Node) (string, error) 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithPos:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

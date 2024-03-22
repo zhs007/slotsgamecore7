@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -11,7 +12,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -93,8 +93,8 @@ func (winResultMulti *WinResultMulti) Init(fn string, pool *GamePropertyPool) er
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("WinResultMulti.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -104,8 +104,8 @@ func (winResultMulti *WinResultMulti) Init(fn string, pool *GamePropertyPool) er
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WinResultMulti.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -180,7 +180,7 @@ func (winResultMulti *WinResultMulti) OnAsciiGame(gameProp *GameProperty, pr *sg
 // 	pbcd, isok := pbComponentData.(*sgc7pb.WinResultMultiData)
 // 	if !isok {
 // 		goutils.Error("WinResultMulti.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -255,7 +255,7 @@ func parseWinResultMulti(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWinResultMulti:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -263,7 +263,7 @@ func parseWinResultMulti(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseWinResultMulti:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -273,7 +273,7 @@ func parseWinResultMulti(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseWinResultMulti:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

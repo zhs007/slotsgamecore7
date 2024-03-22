@@ -2,12 +2,12 @@ package mathtoolset
 
 import (
 	"fmt"
+	"log/slog"
 	"sort"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type SymbolsWinsFileMode int
@@ -259,7 +259,7 @@ func (ssws *SymbolsWinsStats) SaveExcel(fn string, fms []SymbolsWinsFileMode) er
 		err := ssws.SaveExcelSheet(f, fm)
 		if err != nil {
 			goutils.Error("SymbolsWinsStats.SaveExcel",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -297,8 +297,8 @@ func CalcSymbolWins(rss *ReelsStats, wilds []SymbolType, symbol SymbolType, symb
 		cn := rss.GetNum(i, symbol, symbol2, wilds, t)
 		if cn < 0 {
 			goutils.Error("CalcSymbolWins:GetNum",
-				zap.Int("InReelSymbolType", int(t)),
-				zap.Error(ErrInvalidInReelSymbolType))
+				slog.Int("InReelSymbolType", int(t)),
+				goutils.Err(ErrInvalidInReelSymbolType))
 
 			return 0, ErrInvalidInReelSymbolType
 		}
@@ -403,7 +403,7 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 					cw, err := CalcSymbolWins(rss, wilds, symbol, s, lst)
 					if err != nil {
 						goutils.Error("calcSymbolWinsFromList:CalcSymbolWins",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return 0, err
 					}
@@ -425,7 +425,7 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 						cw0, err := CalcSymbolWins(rss, wilds, symbol, s, lst)
 						if err != nil {
 							goutils.Error("calcSymbolWinsFromList:CalcSymbolWins",
-								zap.Error(err))
+								goutils.Err(err))
 
 							return 0, err
 						}
@@ -465,9 +465,9 @@ func calcSymbolWinsFromList(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 		cw, err := calcSymbolWinsFromList(paytables, rss, symbols, wilds, symbol, ci+1, num, lst, wildPayoutSymbol, wildNum)
 		if err != nil {
 			goutils.Error("calcSymbolWinsFromList:calcSymbolWinsFromList",
-				zap.Int("ci", ci),
-				zap.Int("InReelSymbolType", int(t)),
-				zap.Error(err))
+				slog.Int("ci", ci),
+				slog.Int("InReelSymbolType", int(t)),
+				goutils.Err(err))
 
 			return 0, err
 		}
@@ -504,7 +504,7 @@ func CalcSymbolWinsInReelsWithLine(paytables *sgc7game.PayTables, rss *ReelsStat
 		analyzeWildNum(paytables, symbol, num, wildPayoutSymbol))
 	if err != nil {
 		goutils.Error("CalcSymbolWinsInReelsWithLine:calcSymbolFirstWildWins",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return 0, err
 	}
@@ -554,7 +554,7 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 	rss, err := BuildReelsStats(reels, mapSymbols)
 	if err != nil {
 		goutils.Error("AnalyzeReelsWithLine:BuildReelsStats",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -580,7 +580,7 @@ func AnalyzeReelsWithLine(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDa
 					cw, err := CalcSymbolWinsInReelsWithLine(paytables, rss, symbols, wilds, s, i+1, getMaxPayoutSymbol(paytables, symbols, i+1))
 					if err != nil {
 						goutils.Error("AnalyzeReelsWithLine:CalcSymbolWinsInReelsWithLine",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return nil, err
 					}
@@ -623,7 +623,7 @@ func AnalyzeReelsWithLineEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 					cw, err := CalcSymbolWinsInReelsWithLine(paytables, rss, symbols, wilds, s, i+1, getMaxPayoutSymbol(paytables, symbols, i+1))
 					if err != nil {
 						goutils.Error("AnalyzeReelsWithLine:CalcSymbolWinsInReelsWithLine",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return nil, err
 					}

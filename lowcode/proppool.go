@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"sync"
 
 	"github.com/fatih/color"
@@ -9,7 +10,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
-	"go.uber.org/zap"
 )
 
 type GamePropertyPool struct {
@@ -50,8 +50,8 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 	// mapc, isok := pool.mapComponents[betMul]
 	// if !isok {
 	// 	goutils.Error("GamePropertyPool.newGameProp:mapComponents",
-	// 		zap.Int("betMul", betMul),
-	// 		zap.Error(ErrInvalidBet))
+	// 		slog.Int("betMul", betMul),
+	// 		goutils.Err(ErrInvalidBet))
 
 	// 	return nil
 	// }
@@ -83,8 +83,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 	components, isok := pool.mapComponents[betMul]
 // 	if !isok {
 // 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			zap.Int("bet", betMul),
-// 			zap.Error(ErrInvalidBet))
+// 			slog.Int("bet", betMul),
+// 			goutils.Err(ErrInvalidBet))
 
 // 		return nil, ErrInvalidBet
 // 	}
@@ -92,7 +92,7 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 	curComponent, isok := components.MapComponents[cfg.Component]
 // 	if !isok {
 // 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			zap.Error(ErrIvalidStatsComponentInConfig))
+// 			goutils.Err(ErrIvalidStatsComponentInConfig))
 
 // 		return nil, ErrIvalidStatsComponentInConfig
 // 	}
@@ -109,8 +109,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.NewStatsWithConfig(betMul, feature, v)
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:NewStatsWithConfig",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -120,8 +120,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinEnding, k)
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -131,8 +131,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStart, k)
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -142,8 +142,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStartEx, k)
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -153,8 +153,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinNum, "")
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -164,8 +164,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinWin, "")
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -175,8 +175,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStartNum, "")
 // 		if err != nil {
 // 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				goutils.JSON("v", v),
-// 				zap.Error(err))
+// 				slog.Any("v", v),
+// 				goutils.Err(err))
 
 // 			return nil, err
 // 		}
@@ -189,8 +189,8 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 	components, isok := pool.mapComponents[betMul]
 // 	if !isok {
 // 		goutils.Error("GameProperty.newStatusStats",
-// 			zap.Int("bet", betMul),
-// 			zap.Error(ErrInvalidBet))
+// 			slog.Int("bet", betMul),
+// 			goutils.Err(ErrInvalidBet))
 
 // 		return nil, ErrInvalidBet
 // 	}
@@ -198,7 +198,7 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 	curComponent, isok := components.MapComponents[componentName]
 // 	if !isok {
 // 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			zap.Error(ErrIvalidStatsComponentInConfig))
+// 			goutils.Err(ErrIvalidStatsComponentInConfig))
 
 // 		return nil, ErrIvalidStatsComponentInConfig
 // 	}
@@ -234,7 +234,7 @@ func (pool *GamePropertyPool) InitStats(betMul int) error {
 	err := pool.Config.BuildStatsSymbolCodes(pool.DefaultPaytables)
 	if err != nil {
 		goutils.Error("GamePropertyPool.InitStats:BuildStatsSymbolCodes",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -253,7 +253,7 @@ func (pool *GamePropertyPool) InitStats(betMul int) error {
 	// 	_, err := pool.NewStatsWithConfig(betMul, statsTotal, pool.Config.Stats)
 	// 	if err != nil {
 	// 		goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
-	// 			zap.Error(err))
+	// 			goutils.Err(err))
 
 	// 		return err
 	// 	}
@@ -295,8 +295,8 @@ func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*s
 	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewStrVal)
 	if err != nil {
 		goutils.Error("GamePropertyPool.LoadStrWeights:LoadValWeights2FromExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -332,7 +332,7 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 			i64, err := goutils.String2Int64(v.String())
 			if err != nil {
 				goutils.Error("GamePropertyPool.LoadIntWeights:String2Int64",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -343,7 +343,7 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 		nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
 		if err != nil {
 			goutils.Error("GamePropertyPool.LoadIntWeights:NewValWeights2",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -358,8 +358,8 @@ func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*s
 	vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewIntVal[int])
 	if err != nil {
 		goutils.Error("GamePropertyPool.LoadIntWeights:LoadValWeights2FromExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -403,7 +403,7 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 		nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
 		if err != nil {
 			goutils.Error("GamePropertyPool.LoadValWeights:NewValWeights2",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -418,8 +418,8 @@ func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, hea
 	vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(fn, useFileMapping), headerVal, headerWeight, paytables)
 	if err != nil {
 		goutils.Error("GamePropertyPool.LoadValWeights:LoadValWeights2FromExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -435,8 +435,8 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMaskVal",
-			zap.String("name", name),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", name),
+			goutils.Err(ErrInvalidComponentName))
 
 		return ErrInvalidComponentName
 	}
@@ -445,8 +445,8 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	// im, isok := ic.(IMask)
 	// if !isok {
 	// 	goutils.Error("GamePropertyPool.SetMaskVal",
-	// 		zap.String("name", name),
-	// 		zap.Error(ErrNotMask))
+	// 		slog.String("name", name),
+	// 		goutils.Err(ErrNotMask))
 
 	// 	return ErrNotMask
 	// }
@@ -458,8 +458,8 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	}
 
 	goutils.Error("GamePropertyPool.GetMask",
-		zap.String("name", name),
-		zap.Error(ErrInvalidComponent))
+		slog.String("name", name),
+		goutils.Err(ErrInvalidComponent))
 
 	return ErrInvalidComponent
 }
@@ -468,8 +468,8 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.SetMask",
-			zap.String("name", name),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", name),
+			goutils.Err(ErrInvalidComponentName))
 
 		return ErrInvalidComponentName
 	}
@@ -478,8 +478,8 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	// im, isok := ic.(IMask)
 	// if !isok {
 	// 	goutils.Error("GamePropertyPool.SetMaskVal",
-	// 		zap.String("name", name),
-	// 		zap.Error(ErrNotMask))
+	// 		slog.String("name", name),
+	// 		goutils.Err(ErrNotMask))
 
 	// 	return ErrNotMask
 	// }
@@ -495,16 +495,16 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	}
 
 	goutils.Error("GamePropertyPool.GetMask",
-		zap.String("name", name),
-		zap.Error(ErrInvalidComponent))
+		slog.String("name", name),
+		goutils.Err(ErrInvalidComponent))
 
 	return ErrInvalidComponent
 
 	// im, isok := ic.(IMask)
 	// if !isok {
 	// 	goutils.Error("GamePropertyPool.SetMask",
-	// 		zap.String("name", name),
-	// 		zap.Error(ErrNotMask))
+	// 		slog.String("name", name),
+	// 		goutils.Err(ErrNotMask))
 
 	// 	return ErrNotMask
 	// }
@@ -522,8 +522,8 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GamePropertyPool.GetMask",
-			zap.String("name", name),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", name),
+			goutils.Err(ErrInvalidComponentName))
 
 		return nil, ErrInvalidComponentName
 	}
@@ -534,14 +534,14 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	}
 
 	goutils.Error("GamePropertyPool.GetMask",
-		zap.String("name", name),
-		zap.Error(ErrInvalidComponent))
+		slog.String("name", name),
+		goutils.Err(ErrInvalidComponent))
 
 	// im, isok := ic.(IMask)
 	// if !isok {
 	// 	goutils.Error("GamePropertyPool.GetMask",
-	// 		zap.String("name", name),
-	// 		zap.Error(ErrNotMask))
+	// 		slog.String("name", name),
+	// 		goutils.Err(ErrNotMask))
 
 	// 	return nil, ErrNotMask
 	// }
@@ -555,8 +555,8 @@ func (pool *GamePropertyPool) PushTrigger(gameProp *GameProperty, plugin sgc7plu
 	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsRespin() {
 		goutils.Error("GamePropertyPool.PushTrigger",
-			zap.String("name", name),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", name),
+			goutils.Err(ErrInvalidComponentName))
 
 		return ErrInvalidComponentName
 	}
@@ -581,8 +581,8 @@ func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
 	cfg, err := LoadConfig(cfgfn)
 	if err != nil {
 		goutils.Error("newGamePropertyPool:LoadConfig",
-			zap.String("cfgfn", cfgfn),
-			zap.Error(err))
+			slog.String("cfgfn", cfgfn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -610,8 +610,8 @@ func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 		sv, err := LoadSymbolsViewer(cfg.GetPath(cfg.SymbolsViewer, false))
 		if err != nil {
 			goutils.Error("NewGamePropertyPool2:LoadSymbolsViewer",
-				zap.String("fn", cfg.SymbolsViewer),
-				zap.Error(err))
+				slog.String("fn", cfg.SymbolsViewer),
+				goutils.Err(err))
 
 			return nil, err
 		}

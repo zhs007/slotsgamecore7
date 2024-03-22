@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -11,7 +12,6 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -129,8 +129,8 @@ func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) erro
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolValWins.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -140,8 +140,8 @@ func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) erro
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("SymbolValWins.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -161,8 +161,8 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("SymbolValWins.InitEx:Symbol",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 		}
 
 		symbolValWins.Config.SymbolCodes = append(symbolValWins.Config.SymbolCodes, sc)
@@ -298,7 +298,7 @@ func (symbolValWins *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 // 	// pbcd, isok := pbComponentData.(*sgc7pb.SymbolValWinsData)
 // 	// if !isok {
 // 	// 	goutils.Error("SymbolValWins.OnStatsWithPB",
-// 	// 		zap.Error(ErrIvalidProto))
+// 	// 		goutils.Err(ErrIvalidProto))
 
 // 	// 	return 0, ErrIvalidProto
 // 	// }
@@ -320,7 +320,7 @@ func (symbolValWins *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 // 	// 			curwins, err := symbolValWins.OnStatsWithPB(feature, curComponent, v)
 // 	// 			if err != nil {
 // 	// 				goutils.Error("SymbolValWins.OnStats",
-// 	// 					zap.Error(err))
+// 	// 					goutils.Err(err))
 
 // 	// 				continue
 // 	// 			}
@@ -404,7 +404,7 @@ func parseSymbolValWins(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseSymbolValWins:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -412,7 +412,7 @@ func parseSymbolValWins(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseSymbolValWins:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -422,7 +422,7 @@ func parseSymbolValWins(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseSymbolValWins:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

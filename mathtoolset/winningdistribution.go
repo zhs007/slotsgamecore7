@@ -1,6 +1,7 @@
 package mathtoolset
 
 import (
+	"log/slog"
 	"math"
 	"os"
 	"strings"
@@ -8,7 +9,6 @@ import (
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -147,8 +147,8 @@ func (wd *WinningDistribution) AddAvgWin(winf float64, percent float64) error {
 	_, isok := wd.AvgWins[wini]
 	if isok {
 		goutils.Error("WinningDistribution.AddAvgWin",
-			zap.Int("key", wini),
-			zap.Error(ErrDuplicateAvgWin))
+			slog.Int("key", wini),
+			goutils.Err(ErrDuplicateAvgWin))
 
 		return ErrDuplicateAvgWin
 	} else {
@@ -315,8 +315,8 @@ func (wd *WinningDistribution) Save(fn string) {
 	buf, err := yaml.Marshal(wd)
 	if err != nil {
 		goutils.Error("Save:Marshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return
 	}
@@ -454,8 +454,8 @@ func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("LoadWinningDistribution:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -464,8 +464,8 @@ func LoadWinningDistribution(fn string) (*WinningDistribution, error) {
 	err = yaml.Unmarshal(data, wd)
 	if err != nil {
 		goutils.Error("LoadWinningDistribution:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -495,8 +495,8 @@ func LoadWinningDistributionFromExcel(fn string) (*WinningDistribution, error) {
 			winf, err := goutils.String2Float64(data)
 			if err != nil {
 				goutils.Error("LoadWinningDistributionFromExcel:String2Float64:avgwin",
-					zap.String("avgwin", data),
-					zap.Error(err))
+					slog.String("avgwin", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -507,8 +507,8 @@ func LoadWinningDistributionFromExcel(fn string) (*WinningDistribution, error) {
 			perf, err := goutils.String2Float64(data)
 			if err != nil {
 				goutils.Error("LoadWinningDistributionFromExcel:String2Float64:percent",
-					zap.String("percent", data),
-					zap.Error(err))
+					slog.String("percent", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -521,8 +521,8 @@ func LoadWinningDistributionFromExcel(fn string) (*WinningDistribution, error) {
 	})
 	if err != nil {
 		goutils.Error("LoadWinningDistributionFromExcel:LoadExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

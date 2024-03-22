@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
@@ -9,7 +10,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -37,8 +37,8 @@ func (symbolModifier *SymbolModifier) Init(fn string, pool *GamePropertyPool) er
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolModifier.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -48,8 +48,8 @@ func (symbolModifier *SymbolModifier) Init(fn string, pool *GamePropertyPool) er
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("SymbolModifier.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -66,8 +66,8 @@ func (symbolModifier *SymbolModifier) InitEx(cfg any, pool *GamePropertyPool) er
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("SymbolModifier.InitEx:Symbols",
-				zap.String("symbol", s),
-				zap.Error(ErrInvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
 
 			return ErrInvalidSymbol
 		}
@@ -79,8 +79,8 @@ func (symbolModifier *SymbolModifier) InitEx(cfg any, pool *GamePropertyPool) er
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("SymbolModifier.InitEx:TargetSymbols",
-				zap.String("symbol", s),
-				zap.Error(ErrInvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
 
 			return ErrInvalidSymbol
 		}
@@ -142,7 +142,7 @@ func (symbolModifier *SymbolModifier) chgSymbols(gameProp *GameProperty, plugin 
 		cr, err := plugin.Random(context.Background(), len(lst))
 		if err != nil {
 			goutils.Error("SymbolModifier.chgSymbols:random symbols",
-				zap.Error(err))
+				goutils.Err(err))
 
 			break
 		}
@@ -174,7 +174,7 @@ func (symbolModifier *SymbolModifier) procSymbolsRandPos(gameProp *GameProperty,
 	ci, err := plugin.Random(context.Background(), len(lst)/2)
 	if err != nil {
 		goutils.Error("SymbolModifier.procSymbolsRandPos:random pos",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return false
 	}

@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -39,8 +39,8 @@ func (reelModifier *ReelModifier) Init(fn string, pool *GamePropertyPool) error 
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ReelModifier.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -50,8 +50,8 @@ func (reelModifier *ReelModifier) Init(fn string, pool *GamePropertyPool) error 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("ReelModifier.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -68,8 +68,8 @@ func (reelModifier *ReelModifier) InitEx(cfg any, pool *GamePropertyPool) error 
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("ReelModifier.InitEx:HoldSymbols",
-				zap.String("symbol", s),
-				zap.Error(ErrInvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
 
 			return ErrInvalidSymbol
 		}
@@ -80,8 +80,8 @@ func (reelModifier *ReelModifier) InitEx(cfg any, pool *GamePropertyPool) error 
 	rd, isok := pool.Config.MapReels[reelModifier.Config.Reel]
 	if !isok {
 		goutils.Error("ReelModifier.InitEx:Reels",
-			zap.String("reels", reelModifier.Config.Reel),
-			zap.Error(ErrInvalidReels))
+			slog.String("reels", reelModifier.Config.Reel),
+			goutils.Err(ErrInvalidReels))
 
 		return ErrInvalidReels
 	}
@@ -124,7 +124,7 @@ func (reelModifier *ReelModifier) chgReel(gameProp *GameProperty, plugin sgc7plu
 		err := gs.RandReelsWithReelData(reelModifier.Config.ReelData, plugin)
 		if err != nil {
 			goutils.Error("ReelModifier.chgReel:RandReelsWithReelData",
-				zap.Error(err))
+				goutils.Err(err))
 
 			break
 		}
@@ -150,7 +150,7 @@ func (reelModifier *ReelModifier) chgReelWithMask(gameProp *GameProperty, plugin
 	maskval, err := gameProp.Pool.GetMask(mask, gameProp)
 	if err != nil {
 		goutils.Error("ReelModifier.chgReelWithMask:GetMask",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return false
 	}
@@ -160,7 +160,7 @@ func (reelModifier *ReelModifier) chgReelWithMask(gameProp *GameProperty, plugin
 		err := gs.RandMaskReelsWithReelData(reelModifier.Config.ReelData, plugin, maskval, reelModifier.Config.IsReverse)
 		if err != nil {
 			goutils.Error("ReelModifier.chgReelWithMask:RandMaskReelsWithReelData",
-				zap.Error(err))
+				goutils.Err(err))
 
 			break
 		}

@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -30,8 +30,8 @@ func (replaceReel *ReplaceReel) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ReplaceReel.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -41,8 +41,8 @@ func (replaceReel *ReplaceReel) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("ReplaceReel.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -61,8 +61,8 @@ func (replaceReel *ReplaceReel) InitEx(cfg any, pool *GamePropertyPool) error {
 		sc, isok := pool.DefaultPaytables.MapSymbols[v]
 		if !isok {
 			goutils.Error("ReplaceReel.InitEx:MapReels",
-				zap.String("symbol", v),
-				zap.Error(ErrInvalidSymbol))
+				slog.String("symbol", v),
+				goutils.Err(ErrInvalidSymbol))
 
 			return ErrInvalidSymbol
 		}

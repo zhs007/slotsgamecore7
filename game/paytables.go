@@ -1,13 +1,13 @@
 package sgc7game
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type payInfo struct {
@@ -221,8 +221,8 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
 		goutils.Error("LoadPaytablesFromExcel:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -231,9 +231,9 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
 		goutils.Error("LoadPaytablesFromExcel:GetSheetList",
-			goutils.JSON("SheetList", lstname),
-			zap.String("fn", fn),
-			zap.Error(ErrInvalidReelsExcelFile))
+			slog.Any("SheetList", lstname),
+			slog.String("fn", fn),
+			goutils.Err(ErrInvalidReelsExcelFile))
 
 		return nil, ErrInvalidReelsExcelFile
 	}
@@ -241,8 +241,8 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 	rows, err := f.GetRows(lstname[0])
 	if err != nil {
 		goutils.Error("LoadPaytablesFromExcel:GetRows",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -269,19 +269,19 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 					iv, err := goutils.String2Int64(colCell[1:])
 					if err != nil {
 						goutils.Error("LoadPaytablesFromExcel:String2Int64",
-							zap.String("fn", fn),
-							zap.String("header", colCell),
-							zap.Error(err))
+							slog.String("fn", fn),
+							slog.String("header", colCell),
+							goutils.Err(err))
 
 						return nil, err
 					}
 
 					if iv <= 0 {
 						goutils.Error("LoadPaytablesFromExcel",
-							zap.String("info", "check iv"),
-							zap.String("fn", fn),
-							zap.String("header", colCell),
-							zap.Error(ErrInvalidReelsExcelFile))
+							slog.String("info", "check iv"),
+							slog.String("fn", fn),
+							slog.String("header", colCell),
+							goutils.Err(ErrInvalidReelsExcelFile))
 
 						return nil, ErrInvalidReelsExcelFile
 					}
@@ -295,42 +295,42 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 
 			if maxli != len(mapli) {
 				goutils.Error("LoadPaytablesFromExcel",
-					zap.String("info", "check len"),
-					zap.String("fn", fn),
-					zap.Int("maxli", maxli),
-					goutils.JSON("mapli", mapli),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check len"),
+					slog.String("fn", fn),
+					slog.Int("maxli", maxli),
+					slog.Any("mapli", mapli),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return nil, ErrInvalidReelsExcelFile
 			}
 
 			if maxli <= 0 {
 				goutils.Error("LoadPaytablesFromExcel",
-					zap.String("info", "check empty"),
-					zap.String("fn", fn),
-					zap.Int("maxli", maxli),
-					goutils.JSON("mapli", mapli),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check empty"),
+					slog.String("fn", fn),
+					slog.Int("maxli", maxli),
+					slog.Any("mapli", mapli),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return nil, ErrInvalidReelsExcelFile
 			}
 
 			if codeIndex < 0 {
 				goutils.Error("LoadPaytablesFromExcel",
-					zap.String("info", "check empty"),
-					zap.String("fn", fn),
-					zap.Int("codeIndex", codeIndex),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check empty"),
+					slog.String("fn", fn),
+					slog.Int("codeIndex", codeIndex),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return nil, ErrInvalidReelsExcelFile
 			}
 
 			if symbolIndex < 0 {
 				goutils.Error("LoadPaytablesFromExcel",
-					zap.String("info", "check empty"),
-					zap.String("fn", fn),
-					zap.Int("symbolIndex", symbolIndex),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check empty"),
+					slog.String("fn", fn),
+					slog.Int("symbolIndex", symbolIndex),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return nil, ErrInvalidReelsExcelFile
 			}
@@ -344,8 +344,8 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 					v, err := goutils.String2Int64(colCell)
 					if err != nil {
 						goutils.Error("LoadPaytablesFromExcel:String2Int64",
-							zap.String("val", colCell),
-							zap.Error(err))
+							slog.String("val", colCell),
+							goutils.Err(err))
 
 						return nil, err
 					}
@@ -359,8 +359,8 @@ func LoadPaytablesFromExcel(fn string) (*PayTables, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadPaytablesFromExcel:String2Int64",
-								zap.String("val", colCell),
-								zap.Error(err))
+								slog.String("val", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}

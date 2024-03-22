@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path"
@@ -12,7 +13,6 @@ import (
 	goutils "github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/gatiserv"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
-	"go.uber.org/zap"
 )
 
 func copyFile(dstName, srcName string) (written int64, err error) {
@@ -50,8 +50,8 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 	output, err := cmd.Output()
 	if err != nil {
 		goutils.Error("Command",
-			zap.String("command", command),
-			zap.Error(err))
+			slog.String("command", command),
+			goutils.Err(err))
 
 		return
 	}
@@ -67,8 +67,8 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
 			goutils.Error("Checksum",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return
 		}
@@ -83,8 +83,8 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
 			goutils.Error("Checksum",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return
 		}
@@ -106,8 +106,8 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
 			goutils.Error("Checksum",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return
 		}
@@ -122,8 +122,8 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
 			goutils.Error("Checksum",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return
 		}
@@ -142,8 +142,8 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		cs, err := gatiserv.Checksum(fn)
 		if err != nil {
 			goutils.Error("Checksum",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return
 		}
@@ -404,7 +404,7 @@ func genGloryofheroes() {
 }
 
 func main() {
-	goutils.InitLogger("gatiChecksum", sgc7ver.Version,
+	goutils.InitLogger2("gatiChecksum", sgc7ver.Version,
 		"debug", true, "./logs")
 
 	// genElemental2()

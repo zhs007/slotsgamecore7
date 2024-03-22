@@ -1,11 +1,12 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -45,7 +46,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp, isok := gameData.(*GameProperty)
 	if !isok {
 		goutils.Error("BasicGameMod.OnPlay",
-			zap.Error(ErrIvalidGameData))
+			goutils.Err(ErrIvalidGameData))
 
 		return nil, ErrIvalidGameData
 	}
@@ -70,8 +71,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		c, isok := components.MapComponents[gp.FirstComponent]
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-				zap.String("FirstComponent", gp.FirstComponent),
-				zap.Error(ErrInvalidComponentName))
+				slog.String("FirstComponent", gp.FirstComponent),
+				goutils.Err(ErrInvalidComponentName))
 
 			return nil, ErrInvalidComponentName
 		}
@@ -84,9 +85,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				c, isok1 := components.MapComponents[cn]
 				if !isok1 {
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-						zap.String("cmd", cmd),
-						zap.String("MapCmdComponent", cn),
-						zap.Error(ErrInvalidComponentName))
+						slog.String("cmd", cmd),
+						slog.String("MapCmdComponent", cn),
+						goutils.Err(ErrInvalidComponentName))
 
 					return nil, ErrInvalidComponentName
 				}
@@ -99,8 +100,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				c, isok := components.MapComponents[startComponent]
 				if !isok {
 					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-						zap.String("FirstComponent", startComponent),
-						zap.Error(ErrInvalidComponentName))
+						slog.String("FirstComponent", startComponent),
+						goutils.Err(ErrInvalidComponentName))
 
 					return nil, ErrInvalidComponentName
 				}
@@ -117,7 +118,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		if err != nil {
 			if err != ErrComponentDoNothing {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -131,7 +132,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			err := curComponent.EachSymbols(gameProp, pr, gp, plugin, ps, stake, prs, cd)
 			if err != nil {
 				goutils.Error("BasicGameMod.OnPlay:EachSymbols",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -141,7 +142,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			nc, err := gameProp.procRespinBeforeStepEnding(pr, gp)
 			if err != nil {
 				goutils.Error("BasicGameMod.OnPlay:procRespinBeforeStepEnding",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -165,8 +166,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		c, isok := components.MapComponents[nextComponentName]
 		if !isok {
 			goutils.Error("BasicGameMod.OnPlay:MapComponents",
-				zap.String("nextComponentName", nextComponentName),
-				zap.Error(ErrInvalidComponentName))
+				slog.String("nextComponentName", nextComponentName),
+				goutils.Err(ErrInvalidComponentName))
 
 			return nil, ErrInvalidComponentName
 		}
@@ -176,8 +177,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		curComponentNum := gameProp.callStack.GetComponentNum()
 		if curComponentNum >= MaxComponentNumInStep {
 			goutils.Error("BasicGameMod.OnPlay",
-				zap.Int("components", curComponentNum),
-				zap.Error(ErrTooManyComponentsInStep))
+				slog.Int("components", curComponentNum),
+				goutils.Err(ErrTooManyComponentsInStep))
 
 			return nil, ErrTooManyComponentsInStep
 		}
@@ -189,7 +190,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		// err := ic.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
 		// if err != nil {
 		// 	goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
-		// 		zap.Error(err))
+		// 		goutils.Err(err))
 
 		// 	return err
 		// }
@@ -200,7 +201,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	})
 	if err != nil {
 		goutils.Error("BasicGameMod.OnPlay:gameProp.callStack.Each",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -210,7 +211,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	// 		err := v.Component.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
 	// 		if err != nil {
 	// 			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
-	// 				zap.Error(err))
+	// 				goutils.Err(err))
 
 	// 			return nil, err
 	// 		}
@@ -306,8 +307,8 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 	// 	err := v.OnNewGame(gameProp)
 	// 	if err != nil {
 	// 		goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
-	// 			zap.Int("i", i),
-	// 			zap.Error(err))
+	// 			slog.Int("i", i),
+	// 			goutils.Err(err))
 
 	// 		return err
 	// 	}
@@ -330,8 +331,8 @@ func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake
 	// 	err := v.OnNewStep(gameProp)
 	// 	if err != nil {
 	// 		goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
-	// 			zap.Int("i", i),
-	// 			zap.Error(err))
+	// 			slog.Int("i", i),
+	// 			goutils.Err(err))
 
 	// 		return err
 	// 	}
@@ -365,7 +366,7 @@ func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrCompo
 			err := c.Init(pool.Config.GetPath(configfn, false), pool)
 			if err != nil {
 				goutils.Error("NewBasicGameMod:Init",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil
 			}
@@ -397,7 +398,7 @@ func NewBasicGameMod2(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComp
 			err := c.InitEx(pool.Config.mapConfig[v.Name], pool)
 			if err != nil {
 				goutils.Error("NewBasicGameMod:Init",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}

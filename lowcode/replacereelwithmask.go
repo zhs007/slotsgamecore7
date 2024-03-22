@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -40,8 +40,8 @@ func (replaceReelWithMask *ReplaceReelWithMask) Init(fn string, pool *GameProper
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ReplaceReelWithMask.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -51,8 +51,8 @@ func (replaceReelWithMask *ReplaceReelWithMask) Init(fn string, pool *GameProper
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("ReplaceReelWithMask.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -68,8 +68,8 @@ func (replaceReelWithMask *ReplaceReelWithMask) InitEx(cfg any, pool *GameProper
 	sc, isok := pool.DefaultPaytables.MapSymbols[replaceReelWithMask.Config.Symbol]
 	if !isok {
 		goutils.Error("ReplaceReelWithMask.InitEx:Symbol",
-			zap.String("symbol", replaceReelWithMask.Config.Symbol),
-			zap.Error(ErrInvalidSymbol))
+			slog.String("symbol", replaceReelWithMask.Config.Symbol),
+			goutils.Err(ErrInvalidSymbol))
 
 		return ErrInvalidSymbol
 	}
@@ -106,7 +106,7 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 	maskVal, err := gameProp.GetMask(replaceReelWithMask.Config.Mask)
 	if err != nil {
 		goutils.Error("ReplaceReelWithMask.OnPlayGame:GetMask",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -183,7 +183,7 @@ func parseReplaceReelWithMask(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseReplaceReelWithMask:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -191,7 +191,7 @@ func parseReplaceReelWithMask(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseReplaceReelWithMask:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -201,7 +201,7 @@ func parseReplaceReelWithMask(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseReplaceReelWithMask:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

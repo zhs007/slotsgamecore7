@@ -2,10 +2,10 @@ package sgc7game
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 const IntArrValType string = "intarrval"
@@ -50,8 +50,8 @@ func (val *IntArrVal[T]) ParseString(str string) error {
 			iv, err := goutils.String2Int64(v)
 			if err != nil {
 				goutils.Error("IntArrVal[T].ParseString:String2Int64",
-					zap.String("str", str),
-					zap.Error(err))
+					slog.String("str", str),
+					goutils.Err(err))
 
 				return err
 			}

@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -61,8 +61,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) Init(fn string, pool *Ga
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("GenSymbolValsWithSymbol.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -72,8 +72,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) Init(fn string, pool *Ga
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("GenSymbolValsWithSymbol.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -92,8 +92,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) InitEx(cfg any, pool *Ga
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("GenSymbolValsWithSymbol.InitEx:Symbol",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 		}
 
 		genSymbolValsWithSymbol.Config.SymbolCodes = append(genSymbolValsWithSymbol.Config.SymbolCodes, sc)
@@ -103,8 +103,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) InitEx(cfg any, pool *Ga
 		vw2, err := pool.LoadIntWeights(genSymbolValsWithSymbol.Config.Weight, genSymbolValsWithSymbol.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("ChgSymbols.InitEx:LoadIntWeights",
-				zap.String("Weight", genSymbolValsWithSymbol.Config.Weight),
-				zap.Error(err))
+				slog.String("Weight", genSymbolValsWithSymbol.Config.Weight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -143,7 +143,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-									zap.Error(err))
+									goutils.Err(err))
 
 								return "", err
 							}
@@ -159,7 +159,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-									zap.Error(err))
+									goutils.Err(err))
 
 								return "", err
 							}
@@ -185,7 +185,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-									zap.Error(err))
+									goutils.Err(err))
 
 								return "", err
 							}
@@ -201,7 +201,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-									zap.Error(err))
+									goutils.Err(err))
 
 								return "", err
 							}
@@ -282,7 +282,7 @@ func parseGenSymbolValsWithSymbol(gamecfg *Config, cell *ast.Node) (string, erro
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithSymbol:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -290,7 +290,7 @@ func parseGenSymbolValsWithSymbol(gamecfg *Config, cell *ast.Node) (string, erro
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithSymbol:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -300,7 +300,7 @@ func parseGenSymbolValsWithSymbol(gamecfg *Config, cell *ast.Node) (string, erro
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithSymbol:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

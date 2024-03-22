@@ -5,7 +5,6 @@ import (
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type ScriptCore struct {
@@ -26,7 +25,7 @@ func newScriptBasicFuncs(gameProp *GameProperty) []cel.EnvOption {
 					prop, err := String2Property(param0.Value().(string))
 					if err != nil {
 						goutils.Error("newScriptBasicFuncs:setVal:String2Property",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.NullType
 					}
@@ -34,7 +33,7 @@ func newScriptBasicFuncs(gameProp *GameProperty) []cel.EnvOption {
 					err = gameProp.SetVal(prop, param1.Value().(int))
 					if err != nil {
 						goutils.Error("newScriptBasicFuncs:setVal",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.NullType
 					}
@@ -52,7 +51,7 @@ func newScriptBasicFuncs(gameProp *GameProperty) []cel.EnvOption {
 					prop, err := String2Property(param0.Value().(string))
 					if err != nil {
 						goutils.Error("newScriptBasicFuncs:setStrVal:String2Property",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.NullType
 					}
@@ -60,7 +59,7 @@ func newScriptBasicFuncs(gameProp *GameProperty) []cel.EnvOption {
 					err = gameProp.SetStrVal(prop, param1.Value().(string))
 					if err != nil {
 						goutils.Error("newScriptBasicFuncs:SetStrVal",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.NullType
 					}
@@ -81,7 +80,7 @@ func NewScriptCore(gameProp *GameProperty) (*ScriptCore, error) {
 	cel, err := cel.NewEnv(options...)
 	if err != nil {
 		goutils.Error("NewScriptCore:cel.NewEnv",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

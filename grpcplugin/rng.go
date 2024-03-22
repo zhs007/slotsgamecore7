@@ -2,11 +2,11 @@ package grpcplugin
 
 import (
 	"context"
+	"log/slog"
 
 	goutils "github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -54,8 +54,8 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 				grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
 			if err != nil {
 				goutils.Error("RngClient.GetRngs:grpc.Dial",
-					zap.String("server address", client.servAddr),
-					zap.Error(err))
+					slog.String("server address", client.servAddr),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -63,8 +63,8 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 			conn, err = grpc.Dial(client.servAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
 				goutils.Error("RngClient.GetRngs:grpc.Dial",
-					zap.String("server address", client.servAddr),
-					zap.Error(err))
+					slog.String("server address", client.servAddr),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -79,10 +79,10 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 	})
 	if err != nil {
 		goutils.Error("RngClient.GetRngs:GetRngs",
-			zap.String("server address", client.servAddr),
-			zap.String("gamecode", client.gameCode),
-			zap.Int("nums", nums),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			slog.String("gamecode", client.gameCode),
+			slog.Int("nums", nums),
+			goutils.Err(err))
 
 		client.reset()
 

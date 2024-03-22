@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -11,7 +12,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
@@ -82,8 +82,8 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("Collector.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -93,8 +93,8 @@ func (collector *Collector) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("Collector.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -212,7 +212,7 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		err := collector.add(plugin, off, ccd, gameProp, curpr, gp, false)
 		if err != nil {
 			goutils.Error("Collector.OnPlayGame:add:off",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -309,7 +309,7 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 // 	pbcd, isok := pbComponentData.(*sgc7pb.CollectorData)
 // 	if !isok {
 // 		goutils.Error("Collector.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -367,7 +367,7 @@ func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseCollector:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -375,7 +375,7 @@ func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseCollector:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -385,7 +385,7 @@ func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseCollector:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -396,7 +396,7 @@ func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
 		awards, mapawards, err := parseCollectorControllers(gamecfg, ctrls)
 		if err != nil {
 			goutils.Error("parseScatterTrigger:parseCollectorControllers",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
