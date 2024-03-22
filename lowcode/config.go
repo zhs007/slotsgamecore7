@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 	"path"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/mathtoolset"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -91,8 +91,8 @@ func (cfg *Config) BuildStatsSymbolCodes(paytables *sgc7game.PayTables) error {
 		symbolCode, isok := paytables.MapSymbols[v]
 		if !isok {
 			goutils.Error("Config.BuildStatsSymbolCodes",
-				zap.String("symbol", v),
-				zap.Error(ErrIvalidStatsSymbolsInConfig))
+				slog.String("symbol", v),
+				goutils.Err(ErrIvalidStatsSymbolsInConfig))
 
 			return ErrIvalidStatsSymbolsInConfig
 		}
@@ -135,8 +135,8 @@ func LoadConfig(fn string) (*Config, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("LoadConfig:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -145,8 +145,8 @@ func LoadConfig(fn string) (*Config, error) {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("LoadConfig:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -158,10 +158,10 @@ func LoadConfig(fn string) (*Config, error) {
 			ld, err := sgc7game.LoadLineDataFromExcel(cfg.GetPath(v, false))
 			if err != nil {
 				goutils.Error("LoadConfig:LoadLineDataFromExcel",
-					zap.String("key", k),
-					zap.String("linedatafn", v),
-					zap.String("fn", fn),
-					zap.Error(err))
+					slog.String("key", k),
+					slog.String("linedatafn", v),
+					slog.String("fn", fn),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -176,10 +176,10 @@ func LoadConfig(fn string) (*Config, error) {
 		pt, err := sgc7game.LoadPaytablesFromExcel(cfg.GetPath(v, false))
 		if err != nil {
 			goutils.Error("LoadConfig:LoadPaytablesFromExcel",
-				zap.String("key", k),
-				zap.String("paytablesfn", v),
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("key", k),
+				slog.String("paytablesfn", v),
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -191,8 +191,8 @@ func LoadConfig(fn string) (*Config, error) {
 	if !isok {
 		if err != nil {
 			goutils.Error("LoadConfig",
-				zap.String("fn", fn),
-				zap.Error(ErrMustHaveMainPaytables))
+				slog.String("fn", fn),
+				goutils.Err(ErrMustHaveMainPaytables))
 
 			return nil, ErrMustHaveMainPaytables
 		}
@@ -206,10 +206,10 @@ func LoadConfig(fn string) (*Config, error) {
 				rd, err := sgc7game.LoadReelsFromExcel(cfg.GetPath(v, false))
 				if err != nil {
 					goutils.Error("LoadConfig:LoadReelsFromExcel",
-						zap.String("key", k),
-						zap.String("paytablesfn", v),
-						zap.String("fn", fn),
-						zap.Error(err))
+						slog.String("key", k),
+						slog.String("paytablesfn", v),
+						slog.String("fn", fn),
+						goutils.Err(err))
 
 					return nil, err
 				}
@@ -221,10 +221,10 @@ func LoadConfig(fn string) (*Config, error) {
 				rd, err := sgc7game.LoadReelsFromExcel2(cfg.GetPath(v, false), pt)
 				if err != nil {
 					goutils.Error("LoadConfig:LoadReelsFromExcel2",
-						zap.String("key", k),
-						zap.String("paytablesfn", v),
-						zap.String("fn", fn),
-						zap.Error(err))
+						slog.String("key", k),
+						slog.String("paytablesfn", v),
+						slog.String("fn", fn),
+						goutils.Err(err))
 
 					return nil, err
 				}

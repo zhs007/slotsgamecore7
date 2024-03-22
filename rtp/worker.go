@@ -2,12 +2,12 @@ package sgc7rtp
 
 import (
 	"context"
+	"log/slog"
 	"math"
 	"time"
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 	"gonum.org/v1/gonum/stat"
 )
 
@@ -72,8 +72,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 						iserrturn = true
 
 						goutils.Error("StartRTP.Play",
-							zap.Int("results", len(results)),
-							zap.Error(err))
+							slog.Int("results", len(results)),
+							goutils.Err(err))
 
 						break
 					}
@@ -101,7 +101,7 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 							cr, err := plugin.Random(context.Background(), len(pr.NextCmds))
 							if err != nil {
 								goutils.Error("StartRTP.Random",
-									zap.Error(err))
+									goutils.Err(err))
 
 								break
 							}
@@ -260,8 +260,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 						iserrturn = true
 
 						goutils.Error("StartScaleRTPDown.Play",
-							zap.Int("results", len(results)),
-							zap.Error(err))
+							slog.Int("results", len(results)),
+							goutils.Err(err))
 
 						break
 					}
@@ -284,7 +284,7 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 							cr, err := plugin.Random(context.Background(), len(pr.NextCmds))
 							if err != nil {
 								goutils.Error("StartScaleRTPDown.Random",
-									zap.Error(err))
+									goutils.Err(err))
 
 								break
 							}
@@ -330,8 +330,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 						cr, err := plugin.Random(context.Background(), math.MaxInt32)
 						if err != nil {
 							goutils.Error("StartScaleRTPDown.Random",
-								zap.Int("results", len(results)),
-								zap.Error(err))
+								slog.Int("results", len(results)),
+								goutils.Err(err))
 						}
 
 						if cr > val {

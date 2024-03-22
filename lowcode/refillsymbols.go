@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
@@ -38,8 +38,8 @@ func (refillSymbols *RefillSymbols) Init(fn string, pool *GamePropertyPool) erro
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("RefillSymbols.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -49,8 +49,8 @@ func (refillSymbols *RefillSymbols) Init(fn string, pool *GamePropertyPool) erro
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("RefillSymbols.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -165,7 +165,7 @@ func parseRefillSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRefillSymbols:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -173,7 +173,7 @@ func parseRefillSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseRefillSymbols:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -183,7 +183,7 @@ func parseRefillSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseRefillSymbols:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

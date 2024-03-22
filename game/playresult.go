@@ -3,7 +3,6 @@ package sgc7game
 import (
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // PlayResult - result for play
@@ -56,7 +55,7 @@ func PlayResult2JSON(pr *PlayResult) ([]byte, error) {
 	b, err := sonic.Marshal(pr)
 	if err != nil {
 		goutils.Warn("sgc7game.PlayResult2JSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func JSON2PlayResult(buf []byte, pr *PlayResult) (*PlayResult, error) {
 	err := sonic.Unmarshal(buf, &pr)
 	if err != nil {
 		goutils.Warn("sgc7game.JSON2PlayResult",
-			zap.Error(err))
+			goutils.Err(err))
 		return nil, err
 	}
 

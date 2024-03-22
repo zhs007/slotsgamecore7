@@ -1,12 +1,12 @@
 package gamecollection
 
 import (
+	"log/slog"
 	"sync"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 )
 
 type GameMgr struct {
@@ -24,19 +24,19 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 
 		if hash == gameD.HashCode {
 			goutils.Info("GameMgr.InitGame:same hash",
-				zap.String("gameCode", gameCode),
-				zap.String("hash", hash))
+				slog.String("gameCode", gameCode),
+				slog.String("hash", hash))
 
 			return nil
 		}
 
 		// goutils.Info("GameMgr.InitGame",
-		// 	zap.String("data", string(data)))
+		// 	slog.String("data", string(data)))
 
 		gameD1, err := NewGameDataWithHash(gameCode, data, hash)
 		if err != nil {
 			goutils.Error("GameMgr.InitGame:NewGameDataWithHash",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -44,18 +44,18 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 		mgr.MapGames[gameCode] = gameD1
 
 		goutils.Info("GameMgr.InitGame:OK!",
-			zap.String("gameCode", gameCode))
+			slog.String("gameCode", gameCode))
 
 		return nil
 	}
 
 	// goutils.Info("GameMgr.InitGame",
-	// 	zap.String("data", string(data)))
+	// 	slog.String("data", string(data)))
 
 	gameD1, err := NewGameData(gameCode, data)
 	if err != nil {
 		goutils.Error("GameMgr.InitGame:NewGameData",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -63,7 +63,7 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 	mgr.MapGames[gameCode] = gameD1
 
 	goutils.Info("GameMgr.InitGame:OK!",
-		zap.String("gameCode", gameCode))
+		slog.String("gameCode", gameCode))
 
 	return nil
 }
@@ -75,9 +75,9 @@ func (mgr *GameMgr) GetGameConfig(gameCode string) (*sgc7game.Config, error) {
 	gameD, isok := mgr.MapGames[gameCode]
 	if !isok {
 		goutils.Error("GameMgr.GetGameConfig",
-			zap.String("gameCode", gameCode),
-			zap.Int("game number", len(mgr.MapGames)),
-			zap.Error(ErrInvalidGameCode))
+			slog.String("gameCode", gameCode),
+			slog.Int("game number", len(mgr.MapGames)),
+			goutils.Err(ErrInvalidGameCode))
 
 		return nil, ErrInvalidGameCode
 	}
@@ -92,12 +92,12 @@ func (mgr *GameMgr) InitializeGamePlayer(gameCode string) (*sgc7pb.PlayerState, 
 	gameD, isok := mgr.MapGames[gameCode]
 	if !isok || gameD == nil || gameD.Game == nil || gameD.Service == nil {
 		goutils.Error("GameMgr.InitializeGamePlayer",
-			zap.String("gameCode", gameCode),
-			zap.Bool("gameD", gameD != nil),
-			zap.Bool("gameD.Game", gameD.Game != nil),
-			zap.Bool("gameD.Service", gameD.Service != nil),
-			zap.Int("game number", len(mgr.MapGames)),
-			zap.Error(ErrInvalidGameCode))
+			slog.String("gameCode", gameCode),
+			slog.Bool("gameD", gameD != nil),
+			slog.Bool("gameD.Game", gameD.Game != nil),
+			slog.Bool("gameD.Service", gameD.Service != nil),
+			slog.Int("game number", len(mgr.MapGames)),
+			goutils.Err(ErrInvalidGameCode))
 
 		return nil, ErrInvalidGameCode
 	}
@@ -115,8 +115,8 @@ func (mgr *GameMgr) PlayGame(gameCode string, req *sgc7pb.RequestPlay) (*sgc7pb.
 	gameD, isok := mgr.MapGames[gameCode]
 	if !isok {
 		goutils.Error("GameMgr.PlayGame",
-			zap.String("gameCode", gameCode),
-			zap.Error(ErrInvalidGameCode))
+			slog.String("gameCode", gameCode),
+			goutils.Err(ErrInvalidGameCode))
 
 		return nil, ErrInvalidGameCode
 	}
@@ -124,8 +124,8 @@ func (mgr *GameMgr) PlayGame(gameCode string, req *sgc7pb.RequestPlay) (*sgc7pb.
 	reply, err := gameD.Play(req)
 	if err != nil {
 		goutils.Error("GameMgr.PlayGame",
-			zap.String("gameCode", gameCode),
-			zap.Error(err))
+			slog.String("gameCode", gameCode),
+			goutils.Err(err))
 
 		return nil, err
 	}

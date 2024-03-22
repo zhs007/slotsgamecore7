@@ -2,13 +2,13 @@ package mathtoolset
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type GenMathMgr struct {
@@ -30,8 +30,8 @@ func (mgr *GenMathMgr) LoadPaytables(fn string) error {
 		paytables1, err := sgc7game.LoadPaytablesFromExcel(fn)
 		if err != nil {
 			goutils.Error("GenMathMgr.LoadPaytables:LoadPaytablesFromExcel",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return err
 		}
@@ -54,8 +54,8 @@ func (mgr *GenMathMgr) LoadReelsData(paytablesfn string, fn string, isStrReel bo
 			rd1, err := sgc7game.LoadReelsFromExcel2(fn, mgr.Paytables)
 			if err != nil {
 				goutils.Error("GenMathMgr.LoadReelsData:LoadReelsFromExcel2",
-					zap.String("fn", fn),
-					zap.Error(err))
+					slog.String("fn", fn),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -65,8 +65,8 @@ func (mgr *GenMathMgr) LoadReelsData(paytablesfn string, fn string, isStrReel bo
 			rd1, err := sgc7game.LoadReelsFromExcel(fn)
 			if err != nil {
 				goutils.Error("GenMathMgr.LoadReelsData:LoadReelsFromExcel",
-					zap.String("fn", fn),
-					zap.Error(err))
+					slog.String("fn", fn),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -86,8 +86,8 @@ func (mgr *GenMathMgr) LoadReelsState(fn string) error {
 		rss1, err := LoadReelsStats(fn)
 		if err != nil {
 			goutils.Error("GenMathMgr.LoadReelsState:LoadReelsStats",
-				zap.String("fn", fn),
-				zap.Error(err))
+				slog.String("fn", fn),
+				goutils.Err(err))
 
 			return err
 		}
@@ -139,7 +139,7 @@ func (mgr *GenMathMgr) RunCode(i int) error {
 	script, err := NewScriptCore(mgr)
 	if err != nil {
 		goutils.Error("GenMathMgr.RunCode:NewScriptCore",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -147,7 +147,7 @@ func (mgr *GenMathMgr) RunCode(i int) error {
 	err = script.Compile(mgr.Config.Codes[i].Code)
 	if err != nil {
 		goutils.Error("GenMathMgr.RunCode:Compile",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -155,7 +155,7 @@ func (mgr *GenMathMgr) RunCode(i int) error {
 	out, err := script.Eval(mgr)
 	if err != nil {
 		goutils.Error("GenMathMgr.RunCode:Eval",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -173,7 +173,7 @@ func (mgr *GenMathMgr) RunCodeEx(name string) (ref.Val, error) {
 			script, err := NewScriptCore(mgr)
 			if err != nil {
 				goutils.Error("GenMathMgr.RunCode:NewScriptCore",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -181,7 +181,7 @@ func (mgr *GenMathMgr) RunCodeEx(name string) (ref.Val, error) {
 			err = script.Compile(v.Code)
 			if err != nil {
 				goutils.Error("GenMathMgr.RunCode:Compile",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -189,7 +189,7 @@ func (mgr *GenMathMgr) RunCodeEx(name string) (ref.Val, error) {
 			out, err := script.Eval(mgr)
 			if err != nil {
 				goutils.Error("GenMathMgr.RunCode:Eval",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}

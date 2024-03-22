@@ -3,11 +3,11 @@ package bggserv
 import (
 	"context"
 	"io"
+	"log/slog"
 
 	goutils "github.com/zhs007/goutils"
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -43,8 +43,8 @@ func (client *Client) GetConfig(ctx context.Context) (*sgc7pb.GameConfig, error)
 		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
 			goutils.Error("Client.GetConfig:grpc.Dial",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -56,8 +56,8 @@ func (client *Client) GetConfig(ctx context.Context) (*sgc7pb.GameConfig, error)
 	res, err := client.client.GetConfig(ctx, &sgc7pb.RequestConfig{})
 	if err != nil {
 		goutils.Error("Client.GetConfig:GetConfig",
-			zap.String("server address", client.servAddr),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -73,8 +73,8 @@ func (client *Client) Initialize(ctx context.Context) (*sgc7pb.PlayerState, erro
 		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
 			goutils.Error("Client.Initialize:grpc.Dial",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -86,8 +86,8 @@ func (client *Client) Initialize(ctx context.Context) (*sgc7pb.PlayerState, erro
 	res, err := client.client.Initialize(ctx, &sgc7pb.RequestInitialize{})
 	if err != nil {
 		goutils.Error("Client.Initialize:Initialize",
-			zap.String("server address", client.servAddr),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -108,8 +108,8 @@ func (client *Client) Play(ctx context.Context, ps *sgc7pb.PlayerState,
 		conn, err := grpc.Dial(client.servAddr, grpc.WithInsecure())
 		if err != nil {
 			goutils.Error("Client.Play:grpc.Dial",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -127,8 +127,8 @@ func (client *Client) Play(ctx context.Context, ps *sgc7pb.PlayerState,
 	})
 	if err != nil {
 		goutils.Error("Client.Play:Play",
-			zap.String("server address", client.servAddr),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -145,8 +145,8 @@ func (client *Client) Play(ctx context.Context, ps *sgc7pb.PlayerState,
 			}
 
 			goutils.Error("Client.Play:Recv",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			client.reset()
 

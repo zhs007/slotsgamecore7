@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -35,8 +35,8 @@ func (weightTrigger2 *WeightTrigger2) Init(fn string, pool *GamePropertyPool) er
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("WeightTrigger2.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -46,8 +46,8 @@ func (weightTrigger2 *WeightTrigger2) Init(fn string, pool *GamePropertyPool) er
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WeightTrigger2.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -64,8 +64,8 @@ func (weightTrigger2 *WeightTrigger2) InitEx(cfg any, pool *GamePropertyPool) er
 		vw2, err := pool.LoadIntWeights(weightTrigger2.Config.TriggerWeight, weightTrigger2.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("WeightTrigger2.Init:LoadValWeights",
-				zap.String("Weight", weightTrigger2.Config.TriggerWeight),
-				zap.Error(err))
+				slog.String("Weight", weightTrigger2.Config.TriggerWeight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -102,7 +102,7 @@ func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *
 	rv, err := vw.RandVal(plugin)
 	if err != nil {
 		goutils.Error("WeightTrigger2.OnPlayGame:RandVal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

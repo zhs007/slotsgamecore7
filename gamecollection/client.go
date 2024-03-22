@@ -3,11 +3,11 @@ package gamecollection
 import (
 	"context"
 	"io"
+	"log/slog"
 
 	"github.com/zhs007/goutils"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -46,8 +46,8 @@ func (client *Client) onRequest(ctx context.Context) error {
 			grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
 		if err != nil {
 			goutils.Error("Client.onRequest:grpc.Dial",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			return err
 		}
@@ -64,7 +64,7 @@ func (client *Client) InitGame(ctx context.Context, gameCode string, data string
 	err := client.onRequest(ctx)
 	if err != nil {
 		goutils.Error("Client.InitGame:onRequest",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -75,10 +75,10 @@ func (client *Client) InitGame(ctx context.Context, gameCode string, data string
 	})
 	if err != nil {
 		goutils.Error("Client.InitGame:InitGame",
-			zap.String("server address", client.servAddr),
-			zap.String("gameCode", gameCode),
-			zap.String("data", data),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			slog.String("gameCode", gameCode),
+			slog.String("data", data),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -93,7 +93,7 @@ func (client *Client) GetGameConfig(ctx context.Context, gameCode string) (*sgc7
 	err := client.onRequest(ctx)
 	if err != nil {
 		goutils.Error("Client.GetGameConfig:onRequest",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -103,8 +103,8 @@ func (client *Client) GetGameConfig(ctx context.Context, gameCode string) (*sgc7
 	})
 	if err != nil {
 		goutils.Error("Client.GetGameConfig:GetGameConfig",
-			zap.String("server address", client.servAddr),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -119,7 +119,7 @@ func (client *Client) InitializeGamePlayer(ctx context.Context, gameCode string)
 	err := client.onRequest(ctx)
 	if err != nil {
 		goutils.Error("Client.InitializeGamePlayer:onRequest",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -129,9 +129,9 @@ func (client *Client) InitializeGamePlayer(ctx context.Context, gameCode string)
 	})
 	if err != nil {
 		goutils.Error("Client.InitializeGamePlayer:InitializeGamePlayer",
-			zap.String("server address", client.servAddr),
-			zap.String("gameCode", gameCode),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			slog.String("gameCode", gameCode),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -148,7 +148,7 @@ func (client *Client) PlayGame(ctx context.Context, gameCode string, ps *sgc7pb.
 	err := client.onRequest(ctx)
 	if err != nil {
 		goutils.Error("Client.PlayGame:onRequest",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -165,8 +165,8 @@ func (client *Client) PlayGame(ctx context.Context, gameCode string, ps *sgc7pb.
 	})
 	if err != nil {
 		goutils.Error("Client.PlayGame:PlayGame",
-			zap.String("server address", client.servAddr),
-			zap.Error(err))
+			slog.String("server address", client.servAddr),
+			goutils.Err(err))
 
 		client.reset()
 
@@ -183,8 +183,8 @@ func (client *Client) PlayGame(ctx context.Context, gameCode string, ps *sgc7pb.
 			}
 
 			goutils.Error("Client.PlayGame:Recv",
-				zap.String("server address", client.servAddr),
-				zap.Error(err))
+				slog.String("server address", client.servAddr),
+				goutils.Err(err))
 
 			client.reset()
 

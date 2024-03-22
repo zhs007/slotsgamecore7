@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -10,7 +11,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -60,8 +60,8 @@ func (genGigaSymbol *GenGigaSymbol) Init(fn string, pool *GamePropertyPool) erro
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("GenGigaSymbol.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -71,8 +71,8 @@ func (genGigaSymbol *GenGigaSymbol) Init(fn string, pool *GamePropertyPool) erro
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("GenGigaSymbol.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -91,8 +91,8 @@ func (genGigaSymbol *GenGigaSymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 		sc, isok := pool.DefaultPaytables.MapSymbols[genGigaSymbol.Config.Symbol]
 		if !isok {
 			goutils.Error("GenGigaSymbol.InitEx:Symbol",
-				zap.String("symbol", genGigaSymbol.Config.Symbol),
-				zap.Error(ErrInvalidSymbol))
+				slog.String("symbol", genGigaSymbol.Config.Symbol),
+				goutils.Err(ErrInvalidSymbol))
 
 			return ErrInvalidSymbol
 		}
@@ -123,9 +123,9 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	if w <= 0 || h <= 0 {
 		goutils.Error("GenGigaSymbol.OnPlayGame:Random:w",
-			zap.Int("w", w),
-			zap.Int("h", h),
-			zap.Error(ErrIvalidComponentConfig))
+			slog.Int("w", w),
+			slog.Int("h", h),
+			goutils.Err(ErrIvalidComponentConfig))
 
 		return "", ErrIvalidComponentConfig
 	}
@@ -134,7 +134,7 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		x, err := plugin.Random(context.Background(), w)
 		if err != nil {
 			goutils.Error("GenGigaSymbol.OnPlayGame:Random:w",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -142,7 +142,7 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		y, err := plugin.Random(context.Background(), h)
 		if err != nil {
 			goutils.Error("GenGigaSymbol.OnPlayGame:Random:h",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -177,7 +177,7 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 			p, err := plugin.Random(context.Background(), len(pos)/2)
 			if err != nil {
 				goutils.Error("GenGigaSymbol.OnPlayGame:Random",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return "", err
 			}
@@ -264,7 +264,7 @@ func parseGenGigaSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseGenGigaSymbol:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -272,7 +272,7 @@ func parseGenGigaSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseGenGigaSymbol:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -282,7 +282,7 @@ func parseGenGigaSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseGenGigaSymbol:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

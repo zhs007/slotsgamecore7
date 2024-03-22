@@ -3,7 +3,6 @@ package lowcode
 import (
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -20,7 +19,7 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
 		if err != nil {
 			goutils.Error("GetComponentDataVal:anypb.UnmarshalTo:LinesTriggerData",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, false
 		}
@@ -36,7 +35,7 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
 		if err != nil {
 			goutils.Error("GetComponentDataVal:anypb.UnmarshalTo:ScatterTriggerData",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, false
 		}
@@ -52,7 +51,7 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
 		if err != nil {
 			goutils.Error("GetComponentDataVal:anypb.UnmarshalTo:WaysTriggerData",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, false
 		}
@@ -68,7 +67,7 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
 		if err != nil {
 			goutils.Error("GetComponentDataVal:anypb.UnmarshalTo:ClusterTriggerData",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, false
 		}

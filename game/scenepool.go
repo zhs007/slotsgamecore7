@@ -2,7 +2,6 @@ package sgc7game
 
 import (
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 var InitGameScenePoolSize int
@@ -52,7 +51,7 @@ func (pool *GameScenePoolEx) new(w, h int) *GameScene {
 	s, err := NewGameScene(w, h)
 	if err != nil {
 		goutils.Error("GameScenePoolEx.new:NewGameScene",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -64,7 +63,7 @@ func (pool *GameScenePoolEx) new2(w, h int, v int) *GameScene {
 	s, err := NewGameScene2(w, h, v)
 	if err != nil {
 		goutils.Error("GameScenePoolEx.new2:NewGameScene2",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}

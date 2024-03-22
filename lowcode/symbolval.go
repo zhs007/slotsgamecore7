@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -40,8 +40,8 @@ func (symbolVal *SymbolVal) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolVal.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -51,8 +51,8 @@ func (symbolVal *SymbolVal) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("SymbolVal.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -69,8 +69,8 @@ func (symbolVal *SymbolVal) InitEx(cfg any, pool *GamePropertyPool) error {
 		vw2, err := pool.LoadIntWeights(symbolVal.Config.WeightVal, symbolVal.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("SymbolVal.Init:LoadValWeights",
-				zap.String("Weight", symbolVal.Config.WeightVal),
-				zap.Error(err))
+				slog.String("Weight", symbolVal.Config.WeightVal),
+				goutils.Err(err))
 
 			return err
 		}
@@ -123,7 +123,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 						cv, err := vw.RandVal(plugin)
 						if err != nil {
 							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
-								zap.Error(err))
+								goutils.Err(err))
 
 							return "", err
 						}
@@ -153,7 +153,7 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 						cv, err := vw.RandVal(plugin)
 						if err != nil {
 							goutils.Error("SymbolVal.OnPlayGame:WeightVal.RandVal",
-								zap.Error(err))
+								goutils.Err(err))
 
 							return "", err
 						}

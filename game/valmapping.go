@@ -1,10 +1,10 @@
 package sgc7game
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // ValMapping
@@ -37,9 +37,9 @@ func (vm *ValMapping[T, V]) Clone() *ValMapping[T, V] {
 func NewValMapping[T int, V int | int32 | int64](typevals []T, vals []V) (*ValMapping[T, V], error) {
 	if len(typevals) != len(vals) {
 		goutils.Error("NewValMapping",
-			zap.Int("typevals", len(typevals)),
-			zap.Int("vals", len(vals)),
-			zap.Error(ErrInvalidValMapping))
+			slog.Int("typevals", len(typevals)),
+			slog.Int("vals", len(vals)),
+			goutils.Err(ErrInvalidValMapping))
 
 		return nil, ErrInvalidValMapping
 	}
@@ -73,9 +73,9 @@ func LoadValMappingFromExcel[T int, V int | int32 | int64](fn string, headerType
 			v, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadValMappingFromExcel:String2Int64",
-					zap.String("header", header),
-					zap.String("data", data),
-					zap.Error(err))
+					slog.String("header", header),
+					slog.String("data", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -85,9 +85,9 @@ func LoadValMappingFromExcel[T int, V int | int32 | int64](fn string, headerType
 			v, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadValMappingFromExcel:String2Int64",
-					zap.String("header", header),
-					zap.String("data", data),
-					zap.Error(err))
+					slog.String("header", header),
+					slog.String("data", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -98,8 +98,8 @@ func LoadValMappingFromExcel[T int, V int | int32 | int64](fn string, headerType
 	})
 	if err != nil {
 		goutils.Error("LoadValMappingFromExcel:LoadExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

@@ -1,8 +1,9 @@
 package sgc7game
 
 import (
+	"log/slog"
+
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 const StrValType string = "strval"
@@ -44,8 +45,8 @@ func (val *StrVal) Int32() int32 {
 	v, err := goutils.String2Int64(val.Val)
 	if err != nil {
 		goutils.Error("StrVal.Int32:String2Int64",
-			zap.String("val", val.Val),
-			zap.Error(err))
+			slog.String("val", val.Val),
+			goutils.Err(err))
 
 		return 0
 	}
@@ -57,8 +58,8 @@ func (val *StrVal) Int64() int64 {
 	v, err := goutils.String2Int64(val.Val)
 	if err != nil {
 		goutils.Error("StrVal.Int64:String2Int64",
-			zap.String("val", val.Val),
-			zap.Error(err))
+			slog.String("val", val.Val),
+			goutils.Err(err))
 
 		return 0
 	}
@@ -70,8 +71,8 @@ func (val *StrVal) Int() int {
 	v, err := goutils.String2Int64(val.Val)
 	if err != nil {
 		goutils.Error("StrVal.Int:String2Int64",
-			zap.String("val", val.Val),
-			zap.Error(err))
+			slog.String("val", val.Val),
+			goutils.Err(err))
 
 		return 0
 	}
@@ -83,8 +84,8 @@ func (val *StrVal) Float32() float32 {
 	v, err := goutils.String2Float64(val.Val)
 	if err != nil {
 		goutils.Error("StrVal.Float32:String2Float64",
-			zap.String("val", val.Val),
-			zap.Error(err))
+			slog.String("val", val.Val),
+			goutils.Err(err))
 
 		return 0
 	}
@@ -96,8 +97,8 @@ func (val *StrVal) Float64() float64 {
 	v, err := goutils.String2Float64(val.Val)
 	if err != nil {
 		goutils.Error("StrVal.Float64:String2Float64",
-			zap.String("val", val.Val),
-			zap.Error(err))
+			slog.String("val", val.Val),
+			goutils.Err(err))
 
 		return 0
 	}

@@ -1,12 +1,13 @@
 package mathtoolset
 
 import (
+	"log/slog"
+
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type ScriptCore struct {
@@ -19,9 +20,9 @@ func (sc *ScriptCore) Compile(code string) error {
 	ast, issues := sc.Cel.Compile(code)
 	if issues != nil {
 		goutils.Error("ScriptCore.Compile:Compile",
-			zap.String("code", code),
-			goutils.JSON("issues", issues),
-			zap.Error(ErrInvalidCode))
+			slog.String("code", code),
+			slog.Any("issues", issues),
+			goutils.Err(ErrInvalidCode))
 
 		return ErrInvalidCode
 	}
@@ -31,8 +32,8 @@ func (sc *ScriptCore) Compile(code string) error {
 	prg, err := sc.Cel.Program(ast)
 	if err != nil {
 		goutils.Error("ScriptCore.Compile:Program",
-			zap.String("code", code),
-			zap.Error(err))
+			slog.String("code", code),
+			goutils.Err(err))
 
 		return err
 	}
@@ -50,7 +51,7 @@ func (sc *ScriptCore) Eval(mgr *GenMathMgr) (ref.Val, error) {
 		})
 		if err != nil {
 			goutils.Error("ScriptCore.Eval:Eval",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return types.Null(0), err
 		}
@@ -253,7 +254,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 6 {
 						goutils.Error("calcLineRTP",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -261,7 +262,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(params[0].Value().(string))
 					if err != nil {
 						goutils.Error("calcLineRTP:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -269,7 +270,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err = mgrGenMath.LoadReelsState(params[1].Value().(string))
 					if err != nil {
 						goutils.Error("calcLineRTP:LoadReelsState",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -280,7 +281,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ssws, err := AnalyzeReelsWithLineEx(mgrGenMath.Paytables, mgrGenMath.RSS, syms, wilds, int(params[4].Value().(int64)), int(params[5].Value().(int64)))
 					if err != nil {
 						goutils.Error("calcLineRTP:AnalyzeReelsWithLineEx",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -302,7 +303,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 4 {
 						goutils.Error("calcLineRTP",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -310,7 +311,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(params[0].Value().(string))
 					if err != nil {
 						goutils.Error("calcLineRTP:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -318,7 +319,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err = mgrGenMath.LoadReelsState(params[1].Value().(string))
 					if err != nil {
 						goutils.Error("calcLineRTP:LoadReelsState",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -328,7 +329,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ssws, err := AnalyzeReelsScatterEx(mgrGenMath.Paytables, mgrGenMath.RSS, syms, int(params[3].Value().(int64)))
 					if err != nil {
 						goutils.Error("calcLineRTP:AnalyzeReelsScatterEx",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -350,7 +351,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 8 {
 						goutils.Error("calcWaysRTP",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -361,7 +362,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(ptfn)
 					if err != nil {
 						goutils.Error("calcWaysRTP:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -369,7 +370,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err = mgrGenMath.LoadReelsState(rssfn)
 					if err != nil {
 						goutils.Error("calcWaysRTP:LoadReelsState",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -384,7 +385,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ssws, err := AnalyzeReelsWaysEx(mgrGenMath.Paytables, mgrGenMath.RSS, syms, wilds, sm, height, bet, mul)
 					if err != nil {
 						goutils.Error("calcWaysRTP:AnalyzeReelsWaysEx",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -407,7 +408,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 10 {
 						goutils.Error("calcWaysRTPWithSymbolMulti",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -418,7 +419,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(ptfn)
 					if err != nil {
 						goutils.Error("calcWaysRTPWithSymbolMulti:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -426,7 +427,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err = mgrGenMath.LoadReelsState(rssfn)
 					if err != nil {
 						goutils.Error("calcWaysRTPWithSymbolMulti:LoadReelsState",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -442,7 +443,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ssws, err := AnalyzeReelsWaysSymbolMulti(mgrGenMath.Paytables, mgrGenMath.RSS, syms, wilds, sm, symMul, height, bet, mul)
 					if err != nil {
 						goutils.Error("calcWaysRTPWithSymbolMulti:AnalyzeReelsWaysSymbolMulti",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -465,7 +466,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 12 {
 						goutils.Error("calcWaysRTP2",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -476,7 +477,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(paytablefn)
 					if err != nil {
 						goutils.Error("calcWaysRTP2:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -486,7 +487,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					rd, err := mgrGenMath.LoadReelsData(paytablefn, reelfn, isStrReel)
 					if err != nil {
 						goutils.Error("calcWaysRTP2:LoadReelsData",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -503,7 +504,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ssws, err := AnalyzeReelsWaysEx3(mgrGenMath.Paytables, rd, syms, wilds, sm, symMul, overlaySyms, height, bet, mul)
 					if err != nil {
 						goutils.Error("calcWaysRTP2:AnalyzeReelsWaysEx3",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -525,7 +526,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 4 {
 						goutils.Error("calcScatterProbability",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -535,7 +536,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadReelsState(rssfn)
 					if err != nil {
 						goutils.Error("calcScatterProbability:LoadReelsState",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -559,7 +560,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 2 {
 						goutils.Error("calcProbWithWeights",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -569,7 +570,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					vw, err := sgc7game.LoadValWeights2FromExcel(vwfn, "val", "weight", sgc7game.NewStrVal)
 					if err != nil {
 						goutils.Error("calcProbWithWeights:LoadValMapping2FromExcel",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -592,7 +593,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					if len(params) != 5 {
 						goutils.Error("genReelsMainSymbolsDistance",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -604,7 +605,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(paytablefn)
 					if err != nil {
 						goutils.Error("calcWaysRTP2:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -612,7 +613,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					rss, err := LoadReelsStats(rssfn)
 					if err != nil {
 						goutils.Error("genReelsMainSymbolsDistance:LoadReelsStats",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -625,7 +626,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					reels, err := GenReelsMainSymbolsDistance(rss, mainSymbols, offset, 100)
 					if err != nil {
 						goutils.Error("genReelsMainSymbolsDistance:GenReelsMainSymbolsDistance",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -633,7 +634,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err = reels.SaveExcelEx(targetfn, mgrGenMath.Paytables)
 					if err != nil {
 						goutils.Error("genReelsMainSymbolsDistance:SaveExcelEx",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -651,7 +652,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 
 					if len(params) != 1 {
 						goutils.Error("runCode",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -661,7 +662,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ret, err := mgrGenMath.RunCodeEx(codeName)
 					if err != nil {
 						goutils.Error("runCode:RunCodeEx",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -679,7 +680,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 8 {
 						goutils.Error("calcScatterProbabilitWithReels",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -690,7 +691,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					err := mgrGenMath.LoadPaytables(paytablefn)
 					if err != nil {
 						goutils.Error("calcScatterProbabilitWithReels:LoadPaytables",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -700,7 +701,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					rd, err := mgrGenMath.LoadReelsData(paytablefn, reelfn, isStrReel)
 					if err != nil {
 						goutils.Error("calcScatterProbabilitWithReels:LoadReelsData",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -714,7 +715,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 					ret := CalcScatterProbabilitWithReels(rd, SymbolType(sym), sm, overlaySyms, num, height)
 					if err != nil {
 						goutils.Error("CalcScatterProbabilitWithReels:CalcScatterProbabilitWithReels",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return types.Double(0)
 					}
@@ -731,7 +732,7 @@ func newBasicScriptFuncs(mgrGenMath *GenMathMgr) []cel.EnvOption {
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 4 {
 						goutils.Error("calcMulLevelRTP",
-							zap.Error(ErrInvalidFunctionParams))
+							goutils.Err(ErrInvalidFunctionParams))
 
 						return types.Double(0)
 					}
@@ -758,7 +759,7 @@ func NewScriptCore(mgrGenMath *GenMathMgr) (*ScriptCore, error) {
 	cel, err := cel.NewEnv(options...)
 	if err != nil {
 		goutils.Error("NewScriptCore:cel.NewEnv",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

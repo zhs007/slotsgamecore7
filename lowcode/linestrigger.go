@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -12,7 +13,6 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -145,8 +145,8 @@ func (linesTrigger *LinesTrigger) Init(fn string, pool *GamePropertyPool) error 
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("LinesTrigger.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -156,8 +156,8 @@ func (linesTrigger *LinesTrigger) Init(fn string, pool *GamePropertyPool) error 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("LinesTrigger.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -174,8 +174,8 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("LinesTrigger.InitEx:Symbol",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 		}
 
 		linesTrigger.Config.SymbolCodes = append(linesTrigger.Config.SymbolCodes, sc)
@@ -185,8 +185,8 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("LinesTrigger.InitEx:WildSymbols",
-				zap.String("symbol", s),
-				zap.Error(ErrIvalidSymbol))
+				slog.String("symbol", s),
+				goutils.Err(ErrIvalidSymbol))
 
 			return ErrIvalidSymbol
 		}
@@ -197,8 +197,8 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 	stt := ParseSymbolTriggerType(linesTrigger.Config.Type)
 	if stt == STTypeUnknow {
 		goutils.Error("LinesTrigger.InitEx:WildSymbols",
-			zap.String("SymbolTriggerType", linesTrigger.Config.Type),
-			zap.Error(ErrIvalidSymbolTriggerType))
+			slog.String("SymbolTriggerType", linesTrigger.Config.Type),
+			goutils.Err(ErrIvalidSymbolTriggerType))
 
 		return ErrIvalidSymbolTriggerType
 	}
@@ -223,8 +223,8 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		vw2, err := pool.LoadIntWeights(linesTrigger.Config.RespinNumWeight, linesTrigger.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("LinesTrigger.InitEx:LoadIntWeights",
-				zap.String("Weight", linesTrigger.Config.RespinNumWeight),
-				zap.Error(err))
+				slog.String("Weight", linesTrigger.Config.RespinNumWeight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -237,8 +237,8 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 			vw2, err := pool.LoadIntWeights(v, linesTrigger.Config.UseFileMapping)
 			if err != nil {
 				goutils.Error("LinesTrigger.InitEx:LoadIntWeights",
-					zap.String("Weight", v),
-					zap.Error(err))
+					slog.String("Weight", v),
+					goutils.Err(err))
 
 				return err
 			}
@@ -627,8 +627,8 @@ func (linesTrigger *LinesTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *
 			cr, err := vw2.RandVal(plugin)
 			if err != nil {
 				goutils.Error("LinesTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
-					zap.Int("SymbolNum", ret.SymbolNums),
-					zap.Error(err))
+					slog.Int("SymbolNum", ret.SymbolNums),
+					goutils.Err(err))
 
 				return 0, err
 			}
@@ -636,8 +636,8 @@ func (linesTrigger *LinesTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *
 			return cr.Int(), nil
 		} else {
 			goutils.Error("LinesTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
-				zap.Int("SymbolNum", ret.SymbolNums),
-				zap.Error(ErrInvalidSymbolNum))
+				slog.Int("SymbolNum", ret.SymbolNums),
+				goutils.Err(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
 		}
@@ -645,8 +645,8 @@ func (linesTrigger *LinesTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *
 		v, isok := linesTrigger.Config.RespinNumWithScatterNum[ret.SymbolNums]
 		if !isok {
 			goutils.Error("LinesTrigger.calcRespinNum:RespinNumWithScatterNum",
-				zap.Int("SymbolNum", ret.SymbolNums),
-				zap.Error(ErrInvalidSymbolNum))
+				slog.Int("SymbolNum", ret.SymbolNums),
+				goutils.Err(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
 		}
@@ -656,7 +656,7 @@ func (linesTrigger *LinesTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *
 		cr, err := linesTrigger.Config.RespinNumWeightVW.RandVal(plugin)
 		if err != nil {
 			goutils.Error("LinesTrigger.calcRespinNum:RespinNumWeightVW",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, err
 		}
@@ -706,7 +706,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		respinNum, err := linesTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
 			goutils.Error("LinesTrigger.OnPlayGame:calcRespinNum",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", nil
 		}
@@ -716,7 +716,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		err = linesTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
 		if err != nil {
 			goutils.Error("LinesTrigger.OnPlayGame:procMask",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -734,7 +734,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 				node, err := linesTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
 				if err != nil {
 					goutils.Error("LinesTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-						zap.Error(err))
+						goutils.Err(err))
 
 					return "", err
 				}
@@ -771,7 +771,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeightWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
 			// 	if err != nil {
 			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			zap.Error(err))
+			// 			goutils.Err(err))
 
 			// 		return nil
 			// 	}
@@ -787,7 +787,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeight, symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
 			// 	if err != nil {
 			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			zap.Error(err))
+			// 			goutils.Err(err))
 
 			// 		return nil
 			// 	}
@@ -854,7 +854,7 @@ func (linesTrigger *LinesTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 // 	pbcd, isok := pbComponentData.(*sgc7pb.LinesTriggerData)
 // 	if !isok {
 // 		goutils.Error("LinesTrigger.OnStatsWithPB",
-// 			zap.Error(ErrIvalidProto))
+// 			goutils.Err(ErrIvalidProto))
 
 // 		return 0, ErrIvalidProto
 // 	}
@@ -875,7 +875,7 @@ func (linesTrigger *LinesTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 // 				curwins, err := linesTrigger.OnStatsWithPB(feature, curComponent, v)
 // 				if err != nil {
 // 					goutils.Error("LinesTrigger.OnStats",
-// 						zap.Error(err))
+// 						goutils.Err(err))
 
 // 					continue
 // 				}
@@ -1003,7 +1003,7 @@ func parseLinesTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseLinesTrigger:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -1011,7 +1011,7 @@ func parseLinesTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseLinesTrigger:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -1021,7 +1021,7 @@ func parseLinesTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseLinesTrigger:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -1032,7 +1032,7 @@ func parseLinesTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 		awards, err := parseControllers(gamecfg, ctrls)
 		if err != nil {
 			goutils.Error("parseLinesTrigger:parseControllers",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}

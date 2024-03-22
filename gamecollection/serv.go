@@ -2,6 +2,7 @@ package gamecollection
 
 import (
 	"context"
+	"log/slog"
 	"net"
 
 	goutils "github.com/zhs007/goutils"
@@ -10,7 +11,6 @@ import (
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -29,7 +29,7 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, err
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
 		goutils.Error("NewServ.Listen",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -56,9 +56,9 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, err
 	sgc7pb.RegisterGameLogicCollectionServer(grpcServ, serv)
 
 	goutils.Info("NewServ OK.",
-		zap.String("addr", bindaddr),
-		zap.String("ver", version),
-		zap.String("corever", sgc7ver.Version))
+		slog.String("addr", bindaddr),
+		slog.String("ver", version),
+		slog.String("corever", sgc7ver.Version))
 
 	return serv, nil
 }
@@ -76,12 +76,12 @@ func (serv *Serv) Stop() {
 // initGame - initial game
 func (serv *Serv) InitGame(ctx context.Context, req *sgc7pb.RequestInitGame) (*sgc7pb.ReplyInitGame, error) {
 	goutils.Debug("Serv.InitGame",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	err := serv.mgrGame.InitGame(req.GameCode, []byte(req.Config))
 	if err != nil {
 		goutils.Error("Serv.InitGame:InitGame",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return &sgc7pb.ReplyInitGame{
 			IsOK: false,
@@ -97,12 +97,12 @@ func (serv *Serv) InitGame(ctx context.Context, req *sgc7pb.RequestInitGame) (*s
 // GetGameConfig - get game config
 func (serv *Serv) GetGameConfig(ctx context.Context, req *sgc7pb.RequestGameConfig) (*sgc7pb.ReplyGameConfig, error) {
 	goutils.Debug("Serv.GetGameConfig",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	cfg, err := serv.mgrGame.GetGameConfig(req.GameCode)
 	if err != nil {
 		goutils.Error("Serv.GetGameConfig:GetGameConfig",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return &sgc7pb.ReplyGameConfig{
 			IsOK: false,
@@ -119,12 +119,12 @@ func (serv *Serv) GetGameConfig(ctx context.Context, req *sgc7pb.RequestGameConf
 // InitializeGamePlayer - initialize a player
 func (serv *Serv) InitializeGamePlayer(ctx context.Context, req *sgc7pb.RequestInitializeGamePlayer) (*sgc7pb.ReplyInitializeGamePlayer, error) {
 	goutils.Debug("Serv.InitializeGamePlayer",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	ps, err := serv.mgrGame.InitializeGamePlayer(req.GameCode)
 	if err != nil {
 		goutils.Error("Serv.InitializeGamePlayer:InitializeGamePlayer",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return &sgc7pb.ReplyInitializeGamePlayer{
 			IsOK: false,
@@ -141,12 +141,12 @@ func (serv *Serv) InitializeGamePlayer(ctx context.Context, req *sgc7pb.RequestI
 // PlayGame - play game
 func (serv *Serv) PlayGame(req *sgc7pb.RequestPlayGame, stream sgc7pb.GameLogicCollection_PlayGameServer) error {
 	goutils.Debug("Serv.PlayGame",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	res, err := serv.mgrGame.PlayGame(req.GameCode, req.Play)
 	if err != nil {
 		goutils.Error("Serv.PlayGame:PlayGame",
-			zap.Error(err))
+			goutils.Err(err))
 
 		stream.Send(&sgc7pb.ReplyPlayGame{
 			IsOK: false,
@@ -165,12 +165,12 @@ func (serv *Serv) PlayGame(req *sgc7pb.RequestPlayGame, stream sgc7pb.GameLogicC
 // PlayGame2 - play game
 func (serv *Serv) PlayGame2(ctx context.Context, req *sgc7pb.RequestPlayGame) (*sgc7pb.ReplyPlayGame, error) {
 	goutils.Debug("Serv.PlayGame2",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	res, err := serv.mgrGame.PlayGame(req.GameCode, req.Play)
 	if err != nil {
 		goutils.Error("Serv.PlayGame:PlayGame2",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return &sgc7pb.ReplyPlayGame{
 			IsOK: false,

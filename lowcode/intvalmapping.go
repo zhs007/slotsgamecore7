@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -10,7 +11,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -42,8 +42,8 @@ func (intValMapping *IntValMapping) Init(fn string, pool *GamePropertyPool) erro
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("IntValMapping.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -53,8 +53,8 @@ func (intValMapping *IntValMapping) Init(fn string, pool *GamePropertyPool) erro
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("IntValMapping.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -71,8 +71,8 @@ func (intValMapping *IntValMapping) InitEx(cfg any, pool *GamePropertyPool) erro
 		vm2 := pool.LoadIntMapping(intValMapping.Config.ValMapping)
 		if vm2 == nil {
 			goutils.Error("IntValMapping.Init:LoadIntMapping",
-				zap.String("ValMapping", intValMapping.Config.ValMapping),
-				zap.Error(ErrInvalidIntValMappingFile))
+				slog.String("ValMapping", intValMapping.Config.ValMapping),
+				goutils.Err(ErrInvalidIntValMappingFile))
 
 			return ErrInvalidIntValMappingFile
 		}
@@ -80,7 +80,7 @@ func (intValMapping *IntValMapping) InitEx(cfg any, pool *GamePropertyPool) erro
 		intValMapping.Config.ValMappingVM = vm2
 	} else {
 		goutils.Error("IntValMapping.InitEx:ValMapping",
-			zap.Error(ErrInvalidIntValMappingFile))
+			goutils.Err(ErrInvalidIntValMappingFile))
 
 		return ErrInvalidIntValMappingFile
 	}
@@ -112,7 +112,7 @@ func (intValMapping *IntValMapping) OnPlayGame(gameProp *GameProperty, curpr *sg
 	mv, isok := intValMapping.Config.ValMappingVM.MapVals[in]
 	if !isok {
 		goutils.Error("IntValMapping.OnPlayGame:ValMappingVM",
-			zap.Error(ErrInvalidIntValMappingValue))
+			goutils.Err(ErrInvalidIntValMappingValue))
 
 		return "", ErrInvalidIntValMappingValue
 	}
@@ -168,7 +168,7 @@ func parseIntValMapping(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseIntValMapping:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -176,7 +176,7 @@ func parseIntValMapping(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseIntValMapping:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -186,7 +186,7 @@ func parseIntValMapping(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseIntValMapping:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

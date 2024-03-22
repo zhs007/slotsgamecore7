@@ -1,9 +1,10 @@
 package sgc7game
 
 import (
+	"log/slog"
+
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // Config - config
@@ -200,8 +201,8 @@ func (cfg *Config) SetDefaultSceneString(str string) error {
 	ds, err := NewGameSceneWithArr2Ex(arr)
 	if err != nil {
 		goutils.Error("sgc7game.Config.SetDefaultSceneString:NewGameSceneWithArr2Ex",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return err
 	}
@@ -222,8 +223,8 @@ func (cfg *Config) AddDefaultSceneString2(str string) error {
 	ds, err := NewGameSceneWithArr2Ex(arr)
 	if err != nil {
 		goutils.Error("sgc7game.Config.AddDefaultSceneString2:NewGameSceneWithArr2Ex",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return err
 	}
@@ -238,7 +239,7 @@ func (cfg *Config) LoadLineDataFromExcel(fn string) error {
 	ld, err := LoadLineDataFromExcel(fn)
 	if err != nil {
 		goutils.Error("Config.LoadLineDataFromExcel",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -253,7 +254,7 @@ func (cfg *Config) LoadReelsFromExcel(tag string, fn string) error {
 	rd, err := LoadReelsFromExcel(fn)
 	if err != nil {
 		goutils.Error("Config.LoadReelsFromExcel",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -268,7 +269,7 @@ func (cfg *Config) LoadPaytablesFromExcel(fn string) error {
 	pt, err := LoadPaytablesFromExcel(fn)
 	if err != nil {
 		goutils.Error("Config.LoadPaytablesFromExcel",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

@@ -1,11 +1,12 @@
 package gatiserv
 
 import (
+	"log/slog"
+
 	"github.com/valyala/fasthttp"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7http "github.com/zhs007/slotsgamecore7/http"
-	"go.uber.org/zap"
 )
 
 // BasicURL - basic url
@@ -59,7 +60,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			// str, err := BuildPlayerStateString(ps)
 			// if err != nil {
 			// 	goutils.Warn("gatiserv.Serv.initialize:BuildPlayerStateString",
-			// 		zap.Error(err))
+			// 		goutils.Err(err))
 
 			// 	s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 
@@ -85,7 +86,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			// err := s.ParseBody(ctx, params)
 			// if err != nil {
 			// 	goutils.Warn("gatiserv.Serv.validate:ParseBody",
-			// 		zap.Error(err))
+			// 		goutils.Err(err))
 
 			// 	s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
 
@@ -110,7 +111,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			err := s.ParseBody(ctx, params)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.play:ParseBody",
-					zap.Error(err))
+					goutils.Err(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
 
@@ -120,7 +121,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			ret, err := s.Service.Play(params)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.play:Play",
-					zap.Error(err))
+					goutils.Err(err))
 
 				if err == sgc7game.ErrInvalidStake {
 					s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
@@ -136,7 +137,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			err = s.Service.OnPlayBoostData(params, ret)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.play:OnPlayBoostData",
-					zap.Error(err))
+					goutils.Err(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 
@@ -158,7 +159,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			err := s.ParseBody(ctx, &params)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.checksum:ParseBody",
-					zap.Error(err))
+					goutils.Err(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
 
@@ -168,7 +169,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 			ret, err := s.Service.Checksum(params)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.checksum:Checksum",
-					zap.Error(err))
+					goutils.Err(err))
 
 				s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 
@@ -204,7 +205,7 @@ func NewServ(service IService, cfg *Config) *Serv {
 // RegMission -
 func (serv *Serv) RegMission(id string) {
 	goutils.Info("gatiserv.Serv.RegHandle",
-		zap.String("id", id))
+		slog.String("id", id))
 
 	serv.RegHandle(goutils.AppendString(BasicURL, serv.Cfg.GameID, "/evaluate/"+id),
 		func(ctx *fasthttp.RequestCtx, serv1 *sgc7http.Serv) {
@@ -218,8 +219,8 @@ func (serv *Serv) RegMission(id string) {
 			err := serv.ParseBody(ctx, params)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.evaluate:ParseBody",
-					zap.String("id", id),
-					zap.Error(err))
+					slog.String("id", id),
+					goutils.Err(err))
 
 				serv.SetHTTPStatus(ctx, fasthttp.StatusBadRequest)
 
@@ -229,8 +230,8 @@ func (serv *Serv) RegMission(id string) {
 			ret, err := serv.Service.Evaluate(params, id)
 			if err != nil {
 				goutils.Warn("gatiserv.Serv.evaluate:Evaluate",
-					zap.String("id", id),
-					zap.Error(err))
+					slog.String("id", id),
+					goutils.Err(err))
 
 				serv.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 

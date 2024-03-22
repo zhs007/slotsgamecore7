@@ -1,10 +1,11 @@
 package sgc7game
 
 import (
+	"log/slog"
+
 	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
-	"go.uber.org/zap"
 )
 
 // BasicGame - basic game
@@ -76,8 +77,8 @@ func (game *BasicGame) Play(plugin sgc7plugin.IPlugin, cmd string, param string,
 	curgamemod, isok := game.MapGameMods[ps.GetCurGameMod()]
 	if !isok {
 		goutils.Error("sgc7game.BasicGame.Play:MapGameMods[CurGameMod]",
-			zap.String("CurGameMod", ps.GetCurGameMod()),
-			zap.Error(ErrInvalidGameMod))
+			slog.String("CurGameMod", ps.GetCurGameMod()),
+			goutils.Err(ErrInvalidGameMod))
 
 		return nil, ErrInvalidGameMod
 	}

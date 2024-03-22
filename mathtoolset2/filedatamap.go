@@ -7,7 +7,6 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type FileDataMap struct {
@@ -23,7 +22,7 @@ func (mapfd *FileDataMap) GetReader(fn string) io.Reader {
 	sDec, err := base64.StdEncoding.DecodeString(str)
 	if err != nil {
 		goutils.Error("FileDataMap.GetReader:DecodeString",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -52,7 +51,7 @@ func (mapfd *FileDataMap) ToJson() (string, error) {
 	buf, err := sonic.Marshal(mapfd)
 	if err != nil {
 		goutils.Error("FileDataMap:ToJson:Marshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -71,7 +70,7 @@ func NewFileDataMap(fd string) (*FileDataMap, error) {
 	err := sonic.Unmarshal([]byte(fd), mapFD)
 	if err != nil {
 		goutils.Error("NewFileDataMap:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

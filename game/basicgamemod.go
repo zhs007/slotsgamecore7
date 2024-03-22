@@ -1,9 +1,10 @@
 package sgc7game
 
 import (
+	"log/slog"
+
 	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 // BasicGameMod - basic gameMod
@@ -39,9 +40,9 @@ func (mod *BasicGameMod) RandomScene(game IGame, plugin sgc7plugin.IPlugin, reel
 			cs, err := NewGameScene(mod.Width, mod.Height)
 			if err != nil {
 				goutils.Error("sgc7game.BasicGameMod.RandomScene:NewGameScene",
-					zap.Int("width", mod.Width),
-					zap.Int("height", mod.Height),
-					zap.Error(err))
+					slog.Int("width", mod.Width),
+					slog.Int("height", mod.Height),
+					goutils.Err(err))
 
 				return nil, err
 			}

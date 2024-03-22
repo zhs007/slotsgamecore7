@@ -12,7 +12,6 @@ import (
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -49,13 +48,13 @@ func main() {
 		isAllowStats2 = true
 	}
 
-	goutils.InitLogger("lowcodertp", sgc7ver.Version,
+	goutils.InitLogger2("lowcodertp", sgc7ver.Version,
 		"info", true, "./logs")
 
 	icore, err := strconv.Atoi(strcore)
 	if err != nil {
 		goutils.Error("Getenv(CORE)",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return
 	}
@@ -63,7 +62,7 @@ func main() {
 	ispinnums, err := strconv.ParseInt(strspinnums, 10, 64)
 	if err != nil {
 		goutils.Error("Getenv(SPINNUMS)",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return
 	}

@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/zhs007/goutils"
@@ -8,7 +9,6 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 )
 
 const (
@@ -38,8 +38,8 @@ func String2Property(str string) (int, error) {
 	}
 
 	goutils.Error("String2Property",
-		zap.String("str", str),
-		zap.Error(ErrInvalidGamePropertyString))
+		slog.String("str", str),
+		goutils.Err(ErrInvalidGamePropertyString))
 
 	return 0, ErrInvalidGamePropertyString
 }
@@ -267,8 +267,8 @@ func (gameProp *GameProperty) procRespinBeforeStepEnding(pr *sgc7game.PlayResult
 				nc, err := cr.ProcRespinOnStepEnd(gameProp, pr, gp, cd, nextComponent == "")
 				if err != nil {
 					goutils.Error("GameProperty.procRespinBeforeStepEnding:ProcRespinOnStepEnd",
-						zap.String("respin", curRespin),
-						zap.Error(err))
+						slog.String("respin", curRespin),
+						goutils.Err(err))
 
 					return "", err
 				}
@@ -334,8 +334,8 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 	vw2, err := gameProp.GetIntValWeights(fn, useFileMapping)
 	if err != nil {
 		goutils.Error("GameProperty.TriggerFGWithWeights:GetIntValWeights",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return 0, err
 	}
@@ -343,8 +343,8 @@ func (gameProp *GameProperty) TriggerRespinWithWeights(pr *sgc7game.PlayResult, 
 	val, err := vw2.RandVal(plugin)
 	if err != nil {
 		goutils.Error("GameProperty.TriggerFGWithWeights:RandVal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return 0, err
 	}
@@ -364,8 +364,8 @@ func (gameProp *GameProperty) GetIntValWeights(fn string, useFileMapping bool) (
 		curvw2, err := gameProp.Pool.LoadIntWeights(fn, useFileMapping)
 		if err != nil {
 			goutils.Error("GameProperty.GetIntValWeights:LoadSymbolWeights",
-				zap.String("Weight", fn),
-				zap.Error(err))
+				slog.String("Weight", fn),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -399,8 +399,8 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		v, isok := gameProp.Pool.Config.MapPaytables[val]
 		if !isok {
 			goutils.Error("GameProperty.SetStrVal:GamePropCurPaytables",
-				zap.String("val", val),
-				zap.Error(ErrInvalidPaytables))
+				slog.String("val", val),
+				goutils.Err(ErrInvalidPaytables))
 
 			return ErrInvalidPaytables
 		}
@@ -410,8 +410,8 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		v, isok := gameProp.Pool.Config.MapLinedate[val]
 		if !isok {
 			goutils.Error("GameProperty.SetStrVal:GamePropCurLineData",
-				zap.String("val", val),
-				zap.Error(ErrInvalidPaytables))
+				slog.String("val", val),
+				goutils.Err(ErrInvalidPaytables))
 
 			return ErrInvalidPaytables
 		}
@@ -467,8 +467,8 @@ func (gameProp *GameProperty) GetComponentVal(componentVal string) (int, error) 
 	arr := strings.Split(componentVal, ".")
 	if len(arr) != 2 {
 		goutils.Error("GameProperty.GetComponentVal",
-			zap.String("componentVal", componentVal),
-			zap.Error(ErrInvalidComponentVal))
+			slog.String("componentVal", componentVal),
+			goutils.Err(ErrInvalidComponentVal))
 
 		return 0, ErrInvalidComponentVal
 	}
@@ -476,8 +476,8 @@ func (gameProp *GameProperty) GetComponentVal(componentVal string) (int, error) 
 	component, isok := gameProp.Components.MapComponents[arr[0]]
 	if !isok {
 		goutils.Error("GameProperty.GetComponentVal",
-			zap.String("component", arr[0]),
-			zap.Error(ErrInvalidComponent))
+			slog.String("component", arr[0]),
+			goutils.Err(ErrInvalidComponent))
 
 		return 0, ErrInvalidComponent
 	}
@@ -498,14 +498,14 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		component, isok := gameProp.Components.MapComponents[award.OnTriggerRespin]
 		if !isok {
 			goutils.Error("GameProperty.procAward:OnTriggerRespin",
-				zap.Error(ErrInvalidComponent))
+				goutils.Err(ErrInvalidComponent))
 
 			return
 		}
 
 		if !component.IsRespin() {
 			goutils.Error("GameProperty.procAward:OnTriggerRespin:IsRespin",
-				zap.Error(ErrNotRespin))
+				goutils.Err(ErrNotRespin))
 
 			return
 		}
@@ -516,7 +516,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// irespin, isok := component.(IRespin)
 		// if !isok {
 		// 	goutils.Error("GameProperty.procAward:OnTriggerRespin",
-		// 		zap.Error(ErrNotRespin))
+		// 		goutils.Err(ErrNotRespin))
 
 		// 	return
 		// }
@@ -559,7 +559,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// 			err := collector.Add(plugin, award.Vals[0], nil, gameProp, curpr, gp, false)
 		// 			if err != nil {
 		// 				goutils.Error("GameProperty.procAward",
-		// 					zap.Error(err))
+		// 					goutils.Err(err))
 
 		// 				return
 		// 			}
@@ -573,7 +573,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// 			err := collector.Add(plugin, award.Vals[0], nil, gameProp, curpr, gp, true)
 		// 			if err != nil {
 		// 				goutils.Error("GameProperty.procAward",
-		// 					zap.Error(err))
+		// 					goutils.Err(err))
 
 		// 				return
 		// 			}
@@ -583,7 +583,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// 	vw, err := gameProp.GetIntValWeights(award.StrParams[0], true)
 		// 	if err != nil {
 		// 		goutils.Error("GameProperty.procAward:AwardWeightGameRNG:GetIntValWeights",
-		// 			zap.Error(err))
+		// 			goutils.Err(err))
 
 		// 		return
 		// 	}
@@ -591,7 +591,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// 	cr, err := vw.RandVal(plugin)
 		// 	if err != nil {
 		// 		goutils.Error("GameProperty.procAward:AwardWeightGameRNG:RandVal",
-		// 			zap.Error(err))
+		// 			goutils.Err(err))
 
 		// 		return
 		// 	}
@@ -606,7 +606,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// 	// 				err := symbolCollection.Push(plugin, gameProp, gp)
 		// 	// 				if err != nil {
 		// 	// 					goutils.Error("GameProperty.procAward:AwardPushSymbolCollection:Push",
-		// 	// 						zap.Error(err))
+		// 	// 						goutils.Err(err))
 
 		// 	// 					return
 		// 	// 				}
@@ -644,7 +644,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		err := gameProp.Pool.SetMaskVal(plugin, gameProp, curpr, gp, award.StrParams[0], award.Vals[0], award.Vals[1] != 0)
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetMaskVal:SetMaskVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return
 		}
@@ -652,7 +652,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardTriggerRespin2:PushTrigger",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return
 		}
@@ -660,7 +660,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.StrParams[1])
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:SetComponentConfigVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return
 		}
@@ -668,7 +668,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardSetComponentConfigIntVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return
 		}
@@ -676,7 +676,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardChgComponentConfigIntVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return
 		}
@@ -846,8 +846,8 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 	arr := strings.Split(componentConfigValName, ".")
 	if len(arr) != 2 {
 		goutils.Error("GameProperty.SetComponentConfigVal",
-			zap.String("componentConfigValName", componentConfigValName),
-			zap.Error(ErrInvalidComponentVal))
+			slog.String("componentConfigValName", componentConfigValName),
+			goutils.Err(ErrInvalidComponentVal))
 
 		return ErrInvalidComponentVal
 	}
@@ -855,16 +855,16 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 	cd := gameProp.GetCurComponentDataWithName(arr[0])
 	if cd == nil {
 		goutils.Error("GameProperty.SetComponentConfigVal",
-			zap.String("componentConfigVal", arr[0]),
-			zap.Error(ErrInvalidComponent))
+			slog.String("componentConfigVal", arr[0]),
+			goutils.Err(ErrInvalidComponent))
 
 		return ErrInvalidComponent
 	}
 	// cd, isok := gameProp.MapComponentData[arr[0]]
 	// if !isok {
 	// 	goutils.Error("GameProperty.SetComponentConfigVal:MapComponentData",
-	// 		zap.String("componentConfigValName", componentConfigValName),
-	// 		zap.Error(ErrIvalidComponentName))
+	// 		slog.String("componentConfigValName", componentConfigValName),
+	// 		goutils.Err(ErrIvalidComponentName))
 
 	// 	return ErrIvalidComponentName
 	// }
@@ -878,8 +878,8 @@ func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName st
 	arr := strings.Split(componentConfigValName, ".")
 	if len(arr) != 2 {
 		goutils.Error("GameProperty.SetComponentConfigIntVal",
-			zap.String("componentConfigValName", componentConfigValName),
-			zap.Error(ErrInvalidComponentVal))
+			slog.String("componentConfigValName", componentConfigValName),
+			goutils.Err(ErrInvalidComponentVal))
 
 		return ErrInvalidComponentVal
 	}
@@ -887,16 +887,16 @@ func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName st
 	cd := gameProp.GetCurComponentDataWithName(arr[0])
 	if cd == nil {
 		goutils.Error("GameProperty.SetComponentConfigIntVal",
-			zap.String("componentConfigVal", arr[0]),
-			zap.Error(ErrInvalidComponent))
+			slog.String("componentConfigVal", arr[0]),
+			goutils.Err(ErrInvalidComponent))
 
 		return ErrInvalidComponent
 	}
 	// cd, isok := gameProp.MapComponentData[arr[0]]
 	// if !isok {
 	// 	goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
-	// 		zap.String("componentConfigValName", componentConfigValName),
-	// 		zap.Error(ErrIvalidComponentName))
+	// 		slog.String("componentConfigValName", componentConfigValName),
+	// 		goutils.Err(ErrIvalidComponentName))
 
 	// 	return ErrIvalidComponentName
 	// }
@@ -910,8 +910,8 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 	arr := strings.Split(componentConfigValName, ".")
 	if len(arr) != 2 {
 		goutils.Error("GameProperty.SetComponentConfigIntVal",
-			zap.String("componentConfigValName", componentConfigValName),
-			zap.Error(ErrInvalidComponentVal))
+			slog.String("componentConfigValName", componentConfigValName),
+			goutils.Err(ErrInvalidComponentVal))
 
 		return ErrInvalidComponentVal
 	}
@@ -919,16 +919,16 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 	cd := gameProp.GetCurComponentDataWithName(arr[0])
 	if cd == nil {
 		goutils.Error("GameProperty.ChgComponentConfigIntVal",
-			zap.String("componentConfigVal", arr[0]),
-			zap.Error(ErrInvalidComponent))
+			slog.String("componentConfigVal", arr[0]),
+			goutils.Err(ErrInvalidComponent))
 
 		return ErrInvalidComponent
 	}
 	// cd, isok := gameProp.MapComponentData[arr[0]]
 	// if !isok {
 	// 	goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
-	// 		zap.String("componentConfigValName", componentConfigValName),
-	// 		zap.Error(ErrIvalidComponentName))
+	// 		slog.String("componentConfigValName", componentConfigValName),
+	// 		goutils.Err(ErrIvalidComponentName))
 
 	// 	return ErrIvalidComponentName
 	// }
@@ -942,8 +942,8 @@ func (gameProp *GameProperty) GetComponentSymbols(componentName string) []int {
 	cd := gameProp.GetCurComponentDataWithName(componentName)
 	if cd == nil {
 		goutils.Error("GameProperty.GetComponentSymbols",
-			zap.String("componentConfigVal", componentName),
-			zap.Error(ErrInvalidComponent))
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
 
 		return nil
 	}
@@ -955,8 +955,8 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 	cd := gameProp.GetCurComponentDataWithName(componentName)
 	if cd == nil {
 		goutils.Error("GameProperty.AddComponentSymbol",
-			zap.String("componentConfigVal", componentName),
-			zap.Error(ErrInvalidComponent))
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
 
 		return
 	}
@@ -1019,8 +1019,8 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 	ic, isok := gameProp.Components.MapComponents[name]
 	if !isok || !ic.IsMask() {
 		goutils.Error("GameProperty.GetMask",
-			zap.String("name", name),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", name),
+			goutils.Err(ErrInvalidComponentName))
 
 		return nil, ErrInvalidComponentName
 	}
@@ -1033,8 +1033,8 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 	// im, isok := ic.(IMask)
 	// if !isok {
 	// 	goutils.Error("GameProperty.GetMask",
-	// 		zap.String("name", name),
-	// 		zap.Error(ErrNotMask))
+	// 		slog.String("name", name),
+	// 		goutils.Err(ErrNotMask))
 
 	// 	return nil, ErrNotMask
 	// }
@@ -1051,8 +1051,8 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 // 	ic, isok := gameProp.Components.MapComponents[componentName]
 // 	if !isok || !ic.IsMask() {
 // 		goutils.Error("GameProperty.ProcEachSymbol",
-// 			zap.String("name", componentName),
-// 			zap.Error(ErrIvalidComponentName))
+// 			slog.String("name", componentName),
+// 			goutils.Err(ErrIvalidComponentName))
 
 // 		return "", ErrIvalidComponentName
 // 	}
@@ -1067,8 +1067,8 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 // 		}
 
 // 		goutils.Error("GameProperty.ProcEachSymbol:OnEachSymbol",
-// 			zap.String("name", componentName),
-// 			zap.Error(err))
+// 			slog.String("name", componentName),
+// 			goutils.Err(err))
 
 // 		return "", err
 // 	}
@@ -1083,8 +1083,8 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 // 	ic, isok := gameProp.Components.MapComponents[componentName]
 // 	if !isok {
 // 		goutils.Error("GameProperty.NewComponentDataWithForeachSymbol",
-// 			zap.String("name", componentName),
-// 			zap.Error(ErrIvalidComponentName))
+// 			slog.String("name", componentName),
+// 			goutils.Err(ErrIvalidComponentName))
 
 // 		return ErrIvalidComponentName
 // 	}

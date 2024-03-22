@@ -10,7 +10,6 @@ import (
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
-	"go.uber.org/zap"
 )
 
 type FuncOnRTPResults func(lst []*sgc7game.PlayResult, gameData any)
@@ -263,7 +262,7 @@ func (rtp *RTP) Save2CSV(fn string) error {
 	f, err := os.Create(fn)
 	if err != nil {
 		goutils.Error("sgc7rtp.RTP.Save2CSV",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -439,7 +438,7 @@ func (rtp *RTP) SaveReturns2CSV(fn string) error {
 	f, err := os.Create(fn)
 	if err != nil {
 		goutils.Error("sgc7rtp.RTP.SaveReturns2CSV",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

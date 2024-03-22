@@ -2,10 +2,10 @@ package sgc7game
 
 import (
 	"io"
+	"log/slog"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type FuncProcHeader func(x int, str string) string
@@ -15,8 +15,8 @@ func LoadExcel(fn string, sheet string, onheader FuncProcHeader, ondata FuncProc
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
 		goutils.Error("LoadExcel:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -29,8 +29,8 @@ func LoadExcel(fn string, sheet string, onheader FuncProcHeader, ondata FuncProc
 	rows, err := f.GetRows(sheet)
 	if err != nil {
 		goutils.Error("LoadExcel:GetRows",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -49,11 +49,11 @@ func LoadExcel(fn string, sheet string, onheader FuncProcHeader, ondata FuncProc
 					err := ondata(x, y, colname, colCell)
 					if err != nil {
 						goutils.Error("LoadExcel:ondata",
-							zap.Int("x", x),
-							zap.Int("y", y),
-							zap.String("header", colname),
-							zap.String("val", colCell),
-							zap.Error(err))
+							slog.Int("x", x),
+							slog.Int("y", y),
+							slog.String("header", colname),
+							slog.String("val", colCell),
+							goutils.Err(err))
 
 						return err
 					}
@@ -69,7 +69,7 @@ func LoadExcelWithReader(reader io.Reader, sheet string, onheader FuncProcHeader
 	f, err := excelize.OpenReader(reader)
 	if err != nil {
 		goutils.Error("LoadExcelWithReader:OpenReader",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -82,7 +82,7 @@ func LoadExcelWithReader(reader io.Reader, sheet string, onheader FuncProcHeader
 	rows, err := f.GetRows(sheet)
 	if err != nil {
 		goutils.Error("LoadExcelWithReader:GetRows",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -101,11 +101,11 @@ func LoadExcelWithReader(reader io.Reader, sheet string, onheader FuncProcHeader
 					err := ondata(x, y, colname, colCell)
 					if err != nil {
 						goutils.Error("LoadExcelWithReader:ondata",
-							zap.Int("x", x),
-							zap.Int("y", y),
-							zap.String("header", colname),
-							zap.String("val", colCell),
-							zap.Error(err))
+							slog.Int("x", x),
+							slog.Int("y", y),
+							slog.String("header", colname),
+							slog.String("val", colCell),
+							goutils.Err(err))
 
 						return err
 					}

@@ -2,10 +2,10 @@ package mathtoolset
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
@@ -19,9 +19,9 @@ func genReel(plugin sgc7plugin.IPlugin, rs *ReelStats, minoff int) ([]int, error
 		syms, err := nrs.BuildSymbolsWithWeights(excsym)
 		if err != nil || syms.MaxWeight <= 0 {
 			goutils.Error("genReel:BuildSymbolsWithWeights",
-				goutils.JSON("excludeSymbols", excsym),
-				zap.Int("lastnum", nrs.TotalSymbolNum),
-				zap.Error(ErrNoValidSymbols))
+				slog.Any("excludeSymbols", excsym),
+				slog.Int("lastnum", nrs.TotalSymbolNum),
+				goutils.Err(ErrNoValidSymbols))
 
 			return nil, ErrNoValidSymbols
 		}
@@ -30,7 +30,7 @@ func genReel(plugin sgc7plugin.IPlugin, rs *ReelStats, minoff int) ([]int, error
 		s, err := syms.RandVal(plugin)
 		if err != nil {
 			goutils.Error("GenReels:Random",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -64,7 +64,7 @@ func GenReels(rss *ReelsStats, minoff int, trytimes int) (*sgc7game.ReelsData, e
 			reel, err := genReel(plugin, rs, minoff)
 			if err != nil {
 				goutils.Error("GenReels:genReel",
-					zap.Error(err))
+					goutils.Err(err))
 			} else {
 				reels.SetReel(i, reel)
 
@@ -111,9 +111,9 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 				cr, err := plugin.Random(context.Background(), msn)
 				if err != nil {
 					goutils.Error("genReelsMainSymbolsDistance:Random",
-						goutils.JSON("msn", msn),
-						zap.Int("lastoff", lastoff),
-						zap.Error(err))
+						slog.Any("msn", msn),
+						slog.Int("lastoff", lastoff),
+						goutils.Err(err))
 
 					return nil, err
 				}
@@ -132,9 +132,9 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 				syms, err = nrs.BuildSymbolsWithWeights2(excsym, mainSymbols)
 				if err != nil || syms.MaxWeight <= 0 {
 					// goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
-					// 	goutils.JSON("excludeSymbols", excsym),
-					// 	zap.Int("lastnum", nrs.TotalSymbolNum),
-					// 	zap.Error(ErrNoValidSymbols))
+					// 	slog.Any("excludeSymbols", excsym),
+					// 	slog.Int("lastnum", nrs.TotalSymbolNum),
+					// 	goutils.Err(ErrNoValidSymbols))
 
 					return nil, ErrNoValidSymbols
 				}
@@ -143,9 +143,9 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 			syms, err = nrs.BuildSymbolsWithWeights2(excsym, mainSymbols)
 			if err != nil || syms.MaxWeight <= 0 {
 				// goutils.Error("genReelsMainSymbolsDistance:BuildSymbols",
-				// 	goutils.JSON("excludeSymbols", excsym),
-				// 	zap.Int("lastnum", nrs.TotalSymbolNum),
-				// 	zap.Error(ErrNoValidSymbols))
+				// 	slog.Any("excludeSymbols", excsym),
+				// 	slog.Int("lastnum", nrs.TotalSymbolNum),
+				// 	goutils.Err(ErrNoValidSymbols))
 
 				return nil, ErrNoValidSymbols
 			}
@@ -160,7 +160,7 @@ func genReelsMainSymbolsDistance(plugin sgc7plugin.IPlugin, rs *ReelStats,
 		s, err := syms.RandVal(plugin)
 		if err != nil {
 			goutils.Error("genReelsMainSymbolsDistance:Random",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -205,7 +205,7 @@ func GenReelsMainSymbolsDistance(rss *ReelsStats, mainSymbols []SymbolType, mino
 			reel, err := genReelsMainSymbolsDistance(plugin, rs, mainSymbols, minoff)
 			if err != nil {
 				// goutils.Error("GenReelsMainSymbolsDistance:genReelsMainSymbolsDistance",
-				// 	zap.Error(err))
+				// 	goutils.Err(err))
 			} else {
 				isok = true
 
@@ -217,7 +217,7 @@ func GenReelsMainSymbolsDistance(rss *ReelsStats, mainSymbols []SymbolType, mino
 
 		if !isok {
 			goutils.Error("GenReelsMainSymbolsDistance:genReelsMainSymbolsDistance",
-				zap.Error(ErrNoValidSymbols))
+				goutils.Err(ErrNoValidSymbols))
 
 			return nil, ErrNoValidSymbols
 		}

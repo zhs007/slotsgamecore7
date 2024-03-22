@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -11,7 +12,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -89,8 +89,8 @@ func (rollSymbol *RollSymbol) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("RollSymbol.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -100,8 +100,8 @@ func (rollSymbol *RollSymbol) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WeightBranch.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -118,8 +118,8 @@ func (rollSymbol *RollSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 		vw2, err := pool.LoadSymbolWeights(rollSymbol.Config.Weight, "val", "weight", pool.DefaultPaytables, rollSymbol.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("RollSymbol.Init:LoadStrWeights",
-				zap.String("Weight", rollSymbol.Config.Weight),
-				zap.Error(err))
+				slog.String("Weight", rollSymbol.Config.Weight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -127,7 +127,7 @@ func (rollSymbol *RollSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 		rollSymbol.Config.WeightVW = vw2
 	} else {
 		goutils.Error("RollSymbol.InitEx:Weight",
-			zap.Error(ErrIvalidComponentConfig))
+			goutils.Err(ErrIvalidComponentConfig))
 
 		return ErrIvalidComponentConfig
 	}
@@ -205,7 +205,7 @@ func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		cr, err := vw.RandVal(plugin)
 		if err != nil {
 			goutils.Error("RollSymbol.OnPlayGame:RandVal",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -296,7 +296,7 @@ func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRollSymbol:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -304,7 +304,7 @@ func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseRollSymbol:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -314,7 +314,7 @@ func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseRollSymbol:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

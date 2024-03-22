@@ -2,9 +2,9 @@ package sgc7game
 
 import (
 	"fmt"
+	"log/slog"
 
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 const FloatValType string = "floatval"
@@ -40,8 +40,8 @@ func (val *FloatVal[T]) ParseString(str string) error {
 	v, err := goutils.String2Float64(str)
 	if err != nil {
 		goutils.Error("FloatVal[T].ParseString:String2Float64",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return err
 	}

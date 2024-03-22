@@ -2,6 +2,7 @@ package bggserv
 
 import (
 	"context"
+	"log/slog"
 	"net"
 
 	"github.com/bytedance/sonic"
@@ -12,7 +13,6 @@ import (
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 )
@@ -31,7 +31,7 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
 		goutils.Error("NewServ.Listen",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -57,9 +57,9 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 	sgc7pb.RegisterGameLogicServer(grpcServ, serv)
 
 	goutils.Info("NewServ OK.",
-		zap.String("addr", bindaddr),
-		zap.String("ver", version),
-		zap.String("corever", sgc7ver.Version))
+		slog.String("addr", bindaddr),
+		slog.String("ver", version),
+		slog.String("corever", sgc7ver.Version))
 
 	return serv, nil
 }
@@ -77,14 +77,14 @@ func (serv *Serv) Stop() {
 // GetConfig - get config
 func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sgc7pb.GameConfig, error) {
 	goutils.Debug("Serv.GetConfig",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	cfg := serv.game.GetConfig()
 
 	res := sgc7pbutils.BuildPBGameConfig(cfg)
 
 	// goutils.Debug("Serv.GetConfig",
-	// 	goutils.JSON("reply", res))
+	// 	slog.Any("reply", res))
 
 	return res, nil
 }
@@ -92,19 +92,19 @@ func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sg
 // Initialize - initialize a player
 func (serv *Serv) Initialize(ctx context.Context, req *sgc7pb.RequestInitialize) (*sgc7pb.PlayerState, error) {
 	goutils.Debug("Serv.Initialize",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	ps := serv.game.Initialize()
 	res, err := serv.service.BuildPBPlayerState(ps)
 	if err != nil {
 		goutils.Error("Serv.Initialize:BuildPBPlayerState",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
 
 	goutils.Debug("Serv.Initialize",
-		goutils.JSON("reply", res))
+		slog.Any("reply", res))
 
 	return res, nil
 }
@@ -112,18 +112,18 @@ func (serv *Serv) Initialize(ctx context.Context, req *sgc7pb.RequestInitialize)
 // Play - play game
 func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.GameLogic_PlayServer) error {
 	goutils.Debug("Serv.Play",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	res, err := serv.onPlay(req)
 	if err != nil {
 		goutils.Error("Serv.Play:onPlay",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
 
 	// goutils.Debug("Serv.Play",
-	// 	goutils.JSON("reply", res))
+	// 	slog.Any("reply", res))
 	serv.LogReplyPlay("Serv.Play", res, zapcore.DebugLevel)
 
 	return stream.Send(res)
@@ -132,18 +132,18 @@ func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.GameLogic_PlayServ
 // Play2 - play game
 func (serv *Serv) Play2(ctx context.Context, req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	goutils.Debug("Serv.Play",
-		goutils.JSON("req", req))
+		slog.Any("req", req))
 
 	res, err := serv.onPlay(req)
 	if err != nil {
 		goutils.Error("Serv.Play:onPlay",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
 
 	// goutils.Debug("Serv.Play",
-	// 	goutils.JSON("reply", res))
+	// 	slog.Any("reply", res))
 	serv.LogReplyPlay("Serv.Play", res, zapcore.DebugLevel)
 
 	return res, nil
@@ -173,7 +173,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 		err := serv.service.BuildPlayerStateFromPB(ips, req.PlayerState)
 		if err != nil {
 			goutils.Error("Serv.onPlay:BuildPlayerStateFromPB",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -188,8 +188,8 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	err := serv.game.CheckStake(stake)
 	if err != nil {
 		goutils.Error("Serv.onPlay:CheckStake",
-			goutils.JSON("stake", stake),
-			zap.Error(err))
+			slog.Any("stake", stake),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -208,8 +208,8 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 		pr, err := serv.game.Play(plugin, cmd, req.ClientParams, ips, stake, results, gameData)
 		if err != nil {
 			goutils.Error("Serv.onPlay:Play",
-				zap.Int("results", len(results)),
-				zap.Error(err))
+				slog.Int("results", len(results)),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -241,7 +241,7 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 	ps, err := serv.service.BuildPBPlayerState(ips)
 	if err != nil {
 		goutils.Error("Serv.onPlay:BuildPlayerState",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

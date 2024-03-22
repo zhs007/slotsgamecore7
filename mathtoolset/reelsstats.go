@@ -2,13 +2,13 @@ package mathtoolset
 
 import (
 	"fmt"
+	"log/slog"
 	"sort"
 	"strings"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type SymbolStats struct {
@@ -218,7 +218,7 @@ func NewReelStats() *ReelStats {
 func BuildReelStats(reel []int, mapSymbols *SymbolsMapping) (*ReelStats, error) {
 	if len(reel) == 0 {
 		goutils.Error("ReelStats.AnalyzeReel",
-			zap.Error(ErrInvalidReel))
+			goutils.Err(ErrInvalidReel))
 
 		return nil, ErrInvalidReel
 	}
@@ -597,7 +597,7 @@ func BuildReelsStats(reels *sgc7game.ReelsData, mapSymbols *SymbolsMapping) (*Re
 		rs, err := BuildReelStats(r, mapSymbols)
 		if err != nil {
 			goutils.Error("BuildReelsStats:BuildReelStats",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -618,8 +618,8 @@ func getReelNum(mapcolname map[int]string) (int, error) {
 			arr := strings.Split(v, "reel")
 			if len(arr) != 2 {
 				goutils.Error("getReelNum",
-					zap.String("colname", v),
-					zap.Error(ErrInvalidReelsStatsExcelColname))
+					slog.String("colname", v),
+					goutils.Err(ErrInvalidReelsStatsExcelColname))
 
 				return -1, ErrInvalidReelsStatsExcelColname
 			}
@@ -627,8 +627,8 @@ func getReelNum(mapcolname map[int]string) (int, error) {
 			i64, err := goutils.String2Int64(arr[1])
 			if err != nil {
 				goutils.Error("getReelNum:String2Int64",
-					zap.String("colname", v),
-					zap.Error(err))
+					slog.String("colname", v),
+					goutils.Err(err))
 
 				return -1, err
 			}
@@ -643,8 +643,8 @@ func getReelNum(mapcolname map[int]string) (int, error) {
 
 	if len(lst) != lst[len(lst)-1] {
 		goutils.Error("getReelNum",
-			goutils.JSON("mapcolname", mapcolname),
-			zap.Error(ErrInvalidReelsStatsExcelColname))
+			slog.Any("mapcolname", mapcolname),
+			goutils.Err(ErrInvalidReelsStatsExcelColname))
 
 		return -1, ErrInvalidReelsStatsExcelColname
 	}
@@ -656,8 +656,8 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
 		goutils.Error("LoadReelsStats:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -666,9 +666,9 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
 		goutils.Error("LoadReelsStats:GetSheetList",
-			goutils.JSON("SheetList", lstname),
-			zap.String("fn", fn),
-			zap.Error(ErrInvalidReelsStatsExcelFile))
+			slog.Any("SheetList", lstname),
+			slog.String("fn", fn),
+			goutils.Err(ErrInvalidReelsStatsExcelFile))
 
 		return nil, ErrInvalidReelsStatsExcelFile
 	}
@@ -676,8 +676,8 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 	rows, err := f.GetRows(lstname[0])
 	if err != nil {
 		goutils.Error("LoadReelsStats:GetRows",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -696,8 +696,8 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 			reelnum, err = getReelNum(mapcolname)
 			if err != nil {
 				goutils.Error("LoadReelsStats:getReelNum",
-					zap.String("fn", fn),
-					zap.Error(err))
+					slog.String("fn", fn),
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -713,8 +713,8 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 						i64, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadReelsStats:String2Int64",
-								zap.String("val", colCell),
-								zap.Error(err))
+								slog.String("val", colCell),
+								goutils.Err(err))
 
 							break
 							// return nil, err
@@ -725,8 +725,8 @@ func LoadReelsStats(fn string) (*ReelsStats, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadReelsStats:String2Int64",
-								zap.String("val", colCell),
-								zap.Error(err))
+								slog.String("val", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}

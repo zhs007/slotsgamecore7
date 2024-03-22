@@ -2,13 +2,13 @@ package sgc7game
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type reelsInfo5 struct {
@@ -281,8 +281,8 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
 		goutils.Error("LoadReelsFromExcel:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -291,9 +291,9 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
 		goutils.Error("LoadReelsFromExcel:GetSheetList",
-			goutils.JSON("SheetList", lstname),
-			zap.String("fn", fn),
-			zap.Error(ErrInvalidReelsExcelFile))
+			slog.Any("SheetList", lstname),
+			slog.String("fn", fn),
+			goutils.Err(ErrInvalidReelsExcelFile))
 
 		return nil, ErrInvalidReelsExcelFile
 	}
@@ -301,8 +301,8 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 	rows, err := f.GetRows(lstname[0])
 	if err != nil {
 		goutils.Error("LoadReelsFromExcel:GetRows",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -323,19 +323,19 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 					iv, err := goutils.String2Int64(colCell[1:])
 					if err != nil {
 						goutils.Error("LoadReelsFromExcel:String2Int64",
-							zap.String("fn", fn),
-							zap.String("header", colCell),
-							zap.Error(err))
+							slog.String("fn", fn),
+							slog.String("header", colCell),
+							goutils.Err(err))
 
 						return nil, err
 					}
 
 					if iv <= 0 {
 						goutils.Error("LoadReelsFromExcel",
-							zap.String("info", "check iv"),
-							zap.String("fn", fn),
-							zap.String("header", colCell),
-							zap.Error(ErrInvalidReelsExcelFile))
+							slog.String("info", "check iv"),
+							slog.String("fn", fn),
+							slog.String("header", colCell),
+							goutils.Err(ErrInvalidReelsExcelFile))
 
 						return nil, ErrInvalidReelsExcelFile
 					}
@@ -349,22 +349,22 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 
 			if maxri != len(mapri) {
 				goutils.Error("LoadReelsFromExcel",
-					zap.String("info", "check len"),
-					zap.String("fn", fn),
-					zap.Int("maxri", maxri),
-					goutils.JSON("mapri", mapri),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check len"),
+					slog.String("fn", fn),
+					slog.Int("maxri", maxri),
+					slog.Any("mapri", mapri),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return nil, ErrInvalidReelsExcelFile
 			}
 
 			if maxri <= 0 {
 				goutils.Error("LoadReelsFromExcel",
-					zap.String("info", "check empty"),
-					zap.String("fn", fn),
-					zap.Int("maxri", maxri),
-					goutils.JSON("mapri", mapri),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check empty"),
+					slog.String("fn", fn),
+					slog.Int("maxri", maxri),
+					slog.Any("mapri", mapri),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return nil, ErrInvalidReelsExcelFile
 			}
@@ -382,8 +382,8 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadReelsFromExcel:String2Int64",
-								zap.String("val", colCell),
-								zap.Error(err))
+								slog.String("val", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}
@@ -392,11 +392,11 @@ func LoadReelsFromExcel(fn string) (*ReelsData, error) {
 							isend[ri] = true
 						} else if isend[ri] {
 							goutils.Error("LoadReelsFromExcel",
-								zap.String("info", "check already finished."),
-								zap.String("val", colCell),
-								zap.Int("y", y),
-								zap.Int("x", x),
-								zap.Error(err))
+								slog.String("info", "check already finished."),
+								slog.String("val", colCell),
+								slog.Int("y", y),
+								slog.Int("x", x),
+								goutils.Err(err))
 
 							return nil, err
 						} else {
@@ -431,19 +431,19 @@ func LoadReelsFromExcel2(fn string, paytables *PayTables) (*ReelsData, error) {
 			iv, err := goutils.String2Int64(header[1:])
 			if err != nil {
 				goutils.Error("LoadReelsFromExcel2:LoadExcel:String2Int64",
-					zap.String("fn", fn),
-					zap.String("header", header),
-					zap.Error(err))
+					slog.String("fn", fn),
+					slog.String("header", header),
+					goutils.Err(err))
 
 				return ""
 			}
 
 			if iv <= 0 {
 				goutils.Error("LoadReelsFromExcel2:LoadExcel",
-					zap.String("info", "check iv"),
-					zap.String("fn", fn),
-					zap.String("header", header),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check iv"),
+					slog.String("fn", fn),
+					slog.String("header", header),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return ""
 			}
@@ -461,22 +461,22 @@ func LoadReelsFromExcel2(fn string, paytables *PayTables) (*ReelsData, error) {
 
 			if maxri != len(mapri) {
 				goutils.Error("LoadReelsFromExcel2",
-					zap.String("info", "check len"),
-					zap.String("fn", fn),
-					zap.Int("maxri", maxri),
-					goutils.JSON("mapri", mapri),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check len"),
+					slog.String("fn", fn),
+					slog.Int("maxri", maxri),
+					slog.Any("mapri", mapri),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return ErrInvalidReelsExcelFile
 			}
 
 			if maxri <= 0 {
 				goutils.Error("LoadReelsFromExcel2",
-					zap.String("info", "check empty"),
-					zap.String("fn", fn),
-					zap.Int("maxri", maxri),
-					goutils.JSON("mapri", mapri),
-					zap.Error(ErrInvalidReelsExcelFile))
+					slog.String("info", "check empty"),
+					slog.String("fn", fn),
+					slog.Int("maxri", maxri),
+					slog.Any("mapri", mapri),
+					goutils.Err(ErrInvalidReelsExcelFile))
 
 				return ErrInvalidReelsExcelFile
 			}
@@ -495,11 +495,11 @@ func LoadReelsFromExcel2(fn string, paytables *PayTables) (*ReelsData, error) {
 				if isok {
 					if isend[ri] {
 						goutils.Error("LoadReelsFromExcel2",
-							zap.String("info", "check already finished."),
-							zap.String("val", data),
-							zap.Int("y", y),
-							zap.Int("x", x),
-							zap.Error(ErrInvalidReelsExcelFile))
+							slog.String("info", "check already finished."),
+							slog.String("val", data),
+							slog.Int("y", y),
+							slog.Int("x", x),
+							goutils.Err(ErrInvalidReelsExcelFile))
 
 						return ErrInvalidReelsExcelFile
 					}
@@ -517,8 +517,8 @@ func LoadReelsFromExcel2(fn string, paytables *PayTables) (*ReelsData, error) {
 	})
 	if err != nil {
 		goutils.Error("LoadReelsFromExcel2:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

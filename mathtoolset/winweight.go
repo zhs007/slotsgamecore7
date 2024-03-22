@@ -1,11 +1,11 @@
 package mathtoolset
 
 import (
+	"log/slog"
 	"math"
 	"sort"
 
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type WinWeightFitOptions struct {
@@ -171,7 +171,7 @@ func (wad *WinAreaData) scaleUp(avgWin float64, bet int, options *WinWeightFitOp
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleUp:empty lst",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -241,7 +241,7 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleUp",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 	}
 
 	return false
@@ -264,7 +264,7 @@ func (wad *WinAreaData) scaleDown(avgWin float64, bet int, options *WinWeightFit
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleDown",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -334,7 +334,7 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleDown",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 	}
 
 	return false
@@ -357,7 +357,7 @@ func (wad *WinAreaData) scaleUp2(avgWin float64, bet int, options *WinWeightFitO
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleUp:empty lst",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -427,7 +427,7 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleUp",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 	}
 
 	return false
@@ -474,7 +474,7 @@ func (wad *WinAreaData) scaleUpEnding(avgWin float64, bet int, options *WinWeigh
 	if len(lst) <= 0 {
 		// 最后的缩放，如果lst为空就没办法了
 		goutils.Error("WinAreaData.scaleUpEnding:empty lst",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -482,7 +482,7 @@ func (wad *WinAreaData) scaleUpEnding(avgWin float64, bet int, options *WinWeigh
 	if wad.checkTurn(avgWin, bet, options, true, lst[0], 1, false) {
 		// 最后的缩放，如果最近端都不能放大，则算失败
 		goutils.Error("WinAreaData.scaleUpEnding:check 0 cannot scaleup",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -529,7 +529,7 @@ retry:
 	}
 
 	goutils.Error("WinAreaData.scaleUpEnding:cannot scaleup",
-		zap.Error(ErrWinWeightScale))
+		goutils.Err(ErrWinWeightScale))
 
 	return false
 }
@@ -553,7 +553,7 @@ func (wad *WinAreaData) scaleDownEnding(avgWin float64, bet int, options *WinWei
 	if len(lst) <= 0 {
 		// 最后的缩放，如果lst为空就没办法了
 		goutils.Error("WinAreaData.scaleDownEnding:empty lst",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -561,7 +561,7 @@ func (wad *WinAreaData) scaleDownEnding(avgWin float64, bet int, options *WinWei
 	if wad.checkTurn(avgWin, bet, options, false, lst[0], 1, false) {
 		// 最后的缩放，如果最近端都不能放大，则算失败
 		goutils.Error("WinAreaData.scaleDownEnding:check 0 cannot scaleup",
-			zap.Error(ErrWinWeightScale))
+			goutils.Err(ErrWinWeightScale))
 
 		return false
 	}
@@ -608,7 +608,7 @@ retry:
 	}
 
 	goutils.Error("WinAreaData.scaleDownEnding:cannot scaleup",
-		zap.Error(ErrWinWeightScale))
+		goutils.Err(ErrWinWeightScale))
 
 	return false
 }
@@ -630,7 +630,7 @@ func (wad *WinAreaData) scaleDown2(avgWin float64, bet int, options *WinWeightFi
 	if len(lst) <= 0 {
 		// 前面经过merge，不可能出现这种情况
 		goutils.Error("WinAreaData.scaleDown",
-			zap.Error(ErrWinWeightMerge))
+			goutils.Err(ErrWinWeightMerge))
 
 		return false
 	}
@@ -700,7 +700,7 @@ retry:
 		goto retry
 	} else {
 		goutils.Error("WinAreaData.scaleDown",
-			zap.Error(ErrWinWeightMerge))
+			goutils.Err(ErrWinWeightMerge))
 	}
 
 	return false
@@ -911,7 +911,7 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 			ret0, ret1 := ww.isValidData(si, i, aw, bet, options)
 			if !ret0 {
 				goutils.Error("WinWeight.mergeNext:less",
-					zap.Error(ErrWinWeightMerge))
+					goutils.Err(ErrWinWeightMerge))
 
 				return -1, ErrWinWeightMerge
 			}
@@ -929,7 +929,7 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 					ret0, ret1 := ww.isValidData(si, j, aw, bet, options)
 					if !ret0 {
 						goutils.Error("WinWeight.mergeNext:less",
-							zap.Error(ErrWinWeightMerge))
+							goutils.Err(ErrWinWeightMerge))
 
 						return -1, ErrWinWeightMerge
 					}
@@ -952,7 +952,7 @@ func (ww *WinWeight) mergeNext(wd *WinningDistribution, bet int, options *WinWei
 	}
 
 	goutils.Error("WinWeight.mergeNext:unless",
-		zap.Error(ErrWinWeightMerge))
+		goutils.Err(ErrWinWeightMerge))
 
 	return -1, ErrWinWeightMerge
 }
@@ -970,7 +970,7 @@ func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWei
 			ret0, ret1 := ww.isValidData(si, i, aw, bet, options)
 			if si == 0 && !ret0 {
 				goutils.Error("WinWeight.mergeWith:0",
-					zap.Error(ErrWinWeightMerge))
+					goutils.Err(ErrWinWeightMerge))
 
 				return ErrWinWeightMerge
 			}
@@ -1000,9 +1000,9 @@ func (ww *WinWeight) mergeWith(wd *WinningDistribution, bet int, options *WinWei
 				ni, err := ww.mergeNext(wd, bet, options, si, i, maxi)
 				if err != nil {
 					goutils.Error("WinWeight.mergeWith:mergeNext",
-						zap.Int("si", si),
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("si", si),
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -1028,7 +1028,7 @@ func (ww *WinWeight) Fit(wd *WinningDistribution, bet int, options *WinWeightFit
 	err := ww.mergeWith(wd, bet, options)
 	if err != nil {
 		goutils.Error("WinWeight.Fit:mergeWith",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1086,7 +1086,7 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 	err := ww.mergeWith(wd, bet, options)
 	if err != nil {
 		goutils.Error("WinWeight.Fit2:mergeWith",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1143,10 +1143,10 @@ func (ww *WinWeight) Fit2(wd *WinningDistribution, bet int, options *WinWeightFi
 func (ww *WinWeight) merge(mini, maxi int, newi int) error {
 	if !(newi >= mini && newi <= maxi) {
 		goutils.Error("WinWeight.merge",
-			zap.Int("min index", mini),
-			zap.Int("max index", maxi),
-			zap.Int("new index", newi),
-			zap.Error(ErrWinWeightMerge))
+			slog.Int("min index", mini),
+			slog.Int("max index", maxi),
+			slog.Int("new index", newi),
+			goutils.Err(ErrWinWeightMerge))
 
 		return ErrWinWeightMerge
 	}

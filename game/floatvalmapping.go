@@ -1,10 +1,10 @@
 package sgc7game
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // FloatValMapping
@@ -37,9 +37,9 @@ func (vm *FloatValMapping[T, V]) Clone() *FloatValMapping[T, V] {
 func NewFloatValMapping[T int, V float32 | float64](typevals []T, vals []V) (*FloatValMapping[T, V], error) {
 	if len(typevals) != len(vals) {
 		goutils.Error("NewFloatValMapping",
-			zap.Int("typevals", len(typevals)),
-			zap.Int("vals", len(vals)),
-			zap.Error(ErrInvalidValMapping))
+			slog.Int("typevals", len(typevals)),
+			slog.Int("vals", len(vals)),
+			goutils.Err(ErrInvalidValMapping))
 
 		return nil, ErrInvalidValMapping
 	}
@@ -73,9 +73,9 @@ func LoadFloatValMappingFromExcel[T int, V float32 | float64](fn string, headerT
 			v, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadFloatValMappingFromExcel:String2Int64",
-					zap.String("header", header),
-					zap.String("data", data),
-					zap.Error(err))
+					slog.String("header", header),
+					slog.String("data", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -85,9 +85,9 @@ func LoadFloatValMappingFromExcel[T int, V float32 | float64](fn string, headerT
 			v, err := goutils.String2Float64(data)
 			if err != nil {
 				goutils.Error("LoadFloatValMappingFromExcel:String2Float64",
-					zap.String("header", header),
-					zap.String("data", data),
-					zap.Error(err))
+					slog.String("header", header),
+					slog.String("data", data),
+					goutils.Err(err))
 
 				return err
 			}
@@ -98,8 +98,8 @@ func LoadFloatValMappingFromExcel[T int, V float32 | float64](fn string, headerT
 	})
 	if err != nil {
 		goutils.Error("LoadFloatValMappingFromExcel:LoadExcel",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}

@@ -3,11 +3,11 @@ package gatiserv
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 // Checksum - it's like sha1sum fn
@@ -33,8 +33,8 @@ func GenChecksum(lst []*GATICriticalComponent) (*GATICriticalComponents, error) 
 		hash, err := Checksum(v.Filename)
 		if err != nil {
 			goutils.Error("GenChecksum:Checksum",
-				zap.String("filename", v.Filename),
-				zap.Error(err))
+				slog.String("filename", v.Filename),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -64,7 +64,7 @@ func LoadGATIGameInfo(fn string) (*GATIGameInfo, error) {
 	err = sonic.Unmarshal(data, ccs)
 	if err != nil {
 		goutils.Warn("gatiserv.LoadGATIGameInfo",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func SaveGATIGameInfo(gi *GATIGameInfo, fn string) error {
 	b, err := sonic.Marshal(gi)
 	if err != nil {
 		goutils.Warn("gatiserv.SaveGATIGameInfo",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

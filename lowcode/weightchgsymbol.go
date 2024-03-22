@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -34,8 +34,8 @@ func (weightChgSymbol *WeightChgSymbol) Init(fn string, pool *GamePropertyPool) 
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("WeightChgSymbol.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -45,8 +45,8 @@ func (weightChgSymbol *WeightChgSymbol) Init(fn string, pool *GamePropertyPool) 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WeightChgSymbol.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -67,8 +67,8 @@ func (weightChgSymbol *WeightChgSymbol) InitEx(cfg any, pool *GamePropertyPool) 
 		vw2, err := pool.LoadSymbolWeights(fn, "val", "weight", pool.DefaultPaytables, weightChgSymbol.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("WeightChgSymbol.InitEx:LoadIntWeights",
-				zap.String("Weight", fn),
-				zap.Error(err))
+				slog.String("Weight", fn),
+				goutils.Err(err))
 
 			return err
 		}
@@ -112,7 +112,7 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 				cr, err := vw.RandVal(plugin)
 				if err != nil {
 					goutils.Error("WeightChgSymbol.OnPlayGame:RandVal",
-						zap.Error(err))
+						goutils.Err(err))
 
 					return "", err
 				}

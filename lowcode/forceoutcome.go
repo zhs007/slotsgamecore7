@@ -1,12 +1,12 @@
 package lowcode
 
 import (
+	"log/slog"
 	"strings"
 
 	any1 "github.com/golang/protobuf/ptypes/any"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 func cmpVal(srcVal int, op string, targetVal int) bool {
@@ -121,7 +121,7 @@ func ParseFOData(str string) *FOData {
 
 	if len(arr) != 3 {
 		goutils.Error("ParseFOData:Split",
-			zap.String("str", str))
+			slog.String("str", str))
 
 		return nil
 	}
@@ -129,7 +129,7 @@ func ParseFOData(str string) *FOData {
 	arr1 := strings.Split(arr[0], ".")
 	if len(arr1) != 2 {
 		goutils.Error("ParseFOData:Split0",
-			zap.String("str", str))
+			slog.String("str", str))
 
 		return nil
 	}
@@ -137,8 +137,8 @@ func ParseFOData(str string) *FOData {
 	i64, err := goutils.String2Int64(arr[2])
 	if err != nil {
 		goutils.Error("ParseFOData:String2Int64",
-			zap.String("str", str),
-			zap.Error(err))
+			slog.String("str", str),
+			goutils.Err(err))
 
 		return nil
 	}

@@ -2,10 +2,10 @@ package mathtoolset
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 type FuncCmpTarget[T float32 | float64] func(v0 T, v1 T) int
@@ -229,7 +229,7 @@ func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 
 	if len(vw.Vals) <= 1 {
 		goutils.Error("AutoChgWeights",
-			zap.Error(ErrValidParamInAutoChgWeights))
+			goutils.Err(ErrValidParamInAutoChgWeights))
 
 		return nil, ErrValidParamInAutoChgWeights
 	}
@@ -250,8 +250,8 @@ func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 		mappingVals.MapVals[v] = runner(nvw, true)
 
 		goutils.Info("AutoChgWeights:runner",
-			goutils.JSON("ValWeights", nvw),
-			zap.Any("return", mappingVals.MapVals[v]))
+			slog.Any("ValWeights", nvw),
+			slog.Any("return", mappingVals.MapVals[v]))
 
 		if cmpTarget(mappingVals.MapVals[v], target) > 0 {
 			hasbigger = true
@@ -264,7 +264,7 @@ func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 
 	if !hasbigger || !hassmaller {
 		goutils.Error("AutoChgWeights",
-			zap.Error(ErrValidParamInAutoChgWeights))
+			goutils.Err(ErrValidParamInAutoChgWeights))
 
 		return nil, ErrValidParamInAutoChgWeights
 	}
@@ -280,14 +280,14 @@ func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 				curoff = curacwd.calcOff(vw)
 
 				goutils.Info("AutoChgWeights:result",
-					zap.Any("ret", acwd.outputString()),
-					zap.Any("off", curoff))
+					slog.Any("ret", acwd.outputString()),
+					slog.Any("off", curoff))
 			} else {
 				off := acwd.calcOff(vw)
 
 				goutils.Info("AutoChgWeights:result",
-					zap.Any("ret", acwd.outputString()),
-					zap.Any("off", off))
+					slog.Any("ret", acwd.outputString()),
+					slog.Any("off", off))
 
 				if off < curoff {
 					curacwd = acwd
@@ -296,7 +296,7 @@ func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 			}
 		} else {
 			goutils.Info("AutoChgWeights:result",
-				zap.Any("ret", acwd.outputString()))
+				slog.Any("ret", acwd.outputString()))
 		}
 	})
 
@@ -309,7 +309,7 @@ func AutoChgWeights[T float32 | float64](vw *sgc7game.ValWeights, target T,
 	}
 
 	goutils.Error("AutoChgWeights",
-		zap.Error(ErrNoResultInAutoChgWeights))
+		goutils.Err(ErrNoResultInAutoChgWeights))
 
 	return nil, ErrNoResultInAutoChgWeights
 }
@@ -320,7 +320,7 @@ func AutoChgWeightsEx[T float32 | float64](vm *sgc7game.FloatValMapping[int, T],
 
 	if len(vw.Vals) <= 1 {
 		goutils.Error("AutoChgWeightsEx",
-			zap.Error(ErrValidParamInAutoChgWeights))
+			goutils.Err(ErrValidParamInAutoChgWeights))
 
 		return nil, ErrValidParamInAutoChgWeights
 	}
@@ -345,7 +345,7 @@ func AutoChgWeightsEx[T float32 | float64](vm *sgc7game.FloatValMapping[int, T],
 
 	if !hasbigger || !hassmaller {
 		goutils.Error("AutoChgWeightsEx",
-			zap.Error(ErrValidParamInAutoChgWeights))
+			goutils.Err(ErrValidParamInAutoChgWeights))
 
 		return nil, ErrValidParamInAutoChgWeights
 	}
@@ -361,14 +361,14 @@ func AutoChgWeightsEx[T float32 | float64](vm *sgc7game.FloatValMapping[int, T],
 				curoff = curacwd.calcOff(vw)
 
 				goutils.Info("AutoChgWeightsEx:result",
-					zap.Any("ret", acwd.outputString()),
-					zap.Any("off", curoff))
+					slog.Any("ret", acwd.outputString()),
+					slog.Any("off", curoff))
 			} else {
 				off := acwd.calcOff(vw)
 
 				goutils.Info("AutoChgWeightsEx:result",
-					zap.Any("ret", acwd.outputString()),
-					zap.Any("off", off))
+					slog.Any("ret", acwd.outputString()),
+					slog.Any("off", off))
 
 				if off < curoff {
 					curacwd = acwd
@@ -377,7 +377,7 @@ func AutoChgWeightsEx[T float32 | float64](vm *sgc7game.FloatValMapping[int, T],
 			}
 		} else {
 			goutils.Info("AutoChgWeightsEx:result",
-				zap.Any("ret", acwd.outputString()))
+				slog.Any("ret", acwd.outputString()))
 		}
 	})
 
@@ -390,7 +390,7 @@ func AutoChgWeightsEx[T float32 | float64](vm *sgc7game.FloatValMapping[int, T],
 	}
 
 	goutils.Error("AutoChgWeightsEx",
-		zap.Error(ErrNoResultInAutoChgWeights))
+		goutils.Err(ErrNoResultInAutoChgWeights))
 
 	return nil, ErrNoResultInAutoChgWeights
 }

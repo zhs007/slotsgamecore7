@@ -3,7 +3,6 @@ package mathtoolset
 import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 // calcScatterWinsInReels -
@@ -36,7 +35,7 @@ func calcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, ci+1, height)
 		if err != nil {
 			goutils.Error("calcScatterWinsInReels:calcScatterWinsInReels",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, err
 		}
@@ -65,7 +64,7 @@ func CalcScatterWinsInReels(paytables *sgc7game.PayTables, rss *ReelsStats, symb
 		cw, err := calcScatterWinsInReels(paytables, rss, symbol, num, lst, 1, height)
 		if err != nil {
 			goutils.Error("CalcScatterWinsInReels:calcScatterWinsInReels",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return 0, err
 		}
@@ -82,7 +81,7 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 	rss, err := BuildReelsStats(reels, mapSymbols)
 	if err != nil {
 		goutils.Error("AnalyzeReelsWithScatter:BuildReelsStats",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -106,7 +105,7 @@ func AnalyzeReelsScatter(paytables *sgc7game.PayTables, reels *sgc7game.ReelsDat
 					cw, err := CalcScatterWinsInReels(paytables, rss, s, i+1, height)
 					if err != nil {
 						goutils.Error("AnalyzeReelsScatter:CalcScatterWinsInReels",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return nil, err
 					}
@@ -147,7 +146,7 @@ func AnalyzeReelsScatterEx(paytables *sgc7game.PayTables, rss *ReelsStats,
 					cw, err := CalcScatterWinsInReels(paytables, rss, s, i+1, height)
 					if err != nil {
 						goutils.Error("AnalyzeReelsScatter:CalcScatterWinsInReels",
-							zap.Error(err))
+							goutils.Err(err))
 
 						return nil, err
 					}

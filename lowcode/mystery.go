@@ -76,8 +76,8 @@ package lowcode
 // 	data, err := os.ReadFile(fn)
 // 	if err != nil {
 // 		goutils.Error("Mystery.Init:ReadFile",
-// 			zap.String("fn", fn),
-// 			zap.Error(err))
+// 			slog.String("fn", fn),
+// 			goutils.Err(err))
 
 // 		return err
 // 	}
@@ -87,8 +87,8 @@ package lowcode
 // 	err = yaml.Unmarshal(data, cfg)
 // 	if err != nil {
 // 		goutils.Error("Mystery.Init:Unmarshal",
-// 			zap.String("fn", fn),
-// 			zap.Error(err))
+// 			slog.String("fn", fn),
+// 			goutils.Err(err))
 
 // 		return err
 // 	}
@@ -105,8 +105,8 @@ package lowcode
 // 		vw2, err := pool.LoadSymbolWeights(mystery.Config.MysteryWeight, "val", "weight", pool.DefaultPaytables, mystery.Config.UseFileMapping)
 // 		if err != nil {
 // 			goutils.Error("Mystery.Init:LoadSymbolWeights",
-// 				zap.String("Weight", mystery.Config.MysteryWeight),
-// 				zap.Error(err))
+// 				slog.String("Weight", mystery.Config.MysteryWeight),
+// 				goutils.Err(err))
 
 // 			return err
 // 		}
@@ -177,7 +177,7 @@ package lowcode
 // 				curm, err := mystery.MysteryWeights.RandVal(plugin)
 // 				if err != nil {
 // 					goutils.Error("Mystery.OnPlayGame:RandVal",
-// 						zap.Error(err))
+// 						goutils.Err(err))
 
 // 					return "", err
 // 				}
@@ -239,7 +239,7 @@ package lowcode
 // // 	pbcd, isok := pbComponentData.(*sgc7pb.MysteryData)
 // // 	if !isok {
 // // 		goutils.Error("Mystery.OnStatsWithPB",
-// // 			zap.Error(ErrIvalidProto))
+// // 			goutils.Err(ErrIvalidProto))
 
 // // 		return 0, ErrIvalidProto
 // // 	}
@@ -259,7 +259,7 @@ package lowcode
 // 	err := pbComponentData.UnmarshalTo(pbcd)
 // 	if err != nil {
 // 		goutils.Error("Mystery.EachUsedResults:UnmarshalTo",
-// 			zap.Error(err))
+// 			goutils.Err(err))
 
 // 		return
 // 	}

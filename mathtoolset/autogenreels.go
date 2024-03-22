@@ -1,10 +1,11 @@
 package mathtoolset
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 type agrData struct {
@@ -50,7 +51,7 @@ func (lst *agrDataList) add(reelindex int, symbol SymbolType, weight int) error 
 	}
 
 	goutils.Error("agrDataList.add",
-		zap.Error(ErrInvalidDataInAGRDataList))
+		goutils.Err(ErrInvalidDataInAGRDataList))
 
 	return ErrInvalidDataInAGRDataList
 }
@@ -59,7 +60,7 @@ func (lst *agrDataList) rand(plugin sgc7plugin.IPlugin) (*agrData, error) {
 	i, err := lst.weights.RandVal(plugin)
 	if err != nil {
 		goutils.Error("agrDataList.rand",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func AutoGenReels(w, h int, paytables *sgc7game.PayTables, syms []SymbolType, wi
 	rss, err := BuildBasicReelsStatsEx(w, syms)
 	if err != nil {
 		goutils.Error("AutoGenReels:BuildBasicReelsStatsEx",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func AutoGenReels(w, h int, paytables *sgc7game.PayTables, syms []SymbolType, wi
 	ssws, err := AnalyzeReelsWithLineEx(paytables, rss, syms, wilds, totalBet, lineNum)
 	if err != nil {
 		goutils.Error("AutoGenReels:AnalyzeReelsWithLineEx",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -114,15 +115,15 @@ func AutoGenReels(w, h int, paytables *sgc7game.PayTables, syms []SymbolType, wi
 	d, err := lst.rand(plugin)
 	if err != nil {
 		goutils.Error("AutoGenReels",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
 
 	goutils.Info("AutoGenReels",
-		zap.Int("ri", d.reelIndex),
-		zap.Any("s", d.symbol),
-		zap.Float64("rtp", ssws.CountRTP()))
+		slog.Int("ri", d.reelIndex),
+		slog.Any("s", d.symbol),
+		slog.Float64("rtp", ssws.CountRTP()))
 
 	return nil, nil
 }

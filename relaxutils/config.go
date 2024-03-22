@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type FloatList struct {
@@ -104,7 +103,7 @@ func SaveConfig(fn string, cfg any, procSelfCloseTags FuncOnSelfCloseTags) error
 	output, err := xml.MarshalIndent(cfg, "  ", "    ")
 	if err != nil {
 		goutils.Error("SaveConfig:MarshalIndent",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -120,7 +119,7 @@ func SaveConfig(fn string, cfg any, procSelfCloseTags FuncOnSelfCloseTags) error
 	err = os.WriteFile(fn, buf, 0644)
 	if err != nil {
 		goutils.Error("SaveConfig:WriteFile",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

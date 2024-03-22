@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -144,8 +144,8 @@ func (moveSymbol *MoveSymbol) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("MoveSymbol.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -155,8 +155,8 @@ func (moveSymbol *MoveSymbol) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("MoveSymbol.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -174,8 +174,8 @@ func (moveSymbol *MoveSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 			sc, isok := pool.DefaultPaytables.MapSymbols[v.Src.Symbol]
 			if !isok {
 				goutils.Error("ReplaceReel.InitEx:Src.Symbol",
-					zap.String("symbol", v.Src.Symbol),
-					zap.Error(ErrInvalidSymbol))
+					slog.String("symbol", v.Src.Symbol),
+					goutils.Err(ErrInvalidSymbol))
 
 				return ErrInvalidSymbol
 			}
@@ -189,8 +189,8 @@ func (moveSymbol *MoveSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 			sc, isok := pool.DefaultPaytables.MapSymbols[v.Target.Symbol]
 			if !isok {
 				goutils.Error("ReplaceReel.InitEx:Target.Symbol",
-					zap.String("symbol", v.Target.Symbol),
-					zap.Error(ErrInvalidSymbol))
+					slog.String("symbol", v.Target.Symbol),
+					goutils.Err(ErrInvalidSymbol))
 
 				return ErrInvalidSymbol
 			}
@@ -423,7 +423,7 @@ func parseMoveSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseMoveSymbol:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -431,7 +431,7 @@ func parseMoveSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseMoveSymbol:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -441,7 +441,7 @@ func parseMoveSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseMoveSymbol:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

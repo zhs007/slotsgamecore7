@@ -1,12 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/bytedance/sonic"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
-	"go.uber.org/zap"
 )
 
 // Game - game
@@ -21,8 +22,8 @@ func (game *Game) Init(cfgfn string) error {
 	pool, err := newGamePropertyPool(cfgfn)
 	if err != nil {
 		goutils.Error("Game.Init:newGamePropertyPool",
-			zap.String("fn", cfgfn),
-			zap.Error(err))
+			slog.String("fn", cfgfn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -41,7 +42,7 @@ func (game *Game) Init(cfgfn string) error {
 	err = pool.InitStats(pool.Config.Bets[0])
 	if err != nil {
 		goutils.Error("Game.Init:InitStats",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -49,7 +50,7 @@ func (game *Game) Init(cfgfn string) error {
 	err = game.BuildGameConfigData()
 	if err != nil {
 		goutils.Error("Game.Init:BuildGameConfigData",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -64,8 +65,8 @@ func (game *Game) InitForRTP(bet int, cfgfn string) error {
 	pool, err := newGamePropertyPool(cfgfn)
 	if err != nil {
 		goutils.Error("Game.Init:newGamePropertyPool",
-			zap.String("fn", cfgfn),
-			zap.Error(err))
+			slog.String("fn", cfgfn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -84,7 +85,7 @@ func (game *Game) InitForRTP(bet int, cfgfn string) error {
 	err = pool.InitStats(bet)
 	if err != nil {
 		goutils.Error("Game.Init:InitStats",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -92,7 +93,7 @@ func (game *Game) InitForRTP(bet int, cfgfn string) error {
 	err = game.BuildGameConfigData()
 	if err != nil {
 		goutils.Error("Game.Init:BuildGameConfigData",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -107,7 +108,7 @@ func (game *Game) Init2(cfg *Config) error {
 	pool, err := newGamePropertyPool2(cfg)
 	if err != nil {
 		goutils.Error("Game.Init2:NewGamePropertyPool2",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -125,7 +126,7 @@ func (game *Game) Init2(cfg *Config) error {
 		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
 		if err != nil {
 			goutils.Error("Game.Init2:NewBasicGameMod2",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -136,7 +137,7 @@ func (game *Game) Init2(cfg *Config) error {
 	err = pool.InitStats(pool.Config.Bets[0])
 	if err != nil {
 		goutils.Error("Game.Init2:InitStats",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -144,7 +145,7 @@ func (game *Game) Init2(cfg *Config) error {
 	err = game.BuildGameConfigData()
 	if err != nil {
 		goutils.Error("Game.Init2:BuildGameConfigData",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -159,7 +160,7 @@ func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
 	pool, err := newGamePropertyPool2(cfg)
 	if err != nil {
 		goutils.Error("Game.Init2:NewGamePropertyPool2",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -175,7 +176,7 @@ func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
 		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
 		if err != nil {
 			goutils.Error("Game.Init2:NewBasicGameMod2",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -186,7 +187,7 @@ func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
 	err = pool.InitStats(bet)
 	if err != nil {
 		goutils.Error("Game.Init2:InitStats",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -194,7 +195,7 @@ func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
 	err = game.BuildGameConfigData()
 	if err != nil {
 		goutils.Error("Game.Init2:BuildGameConfigData",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil
 	}
@@ -265,7 +266,7 @@ func (game *Game) BuildGameConfigData() error {
 	buf, err := sonic.Marshal(game.Pool.mapComponents)
 	if err != nil {
 		goutils.Error("Game.BuildGameConfigData:Marshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

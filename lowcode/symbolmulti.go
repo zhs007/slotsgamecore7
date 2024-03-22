@@ -1,13 +1,13 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -39,8 +39,8 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolMulti.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -50,8 +50,8 @@ func (symbolMulti *SymbolMulti) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("SymbolMulti.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -71,8 +71,8 @@ func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
 			vw2, err := pool.LoadIntWeights(v, symbolMulti.Config.UseFileMapping)
 			if err != nil {
 				goutils.Error("SymbolMulti.Init:LoadValWeights",
-					zap.String("Weight", v),
-					zap.Error(err))
+					slog.String("Weight", v),
+					goutils.Err(err))
 
 				return err
 			}
@@ -83,8 +83,8 @@ func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
 		vw2, err := pool.LoadIntWeights(symbolMulti.Config.WeightMulti, symbolMulti.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("SymbolMulti.Init:LoadValWeights",
-				zap.String("Weight", symbolMulti.Config.WeightMulti),
-				zap.Error(err))
+				slog.String("Weight", symbolMulti.Config.WeightMulti),
+				goutils.Err(err))
 
 			return err
 		}
@@ -145,7 +145,7 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 						cv, err := vw2.RandVal(plugin)
 						if err != nil {
 							goutils.Error("SymbolMulti.OnPlayGame:WeightMulti.RandVal",
-								zap.Error(err))
+								goutils.Err(err))
 
 							return "", err
 						}

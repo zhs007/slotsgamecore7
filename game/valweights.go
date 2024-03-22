@@ -1,12 +1,12 @@
 package sgc7game
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 // ValWeights
@@ -19,7 +19,7 @@ type ValWeights struct {
 func (vw *ValWeights) SortBy(dst *ValWeights) error {
 	if len(vw.Vals) != len(dst.Vals) {
 		goutils.Error("ValWeights.SortBy",
-			zap.Error(ErrInvalidValWeights))
+			goutils.Err(ErrInvalidValWeights))
 
 		return ErrInvalidValWeights
 	}
@@ -39,9 +39,9 @@ func (vw *ValWeights) SortBy(dst *ValWeights) error {
 
 	if maxweights != vw.MaxWeight {
 		goutils.Error("ValWeights.SortBy",
-			zap.Int("MaxWeight", vw.MaxWeight),
-			zap.Int("NewMaxWeight", maxweights),
-			zap.Error(ErrInvalidValWeights))
+			slog.Int("MaxWeight", vw.MaxWeight),
+			slog.Int("NewMaxWeight", maxweights),
+			goutils.Err(ErrInvalidValWeights))
 
 		return ErrInvalidValWeights
 	}
@@ -110,7 +110,7 @@ func (vw *ValWeights) RandVal(plugin sgc7plugin.IPlugin) (int, error) {
 	ci, err := RandWithWeights(plugin, vw.MaxWeight, vw.Weights)
 	if err != nil {
 		goutils.Error("ValWeights.RandVal:RandWithWeights",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return 0, err
 	}
@@ -122,7 +122,7 @@ func (vw *ValWeights) RandVal(plugin sgc7plugin.IPlugin) (int, error) {
 func (vw *ValWeights) CloneExcludeVal(val int) (*ValWeights, error) {
 	if len(vw.Vals) <= 1 {
 		goutils.Error("ValWeights.RandVal:CloneExcludeVal",
-			zap.Error(ErrInvalidValWeights))
+			goutils.Err(ErrInvalidValWeights))
 
 		return nil, ErrInvalidValWeights
 	}
@@ -140,7 +140,7 @@ func (vw *ValWeights) CloneExcludeVal(val int) (*ValWeights, error) {
 	}
 
 	goutils.Error("ValWeights.RandVal:CloneExcludeVal",
-		zap.Error(ErrInvalidValWeightsVal))
+		goutils.Err(ErrInvalidValWeightsVal))
 
 	return nil, ErrInvalidValWeightsVal
 }
@@ -152,9 +152,9 @@ func NewValWeightsEx() *ValWeights {
 func NewValWeights(vals []int, weights []int) (*ValWeights, error) {
 	if len(vals) != len(weights) {
 		goutils.Error("NewValWeights",
-			zap.Int("vals", len(vals)),
-			zap.Int("weights", len(weights)),
-			zap.Error(ErrInvalidValWeights))
+			slog.Int("vals", len(vals)),
+			slog.Int("weights", len(weights)),
+			goutils.Err(ErrInvalidValWeights))
 
 		return nil, ErrInvalidValWeights
 	}
@@ -180,8 +180,8 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
 		goutils.Error("LoadValWeightsFromExcel:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -190,9 +190,9 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
 		goutils.Error("LoadValWeightsFromExcel:GetSheetList",
-			goutils.JSON("SheetList", lstname),
-			zap.String("fn", fn),
-			zap.Error(ErrInvalidReelsExcelFile))
+			slog.Any("SheetList", lstname),
+			slog.String("fn", fn),
+			goutils.Err(ErrInvalidReelsExcelFile))
 
 		return nil, ErrInvalidReelsExcelFile
 	}
@@ -200,8 +200,8 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 	rows, err := f.GetRows(lstname[0])
 	if err != nil {
 		goutils.Error("LoadValWeightsFromExcel:GetRows",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -224,8 +224,8 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadValWeightsFromExcel:String2Int64",
-								zap.String("val", colCell),
-								zap.Error(err))
+								slog.String("val", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}
@@ -235,8 +235,8 @@ func LoadValWeightsFromExcel(fn string) (*ValWeights, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadValWeightsFromExcel:String2Int64",
-								zap.String("weight", colCell),
-								zap.Error(err))
+								slog.String("weight", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}

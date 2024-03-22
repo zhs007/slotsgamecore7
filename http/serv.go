@@ -1,12 +1,12 @@
 package sgc7http
 
 import (
+	"log/slog"
 	"net"
 
 	"github.com/bytedance/sonic"
 	"github.com/valyala/fasthttp"
 	goutils "github.com/zhs007/goutils"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -72,7 +72,7 @@ func (s *Serv) Start() error {
 	ln, err := net.Listen("tcp4", s.bindAddr)
 	if err != nil {
 		goutils.Error("gatiserv.Serv.Start:Listen",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -95,7 +95,7 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj any) {
 	b, err := sonic.Marshal(jsonObj)
 	if err != nil {
 		goutils.Warn("gatiserv.Serv.SetResponse",
-			zap.Error(err))
+			goutils.Err(err))
 
 		s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 
@@ -107,8 +107,8 @@ func (s *Serv) SetResponse(ctx *fasthttp.RequestCtx, jsonObj any) {
 	ctx.SetBody(b)
 
 	goutils.Debug("gatiserv.Serv.SetResponse",
-		zap.String("RequestURI", string(ctx.RequestURI())),
-		zap.String("body", string(b)))
+		slog.String("RequestURI", string(ctx.RequestURI())),
+		slog.String("body", string(b)))
 }
 
 // SetResponse - set a response
@@ -127,7 +127,7 @@ func (s *Serv) SetPBResponse(ctx *fasthttp.RequestCtx, msg proto.Message) {
 	result, err := protojson.Marshal(msg)
 	if err != nil {
 		goutils.Warn("gatiserv.Serv.SetResponse",
-			zap.Error(err))
+			goutils.Err(err))
 
 		s.SetHTTPStatus(ctx, fasthttp.StatusInternalServerError)
 
@@ -139,8 +139,8 @@ func (s *Serv) SetPBResponse(ctx *fasthttp.RequestCtx, msg proto.Message) {
 	ctx.SetBody([]byte(result))
 
 	goutils.Debug("gatiserv.Serv.SetResponse",
-		zap.String("RequestURI", string(ctx.RequestURI())),
-		zap.String("body", string(result)))
+		slog.String("RequestURI", string(ctx.RequestURI())),
+		slog.String("body", string(result)))
 }
 
 // SetStringResponse - set a response with string
@@ -150,8 +150,8 @@ func (s *Serv) SetStringResponse(ctx *fasthttp.RequestCtx, str string) {
 	ctx.SetBody([]byte(str))
 
 	goutils.Debug("gatiserv.Serv.SetStringResponse",
-		zap.String("RequestURI", string(ctx.RequestURI())),
-		zap.String("body", str))
+		slog.String("RequestURI", string(ctx.RequestURI())),
+		slog.String("body", str))
 }
 
 // SetHTTPStatus - set a response with status
@@ -159,38 +159,38 @@ func (s *Serv) SetHTTPStatus(ctx *fasthttp.RequestCtx, statusCode int) {
 	ctx.SetStatusCode(statusCode)
 
 	goutils.Debug("gatiserv.Serv.SetHTTPStatus",
-		zap.String("RequestURI", string(ctx.RequestURI())),
-		zap.Int("statusCode", statusCode))
+		slog.String("RequestURI", string(ctx.RequestURI())),
+		slog.Int("statusCode", statusCode))
 }
 
 func (s *Serv) outputDebugInfo(ctx *fasthttp.RequestCtx) {
 	goutils.Debug("Request infomation",
-		zap.String("Method", string(ctx.Method())),
-		zap.String("RequestURI", string(ctx.RequestURI())),
-		zap.String("Path", string(ctx.Path())),
-		zap.String("Host", string(ctx.Host())),
-		zap.String("UserAgent", string(ctx.UserAgent())),
-		zap.String("RemoteIP", ctx.RemoteIP().String()),
-		zap.Uint64("ConnRequestNum", ctx.ConnRequestNum()),
-		zap.Time("ConnTime", ctx.ConnTime()),
-		zap.Time("Time", ctx.Time()),
+		slog.String("Method", string(ctx.Method())),
+		slog.String("RequestURI", string(ctx.RequestURI())),
+		slog.String("Path", string(ctx.Path())),
+		slog.String("Host", string(ctx.Host())),
+		slog.String("UserAgent", string(ctx.UserAgent())),
+		slog.String("RemoteIP", ctx.RemoteIP().String()),
+		slog.Int64("ConnRequestNum", int64(ctx.ConnRequestNum())),
+		slog.Time("ConnTime", ctx.ConnTime()),
+		slog.Time("Time", ctx.Time()),
 	)
 
 	if ctx.QueryArgs() != nil {
 		goutils.Debug("Request infomation QueryArgs",
-			zap.String("QueryArgs", ctx.QueryArgs().String()),
+			slog.String("QueryArgs", ctx.QueryArgs().String()),
 		)
 	}
 
 	if ctx.PostArgs() != nil {
 		goutils.Debug("Request infomation PostArgs",
-			zap.String("PostArgs", ctx.PostArgs().String()),
+			slog.String("PostArgs", ctx.PostArgs().String()),
 		)
 	}
 
 	if ctx.PostBody() != nil {
 		goutils.Debug("Request infomation PostBody",
-			zap.String("PostBody", string(ctx.PostBody())),
+			slog.String("PostBody", string(ctx.PostBody())),
 		)
 	}
 }

@@ -1,9 +1,10 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 )
 
 type ComponentList struct {
@@ -24,8 +25,8 @@ func (lst *ComponentList) onInit(start string) error {
 		node, err := ParseStepParentChildren(lst, start)
 		if err != nil {
 			goutils.Error("ComponentList.onInit:ParseStepParentChildren",
-				zap.String("start", start),
-				zap.Error(err))
+				slog.String("start", start),
+				goutils.Err(err))
 
 			return err
 		}
@@ -49,8 +50,8 @@ func (lst *ComponentList) GetAllLinkComponents(componentName string) []string {
 	ic, isok := lst.MapComponents[componentName]
 	if !isok {
 		goutils.Error("ComponentList.GetAllLinkComponents",
-			zap.String("name", componentName),
-			zap.Error(ErrInvalidComponentName))
+			slog.String("name", componentName),
+			goutils.Err(ErrInvalidComponentName))
 
 		return nil
 	}

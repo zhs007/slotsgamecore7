@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"fmt"
+	"log/slog"
 	"path"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7rtp "github.com/zhs007/slotsgamecore7/rtp"
 	"github.com/zhs007/slotsgamecore7/stats2"
-	"go.uber.org/zap"
 )
 
 type RTPSymbolFeature struct {
@@ -274,8 +274,8 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	})
 	if err != nil {
 		goutils.Error("StartRTP:NewGame3",
-			zap.String("gamecfg", gamecfg),
-			zap.Error(err))
+			slog.String("gamecfg", gamecfg),
+			goutils.Err(err))
 
 		return err
 	}
@@ -310,15 +310,15 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 
 	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
 		goutils.Info("processing...",
-			zap.Int64("total nums", totalnums),
-			zap.Int64("current nums", curnums),
-			zap.Duration("cost time", curtime))
+			slog.Int64("total nums", totalnums),
+			slog.Int64("current nums", curnums),
+			slog.Duration("cost time", curtime))
 	}, true, 0)
 
 	goutils.Info("finish.",
-		zap.Int64("total nums", ispinnums),
-		zap.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
-		zap.Duration("cost time", d))
+		slog.Int64("total nums", ispinnums),
+		slog.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
+		slog.Duration("cost time", d))
 
 	curtime := time.Now()
 
@@ -330,7 +330,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	// 	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
 	// 	goutils.Info("finish.",
-	// 		zap.Int64("total nums", game.Pool.Stats.TotalNum))
+	// 		slog.Int64("total nums", game.Pool.Stats.TotalNum))
 	// }
 
 	if gAllowStats2 {
@@ -340,7 +340,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		components.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-%v-stats-%v.xlsx", game.Pool.Config.Name, bet, curtime.Format("2006-01-02_15_04_05"))))
 
 		goutils.Info("finish.",
-			zap.Int64("total nums", components.Stats2.BetTimes))
+			slog.Int64("total nums", components.Stats2.BetTimes))
 	}
 
 	return nil
@@ -355,7 +355,7 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 	})
 	if err != nil {
 		goutils.Error("StartRTPWithData:NewGame3",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -391,9 +391,9 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, 0)
 
 	goutils.Info("finish.",
-		zap.Int64("total nums", ispinnums),
-		zap.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
-		zap.Duration("cost time", d))
+		slog.Int64("total nums", ispinnums),
+		slog.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
+		slog.Duration("cost time", d))
 
 	// curtime := time.Now()
 
@@ -405,7 +405,7 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 	// 	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
 	// 	goutils.Info("finish.",
-	// 		zap.Int64("total nums", game.Pool.Stats.TotalNum))
+	// 		slog.Int64("total nums", game.Pool.Stats.TotalNum))
 	// }
 
 	// if gAllowStats2 {
@@ -415,7 +415,7 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 	// components.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-%v-stats-%v.xlsx", game.Pool.Config.Name, bet, curtime.Format("2006-01-02_15_04_05"))))
 
 	// goutils.Info("finish.",
-	// 	zap.Int64("total nums", components.Stats2.BetTimes))
+	// 	slog.Int64("total nums", components.Stats2.BetTimes))
 	// }
 
 	return components.Stats2, nil

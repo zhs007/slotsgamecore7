@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -10,7 +11,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -45,8 +45,8 @@ func (addSymbols *AddSymbols) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("AddSymbols.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -56,8 +56,8 @@ func (addSymbols *AddSymbols) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("AddSymbols.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -73,8 +73,8 @@ func (addSymbols *AddSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	sc, isok := pool.DefaultPaytables.MapSymbols[addSymbols.Config.Symbol]
 	if !isok {
 		goutils.Error("AddSymbols.InitEx:Symbol",
-			zap.String("symbol", addSymbols.Config.Symbol),
-			zap.Error(ErrInvalidSymbol))
+			slog.String("symbol", addSymbols.Config.Symbol),
+			goutils.Err(ErrInvalidSymbol))
 
 		return ErrInvalidSymbol
 	}
@@ -85,8 +85,8 @@ func (addSymbols *AddSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		vw2, err := pool.LoadIntWeights(addSymbols.Config.SymbolNumWeight, addSymbols.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("WeightReels.Init:LoadIntWeights",
-				zap.String("SymbolNumWeight", addSymbols.Config.SymbolNumWeight),
-				zap.Error(err))
+				slog.String("SymbolNumWeight", addSymbols.Config.SymbolNumWeight),
+				goutils.Err(err))
 
 			return err
 		}
@@ -98,8 +98,8 @@ func (addSymbols *AddSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		sc, isok := pool.DefaultPaytables.MapSymbols[v]
 		if !isok {
 			goutils.Error("AddSymbols.InitEx:IgnoreSymbols",
-				zap.String("symbol", v),
-				zap.Error(ErrInvalidSymbol))
+				slog.String("symbol", v),
+				goutils.Err(ErrInvalidSymbol))
 
 			return ErrInvalidSymbol
 		}
@@ -130,7 +130,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		cv, err := addSymbols.Config.SymbolNumWeightVW.RandVal(plugin)
 		if err != nil {
 			goutils.Error("AddSymbols.OnPlayGame:SymbolNumWeightVW",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -165,7 +165,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		cr, err := plugin.Random(context.Background(), len(pos)/2)
 		if err != nil {
 			goutils.Error("AddSymbols.OnPlayGame:Random",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return "", err
 		}
@@ -241,7 +241,7 @@ func parseAddSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseAddSymbols:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -249,7 +249,7 @@ func parseAddSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseAddSymbols:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -259,7 +259,7 @@ func parseAddSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseAddSymbols:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

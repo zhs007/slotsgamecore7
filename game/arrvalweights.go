@@ -1,12 +1,12 @@
 package sgc7game
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 // ArrValWeights
@@ -19,9 +19,9 @@ type ArrValWeights struct {
 func NewArrValWeights(arrvals [][]int, weights []int) (*ArrValWeights, error) {
 	if len(arrvals) != len(weights) {
 		goutils.Error("NewArrValWeights",
-			zap.Int("vals", len(arrvals)),
-			zap.Int("weights", len(weights)),
-			zap.Error(ErrInvalidValWeights))
+			slog.Int("vals", len(arrvals)),
+			slog.Int("weights", len(weights)),
+			goutils.Err(ErrInvalidValWeights))
 
 		return nil, ErrInvalidValWeights
 	}
@@ -51,7 +51,7 @@ func (vw *ArrValWeights) RandVal(plugin sgc7plugin.IPlugin) ([]int, error) {
 	ci, err := RandWithWeights(plugin, vw.MaxWeight, vw.Weights)
 	if err != nil {
 		goutils.Error("ArrValWeights.RandVal:RandWithWeights",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -64,8 +64,8 @@ func LoadArrValWeightsFromExcel(fn string) (*ArrValWeights, error) {
 	f, err := excelize.OpenFile(fn)
 	if err != nil {
 		goutils.Error("LoadArrValWeightsFromExcel:OpenFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -73,9 +73,9 @@ func LoadArrValWeightsFromExcel(fn string) (*ArrValWeights, error) {
 	lstname := f.GetSheetList()
 	if len(lstname) <= 0 {
 		goutils.Error("LoadArrValWeightsFromExcel:GetSheetList",
-			goutils.JSON("SheetList", lstname),
-			zap.String("fn", fn),
-			zap.Error(ErrInvalidReelsExcelFile))
+			slog.Any("SheetList", lstname),
+			slog.String("fn", fn),
+			goutils.Err(ErrInvalidReelsExcelFile))
 
 		return nil, ErrInvalidReelsExcelFile
 	}
@@ -83,8 +83,8 @@ func LoadArrValWeightsFromExcel(fn string) (*ArrValWeights, error) {
 	rows, err := f.GetRows(lstname[0])
 	if err != nil {
 		goutils.Error("LoadArrValWeightsFromExcel:GetRows",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -109,8 +109,8 @@ func LoadArrValWeightsFromExcel(fn string) (*ArrValWeights, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadArrValWeightsFromExcel:String2Int64",
-								zap.String("val", colCell),
-								zap.Error(err))
+								slog.String("val", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}
@@ -120,8 +120,8 @@ func LoadArrValWeightsFromExcel(fn string) (*ArrValWeights, error) {
 						v, err := goutils.String2Int64(colCell)
 						if err != nil {
 							goutils.Error("LoadArrValWeightsFromExcel:String2Int64",
-								zap.String("weight", colCell),
-								zap.Error(err))
+								slog.String("weight", colCell),
+								goutils.Err(err))
 
 							return nil, err
 						}

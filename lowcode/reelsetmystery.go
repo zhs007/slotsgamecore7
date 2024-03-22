@@ -49,8 +49,8 @@ package lowcode
 // 	data, err := os.ReadFile(fn)
 // 	if err != nil {
 // 		goutils.Error("ReelSetMystery.Init:ReadFile",
-// 			zap.String("fn", fn),
-// 			zap.Error(err))
+// 			slog.String("fn", fn),
+// 			goutils.Err(err))
 
 // 		return err
 // 	}
@@ -60,8 +60,8 @@ package lowcode
 // 	err = yaml.Unmarshal(data, cfg)
 // 	if err != nil {
 // 		goutils.Error("ReelSetMystery.Init:Unmarshal",
-// 			zap.String("fn", fn),
-// 			zap.Error(err))
+// 			slog.String("fn", fn),
+// 			goutils.Err(err))
 
 // 		return err
 // 	}
@@ -78,8 +78,8 @@ package lowcode
 // 		vw2, err := pool.LoadSymbolWeights(v, "val", "weight", pool.DefaultPaytables, reelSetMystery.Config.UseFileMapping)
 // 		if err != nil {
 // 			goutils.Error("ReelSetMystery.Init:LoadSymbolWeights",
-// 				zap.String("Weight", v),
-// 				zap.Error(err))
+// 				slog.String("Weight", v),
+// 				goutils.Err(err))
 
 // 			return err
 // 		}
@@ -121,8 +121,8 @@ package lowcode
 // 		vw2, isok := reelSetMystery.MapMysteryWeights[gameProp.GetTagStr(TagCurReels)]
 // 		if !isok {
 // 			goutils.Error("ReelSetMystery.OnPlayGame:MapMysteryWeights",
-// 				zap.String("TagCurReels", gameProp.GetTagStr(TagCurReels)),
-// 				zap.Error(ErrIvalidTagCurReels))
+// 				slog.String("TagCurReels", gameProp.GetTagStr(TagCurReels)),
+// 				goutils.Err(ErrIvalidTagCurReels))
 
 // 			return "", ErrIvalidTagCurReels
 // 		}
@@ -147,7 +147,7 @@ package lowcode
 // 			curm, err := vw2.RandVal(plugin)
 // 			if err != nil {
 // 				goutils.Error("ReelSetMystery.OnPlayGame:RandVal",
-// 					zap.Error(err))
+// 					goutils.Err(err))
 
 // 				return "", err
 // 			}
@@ -196,7 +196,7 @@ package lowcode
 // // 	pbcd, isok := pbComponentData.(*sgc7pb.ReelSetMysteryData)
 // // 	if !isok {
 // // 		goutils.Error("ReelSetMystery.OnStatsWithPB",
-// // 			zap.Error(ErrIvalidProto))
+// // 			goutils.Err(ErrIvalidProto))
 
 // // 		return 0, ErrIvalidProto
 // // 	}
@@ -216,7 +216,7 @@ package lowcode
 // 	err := pbComponentData.UnmarshalTo(pbcd)
 // 	if err != nil {
 // 		goutils.Error("ReelSetMystery.EachUsedResults:UnmarshalTo",
-// 			zap.Error(err))
+// 			goutils.Err(err))
 
 // 		return
 // 	}

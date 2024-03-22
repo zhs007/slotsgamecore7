@@ -1,13 +1,13 @@
 package gatiserv
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 // BasicService - basic service
@@ -23,8 +23,8 @@ func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicServi
 	gi, err := LoadGATIGameInfo(gifn)
 	if err != nil {
 		goutils.Error("NewBasicService:LoadGATIGameInfo",
-			zap.String("gifn", gifn),
-			zap.Error(err))
+			slog.String("gifn", gifn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -34,9 +34,9 @@ func NewBasicService(game sgc7game.IGame, gifn string, gcfn string) (*BasicServi
 		curpwd, _ := os.Getwd()
 
 		goutils.Error("NewBasicService:LoadGATIGameConfig",
-			zap.String("gcfn", gcfn),
-			zap.String("pwd", curpwd),
-			zap.Error(err))
+			slog.String("gcfn", gcfn),
+			slog.String("pwd", curpwd),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -75,8 +75,8 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 		err := BuildIPlayerState(ips, params.PlayerState)
 		if err != nil {
 			goutils.Error("BasicService.Play:BuildIPlayerState",
-				goutils.JSON("PlayerState", params.PlayerState),
-				zap.Error(err))
+				slog.Any("PlayerState", params.PlayerState),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -91,8 +91,8 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	err := sv.Game.CheckStake(stake)
 	if err != nil {
 		goutils.Error("BasicService.Play:CheckStake",
-			goutils.JSON("stake", stake),
-			zap.Error(err))
+			slog.Any("stake", stake),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -111,8 +111,8 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 		pr, err := sv.Game.Play(plugin, cmd, params.Params, ips, stake, results, gameData)
 		if err != nil {
 			goutils.Error("BasicService.Play:Play",
-				zap.Int("results", len(results)),
-				zap.Error(err))
+				slog.Int("results", len(results)),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -147,7 +147,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 	ps, err := BuildPlayerState(ips)
 	if err != nil {
 		goutils.Error("BasicService.Play:BuildPlayerState",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

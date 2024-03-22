@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -9,7 +10,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -45,8 +45,8 @@ func (basicReels *BasicReels) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("BasicReels.Init:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -56,8 +56,8 @@ func (basicReels *BasicReels) Init(fn string, pool *GamePropertyPool) error {
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("BasicReels.Init:Unmarshal",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return err
 	}
@@ -74,8 +74,8 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	// 	vw2, err := pool.LoadStrWeights(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping)
 	// 	if err != nil {
 	// 		goutils.Error("BasicReels.Init:LoadValWeights",
-	// 			zap.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
-	// 			zap.Error(err))
+	// 			slog.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
+	// 			goutils.Err(err))
 
 	// 		return err
 	// 	}
@@ -114,7 +114,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	// 	val, _, err := basicReels.ReelSetWeights.RandValEx(plugin)
 	// 	if err != nil {
 	// 		goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
-	// 			zap.Error(err))
+	// 			goutils.Err(err))
 
 	// 		return "", err
 	// 	}
@@ -127,7 +127,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	// 	rd, isok := gameProp.Pool.Config.MapReels[curreels]
 	// 	if !isok {
 	// 		goutils.Error("BasicReels.OnPlayGame:MapReels",
-	// 			zap.Error(ErrInvalidReels))
+	// 			goutils.Err(ErrInvalidReels))
 
 	// 		return "", ErrInvalidReels
 	// 	}
@@ -139,7 +139,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	rd, isok := gameProp.Pool.Config.MapReels[reelname]
 	if !isok {
 		goutils.Error("BasicReels.OnPlayGame:MapReels",
-			zap.Error(ErrInvalidReels))
+			goutils.Err(ErrInvalidReels))
 
 		return "", ErrInvalidReels
 	}
@@ -155,7 +155,7 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	// if err != nil {
 	// 	goutils.Error("BasicReels.OnPlayGame:NewGameScene",
-	// 		zap.Error(err))
+	// 		goutils.Err(err))
 
 	// 	return err
 	// }
@@ -223,7 +223,7 @@ func parseBasicReels(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseBasicReels2:getConfigInCell",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -231,7 +231,7 @@ func parseBasicReels(gamecfg *Config, cell *ast.Node) (string, error) {
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseBasicReels2:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}
@@ -241,7 +241,7 @@ func parseBasicReels(gamecfg *Config, cell *ast.Node) (string, error) {
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseBasicReels2:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return "", err
 	}

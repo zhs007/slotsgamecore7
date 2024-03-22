@@ -2,17 +2,17 @@ package mathtoolset
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 func GenMath(fn string) error {
 	cfg, err := LoadConfig(fn)
 	if err != nil {
 		goutils.Error("GenMath:LoadConfig",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -20,7 +20,7 @@ func GenMath(fn string) error {
 	paytables, err := sgc7game.LoadPaytablesFromExcel(cfg.Paytables)
 	if err != nil {
 		goutils.Error("GenMath:LoadPaytablesFromExcel",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -31,7 +31,7 @@ func GenMath(fn string) error {
 		script, err := NewScriptCore(mgrGenMath)
 		if err != nil {
 			goutils.Error("GenMath:NewScriptCore",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -39,7 +39,7 @@ func GenMath(fn string) error {
 		err = script.Compile(cfg.Code)
 		if err != nil {
 			goutils.Error("GenMath:Compile",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -47,15 +47,15 @@ func GenMath(fn string) error {
 		out, err := script.Eval(mgrGenMath)
 		if err != nil {
 			goutils.Error("GenMath:Eval",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
 
 		if out.Value().(float64) < cfg.TargetRTP {
 			goutils.Error("GenMath:Eval",
-				zap.Float64("cur-rtp", out.Value().(float64)),
-				zap.Error(ErrInvalidTargetRTP))
+				slog.Float64("cur-rtp", out.Value().(float64)),
+				goutils.Err(ErrInvalidTargetRTP))
 
 			return err
 		}
@@ -67,7 +67,7 @@ func GenMath(fn string) error {
 		script, err := NewScriptCore(mgrGenMath)
 		if err != nil {
 			goutils.Error("GenMath:NewScriptCore",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -75,7 +75,7 @@ func GenMath(fn string) error {
 		err = script.Compile(cfg.Code)
 		if err != nil {
 			goutils.Error("GenMath:Compile",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -83,7 +83,7 @@ func GenMath(fn string) error {
 		out, err := script.Eval(mgrGenMath)
 		if err != nil {
 			goutils.Error("GenMath:Eval",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -105,7 +105,7 @@ func GenMath(fn string) error {
 		rss, err := LoadReelsStats(cfg.GenReelsConfig.ReelsStatsFilename)
 		if err != nil {
 			goutils.Error("GenMath:LoadReelsStats",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -115,7 +115,7 @@ func GenMath(fn string) error {
 		reels, err := GenReelsMainSymbolsDistance(rss, mainSymbols, cfg.GenReelsConfig.Offset, 100)
 		if err != nil {
 			goutils.Error("GenMath:GenReelsMainSymbolsDistance",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}
@@ -123,7 +123,7 @@ func GenMath(fn string) error {
 		err = reels.SaveExcel(cfg.GenReelsConfig.ReelsFilename)
 		if err != nil {
 			goutils.Error("GenMath:SaveExcel",
-				zap.Error(err))
+				goutils.Err(err))
 
 			return err
 		}

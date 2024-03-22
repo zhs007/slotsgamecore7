@@ -1,11 +1,12 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 )
 
 func isIntValWeights(lst []*weightData) bool {
@@ -23,7 +24,7 @@ func parseValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseValWeights:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -33,7 +34,7 @@ func parseValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseValWeights:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func parseValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 			i64, err := goutils.String2Int64(v.Val)
 			if err != nil {
 				goutils.Error("parseValWeights:String2Int64",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return nil, err
 			}
@@ -73,7 +74,7 @@ func parseReelSetWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseReelSetWeights:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func parseReelSetWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseReelSetWeights:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.V
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseSymbolWeights:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -113,7 +114,7 @@ func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.V
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseSymbolWeights:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -125,9 +126,9 @@ func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.V
 		sc, isok := paytables.MapSymbols[v.Val]
 		if !isok {
 			goutils.Error("parseSymbolWeights:MapSymbols",
-				zap.Int("i", i),
-				zap.String("symbol", v.Val),
-				zap.Error(ErrIvalidSymbol))
+				slog.Int("i", i),
+				slog.String("symbol", v.Val),
+				goutils.Err(ErrIvalidSymbol))
 
 			return nil, ErrIvalidSymbol
 		}
@@ -143,7 +144,7 @@ func parseStrWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseStrWeights:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -153,7 +154,7 @@ func parseStrWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseStrWeights:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -173,7 +174,7 @@ func parseIntValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseIntValWeights:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func parseIntValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseIntValWeights:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -195,8 +196,8 @@ func parseIntValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 		iv, err := goutils.String2Int64(v.Val)
 		if err != nil {
 			goutils.Error("parseIntValWeights:String2Int64",
-				zap.String("val", v.Val),
-				zap.Error(err))
+				slog.String("val", v.Val),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -212,7 +213,7 @@ func parseIntValMappingFile(n *ast.Node) (*sgc7game.ValMapping2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseIntValMappingFile:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -222,7 +223,7 @@ func parseIntValMappingFile(n *ast.Node) (*sgc7game.ValMapping2, error) {
 	err = sonic.Unmarshal(buf, &lst)
 	if err != nil {
 		goutils.Error("parseIntValMappingFile:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -234,8 +235,8 @@ func parseIntValMappingFile(n *ast.Node) (*sgc7game.ValMapping2, error) {
 		inv, err := goutils.String2Int64(v.In)
 		if err != nil {
 			goutils.Error("parseIntValMappingFile:String2Int64",
-				zap.String("in", v.In),
-				zap.Error(err))
+				slog.String("in", v.In),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -243,8 +244,8 @@ func parseIntValMappingFile(n *ast.Node) (*sgc7game.ValMapping2, error) {
 		outv, err := goutils.String2Int64(v.Out)
 		if err != nil {
 			goutils.Error("parseIntValMappingFile:String2Int64",
-				zap.String("out", v.Out),
-				zap.Error(err))
+				slog.String("out", v.Out),
+				goutils.Err(err))
 
 			return nil, err
 		}

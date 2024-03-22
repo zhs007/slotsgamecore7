@@ -2,12 +2,12 @@ package sgc7rtp
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"sort"
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	"go.uber.org/zap"
 	"gonum.org/v1/gonum/stat"
 )
 
@@ -111,10 +111,10 @@ func (rdlst *RTPReturnDataList) SaveReturns2CSV(fn string) error {
 	if len(rdlst.Returns) != len(rdlst.ReturnWeights) ||
 		len(rdlst.Returns) != len(rdlst.TotalReturns) {
 		goutils.Error("RTPReturnDataList:SaveReturns2CSV",
-			zap.Int("Returns len", len(rdlst.Returns)),
-			zap.Int("ReturnWeights len", len(rdlst.ReturnWeights)),
-			zap.Int("TotalReturns len", len(rdlst.TotalReturns)),
-			zap.Error(ErrInvalidReturnLen))
+			slog.Int("Returns len", len(rdlst.Returns)),
+			slog.Int("ReturnWeights len", len(rdlst.ReturnWeights)),
+			slog.Int("TotalReturns len", len(rdlst.TotalReturns)),
+			goutils.Err(ErrInvalidReturnLen))
 
 		return ErrInvalidReturnLen
 	}
@@ -134,7 +134,7 @@ func (rdlst *RTPReturnDataList) SaveReturns2CSV(fn string) error {
 	f, err := os.Create(fn)
 	if err != nil {
 		goutils.Error("sgc7rtp.RTPReturnDataList.SaveReturns2CSV",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}

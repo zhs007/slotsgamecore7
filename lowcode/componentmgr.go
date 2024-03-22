@@ -1,8 +1,9 @@
 package lowcode
 
 import (
+	"log/slog"
+
 	"github.com/zhs007/goutils"
-	"go.uber.org/zap"
 )
 
 type ComponentMgr struct {
@@ -20,8 +21,8 @@ func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent 
 	}
 
 	goutils.Error("ComponentMgr.NewComponent",
-		zap.String("component", cfgComponent.Type),
-		zap.Error(ErrInvalidComponent))
+		slog.String("component", cfgComponent.Type),
+		goutils.Err(ErrInvalidComponent))
 
 	return nil
 }

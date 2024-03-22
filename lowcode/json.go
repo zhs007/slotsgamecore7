@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 
@@ -9,15 +10,14 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"go.uber.org/zap"
 )
 
 func loadBasicInfo(cfg *Config, buf []byte) error {
 	gameName, err := sonic.Get(buf, "gameName")
 	if err != nil {
 		goutils.Error("loadBasicInfo:Get",
-			zap.String("key", "gameName"),
-			zap.Error(err))
+			slog.String("key", "gameName"),
+			goutils.Err(err))
 
 		return err
 	}
@@ -27,8 +27,8 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 	lstParam, err := sonic.Get(buf, "parameter")
 	if err != nil {
 		goutils.Error("loadBasicInfo:Get",
-			zap.String("key", "parameter"),
-			zap.Error(err))
+			slog.String("key", "parameter"),
+			goutils.Err(err))
 
 		return err
 	}
@@ -36,7 +36,7 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 	lst, err := lstParam.ArrayUseNode()
 	if err != nil {
 		goutils.Error("loadBasicInfo:ArrayUseNode",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -45,8 +45,8 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 		str, err := v.Get("name").String()
 		if err != nil {
 			goutils.Error("loadBasicInfo:name",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -55,8 +55,8 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			w, err := v.Get("value").Int64()
 			if err != nil {
 				goutils.Error("loadBasicInfo:Width",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return ErrIvalidWidth
 			}
@@ -66,8 +66,8 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			h, err := v.Get("value").Int64()
 			if err != nil {
 				goutils.Error("loadBasicInfo:Height",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return ErrIvalidHeight
 			}
@@ -77,8 +77,8 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			scene, err := v.Get("value").String()
 			if err != nil {
 				goutils.Error("loadBasicInfo:Scene",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return ErrIvalidDefaultScene
 			}
@@ -94,7 +94,7 @@ func parse2IntSlice(n *ast.Node) ([]int, error) {
 	arr, err := n.ArrayUseNode()
 	if err != nil {
 		goutils.Error("parse2IntSlice:Array",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -105,8 +105,8 @@ func parse2IntSlice(n *ast.Node) ([]int, error) {
 		iv, err := v.Int64()
 		if err != nil {
 			goutils.Error("parse2IntSlice:Int64",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func parse2StringSlice(n *ast.Node) ([]string, error) {
 	arr, err := n.ArrayUseNode()
 	if err != nil {
 		goutils.Error("parse2StringSlice:Array",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -132,8 +132,8 @@ func parse2StringSlice(n *ast.Node) ([]string, error) {
 		strv, err := v.String()
 		if err != nil {
 			goutils.Error("parse2StringSlice:String",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return nil, err
 		}
@@ -147,7 +147,7 @@ func parse2StringSlice(n *ast.Node) ([]string, error) {
 func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 	if n == nil {
 		goutils.Error("parsePaytables",
-			zap.Error(ErrIvalidPayTables))
+			goutils.Err(ErrIvalidPayTables))
 
 		return nil, ErrIvalidPayTables
 	}
@@ -155,7 +155,7 @@ func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parsePaytables:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 	err = sonic.Unmarshal(buf, &dataPaytables)
 	if err != nil {
 		goutils.Error("parsePaytables:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 	lst, err := lstPaytables.ArrayUseNode()
 	if err != nil {
 		goutils.Error("loadPaytables:ArrayUseNode",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -196,8 +196,8 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 		name, err := v.Get("fileName").String()
 		if err != nil {
 			goutils.Error("loadPaytables:fileName",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -205,8 +205,8 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 		paytables, err := parsePaytables(v.Get("fileJson"))
 		if err != nil {
 			goutils.Error("loadPaytables:parsePaytables",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -225,7 +225,7 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
 	if n == nil {
 		goutils.Error("parseLineData",
-			zap.Error(ErrIvalidReels))
+			goutils.Err(ErrIvalidReels))
 
 		return nil, ErrIvalidReels
 	}
@@ -233,7 +233,7 @@ func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseLineData:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
 	err = sonic.Unmarshal(buf, &dataLines)
 	if err != nil {
 		goutils.Error("parseLineData:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
 func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
 	if n == nil {
 		goutils.Error("parseReels",
-			zap.Error(ErrIvalidReels))
+			goutils.Err(ErrIvalidReels))
 
 		return nil, ErrIvalidReels
 	}
@@ -264,7 +264,7 @@ func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData
 	buf, err := n.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseReels:MarshalJSON",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData
 	err = sonic.Unmarshal(buf, &dataReels)
 	if err != nil {
 		goutils.Error("parseReels:Unmarshal",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -288,9 +288,9 @@ func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData
 			sc, isok := paytables.MapSymbols[strSym]
 			if !isok {
 				goutils.Error("parseReels:MapSymbols",
-					zap.Int("x", x),
-					zap.Int("y", y),
-					zap.Error(ErrIvalidSymbolInReels))
+					slog.Int("x", x),
+					slog.Int("y", y),
+					goutils.Err(ErrIvalidSymbolInReels))
 
 				return nil, ErrIvalidSymbolInReels
 			}
@@ -308,7 +308,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 	lst, err := lstOther.ArrayUseNode()
 	if err != nil {
 		goutils.Error("loadOtherList:ArrayUseNode",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -317,8 +317,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 		name, err := v.Get("fileName").String()
 		if err != nil {
 			goutils.Error("loadOtherList:fileName",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -326,8 +326,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 		t, err := v.Get("type").String()
 		if err != nil {
 			goutils.Error("loadOtherList:type",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -336,8 +336,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
 			if err != nil {
 				goutils.Error("loadOtherList:parseLineData",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -352,8 +352,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
 			if err != nil {
 				goutils.Error("loadOtherList:parseReels",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -364,8 +364,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			vw2, err := parseValWeights(v.Get("fileJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseValWeights",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -375,8 +375,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			vw2, err := parseReelSetWeights(v.Get("fileJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseReelSetWeights",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -386,8 +386,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			vw2, err := parseSymbolWeights(v.Get("fileJson"), cfg.GetDefaultPaytables())
 			if err != nil {
 				goutils.Error("loadOtherList:parseSymbolWeights",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -397,8 +397,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			vm2, err := parseIntValMappingFile(v.Get("fileJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseSymbolWeights",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -408,8 +408,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			vm2, err := parseStrWeights(v.Get("fileJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseStrWeights",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -419,8 +419,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			vm2, err := parseIntValWeights(v.Get("fileJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseIntValWeights",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -428,9 +428,9 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			cfg.mapValWeights[name] = vm2
 		} else {
 			goutils.Error("loadOtherList",
-				zap.Int("i", i),
-				zap.String("type", t),
-				zap.Error(ErrUnsupportedOtherList))
+				slog.Int("i", i),
+				slog.String("type", t),
+				goutils.Err(ErrUnsupportedOtherList))
 
 			return ErrUnsupportedOtherList
 		}
@@ -466,7 +466,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	lst, err := cells.ArrayUseNode()
 	if err != nil {
 		goutils.Error("loadCells:ArrayUseNode",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -475,8 +475,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 		shape, err := cell.Get("shape").String()
 		if err != nil {
 			goutils.Error("loadCells:Get:shape",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -484,8 +484,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 		id, err := cell.Get("id").String()
 		if err != nil {
 			goutils.Error("loadCells:Get:id",
-				zap.Int("i", i),
-				zap.Error(err))
+				slog.Int("i", i),
+				goutils.Err(err))
 
 			return err
 		}
@@ -497,8 +497,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			componentType, err := cell.Get("label").String()
 			if err != nil {
 				goutils.Error("loadCells:Get:label",
-					zap.Int("i", i),
-					zap.Error(err))
+					slog.Int("i", i),
+					goutils.Err(err))
 
 				return err
 			}
@@ -509,8 +509,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseWeightReels(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseWeightReels",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -520,8 +520,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseBasicReels(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseBasicReels",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -531,8 +531,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseScatterTrigger(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseScatterTrigger",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -542,8 +542,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseLinesTrigger(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseLinesTrigger",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -553,8 +553,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseWaysTrigger(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseWaysTrigger",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -564,8 +564,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseMoveSymbol(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseMoveSymbol",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -575,8 +575,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseRespin(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseRespin",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -586,8 +586,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseSymbolCollection2(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseSymbolCollection2",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -597,8 +597,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseRemoveSymbols(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseRemoveSymbols",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -608,8 +608,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseDropDownSymbols(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseDropDownSymbols",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -619,8 +619,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseRefillSymbols(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseRefillSymbols",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -630,8 +630,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseCollector(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseCollector",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -641,8 +641,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseQueueBranch(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseQueueBranch",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -652,8 +652,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseReplaceSymbolGroup(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseReplaceSymbolGroup",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -663,8 +663,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseRollSymbol(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseRollSymbol",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -674,8 +674,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseMask(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseMask",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -685,8 +685,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseReplaceReelWithMask(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseReplaceReelWithMask",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -696,8 +696,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parsePiggyBank(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parsePiggyBank",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -707,8 +707,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseAddSymbols(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseAddSymbols",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -718,8 +718,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseIntValMapping(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseIntValMapping",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -729,8 +729,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseWeightBranch(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseWeightBranch",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -740,8 +740,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseClusterTrigger(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseClusterTrigger",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -751,8 +751,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseGenGigaSymbol(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseGenGigaSymbol",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -762,8 +762,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseWinResultCache(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseWinResultCache",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -773,8 +773,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseGenSymbolValsWithPos(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseGenSymbolValsWithPos",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -784,8 +784,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseCheckSymbolVals(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseCheckSymbolVals",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -795,8 +795,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parsePositionCollection(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parsePositionCollection",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -806,8 +806,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseChgSymbolVals(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseChgSymbolVals",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -817,8 +817,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseChgSymbols(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseChgSymbols",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -828,8 +828,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseGenSymbolValsWithSymbol(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseGenSymbolValsWithSymbol",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -839,8 +839,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				componentName, err := parseSymbolValWins(cfg, &cell)
 				if err != nil {
 					goutils.Error("loadCells:parseSymbolValWins",
-						zap.Int("i", i),
-						zap.Error(err))
+						slog.Int("i", i),
+						goutils.Err(err))
 
 					return err
 				}
@@ -848,8 +848,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 				mapComponentName[id] = componentName
 			} else {
 				goutils.Error("loadCells:ErrUnsupportedComponentType",
-					zap.String("componentType", componentType),
-					zap.Error(ErrUnsupportedComponentType))
+					slog.String("componentType", componentType),
+					goutils.Err(ErrUnsupportedComponentType))
 
 				return ErrUnsupportedComponentType
 			}
@@ -857,7 +857,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			source, err := cell.Get("source").Get("cell").String()
 			if err != nil {
 				goutils.Error("loadCells:edge:source:cell",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return err
 			}
@@ -865,7 +865,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			sourcePort, err := cell.Get("source").Get("port").String()
 			if err != nil {
 				goutils.Error("loadCells:edge:source:port",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return err
 			}
@@ -873,7 +873,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 			target, err := cell.Get("target").Get("cell").String()
 			if err != nil {
 				goutils.Error("loadCells:edge:target",
-					zap.Error(err))
+					goutils.Err(err))
 
 				return err
 			}
@@ -894,8 +894,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 					ldid.add(arr[1], source, target)
 				} else {
 					goutils.Error("loadCells:sourcePort",
-						zap.String("sourcePort", sourcePort),
-						zap.Error(ErrUnsupportedLinkType))
+						slog.String("sourcePort", sourcePort),
+						goutils.Err(ErrUnsupportedLinkType))
 
 					return ErrUnsupportedLinkType
 				}
@@ -971,8 +971,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	// 		cfg, isok := mapTrigger[k]
 	// 		if !isok {
 	// 			goutils.Error("loadCells:BeforMain",
-	// 				zap.String("label", k),
-	// 				zap.Error(ErrIvalidTriggerLabel))
+	// 				slog.String("label", k),
+	// 				goutils.Err(ErrIvalidTriggerLabel))
 
 	// 			return ErrIvalidTriggerLabel
 	// 		}
@@ -984,8 +984,8 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	// 		cfg, isok := mapTrigger[k]
 	// 		if !isok {
 	// 			goutils.Error("loadCells:AfterMain",
-	// 				zap.String("label", k),
-	// 				zap.Error(ErrIvalidTriggerLabel))
+	// 				slog.String("label", k),
+	// 				goutils.Err(ErrIvalidTriggerLabel))
 
 	// 			return ErrIvalidTriggerLabel
 	// 		}
@@ -1001,7 +1001,7 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	bet, err := betMethod.Get("bet").Int64()
 	if err != nil {
 		goutils.Error("loadBetMethod:Get:bet",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -1012,7 +1012,7 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	err = loadCells(cfg, int(bet), betMethod.Get("graph").Get("cells"))
 	if err != nil {
 		goutils.Error("loadBetMethod:loadCells",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
@@ -1024,8 +1024,8 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("NewGame2:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1037,8 +1037,8 @@ func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) 
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("NewGame2:ReadFile",
-			zap.String("fn", fn),
-			zap.Error(err))
+			slog.String("fn", fn),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1088,7 +1088,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	err := loadBasicInfo(cfg, data)
 	if err != nil {
 		goutils.Error("NewGame2WithData:loadBasicInfo",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1096,8 +1096,8 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	lstPaytables, err := sonic.Get(data, "repository", "paytableList")
 	if err != nil {
 		goutils.Error("NewGame2WithData:Get",
-			zap.String("key", "repository.paytableList"),
-			zap.Error(err))
+			slog.String("key", "repository.paytableList"),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1105,7 +1105,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	err = loadPaytables(cfg, &lstPaytables)
 	if err != nil {
 		goutils.Error("NewGame2WithData:loadPaytables",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1113,8 +1113,8 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	lstOther, err := sonic.Get(data, "repository", "otherList")
 	if err != nil {
 		goutils.Error("NewGame2WithData:Get",
-			zap.String("key", "repository.otherList"),
-			zap.Error(err))
+			slog.String("key", "repository.otherList"),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1122,7 +1122,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	err = loadOtherList(cfg, &lstOther)
 	if err != nil {
 		goutils.Error("NewGame2WithData:loadOtherList",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1134,8 +1134,8 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	betMethod, err := sonic.Get(data, "betMethod", 0)
 	if err != nil {
 		goutils.Error("NewGame2WithData:Get",
-			zap.String("key", "betMethod[0]"),
-			zap.Error(err))
+			slog.String("key", "betMethod[0]"),
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1143,7 +1143,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	err = loadBetMethod(cfg, &betMethod)
 	if err != nil {
 		goutils.Error("NewGame2WithData:loadBetMethod",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}
@@ -1153,7 +1153,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	err = game.Init2(cfg)
 	if err != nil {
 		goutils.Error("NewGame2WithData:Init2",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return nil, err
 	}

@@ -11,7 +11,6 @@ import (
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
-	"go.uber.org/zap"
 )
 
 func Hash(data []byte) string {
@@ -55,7 +54,7 @@ func addWinResult(sv grpcserv.IService, pr *sgc7pb.ReplyPlay, playResult *sgc7ga
 	gp, err := sv.BuildPBGameModParam(playResult.CurGameModParams)
 	if err != nil {
 		goutils.Error("addWinResult:BuildPBGameModParam",
-			zap.Error(err))
+			goutils.Err(err))
 
 		return err
 	}
