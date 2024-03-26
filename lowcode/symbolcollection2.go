@@ -12,6 +12,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -20,7 +21,9 @@ const SymbolCollection2TypeName = "symbolCollection2"
 
 type SymbolCollection2Data struct {
 	BasicComponentData
-	SymbolCodes []int
+	SymbolCodes  []int
+	TotalCoinWin int64
+	TotalCashWin int64
 }
 
 // OnNewGame -
@@ -35,8 +38,9 @@ func (symbolCollection2Data *SymbolCollection2Data) OnNewGame(gameProp *GameProp
 }
 
 // // OnNewStep -
-// func (symbolCollection2Data *SymbolCollection2Data) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	symbolCollection2Data.BasicComponentData.OnNewStep(gameProp, component)
+// func (symbolCollection2Data *SymbolCollection2Data) onNewStep() {
+// 	// symbolCollection2Data.BasicComponentData.OnNewStep(gameProp, component)
+// 	// symbolCollection2Data
 // }
 
 // BuildPBComponentData
@@ -213,6 +217,14 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		}
 
 		if !isComponentDoNothing {
+			// if gAllowStats2 {
+			// 	if !gameProp.stats2Cache.HasFeature(curComponent.GetName()) {
+			// 		gameProp.stats2Cache.AddFeature(curComponent.GetName(), curComponent.NewStats2(gameProp.Components.statsNodeData.GetParent(curComponent.GetName())))
+			// 	}
+
+			// 	curComponent.OnStats2(ccd, gameProp.stats2Cache)
+			// }
+
 			gameProp.OnCallEnd(curComponent, ccd, gp)
 		}
 
@@ -232,6 +244,9 @@ func (symbolCollection2 *SymbolCollection2) EachSymbols(gameProp *GameProperty, 
 
 	if len(symbolCollection2.Config.Children) > 0 {
 		scd := cd.(*SymbolCollection2Data)
+
+		scd.CashWin = 0
+		scd.CoinWin = 0
 
 		for i, curs := range scd.SymbolCodes {
 			err := gameProp.callStack.StartEachSymbols(gameProp, symbolCollection2, symbolCollection2.Config.Children, curs, i)
@@ -319,6 +334,18 @@ func (symbolCollection2 *SymbolCollection2) GetAllLinkComponents() []string {
 // GetChildLinkComponents - get next link components
 func (symbolCollection2 *SymbolCollection2) GetChildLinkComponents() []string {
 	return []string{symbolCollection2.Config.ForeachComponent}
+}
+
+// NewStats2 -
+func (symbolCollection2 *SymbolCollection2) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptRootTrigger})
+}
+
+// OnStats2
+func (symbolCollection2 *SymbolCollection2) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+	cd := icd.(*SymbolCollection2Data)
+
+	s2.ProcStatsForeachTrigger(symbolCollection2.Name, len(cd.SymbolCodes), 0)
 }
 
 func NewSymbolCollection2(name string) IComponent {

@@ -136,6 +136,8 @@ message MaskData {
 message SymbolCollectionData {
     ComponentData basicComponentData = 1;
     repeated int32 symbolCodes = 2;
+	int64 totalCoinWin = 3;
+	int64 totalCashWin = 4;
 }
 
 // SymbolTriggerData

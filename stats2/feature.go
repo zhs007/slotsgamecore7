@@ -65,8 +65,10 @@ func (f2 *Feature) procCacheStatsRootTrigger(wins int64, isEnding bool) {
 	}
 }
 
-func (f2 *Feature) procCacheStatsRootTriggerWins(win int64) {
+func (f2 *Feature) procCacheStatsForeachTrigger(runtimes int, win int64) {
 	if f2.RootTrigger != nil {
+		f2.RootTrigger.TriggerTimes++
+		f2.RootTrigger.RunTimes += int64(runtimes)
 		f2.RootTrigger.TotalWins += win
 	}
 }

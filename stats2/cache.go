@@ -52,6 +52,13 @@ func (s2 *Cache) ProcStatsRootTrigger(name string, wins int64, isEnding bool) {
 	}
 }
 
+func (s2 *Cache) ProcStatsForeachTrigger(name string, runtimes int, wins int64) {
+	f2, isok := s2.MapStats[name]
+	if isok {
+		f2.procCacheStatsForeachTrigger(runtimes, wins)
+	}
+}
+
 func NewCache(bet int) *Cache {
 	s2 := &Cache{
 		MapStats: make(map[string]*Feature),
