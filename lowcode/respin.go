@@ -12,7 +12,6 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
 	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -318,66 +317,66 @@ func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 	return nil
 }
 
-// OnStats
-func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	if feature != nil && len(lst) > 0 {
+// // OnStats
+// func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
+// 	if feature != nil && len(lst) > 0 {
 
-		if feature.RespinNumStatus != nil ||
-			feature.RespinWinStatus != nil {
-			pbcd, lastpr := findLastPBComponentData(lst, respin.Name)
-			if pbcd != nil {
-				respin.onStatsWithPBEnding(feature, pbcd, lastpr)
-			}
-		}
+// 		if feature.RespinNumStatus != nil ||
+// 			feature.RespinWinStatus != nil {
+// 			pbcd, lastpr := findLastPBComponentData(lst, respin.Name)
+// 			if pbcd != nil {
+// 				respin.onStatsWithPBEnding(feature, pbcd, lastpr)
+// 			}
+// 		}
 
-		if feature.RespinStartNumStatus != nil {
-			pbcd, firstpr := findFirstPBComponentData(lst, respin.Name)
-			if pbcd != nil {
-				respin.onStatsWithPBStart(feature, pbcd, firstpr)
-			}
-		}
-	}
+// 		if feature.RespinStartNumStatus != nil {
+// 			pbcd, firstpr := findFirstPBComponentData(lst, respin.Name)
+// 			if pbcd != nil {
+// 				respin.onStatsWithPBStart(feature, pbcd, firstpr)
+// 			}
+// 		}
+// 	}
 
-	return false, 0, 0
-}
+// 	return false, 0, 0
+// }
 
-// onStatsWithPBEnding -
-func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
-	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
-	if !isok {
-		goutils.Error("Respin.onStatsWithPBEnding",
-			goutils.Err(ErrIvalidProto))
+// // onStatsWithPBEnding -
+// func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
+// 	if !isok {
+// 		goutils.Error("Respin.onStatsWithPBEnding",
+// 			goutils.Err(ErrIvalidProto))
 
-		return ErrIvalidProto
-	}
+// 		return ErrIvalidProto
+// 	}
 
-	if feature.RespinNumStatus != nil {
-		feature.RespinNumStatus.AddStatus(int(pbcd.CurRespinNum))
-	}
+// 	if feature.RespinNumStatus != nil {
+// 		feature.RespinNumStatus.AddStatus(int(pbcd.CurRespinNum))
+// 	}
 
-	if feature.RespinWinStatus != nil {
-		feature.RespinWinStatus.AddStatus(int(pbcd.TotalCoinWin))
-	}
+// 	if feature.RespinWinStatus != nil {
+// 		feature.RespinWinStatus.AddStatus(int(pbcd.TotalCoinWin))
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-// onStatsWithPBEnding -
-func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
-	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
-	if !isok {
-		goutils.Error("Respin.onStatsWithPBStart",
-			goutils.Err(ErrIvalidProto))
+// // onStatsWithPBEnding -
+// func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
+// 	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
+// 	if !isok {
+// 		goutils.Error("Respin.onStatsWithPBStart",
+// 			goutils.Err(ErrIvalidProto))
 
-		return ErrIvalidProto
-	}
+// 		return ErrIvalidProto
+// 	}
 
-	if feature.RespinStartNumStatus != nil {
-		feature.RespinStartNumStatus.AddStatus(int(pbcd.LastRespinNum))
-	}
+// 	if feature.RespinStartNumStatus != nil {
+// 		feature.RespinStartNumStatus.AddStatus(int(pbcd.LastRespinNum))
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // NewComponentData -
 func (respin *Respin) NewComponentData() IComponentData {

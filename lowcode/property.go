@@ -286,7 +286,7 @@ func (gameProp *GameProperty) procRespinBeforeStepEnding(pr *sgc7game.PlayResult
 }
 
 func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData, gp *GameParams) {
-	if gAllowStats2 {
+	if !component.IsRespin() && gAllowStats2 {
 		if !gameProp.stats2Cache.HasFeature(component.GetName()) {
 			gameProp.stats2Cache.AddFeature(component.GetName(), component.NewStats2(gameProp.Components.statsNodeData.GetParent(component.GetName())))
 		}
@@ -979,30 +979,37 @@ func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult,
 	// 	return
 	// }
 
-	// if gAllowStats2 {
-	// 	for _, v := range gp.HistoryComponents {
-	// 		ic, isok := gameProp.Components.MapComponents[v]
-	// 		if isok {
-	// 			if !gameProp.stats2Cache.HasFeature(v) {
-	// 				gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
-	// 			}
+	if gAllowStats2 {
+		for _, v := range gp.HistoryComponents {
+			ic, isok := gameProp.Components.MapComponents[v]
+			if isok && ic.IsRespin() {
+				if !gameProp.stats2Cache.HasFeature(v) {
+					gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
+				}
 
-	// 			ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
-	// 		} else {
-	// 			arr := strings.Split(v, "/")
-	// 			if len(arr) == 2 {
-	// 				ic1, isok1 := gameProp.Components.MapComponents[arr[1]]
-	// 				if isok1 {
-	// 					if !gameProp.stats2Cache.HasFeature(arr[1]) {
-	// 						gameProp.stats2Cache.AddFeature(arr[1], ic1.NewStats2(gameProp.Components.statsNodeData.GetParent(arr[1])))
-	// 					}
+				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
+			}
 
-	// 					ic.OnStats2(gameProp.GetComponentData(ic1), gameProp.stats2Cache)
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+			// 			if !gameProp.stats2Cache.HasFeature(v) {
+			// 				gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
+			// 			}
+
+			// 			ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
+			// 		} else {
+			// 			arr := strings.Split(v, "/")
+			// 			if len(arr) == 2 {
+			// 				ic1, isok1 := gameProp.Components.MapComponents[arr[1]]
+			// 				if isok1 {
+			// 					if !gameProp.stats2Cache.HasFeature(arr[1]) {
+			// 						gameProp.stats2Cache.AddFeature(arr[1], ic1.NewStats2(gameProp.Components.statsNodeData.GetParent(arr[1])))
+			// 					}
+
+			// 					ic.OnStats2(gameProp.GetComponentData(ic1), gameProp.stats2Cache)
+			// 				}
+			// 			}
+			// 		}
+		}
+	}
 
 	if pr.IsFinish {
 		gameProp.PoolScene.Reset()
