@@ -292,6 +292,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 
 	isTrigger := false
 	lst := []*sgc7game.Result{}
+	lstSym := linesTrigger.getSymbols(gameProp)
 
 	if linesTrigger.Config.TriggerType == STTypeLines {
 		// os := linesTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, linesTrigger.Name, "")
@@ -330,7 +331,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
 						ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
-								return true
+								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 							}, func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -365,7 +366,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					if !isTriggerFull && linesTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
 						ret := sgc7game.CalcLineRL2(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
-								return true
+								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 							}, func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -427,7 +428,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
 						ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
-								return true
+								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 							}, func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -458,7 +459,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					if linesTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
 						ret := sgc7game.CalcLineRLEx(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
-								return true
+								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 							}, func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -525,7 +526,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 				if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
 					ret := sgc7game.CheckLine(gs, v, linesTrigger.Config.MinNum,
 						func(cursymbol int) bool {
-							return true
+							return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 							// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 						}, func(cursymbol int) bool {
 							return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -554,7 +555,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 				if linesTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
 					ret := sgc7game.CheckLineRL(gs, v, linesTrigger.Config.MinNum,
 						func(cursymbol int) bool {
-							return true
+							return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 							// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
 						}, func(cursymbol int) bool {
 							return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0

@@ -331,6 +331,26 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				lst = append(lst, ret)
 			}
 		}
+	} else if scatterTrigger.Config.TriggerType == STTypeReelScatters {
+		for _, s := range symbols {
+			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
+				func(scatter int, cursymbol int) bool {
+					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+				}, true)
+
+			if ret != nil {
+				// if scatterTrigger.Config.BetType == BTypeNoPay {
+				// 	ret.CoinWin = 0
+				// 	ret.CashWin = 0
+				// } else {
+				// 	// gameProp.ProcMulti(ret)
+				// }
+
+				isTrigger = true
+
+				lst = append(lst, ret)
+			}
+		}
 	} else if scatterTrigger.Config.TriggerType == STTypeCountScatter {
 		ret := sgc7game.CalcScatterEx(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
 			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
