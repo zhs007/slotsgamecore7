@@ -127,6 +127,14 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		if !isComponentDoNothing {
+			// if gAllowStats2 {
+			// 	if !gameProp.stats2Cache.HasFeature(curComponent.GetName()) {
+			// 		gameProp.stats2Cache.AddFeature(curComponent.GetName(), curComponent.NewStats2(gameProp.Components.statsNodeData.GetParent(curComponent.GetName())))
+			// 	}
+
+			// 	curComponent.OnStats2(cd, gameProp.stats2Cache)
+			// }
+
 			gameProp.OnCallEnd(curComponent, cd, gp)
 
 			err := curComponent.EachSymbols(gameProp, pr, gp, plugin, ps, stake, prs, cd)
@@ -232,6 +240,14 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.onStepEnd(gp, pr, prs)
 
 	if gAllowStats2 && pr.IsFinish {
+		totalwins := int64(pr.CoinWin)
+
+		for _, cpr := range prs {
+			totalwins += int64(cpr.CoinWin)
+		}
+
+		gameProp.stats2Cache.ProcStatsOnEnding(totalwins)
+
 		components.Stats2.PushCache(gameProp.stats2Cache)
 
 		// gameProp.stats2SpinData.OnBetEnding(components.Stats2)

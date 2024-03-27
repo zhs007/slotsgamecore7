@@ -99,19 +99,19 @@ type ClusterTriggerConfig struct {
 	Symbols              []string `yaml:"symbols" json:"symbols"` // like scatter
 	SymbolCodes          []int    `yaml:"-" json:"-"`             // like scatter
 	// ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
-	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
-	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
-	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
-	BetType                         BetType                       `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
-	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
-	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
-	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
-	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
-	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
-	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
-	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
-	NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
+	Type            string            `yaml:"type" json:"type"`                       // like scatters
+	TriggerType     SymbolTriggerType `yaml:"-" json:"-"`                             // SymbolTriggerType
+	BetTypeString   string            `yaml:"betType" json:"betType"`                 // bet or totalBet or noPay
+	BetType         BetType           `yaml:"-" json:"-"`                             // bet or totalBet or noPay
+	MinNum          int               `yaml:"minNum" json:"minNum"`                   // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols     []string          `yaml:"wildSymbols" json:"wildSymbols"`         // wild etc
+	WildSymbolCodes []int             `yaml:"-" json:"-"`                             // wild symbolCode
+	WinMulti        int               `yaml:"winMulti" json:"winMulti"`               // winMulti，最后的中奖倍数，默认为1
+	JumpToComponent string            `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
+	ForceToNext     bool              `yaml:"forceToNext" json:"forceToNext"`         // 如果触发，默认跳转jump to，这里可以强制走next分支
+	Awards          []*Award          `yaml:"awards" json:"awards"`                   // 新的奖励系统
+	IsReverse       bool              `yaml:"isReverse" json:"isReverse"`             // 如果isReverse，表示判定为否才触发
+	// NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
@@ -416,19 +416,23 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	if isTrigger {
 		clusterTrigger.procWins(std, lst)
 
-		if !clusterTrigger.Config.NeedDiscardResults {
-			for _, v := range lst {
-				clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+		// if !clusterTrigger.Config.NeedDiscardResults {
+		for _, v := range lst {
+			clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
 
-				std.SymbolNum += v.SymbolNums
-				std.WildNum += v.Wilds
-			}
-		} else {
-			for _, v := range lst {
-				std.SymbolNum += v.SymbolNums
-				std.WildNum += v.Wilds
-			}
+			std.SymbolNum += v.SymbolNums
+			std.WildNum += v.Wilds
 		}
+
+		// if std.CoinWin != std.Wins {
+		// 	goutils.Error("Err!")
+		// }
+		// } else {
+		// 	for _, v := range lst {
+		// 		std.SymbolNum += v.SymbolNums
+		// 		std.WildNum += v.Wilds
+		// 	}
+		// }
 
 		respinNum, err := clusterTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
@@ -653,7 +657,7 @@ func (clusterTrigger *ClusterTrigger) OnStats2(icd IComponentData, s2 *stats2.Ca
 
 	cd := icd.(*ClusterTriggerData)
 
-	s2.ProcStatsWins(clusterTrigger.Name, int64(cd.Wins), true)
+	s2.ProcStatsWins(clusterTrigger.Name, int64(cd.Wins))
 }
 
 // GetAllLinkComponents - get all link components

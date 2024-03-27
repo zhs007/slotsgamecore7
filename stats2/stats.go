@@ -2,6 +2,7 @@ package stats2
 
 import (
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -14,7 +15,10 @@ type Stats struct {
 	chanBet        chan int            `json:"-"`
 	chanCache      chan *Cache         `json:"-"`
 	TotalBet       int64               `json:"totalBet"`
+	TotalWins      int64               `json:"totalWins"`
 	BetTimes       int64               `json:"betTimes"`
+	MaxWins        int64               `json:"maxWins"`
+	MaxWinTimes    int64               `json:"maxWinTimes"`
 	BetEndingTimes int64               `json:"-"`
 	Components     []string            `json:"components"`
 }
@@ -34,23 +38,72 @@ func (s2 *Stats) onCache(cache *Cache) {
 			s.Merge(v)
 		}
 	}
+
+	if cache.TotalWin > s2.MaxWins {
+		s2.MaxWins = cache.TotalWin
+		s2.MaxWinTimes = 1
+	} else if cache.TotalWin == s2.MaxWins {
+		s2.MaxWinTimes++
+	}
+
+	s2.TotalWins += cache.TotalWin
 }
 
 func (s2 *Stats) SaveExcel(fn string) error {
-	f := excelize.NewFile()
+	buf, err := s2.ExportExcel()
+	if err != nil {
+		goutils.Error("Stats.SaveExcel:ExportExcel",
+			goutils.Err(err))
 
-	for _, cn := range s2.Components {
-		f2, isok := s2.MapStats[cn]
-		if isok {
-			f2.SaveSheet(f, cn, s2)
-		}
+		return err
 	}
 
-	return f.SaveAs(fn)
+	os.WriteFile(fn, buf, 0644)
+
+	return nil
+	// f := excelize.NewFile()
+
+	// for _, cn := range s2.Components {
+	// 	f2, isok := s2.MapStats[cn]
+	// 	if isok {
+	// 		f2.SaveSheet(f, cn, s2)
+	// 	}
+	// }
+
+	// return f.SaveAs(fn)
+}
+
+func (s2 *Stats) saveBasicSheet(f *excelize.File) {
+	sheet := "basic"
+	f.NewSheet(sheet)
+
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "spin times")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 1), "total bet")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 2), "total wins")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 3), "rtp")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 4), "max wins")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 5), "times of the max wins")
+
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 0), s2.BetEndingTimes)
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 1), s2.TotalBet)
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), s2.TotalWins)
+
+	if s2.TotalBet > 0 {
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, 3), float64(s2.TotalWins)/float64(s2.TotalBet))
+	} else {
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, 3), 0)
+	}
+
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 4), s2.MaxWins)
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 5), s2.MaxWinTimes)
 }
 
 func (s2 *Stats) ExportExcel() ([]byte, error) {
 	f := excelize.NewFile()
+
+	s2.saveBasicSheet(f)
+
+	f.DeleteSheet(f.GetSheetName(0))
 
 	for _, cn := range s2.Components {
 		f2, isok := s2.MapStats[cn]

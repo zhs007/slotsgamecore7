@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	devt.de/krotik/common v1.5.1
-	github.com/bytedance/sonic v1.10.0
+	github.com/bytedance/sonic v1.11.2
 	github.com/fatih/color v1.15.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/cel-go v0.13.0
