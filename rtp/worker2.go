@@ -161,6 +161,8 @@ func StartRTP2(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stak
 		return StartRTP(game, rtp, 1, spinnums, stake, numsTimer, ontimer, needVariance, limitPayout)
 	}
 
+	zerortp := rtp.Clone()
+
 	tasknum := 100
 
 	t1 := time.Now()
@@ -186,7 +188,7 @@ func StartRTP2(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stak
 	// }()
 
 	for i := 0; i < worknums; i++ {
-		startWorker(game, rtp, spinnums/int64(tasknum), stake, needVariance, limitPayout, ch)
+		startWorker(game, zerortp, spinnums/int64(tasknum), stake, needVariance, limitPayout, ch)
 	}
 
 	// lastspinnums := 0
@@ -207,7 +209,7 @@ func StartRTP2(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stak
 		ontimer(spinnums, curspinnum, time.Since(t1))
 
 		if lastnums >= worknums {
-			startWorker(game, rtp, spinnums/int64(tasknum), stake, needVariance, limitPayout, ch)
+			startWorker(game, zerortp, spinnums/int64(tasknum), stake, needVariance, limitPayout, ch)
 		}
 	}
 
