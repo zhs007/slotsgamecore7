@@ -20,21 +20,14 @@ func (s2 *Cache) AddFeature(name string, feature *Feature) {
 	s2.MapStats[name] = feature
 }
 
-func (s2 *Cache) ProcStatsWins(name string, win int64, isRealWin bool) {
+func (s2 *Cache) ProcStatsOnEnding(win int64) {
+	s2.TotalWin = win
+}
+
+func (s2 *Cache) ProcStatsWins(name string, win int64) {
 	f2, isok := s2.MapStats[name]
 	if isok {
 		f2.procCacheStatsWins(win)
-
-		// if isRealWin && f2.Parent != "" {
-		// 	p2, isok := s2.MapStats[f2.Parent]
-		// 	if isok {
-		// 		p2.procCacheStatsRootTriggerWins(win)
-		// 	}
-		// }
-	}
-
-	if isRealWin {
-		s2.TotalWin += win
 	}
 }
 

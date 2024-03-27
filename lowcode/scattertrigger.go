@@ -756,7 +756,7 @@ func (scatterTrigger *ScatterTrigger) OnStats2(icd IComponentData, s2 *stats2.Ca
 
 	cd := icd.(*ScatterTriggerData)
 
-	s2.ProcStatsWins(scatterTrigger.Name, int64(cd.Wins), true)
+	s2.ProcStatsWins(scatterTrigger.Name, int64(cd.Wins))
 }
 
 // func (scatterTrigger *ScatterTrigger) getSymbols() []int {

@@ -927,7 +927,7 @@ func (linesTrigger *LinesTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache)
 
 	cd := icd.(*LinesTriggerData)
 
-	s2.ProcStatsWins(linesTrigger.Name, int64(cd.Wins), true)
+	s2.ProcStatsWins(linesTrigger.Name, int64(cd.Wins))
 }
 
 // GetAllLinkComponents - get all link components

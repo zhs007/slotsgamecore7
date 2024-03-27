@@ -28,11 +28,11 @@ type RespinData struct {
 	CurAddRespinNum       int
 	RetriggerAddRespinNum int // 再次触发时增加的次数
 	TotalCoinWin          int64
-	TotalCashWin          int64
-	LastTriggerNum        int      // 剩余的触发次数，respin有2种模式，一种是直接增加免费次数，一种是累积整体触发次数
-	CurTriggerNum         int      // 当前已经触发次数
-	Awards                []*Award // 当前已经触发次数
-	TriggerRespinNum      []int    // 配合LastTriggerNum用的respin次数，-1表示用当前的RetriggerAddRespinNum，否则就是具体值
+	// TotalCashWin          int64
+	LastTriggerNum   int      // 剩余的触发次数，respin有2种模式，一种是直接增加免费次数，一种是累积整体触发次数
+	CurTriggerNum    int      // 当前已经触发次数
+	Awards           []*Award // 当前已经触发次数
+	TriggerRespinNum []int    // 配合LastTriggerNum用的respin次数，-1表示用当前的RetriggerAddRespinNum，否则就是具体值
 }
 
 // OnNewGame -
@@ -43,7 +43,7 @@ func (respinData *RespinData) OnNewGame(gameProp *GameProperty, component ICompo
 	respinData.CurRespinNum = 0
 	respinData.CurAddRespinNum = 0
 	respinData.TotalCoinWin = 0
-	respinData.TotalCashWin = 0
+	// respinData.TotalCashWin = 0
 	respinData.RetriggerAddRespinNum = 0
 	respinData.LastTriggerNum = 0
 	respinData.CurTriggerNum = 0
@@ -60,12 +60,12 @@ func (respinData *RespinData) onNewStep() {
 // BuildPBComponentData
 func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RespinData{
-		BasicComponentData:    respinData.BuildPBBasicComponentData(),
-		LastRespinNum:         int32(respinData.LastRespinNum),
-		CurRespinNum:          int32(respinData.CurRespinNum),
-		CurAddRespinNum:       int32(respinData.CurAddRespinNum),
-		TotalCoinWin:          respinData.TotalCoinWin,
-		TotalCashWin:          respinData.TotalCashWin,
+		BasicComponentData: respinData.BuildPBBasicComponentData(),
+		LastRespinNum:      int32(respinData.LastRespinNum),
+		CurRespinNum:       int32(respinData.CurRespinNum),
+		CurAddRespinNum:    int32(respinData.CurAddRespinNum),
+		TotalCoinWin:       respinData.TotalCoinWin,
+		// TotalCashWin:          respinData.TotalCashWin,
 		RetriggerAddRespinNum: int32(respinData.RetriggerAddRespinNum),
 		LastTriggerNum:        int32(respinData.LastTriggerNum),
 		CurTriggerNum:         int32(respinData.CurTriggerNum),
@@ -406,7 +406,7 @@ func (respin *Respin) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7gam
 
 	rcd := cd.(*RespinData)
 
-	rcd.TotalCashWin += curpr.CashWin
+	// rcd.TotalCashWin += curpr.CashWin
 	rcd.TotalCoinWin += int64(curpr.CoinWin)
 
 	if canRemove && rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
@@ -435,7 +435,7 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache) {
 	rcd := icd.(*RespinData)
 
 	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
-		s2.ProcStatsRootTrigger(respin.Name, rcd.TotalCashWin, true)
+		s2.ProcStatsRootTrigger(respin.Name, rcd.TotalCoinWin, true)
 	} else {
 		s2.ProcStatsRootTrigger(respin.Name, 0, false)
 	}

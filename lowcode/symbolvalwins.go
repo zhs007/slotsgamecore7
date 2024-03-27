@@ -362,7 +362,7 @@ func (symbolValWins *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cach
 
 	svwd := icd.(*SymbolValWinsData)
 
-	s2.ProcStatsWins(symbolValWins.Name, int64(svwd.Wins), true)
+	s2.ProcStatsWins(symbolValWins.Name, int64(svwd.Wins))
 }
 
 func (symbolValWins *SymbolValWins) GetWinMulti(basicCD *BasicComponentData) int {

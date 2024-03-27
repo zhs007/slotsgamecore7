@@ -35,6 +35,7 @@ func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, paren
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 5), "total wins")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 6), "avg wins for per trigger")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 7), "avg wins for per running")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 8), "rtp")
 
 	totaltimes := s2.GetRunTimes(parent)
 
@@ -67,6 +68,12 @@ func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, paren
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 7), float64(trigger.TotalWins)/float64(trigger.RunTimes))
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 7), 0)
+	}
+
+	if s2.TotalBet > 0 {
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, 8), float64(trigger.TotalWins)/float64(s2.TotalBet))
+	} else {
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, 8), 0)
 	}
 }
 

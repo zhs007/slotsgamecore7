@@ -725,7 +725,7 @@ func (waysTrigger *WaysTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache) {
 
 	cd := icd.(*WaysTriggerData)
 
-	s2.ProcStatsWins(waysTrigger.Name, int64(cd.Wins), true)
+	s2.ProcStatsWins(waysTrigger.Name, int64(cd.Wins))
 }
 
 // GetAllLinkComponents - get all link components

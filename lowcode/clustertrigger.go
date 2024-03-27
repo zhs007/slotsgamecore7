@@ -653,7 +653,7 @@ func (clusterTrigger *ClusterTrigger) OnStats2(icd IComponentData, s2 *stats2.Ca
 
 	cd := icd.(*ClusterTriggerData)
 
-	s2.ProcStatsWins(clusterTrigger.Name, int64(cd.Wins), true)
+	s2.ProcStatsWins(clusterTrigger.Name, int64(cd.Wins))
 }
 
 // GetAllLinkComponents - get all link components
