@@ -278,7 +278,7 @@ func (jcfg *jsonGenSymbolValsWithSymbol) build() *GenSymbolValsWithSymbolConfig 
 	return cfg
 }
 
-func parseGenSymbolValsWithSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseGenSymbolValsWithSymbol(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseGenSymbolValsWithSymbol:getConfigInCell",
@@ -315,7 +315,7 @@ func parseGenSymbolValsWithSymbol(gamecfg *Config, cell *ast.Node) (string, erro
 		Type: GenSymbolValsWithSymbolTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

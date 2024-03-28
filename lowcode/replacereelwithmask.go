@@ -179,7 +179,7 @@ func (jcfg *jsonReplaceReelWithMask) build() *ReplaceReelWithMaskConfig {
 	return cfg
 }
 
-func parseReplaceReelWithMask(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseReplaceReelWithMask(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseReplaceReelWithMask:getConfigInCell",
@@ -216,7 +216,7 @@ func parseReplaceReelWithMask(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: ReplaceReelWithMaskTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

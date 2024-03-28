@@ -20,7 +20,7 @@ func Test_ParseStepParentChildren(t *testing.T) {
 	components := game.Pool.mapComponents[bet]
 	// gameProp := game.Pool.newGameProp(bet)
 
-	node, err := ParseStepParentChildren(components, game.Pool.Config.StartComponents[bet])
+	node, err := ParseStepParentChildren(components, game.Pool.Config.MapBetConfigs[bet].Start)
 	assert.NoError(t, err)
 	assert.NotNil(t, node)
 	assert.True(t, node.CountComponentNum() == 24)

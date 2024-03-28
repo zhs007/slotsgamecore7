@@ -260,7 +260,7 @@ func (jcfg *jsonGenGigaSymbol) build() *GenGigaSymbolConfig {
 	return cfg
 }
 
-func parseGenGigaSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseGenGigaSymbol(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseGenGigaSymbol:getConfigInCell",
@@ -297,7 +297,7 @@ func parseGenGigaSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: GenGigaSymbolTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

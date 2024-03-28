@@ -474,7 +474,7 @@ func (jcfg *jsonMask) build() *MaskConfig {
 	return cfg
 }
 
-func parseMask(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseMask(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseMask:getConfigInCell",
@@ -511,7 +511,7 @@ func parseMask(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: MaskTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

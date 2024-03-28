@@ -74,7 +74,8 @@
                 "OUTPUTPATH": "${workspaceFolder}/output",
                 "SPINNUMS": "100000",
                 "CORE":"1",
-                "ALLOWSTATS2":"true"
+                "ALLOWSTATS2":"true",
+                "BET":"25",
             }
         },
         {

@@ -269,7 +269,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
-	game, err := NewGame3ForRTP(int(bet), gamecfg, func() sgc7plugin.IPlugin {
+	game, err := NewGame2(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
 	})
 	if err != nil {

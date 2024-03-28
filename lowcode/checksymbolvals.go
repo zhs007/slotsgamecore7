@@ -212,7 +212,7 @@ func (jcfg *jsonCheckSymbolVals) build() *CheckSymbolValsConfig {
 	return cfg
 }
 
-func parseCheckSymbolVals(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseCheckSymbolVals(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseCheckSymbolVals:getConfigInCell",
@@ -249,7 +249,7 @@ func parseCheckSymbolVals(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: CheckSymbolValsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

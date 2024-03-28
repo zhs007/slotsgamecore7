@@ -196,6 +196,8 @@ func SetAllowForceOutcome(maxTry int) {
 const MaxStepNum = 1000
 const MaxComponentNumInStep = 100
 
+const BasicGameModName = "basic"
+
 func init() {
 	initCheckWinType()
 

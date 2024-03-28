@@ -251,7 +251,7 @@ func (jwt *jsonWinResultMulti) build() *WinResultMultiConfig {
 	return cfg
 }
 
-func parseWinResultMulti(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseWinResultMulti(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWinResultMulti:getConfigInCell",
@@ -288,7 +288,7 @@ func parseWinResultMulti(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: WinResultMultiTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

@@ -367,7 +367,7 @@ func (jr *jsonSymbolCollection2) build() *SymbolCollection2Config {
 	return cfg
 }
 
-func parseSymbolCollection2(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseSymbolCollection2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseSymbolCollection2:getConfigInCell",
@@ -404,7 +404,7 @@ func parseSymbolCollection2(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: SymbolCollection2TypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

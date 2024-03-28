@@ -250,7 +250,7 @@ func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 	return cfg
 }
 
-func parseWeightReels(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseWeightReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWeightReels:getConfigInCell",
@@ -287,7 +287,7 @@ func parseWeightReels(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: WeightReelsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

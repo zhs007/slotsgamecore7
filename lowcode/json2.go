@@ -154,7 +154,7 @@ func (jcd *jsonControllerData) build4Collector() (string, *Award) {
 	return jcd.TriggerNum, jcd.build()
 }
 
-func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
+func parseControllers(controller *ast.Node) ([]*Award, error) {
 	buf, err := controller.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseControllers:MarshalJSON",
@@ -191,7 +191,7 @@ func parseControllers(gamecfg *Config, controller *ast.Node) ([]*Award, error) {
 	return awards, nil
 }
 
-func parseCollectorControllers(gamecfg *Config, controller *ast.Node) ([]*Award, map[int][]*Award, error) {
+func parseCollectorControllers(controller *ast.Node) ([]*Award, map[int][]*Award, error) {
 	buf, err := controller.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseControllers:MarshalJSON",

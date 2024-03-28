@@ -790,7 +790,7 @@ func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
 	return cfg
 }
 
-func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseWaysTrigger(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWaysTrigger:getConfigInCell",
@@ -820,7 +820,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(gamecfg, ctrls)
+		awards, err := parseControllers(ctrls)
 		if err != nil {
 			goutils.Error("parseWaysTrigger:parseControllers",
 				goutils.Err(err))
@@ -839,7 +839,7 @@ func parseWaysTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: WaysTriggerTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }
