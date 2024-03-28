@@ -161,7 +161,7 @@ func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
 	return cfg
 }
 
-func parseRefillSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseRefillSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRefillSymbols:getConfigInCell",
@@ -198,7 +198,7 @@ func parseRefillSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: RefillSymbolsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

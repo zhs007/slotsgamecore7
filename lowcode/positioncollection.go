@@ -258,7 +258,7 @@ func (jcfg *jsonPositionCollection) build() *PositionCollectionConfig {
 	return cfg
 }
 
-func parsePositionCollection(gamecfg *Config, cell *ast.Node) (string, error) {
+func parsePositionCollection(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parsePositionCollection:getConfigInCell",
@@ -295,7 +295,7 @@ func parsePositionCollection(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: PositionCollectionTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

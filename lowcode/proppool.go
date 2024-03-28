@@ -226,7 +226,7 @@ func (pool *GamePropertyPool) loadAllWeights() {
 
 func (pool *GamePropertyPool) onInit() {
 	for bet, v := range pool.mapComponents {
-		v.onInit(pool.Config.StartComponents[bet])
+		v.onInit(pool.Config.MapBetConfigs[bet].Start)
 	}
 }
 
@@ -577,18 +577,18 @@ func (pool *GamePropertyPool) GetComponentList(bet int) *ComponentList {
 	return pool.mapComponents[bet]
 }
 
-func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
-	cfg, err := LoadConfig(cfgfn)
-	if err != nil {
-		goutils.Error("newGamePropertyPool:LoadConfig",
-			slog.String("cfgfn", cfgfn),
-			goutils.Err(err))
+// func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
+// 	cfg, err := LoadConfig(cfgfn)
+// 	if err != nil {
+// 		goutils.Error("newGamePropertyPool:LoadConfig",
+// 			slog.String("cfgfn", cfgfn),
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	return newGamePropertyPool2(cfg)
-}
+// 	return newGamePropertyPool2(cfg)
+// }
 
 func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{

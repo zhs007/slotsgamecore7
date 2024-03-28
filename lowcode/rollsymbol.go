@@ -292,7 +292,7 @@ func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
 	return cfg
 }
 
-func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseRollSymbol(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRollSymbol:getConfigInCell",
@@ -329,7 +329,7 @@ func parseRollSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: RollSymbolTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

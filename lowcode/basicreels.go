@@ -219,7 +219,7 @@ func (jbr *jsonBasicReels) build() *BasicReelsConfig {
 	return cfg
 }
 
-func parseBasicReels(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseBasicReels2:getConfigInCell",
@@ -256,7 +256,7 @@ func parseBasicReels(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: BasicReelsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

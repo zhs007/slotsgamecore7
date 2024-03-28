@@ -1010,7 +1010,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 	return cfg
 }
 
-func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseScatterTrigger(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseScatterTrigger:getConfigInCell",
@@ -1040,7 +1040,7 @@ func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(gamecfg, ctrls)
+		awards, err := parseControllers(ctrls)
 		if err != nil {
 			goutils.Error("parseScatterTrigger:parseControllers",
 				goutils.Err(err))
@@ -1059,7 +1059,7 @@ func parseScatterTrigger(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: ScatterTriggerTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

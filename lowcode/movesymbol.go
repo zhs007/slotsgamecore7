@@ -419,7 +419,7 @@ func (jms *jsonMoveSymbol) build() *MoveSymbolConfig {
 	return cfg
 }
 
-func parseMoveSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseMoveSymbol(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseMoveSymbol:getConfigInCell",
@@ -456,7 +456,7 @@ func parseMoveSymbol(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: MoveSymbolTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

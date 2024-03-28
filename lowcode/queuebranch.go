@@ -200,7 +200,7 @@ func (jcfg *jsonQueueBranch) build() *QueueBranchConfig {
 	return cfg
 }
 
-func parseQueueBranch(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseQueueBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseQueueBranch:getConfigInCell",
@@ -237,7 +237,7 @@ func parseQueueBranch(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: QueueBranchTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

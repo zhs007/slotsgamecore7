@@ -227,7 +227,7 @@ func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 	return cfg
 }
 
-func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseChgSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseChgSymbols:getConfigInCell",
@@ -257,7 +257,7 @@ func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(gamecfg, ctrls)
+		awards, err := parseControllers(ctrls)
 		if err != nil {
 			goutils.Error("parseClusterTrigger:parseControllers",
 				goutils.Err(err))
@@ -276,7 +276,7 @@ func parseChgSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: ChgSymbolsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

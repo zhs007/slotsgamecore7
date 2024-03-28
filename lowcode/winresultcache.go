@@ -225,7 +225,7 @@ func (jwt *jsonWinResultCache) build() *WinResultCacheConfig {
 	return cfg
 }
 
-func parseWinResultCache(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseWinResultCache(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWinResultCache:getConfigInCell",
@@ -262,7 +262,7 @@ func parseWinResultCache(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: WinResultCacheTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

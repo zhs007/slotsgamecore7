@@ -245,7 +245,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	return cfg
 }
 
-func parseRemoveSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseRemoveSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRemoveSymbols:getConfigInCell",
@@ -275,7 +275,7 @@ func parseRemoveSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(gamecfg, ctrls)
+		awards, err := parseControllers(ctrls)
 		if err != nil {
 			goutils.Error("parseRemoveSymbols:parseControllers",
 				goutils.Err(err))
@@ -294,7 +294,7 @@ func parseRemoveSymbols(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: RemoveSymbolsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

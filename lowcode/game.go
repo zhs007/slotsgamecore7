@@ -1,12 +1,9 @@
 package lowcode
 
 import (
-	"log/slog"
-
 	"github.com/bytedance/sonic"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
-	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 )
 
@@ -17,91 +14,91 @@ type Game struct {
 	MgrComponent *ComponentMgr
 }
 
-// Init - initial game
-func (game *Game) Init(cfgfn string) error {
-	pool, err := newGamePropertyPool(cfgfn)
-	if err != nil {
-		goutils.Error("Game.Init:newGamePropertyPool",
-			slog.String("fn", cfgfn),
-			goutils.Err(err))
+// // Init - initial game
+// func (game *Game) Init(cfgfn string) error {
+// 	pool, err := newGamePropertyPool(cfgfn)
+// 	if err != nil {
+// 		goutils.Error("Game.Init:newGamePropertyPool",
+// 			slog.String("fn", cfgfn),
+// 			goutils.Err(err))
 
-		return err
-	}
+// 		return err
+// 	}
 
-	game.Pool = pool
+// 	game.Pool = pool
 
-	game.Cfg.PayTables = pool.DefaultPaytables
-	game.SetVer(sgc7ver.Version)
+// 	game.Cfg.PayTables = pool.DefaultPaytables
+// 	game.SetVer(sgc7ver.Version)
 
-	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
+// 	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
 
-	for _, v := range pool.Config.GameMods {
-		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
-	}
+// 	for _, v := range pool.Config.GameMods {
+// 		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
+// 	}
 
-	err = pool.InitStats(pool.Config.Bets[0])
-	if err != nil {
-		goutils.Error("Game.Init:InitStats",
-			goutils.Err(err))
+// 	err = pool.InitStats(pool.Config.Bets[0])
+// 	if err != nil {
+// 		goutils.Error("Game.Init:InitStats",
+// 			goutils.Err(err))
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	err = game.BuildGameConfigData()
-	if err != nil {
-		goutils.Error("Game.Init:BuildGameConfigData",
-			goutils.Err(err))
+// 	err = game.BuildGameConfigData()
+// 	if err != nil {
+// 		goutils.Error("Game.Init:BuildGameConfigData",
+// 			goutils.Err(err))
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	pool.onInit()
+// 	pool.onInit()
 
-	return nil
-}
+// 	return nil
+// }
 
-// Init - initial game
-func (game *Game) InitForRTP(bet int, cfgfn string) error {
-	pool, err := newGamePropertyPool(cfgfn)
-	if err != nil {
-		goutils.Error("Game.Init:newGamePropertyPool",
-			slog.String("fn", cfgfn),
-			goutils.Err(err))
+// // Init - initial game
+// func (game *Game) InitForRTP(bet int, cfgfn string) error {
+// 	pool, err := newGamePropertyPool(cfgfn)
+// 	if err != nil {
+// 		goutils.Error("Game.Init:newGamePropertyPool",
+// 			slog.String("fn", cfgfn),
+// 			goutils.Err(err))
 
-		return err
-	}
+// 		return err
+// 	}
 
-	game.Pool = pool
+// 	game.Pool = pool
 
-	game.Cfg.PayTables = pool.DefaultPaytables
-	game.SetVer(sgc7ver.Version)
+// 	game.Cfg.PayTables = pool.DefaultPaytables
+// 	game.SetVer(sgc7ver.Version)
 
-	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
+// 	game.Cfg.SetDefaultSceneString(game.Pool.Config.DefaultScene)
 
-	for _, v := range pool.Config.GameMods {
-		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
-	}
+// 	for _, v := range pool.Config.GameMods {
+// 		game.AddGameMod(NewBasicGameMod(pool, v, game.MgrComponent))
+// 	}
 
-	err = pool.InitStats(bet)
-	if err != nil {
-		goutils.Error("Game.Init:InitStats",
-			goutils.Err(err))
+// 	err = pool.InitStats(bet)
+// 	if err != nil {
+// 		goutils.Error("Game.Init:InitStats",
+// 			goutils.Err(err))
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	err = game.BuildGameConfigData()
-	if err != nil {
-		goutils.Error("Game.Init:BuildGameConfigData",
-			goutils.Err(err))
+// 	err = game.BuildGameConfigData()
+// 	if err != nil {
+// 		goutils.Error("Game.Init:BuildGameConfigData",
+// 			goutils.Err(err))
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	pool.onInit()
+// 	pool.onInit()
 
-	return nil
-}
+// 	return nil
+// }
 
 // Init - initial game
 func (game *Game) Init2(cfg *Config) error {
@@ -122,17 +119,17 @@ func (game *Game) Init2(cfg *Config) error {
 
 	pool.loadAllWeights()
 
-	for _, v := range pool.Config.GameMods {
-		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
-		if err != nil {
-			goutils.Error("Game.Init2:NewBasicGameMod2",
-				goutils.Err(err))
+	// for _, v := range pool.Config.GameMods {
+	gamemod, err := NewBasicGameMod2(pool, game.MgrComponent)
+	if err != nil {
+		goutils.Error("Game.Init2:NewBasicGameMod2",
+			goutils.Err(err))
 
-			return err
-		}
-
-		game.AddGameMod(gamemod)
+		return err
 	}
+
+	game.AddGameMod(gamemod)
+	// }
 
 	err = pool.InitStats(pool.Config.Bets[0])
 	if err != nil {
@@ -172,17 +169,17 @@ func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
 
 	game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
 
-	for _, v := range pool.Config.GameMods {
-		gamemod, err := NewBasicGameMod2(pool, v, game.MgrComponent)
-		if err != nil {
-			goutils.Error("Game.Init2:NewBasicGameMod2",
-				goutils.Err(err))
+	// for _, v := range pool.Config.GameMods {
+	gamemod, err := NewBasicGameMod2(pool, game.MgrComponent)
+	if err != nil {
+		goutils.Error("Game.Init2:NewBasicGameMod2",
+			goutils.Err(err))
 
-			return err
-		}
-
-		game.AddGameMod(gamemod)
+		return err
 	}
+
+	game.AddGameMod(gamemod)
+	// }
 
 	err = pool.InitStats(bet)
 	if err != nil {
@@ -216,7 +213,7 @@ func (game *Game) CheckStake(stake *sgc7game.Stake) error {
 
 // NewPlayerState - new playerstate
 func (game *Game) NewPlayerState() sgc7game.IPlayerState {
-	bps := sgc7game.NewBasicPlayerState("bg")
+	bps := sgc7game.NewBasicPlayerState(BasicGameModName)
 
 	return bps
 }
@@ -225,18 +222,18 @@ func (game *Game) NewPlayerState() sgc7game.IPlayerState {
 func (game *Game) ResetConfig(cfg any) {
 	ncfg := cfg.(*Config)
 
-	for _, v := range game.Pool.Config.GameMods {
-		gm := game.MapGameMods[v.Type].(*BasicGameMod)
-		gm.ResetConfig(ncfg)
-	}
+	// for _, v := range game.Pool.Config.GameMods {
+	gm := game.MapGameMods[BasicGameModName].(*BasicGameMod)
+	gm.ResetConfig(ncfg)
+	// }
 }
 
 // OnAsciiGame - outpur to asciigame
 func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult) error {
-	for _, v := range game.Pool.Config.GameMods {
-		gm := game.MapGameMods[v.Type].(*BasicGameMod)
-		gm.OnAsciiGame(gameProp, pr, lst)
-	}
+	// for _, v := range game.Pool.Config.GameMods {
+	gm := game.MapGameMods[BasicGameModName].(*BasicGameMod)
+	gm.OnAsciiGame(gameProp, pr, lst)
+	// }
 
 	if pr.IsFinish {
 		// if game.Pool.Stats != nil {
@@ -276,49 +273,49 @@ func (game *Game) BuildGameConfigData() error {
 	return nil
 }
 
-// NewGame - new a Game
-func NewGame(cfgfn string) (*Game, error) {
-	game := &Game{
-		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
-			return sgc7plugin.NewFastPlugin()
-		}),
-		MgrComponent: NewComponentMgr(),
-	}
+// // NewGame - new a Game
+// func NewGame(cfgfn string) (*Game, error) {
+// 	game := &Game{
+// 		BasicGame: sgc7game.NewBasicGame(func() sgc7plugin.IPlugin {
+// 			return sgc7plugin.NewFastPlugin()
+// 		}),
+// 		MgrComponent: NewComponentMgr(),
+// 	}
 
-	err := game.Init(cfgfn)
-	if err != nil {
-		return nil, err
-	}
+// 	err := game.Init(cfgfn)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return game, nil
-}
+// 	return game, nil
+// }
 
-// NewGame - new a Game
-func NewGameEx(cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	game := &Game{
-		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
-		MgrComponent: NewComponentMgr(),
-	}
+// // NewGame - new a Game
+// func NewGameEx(cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+// 	game := &Game{
+// 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
+// 		MgrComponent: NewComponentMgr(),
+// 	}
 
-	err := game.Init(cfgfn)
-	if err != nil {
-		return nil, err
-	}
+// 	err := game.Init(cfgfn)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return game, nil
-}
+// 	return game, nil
+// }
 
-// NewGame - new a Game
-func NewGameExForRTP(bet int, cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	game := &Game{
-		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
-		MgrComponent: NewComponentMgr(),
-	}
+// // NewGame - new a Game
+// func NewGameExForRTP(bet int, cfgfn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+// 	game := &Game{
+// 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
+// 		MgrComponent: NewComponentMgr(),
+// 	}
 
-	err := game.InitForRTP(bet, cfgfn)
-	if err != nil {
-		return nil, err
-	}
+// 	err := game.InitForRTP(bet, cfgfn)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return game, nil
-}
+// 	return game, nil
+// }

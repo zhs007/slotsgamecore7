@@ -458,7 +458,7 @@ func newLinkData() *linkData {
 	}
 }
 
-func loadCells(cfg *Config, bet int, cells *ast.Node) error {
+func loadCells(cfg *BetConfig, cells *ast.Node) error {
 	ldid := newLinkData()
 	lstStartID := []string{}
 	mapComponentName := make(map[string]string)
@@ -904,7 +904,7 @@ func loadCells(cfg *Config, bet int, cells *ast.Node) error {
 	}
 
 	if len(lstStartID) > 0 {
-		cfg.StartComponents[bet] = mapComponentName[lstStartID[0]]
+		cfg.Start = mapComponentName[lstStartID[0]]
 	}
 
 	for lt, arr := range ldid.mapLinks {
@@ -1006,16 +1006,25 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 		return err
 	}
 
-	cfg.Bets = append(cfg.Bets, int(bet))
-	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+	betcfg := &BetConfig{
+		Bet:            int(bet),
+		TotalBetInWins: int(bet),
+		mapConfig:      make(map[string]IComponentConfig),
+		mapBasicConfig: make(map[string]*BasicComponentConfig),
+	}
 
-	err = loadCells(cfg, int(bet), betMethod.Get("graph").Get("cells"))
+	cfg.Bets = append(cfg.Bets, int(bet))
+	// cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+
+	err = loadCells(betcfg, betMethod.Get("graph").Get("cells"))
 	if err != nil {
 		goutils.Error("loadBetMethod:loadCells",
 			goutils.Err(err))
 
 		return err
 	}
+
+	cfg.MapBetConfigs[int(bet)] = betcfg
 
 	return nil
 }
@@ -1033,34 +1042,34 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 	return NewGame2WithData(data, funcNewPlugin)
 }
 
-func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	data, err := os.ReadFile(fn)
-	if err != nil {
-		goutils.Error("NewGame2:ReadFile",
-			slog.String("fn", fn),
-			goutils.Err(err))
+// func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+// 	data, err := os.ReadFile(fn)
+// 	if err != nil {
+// 		goutils.Error("NewGame2:ReadFile",
+// 			slog.String("fn", fn),
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	return NewGame2WithData(data, funcNewPlugin)
-}
+// 	return NewGame2WithData(data, funcNewPlugin)
+// }
 
-func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	if strings.Contains(fn, ".json") {
-		return NewGame2(fn, funcNewPlugin)
-	}
+// func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+// 	if strings.Contains(fn, ".json") {
+// 		return NewGame2(fn, funcNewPlugin)
+// 	}
 
-	return NewGameEx(fn, funcNewPlugin)
-}
+// 	return NewGameEx(fn, funcNewPlugin)
+// }
 
-func NewGame3ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-	if strings.Contains(fn, ".json") {
-		return NewGame2(fn, funcNewPlugin)
-	}
+// func NewGame3ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+// 	if strings.Contains(fn, ".json") {
+// 		return NewGame2(fn, funcNewPlugin)
+// 	}
 
-	return NewGameExForRTP(bet, fn, funcNewPlugin)
-}
+// 	return NewGameExForRTP(bet, fn, funcNewPlugin)
+// }
 
 func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
 	game := &Game{
@@ -1069,19 +1078,20 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	}
 
 	cfg := &Config{
-		Paytables:         make(map[string]string),
-		MapPaytables:      make(map[string]*sgc7game.PayTables),
-		Linedata:          make(map[string]string),
-		MapLinedate:       make(map[string]*sgc7game.LineData),
-		Reels:             make(map[string]string),
-		MapReels:          make(map[string]*sgc7game.ReelsData),
-		mapConfig:         make(map[string]IComponentConfig),
-		StartComponents:   make(map[int]string),
-		mapBasicConfig:    make(map[string]*BasicComponentConfig),
+		Paytables:    make(map[string]string),
+		MapPaytables: make(map[string]*sgc7game.PayTables),
+		Linedata:     make(map[string]string),
+		MapLinedate:  make(map[string]*sgc7game.LineData),
+		Reels:        make(map[string]string),
+		MapReels:     make(map[string]*sgc7game.ReelsData),
+		// mapConfig:         make(map[string]IComponentConfig),
+		// StartComponents: make(map[int]string),
+		// mapBasicConfig:    make(map[string]*BasicComponentConfig),
 		mapValWeights:     make(map[string]*sgc7game.ValWeights2),
 		mapReelSetWeights: make(map[string]*sgc7game.ValWeights2),
 		mapStrWeights:     make(map[string]*sgc7game.ValWeights2),
 		mapIntMapping:     make(map[string]*sgc7game.ValMapping2),
+		MapBetConfigs:     make(map[int]*BetConfig),
 		// mapBetConfig:    make(map[int]*BetDataConfig),
 	}
 
@@ -1127,9 +1137,9 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 		return nil, err
 	}
 
-	cfgGameMod := &GameModConfig{}
-	cfgGameMod.Type = "bg"
-	cfg.GameMods = append(cfg.GameMods, cfgGameMod)
+	// cfgGameMod := &GameModConfig{}
+	// cfgGameMod.Type = "bg"
+	// cfg.GameMods = append(cfg.GameMods, cfgGameMod)
 
 	betMethodNode, err := sonic.Get(data, "betMethod")
 	if err != nil {

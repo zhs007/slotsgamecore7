@@ -265,7 +265,7 @@ func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 	return cfg
 }
 
-func parseWeightBranch(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseWeightBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("WeightBranch:getConfigInCell",
@@ -302,7 +302,7 @@ func parseWeightBranch(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: WeightBranchTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

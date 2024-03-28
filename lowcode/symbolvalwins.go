@@ -400,7 +400,7 @@ func (jcfg *jsonSymbolValWins) build() *SymbolValWinsConfig {
 	return cfg
 }
 
-func parseSymbolValWins(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseSymbolValWins(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseSymbolValWins:getConfigInCell",
@@ -437,7 +437,7 @@ func parseSymbolValWins(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: SymbolValWinsTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }

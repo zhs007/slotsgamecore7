@@ -40,11 +40,11 @@ func main() {
 	lowcode.SetJsonMode()
 	lowcode.SetAllowStatsV2()
 
-	game, err := lowcode.NewGame3(gamecfg, func() sgc7plugin.IPlugin {
+	game, err := lowcode.NewGame2(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
 	})
 	if err != nil {
-		goutils.Error("NewGame3",
+		goutils.Error("NewGame2",
 			slog.String("gamecfg", gamecfg),
 			goutils.Err(err))
 

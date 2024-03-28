@@ -363,7 +363,7 @@ func (jcfg *jsonCollector) build() *CollectorConfig {
 	return cfg
 }
 
-func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
+func parseCollector(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseCollector:getConfigInCell",
@@ -393,7 +393,7 @@ func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, mapawards, err := parseCollectorControllers(gamecfg, ctrls)
+		awards, mapawards, err := parseCollectorControllers(ctrls)
 		if err != nil {
 			goutils.Error("parseScatterTrigger:parseCollectorControllers",
 				goutils.Err(err))
@@ -418,7 +418,7 @@ func parseCollector(gamecfg *Config, cell *ast.Node) (string, error) {
 		Type: CollectorTypeName,
 	}
 
-	gamecfg.GameMods[0].Components = append(gamecfg.GameMods[0].Components, ccfg)
+	gamecfg.Components = append(gamecfg.Components, ccfg)
 
 	return label, nil
 }
