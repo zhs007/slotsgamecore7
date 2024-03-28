@@ -90,12 +90,12 @@ func (basicComponentData *BasicComponentData) ClearConfigIntVal(key string) {
 	delete(basicComponentData.MapConfigIntVals, key)
 }
 
-// InitSrcScenes -
-func (basicComponentData *BasicComponentData) initSrcScenes() {
-	for i := range basicComponentData.SrcScenes {
-		basicComponentData.SrcScenes[i] = -1
-	}
-}
+// // InitSrcScenes -
+// func (basicComponentData *BasicComponentData) initSrcScenes() {
+// 	for i := range basicComponentData.SrcScenes {
+// 		basicComponentData.SrcScenes[i] = -1
+// 	}
+// }
 
 // BuildPBComponentData
 func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Message {
@@ -294,7 +294,7 @@ func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 }
 
 // onStepEnd -
-func (basicComponent *BasicComponent) onStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, nextComponent string) string {
+func (basicComponent *BasicComponent) onStepEnd(_ *GameProperty, _ *sgc7game.PlayResult, _ *GameParams, nextComponent string) string {
 	if nextComponent == "" {
 		nextComponent = basicComponent.Config.DefaultNextComponent
 	}

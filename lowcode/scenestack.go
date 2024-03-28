@@ -140,7 +140,7 @@ func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *Basic
 	return ssd.Scene
 }
 
-func (stack *SceneStack) onStepStart(pr *sgc7game.PlayResult) {
+func (stack *SceneStack) onStepStart(_ *sgc7game.PlayResult) {
 	stack.Scenes = nil
 
 	// for _, v := range stack.CacheScenes {

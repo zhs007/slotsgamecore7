@@ -1554,7 +1554,7 @@ func CalcFullLineEx2(scene *GameScene, pt *PayTables, bet int,
 	return results
 }
 
-func buildFullLineResult(scene *GameScene, pt *PayTables, bet int, s0 int, arry []int, wildNums int) *Result {
+func buildFullLineResult(_ *GameScene, pt *PayTables, bet int, s0 int, arry []int, wildNums int) *Result {
 	nums := len(arry)
 
 	if nums > 0 && pt.MapPay[s0][nums-1] > 0 {

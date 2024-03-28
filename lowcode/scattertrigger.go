@@ -305,7 +305,7 @@ func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty
 }
 
 // CanTrigger -
-func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, _ *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 

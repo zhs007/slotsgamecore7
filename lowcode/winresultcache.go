@@ -196,14 +196,14 @@ func (winResultCache *WinResultCache) NewComponentData() IComponentData {
 	return &WinResultCacheData{}
 }
 
-func (winResultCache *WinResultCache) getWinMulti(basicCD *BasicComponentData) int {
-	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
-	if isok {
-		return winMulti
-	}
+// func (winResultCache *WinResultCache) getWinMulti(basicCD *BasicComponentData) int {
+// 	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
+// 	if isok {
+// 		return winMulti
+// 	}
 
-	return winResultCache.Config.WinMulti
-}
+// 	return winResultCache.Config.WinMulti
+// }
 
 func NewWinResultCache(name string) IComponent {
 	return &WinResultCache{

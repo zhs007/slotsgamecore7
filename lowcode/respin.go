@@ -197,7 +197,7 @@ type Respin struct {
 // }
 
 // OnPlayGame - on playgame
-func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData, gameProp *GameProperty) bool {
+func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData, _ *GameProperty) bool {
 	if respinData.LastRespinNum <= level.LastRespinNum && respinData.CoinWin < level.MaxCoinWins {
 		return true
 	}

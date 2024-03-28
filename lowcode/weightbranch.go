@@ -70,16 +70,16 @@ type WeightBranchConfig struct {
 	MapBranchs           map[string]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"` // 可以不用配置全，如果没有配置的，就跳转默认的next
 }
 
-// SetLinkComponent
-func (cfg *WeightBranchConfig) hasValWeight(val string) bool {
-	for _, v := range cfg.WeightVW.Vals {
-		if v.String() == val {
-			return true
-		}
-	}
+// // SetLinkComponent
+// func (cfg *WeightBranchConfig) hasValWeight(val string) bool {
+// 	for _, v := range cfg.WeightVW.Vals {
+// 		if v.String() == val {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
 // SetLinkComponent
 func (cfg *WeightBranchConfig) SetLinkComponent(link string, componentName string) {
