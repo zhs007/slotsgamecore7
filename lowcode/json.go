@@ -1131,21 +1131,41 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 	cfgGameMod.Type = "bg"
 	cfg.GameMods = append(cfg.GameMods, cfgGameMod)
 
-	betMethod, err := sonic.Get(data, "betMethod", 0)
+	betMethodNode, err := sonic.Get(data, "betMethod")
 	if err != nil {
 		goutils.Error("NewGame2WithData:Get",
-			slog.String("key", "betMethod[0]"),
+			slog.String("key", "betMethod"),
 			goutils.Err(err))
 
 		return nil, err
 	}
 
-	err = loadBetMethod(cfg, &betMethod)
+	lstBetMethod, err := betMethodNode.ArrayUseNode()
 	if err != nil {
-		goutils.Error("NewGame2WithData:loadBetMethod",
+		goutils.Error("NewGame2WithData:Get",
+			slog.String("key", "lstBetMethod.ArrayUseNode"),
 			goutils.Err(err))
 
 		return nil, err
+	}
+
+	for _, betMethod := range lstBetMethod {
+		// betMethod := lstBetMethod.Index(i) //sonic.Get(data, "betMethod", 0)
+		// if err != nil {
+		// 	goutils.Error("NewGame2WithData:Get",
+		// 		slog.String("key", "betMethod[0]"),
+		// 		goutils.Err(err))
+
+		// 	return nil, err
+		// }
+
+		err = loadBetMethod(cfg, &betMethod)
+		if err != nil {
+			goutils.Error("NewGame2WithData:loadBetMethod",
+				goutils.Err(err))
+
+			return nil, err
+		}
 	}
 
 	// cfg.RTP = &RTPConfig{}
