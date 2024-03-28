@@ -47,12 +47,13 @@ func (game *BasicGame) SetVer(ver string) {
 
 // NewPlayerState - new playerstate
 func (game *BasicGame) NewPlayerState() IPlayerState {
-	return &BasicPlayerState{}
+	return NewBasicPlayerState("bg")
 }
 
 // Initialize - initialize PlayerState
 func (game *BasicGame) Initialize() IPlayerState {
-	return NewBasicPlayerState("bg")
+	return game.NewPlayerState()
+	// return NewBasicPlayerState("bg")
 }
 
 // AddGameMod - add a gamemod
