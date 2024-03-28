@@ -20,7 +20,7 @@ func startWorker(game sgc7game.IGame, rtp *RTP, spinnums int64, stake *sgc7game.
 		plugin := game.NewPlugin()
 		defer game.FreePlugin(plugin)
 
-		ps := game.NewPlayerState()
+		ps := game.Initialize()
 		// ps := sgc7game.NewBasicPlayerState("bg")
 		results := []*sgc7game.PlayResult{}
 		gameData := game.NewGameData(stake)

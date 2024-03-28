@@ -213,6 +213,11 @@ func (game *Game) CheckStake(stake *sgc7game.Stake) error {
 
 // NewPlayerState - new playerstate
 func (game *Game) NewPlayerState() sgc7game.IPlayerState {
+	return &sgc7game.BasicPlayerState{}
+}
+
+// Initialize - initialize PlayerState
+func (game *Game) Initialize() sgc7game.IPlayerState {
 	bps := sgc7game.NewBasicPlayerState(BasicGameModName)
 
 	return bps
