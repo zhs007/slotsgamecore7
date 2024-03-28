@@ -37,7 +37,7 @@ func main() {
 		isBreakAtFeature = i64 > 0
 	}
 
-	lowcode.SetJsonMode()
+	// lowcode.SetJsonMode()
 	lowcode.SetAllowStatsV2()
 
 	game, err := lowcode.NewGame2(gamecfg, func() sgc7plugin.IPlugin {

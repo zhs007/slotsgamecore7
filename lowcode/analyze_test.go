@@ -8,7 +8,7 @@ import (
 )
 
 func Test_ParseStepParentChildren(t *testing.T) {
-	SetJsonMode()
+	// SetJsonMode()
 
 	game, err := NewGame2("../unittestdata/testgame.json", func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()

@@ -171,12 +171,12 @@ func initCheckWinType() {
 	strCheckWinType["count"] = CheckWinTypeCount
 }
 
-// json mode - 是否json配置模式，json模式下会有些特殊处理，少一些互斥锁
-var gJsonMode bool
+// // json mode - 是否json配置模式，json模式下会有些特殊处理，少一些互斥锁
+// var gJsonMode bool
 
-func SetJsonMode() {
-	gJsonMode = true
-}
+// func SetJsonMode() {
+// 	gJsonMode = true
+// }
 
 // statsv2 - 是否开启 stats ，默认不开启，有cpu消耗
 var gAllowStats2 bool
