@@ -72,10 +72,17 @@ type GameProperty struct {
 	SceneStack             *SceneStack
 	OtherSceneStack        *SceneStack
 	stats2Cache            *stats2.Cache
+	usedComponent          []string
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
 	return gameProp.CurBetMul
+}
+
+func (gameProp *GameProperty) UseComponent(componentName string) {
+	if goutils.IndexOfStringSlice(gameProp.usedComponent, componentName, 0) < 0 {
+		gameProp.usedComponent = append(gameProp.usedComponent, componentName)
+	}
 }
 
 func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
@@ -107,6 +114,8 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 	gameProp.mapComponentOtherScene = make(map[string]*sgc7game.GameScene)
 
 	gameProp.callStack.OnNewGame()
+
+	gameProp = nil
 
 	return nil
 }
@@ -244,11 +253,18 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 
 		pr.IsFinish = false
 
-		if goutils.IndexOfStringSlice(gp.HistoryComponents, gp.NextStepFirstComponent, 0) < 0 {
-			cd := gameProp.GetGlobalComponentDataWithName(gp.NextStepFirstComponent)
-			gp.AddComponentData(gp.NextStepFirstComponent, cd)
-			// gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
+		for _, v := range gameProp.usedComponent {
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, v, 0) < 0 {
+				cd := gameProp.GetGlobalComponentDataWithName(v)
+				gp.AddComponentData(v, cd)
+				// gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
+			}
 		}
+		// if goutils.IndexOfStringSlice(gp.HistoryComponents, gp.NextStepFirstComponent, 0) < 0 {
+		// 	cd := gameProp.GetGlobalComponentDataWithName(gp.NextStepFirstComponent)
+		// 	gp.AddComponentData(gp.NextStepFirstComponent, cd)
+		// 	// gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
+		// }
 	} else if !pr.IsWait {
 		pr.IsFinish = true
 	}
@@ -313,6 +329,8 @@ func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7g
 	// if respinNum > 0 {
 	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {
+		gameProp.UseComponent(respinComponent)
+
 		cd := gameProp.GetGlobalComponentData(component)
 		if usePushTrigger {
 			cd.PushTriggerRespin(gameProp, plugin, pr, gp, respinNum)
@@ -538,6 +556,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			cd := gameProp.GetGlobalComponentData(component)
+			gameProp.UseComponent(award.StrParams[0])
 
 			cd.AddRespinTimes(award.Vals[0])
 			// respin, isok := component.(IRespin)
@@ -649,6 +668,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			// }
 		}
 	} else if award.Type == AwardSetMaskVal {
+		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.Pool.SetMaskVal(plugin, gameProp, curpr, gp, award.StrParams[0], award.Vals[0], award.Vals[1] != 0)
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetMaskVal:SetMaskVal",
@@ -657,6 +677,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	} else if award.Type == AwardTriggerRespin2 {
+		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardTriggerRespin2:PushTrigger",
@@ -877,6 +898,8 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 	// 	return ErrIvalidComponentName
 	// }
 
+	gameProp.UseComponent(arr[0])
+
 	cd.SetConfigVal(arr[1], val)
 
 	return nil
@@ -900,6 +923,8 @@ func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName st
 
 		return ErrInvalidComponent
 	}
+
+	gameProp.UseComponent(arr[0])
 	// cd, isok := gameProp.MapComponentData[arr[0]]
 	// if !isok {
 	// 	goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
@@ -932,6 +957,8 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 
 		return ErrInvalidComponent
 	}
+
+	gameProp.UseComponent(arr[0])
 	// cd, isok := gameProp.MapComponentData[arr[0]]
 	// if !isok {
 	// 	goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
@@ -968,6 +995,8 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 
 		return
 	}
+
+	gameProp.UseComponent(componentName)
 
 	cd.AddSymbol(symbolCode)
 }

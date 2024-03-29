@@ -270,6 +270,8 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
 
 	if scatterTrigger.Config.TargetMask != "" {
+		gameProp.UseComponent(scatterTrigger.Config.TargetMask)
+
 		mask := make([]bool, gs.Width)
 
 		for i := 0; i < len(ret.Pos)/2; i++ {
@@ -448,6 +450,8 @@ func (scatterTrigger *ScatterTrigger) procWins(gameProp *GameProperty, std *Scat
 			}
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+
+			gameProp.UseComponent(scatterTrigger.Config.PiggyBankComponent)
 		}
 	}
 
