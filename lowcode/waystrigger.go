@@ -118,6 +118,7 @@ type WaysTriggerConfig struct {
 	SymbolAwardsWeights *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"` // 每个中奖符号随机一组奖励
 	TargetMask          string            `yaml:"targetMask" json:"targetMask"`                   // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse           bool              `yaml:"isReverse" json:"isReverse"`                     // 如果isReverse，表示判定为否才触发
+	PiggyBankComponent  string            `yaml:"piggyBankComponent" json:"piggyBankComponent"`   // piggyBank component
 	// NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
@@ -397,7 +398,7 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 }
 
 // procWins
-func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
+func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
 	if waysTrigger.Config.BetType == BTypeNoPay {
 		for _, v := range lst {
 			v.CoinWin = 0
@@ -415,6 +416,21 @@ func (waysTrigger *WaysTrigger) procWins(std *WaysTriggerData, lst []*sgc7game.R
 		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
+	}
+
+	if std.Wins > 0 {
+		if waysTrigger.Config.PiggyBankComponent != "" {
+			cd := gameProp.GetCurComponentDataWithName(waysTrigger.Config.PiggyBankComponent)
+			if cd == nil {
+				goutils.Error("ScatterTrigger.procWins:GetCurComponentDataWithName",
+					slog.String("PiggyBankComponent", waysTrigger.Config.PiggyBankComponent),
+					goutils.Err(ErrInvalidComponent))
+
+				return 0, ErrInvalidComponent
+			}
+
+			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+		}
 	}
 
 	return std.Wins, nil
@@ -486,7 +502,7 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
-		waysTrigger.procWins(std, lst)
+		waysTrigger.procWins(gameProp, std, lst)
 
 		// if !waysTrigger.Config.NeedDiscardResults {
 		for _, v := range lst {
@@ -767,22 +783,24 @@ func NewWaysTrigger(name string) IComponent {
 //		]
 //	},
 type jsonWaysTrigger struct {
-	Symbols     []string `json:"symbols"`
-	TriggerType string   `json:"triggerType"`
-	BetType     string   `json:"betType"`
-	MinNum      int      `json:"minNum"`
-	WildSymbols []string `json:"wildSymbols"`
-	WinMulti    int      `json:"winMulti"`
+	Symbols             []string `json:"symbols"`
+	TriggerType         string   `json:"triggerType"`
+	BetType             string   `json:"betType"`
+	MinNum              int      `json:"minNum"`
+	WildSymbols         []string `json:"wildSymbols"`
+	WinMulti            int      `json:"winMulti"`
+	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
 }
 
-func (jwt *jsonWaysTrigger) build() *WaysTriggerConfig {
+func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
 	cfg := &WaysTriggerConfig{
-		Symbols:       jwt.Symbols,
-		Type:          jwt.TriggerType,
-		BetTypeString: jwt.BetType,
-		MinNum:        jwt.MinNum,
-		WildSymbols:   jwt.WildSymbols,
-		WinMulti:      jwt.WinMulti,
+		Symbols:            jcfg.Symbols,
+		Type:               jcfg.TriggerType,
+		BetTypeString:      jcfg.BetType,
+		MinNum:             jcfg.MinNum,
+		WildSymbols:        jcfg.WildSymbols,
+		WinMulti:           jcfg.WinMulti,
+		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
 	}
 
 	// cfg.UseSceneV3 = true
