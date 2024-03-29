@@ -275,6 +275,8 @@ func (linesTrigger *LinesTrigger) procMask(gs *sgc7game.GameScene, gameProp *Gam
 			mask[ret.Pos[i*2]] = true
 		}
 
+		gameProp.UseComponent(linesTrigger.Config.TargetMask)
+
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, linesTrigger.Config.TargetMask, mask, false)
 	}
 
@@ -632,6 +634,8 @@ func (linesTrigger *LinesTrigger) procWins(gameProp *GameProperty, std *LinesTri
 			}
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+
+			gameProp.UseComponent(linesTrigger.Config.PiggyBankComponent)
 		}
 	}
 

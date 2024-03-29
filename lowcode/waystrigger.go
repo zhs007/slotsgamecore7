@@ -268,6 +268,8 @@ func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameP
 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
 
 	if waysTrigger.Config.TargetMask != "" {
+		gameProp.UseComponent(waysTrigger.Config.TargetMask)
+
 		mask := make([]bool, gs.Width)
 
 		for i := 0; i < len(ret.Pos)/2; i++ {
@@ -430,6 +432,8 @@ func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, std *WaysTrigge
 			}
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+
+			gameProp.UseComponent(waysTrigger.Config.PiggyBankComponent)
 		}
 	}
 

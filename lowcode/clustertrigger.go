@@ -359,6 +359,8 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, std *Clus
 			}
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+
+			gameProp.UseComponent(clusterTrigger.Config.PiggyBankComponent)
 		}
 	}
 
