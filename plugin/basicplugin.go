@@ -3,12 +3,11 @@ package sgc7plugin
 import (
 	"context"
 	"math/rand"
-	"time"
 
 	sgc7utils "github.com/zhs007/slotsgamecore7/utils"
 )
 
-var isBasicPluginInited = false
+// var isBasicPluginInited = false
 
 // BasicPlugin - basic plugin
 type BasicPlugin struct {
@@ -57,9 +56,14 @@ func (bp *BasicPlugin) Random(ctx context.Context, r int) (int, error) {
 
 // Init - initial
 func (bp *BasicPlugin) Init() {
-	if !isBasicPluginInited {
-		rand.Seed(time.Now().UnixNano())
+	// if !isBasicPluginInited {
+	// 	rand.Seed(time.Now().UnixNano())
 
-		isBasicPluginInited = true
-	}
+	// 	isBasicPluginInited = true
+	// }
+}
+
+// SetSeed - set a seed
+func (bp *BasicPlugin) SetSeed(seed int) {
+
 }
