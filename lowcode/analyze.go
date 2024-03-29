@@ -118,6 +118,18 @@ func (node *SPCNode) Format() {
 	}
 }
 
+func (node *SPCNode) IsIn(componentName string) bool {
+	if node.IsInNormal(componentName) {
+		return true
+	}
+
+	if node.IsInChildren(componentName) {
+		return true
+	}
+
+	return false
+}
+
 func (node *SPCNode) IsInNormal(componentName string) bool {
 	return goutils.IndexOfStringSlice(node.NormalComponents, componentName, 0) >= 0
 }
@@ -160,7 +172,11 @@ func isParentComponentInSPC(component IComponent) bool {
 	return false
 }
 
-func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
+func parseNextComponents(lst *ComponentList, start string, historys []string) (*SPCNode, []string, error) {
+	if start == "" {
+		return nil, historys, nil
+	}
+
 	node := &SPCNode{}
 	cn := start
 
@@ -170,59 +186,70 @@ func parseNextComponents(lst *ComponentList, start string) (*SPCNode, error) {
 			slog.String("name", cn),
 			goutils.Err(ErrInvalidComponentName))
 
-		return nil, ErrInvalidComponentName
+		return nil, nil, ErrInvalidComponentName
 	}
 
 	if isParentComponentInSPC(ic) {
 		children := ic.GetChildLinkComponents()
 		if len(children) == 1 {
-			childNode, err := parseNextComponents(lst, children[0])
+			childNode, nh, err := parseNextComponents(lst, children[0], historys)
 			if err != nil {
 				goutils.Error("parseNextComponents:parseNextComponents",
 					slog.String("name", children[0]),
 					goutils.Err(err))
 
-				return nil, err
+				return nil, nil, err
 			}
 
-			childNode.Root = cn
+			historys = nh
 
-			node.AddChild(childNode)
+			if childNode != nil {
+				childNode.Root = cn
+
+				historys = append(historys, children[0])
+				node.AddChild(childNode)
+			}
 		} else if len(children) > 1 {
 			goutils.Error("parseNextComponents",
 				slog.String("name", cn),
 				slog.Any("children", children),
 				goutils.Err(ErrInvalidComponentChildren))
 
-			return nil, ErrInvalidComponentChildren
+			return nil, nil, ErrInvalidComponentChildren
 		}
 	} else {
+		historys = append(historys, cn)
+
 		node.AddNormal(cn)
 	}
 
 	nextComponents := ic.GetNextLinkComponents()
 	for _, curcomponent := range nextComponents {
-		if curcomponent != "" {
-			nextNode, err := parseNextComponents(lst, curcomponent)
+		if curcomponent != "" && goutils.IndexOfStringSlice(historys, curcomponent, 0) < 0 {
+			nextNode, nh, err := parseNextComponents(lst, curcomponent, historys)
 			if err != nil {
 				goutils.Error("parseNextComponents:nextComponents:parseNextComponents",
 					slog.String("name", curcomponent),
 					goutils.Err(err))
 
-				return nil, err
+				return nil, nil, err
 			}
 
+			historys = nh
+
 			for _, child := range nextNode.Children {
+				historys = append(historys, child.Root)
 				node.AddChild(child)
 			}
 
 			for _, nc := range nextNode.NormalComponents {
+				historys = append(historys, nc)
 				node.AddNormal(nc)
 			}
 		}
 	}
 
-	return node, nil
+	return node, historys, nil
 }
 
 func ParseStepParentChildren(lst *ComponentList, start string) (*SPCNode, error) {
@@ -230,7 +257,7 @@ func ParseStepParentChildren(lst *ComponentList, start string) (*SPCNode, error)
 		return nil, nil
 	}
 
-	node, err := parseNextComponents(lst, start)
+	node, _, err := parseNextComponents(lst, start, []string{})
 	if err != nil {
 		goutils.Error("ParseStepParentChildren:parseNextComponents",
 			slog.String("name", start),

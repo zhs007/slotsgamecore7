@@ -416,7 +416,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 // }
 
 // procWins
-func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
+func (scatterTrigger *ScatterTrigger) procWins(gameProp *GameProperty, std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
 	if scatterTrigger.Config.BetType == BTypeNoPay {
 		for _, v := range lst {
 			v.CoinWin = 0
@@ -434,6 +434,21 @@ func (scatterTrigger *ScatterTrigger) procWins(std *ScatterTriggerData, lst []*s
 		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
+	}
+
+	if std.Wins > 0 {
+		if scatterTrigger.Config.PiggyBankComponent != "" {
+			cd := gameProp.GetCurComponentDataWithName(scatterTrigger.Config.PiggyBankComponent)
+			if cd == nil {
+				goutils.Error("ScatterTrigger.procWins:GetCurComponentDataWithName",
+					slog.String("PiggyBankComponent", scatterTrigger.Config.PiggyBankComponent),
+					goutils.Err(ErrInvalidComponent))
+
+				return 0, ErrInvalidComponent
+			}
+
+			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+		}
 	}
 
 	return std.Wins, nil
@@ -505,7 +520,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
-		scatterTrigger.procWins(std, lst)
+		scatterTrigger.procWins(gameProp, std, lst)
 
 		// if !scatterTrigger.Config.NeedDiscardResults {
 		for _, v := range lst {

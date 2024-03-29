@@ -119,6 +119,7 @@ type LinesTriggerConfig struct {
 	SymbolAwardsWeights  *AwardsWeights    `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"` // 每个中奖符号随机一组奖励
 	TargetMask           string            `yaml:"targetMask" json:"targetMask"`                   // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse            bool              `yaml:"isReverse" json:"isReverse"`                     // 如果isReverse，表示判定为否才触发
+	PiggyBankComponent   string            `yaml:"piggyBankComponent" json:"piggyBankComponent"`   // piggyBank component
 	// NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
@@ -599,7 +600,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 }
 
 // procWins
-func (linesTrigger *LinesTrigger) procWins(std *LinesTriggerData, lst []*sgc7game.Result) (int, error) {
+func (linesTrigger *LinesTrigger) procWins(gameProp *GameProperty, std *LinesTriggerData, lst []*sgc7game.Result) (int, error) {
 	if linesTrigger.Config.BetType == BTypeNoPay {
 		for _, v := range lst {
 			v.CoinWin = 0
@@ -617,6 +618,21 @@ func (linesTrigger *LinesTrigger) procWins(std *LinesTriggerData, lst []*sgc7gam
 		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
+	}
+
+	if std.Wins > 0 {
+		if linesTrigger.Config.PiggyBankComponent != "" {
+			cd := gameProp.GetCurComponentDataWithName(linesTrigger.Config.PiggyBankComponent)
+			if cd == nil {
+				goutils.Error("LinesTrigger.procWins:GetCurComponentDataWithName",
+					slog.String("PiggyBankComponent", linesTrigger.Config.PiggyBankComponent),
+					goutils.Err(ErrInvalidComponent))
+
+				return 0, ErrInvalidComponent
+			}
+
+			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+		}
 	}
 
 	return std.Wins, nil
@@ -691,7 +707,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
-		linesTrigger.procWins(std, lst)
+		linesTrigger.procWins(gameProp, std, lst)
 
 		// if !linesTrigger.Config.NeedDiscardResults {
 		for _, v := range lst {
@@ -982,24 +998,26 @@ func NewLinesTrigger(name string) IComponent {
 //
 // ]
 type jsonLinesTrigger struct {
-	Symbols      []string `json:"symbols"`
-	TriggerType  string   `json:"triggerType"`
-	CheckWinType string   `json:"checkWinType"`
-	BetType      string   `json:"betType"`
-	MinNum       int      `json:"minNum"`
-	WildSymbols  []string `json:"wildSymbols"`
-	WinMulti     int      `json:"winMulti"`
+	Symbols             []string `json:"symbols"`
+	TriggerType         string   `json:"triggerType"`
+	CheckWinType        string   `json:"checkWinType"`
+	BetType             string   `json:"betType"`
+	MinNum              int      `json:"minNum"`
+	WildSymbols         []string `json:"wildSymbols"`
+	WinMulti            int      `json:"winMulti"`
+	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
 }
 
-func (jlt *jsonLinesTrigger) build() *LinesTriggerConfig {
+func (jcfg *jsonLinesTrigger) build() *LinesTriggerConfig {
 	cfg := &LinesTriggerConfig{
-		Symbols:         jlt.Symbols,
-		Type:            jlt.TriggerType,
-		BetTypeString:   jlt.BetType,
-		StrCheckWinType: jlt.CheckWinType,
-		MinNum:          jlt.MinNum,
-		WildSymbols:     jlt.WildSymbols,
-		WinMulti:        jlt.WinMulti,
+		Symbols:            jcfg.Symbols,
+		Type:               jcfg.TriggerType,
+		BetTypeString:      jcfg.BetType,
+		StrCheckWinType:    jcfg.CheckWinType,
+		MinNum:             jcfg.MinNum,
+		WildSymbols:        jcfg.WildSymbols,
+		WinMulti:           jcfg.WinMulti,
+		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
 	}
 
 	// cfg.UseSceneV3 = true

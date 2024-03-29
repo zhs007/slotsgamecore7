@@ -60,3 +60,8 @@ func (fp *FastPlugin) Random(ctx context.Context, r int) (int, error) {
 func (fp *FastPlugin) Init() {
 	fp.RNG.Seed(uint32(time.Now().UnixNano()))
 }
+
+// SetSeed - set a seed
+func (fp *FastPlugin) SetSeed(seed int) {
+
+}

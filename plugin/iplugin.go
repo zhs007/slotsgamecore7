@@ -28,4 +28,6 @@ type IPlugin interface {
 	SetScenePool(any)
 	// GetScenePool - get scene pool
 	GetScenePool() any
+	// SetSeed - set a seed
+	SetSeed(seed int)
 }
