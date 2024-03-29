@@ -38,7 +38,7 @@ func (client *Client) reset() {
 	client.client = nil
 }
 
-func (client *Client) onRequest(ctx context.Context) error {
+func (client *Client) onRequest(_ context.Context) error {
 	if client.conn == nil || client.client == nil {
 		conn, err := grpc.Dial(client.servAddr,
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -174,12 +174,12 @@ func (client *Client) PlayGame(ctx context.Context, gameCode string, ps *sgc7pb.
 	}
 
 	// reply := &sgc7pb.ReplyPlayGame{}
-
+	var reply *sgc7pb.ReplyPlayGame
 	for {
 		rp, err := stream.Recv()
 		if err != nil {
 			if err == io.EOF {
-				return rp, nil
+				return reply, nil
 			}
 
 			goutils.Error("Client.PlayGame:Recv",
@@ -189,9 +189,11 @@ func (client *Client) PlayGame(ctx context.Context, gameCode string, ps *sgc7pb.
 			client.reset()
 
 			return nil, err
+		} else {
+			reply = rp
 		}
 
-		return rp, nil
+		// return rp, nil
 
 		// if rp != nil {
 		// 	sgc7pbutils.MergeReplyPlay(reply, rp)

@@ -122,14 +122,6 @@ func NewGameParam() *GameParams {
 	}
 }
 
-// // gIsForceDisableStats - disable stats
-// var gIsForceDisableStats bool
-
-// // SetForceDisableStats - disable stats
-// func SetForceDisableStats() {
-// 	gIsForceDisableStats = true
-// }
-
 // gIsReleaseMode - release mode
 var gIsReleaseMode bool
 
@@ -171,13 +163,6 @@ func initCheckWinType() {
 	strCheckWinType["count"] = CheckWinTypeCount
 }
 
-// json mode - 是否json配置模式，json模式下会有些特殊处理，少一些互斥锁
-var gJsonMode bool
-
-func SetJsonMode() {
-	gJsonMode = true
-}
-
 // statsv2 - 是否开启 stats ，默认不开启，有cpu消耗
 var gAllowStats2 bool
 
@@ -200,6 +185,4 @@ const BasicGameModName = "basic"
 
 func init() {
 	initCheckWinType()
-
-	// gIsForceDisableStats = true
 }

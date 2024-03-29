@@ -38,7 +38,7 @@ func (client *Client) reset() {
 	client.client = nil
 }
 
-func (client *Client) onRequest(ctx context.Context) error {
+func (client *Client) onRequest(_ context.Context) error {
 	if client.conn == nil || client.client == nil {
 		conn, err := grpc.Dial(client.servAddr,
 			grpc.WithTransportCredentials(insecure.NewCredentials()),

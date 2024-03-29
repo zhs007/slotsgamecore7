@@ -294,7 +294,7 @@ func (waysTrigger *WaysTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *
 }
 
 // CanTrigger -
-func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	// std := gameProp.MapComponentData[waysTrigger.Name].(*WaysTriggerData)
 
 	isTrigger := false

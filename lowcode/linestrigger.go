@@ -290,7 +290,7 @@ func (linesTrigger *LinesTrigger) getSymbols(gameProp *GameProperty) []int {
 }
 
 // canTrigger -
-func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
 	// std := cd.(*LinesTriggerData)
 
 	isTrigger := false

@@ -691,7 +691,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	}
 }
 
-func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherSceneFeature, curpr *sgc7game.PlayResult, os *sgc7game.GameScene) {
+func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherSceneFeature, _ *sgc7game.PlayResult, os *sgc7game.GameScene) {
 	if otherSceneFeature.Type == OtherSceneFeatureGameMulti {
 		mul := 1
 
@@ -972,7 +972,7 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 	cd.AddSymbol(symbolCode)
 }
 
-func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
+func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {
 	// // scene v3
 	// if len(gameProp.SceneStack.Scenes) > 0 {
 

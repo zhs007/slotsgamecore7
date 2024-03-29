@@ -11,7 +11,7 @@ type ScriptCore struct {
 	Cel *cel.Env
 }
 
-func newScriptVariables(gameProp *GameProperty) []cel.EnvOption {
+func newScriptVariables(*GameProperty) []cel.EnvOption {
 	return []cel.EnvOption{}
 }
 

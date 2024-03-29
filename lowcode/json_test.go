@@ -8,7 +8,7 @@ import (
 )
 
 func Test_NewGame2(t *testing.T) {
-	SetJsonMode()
+	// SetJsonMode()
 
 	game, err := NewGame2("../data/game002.json", func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()

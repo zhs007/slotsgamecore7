@@ -90,59 +90,59 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 	return nil
 }
 
-func parse2IntSlice(n *ast.Node) ([]int, error) {
-	arr, err := n.ArrayUseNode()
-	if err != nil {
-		goutils.Error("parse2IntSlice:Array",
-			goutils.Err(err))
+// func parse2IntSlice(n *ast.Node) ([]int, error) {
+// 	arr, err := n.ArrayUseNode()
+// 	if err != nil {
+// 		goutils.Error("parse2IntSlice:Array",
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	iarr := []int{}
+// 	iarr := []int{}
 
-	for i, v := range arr {
-		iv, err := v.Int64()
-		if err != nil {
-			goutils.Error("parse2IntSlice:Int64",
-				slog.Int("i", i),
-				goutils.Err(err))
+// 	for i, v := range arr {
+// 		iv, err := v.Int64()
+// 		if err != nil {
+// 			goutils.Error("parse2IntSlice:Int64",
+// 				slog.Int("i", i),
+// 				goutils.Err(err))
 
-			return nil, err
-		}
+// 			return nil, err
+// 		}
 
-		iarr = append(iarr, int(iv))
-	}
+// 		iarr = append(iarr, int(iv))
+// 	}
 
-	return iarr, nil
-}
+// 	return iarr, nil
+// }
 
-func parse2StringSlice(n *ast.Node) ([]string, error) {
-	arr, err := n.ArrayUseNode()
-	if err != nil {
-		goutils.Error("parse2StringSlice:Array",
-			goutils.Err(err))
+// func parse2StringSlice(n *ast.Node) ([]string, error) {
+// 	arr, err := n.ArrayUseNode()
+// 	if err != nil {
+// 		goutils.Error("parse2StringSlice:Array",
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	strarr := []string{}
+// 	strarr := []string{}
 
-	for i, v := range arr {
-		strv, err := v.String()
-		if err != nil {
-			goutils.Error("parse2StringSlice:String",
-				slog.Int("i", i),
-				goutils.Err(err))
+// 	for i, v := range arr {
+// 		strv, err := v.String()
+// 		if err != nil {
+// 			goutils.Error("parse2StringSlice:String",
+// 				slog.Int("i", i),
+// 				goutils.Err(err))
 
-			return nil, err
-		}
+// 			return nil, err
+// 		}
 
-		strarr = append(strarr, (strv))
-	}
+// 		strarr = append(strarr, (strv))
+// 	}
 
-	return strarr, nil
-}
+// 	return strarr, nil
+// }
 
 func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 	if n == nil {
@@ -222,7 +222,7 @@ func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
 	return nil
 }
 
-func parseLineData(n *ast.Node, width int) (*sgc7game.LineData, error) {
+func parseLineData(n *ast.Node, _ int) (*sgc7game.LineData, error) {
 	if n == nil {
 		goutils.Error("parseLineData",
 			goutils.Err(ErrIvalidReels))

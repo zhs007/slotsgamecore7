@@ -6,7 +6,6 @@ import (
 	"net"
 
 	goutils "github.com/zhs007/goutils"
-	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -22,7 +21,7 @@ type Serv struct {
 
 // NewServ -
 func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, error) {
-	lowcode.SetJsonMode()
+	// lowcode.SetJsonMode()
 
 	lis, err := net.Listen("tcp", bindaddr)
 	if err != nil {
