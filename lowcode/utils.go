@@ -140,7 +140,7 @@ func IsInPosArea(x, y int, posArea []int) bool {
 }
 
 // ProcCheat -
-func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) (*ForceOutcome, error) {
+func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) (*ForceOutcome2, error) {
 	if cheat != "" {
 		if sgc7game.IsRngString(cheat) {
 			str := goutils.AppendString("[", cheat, "]")
@@ -154,7 +154,8 @@ func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) (*ForceOutcome, error) {
 			plugin.SetCache(rngs)
 		} else {
 			if gAllowForceOutcome {
-				return ParseForceOutcome(cheat), nil
+				return NewForceOutcome2(cheat)
+				// return ParseForceOutcome(cheat), nil
 			}
 		}
 	}
