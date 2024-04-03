@@ -146,6 +146,6 @@ var (
 
 	// ErrInvalidForceOutcome2Code - invalid ForceOutcome2 code
 	ErrInvalidForceOutcome2Code = errors.New("invalid ForceOutcome2 code")
-	// ErrInvalidForceOutcome2CheckErr - invalid ForceOutcome2 check return error
-	ErrInvalidForceOutcome2CheckErr = errors.New("invalid ForceOutcome2 check return error")
+	// ErrInvalidForceOutcome2ReturnVal - invalid ForceOutcome2 return value
+	ErrInvalidForceOutcome2ReturnVal = errors.New("invalid ForceOutcome2 return value")
 )
