@@ -77,6 +77,20 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 		} else if val == "symbolNum" {
 			return int(msg.SymbolNum), true
 		}
+	} else if pbany.TypeUrl == "type.googleapis.com/sgc7pb.RespinData" {
+		var msg sgc7pb.RespinData
+
+		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
+		if err != nil {
+			goutils.Error("GetComponentDataVal:anypb.UnmarshalTo:RespinData",
+				goutils.Err(err))
+
+			return 0, false
+		}
+
+		if val == "curRespinNum" {
+			return int(msg.CurRespinNum), true
+		}
 	}
 
 	return 0, false
