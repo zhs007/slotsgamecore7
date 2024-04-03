@@ -45,8 +45,15 @@ func (fo2 *ForceOutcome2) SetScript(code string) error {
 func (fo2 *ForceOutcome2) IsValid(results []*sgc7game.PlayResult) bool {
 	fo2.results = results
 
+	totalwins := 0
+	for _, v := range results {
+		totalwins += v.CoinWin
+	}
+
 	// 必须返回一个 bool
-	out, _, err := fo2.program.Eval(map[string]any{})
+	out, _, err := fo2.program.Eval(map[string]any{
+		"totalWins": totalwins,
+	})
 	if err != nil {
 		goutils.Error("ForceOutcome2.IsValid:Eval",
 			goutils.Err(err))
@@ -68,8 +75,15 @@ func (fo2 *ForceOutcome2) IsValid(results []*sgc7game.PlayResult) bool {
 func (fo2 *ForceOutcome2) CalcVal(results []*sgc7game.PlayResult) int {
 	fo2.results = results
 
+	totalwins := 0
+	for _, v := range results {
+		totalwins += v.CoinWin
+	}
+
 	// 必须返回一个 int
-	out, _, err := fo2.program.Eval(map[string]any{})
+	out, _, err := fo2.program.Eval(map[string]any{
+		"totalWins": totalwins,
+	})
 	if err != nil {
 		goutils.Error("ForceOutcome2.CalcVal:Eval",
 			goutils.Err(err))
@@ -150,7 +164,9 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 }
 
 func (fo2 *ForceOutcome2) newScriptVariables() []cel.EnvOption {
-	return []cel.EnvOption{}
+	return []cel.EnvOption{
+		cel.Variable("totalWins", cel.IntType),
+	}
 }
 
 func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
