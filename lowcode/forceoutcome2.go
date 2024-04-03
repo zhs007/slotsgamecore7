@@ -155,8 +155,8 @@ func (fo2 *ForceOutcome2) newScriptVariables() []cel.EnvOption {
 
 func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 	return []cel.EnvOption{
-		cel.Function("get",
-			cel.Overload("get_string_string",
+		cel.Function("getV",
+			cel.Overload("getV_string_string",
 				[]*cel.Type{cel.StringType, cel.StringType},
 				cel.IntType,
 				cel.BinaryBinding(func(param0 ref.Val, param1 ref.Val) ref.Val {
@@ -167,8 +167,8 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				),
 			),
 		),
-		cel.Function("getMax",
-			cel.Overload("getMax_string_string",
+		cel.Function("getMaxV",
+			cel.Overload("getMaxV_string_string",
 				[]*cel.Type{cel.StringType, cel.StringType},
 				cel.IntType,
 				cel.BinaryBinding(func(param0 ref.Val, param1 ref.Val) ref.Val {
@@ -179,8 +179,8 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				),
 			),
 		),
-		cel.Function("has",
-			cel.Overload("has_string",
+		cel.Function("hasC",
+			cel.Overload("hasC_string",
 				[]*cel.Type{cel.StringType},
 				cel.BoolType,
 				cel.UnaryBinding(func(param ref.Val) ref.Val {
