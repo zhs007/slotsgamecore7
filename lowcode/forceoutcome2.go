@@ -48,7 +48,7 @@ func (fo2 *ForceOutcome2) IsValid(results []*sgc7game.PlayResult) bool {
 	// 必须返回一个 bool
 	out, _, err := fo2.program.Eval(map[string]any{})
 	if err != nil {
-		goutils.Error("ForceOutcome2.Check:Eval",
+		goutils.Error("ForceOutcome2.IsValid:Eval",
 			goutils.Err(err))
 
 		return false
@@ -56,13 +56,36 @@ func (fo2 *ForceOutcome2) IsValid(results []*sgc7game.PlayResult) bool {
 
 	ret, isok := out.Value().(bool)
 	if !isok {
-		goutils.Error("ForceOutcome2.Check:ret",
-			goutils.Err(ErrInvalidForceOutcome2CheckErr))
+		goutils.Error("ForceOutcome2.IsValid:ret",
+			goutils.Err(ErrInvalidForceOutcome2ReturnVal))
 
 		return false
 	}
 
 	return ret
+}
+
+func (fo2 *ForceOutcome2) CalcVal(results []*sgc7game.PlayResult) int {
+	fo2.results = results
+
+	// 必须返回一个 int
+	out, _, err := fo2.program.Eval(map[string]any{})
+	if err != nil {
+		goutils.Error("ForceOutcome2.CalcVal:Eval",
+			goutils.Err(err))
+
+		return -1
+	}
+
+	ret, isok := out.Value().(int64)
+	if !isok {
+		goutils.Error("ForceOutcome2.CalcVal:ret",
+			goutils.Err(ErrInvalidForceOutcome2ReturnVal))
+
+		return -1
+	}
+
+	return int(ret)
 }
 
 func (fo2 *ForceOutcome2) hasComponent(component string) bool {
