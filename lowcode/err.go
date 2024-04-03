@@ -143,4 +143,9 @@ var (
 
 	// ErrInvalidComponentChildren - invalid component children
 	ErrInvalidComponentChildren = errors.New("invalid component children")
+
+	// ErrInvalidForceOutcome2Code - invalid ForceOutcome2 code
+	ErrInvalidForceOutcome2Code = errors.New("invalid ForceOutcome2 code")
+	// ErrInvalidForceOutcome2CheckErr - invalid ForceOutcome2 check return error
+	ErrInvalidForceOutcome2CheckErr = errors.New("invalid ForceOutcome2 check return error")
 )
