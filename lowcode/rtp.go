@@ -266,7 +266,8 @@ type RTPConfig struct {
 // }
 
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64) error {
-	IsStatsComponentMsg = true
+	// SetRTPMode()
+	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2(gamecfg, func() sgc7plugin.IPlugin {
@@ -347,7 +348,8 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 }
 
 func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer) (*stats2.Stats, error) {
-	IsStatsComponentMsg = true
+	// SetRTPMode()
+	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2WithData(gamecfg, func() sgc7plugin.IPlugin {

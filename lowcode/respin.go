@@ -77,6 +77,15 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
+// GetVal -
+func (respinData *RespinData) GetVal(key string) (int, bool) {
+	if key == CVCurRespinNum {
+		return respinData.CurRespinNum, true
+	}
+
+	return 0, false
+}
+
 // GetLastRespinNum -
 func (respinData *RespinData) GetLastRespinNum() int {
 	return respinData.LastRespinNum

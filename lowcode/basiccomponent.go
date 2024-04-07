@@ -50,8 +50,8 @@ func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, 
 // }
 
 // GetVal -
-func (basicComponentData *BasicComponentData) GetVal(key string) int {
-	return 0
+func (basicComponentData *BasicComponentData) GetVal(key string) (int, bool) {
+	return 0, false
 }
 
 // SetVal -

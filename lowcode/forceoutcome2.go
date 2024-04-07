@@ -121,9 +121,9 @@ func (fo2 *ForceOutcome2) getComponentVal(component string, val string) int {
 	for _, ret := range fo2.results {
 		gp, isok := ret.CurGameModParams.(*GameParams)
 		if isok {
-			for k, v := range gp.MapComponents {
+			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := GetComponentDataVal(v, val)
+					curval, isok2 := v.GetVal(val)
 					if isok2 {
 						return curval
 					}
@@ -141,9 +141,9 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 	for _, ret := range fo2.results {
 		gp, isok := ret.CurGameModParams.(*GameParams)
 		if isok {
-			for k, v := range gp.MapComponents {
+			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := GetComponentDataVal(v, val)
+					curval, isok2 := v.GetVal(val)
 					if isok2 {
 						if !hasval {
 							maxval = curval

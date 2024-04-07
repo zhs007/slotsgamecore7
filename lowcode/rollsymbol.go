@@ -52,8 +52,8 @@ func (rollSymbolData *RollSymbolData) BuildPBComponentData() proto.Message {
 }
 
 // GetVal -
-func (rollSymbolData *RollSymbolData) GetVal(key string) int {
-	return 0
+func (rollSymbolData *RollSymbolData) GetVal(key string) (int, bool) {
+	return 0, false
 }
 
 // SetVal -

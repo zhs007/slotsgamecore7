@@ -510,7 +510,16 @@ func (gameProp *GameProperty) GetComponentVal(componentVal string) (int, error) 
 
 	cd := gameProp.callStack.GetComponentData(gameProp, component)
 
-	return cd.GetVal(arr[1]), nil
+	v, isok := cd.GetVal(arr[1])
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal:GetVal",
+			slog.String("componentVal", componentVal),
+			goutils.Err(ErrInvalidComponentVal))
+
+		return 0, ErrInvalidComponentVal
+	}
+
+	return v, nil
 }
 
 func (gameProp *GameProperty) GetComponentVal2(component string, val string) (int, error) {
@@ -525,7 +534,17 @@ func (gameProp *GameProperty) GetComponentVal2(component string, val string) (in
 
 	cd := gameProp.callStack.GetComponentData(gameProp, ic)
 
-	return cd.GetVal(val), nil
+	v, isok := cd.GetVal(val)
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal:GetVal",
+			slog.String("component", component),
+			slog.String("val", val),
+			goutils.Err(ErrInvalidComponentVal))
+
+		return 0, ErrInvalidComponentVal
+	}
+
+	return v, nil
 }
 
 func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {

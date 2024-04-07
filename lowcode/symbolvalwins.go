@@ -78,17 +78,17 @@ func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message
 }
 
 // GetVal -
-func (symbolValWinsData *SymbolValWinsData) GetVal(key string) int {
+func (symbolValWinsData *SymbolValWinsData) GetVal(key string) (int, bool) {
 	if key == SVWDVSymbolNum {
-		return symbolValWinsData.SymbolNum
+		return symbolValWinsData.SymbolNum, true
 	} else if key == SVWDVWins {
-		return symbolValWinsData.Wins
+		return symbolValWinsData.Wins, true
 	}
 	// } else if key == SVWDVCollectorNum {
 	// 	return symbolValWinsData.CollectorNum
 	// }
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

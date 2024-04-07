@@ -65,18 +65,18 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 }
 
 // GetVal -
-func (clusterTriggerData *ClusterTriggerData) GetVal(key string) int {
+func (clusterTriggerData *ClusterTriggerData) GetVal(key string) (int, bool) {
 	if key == CVSymbolNum {
-		return clusterTriggerData.SymbolNum
+		return clusterTriggerData.SymbolNum, true
 	} else if key == CVWildNum {
-		return clusterTriggerData.WildNum
+		return clusterTriggerData.WildNum, true
 	} else if key == CVRespinNum {
-		return clusterTriggerData.RespinNum
+		return clusterTriggerData.RespinNum, true
 	} else if key == CVWins {
-		return clusterTriggerData.Wins
+		return clusterTriggerData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -
