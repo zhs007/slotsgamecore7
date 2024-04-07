@@ -265,14 +265,14 @@ type RTPConfig struct {
 // 	rtp.AddHitRateNode(cfgHitRateFeature.Name, newFuncHitRate(cfgHitRateFeature))
 // }
 
-func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64) error {
+func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64, funcNewRNG FuncNewRNG) error {
 	// SetRTPMode()
 	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	})
+	}, funcNewRNG)
 	if err != nil {
 		goutils.Error("StartRTP:NewGame3",
 			slog.String("gamecfg", gamecfg),
@@ -347,14 +347,14 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	return nil
 }
 
-func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer) (*stats2.Stats, error) {
+func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer, funcNewRNG FuncNewRNG) (*stats2.Stats, error) {
 	// SetRTPMode()
 	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2WithData(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	})
+	}, funcNewRNG)
 	if err != nil {
 		goutils.Error("StartRTPWithData:NewGame3",
 			goutils.Err(err))

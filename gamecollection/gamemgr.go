@@ -6,12 +6,14 @@ import (
 
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 )
 
 type GameMgr struct {
 	sync.Mutex
 	MapGames map[string]*GameData
+	newRNG   lowcode.FuncNewRNG
 }
 
 func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
@@ -33,7 +35,7 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 		// goutils.Info("GameMgr.InitGame",
 		// 	slog.String("data", string(data)))
 
-		gameD1, err := NewGameDataWithHash(gameCode, data, hash)
+		gameD1, err := NewGameDataWithHash(gameCode, data, hash, mgr.newRNG)
 		if err != nil {
 			goutils.Error("GameMgr.InitGame:NewGameDataWithHash",
 				goutils.Err(err))
@@ -52,7 +54,7 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 	// goutils.Info("GameMgr.InitGame",
 	// 	slog.String("data", string(data)))
 
-	gameD1, err := NewGameData(gameCode, data)
+	gameD1, err := NewGameData(gameCode, data, mgr.newRNG)
 	if err != nil {
 		goutils.Error("GameMgr.InitGame:NewGameData",
 			goutils.Err(err))
@@ -133,8 +135,9 @@ func (mgr *GameMgr) PlayGame(gameCode string, req *sgc7pb.RequestPlay) (*sgc7pb.
 	return reply, nil
 }
 
-func NewGameMgr() *GameMgr {
+func NewGameMgr(funcNewRNG lowcode.FuncNewRNG) *GameMgr {
 	return &GameMgr{
 		MapGames: make(map[string]*GameData),
+		newRNG:   funcNewRNG,
 	}
 }

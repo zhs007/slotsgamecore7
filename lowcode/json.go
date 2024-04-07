@@ -1029,7 +1029,7 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	return nil
 }
 
-func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG) (*Game, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("NewGame2:ReadFile",
@@ -1039,7 +1039,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 		return nil, err
 	}
 
-	return NewGame2WithData(data, funcNewPlugin)
+	return NewGame2WithData(data, funcNewPlugin, funcNewRNG)
 }
 
 // func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
@@ -1071,7 +1071,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) 
 // 	return NewGameExForRTP(bet, fn, funcNewPlugin)
 // }
 
-func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
+func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG) (*Game, error) {
 	game := &Game{
 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
 		MgrComponent: NewComponentMgr(),
@@ -1180,7 +1180,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Gam
 
 	// cfg.RTP = &RTPConfig{}
 
-	err = game.Init2(cfg)
+	err = game.Init2(cfg, funcNewRNG)
 	if err != nil {
 		goutils.Error("NewGame2WithData:Init2",
 			goutils.Err(err))
