@@ -253,44 +253,16 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	return nil
 }
 
-func (clusterTrigger *ClusterTrigger) calcSymbolValMulti(ret *sgc7game.Result, os *sgc7game.GameScene) int {
+func (clusterTrigger *ClusterTrigger) calcSymbolValMulti(ret *sgc7game.Result, os *sgc7game.GameScene, funcCalcMulti sgc7game.FuncCalcMulti) int {
 	mul := 1
 
-	if clusterTrigger.Config.OSMulType == OSMTAdd {
-		for i := 0; i < len(ret.Pos)/2; i++ {
-			x := ret.Pos[i*2]
-			y := ret.Pos[i*2+1]
+	for i := 0; i < len(ret.Pos)/2; i++ {
+		x := ret.Pos[i*2]
+		y := ret.Pos[i*2+1]
 
-			if os.Arr[x][y] > 1 {
-				mul += os.Arr[x][y]
-			}
-		}
-	} else if clusterTrigger.Config.OSMulType == OSMTMul {
-		for i := 0; i < len(ret.Pos)/2; i++ {
-			x := ret.Pos[i*2]
-			y := ret.Pos[i*2+1]
-
-			if os.Arr[x][y] > 1 {
-				mul *= os.Arr[x][y]
-			}
-		}
-	} else if clusterTrigger.Config.OSMulType == OSMTPowOf2Add {
-		for i := 0; i < len(ret.Pos)/2; i++ {
-			x := ret.Pos[i*2]
-			y := ret.Pos[i*2+1]
-
-			if os.Arr[x][y] >= 1 {
-				mul += PowInt(2, os.Arr[x][y])
-			}
-		}
-	} else if clusterTrigger.Config.OSMulType == OSMTPowOf2Mul {
-		for i := 0; i < len(ret.Pos)/2; i++ {
-			x := ret.Pos[i*2]
-			y := ret.Pos[i*2+1]
-
-			if os.Arr[x][y] >= 1 {
-				mul *= PowInt(2, os.Arr[x][y])
-			}
+		mul = funcCalcMulti(mul, os.Arr[x][y])
+		if os.Arr[x][y] > 1 {
+			mul += os.Arr[x][y]
 		}
 	}
 
@@ -330,12 +302,14 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sg
 			std.WildNum += v.Wilds
 		}
 	} else {
+		funcCalcMulti := GetSymbolValMultiFunc(clusterTrigger.Config.OSMulType)
+
 		if !gIsReleaseMode {
 			cd.AvgSymbolValMulti = 0
 		}
 
 		for _, v := range lst {
-			svm := clusterTrigger.calcSymbolValMulti(v, os)
+			svm := clusterTrigger.calcSymbolValMulti(v, os, funcCalcMulti)
 
 			if !gIsReleaseMode {
 				cd.AvgSymbolValMulti += svm

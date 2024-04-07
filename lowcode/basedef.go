@@ -96,6 +96,46 @@ func ParseOtherSceneMultiType(str string) OtherSceneMultiType {
 	return OSMTNone
 }
 
+func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
+	if t == OSMTAdd {
+		return func(src int, target int) int {
+			if target > 1 {
+				return src + target
+			}
+
+			return src
+		}
+	} else if t == OSMTMul {
+		return func(src int, target int) int {
+			if target > 1 {
+				return src * target
+			}
+
+			return src
+		}
+	} else if t == OSMTPowOf2Add {
+		return func(src int, target int) int {
+			if target >= 1 {
+				return src + PowInt(2, target)
+			}
+
+			return src
+		}
+	} else if t == OSMTPowOf2Mul {
+		return func(src int, target int) int {
+			if target >= 1 {
+				return src * PowInt(2, target)
+			}
+
+			return src
+		}
+	}
+
+	return func(src int, target int) int {
+		return 1
+	}
+}
+
 type GameParams struct {
 	sgc7pb.GameParam `json:",inline"`
 	LastScene        *sgc7game.GameScene       `json:"-"`

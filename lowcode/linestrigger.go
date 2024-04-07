@@ -310,43 +310,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 		return false, nil
 	}
 
-	funcCalcMulti := func(src int, target int) int {
-		return 1
-	}
-
-	if linesTrigger.Config.OSMulType == OSMTAdd {
-		funcCalcMulti = func(src int, target int) int {
-			if target > 1 {
-				return src + target
-			}
-
-			return src
-		}
-	} else if linesTrigger.Config.OSMulType == OSMTMul {
-		funcCalcMulti = func(src int, target int) int {
-			if target > 1 {
-				return src * target
-			}
-
-			return src
-		}
-	} else if linesTrigger.Config.OSMulType == OSMTPowOf2Add {
-		funcCalcMulti = func(src int, target int) int {
-			if target >= 1 {
-				return src + PowInt(2, target)
-			}
-
-			return src
-		}
-	} else if linesTrigger.Config.OSMulType == OSMTPowOf2Mul {
-		funcCalcMulti = func(src int, target int) int {
-			if target >= 1 {
-				return src * PowInt(2, target)
-			}
-
-			return src
-		}
-	}
+	funcCalcMulti := GetSymbolValMultiFunc(linesTrigger.Config.OSMulType)
 
 	if linesTrigger.Config.TriggerType == STTypeLines {
 		if linesTrigger.Config.OSMulType == OSMTNone { // no otherscene multi
