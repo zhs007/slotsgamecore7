@@ -204,7 +204,8 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		}
 
 		ccd := gameProp.GetCurComponentData(curComponent)
-		nc, err := curComponent.OnPlayGame(gameProp, curpr, gp, plugin, "", "", ps, stake, prs, ccd)
+		currng := gameProp.rng.GetCurRNG(curComponent.GetName())
+		nc, err := curComponent.OnPlayGame(gameProp, curpr, gp, currng, "", "", ps, stake, prs, ccd)
 		if err != nil {
 			if err != ErrComponentDoNothing {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",

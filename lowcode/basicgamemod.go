@@ -114,7 +114,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	for {
 		isComponentDoNothing := false
 		cd := gameProp.callStack.GetCurComponentData(gameProp, curComponent)
-		nextComponentName, err := curComponent.OnPlayGame(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
+		currng := gameProp.rng.GetCurRNG(curComponent.GetName())
+		nextComponentName, err := curComponent.OnPlayGame(gameProp, pr, gp, currng, cmd, param, ps, stake, prs, cd)
 		if err != nil {
 			if err != ErrComponentDoNothing {
 				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
@@ -137,7 +138,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 			gameProp.OnCallEnd(curComponent, cd, gp)
 
-			err := curComponent.EachSymbols(gameProp, pr, gp, plugin, ps, stake, prs, cd)
+			err := curComponent.EachSymbols(gameProp, pr, gp, currng, ps, stake, prs, cd)
 			if err != nil {
 				goutils.Error("BasicGameMod.OnPlay:EachSymbols",
 					goutils.Err(err))
