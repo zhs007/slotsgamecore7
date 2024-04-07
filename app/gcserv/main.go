@@ -13,7 +13,7 @@ func main() {
 	goutils.InitLogger2("gamecollection", sgc7ver.Version,
 		"debug", true, "./logs")
 
-	serv, err := gamecollection.NewServ(":5000", sgc7ver.Version, false)
+	serv, err := gamecollection.NewServ(":5000", sgc7ver.Version, false, lowcode.NewBasicRNG)
 	if err != nil {
 		goutils.Error("NewServ",
 			goutils.Err(err))

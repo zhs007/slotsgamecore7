@@ -101,8 +101,8 @@ type Game struct {
 // }
 
 // Init - initial game
-func (game *Game) Init2(cfg *Config) error {
-	pool, err := newGamePropertyPool2(cfg)
+func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG) error {
+	pool, err := newGamePropertyPool2(cfg, funcNewRNG)
 	if err != nil {
 		goutils.Error("Game.Init2:NewGamePropertyPool2",
 			goutils.Err(err))
@@ -152,55 +152,55 @@ func (game *Game) Init2(cfg *Config) error {
 	return nil
 }
 
-// Init - initial game
-func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
-	pool, err := newGamePropertyPool2(cfg)
-	if err != nil {
-		goutils.Error("Game.Init2:NewGamePropertyPool2",
-			goutils.Err(err))
+// // Init - initial game
+// func (game *Game) Init2ForRTP(cfg *Config, bet int) error {
+// 	pool, err := newGamePropertyPool2(cfg)
+// 	if err != nil {
+// 		goutils.Error("Game.Init2:NewGamePropertyPool2",
+// 			goutils.Err(err))
 
-		return err
-	}
+// 		return err
+// 	}
 
-	game.Pool = pool
+// 	game.Pool = pool
 
-	game.Cfg.PayTables = pool.DefaultPaytables
-	game.SetVer(sgc7ver.Version)
+// 	game.Cfg.PayTables = pool.DefaultPaytables
+// 	game.SetVer(sgc7ver.Version)
 
-	game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
+// 	game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
 
-	// for _, v := range pool.Config.GameMods {
-	gamemod, err := NewBasicGameMod2(pool, game.MgrComponent)
-	if err != nil {
-		goutils.Error("Game.Init2:NewBasicGameMod2",
-			goutils.Err(err))
+// 	// for _, v := range pool.Config.GameMods {
+// 	gamemod, err := NewBasicGameMod2(pool, game.MgrComponent)
+// 	if err != nil {
+// 		goutils.Error("Game.Init2:NewBasicGameMod2",
+// 			goutils.Err(err))
 
-		return err
-	}
+// 		return err
+// 	}
 
-	game.AddGameMod(gamemod)
-	// }
+// 	game.AddGameMod(gamemod)
+// 	// }
 
-	err = pool.InitStats(bet)
-	if err != nil {
-		goutils.Error("Game.Init2:InitStats",
-			goutils.Err(err))
+// 	err = pool.InitStats(bet)
+// 	if err != nil {
+// 		goutils.Error("Game.Init2:InitStats",
+// 			goutils.Err(err))
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	err = game.BuildGameConfigData()
-	if err != nil {
-		goutils.Error("Game.Init2:BuildGameConfigData",
-			goutils.Err(err))
+// 	err = game.BuildGameConfigData()
+// 	if err != nil {
+// 		goutils.Error("Game.Init2:BuildGameConfigData",
+// 			goutils.Err(err))
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	pool.onInit()
+// 	pool.onInit()
 
-	return nil
-}
+// 	return nil
+// }
 
 // CheckStake - check stake
 func (game *Game) CheckStake(stake *sgc7game.Stake) error {

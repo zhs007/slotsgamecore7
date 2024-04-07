@@ -70,18 +70,18 @@ func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 }
 
 // GetVal -
-func (linesTriggerData *LinesTriggerData) GetVal(key string) int {
+func (linesTriggerData *LinesTriggerData) GetVal(key string) (int, bool) {
 	if key == CVSymbolNum {
-		return linesTriggerData.SymbolNum
+		return linesTriggerData.SymbolNum, true
 	} else if key == CVWildNum {
-		return linesTriggerData.WildNum
+		return linesTriggerData.WildNum, true
 	} else if key == CVRespinNum {
-		return linesTriggerData.RespinNum
+		return linesTriggerData.RespinNum, true
 	} else if key == CVWins {
-		return linesTriggerData.Wins
+		return linesTriggerData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

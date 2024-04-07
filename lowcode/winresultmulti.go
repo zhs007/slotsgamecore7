@@ -53,12 +53,12 @@ func (winResultMultiData *WinResultMultiData) BuildPBComponentData() proto.Messa
 }
 
 // GetVal -
-func (winResultMultiData *WinResultMultiData) GetVal(key string) int {
+func (winResultMultiData *WinResultMultiData) GetVal(key string) (int, bool) {
 	if key == CVWins {
-		return winResultMultiData.Wins
+		return winResultMultiData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

@@ -52,12 +52,12 @@ func (winResultCacheData *WinResultCacheData) BuildPBComponentData() proto.Messa
 }
 
 // GetVal -
-func (winResultCacheData *WinResultCacheData) GetVal(key string) int {
+func (winResultCacheData *WinResultCacheData) GetVal(key string) (int, bool) {
 	if key == CVWins {
-		return winResultCacheData.Wins
+		return winResultCacheData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

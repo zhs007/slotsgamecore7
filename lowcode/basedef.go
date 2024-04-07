@@ -4,11 +4,10 @@ import (
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-var IsStatsComponentMsg bool
+// var IsStatsComponentMsg bool
 
 const (
 	TagCurReels = "reels"
@@ -75,17 +74,17 @@ func ParseBetType(str string) BetType {
 
 type GameParams struct {
 	sgc7pb.GameParam `json:",inline"`
-	LastScene        *sgc7game.GameScene      `json:"-"`
-	LastOtherScene   *sgc7game.GameScene      `json:"-"`
-	MapComponentMsgs map[string]proto.Message `json:"-"`
+	LastScene        *sgc7game.GameScene       `json:"-"`
+	LastOtherScene   *sgc7game.GameScene       `json:"-"`
+	MapComponentData map[string]IComponentData `json:"-"`
 }
 
 func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
-	if IsStatsComponentMsg {
-		pbmsg := cd.BuildPBComponentData()
+	if !gIsReleaseMode {
+		gp.MapComponentData[name] = cd
+	}
 
-		gp.MapComponentMsgs[name] = pbmsg
-
+	if gIsRTPMode {
 		return nil
 	}
 
@@ -118,16 +117,26 @@ func (gp *GameParams) SetGameProp(gameProp *GameProperty) error {
 
 func NewGameParam() *GameParams {
 	return &GameParams{
-		MapComponentMsgs: make(map[string]proto.Message),
+		MapComponentData: make(map[string]IComponentData),
 	}
 }
 
 // gIsReleaseMode - release mode
+// release模式下，效率会高一些，正式服务器、校验rtp默认都是release模式
 var gIsReleaseMode bool
 
 // SetReleaseMode - release mode
 func SetReleaseMode() {
 	gIsReleaseMode = true
+}
+
+// gIsRTPMode - RTP mode
+// rtp模式下，不考虑前端数据，所以会更快一些
+var gIsRTPMode bool
+
+// SetRTPMode - rtp mode
+func SetRTPMode() {
+	gIsRTPMode = true
 }
 
 type CheckWinType int

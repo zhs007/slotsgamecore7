@@ -42,7 +42,7 @@ func main() {
 
 	game, err := lowcode.NewGame2(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	})
+	}, lowcode.NewBasicRNG)
 	if err != nil {
 		goutils.Error("NewGame2",
 			slog.String("gamecfg", gamecfg),
@@ -64,7 +64,7 @@ func main() {
 		Currency: "EUR",
 	}
 
-	lowcode.IsStatsComponentMsg = true
+	// lowcode.IsStatsComponentMsg = true
 
 	asciigame.StartGame(game, stake, func(pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, gameData any) {
 		gameProp, isok := gameData.(*lowcode.GameProperty)

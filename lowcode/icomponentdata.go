@@ -17,7 +17,7 @@ type IComponentData interface {
 	BuildPBComponentData() proto.Message
 
 	// GetVal -
-	GetVal(key string) int
+	GetVal(key string) (int, bool)
 	// SetVal -
 	SetVal(key string, val int)
 

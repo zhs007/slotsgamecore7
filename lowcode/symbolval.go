@@ -137,9 +137,9 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 			symbolVal.AddOtherScene(gameProp, curpr, os, cd)
 
-			if symbolVal.OtherSceneFeature != nil {
-				gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
-			}
+			// if symbolVal.OtherSceneFeature != nil {
+			// 	gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
+			// }
 		} else {
 			os := os1.CloneEx(gameProp.PoolScene)
 
@@ -167,9 +167,9 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 			symbolVal.AddOtherScene(gameProp, curpr, os, cd)
 
-			if symbolVal.OtherSceneFeature != nil {
-				gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
-			}
+			// if symbolVal.OtherSceneFeature != nil {
+			// 	gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
+			// }
 		}
 	} else {
 		symbolVal.ClearOtherScene(gameProp)

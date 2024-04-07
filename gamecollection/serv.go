@@ -6,6 +6,7 @@ import (
 	"net"
 
 	goutils "github.com/zhs007/goutils"
+	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pbutils "github.com/zhs007/slotsgamecore7/pbutils"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
@@ -22,7 +23,7 @@ type Serv struct {
 }
 
 // NewServ -
-func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, error) {
+func NewServ(bindaddr string, version string, useOpenTelemetry bool, funcNewRNG lowcode.FuncNewRNG) (*Serv, error) {
 	// lowcode.SetJsonMode()
 
 	lis, err := net.Listen("tcp", bindaddr)
@@ -49,7 +50,7 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool) (*Serv, err
 	serv := &Serv{
 		lis:      lis,
 		grpcServ: grpcServ,
-		mgrGame:  NewGameMgr(),
+		mgrGame:  NewGameMgr(funcNewRNG),
 	}
 
 	sgc7pb.RegisterGameLogicCollectionServer(grpcServ, serv)

@@ -51,12 +51,12 @@ func (piggyBankData *PiggyBankData) BuildPBComponentData() proto.Message {
 }
 
 // GetVal -
-func (piggyBankData *PiggyBankData) GetVal(key string) int {
+func (piggyBankData *PiggyBankData) GetVal(key string) (int, bool) {
 	if key == CVWins {
-		return piggyBankData.Wins
+		return piggyBankData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

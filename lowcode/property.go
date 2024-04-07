@@ -19,14 +19,6 @@ const (
 	GamePropCurLineData  = 5
 	GamePropCurLineNum   = 6
 	GamePropCurBetIndex  = 7
-
-	GamePropStepMulti     = 100
-	GamePropGameMulti     = 101
-	GamePropGameCoinMulti = 102 // 这次spin的全部step都生效，是只有coin玩法才生效的倍数
-	GamePropStepCoinMulti = 103 // 这次spin的step才生效，是只有coin玩法才生效的倍数
-
-	// GamePropNextComponent   = 200
-	// GamePropRespinComponent = 201
 )
 
 var MapProperty map[string]int
@@ -73,6 +65,7 @@ type GameProperty struct {
 	OtherSceneStack        *SceneStack
 	stats2Cache            *stats2.Cache
 	usedComponent          []string
+	rng                    IRNG
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
@@ -95,10 +88,7 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 	gp.SetGameProp(gameProp)
 }
 
-func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
-	gameProp.SetVal(GamePropGameMulti, 1)
-	gameProp.SetVal(GamePropGameCoinMulti, 1)
-
+func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake, curPlugin sgc7plugin.IPlugin) error {
 	curBet := stake.CashBet / stake.CoinBet
 	for i, v := range gameProp.Pool.Config.Bets {
 		if v == int(curBet) {
@@ -115,7 +105,10 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
 
 	gameProp.callStack.OnNewGame()
 
-	gameProp = nil
+	// gameProp.rng = gameProp.newRNG()
+
+	gameProp.rng.OnNewGame(curPlugin)
+	// gameProp = nil
 
 	return nil
 }
@@ -124,13 +117,6 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.mapInt = make(map[string]int)
 	gameProp.mapStr = make(map[string]string)
 
-	// gameProp.SetStrVal(GamePropNextComponent, "")
-	// gameProp.SetStrVal(GamePropRespinComponent, "")
-
-	gameProp.SetVal(GamePropStepMulti, 1)
-	gameProp.SetVal(GamePropStepCoinMulti, 1)
-
-	// gameProp.HistoryComponents = nil
 	gameProp.callStack.OnNewStep()
 
 	return nil
@@ -215,18 +201,12 @@ func (gameProp *GameProperty) GetOtherScene(pr *sgc7game.PlayResult, tag string)
 
 func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, respinComponent string, gs *sgc7game.GameScene, os *sgc7game.GameScene) {
 	if gs != nil {
-		// gp.LastScene = gs.Clone()
 		gp.LastScene = gs.CloneEx(gameProp.PoolScene)
 	}
 
 	if os != nil {
-		// gp.LastOtherScene = os.Clone()
 		gp.LastOtherScene = os.CloneEx(gameProp.PoolScene)
 	}
-
-	// gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
-
-	// gp.NextStepFirstComponent = respinComponent
 }
 
 func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
@@ -257,14 +237,8 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 			if goutils.IndexOfStringSlice(gp.HistoryComponents, v, 0) < 0 {
 				cd := gameProp.GetGlobalComponentDataWithName(v)
 				gp.AddComponentData(v, cd)
-				// gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
 			}
 		}
-		// if goutils.IndexOfStringSlice(gp.HistoryComponents, gp.NextStepFirstComponent, 0) < 0 {
-		// 	cd := gameProp.GetGlobalComponentDataWithName(gp.NextStepFirstComponent)
-		// 	gp.AddComponentData(gp.NextStepFirstComponent, cd)
-		// 	// gp.AddComponentData(gp.NextStepFirstComponent, gameProp.MapComponentData[gp.NextStepFirstComponent])
-		// }
 	} else if !pr.IsWait {
 		pr.IsFinish = true
 	}
@@ -314,19 +288,7 @@ func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData,
 	gp.HistoryComponents = append(gp.HistoryComponents, tag)
 }
 
-// func (gameProp *GameProperty) AddComponent2History(component IComponent, index int, gp *GameParams) {
-// 	// for _, c := range gameProp.HistoryComponents {
-// 	// 	if c.Component.GetName() == component.GetName() {
-// 	// 		return
-// 	// 	}
-// 	// }
-
-// 	gameProp.HistoryComponents = append(gameProp.HistoryComponents, &HistoryComponentData{Component: component, ForeachIndex: index})
-// 	gp.HistoryComponents = append(gp.HistoryComponents, component.GetName())
-// }
-
 func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string, usePushTrigger bool) error {
-	// if respinNum > 0 {
 	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {
 		gameProp.UseComponent(respinComponent)
@@ -337,21 +299,7 @@ func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7g
 		} else {
 			cd.AddRespinTimes(respinNum)
 		}
-		// respin, isok := component.(*Respin)
-		// if isok {
-		// 	if usePushTrigger {
-		// 		respin.PushTrigger(gameProp, plugin, pr, gp, respinNum)
-		// 	} else {
-		// 		respin.AddRespinTimes(gameProp, respinNum)
-		// 	}
-
-		// gameProp.SetStrVal(GamePropRespinComponent, respinComponent)
-		// gameProp.onTriggerRespin(respinComponent)
-
-		// gp.NextStepFirstComponent = respinComponent
-		// }
 	}
-	// }
 
 	return nil
 }
@@ -510,7 +458,16 @@ func (gameProp *GameProperty) GetComponentVal(componentVal string) (int, error) 
 
 	cd := gameProp.callStack.GetComponentData(gameProp, component)
 
-	return cd.GetVal(arr[1]), nil
+	v, isok := cd.GetVal(arr[1])
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal:GetVal",
+			slog.String("componentVal", componentVal),
+			goutils.Err(ErrInvalidComponentVal))
+
+		return 0, ErrInvalidComponentVal
+	}
+
+	return v, nil
 }
 
 func (gameProp *GameProperty) GetComponentVal2(component string, val string) (int, error) {
@@ -525,7 +482,17 @@ func (gameProp *GameProperty) GetComponentVal2(component string, val string) (in
 
 	cd := gameProp.callStack.GetComponentData(gameProp, ic)
 
-	return cd.GetVal(val), nil
+	v, isok := cd.GetVal(val)
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal:GetVal",
+			slog.String("component", component),
+			slog.String("val", val),
+			goutils.Err(ErrInvalidComponentVal))
+
+		return 0, ErrInvalidComponentVal
+	}
+
+	return v, nil
 }
 
 func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Award, curpr *sgc7game.PlayResult, gp *GameParams) {
@@ -554,16 +521,6 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		cd := gameProp.GetGlobalComponentData(component)
 		cd.AddTriggerRespinAward(award)
 
-		// irespin, isok := component.(IRespin)
-		// if !isok {
-		// 	goutils.Error("GameProperty.procAward:OnTriggerRespin",
-		// 		goutils.Err(ErrNotRespin))
-
-		// 	return
-		// }
-
-		// irespin.AddTriggerAward(gameProp, award)
-
 		return
 	}
 
@@ -574,113 +531,19 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			gameProp.UseComponent(award.StrParams[0])
 
 			cd.AddRespinTimes(award.Vals[0])
-			// respin, isok := component.(IRespin)
-			// if isok {
-			// 	respin.AddRespinTimes(gameProp, award.Vals[0])
-			// }
 		}
-	} else if award.Type == AwardGameMulti {
-		gameProp.SetVal(GamePropGameMulti, award.Vals[0])
-	} else if award.Type == AwardStepMulti {
-		gameProp.SetVal(GamePropStepMulti, award.Vals[0])
-	} else if award.Type == AwardInitMask {
-		// component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		// if isok {
-		// 	mask, isok := component.(*Mask)
-		// 	if isok {
-		// 		mask.ProcMask(plugin, gameProp, curpr, prs, gp, award.StrParams[1])
-		// 	}
-		// }
 	} else if award.Type == AwardTriggerRespin {
 		gameProp.TriggerRespin(plugin, curpr, gp, award.Vals[0], award.StrParams[0], false)
-		// } else if award.Type == AwardCollector {
-		// 	component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		// 	if isok {
-		// 		collector, isok := component.(*Collector)
-		// 		if isok {
-		// 			err := collector.Add(plugin, award.Vals[0], nil, gameProp, curpr, gp, false)
-		// 			if err != nil {
-		// 				goutils.Error("GameProperty.procAward",
-		// 					goutils.Err(err))
-
-		// 				return
-		// 			}
-		// 		}
-		// 	}
-		// } else if award.Type == AwardNoLevelUpCollector {
-		// 	component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		// 	if isok {
-		// 		collector, isok := component.(*Collector)
-		// 		if isok {
-		// 			err := collector.Add(plugin, award.Vals[0], nil, gameProp, curpr, gp, true)
-		// 			if err != nil {
-		// 				goutils.Error("GameProperty.procAward",
-		// 					goutils.Err(err))
-
-		// 				return
-		// 			}
-		// 		}
-		// 	}
-		// } else if award.Type == AwardWeightGameRNG {
-		// 	vw, err := gameProp.GetIntValWeights(award.StrParams[0], true)
-		// 	if err != nil {
-		// 		goutils.Error("GameProperty.procAward:AwardWeightGameRNG:GetIntValWeights",
-		// 			goutils.Err(err))
-
-		// 		return
-		// 	}
-
-		// 	cr, err := vw.RandVal(plugin)
-		// 	if err != nil {
-		// 		goutils.Error("GameProperty.procAward:AwardWeightGameRNG:RandVal",
-		// 			goutils.Err(err))
-
-		// 		return
-		// 	}
-
-		// 	gameProp.TagInt(award.StrParams[1], cr.Int())
-		// 	// } else if award.Type == AwardPushSymbolCollection {
-		// 	// 	component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		// 	// 	if isok {
-		// 	// 		symbolCollection, isok := component.(*SymbolCollection)
-		// 	// 		if isok {
-		// 	// 			for i := 0; i < award.Vals[0]; i++ {
-		// 	// 				err := symbolCollection.Push(plugin, gameProp, gp)
-		// 	// 				if err != nil {
-		// 	// 					goutils.Error("GameProperty.procAward:AwardPushSymbolCollection:Push",
-		// 	// 						goutils.Err(err))
-
-		// 	// 					return
-		// 	// 				}
-		// 	// 			}
-
-		// 	// 			gameProp.AddComponent2History(component, gp)
-		// 	// 		}
-		// 	// 	}
-	} else if award.Type == AwardGameCoinMulti {
-		gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
-	} else if award.Type == AwardStepCoinMulti {
-		gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
-	} else if award.Type == AwardRetriggerRespin {
-		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		if isok {
-			cd := gameProp.GetGlobalComponentData(component)
-			cd.TriggerRespin(gameProp, plugin, curpr, gp)
-			// respin, isok := component.(IRespin)
-			// if isok {
-			// 	respin.Trigger(gameProp, plugin, curpr, gp)
-			// }
-		}
+		// component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
+		// if isok {
+		// 	cd := gameProp.GetGlobalComponentData(component)
+		// 	cd.TriggerRespin(gameProp, plugin, curpr, gp)
+		// }
 	} else if award.Type == AwardAddRetriggerRespinNum {
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			cd := gameProp.GetGlobalComponentData(component)
 			cd.ChgConfigIntVal(CCVRetriggerRespinNum, award.Vals[0])
-			// cd.AddRetriggerRespinNum(award.Vals[0])
-			// respin, isok := component.(IRespin)
-			// if isok {
-			// 	respin.AddRetriggerRespinNum(gameProp, award.Vals[0])
-			// }
 		}
 	} else if award.Type == AwardSetMaskVal {
 		gameProp.UseComponent(award.StrParams[0])
@@ -727,68 +590,6 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	}
 }
 
-func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherSceneFeature, _ *sgc7game.PlayResult, os *sgc7game.GameScene) {
-	if otherSceneFeature.Type == OtherSceneFeatureGameMulti {
-		mul := 1
-
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				mul *= v
-			}
-		}
-
-		gameProp.SetVal(GamePropGameMulti, mul)
-	} else if otherSceneFeature.Type == OtherSceneFeatureGameMultiSum {
-		mul := 0
-
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				if v > 1 {
-					mul += v
-				}
-			}
-		}
-
-		gameProp.SetVal(GamePropGameMulti, mul)
-	} else if otherSceneFeature.Type == OtherSceneFeatureStepMultiSum {
-		mul := 0
-
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				if v > 1 {
-					mul += v
-				}
-			}
-		}
-
-		gameProp.SetVal(GamePropStepMulti, mul)
-	} else if otherSceneFeature.Type == OtherSceneFeatureStepMulti {
-		mul := 1
-
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				mul *= v
-			}
-		}
-
-		gameProp.SetVal(GamePropStepMulti, mul)
-	}
-}
-
-// func (gameProp *GameProperty) ProcMulti(ret *sgc7game.Result) {
-// 	mul := gameProp.GetVal(GamePropStepMulti) * gameProp.GetVal(GamePropGameMulti)
-// 	ret.CoinWin *= mul
-// 	ret.CashWin *= mul
-// }
-
-// func (gameProp *GameProperty) GetBet(stake *sgc7game.Stake, bettype string) int {
-// 	if bettype == BetTypeTotalBet {
-// 		return int(stake.CoinBet) * gameProp.Pool.Config.TotalBetInWins[gameProp.GetVal(GamePropCurBetIndex)]
-// 	}
-
-// 	return int(stake.CoinBet)
-// }
-
 func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 	if bt == BTypeTotalBet {
 		return int(stake.CoinBet) * gameProp.Pool.Config.TotalBetInWins[gameProp.GetVal(GamePropCurBetIndex)]
@@ -799,28 +600,12 @@ func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 	return 0
 }
 
-// func (gameProp *GameProperty) SaveRetriggerRespinNum(respinComponent string) error {
-// 	component, isok := gameProp.Components.MapComponents[respinComponent]
-// 	if isok {
-// 		respin, isok := component.(IRespin)
-// 		if isok {
-// 			respin.SaveRetriggerRespinNum(gameProp)
-// 		}
-// 	}
-
-// 	return nil
-// }
-
 func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
 	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {
 		cd := gameProp.GetGlobalComponentData(component)
 
 		return cd.GetLastRespinNum()
-		// respin, isok := component.(IRespin)
-		// if isok {
-		// 	return respin.GetLastRespinNum(gameProp)
-		// }
 	}
 
 	return 0
@@ -833,12 +618,6 @@ func (gameProp *GameProperty) CanTrigger(componentName string, gs *sgc7game.Game
 		isTrigger, _ := component.CanTriggerWithScene(gameProp, gs, curpr, stake)
 
 		return isTrigger
-		// st, isok := component.(ISymbolTrigger)
-		// if isok {
-		// 	isTrigger, _ := st.CanTrigger(gameProp, gs, curpr, stake, false)
-
-		// 	return isTrigger
-		// }
 	}
 
 	return false
@@ -848,25 +627,11 @@ func (gameProp *GameProperty) IsInCurCallStack(componentName string) bool {
 	return gameProp.callStack.IsInCurCallStack(componentName)
 }
 
-// func (gameProp *GameProperty) InHistoryComponents(componentName string) bool {
-// 	for _, ic := range gameProp.HistoryComponents {
-// 		if ic.Component.GetName() == componentName {
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
-
 func (gameProp *GameProperty) IsEndingRespin(componentName string) bool {
 	component, isok := gameProp.Components.MapComponents[componentName]
 	if isok {
 		cd := gameProp.GetGlobalComponentData(component)
 		return cd.IsRespinEnding()
-		// respin, isok := component.(IRespin)
-		// if isok {
-		// 	return respin.IsEnding(gameProp)
-		// }
 	}
 
 	return false
@@ -877,10 +642,6 @@ func (gameProp *GameProperty) IsStartedRespin(componentName string) bool {
 	if isok {
 		cd := gameProp.GetGlobalComponentData(component)
 		return cd.IsRespinStarted()
-		// respin, isok := component.(IRespin)
-		// if isok {
-		// 	return respin.IsStarted(gameProp)
-		// }
 	}
 
 	return false
@@ -904,14 +665,6 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 
 		return ErrInvalidComponent
 	}
-	// cd, isok := gameProp.MapComponentData[arr[0]]
-	// if !isok {
-	// 	goutils.Error("GameProperty.SetComponentConfigVal:MapComponentData",
-	// 		slog.String("componentConfigValName", componentConfigValName),
-	// 		goutils.Err(ErrIvalidComponentName))
-
-	// 	return ErrIvalidComponentName
-	// }
 
 	gameProp.UseComponent(arr[0])
 
@@ -940,14 +693,6 @@ func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName st
 	}
 
 	gameProp.UseComponent(arr[0])
-	// cd, isok := gameProp.MapComponentData[arr[0]]
-	// if !isok {
-	// 	goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
-	// 		slog.String("componentConfigValName", componentConfigValName),
-	// 		goutils.Err(ErrIvalidComponentName))
-
-	// 	return ErrIvalidComponentName
-	// }
 
 	cd.SetConfigIntVal(arr[1], val)
 
@@ -974,14 +719,6 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 	}
 
 	gameProp.UseComponent(arr[0])
-	// cd, isok := gameProp.MapComponentData[arr[0]]
-	// if !isok {
-	// 	goutils.Error("GameProperty.SetComponentConfigIntVal:MapComponentData",
-	// 		slog.String("componentConfigValName", componentConfigValName),
-	// 		goutils.Err(ErrIvalidComponentName))
-
-	// 	return ErrIvalidComponentName
-	// }
 
 	cd.ChgConfigIntVal(arr[1], off)
 
@@ -1017,12 +754,6 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 }
 
 func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {
-	// // scene v3
-	// if len(gameProp.SceneStack.Scenes) > 0 {
-
-	// 	return
-	// }
-
 	if gAllowStats2 {
 		for _, v := range gp.HistoryComponents {
 			ic, isok := gameProp.Components.MapComponents[v]
@@ -1033,56 +764,11 @@ func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult,
 
 				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
 			}
-
-			// 			if !gameProp.stats2Cache.HasFeature(v) {
-			// 				gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
-			// 			}
-
-			// 			ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
-			// 		} else {
-			// 			arr := strings.Split(v, "/")
-			// 			if len(arr) == 2 {
-			// 				ic1, isok1 := gameProp.Components.MapComponents[arr[1]]
-			// 				if isok1 {
-			// 					if !gameProp.stats2Cache.HasFeature(arr[1]) {
-			// 						gameProp.stats2Cache.AddFeature(arr[1], ic1.NewStats2(gameProp.Components.statsNodeData.GetParent(arr[1])))
-			// 					}
-
-			// 					ic.OnStats2(gameProp.GetComponentData(ic1), gameProp.stats2Cache)
-			// 				}
-			// 			}
-			// 		}
 		}
 	}
 
 	if pr.IsFinish {
 		gameProp.PoolScene.Reset()
-
-		// for _, curpr := range prs {
-		// 	for _, s := range curpr.Scenes {
-		// 		gameProp.PoolScene.Put(s)
-		// 	}
-
-		// 	for _, s := range curpr.OtherScenes {
-		// 		gameProp.PoolScene.Put(s)
-		// 	}
-
-		// 	for _, s := range curpr.PrizeScenes {
-		// 		gameProp.PoolScene.Put(s)
-		// 	}
-		// }
-
-		// for _, s := range pr.Scenes {
-		// 	gameProp.PoolScene.Put(s)
-		// }
-
-		// for _, s := range pr.OtherScenes {
-		// 	gameProp.PoolScene.Put(s)
-		// }
-
-		// for _, s := range pr.PrizeScenes {
-		// 	gameProp.PoolScene.Put(s)
-		// }
 	}
 }
 
@@ -1100,76 +786,8 @@ func (gameProp *GameProperty) GetMask(name string) ([]bool, error) {
 	mask := cd.GetMask()
 
 	return mask, nil
-
-	// im, isok := ic.(IMask)
-	// if !isok {
-	// 	goutils.Error("GameProperty.GetMask",
-	// 		slog.String("name", name),
-	// 		goutils.Err(ErrNotMask))
-
-	// 	return nil, ErrNotMask
-	// }
-
-	// mask := im.GetMask(gameProp)
-
-	// return mask, nil
 }
 
-// // ForEachSymbols - foreach symbols
-// func (gameProp *GameProperty) ProcEachSymbol(componentName string, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
-// 	prs []*sgc7game.PlayResult, si int, symbol int) (string, error) {
-
-// 	ic, isok := gameProp.Components.MapComponents[componentName]
-// 	if !isok || !ic.IsMask() {
-// 		goutils.Error("GameProperty.ProcEachSymbol",
-// 			slog.String("name", componentName),
-// 			goutils.Err(ErrIvalidComponentName))
-
-// 		return "", ErrIvalidComponentName
-// 	}
-
-// 	cd := ic.NewComponentData()
-// 	mainkey := fmt.Sprintf("%v:%v", componentName, si)
-
-// 	next, err := ic.OnEachSymbol(gameProp, curpr, gp, plugin, ps, stake, prs, symbol, cd)
-// 	if err != nil {
-// 		if err == ErrComponentDoNothing {
-// 			return next, ErrComponentDoNothing
-// 		}
-
-// 		goutils.Error("GameProperty.ProcEachSymbol:OnEachSymbol",
-// 			slog.String("name", componentName),
-// 			goutils.Err(err))
-
-// 		return "", err
-// 	}
-
-// 	gameProp.MapComponentData[mainkey] = cd
-// 	// gameProp.HistoryComponents = append(gameProp.HistoryComponents, )
-
-// 	return next, err
-// }
-
-// func (gameProp *GameProperty) NewComponentDataWithForeachSymbol(componentName string, symbolCode int, index int) error {
-// 	ic, isok := gameProp.Components.MapComponents[componentName]
-// 	if !isok {
-// 		goutils.Error("GameProperty.NewComponentDataWithForeachSymbol",
-// 			slog.String("name", componentName),
-// 			goutils.Err(ErrIvalidComponentName))
-
-// 		return ErrIvalidComponentName
-// 	}
-
-// 	mainkey := fmt.Sprintf("%v:%v", componentName, index)
-// 	gameProp.MapComponentData[mainkey] = ic.NewComponentData()
-
-// 	ic.SetForeachSymbolData(&ForeachSymbolData{
-// 		SymbolCode: symbolCode,
-// 		Index:      index,
-// 	})
-
-//		return nil
-//	}
 func (gameProp *GameProperty) GetCurComponentData(ic IComponent) IComponentData {
 	return gameProp.callStack.GetCurComponentData(gameProp, ic)
 }

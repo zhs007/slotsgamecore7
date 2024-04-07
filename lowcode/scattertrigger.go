@@ -68,18 +68,18 @@ func (scatterTriggerData *ScatterTriggerData) BuildPBComponentData() proto.Messa
 }
 
 // GetVal -
-func (scatterTriggerData *ScatterTriggerData) GetVal(key string) int {
+func (scatterTriggerData *ScatterTriggerData) GetVal(key string) (int, bool) {
 	if key == CVSymbolNum {
-		return scatterTriggerData.SymbolNum
+		return scatterTriggerData.SymbolNum, true
 	} else if key == CVWildNum {
-		return scatterTriggerData.WildNum
+		return scatterTriggerData.WildNum, true
 	} else if key == CVRespinNum {
-		return scatterTriggerData.RespinNum
+		return scatterTriggerData.RespinNum, true
 	} else if key == CVWins {
-		return scatterTriggerData.Wins
+		return scatterTriggerData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

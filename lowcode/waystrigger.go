@@ -68,18 +68,18 @@ func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 }
 
 // GetVal -
-func (waysTriggerData *WaysTriggerData) GetVal(key string) int {
+func (waysTriggerData *WaysTriggerData) GetVal(key string) (int, bool) {
 	if key == CVSymbolNum {
-		return waysTriggerData.SymbolNum
+		return waysTriggerData.SymbolNum, true
 	} else if key == CVWildNum {
-		return waysTriggerData.WildNum
+		return waysTriggerData.WildNum, true
 	} else if key == CVRespinNum {
-		return waysTriggerData.RespinNum
+		return waysTriggerData.RespinNum, true
 	} else if key == CVWins {
-		return waysTriggerData.Wins
+		return waysTriggerData.Wins, true
 	}
 
-	return 0
+	return 0, false
 }
 
 // SetVal -

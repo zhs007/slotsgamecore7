@@ -24,6 +24,7 @@ type GamePropertyPool struct {
 	mapStrValWeights    map[string]*sgc7game.ValWeights2
 	mapIntValWeights    map[string]*sgc7game.ValWeights2
 	mapSymbolValWeights map[string]*sgc7game.ValWeights2
+	newRNG              FuncNewRNG
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -41,6 +42,7 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		SceneStack:       NewSceneStack(false),
 		OtherSceneStack:  NewSceneStack(true),
 		callStack:        NewCallStack(),
+		rng:              pool.newRNG(),
 	}
 
 	if gameProp.CurLineData != nil {
@@ -590,7 +592,7 @@ func (pool *GamePropertyPool) GetComponentList(bet int) *ComponentList {
 // 	return newGamePropertyPool2(cfg)
 // }
 
-func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
+func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
 		MapGamePropPool:     make(map[int]*sync.Pool),
 		Config:              cfg,
@@ -600,6 +602,7 @@ func newGamePropertyPool2(cfg *Config) (*GamePropertyPool, error) {
 		mapStrValWeights:    make(map[string]*sgc7game.ValWeights2),
 		mapIntValWeights:    make(map[string]*sgc7game.ValWeights2),
 		mapSymbolValWeights: make(map[string]*sgc7game.ValWeights2),
+		newRNG:              funcNewRNG,
 	}
 
 	if cfg.SymbolsViewer == "" {
