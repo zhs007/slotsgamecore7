@@ -158,9 +158,9 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
 
-		if symbolVal2.OtherSceneFeature != nil {
-			gameProp.procOtherSceneFeature(symbolVal2.OtherSceneFeature, curpr, os)
-		}
+		// if symbolVal2.OtherSceneFeature != nil {
+		// 	gameProp.procOtherSceneFeature(symbolVal2.OtherSceneFeature, curpr, os)
+		// }
 	} else {
 		symbolVal2.ClearOtherScene(gameProp)
 	}

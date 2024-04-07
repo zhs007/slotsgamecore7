@@ -20,10 +20,10 @@ const (
 	GamePropCurLineNum   = 6
 	GamePropCurBetIndex  = 7
 
-	GamePropStepMulti     = 100
-	GamePropGameMulti     = 101
-	GamePropGameCoinMulti = 102 // 这次spin的全部step都生效，是只有coin玩法才生效的倍数
-	GamePropStepCoinMulti = 103 // 这次spin的step才生效，是只有coin玩法才生效的倍数
+	// GamePropStepMulti     = 100
+	// GamePropGameMulti     = 101
+	// GamePropGameCoinMulti = 102 // 这次spin的全部step都生效，是只有coin玩法才生效的倍数
+	// GamePropStepCoinMulti = 103 // 这次spin的step才生效，是只有coin玩法才生效的倍数
 
 	// GamePropNextComponent   = 200
 	// GamePropRespinComponent = 201
@@ -96,8 +96,8 @@ func (gameProp *GameProperty) BuildGameParam(gp *GameParams) {
 }
 
 func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake) error {
-	gameProp.SetVal(GamePropGameMulti, 1)
-	gameProp.SetVal(GamePropGameCoinMulti, 1)
+	// gameProp.SetVal(GamePropGameMulti, 1)
+	// gameProp.SetVal(GamePropGameCoinMulti, 1)
 
 	curBet := stake.CashBet / stake.CoinBet
 	for i, v := range gameProp.Pool.Config.Bets {
@@ -127,8 +127,8 @@ func (gameProp *GameProperty) OnNewStep() error {
 	// gameProp.SetStrVal(GamePropNextComponent, "")
 	// gameProp.SetStrVal(GamePropRespinComponent, "")
 
-	gameProp.SetVal(GamePropStepMulti, 1)
-	gameProp.SetVal(GamePropStepCoinMulti, 1)
+	// gameProp.SetVal(GamePropStepMulti, 1)
+	// gameProp.SetVal(GamePropStepCoinMulti, 1)
 
 	// gameProp.HistoryComponents = nil
 	gameProp.callStack.OnNewStep()
@@ -598,18 +598,18 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			// 	respin.AddRespinTimes(gameProp, award.Vals[0])
 			// }
 		}
-	} else if award.Type == AwardGameMulti {
-		gameProp.SetVal(GamePropGameMulti, award.Vals[0])
-	} else if award.Type == AwardStepMulti {
-		gameProp.SetVal(GamePropStepMulti, award.Vals[0])
-	} else if award.Type == AwardInitMask {
-		// component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
-		// if isok {
-		// 	mask, isok := component.(*Mask)
-		// 	if isok {
-		// 		mask.ProcMask(plugin, gameProp, curpr, prs, gp, award.StrParams[1])
-		// 	}
-		// }
+		// } else if award.Type == AwardGameMulti {
+		// 	gameProp.SetVal(GamePropGameMulti, award.Vals[0])
+		// } else if award.Type == AwardStepMulti {
+		// 	gameProp.SetVal(GamePropStepMulti, award.Vals[0])
+		// } else if award.Type == AwardInitMask {
+		// 	// component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
+		// 	// if isok {
+		// 	// 	mask, isok := component.(*Mask)
+		// 	// 	if isok {
+		// 	// 		mask.ProcMask(plugin, gameProp, curpr, prs, gp, award.StrParams[1])
+		// 	// 	}
+		// 	// }
 	} else if award.Type == AwardTriggerRespin {
 		gameProp.TriggerRespin(plugin, curpr, gp, award.Vals[0], award.StrParams[0], false)
 		// } else if award.Type == AwardCollector {
@@ -676,11 +676,11 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		// 	// 			gameProp.AddComponent2History(component, gp)
 		// 	// 		}
 		// 	// 	}
-	} else if award.Type == AwardGameCoinMulti {
-		gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
-	} else if award.Type == AwardStepCoinMulti {
-		gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
-	} else if award.Type == AwardRetriggerRespin {
+		// } else if award.Type == AwardGameCoinMulti {
+		// 	gameProp.SetVal(GamePropGameCoinMulti, award.Vals[0])
+		// } else if award.Type == AwardStepCoinMulti {
+		// 	gameProp.SetVal(GamePropStepCoinMulti, award.Vals[0])
+		// } else if award.Type == AwardRetriggerRespin {
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			cd := gameProp.GetGlobalComponentData(component)
@@ -746,53 +746,53 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	}
 }
 
-func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherSceneFeature, _ *sgc7game.PlayResult, os *sgc7game.GameScene) {
-	if otherSceneFeature.Type == OtherSceneFeatureGameMulti {
-		mul := 1
+// func (gameProp *GameProperty) procOtherSceneFeature(otherSceneFeature *OtherSceneFeature, _ *sgc7game.PlayResult, os *sgc7game.GameScene) {
+// 	if otherSceneFeature.Type == OtherSceneFeatureGameMulti {
+// 		mul := 1
 
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				mul *= v
-			}
-		}
+// 		for _, arr := range os.Arr {
+// 			for _, v := range arr {
+// 				mul *= v
+// 			}
+// 		}
 
-		gameProp.SetVal(GamePropGameMulti, mul)
-	} else if otherSceneFeature.Type == OtherSceneFeatureGameMultiSum {
-		mul := 0
+// 		gameProp.SetVal(GamePropGameMulti, mul)
+// 	} else if otherSceneFeature.Type == OtherSceneFeatureGameMultiSum {
+// 		mul := 0
 
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				if v > 1 {
-					mul += v
-				}
-			}
-		}
+// 		for _, arr := range os.Arr {
+// 			for _, v := range arr {
+// 				if v > 1 {
+// 					mul += v
+// 				}
+// 			}
+// 		}
 
-		gameProp.SetVal(GamePropGameMulti, mul)
-	} else if otherSceneFeature.Type == OtherSceneFeatureStepMultiSum {
-		mul := 0
+// 		gameProp.SetVal(GamePropGameMulti, mul)
+// 	} else if otherSceneFeature.Type == OtherSceneFeatureStepMultiSum {
+// 		mul := 0
 
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				if v > 1 {
-					mul += v
-				}
-			}
-		}
+// 		for _, arr := range os.Arr {
+// 			for _, v := range arr {
+// 				if v > 1 {
+// 					mul += v
+// 				}
+// 			}
+// 		}
 
-		gameProp.SetVal(GamePropStepMulti, mul)
-	} else if otherSceneFeature.Type == OtherSceneFeatureStepMulti {
-		mul := 1
+// 		gameProp.SetVal(GamePropStepMulti, mul)
+// 	} else if otherSceneFeature.Type == OtherSceneFeatureStepMulti {
+// 		mul := 1
 
-		for _, arr := range os.Arr {
-			for _, v := range arr {
-				mul *= v
-			}
-		}
+// 		for _, arr := range os.Arr {
+// 			for _, v := range arr {
+// 				mul *= v
+// 			}
+// 		}
 
-		gameProp.SetVal(GamePropStepMulti, mul)
-	}
-}
+// 		gameProp.SetVal(GamePropStepMulti, mul)
+// 	}
+// }
 
 // func (gameProp *GameProperty) ProcMulti(ret *sgc7game.Result) {
 // 	mul := gameProp.GetVal(GamePropStepMulti) * gameProp.GetVal(GamePropGameMulti)
