@@ -148,4 +148,7 @@ var (
 	ErrInvalidForceOutcome2Code = errors.New("invalid ForceOutcome2 code")
 	// ErrInvalidForceOutcome2ReturnVal - invalid ForceOutcome2 return value
 	ErrInvalidForceOutcome2ReturnVal = errors.New("invalid ForceOutcome2 return value")
+
+	// ErrInvalidOtherScene - invalid OtherScene
+	ErrInvalidOtherScene = errors.New("invalid OtherScene")
 )

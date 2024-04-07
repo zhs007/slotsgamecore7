@@ -37,6 +37,9 @@ type FuncCalcOtherMulEx func(scene *GameScene, symbol int, pos []int) int
 // FuncGetMulti - get multi
 type FuncGetMulti func(x, y int) int
 
+// FuncCalcMulti - calc multi
+type FuncCalcMulti func(src int, target int) int
+
 // FuncGetSymbol - get symbol
 type FuncGetSymbol func(cursymbol int) int
 

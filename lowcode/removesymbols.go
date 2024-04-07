@@ -21,6 +21,16 @@ const RemoveSymbolsTypeName = "removeSymbols"
 type RemoveSymbolsData struct {
 	BasicComponentData
 	RemovedNum int
+	AvgHeight  int // 平均移除图标的高度，用int表示浮点数，因此100表示1
+}
+
+// GetVal -
+func (removeSymbolsData *RemoveSymbolsData) GetVal(key string) (int, bool) {
+	if key == CVAvgHeight {
+		return removeSymbolsData.AvgHeight, true
+	}
+
+	return 0, false
 }
 
 // OnNewGame -
@@ -33,6 +43,10 @@ func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 	// removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	removeSymbolsData.RemovedNum = 0
+
+	if gIsReleaseMode {
+		removeSymbolsData.AvgHeight = 0
+	}
 }
 
 // BuildPBComponentData
@@ -139,6 +153,8 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	bcd.RemovedNum = 0
 
+	totalHeight := 0
+
 	for _, cn := range removeSymbols.Config.TargetComponents {
 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
 		if ccd != nil {
@@ -150,6 +166,10 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 					if removeSymbols.canRemove(x, y, ngs) {
 						if ngs == gs {
 							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						if !gIsReleaseMode {
+							totalHeight += y
 						}
 
 						ngs.Arr[x][y] = -1
@@ -165,6 +185,10 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, ErrComponentDoNothing
+	}
+
+	if !gIsReleaseMode {
+		bcd.AvgHeight = totalHeight * 100 / bcd.RemovedNum
 	}
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &bcd.BasicComponentData)

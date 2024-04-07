@@ -27,4 +27,6 @@ const (
 	CVLastRespinNum         string = "lastRespinNum"         // lastRespinNum
 	CVLastTriggerNum        string = "lastTriggerNum"        // lastTriggerNum
 	CVRetriggerAddRespinNum string = "retriggerAddRespinNum" // retriggerAddRespinNum
+	CVAvgSymbolValMulti     string = "avgSymbolValMulti"     // avgSymbolValMulti
+	CVAvgHeight             string = "avgHeight"             // avgHeight
 )
