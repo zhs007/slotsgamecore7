@@ -125,6 +125,11 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 
 	if genSymbolValsWithPos.Config.Type == GSVWPTypeAdd {
 		for _, cn := range genSymbolValsWithPos.Config.TargetComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
 			ccd := gameProp.GetCurComponentDataWithName(cn)
 			lst := ccd.GetResults()
 			for _, ri := range lst {
@@ -146,6 +151,11 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 		}
 	} else if genSymbolValsWithPos.Config.Type == GSVWPTypeMask {
 		for _, cn := range genSymbolValsWithPos.Config.TargetComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
 			ccd := gameProp.GetCurComponentDataWithName(cn)
 			lst := ccd.GetResults()
 			for _, ri := range lst {
