@@ -80,6 +80,10 @@ func (clusterTriggerData *ClusterTriggerData) GetVal(key string) (int, bool) {
 	} else if key == CVWins {
 		return clusterTriggerData.Wins, true
 	} else if key == CVAvgSymbolValMulti {
+		if clusterTriggerData.AvgSymbolValMulti == 0 {
+			return 100, true
+		}
+
 		return clusterTriggerData.AvgSymbolValMulti, true
 	}
 
