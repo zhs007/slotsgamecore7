@@ -72,6 +72,70 @@ func ParseBetType(str string) BetType {
 	return BTypeNoPay
 }
 
+type OtherSceneMultiType int
+
+const (
+	OSMTNone      OtherSceneMultiType = 0
+	OSMTAdd       OtherSceneMultiType = 1 // 每个位置用加来计算总倍数
+	OSMTMul       OtherSceneMultiType = 2 // 每个位置用乘来计算总倍数
+	OSMTPowOf2Add OtherSceneMultiType = 3 // 每个位置用2的次方之和来计算总倍数
+	OSMTPowOf2Mul OtherSceneMultiType = 4 // 每个位置用2的次方之积来计算总倍数
+)
+
+func ParseOtherSceneMultiType(str string) OtherSceneMultiType {
+	if str == "add" {
+		return OSMTNone
+	} else if str == "mul" {
+		return OSMTMul
+	} else if str == "powof2add" {
+		return OSMTPowOf2Add
+	} else if str == "powof2mul" {
+		return OSMTPowOf2Mul
+	}
+
+	return OSMTNone
+}
+
+func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
+	if t == OSMTAdd {
+		return func(src int, target int) int {
+			if target > 1 {
+				return src + target
+			}
+
+			return src
+		}
+	} else if t == OSMTMul {
+		return func(src int, target int) int {
+			if target > 1 {
+				return src * target
+			}
+
+			return src
+		}
+	} else if t == OSMTPowOf2Add {
+		return func(src int, target int) int {
+			if target >= 1 {
+				return src + PowInt(2, target)
+			}
+
+			return src
+		}
+	} else if t == OSMTPowOf2Mul {
+		return func(src int, target int) int {
+			if target >= 1 {
+				return src * PowInt(2, target)
+			}
+
+			return src
+		}
+	}
+
+	return func(src int, target int) int {
+		return 1
+	}
+}
+
 type GameParams struct {
 	sgc7pb.GameParam `json:",inline"`
 	LastScene        *sgc7game.GameScene       `json:"-"`

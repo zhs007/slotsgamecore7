@@ -25,12 +25,13 @@ const (
 
 type ClusterTriggerData struct {
 	BasicComponentData
-	NextComponent string
-	SymbolNum     int
-	WildNum       int
-	RespinNum     int
-	Wins          int
-	WinMulti      int
+	NextComponent     string
+	SymbolNum         int
+	WildNum           int
+	RespinNum         int
+	Wins              int
+	WinMulti          int
+	AvgSymbolValMulti int // 平均的symbolVal倍数，用整数来表达浮点数，100是1倍
 }
 
 // OnNewGame -
@@ -47,6 +48,10 @@ func (clusterTriggerData *ClusterTriggerData) onNewStep() {
 	clusterTriggerData.RespinNum = 0
 	clusterTriggerData.Wins = 0
 	clusterTriggerData.WinMulti = 1
+
+	// if !gIsReleaseMode {
+	// 	clusterTriggerData.AvgSymbolValMulti = 100
+	// }
 }
 
 // BuildPBComponentData
@@ -74,6 +79,8 @@ func (clusterTriggerData *ClusterTriggerData) GetVal(key string) (int, bool) {
 		return clusterTriggerData.RespinNum, true
 	} else if key == CVWins {
 		return clusterTriggerData.Wins, true
+	} else if key == CVAvgSymbolValMulti {
+		return clusterTriggerData.AvgSymbolValMulti, true
 	}
 
 	return 0, false
@@ -95,24 +102,24 @@ func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
 // ClusterTriggerConfig - configuration for ClusterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ClusterTriggerConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbols              []string `yaml:"symbols" json:"symbols"` // like scatter
-	SymbolCodes          []int    `yaml:"-" json:"-"`             // like scatter
-	// ExcludeSymbolCodes              []int                         `yaml:"-" json:"-"`                                                         // 在 lines 和 ways 里有用
-	Type               string            `yaml:"type" json:"type"`                             // like scatters
-	TriggerType        SymbolTriggerType `yaml:"-" json:"-"`                                   // SymbolTriggerType
-	BetTypeString      string            `yaml:"betType" json:"betType"`                       // bet or totalBet or noPay
-	BetType            BetType           `yaml:"-" json:"-"`                                   // bet or totalBet or noPay
-	MinNum             int               `yaml:"minNum" json:"minNum"`                         // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols        []string          `yaml:"wildSymbols" json:"wildSymbols"`               // wild etc
-	WildSymbolCodes    []int             `yaml:"-" json:"-"`                                   // wild symbolCode
-	WinMulti           int               `yaml:"winMulti" json:"winMulti"`                     // winMulti，最后的中奖倍数，默认为1
-	JumpToComponent    string            `yaml:"jumpToComponent" json:"jumpToComponent"`       // jump to
-	ForceToNext        bool              `yaml:"forceToNext" json:"forceToNext"`               // 如果触发，默认跳转jump to，这里可以强制走next分支
-	Awards             []*Award          `yaml:"awards" json:"awards"`                         // 新的奖励系统
-	IsReverse          bool              `yaml:"isReverse" json:"isReverse"`                   // 如果isReverse，表示判定为否才触发
-	PiggyBankComponent string            `yaml:"piggyBankComponent" json:"piggyBankComponent"` // piggyBank component
-	// NeedDiscardResults              bool                          `yaml:"needDiscardResults" json:"needDiscardResults"`                       // 如果needDiscardResults，表示抛弃results
+	BasicComponentConfig            `yaml:",inline" json:",inline"`
+	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
+	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
+	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
+	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
+	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`                             // OtherSceneMultiType
+	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                                         // OtherSceneMultiType
+	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
+	BetType                         BetType                       `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
+	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
+	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
+	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
+	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
+	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
+	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
+	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
@@ -166,6 +173,8 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	clusterTrigger.Config = cfg.(*ClusterTriggerConfig)
 	clusterTrigger.Config.ComponentType = ClusterTriggerTypeName
 
+	clusterTrigger.Config.OSMulType = ParseOtherSceneMultiType(clusterTrigger.Config.OSMulTypeString)
+
 	for _, s := range clusterTrigger.Config.Symbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
@@ -207,14 +216,6 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		award.Init()
 	}
 
-	// if clusterTrigger.Config.SymbolAwardsWeights != nil {
-	// 	clusterTrigger.Config.SymbolAwardsWeights.Init()
-	// }
-
-	// clusterTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, clusterTrigger.Config.SymbolCodes)
-
-	// clusterTrigger.Config.CheckWinType = ParseCheckWinType(clusterTrigger.Config.StrCheckWinType)
-
 	if clusterTrigger.Config.RespinNumWeight != "" {
 		vw2, err := pool.LoadIntWeights(clusterTrigger.Config.RespinNumWeight, clusterTrigger.Config.UseFileMapping)
 		if err != nil {
@@ -247,90 +248,38 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		clusterTrigger.Config.WinMulti = 1
 	}
 
-	// if clusterTrigger.Config.BetType == BTypeNoPay {
-	// 	clusterTrigger.Config.NeedDiscardResults = true
-	// }
-
 	clusterTrigger.onInit(&clusterTrigger.Config.BasicComponentConfig)
 
 	return nil
 }
 
-// // playgame
-// func (clusterTrigger *ClusterTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
-// 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
+func (clusterTrigger *ClusterTrigger) calcSymbolValMulti(ret *sgc7game.Result, os *sgc7game.GameScene, funcCalcMulti sgc7game.FuncCalcMulti) int {
+	mul := 1
 
-// 	if clusterTrigger.Config.TargetMask != "" {
-// 		mask := make([]bool, gs.Width)
+	for i := 0; i < len(ret.Pos)/2; i++ {
+		x := ret.Pos[i*2]
+		y := ret.Pos[i*2+1]
 
-// 		for i := 0; i < len(ret.Pos)/2; i++ {
-// 			mask[ret.Pos[i*2]] = true
-// 		}
+		mul = funcCalcMulti(mul, os.Arr[x][y])
+		if os.Arr[x][y] > 1 {
+			mul += os.Arr[x][y]
+		}
+	}
 
-// 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, clusterTrigger.Config.TargetMask, mask, false)
-// 	}
-
-// 	return nil
-// }
-
-// // CanTrigger -
-// func (clusterTrigger *ClusterTrigger) CanTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, isSaveResult bool) (bool, []*sgc7game.Result) {
-// 	// std := gameProp.MapComponentData[clusterTrigger.Name].(*ClusterTriggerData)
-
-// 	isTrigger := false
-// 	lst := []*sgc7game.Result{}
-
-// 	if clusterTrigger.Config.TriggerType == STTypeCluster {
-
-// 		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
-// 			func(cursymbol int) bool {
-// 				return goutils.IndexOfIntSlice(clusterTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
-// 			}, func(cursymbol int) bool {
-// 				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-// 			}, func(cursymbol int, startsymbol int) bool {
-// 				if cursymbol == startsymbol {
-// 					return true
-// 				}
-
-// 				return goutils.IndexOfIntSlice(clusterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-// 			}, func(cursymbol int) int {
-// 				return cursymbol
-// 			})
-// 		if err != nil {
-// 			goutils.Error("ClusterTrigger.CanTrigger:CalcClusterResult",
-// 				goutils.Err(err))
-
-// 			return false, nil
-// 		}
-
-// 		for _, v := range currets {
-// 			gameProp.ProcMulti(v)
-
-// 			// if isSaveResult {
-// 			// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
-// 			// }
-// 		}
-
-// 		lst = append(lst, currets...)
-
-// 		if len(lst) > 0 {
-// 			isTrigger = true
-// 		}
-// 	}
-
-// 	if clusterTrigger.Config.IsReverse {
-// 		isTrigger = !isTrigger
-// 	}
-
-// 	return isTrigger, lst
-// }
+	return mul
+}
 
 // procWins
-func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, std *ClusterTriggerData, lst []*sgc7game.Result) (int, error) {
+func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sgc7game.PlayResult, std *ClusterTriggerData, lst []*sgc7game.Result, os *sgc7game.GameScene, cd *ClusterTriggerData) (int, error) {
 	if clusterTrigger.Config.BetType == BTypeNoPay {
 		for _, v := range lst {
 			v.CoinWin = 0
 			v.CashWin = 0
+
+			clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+			std.SymbolNum += v.SymbolNums
+			std.WildNum += v.Wilds
 		}
 
 		return 0, nil
@@ -338,13 +287,50 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, std *Clus
 
 	std.WinMulti = clusterTrigger.GetWinMulti(&std.BasicComponentData)
 
-	for _, v := range lst {
-		v.OtherMul = std.WinMulti
+	if clusterTrigger.Config.OSMulType == OSMTNone {
+		for _, v := range lst {
+			v.OtherMul = std.WinMulti
 
-		v.CoinWin *= std.WinMulti
-		v.CashWin *= std.WinMulti
+			v.CoinWin *= std.WinMulti
+			v.CashWin *= std.WinMulti
 
-		std.Wins += v.CoinWin
+			std.Wins += v.CoinWin
+
+			clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+			std.SymbolNum += v.SymbolNums
+			std.WildNum += v.Wilds
+		}
+	} else {
+		funcCalcMulti := GetSymbolValMultiFunc(clusterTrigger.Config.OSMulType)
+
+		if !gIsReleaseMode {
+			cd.AvgSymbolValMulti = 0
+		}
+
+		for _, v := range lst {
+			svm := clusterTrigger.calcSymbolValMulti(v, os, funcCalcMulti)
+
+			if !gIsReleaseMode {
+				cd.AvgSymbolValMulti += svm
+			}
+
+			v.OtherMul = std.WinMulti * svm
+
+			v.CoinWin *= std.WinMulti
+			v.CashWin *= std.WinMulti
+
+			std.Wins += v.CoinWin
+
+			clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+			std.SymbolNum += v.SymbolNums
+			std.WildNum += v.Wilds
+		}
+
+		if !gIsReleaseMode {
+			cd.AvgSymbolValMulti = cd.AvgSymbolValMulti * 100 / len(lst)
+		}
 	}
 
 	if std.Wins > 0 {
@@ -422,34 +408,22 @@ func (clusterTrigger *ClusterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	// clusterTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	std := cd.(*ClusterTriggerData)
 	std.onNewStep()
 
 	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
+	os := clusterTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	isTrigger, lst := clusterTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake)
 
 	if isTrigger {
-		clusterTrigger.procWins(gameProp, std, lst)
+		clusterTrigger.procWins(gameProp, curpr, std, lst, os, std)
 
-		// if !clusterTrigger.Config.NeedDiscardResults {
-		for _, v := range lst {
-			clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+		// for _, v := range lst {
+		// 	clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
 
-			std.SymbolNum += v.SymbolNums
-			std.WildNum += v.Wilds
-		}
-
-		// if std.CoinWin != std.Wins {
-		// 	goutils.Error("Err!")
-		// }
-		// } else {
-		// 	for _, v := range lst {
-		// 		std.SymbolNum += v.SymbolNums
-		// 		std.WildNum += v.Wilds
-		// 	}
+		// 	std.SymbolNum += v.SymbolNums
+		// 	std.WildNum += v.Wilds
 		// }
 
 		respinNum, err := clusterTrigger.calcRespinNum(plugin, lst[0])
@@ -777,6 +751,7 @@ type jsonClusterTrigger struct {
 	Symbols             []string `json:"symbols"`
 	TriggerType         string   `json:"triggerType"`
 	BetType             string   `json:"betType"`
+	SymbolValsMulti     string   `json:"symbolValsMulti"`
 	MinNum              int      `json:"minNum"`
 	WildSymbols         []string `json:"wildSymbols"`
 	WinMulti            int      `json:"winMulti"`
@@ -788,6 +763,7 @@ func (jcfg *jsonClusterTrigger) build() *ClusterTriggerConfig {
 		Symbols:            jcfg.Symbols,
 		Type:               jcfg.TriggerType,
 		BetTypeString:      jcfg.BetType,
+		OSMulTypeString:    jcfg.SymbolValsMulti,
 		MinNum:             jcfg.MinNum,
 		WildSymbols:        jcfg.WildSymbols,
 		WinMulti:           jcfg.WinMulti,

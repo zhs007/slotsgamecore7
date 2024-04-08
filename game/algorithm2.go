@@ -361,7 +361,7 @@ func CountSymbolOnLine(scene *GameScene, pt *PayTables, ld []int, bet int, symbo
 	isWild FuncIsWild,
 	isSameSymbol FuncIsSameSymbol,
 	getSymbol FuncGetSymbol,
-	getMulti FuncGetMulti) *Result {
+	getMulti FuncGetMulti, calcMulti FuncCalcMulti) *Result {
 
 	sx := 0
 
@@ -400,14 +400,14 @@ func CountSymbolOnLine(scene *GameScene, pt *PayTables, ld []int, bet int, symbo
 
 							pos = append(pos, sx+x, ld[sx+x])
 							wpos = append(wpos, sx+x, ld[sx+x])
-							wotherMul *= getMulti(sx+x, ld[sx+x])
-							otherMul *= getMulti(sx+x, ld[sx+x])
+							wotherMul = calcMulti(wotherMul, getMulti(sx+x, ld[sx+x]))
+							otherMul = calcMulti(otherMul, getMulti(sx+x, ld[sx+x]))
 						} else {
 							ws = symbol
 
 							nums++
 							pos = append(pos, sx+x, ld[sx+x])
-							otherMul *= getMulti(sx+x, ld[sx+x])
+							otherMul = calcMulti(otherMul, getMulti(sx+x, ld[sx+x]))
 						}
 					} else {
 						if isWild(cs) {
@@ -417,7 +417,7 @@ func CountSymbolOnLine(scene *GameScene, pt *PayTables, ld []int, bet int, symbo
 						nums++
 
 						pos = append(pos, sx+x, ld[sx+x])
-						otherMul *= getMulti(sx+x, ld[sx+x])
+						otherMul = calcMulti(otherMul, getMulti(sx+x, ld[sx+x]))
 					}
 				}
 			}
@@ -501,7 +501,7 @@ func CountSymbolOnLine(scene *GameScene, pt *PayTables, ld []int, bet int, symbo
 			nums++
 
 			pos = append(pos, sx+x, ld[sx+x])
-			otherMul *= getMulti(sx+x, ld[sx+x])
+			otherMul = calcMulti(otherMul, getMulti(sx+x, ld[sx+x]))
 		}
 	}
 

@@ -275,3 +275,32 @@ func InsSliceNonRep(arr []string, src []string) []string {
 
 	return arr
 }
+
+func PowInt(v int, n int) int {
+	if n < 0 {
+		return 1
+	}
+
+	if n == 0 {
+		return 1
+	}
+
+	if n == 1 {
+		return v
+	}
+
+	if n == 2 {
+		return v * v
+	}
+
+	if n == 3 {
+		return v * v * v
+	}
+
+	t := v * v * v
+	for i := 3; i < n; i++ {
+		t *= v
+	}
+
+	return t
+}
