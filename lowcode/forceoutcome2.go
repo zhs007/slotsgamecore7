@@ -147,6 +147,7 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 					if isok2 {
 						if !hasval {
 							maxval = curval
+							hasval = true
 						} else if maxval < curval {
 							maxval = curval
 						}
