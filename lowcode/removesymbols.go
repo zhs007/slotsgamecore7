@@ -156,6 +156,11 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	totalHeight := 0
 
 	for _, cn := range removeSymbols.Config.TargetComponents {
+		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+			continue
+		}
+
 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
 		if ccd != nil {
 			lst := ccd.GetResults()

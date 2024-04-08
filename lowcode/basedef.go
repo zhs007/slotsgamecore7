@@ -84,7 +84,7 @@ const (
 
 func ParseOtherSceneMultiType(str string) OtherSceneMultiType {
 	if str == "add" {
-		return OSMTNone
+		return OSMTAdd
 	} else if str == "mul" {
 		return OSMTMul
 	} else if str == "powof2add" {
