@@ -151,4 +151,7 @@ var (
 
 	// ErrInvalidOtherScene - invalid OtherScene
 	ErrInvalidOtherScene = errors.New("invalid OtherScene")
+
+	// ErrInvalidSetComponent - invalid a set component
+	ErrInvalidSetComponent = errors.New("invalid a set component")
 )

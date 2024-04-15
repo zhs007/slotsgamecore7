@@ -20,6 +20,6 @@ func (rng *BasicRNG) OnNewGame(plugin sgc7plugin.IPlugin) error {
 }
 
 // GetCurRNG -
-func (rng *BasicRNG) GetCurRNG(componentName string) sgc7plugin.IPlugin {
-	return rng.curPlugin
+func (rng *BasicRNG) GetCurRNG(componentName string) (bool, int, sgc7plugin.IPlugin) {
+	return false, -1, rng.curPlugin
 }
