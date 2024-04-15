@@ -164,6 +164,16 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 	return 0
 }
 
+func (fo2 *ForceOutcome2) getLatestSymbolVal(x, y int, defval int) int {
+	i := len(fo2.results) - 1
+	if len(fo2.results[i].OtherScenes) <= 0 {
+		return defval
+	}
+
+	os := fo2.results[i].OtherScenes[len(fo2.results[i].OtherScenes)-1]
+	return os.Arr[x][y]
+}
+
 func (fo2 *ForceOutcome2) newScriptVariables() []cel.EnvOption {
 	return []cel.EnvOption{
 		cel.Variable("totalWins", cel.IntType),
@@ -190,6 +200,52 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				cel.IntType,
 				cel.BinaryBinding(func(param0 ref.Val, param1 ref.Val) ref.Val {
 					val := fo2.getMaxComponentVal(param0.Value().(string), param1.Value().(string))
+
+					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("getLatestSymbolVal",
+			cel.Overload("getLatestSymbolVal_int_int_int",
+				[]*cel.Type{cel.IntType, cel.IntType, cel.IntType},
+				cel.IntType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 3 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getLatestSymbolVal",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					x, isok := params[0].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getLatestSymbolVal",
+							slog.Int("i", 0),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					y, isok := params[1].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getLatestSymbolVal",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					defval, isok := params[2].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getLatestSymbolVal",
+							slog.Int("i", 2),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					val := fo2.getLatestSymbolVal(int(x), int(y), int(defval))
 
 					return types.Int(val)
 				},
