@@ -83,6 +83,13 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 	bcd := cd.(*BasicComponentData)
 
 	gs := dropDownSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
+	if gs == nil {
+		goutils.Error("DropDownSymbols.OnPlayGame",
+			goutils.Err(ErrInvalidScene))
+
+		return "", ErrInvalidScene
+	}
+
 	if !gs.HasSymbol(-1) {
 		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
