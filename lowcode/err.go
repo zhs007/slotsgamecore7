@@ -157,4 +157,9 @@ var (
 
 	// ErrInvalidSetComponent - invalid a set component
 	ErrInvalidSetComponent = errors.New("invalid a set component")
+
+	// ErrInvalidScriptParamsNumber - invalid script params number
+	ErrInvalidScriptParamsNumber = errors.New("invalid script params number")
+	// ErrInvalidScriptParamType - invalid script param type
+	ErrInvalidScriptParamType = errors.New("invalid param type")
 )
