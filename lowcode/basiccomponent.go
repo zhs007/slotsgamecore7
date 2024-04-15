@@ -691,6 +691,15 @@ func (basicComponent *BasicComponent) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin,
 	return ErrInvalidComponent
 }
 
+// OnPlayGameWithSet - on playgame with a set
+func (basicComponent *BasicComponent) OnPlayGameWithSet(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData, set int) (string, error) {
+	goutils.Error("BasicComponent.OnPlayGameWithSet",
+		goutils.Err(ErrInvalidSetComponent))
+
+	return "", ErrInvalidSetComponent
+}
+
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
 		Name:        name,
