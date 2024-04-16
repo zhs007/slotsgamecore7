@@ -41,6 +41,8 @@ type GenGigaSymbolConfig struct {
 	Number               int               `yaml:"number" json:"number"`
 	Symbol               string            `yaml:"symbol" json:"symbol"`
 	SymbolCode           int               `yaml:"-" json:"-"`
+	ExcludeSymbols       []string          `yaml:"excludeSymbols" json:"excludeSymbols"`
+	ExcludeSymbolCodes   []int             `yaml:"-" json:"-"`
 }
 
 // SetLinkComponent
@@ -100,9 +102,65 @@ func (genGigaSymbol *GenGigaSymbol) InitEx(cfg any, pool *GamePropertyPool) erro
 		genGigaSymbol.Config.SymbolCode = sc
 	}
 
+	genGigaSymbol.Config.ExcludeSymbolCodes = nil
+	for _, v := range genGigaSymbol.Config.ExcludeSymbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[v]
+		if !isok {
+			goutils.Error("GenGigaSymbol.InitEx:ExcludeSymbols",
+				slog.String("symbol", v),
+				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		genGigaSymbol.Config.ExcludeSymbolCodes = append(genGigaSymbol.Config.ExcludeSymbolCodes, sc)
+	}
+
 	genGigaSymbol.onInit(&genGigaSymbol.Config.BasicComponentConfig)
 
 	return nil
+}
+
+func (genGigaSymbol *GenGigaSymbol) isValidPos(gs *sgc7game.GameScene, x, y int) bool {
+	for tx := 0; tx < genGigaSymbol.Config.GigaWidth; tx++ {
+		for ty := 0; ty < genGigaSymbol.Config.GigaHeight; ty++ {
+			if goutils.IndexOfIntSlice(genGigaSymbol.Config.ExcludeSymbolCodes, gs.Arr[x+tx][y+ty], 0) >= 0 {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (genGigaSymbol *GenGigaSymbol) genValidPos(gs *sgc7game.GameScene) ([]int, error) {
+	lstPos := []int{}
+
+	if len(genGigaSymbol.Config.ExcludeSymbolCodes) == 0 {
+		cx := genGigaSymbol.Config.GigaWidth / 2
+		cy := genGigaSymbol.Config.GigaHeight / 2
+
+		for tx := cx; tx < gs.Width-(genGigaSymbol.Config.GigaWidth-cx); tx++ {
+			for ty := cy; ty < gs.Height-(genGigaSymbol.Config.GigaHeight-cy); ty++ {
+				lstPos = append(lstPos, tx, ty)
+			}
+		}
+
+		return lstPos, nil
+	}
+
+	cx := genGigaSymbol.Config.GigaWidth / 2
+	cy := genGigaSymbol.Config.GigaHeight / 2
+
+	for tx := cx; tx < gs.Width-(genGigaSymbol.Config.GigaWidth-cx); tx++ {
+		for ty := cy; ty < gs.Height-(genGigaSymbol.Config.GigaHeight-cy); ty++ {
+			if genGigaSymbol.isValidPos(gs, tx, ty) {
+				lstPos = append(lstPos, tx, ty)
+			}
+		}
+	}
+
+	return lstPos, nil
 }
 
 // playgame
@@ -116,36 +174,41 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 	cd.UsedScenes = nil
 
 	gs := genGigaSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
+	if gs == nil {
+		goutils.Error("GenGigaSymbol.OnPlayGame:GetTargetScene3",
+			goutils.Err(ErrInvalidScene))
+
+		return "", ErrInvalidScene
+	}
+
 	ngs := gs
 
-	w := gs.Width - genGigaSymbol.Config.GigaWidth + 1
-	h := gs.Height - genGigaSymbol.Config.GigaHeight + 1
+	lstpos, err := genGigaSymbol.genValidPos(gs)
+	if err != nil {
+		goutils.Error("GenGigaSymbol.OnPlayGame:genValidPos",
+			goutils.Err(err))
 
-	if w <= 0 || h <= 0 {
-		goutils.Error("GenGigaSymbol.OnPlayGame:Random:w",
-			slog.Int("w", w),
-			slog.Int("h", h),
-			goutils.Err(ErrIvalidComponentConfig))
+		return "", err
+	}
 
-		return "", ErrIvalidComponentConfig
+	if len(lstpos) == 0 {
+		goutils.Error("GenGigaSymbol.OnPlayGame:lstpos",
+			goutils.Err(ErrInvalidPosition))
+
+		return "", ErrInvalidPosition
 	}
 
 	if genGigaSymbol.Config.Number == 1 {
-		x, err := plugin.Random(context.Background(), w)
+		i, err := plugin.Random(context.Background(), len(lstpos)/2)
 		if err != nil {
-			goutils.Error("GenGigaSymbol.OnPlayGame:Random:w",
+			goutils.Error("GenGigaSymbol.OnPlayGame:Random",
 				goutils.Err(err))
 
 			return "", err
 		}
 
-		y, err := plugin.Random(context.Background(), h)
-		if err != nil {
-			goutils.Error("GenGigaSymbol.OnPlayGame:Random:h",
-				goutils.Err(err))
-
-			return "", err
-		}
+		x := lstpos[i*2]
+		y := lstpos[i*2+1]
 
 		ngs = gs.CloneEx(gameProp.PoolScene)
 
@@ -162,41 +225,41 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 	} else {
 		// 需要考虑相互不覆盖
 
-		ngs = gs.CloneEx(gameProp.PoolScene)
+		// ngs = gs.CloneEx(gameProp.PoolScene)
 
-		pos := make([]int, 0, w*h*2)
-		npos := make([]int, 0, w*h*2)
+		// pos := make([]int, 0, w*h*2)
+		// npos := make([]int, 0, w*h*2)
 
-		for x := 0; x < w; x++ {
-			for y := 0; y < h; y++ {
-				pos = append(pos, x, y)
-			}
-		}
+		// for x := 0; x < w; x++ {
+		// 	for y := 0; y < h; y++ {
+		// 		pos = append(pos, x, y)
+		// 	}
+		// }
 
-		for i := 0; i < genGigaSymbol.Config.Number; i++ {
-			p, err := plugin.Random(context.Background(), len(pos)/2)
-			if err != nil {
-				goutils.Error("GenGigaSymbol.OnPlayGame:Random",
-					goutils.Err(err))
+		// for i := 0; i < genGigaSymbol.Config.Number; i++ {
+		// 	p, err := plugin.Random(context.Background(), len(pos)/2)
+		// 	if err != nil {
+		// 		goutils.Error("GenGigaSymbol.OnPlayGame:Random",
+		// 			goutils.Err(err))
 
-				return "", err
-			}
+		// 		return "", err
+		// 	}
 
-			x := pos[p*2]
-			y := pos[p*2+1]
+		// 	x := pos[p*2]
+		// 	y := pos[p*2+1]
 
-			if i < genGigaSymbol.Config.Number-1 {
-				for j := 0; j < len(pos)/2; j++ {
-					if !(pos[j*2] >= x && pos[j*2+1] >= y && pos[j*2] < x+genGigaSymbol.Config.GigaWidth && pos[j*2+1] < y+genGigaSymbol.Config.GigaHeight) {
-						npos = append(npos, pos[j*2], pos[j*2+1])
-					}
-				}
+		// 	if i < genGigaSymbol.Config.Number-1 {
+		// 		for j := 0; j < len(pos)/2; j++ {
+		// 			if !(pos[j*2] >= x && pos[j*2+1] >= y && pos[j*2] < x+genGigaSymbol.Config.GigaWidth && pos[j*2+1] < y+genGigaSymbol.Config.GigaHeight) {
+		// 				npos = append(npos, pos[j*2], pos[j*2+1])
+		// 			}
+		// 		}
 
-				tpos := pos
-				pos = npos
-				npos = tpos
-			}
-		}
+		// 		tpos := pos
+		// 		pos = npos
+		// 		npos = tpos
+		// 	}
+		// }
 	}
 
 	if ngs == gs {
@@ -239,20 +302,22 @@ func NewGenGigaSymbol(name string) IComponent {
 // "gigaHeight": 3,
 // "number": 1
 type jsonGenGigaSymbol struct {
-	Type       string `json:"type"`
-	GigaWidth  int    `json:"gigaWidth"`
-	GigaHeight int    `json:"gigaHeight"`
-	Number     int    `json:"number"`
-	Symbol     string `json:"symbol"`
+	Type           string   `json:"type"`
+	GigaWidth      int      `json:"gigaWidth"`
+	GigaHeight     int      `json:"gigaHeight"`
+	Number         int      `json:"number"`
+	Symbol         string   `json:"symbol"`
+	ExcludeSymbols []string `json:"excludeSymbols"`
 }
 
 func (jcfg *jsonGenGigaSymbol) build() *GenGigaSymbolConfig {
 	cfg := &GenGigaSymbolConfig{
-		StrType:    jcfg.Type,
-		GigaWidth:  jcfg.GigaWidth,
-		GigaHeight: jcfg.GigaHeight,
-		Number:     jcfg.Number,
-		Symbol:     jcfg.Symbol,
+		StrType:        jcfg.Type,
+		GigaWidth:      jcfg.GigaWidth,
+		GigaHeight:     jcfg.GigaHeight,
+		Number:         jcfg.Number,
+		Symbol:         jcfg.Symbol,
+		ExcludeSymbols: jcfg.ExcludeSymbols,
 	}
 
 	// cfg.UseSceneV3 = true

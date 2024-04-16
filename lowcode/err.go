@@ -162,4 +162,7 @@ var (
 	ErrInvalidScriptParamsNumber = errors.New("invalid script params number")
 	// ErrInvalidScriptParamType - invalid script param type
 	ErrInvalidScriptParamType = errors.New("invalid param type")
+
+	// ErrInvalidPosition - invalid invalid position
+	ErrInvalidPosition = errors.New("invalid invalid position")
 )
