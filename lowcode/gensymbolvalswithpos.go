@@ -42,7 +42,7 @@ type GenSymbolValsWithPosConfig struct {
 	ValMapping           string                   `yaml:"valMapping" json:"valMapping"`
 	ValMappingVM         *sgc7game.ValMapping2    `yaml:"-" json:"-"`
 	IsUseSource          bool                     `yaml:"isUseSource" json:"isUseSource"`
-	IsAlwaysGen          bool                     `yaml:"isAlwaysGen" json:"isAlwaysGen"`
+	DefaultVal           int                      `yaml:"defaultVal" json:"defaultVal"`
 }
 
 // SetLinkComponent
@@ -119,6 +119,9 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 
 	if genSymbolValsWithPos.Config.IsUseSource {
 		os = genSymbolValsWithPos.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		// if os == nil {
+		// 	os = sgc7game.NewGameScenePoolEx().New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
+		// }
 	}
 
 	nos := os
@@ -141,7 +144,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						if os != nil {
 							nos = os.CloneEx(gameProp.PoolScene)
 						} else {
-							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
+							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
 						}
 					}
 
@@ -231,7 +234,7 @@ type jsonGenSymbolValsWithPos struct {
 	StrType          string   `json:"genType"`
 	ValMapping       string   `json:"valMapping"`
 	IsUseSource      string   `json:"isUseSource"`
-	IsAlwaysGen      string   `json:"isAlwaysGen"`
+	DefaultVal       int      `json:"defaultVal"`
 }
 
 func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
@@ -240,7 +243,7 @@ func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
 		TargetComponents: jcfg.TargetComponents,
 		ValMapping:       jcfg.ValMapping,
 		IsUseSource:      jcfg.IsUseSource == "true",
-		IsAlwaysGen:      jcfg.IsAlwaysGen == "true",
+		DefaultVal:       jcfg.DefaultVal,
 	}
 
 	// cfg.UseSceneV3 = true

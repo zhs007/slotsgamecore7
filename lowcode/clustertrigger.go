@@ -19,9 +19,9 @@ import (
 
 const ClusterTriggerTypeName = "clusterTrigger"
 
-const (
-	CTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-)
+// const (
+// 	CTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+// )
 
 type ClusterTriggerData struct {
 	BasicComponentData
