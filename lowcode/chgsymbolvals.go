@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -38,7 +39,7 @@ const (
 )
 
 func parseChgSymbolValsSourceType(strType string) ChgSymbolValsSourceType {
-	if strType == "positionCollection" {
+	if strType == "positioncollection" {
 		return CSVSTypePositionCollection
 	}
 
@@ -226,7 +227,7 @@ type jsonChgSymbolVals struct {
 func (jcfg *jsonChgSymbolVals) build() *ChgSymbolValsConfig {
 	cfg := &ChgSymbolValsConfig{
 		StrType:             jcfg.Type,
-		StrSourceType:       jcfg.SourceType,
+		StrSourceType:       strings.ToLower(jcfg.SourceType),
 		PositionCollection:  jcfg.PositionCollection,
 		WinResultComponents: jcfg.WinResultComponents,
 	}
