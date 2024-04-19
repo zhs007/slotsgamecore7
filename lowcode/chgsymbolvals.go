@@ -57,6 +57,8 @@ type ChgSymbolValsConfig struct {
 	PositionCollection   string                  `yaml:"positionCollection" json:"positionCollection"`
 	WinResultComponents  []string                `yaml:"winResultComponents" json:"winResultComponents"`
 	MaxNumber            int                     `yaml:"maxNumber" json:"maxNumber"`
+	MaxVal               int                     `yaml:"maxVal" json:"maxVal"`
+	MinVal               int                     `yaml:"minVal" json:"minVal"`
 }
 
 // SetLinkComponent
@@ -167,11 +169,13 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						nos = os.CloneEx(gameProp.PoolScene)
 
 						for i := 0; i < len(npos)/2; i++ {
-							nos.Arr[npos[i*2]][npos[i*2+1]]++
+							if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
+								nos.Arr[npos[i*2]][npos[i*2+1]]++
+							}
 						}
 					} else if chgSymbolVals.Config.Type == CSVTypeDec {
 						for i := 0; i < len(npos)/2; i++ {
-							if nos.Arr[npos[i*2]][npos[i*2+1]] > 0 {
+							if nos.Arr[npos[i*2]][npos[i*2+1]] > chgSymbolVals.Config.MinVal {
 								if nos == os {
 									nos = os.CloneEx(gameProp.PoolScene)
 								}
@@ -190,22 +194,32 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 				for _, ri := range lst {
 					pos := curpr.Results[ri].Pos
 					if len(pos) > 0 {
+						npos, err := chgSymbolVals.rebuildPos(pos, plugin)
+						if err != nil {
+							goutils.Error("ChgSymbolVals.OnPlayGame:rebuildPos",
+								goutils.Err(err))
+
+							return "", nil
+						}
+
 						if chgSymbolVals.Config.Type == CSVTypeInc {
 							if nos == os {
 								nos = os.CloneEx(gameProp.PoolScene)
 							}
 
-							for i := 0; i < len(pos)/2; i++ {
-								nos.Arr[pos[i*2]][pos[i*2+1]]++
+							for i := 0; i < len(npos)/2; i++ {
+								if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
+									nos.Arr[npos[i*2]][npos[i*2+1]]++
+								}
 							}
 						} else if chgSymbolVals.Config.Type == CSVTypeDec {
-							for i := 0; i < len(pos)/2; i++ {
-								if nos.Arr[pos[i*2]][pos[i*2+1]] > 0 {
+							for i := 0; i < len(npos)/2; i++ {
+								if nos.Arr[npos[i*2]][npos[i*2+1]] > chgSymbolVals.Config.MinVal {
 									if nos == os {
 										nos = os.CloneEx(gameProp.PoolScene)
 									}
 
-									nos.Arr[pos[i*2]][pos[i*2+1]]--
+									nos.Arr[npos[i*2]][npos[i*2+1]]--
 								}
 							}
 						}
@@ -261,6 +275,8 @@ type jsonChgSymbolVals struct {
 	PositionCollection  string   `json:"positionCollection"`
 	WinResultComponents []string `json:"winResultComponents"`
 	MaxNumber           int      `json:"maxNumber"`
+	MaxVal              int      `json:"maxVal"`
+	MinVal              int      `json:"minVal"`
 }
 
 func (jcfg *jsonChgSymbolVals) build() *ChgSymbolValsConfig {
@@ -270,6 +286,8 @@ func (jcfg *jsonChgSymbolVals) build() *ChgSymbolValsConfig {
 		PositionCollection:  jcfg.PositionCollection,
 		WinResultComponents: jcfg.WinResultComponents,
 		MaxNumber:           jcfg.MaxNumber,
+		MaxVal:              jcfg.MaxVal,
+		MinVal:              jcfg.MinVal,
 	}
 
 	// cfg.UseSceneV3 = true

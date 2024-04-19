@@ -44,6 +44,8 @@ type GenSymbolValsWithPosConfig struct {
 	IsUseSource          bool                     `yaml:"isUseSource" json:"isUseSource"`
 	IsAlwaysGen          bool                     `yaml:"isAlwaysGen" json:"isAlwaysGen"`
 	DefaultVal           int                      `yaml:"defaultVal" json:"defaultVal"`
+	MaxVal               int                      `yaml:"maxVal" json:"maxVal"`
+	MinVal               int                      `yaml:"minVal" json:"minVal"`
 }
 
 // SetLinkComponent
@@ -141,15 +143,17 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 					x := curpr.Results[ri].Pos[pi*2]
 					y := curpr.Results[ri].Pos[pi*2+1]
 
-					if nos == os {
-						if os != nil {
-							nos = os.CloneEx(gameProp.PoolScene)
-						} else {
-							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
+					if nos.Arr[x][y] < genSymbolValsWithPos.Config.MaxVal {
+						if nos == os {
+							if os != nil {
+								nos = os.CloneEx(gameProp.PoolScene)
+							} else {
+								nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
+							}
 						}
-					}
 
-					nos.Arr[x][y]++
+						nos.Arr[x][y]++
+					}
 				}
 			}
 		}
@@ -171,15 +175,17 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						continue
 					}
 
-					if nos == os {
-						if os != nil {
-							nos = os.CloneEx(gameProp.PoolScene)
-						} else {
-							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
+					if nos.Arr[x][y] < genSymbolValsWithPos.Config.MaxVal {
+						if nos == os {
+							if os != nil {
+								nos = os.CloneEx(gameProp.PoolScene)
+							} else {
+								nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
+							}
 						}
-					}
 
-					nos.Arr[x][y]++
+						nos.Arr[x][y]++
+					}
 				}
 			}
 		}
@@ -241,6 +247,8 @@ type jsonGenSymbolValsWithPos struct {
 	IsUseSource      string   `json:"isUseSource"`
 	IsAlwaysGen      string   `json:"isAlwaysGen"`
 	DefaultVal       int      `json:"defaultVal"`
+	MaxVal           int      `json:"maxVal"`
+	MinVal           int      `json:"minVal"`
 }
 
 func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
@@ -251,6 +259,8 @@ func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
 		IsUseSource:      jcfg.IsUseSource == "true",
 		IsAlwaysGen:      jcfg.IsAlwaysGen == "true",
 		DefaultVal:       jcfg.DefaultVal,
+		MaxVal:           jcfg.MaxVal,
+		MinVal:           jcfg.MinVal,
 	}
 
 	// cfg.UseSceneV3 = true
