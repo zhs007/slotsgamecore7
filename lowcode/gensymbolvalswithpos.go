@@ -143,7 +143,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 					x := curpr.Results[ri].Pos[pi*2]
 					y := curpr.Results[ri].Pos[pi*2+1]
 
-					if os.Arr[x][y] < genSymbolValsWithPos.Config.MaxVal {
+					if os == nil || os.Arr[x][y] < genSymbolValsWithPos.Config.MaxVal {
 						if nos == os {
 							if os != nil {
 								nos = os.CloneEx(gameProp.PoolScene)
@@ -175,7 +175,7 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GamePrope
 						continue
 					}
 
-					if os.Arr[x][y] < genSymbolValsWithPos.Config.MaxVal {
+					if os == nil || os.Arr[x][y] < genSymbolValsWithPos.Config.MaxVal {
 						if nos == os {
 							if os != nil {
 								nos = os.CloneEx(gameProp.PoolScene)
