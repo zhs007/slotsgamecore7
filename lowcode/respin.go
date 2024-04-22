@@ -110,6 +110,15 @@ func (respinData *RespinData) ChgConfigIntVal(key string, off int) {
 	}
 }
 
+// SetConfigIntVal -
+func (respinData *RespinData) SetConfigIntVal(key string, val int) {
+	if key == CCVLastRespinNum {
+		respinData.AddRespinTimes(val)
+	} else {
+		respinData.BasicComponentData.ChgConfigIntVal(key, val)
+	}
+}
+
 // // AddRetriggerRespinNum -
 // func (respinData *RespinData) AddRetriggerRespinNum(num int) {
 // 	respinData.RetriggerAddRespinNum += num
