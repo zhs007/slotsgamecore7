@@ -19,9 +19,9 @@ import (
 
 const WaysTriggerTypeName = "waysTrigger"
 
-const (
-	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-)
+// const (
+// 	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+// )
 
 type WaysTriggerData struct {
 	BasicComponentData
@@ -728,7 +728,7 @@ func (waysTrigger *WaysTrigger) NewComponentData() IComponentData {
 }
 
 func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
-	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
+	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
 		return winMulti
 	}

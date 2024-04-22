@@ -54,6 +54,8 @@ func (piggyBankData *PiggyBankData) BuildPBComponentData() proto.Message {
 func (piggyBankData *PiggyBankData) GetVal(key string) (int, bool) {
 	if key == CVWins {
 		return piggyBankData.Wins, true
+	} else if key == CVWinMulti {
+		return piggyBankData.WinMulti, true
 	}
 
 	return 0, false
@@ -196,7 +198,7 @@ func (piggyBank *PiggyBank) NewComponentData() IComponentData {
 }
 
 func (piggyBank *PiggyBank) GetWinMulti(basicCD *BasicComponentData) int {
-	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
+	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
 		return winMulti
 	}
