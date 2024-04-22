@@ -421,11 +421,16 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 // }
 
 // procWins
-func (scatterTrigger *ScatterTrigger) procWins(gameProp *GameProperty, std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
+func (scatterTrigger *ScatterTrigger) procWins(gameProp *GameProperty, curpr *sgc7game.PlayResult, std *ScatterTriggerData, lst []*sgc7game.Result) (int, error) {
 	if scatterTrigger.Config.BetType == BTypeNoPay {
 		for _, v := range lst {
 			v.CoinWin = 0
 			v.CashWin = 0
+
+			scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+			std.SymbolNum += v.SymbolNums
+			std.WildNum += v.Wilds
 		}
 
 		return 0, nil
@@ -439,6 +444,11 @@ func (scatterTrigger *ScatterTrigger) procWins(gameProp *GameProperty, std *Scat
 		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
+
+		scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+		std.SymbolNum += v.SymbolNums
+		std.WildNum += v.Wilds
 	}
 
 	if std.Wins > 0 {
@@ -453,6 +463,11 @@ func (scatterTrigger *ScatterTrigger) procWins(gameProp *GameProperty, std *Scat
 			}
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+
+			for _, v := range lst {
+				curpr.CashWin -= int64(v.CashWin)
+				curpr.CoinWin -= v.CoinWin
+			}
 
 			gameProp.UseComponent(scatterTrigger.Config.PiggyBankComponent)
 		}
@@ -527,15 +542,15 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	isTrigger, lst := scatterTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
-		scatterTrigger.procWins(gameProp, std, lst)
+		scatterTrigger.procWins(gameProp, curpr, std, lst)
 
 		// if !scatterTrigger.Config.NeedDiscardResults {
-		for _, v := range lst {
-			scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
+		// for _, v := range lst {
+		// 	scatterTrigger.AddResult(curpr, v, &std.BasicComponentData)
 
-			std.SymbolNum += v.SymbolNums
-			std.WildNum += v.Wilds
-		}
+		// 	std.SymbolNum += v.SymbolNums
+		// 	std.WildNum += v.Wilds
+		// }
 		// } else {
 		// 	for _, v := range lst {
 		// 		std.SymbolNum += v.SymbolNums
