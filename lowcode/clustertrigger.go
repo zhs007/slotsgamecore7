@@ -350,6 +350,11 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sg
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
 
+			for _, v := range lst {
+				curpr.CashWin -= int64(v.CashWin)
+				curpr.CoinWin -= v.CoinWin
+			}
+
 			gameProp.UseComponent(clusterTrigger.Config.PiggyBankComponent)
 		}
 	}

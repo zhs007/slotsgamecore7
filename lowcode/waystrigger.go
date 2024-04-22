@@ -402,11 +402,16 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 }
 
 // procWins
-func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
+func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, curpr *sgc7game.PlayResult, std *WaysTriggerData, lst []*sgc7game.Result) (int, error) {
 	if waysTrigger.Config.BetType == BTypeNoPay {
 		for _, v := range lst {
 			v.CoinWin = 0
 			v.CashWin = 0
+
+			waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+			std.SymbolNum += v.SymbolNums
+			std.WildNum += v.Wilds
 		}
 
 		return 0, nil
@@ -420,6 +425,11 @@ func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, std *WaysTrigge
 		v.CashWin *= std.WinMulti
 
 		std.Wins += v.CoinWin
+
+		waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+
+		std.SymbolNum += v.SymbolNums
+		std.WildNum += v.Wilds
 	}
 
 	if std.Wins > 0 {
@@ -434,6 +444,11 @@ func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, std *WaysTrigge
 			}
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
+
+			for _, v := range lst {
+				curpr.CashWin -= int64(v.CashWin)
+				curpr.CoinWin -= v.CoinWin
+			}
 
 			gameProp.UseComponent(waysTrigger.Config.PiggyBankComponent)
 		}
@@ -508,15 +523,15 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake)
 
 	if isTrigger {
-		waysTrigger.procWins(gameProp, std, lst)
+		waysTrigger.procWins(gameProp, curpr, std, lst)
 
 		// if !waysTrigger.Config.NeedDiscardResults {
-		for _, v := range lst {
-			waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
+		// for _, v := range lst {
+		// 	waysTrigger.AddResult(curpr, v, &std.BasicComponentData)
 
-			std.SymbolNum += v.SymbolNums
-			std.WildNum += v.Wilds
-		}
+		// 	std.SymbolNum += v.SymbolNums
+		// 	std.WildNum += v.Wilds
+		// }
 		// } else {
 		// 	for _, v := range lst {
 		// 		std.SymbolNum += v.SymbolNums
