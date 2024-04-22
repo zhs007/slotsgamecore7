@@ -41,6 +41,24 @@ func (collectorData *CollectorData) onNewStep() {
 
 // // ChgConfigIntVal -
 // func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
+// 	if key == CCVLastRespinNum {
+// 		respinData.AddRespinTimes(off)
+// 	} else {
+// 		respinData.BasicComponentData.ChgConfigIntVal(key, off)
+// 	}
+// }
+
+// SetConfigIntVal -
+func (collectorData *CollectorData) SetConfigIntVal(key string, val int) {
+	if key == CCVValueNum {
+		collectorData.Val = val
+	} else {
+		collectorData.BasicComponentData.ChgConfigIntVal(key, val)
+	}
+}
+
+// // ChgConfigIntVal -
+// func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
 // 	if key == CCVValueNum {
 // 		collectorData.Val += off
 // 	}
