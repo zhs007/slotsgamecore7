@@ -28,15 +28,20 @@ type PiggyBankData struct {
 // OnNewGame -
 func (piggyBankData *PiggyBankData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	piggyBankData.BasicComponentData.OnNewGame(gameProp, component)
-}
-
-// onNewStep -
-func (piggyBankData *PiggyBankData) onNewStep() {
-	// piggyBankData.BasicComponentData.OnNewStep(gameProp, component)
 
 	piggyBankData.Wins = 0
 	piggyBankData.WinMulti = 1
+
+	piggyBankData.SetConfigIntVal(CCVWinMulti, 1)
 }
+
+// // onNewStep -
+// func (piggyBankData *PiggyBankData) onNewStep() {
+// 	// piggyBankData.BasicComponentData.OnNewStep(gameProp, component)
+
+// 	// piggyBankData.Wins = 0
+// 	// piggyBankData.WinMulti = 1
+// }
 
 // BuildPBComponentData
 func (piggyBankData *PiggyBankData) BuildPBComponentData() proto.Message {
@@ -133,7 +138,7 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd := icd.(*PiggyBankData)
 
-	cd.onNewStep()
+	// cd.onNewStep()
 
 	winMulti := piggyBank.GetWinMulti(&cd.BasicComponentData)
 
