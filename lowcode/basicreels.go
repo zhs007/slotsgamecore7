@@ -22,9 +22,9 @@ const BasicReelsTypeName = "basicReels"
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	// ReelSetsWeight       string `yaml:"reelSetWeight" json:"reelSetWeight"`
-	ReelSet      string `yaml:"reelSet" json:"reelSet"`
-	IsExpandReel bool   `yaml:"isExpandReel" json:"isExpandReel"`
+	ReelSet              string   `yaml:"reelSet" json:"reelSet"`
+	IsExpandReel         bool     `yaml:"isExpandReel" json:"isExpandReel"`
+	Awards               []*Award `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -37,7 +37,6 @@ func (cfg *BasicReelsConfig) SetLinkComponent(link string, componentName string)
 type BasicReels struct {
 	*BasicComponent `json:"-"`
 	Config          *BasicReelsConfig `json:"config"`
-	// ReelSetWeights  *sgc7game.ValWeights2 `json:"-"`
 }
 
 // Init -
@@ -82,6 +81,10 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 
 	// 	basicReels.ReelSetWeights = vw2
 	// }
+
+	for _, award := range basicReels.Config.Awards {
+		award.Init()
+	}
 
 	basicReels.onInit(&basicReels.Config.BasicComponentConfig)
 
@@ -168,6 +171,10 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	basicReels.AddScene(gameProp, curpr, sc, bcd)
 
+	if len(basicReels.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, basicReels.Config.Awards, curpr, gp)
+	}
+
 	nc := basicReels.onStepEnd(gameProp, curpr, gp, "")
 
 	// gp.AddComponentData(basicReels.Name, cd)
@@ -220,9 +227,9 @@ func (jbr *jsonBasicReels) build() *BasicReelsConfig {
 }
 
 func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
-		goutils.Error("parseBasicReels2:getConfigInCell",
+		goutils.Error("parseBasicReels:getConfigInCell",
 			goutils.Err(err))
 
 		return "", err
@@ -230,7 +237,7 @@ func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseBasicReels2:MarshalJSON",
+		goutils.Error("parseBasicReels:MarshalJSON",
 			goutils.Err(err))
 
 		return "", err
@@ -240,13 +247,25 @@ func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
-		goutils.Error("parseBasicReels2:Unmarshal",
+		goutils.Error("parseBasicReels:Unmarshal",
 			goutils.Err(err))
 
 		return "", err
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseBasicReels:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
