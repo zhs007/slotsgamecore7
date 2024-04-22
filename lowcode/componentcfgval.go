@@ -29,4 +29,5 @@ const (
 	CVRetriggerAddRespinNum string = "retriggerAddRespinNum" // retriggerAddRespinNum
 	CVAvgSymbolValMulti     string = "avgSymbolValMulti"     // avgSymbolValMulti
 	CVAvgHeight             string = "avgHeight"             // avgHeight
+	CVWinMulti              string = "winMulti"              // winMulti
 )

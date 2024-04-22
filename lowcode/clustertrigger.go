@@ -634,7 +634,7 @@ func (clusterTrigger *ClusterTrigger) NewComponentData() IComponentData {
 }
 
 func (clusterTrigger *ClusterTrigger) GetWinMulti(basicCD *BasicComponentData) int {
-	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
+	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
 		return winMulti
 	}
