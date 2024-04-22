@@ -1,6 +1,7 @@
 package mathtoolset2
 
 import (
+	"io"
 	"log/slog"
 
 	"github.com/google/cel-go/cel"
@@ -132,9 +133,66 @@ func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 	)
 }
 
+// newGenStackReels - mergeReels(targetfn string, files []string)
+func (sc *ScriptCore) newMergeReels() cel.EnvOption {
+	return cel.Function("mergeReels",
+		cel.Overload("mergeReels_string_list",
+			[]*cel.Type{cel.StringType, cel.ListType(cel.StringType)},
+			cel.BoolType,
+			cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+
+				if len(params) != 2 {
+					goutils.Error("mergeReels",
+						goutils.Err(ErrInvalidFunctionParams))
+
+					sc.pushError(ErrInvalidFunctionParams)
+
+					return types.Bool(false)
+				}
+
+				targetfn := params[0].Value().(string)
+				files := List2StrSlice(params[1])
+				readers := []io.Reader{}
+
+				for _, v := range files {
+					readers = append(readers, sc.MapFiles.GetReader(v))
+				}
+
+				rd, err := MergeReels(readers)
+				if err != nil {
+					goutils.Error("mergeReels:MergeReels",
+						goutils.Err(err))
+
+					sc.pushError(err)
+
+					return types.Bool(false)
+				}
+
+				f := NewExcelFile(rd)
+
+				buf, err := f.WriteToBuffer()
+				if err != nil {
+					goutils.Error("mergeReels:WriteToBuffer",
+						goutils.Err(err))
+
+					sc.pushError(err)
+
+					return types.Bool(false)
+				}
+
+				sc.MapOutputFiles.AddBuffer(targetfn, buf)
+
+				return types.Bool(true)
+			},
+			),
+		),
+	)
+}
+
 func (sc *ScriptCore) newBasicScriptFuncs() []cel.EnvOption {
 	return []cel.EnvOption{
 		sc.newGenStackReels(),
+		sc.newMergeReels(),
 	}
 }
 
