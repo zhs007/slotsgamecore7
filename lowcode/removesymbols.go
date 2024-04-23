@@ -43,6 +43,7 @@ func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 	// removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	removeSymbolsData.RemovedNum = 0
+	removeSymbolsData.UsedScenes = nil
 
 	if gIsReleaseMode {
 		removeSymbolsData.AvgHeight = 0
