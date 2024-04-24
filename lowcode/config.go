@@ -27,6 +27,12 @@ type BetConfig struct {
 	Components     []*ComponentConfig               `yaml:"components"`
 	mapConfig      map[string]IComponentConfig      `yaml:"-"`
 	mapBasicConfig map[string]*BasicComponentConfig `yaml:"-"`
+	ForceEnding    string                           `yaml:"-"`
+}
+
+func (betCfg *BetConfig) Reset(start string, end string) {
+	betCfg.Start = start
+	betCfg.ForceEnding = end
 }
 
 // type BetDataConfig struct {
@@ -44,38 +50,39 @@ type BetConfig struct {
 // }
 
 type Config struct {
-	Name         string                         `yaml:"name"`
-	Width        int                            `yaml:"width"`
-	Height       int                            `yaml:"height"`
-	Linedata     map[string]string              `yaml:"linedata"`
-	MapLinedate  map[string]*sgc7game.LineData  `yaml:"-"`
-	Paytables    map[string]string              `yaml:"paytables"`
-	MapPaytables map[string]*sgc7game.PayTables `yaml:"-"`
-	// IsIntReel         bool                           `yaml:"isIntReel"`
-	Reels            map[string]string              `yaml:"reels"`
-	MapReels         map[string]*sgc7game.ReelsData `yaml:"-"`
-	FileMapping      map[string]string              `yaml:"fileMapping"`
-	SymbolsViewer    string                         `yaml:"symbolsViewer"`
-	DefaultScene     string                         `yaml:"defaultScene"`
-	DefaultPaytables string                         `yaml:"defaultPaytables"`
-	DefaultLinedata  string                         `yaml:"defaultLinedata"`
-	Bets             []int                          `yaml:"bets"`
-	TotalBetInWins   []int                          `yaml:"totalBetInWins"`
-	// StartComponents  map[int]string                 `yaml:"startComponents"`
-	// GameMods          []*GameModConfig               `yaml:"gamemods"`
-	StatsSymbols      []string                  `yaml:"statsSymbols"`
-	StatsSymbolCodes  []mathtoolset.SymbolType  `yaml:"-"`
-	MainPath          string                    `yaml:"mainPath"`
-	MapCmdComponent   map[string]string         `yaml:"mapCmdComponent"`
-	ComponentsMapping map[int]map[string]string `yaml:"componentsMapping"`
-	MapBetConfigs     map[int]*BetConfig        `yaml:"mapBetConfigs"`
-	// mapConfig         map[string]IComponentConfig      `yaml:"-"`
-	// mapBasicConfig    map[string]*BasicComponentConfig `yaml:"-"`
+	Name              string                           `yaml:"name"`
+	Width             int                              `yaml:"width"`
+	Height            int                              `yaml:"height"`
+	Linedata          map[string]string                `yaml:"linedata"`
+	MapLinedate       map[string]*sgc7game.LineData    `yaml:"-"`
+	Paytables         map[string]string                `yaml:"paytables"`
+	MapPaytables      map[string]*sgc7game.PayTables   `yaml:"-"`
+	Reels             map[string]string                `yaml:"reels"`
+	MapReels          map[string]*sgc7game.ReelsData   `yaml:"-"`
+	FileMapping       map[string]string                `yaml:"fileMapping"`
+	SymbolsViewer     string                           `yaml:"symbolsViewer"`
+	DefaultScene      string                           `yaml:"defaultScene"`
+	DefaultPaytables  string                           `yaml:"defaultPaytables"`
+	DefaultLinedata   string                           `yaml:"defaultLinedata"`
+	Bets              []int                            `yaml:"bets"`
+	TotalBetInWins    []int                            `yaml:"totalBetInWins"`
+	StatsSymbols      []string                         `yaml:"statsSymbols"`
+	StatsSymbolCodes  []mathtoolset.SymbolType         `yaml:"-"`
+	MainPath          string                           `yaml:"mainPath"`
+	MapCmdComponent   map[string]string                `yaml:"mapCmdComponent"`
+	ComponentsMapping map[int]map[string]string        `yaml:"componentsMapping"`
+	MapBetConfigs     map[int]*BetConfig               `yaml:"mapBetConfigs"`
 	mapValWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
 	mapReelSetWeights map[string]*sgc7game.ValWeights2 `yaml:"-"`
 	mapStrWeights     map[string]*sgc7game.ValWeights2 `yaml:"-"`
 	mapIntMapping     map[string]*sgc7game.ValMapping2 `yaml:"-"`
-	// mapBetConfig      map[int]*BetDataConfig           `yaml:"-"`
+}
+
+func (cfg *Config) Reset(bet int, start string, end string) {
+	betCfg, isok := cfg.MapBetConfigs[bet]
+	if isok {
+		betCfg.Reset(start, end)
+	}
 }
 
 func (cfg *Config) GetPath(fn string, useFileMapping bool) string {

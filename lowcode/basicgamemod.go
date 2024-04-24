@@ -172,6 +172,12 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			nextComponentName = nc
 		}
 
+		if !gIsReleaseMode {
+			if gameProp.Pool.Config.MapBetConfigs[int(stake.CashBet/stake.CoinBet)].ForceEnding == nextComponentName {
+				nextComponentName = ""
+			}
+		}
+
 		if gameProp.IsRespin(nextComponentName) && !gameProp.IsEndingRespin(nextComponentName) {
 			gameProp.onTriggerRespin(nextComponentName)
 			gp.NextStepFirstComponent = nextComponentName
