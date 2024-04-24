@@ -505,354 +505,365 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 
 			componentType = strings.ToLower(componentType)
 
-			if componentType == "weightreels" {
-				componentName, err := parseWeightReels(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseWeightReels",
-						slog.Int("i", i),
-						goutils.Err(err))
+			componentName, err := gJsonMgr.LoadComponent(componentType, cfg, &cell)
+			if err != nil {
+				goutils.Error("loadCells:LoadComponent",
+					slog.Int("i", i),
+					goutils.Err(err))
 
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "basicreels" {
-				componentName, err := parseBasicReels(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseBasicReels",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "scattertrigger" {
-				componentName, err := parseScatterTrigger(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseScatterTrigger",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "linestrigger" {
-				componentName, err := parseLinesTrigger(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseLinesTrigger",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "waystrigger" {
-				componentName, err := parseWaysTrigger(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseWaysTrigger",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "movesymbol" {
-				componentName, err := parseMoveSymbol(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseMoveSymbol",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "respin" {
-				componentName, err := parseRespin(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseRespin",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "symbolcollection" {
-				componentName, err := parseSymbolCollection2(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseSymbolCollection2",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "removesymbols" {
-				componentName, err := parseRemoveSymbols(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseRemoveSymbols",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "dropdownsymbols" {
-				componentName, err := parseDropDownSymbols(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseDropDownSymbols",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "refillsymbols" {
-				componentName, err := parseRefillSymbols(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseRefillSymbols",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "collector" {
-				componentName, err := parseCollector(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseCollector",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "queuebranch" || componentType == "delayqueue" {
-				componentName, err := parseQueueBranch(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseQueueBranch",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "replacesymbolgroup" {
-				componentName, err := parseReplaceSymbolGroup(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseReplaceSymbolGroup",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "rollsymbol" {
-				componentName, err := parseRollSymbol(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseRollSymbol",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "mask" {
-				componentName, err := parseMask(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseMask",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "replacereelwithmask" {
-				componentName, err := parseReplaceReelWithMask(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseReplaceReelWithMask",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "piggybank" {
-				componentName, err := parsePiggyBank(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parsePiggyBank",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "addsymbols" {
-				componentName, err := parseAddSymbols(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseAddSymbols",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "intvalmapping" {
-				componentName, err := parseIntValMapping(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseIntValMapping",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "weightbranch" {
-				componentName, err := parseWeightBranch(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseWeightBranch",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "clustertrigger" {
-				componentName, err := parseClusterTrigger(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseClusterTrigger",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "gengigasymbol" {
-				componentName, err := parseGenGigaSymbol(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseGenGigaSymbol",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "winresultcache" {
-				componentName, err := parseWinResultCache(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseWinResultCache",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "gensymbolvalswithwinresult" {
-				componentName, err := parseGenSymbolValsWithPos(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseGenSymbolValsWithPos",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "checksymbolvals" {
-				componentName, err := parseCheckSymbolVals(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseCheckSymbolVals",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "positioncollection" {
-				componentName, err := parsePositionCollection(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parsePositionCollection",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "chgsymbolvals" {
-				componentName, err := parseChgSymbolVals(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseChgSymbolVals",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "chgsymbols" {
-				componentName, err := parseChgSymbols(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseChgSymbols",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "gensymbolvalswithsymbol" {
-				componentName, err := parseGenSymbolValsWithSymbol(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseGenSymbolValsWithSymbol",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else if componentType == "symbolvalswins" {
-				componentName, err := parseSymbolValWins(cfg, &cell)
-				if err != nil {
-					goutils.Error("loadCells:parseSymbolValWins",
-						slog.Int("i", i),
-						goutils.Err(err))
-
-					return err
-				}
-
-				mapComponentName[id] = componentName
-			} else {
-				goutils.Error("loadCells:ErrUnsupportedComponentType",
-					slog.String("componentType", componentType),
-					goutils.Err(ErrUnsupportedComponentType))
-
-				return ErrUnsupportedComponentType
+				return err
 			}
+
+			mapComponentName[id] = componentName
+
+			// if componentType == "weightreels" {
+			// 	componentName, err := parseWeightReels(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseWeightReels",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "basicreels" {
+			// 	componentName, err := parseBasicReels(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseBasicReels",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "scattertrigger" {
+			// 	componentName, err := parseScatterTrigger(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseScatterTrigger",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "linestrigger" {
+			// 	componentName, err := parseLinesTrigger(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseLinesTrigger",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "waystrigger" {
+			// 	componentName, err := parseWaysTrigger(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseWaysTrigger",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "movesymbol" {
+			// 	componentName, err := parseMoveSymbol(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseMoveSymbol",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "respin" {
+			// 	componentName, err := parseRespin(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseRespin",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "symbolcollection" {
+			// 	componentName, err := parseSymbolCollection2(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseSymbolCollection2",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "removesymbols" {
+			// 	componentName, err := parseRemoveSymbols(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseRemoveSymbols",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "dropdownsymbols" {
+			// 	componentName, err := parseDropDownSymbols(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseDropDownSymbols",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "refillsymbols" {
+			// 	componentName, err := parseRefillSymbols(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseRefillSymbols",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "collector" {
+			// 	componentName, err := parseCollector(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseCollector",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "queuebranch" || componentType == "delayqueue" {
+			// 	componentName, err := parseQueueBranch(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseQueueBranch",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "replacesymbolgroup" {
+			// 	componentName, err := parseReplaceSymbolGroup(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseReplaceSymbolGroup",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "rollsymbol" {
+			// 	componentName, err := parseRollSymbol(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseRollSymbol",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "mask" {
+			// 	componentName, err := parseMask(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseMask",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "replacereelwithmask" {
+			// 	componentName, err := parseReplaceReelWithMask(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseReplaceReelWithMask",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "piggybank" {
+			// 	componentName, err := parsePiggyBank(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parsePiggyBank",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "addsymbols" {
+			// 	componentName, err := parseAddSymbols(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseAddSymbols",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "intvalmapping" {
+			// 	componentName, err := parseIntValMapping(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseIntValMapping",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "weightbranch" {
+			// 	componentName, err := parseWeightBranch(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseWeightBranch",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "clustertrigger" {
+			// 	componentName, err := parseClusterTrigger(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseClusterTrigger",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "gengigasymbol" {
+			// 	componentName, err := parseGenGigaSymbol(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseGenGigaSymbol",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "winresultcache" {
+			// 	componentName, err := parseWinResultCache(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseWinResultCache",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "gensymbolvalswithwinresult" {
+			// 	componentName, err := parseGenSymbolValsWithPos(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseGenSymbolValsWithPos",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "checksymbolvals" {
+			// 	componentName, err := parseCheckSymbolVals(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseCheckSymbolVals",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "positioncollection" {
+			// 	componentName, err := parsePositionCollection(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parsePositionCollection",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "chgsymbolvals" {
+			// 	componentName, err := parseChgSymbolVals(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseChgSymbolVals",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "chgsymbols" {
+			// 	componentName, err := parseChgSymbols(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseChgSymbols",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "gensymbolvalswithsymbol" {
+			// 	componentName, err := parseGenSymbolValsWithSymbol(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseGenSymbolValsWithSymbol",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else if componentType == "symbolvalswins" {
+			// 	componentName, err := parseSymbolValWins(cfg, &cell)
+			// 	if err != nil {
+			// 		goutils.Error("loadCells:parseSymbolValWins",
+			// 			slog.Int("i", i),
+			// 			goutils.Err(err))
+
+			// 		return err
+			// 	}
+
+			// 	mapComponentName[id] = componentName
+			// } else {
+			// 	goutils.Error("loadCells:ErrUnsupportedComponentType",
+			// 		slog.String("componentType", componentType),
+			// 		goutils.Err(ErrUnsupportedComponentType))
+
+			// 	return ErrUnsupportedComponentType
+			// }
 		} else if shape == "edge" {
 			source, err := cell.Get("source").Get("cell").String()
 			if err != nil {
