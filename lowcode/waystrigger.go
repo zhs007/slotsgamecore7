@@ -52,6 +52,20 @@ func (waysTriggerData *WaysTriggerData) onNewStep() {
 	waysTriggerData.WinMulti = 1
 }
 
+// Clone
+func (waysTriggerData *WaysTriggerData) Clone() IComponentData {
+	target := &WaysTriggerData{
+		BasicComponentData: waysTriggerData.CloneBasicComponentData(),
+		SymbolNum:          waysTriggerData.SymbolNum,
+		WildNum:            waysTriggerData.WildNum,
+		RespinNum:          waysTriggerData.RespinNum,
+		Wins:               waysTriggerData.Wins,
+		WinMulti:           waysTriggerData.WinMulti,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WaysTriggerData{

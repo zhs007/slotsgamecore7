@@ -4,17 +4,21 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type FuncOnEachUsedResult func(*sgc7game.Result)
+type FuncNewComponentData func() IComponentData
 
 type IComponentData interface {
 	// OnNewGame -
 	OnNewGame(gameProp *GameProperty, component IComponent)
-	// // OnNewStep -
-	// OnNewStep(gameProp *GameProperty, component IComponent)
 	// BuildPBComponentData
 	BuildPBComponentData() proto.Message
+	// LoadPB
+	LoadPB(pb *anypb.Any) error
+	// Clone
+	Clone() IComponentData
 
 	// GetVal -
 	GetVal(key string) (int, bool)

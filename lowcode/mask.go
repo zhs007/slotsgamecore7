@@ -73,6 +73,23 @@ func (maskData *MaskData) onNewStep() {
 	}
 }
 
+// Clone
+func (maskData *MaskData) Clone() IComponentData {
+	target := &MaskData{
+		BasicComponentData: maskData.CloneBasicComponentData(),
+		Num:                maskData.Num,
+		NewChged:           maskData.NewChged,
+	}
+
+	target.Vals = make([]bool, len(maskData.Vals))
+	copy(target.Vals, maskData.Vals)
+
+	target.NewVals = make([]bool, len(maskData.NewVals))
+	copy(target.NewVals, maskData.NewVals)
+
+	return target
+}
+
 // BuildPBComponentData
 func (maskData *MaskData) BuildPBComponentData() proto.Message {
 	pb := &sgc7pb.MaskData{

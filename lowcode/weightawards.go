@@ -33,6 +33,18 @@ func (weightAwardsData *WeightAwardsData) OnNewGame(gameProp *GameProperty, comp
 // 	weightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
 // }
 
+// Clone
+func (weightAwardsData *WeightAwardsData) Clone() IComponentData {
+	target := &WeightAwardsData{
+		BasicComponentData: weightAwardsData.CloneBasicComponentData(),
+	}
+
+	target.GotIndex = make([]int, len(weightAwardsData.GotIndex))
+	copy(target.GotIndex, weightAwardsData.GotIndex)
+
+	return target
+}
+
 // BuildPBComponentData
 func (weightAwardsData *WeightAwardsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightAwardsData{

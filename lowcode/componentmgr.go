@@ -4,14 +4,20 @@ import (
 	"log/slog"
 
 	"github.com/zhs007/goutils"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type ComponentMgr struct {
-	MapComponent map[string]FuncNewComponent
+	MapComponent     map[string]FuncNewComponent
+	MapComponentData map[string]FuncNewComponentData // 未写完，写了一半，觉得clone效率更高，后续如果确定需要要再写
 }
 
 func (mgr *ComponentMgr) Reg(component string, funcNew FuncNewComponent) {
 	mgr.MapComponent[component] = funcNew
+}
+
+func (mgr *ComponentMgr) RegComponentData(pbtype string, funcNewComponentData FuncNewComponentData) {
+	mgr.MapComponentData[pbtype] = funcNewComponentData
 }
 
 func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent {
@@ -27,9 +33,39 @@ func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent 
 	return nil
 }
 
+// LoadPB
+func (mgr *ComponentMgr) LoadPB(pb *anypb.Any) (IComponentData, error) {
+	funcCD, isok := mgr.MapComponentData[pb.TypeUrl]
+	if isok {
+		icd := funcCD()
+		if icd == nil {
+			goutils.Error("ComponentMgr.LoadPB",
+				goutils.Err(ErrInvalidFuncNewComponentData))
+
+			return nil, ErrInvalidFuncNewComponentData
+		}
+
+		err := icd.LoadPB(pb)
+		if icd == nil {
+			goutils.Error("ComponentMgr.LoadPB:LoadPB",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		return icd, nil
+	}
+
+	goutils.Error("ComponentMgr.LoadPB",
+		goutils.Err(ErrInvalidAnypbTypeURL))
+
+	return nil, ErrInvalidAnypbTypeURL
+}
+
 func NewComponentMgr() *ComponentMgr {
 	mgr := &ComponentMgr{
-		MapComponent: make(map[string]FuncNewComponent),
+		MapComponent:     make(map[string]FuncNewComponent),
+		MapComponentData: make(map[string]FuncNewComponentData),
 	}
 
 	mgr.Reg(BasicReelsTypeName, NewBasicReels)

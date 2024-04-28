@@ -28,6 +28,55 @@ type BasicComponentData struct {
 	StrOutput             string
 }
 
+// Clone
+func (basicComponentData *BasicComponentData) CloneBasicComponentData() BasicComponentData {
+	target := BasicComponentData{
+		CashWin:               basicComponentData.CashWin,
+		CoinWin:               basicComponentData.CoinWin,
+		TargetSceneIndex:      basicComponentData.TargetSceneIndex,
+		TargetOtherSceneIndex: basicComponentData.TargetOtherSceneIndex,
+		MapConfigVals:         make(map[string]string),
+		MapConfigIntVals:      make(map[string]int),
+		Output:                basicComponentData.Output,
+		StrOutput:             basicComponentData.StrOutput,
+	}
+
+	target.UsedScenes = make([]int, len(basicComponentData.UsedScenes))
+	copy(target.UsedScenes, basicComponentData.UsedScenes)
+
+	target.UsedOtherScenes = make([]int, len(basicComponentData.UsedOtherScenes))
+	copy(target.UsedOtherScenes, basicComponentData.UsedOtherScenes)
+
+	target.UsedResults = make([]int, len(basicComponentData.UsedResults))
+	copy(target.UsedResults, basicComponentData.UsedResults)
+
+	target.UsedPrizeScenes = make([]int, len(basicComponentData.UsedPrizeScenes))
+	copy(target.UsedPrizeScenes, basicComponentData.UsedPrizeScenes)
+
+	target.RNG = make([]int, len(basicComponentData.RNG))
+	copy(target.RNG, basicComponentData.RNG)
+
+	for k, v := range basicComponentData.MapConfigVals {
+		target.MapConfigVals[k] = v
+	}
+
+	for k, v := range basicComponentData.MapConfigIntVals {
+		target.MapConfigIntVals[k] = v
+	}
+
+	target.SrcScenes = make([]int, len(basicComponentData.SrcScenes))
+	copy(target.SrcScenes, basicComponentData.SrcScenes)
+
+	return target
+}
+
+// Clone
+func (basicComponentData *BasicComponentData) Clone() IComponentData {
+	target := basicComponentData.CloneBasicComponentData()
+
+	return &target
+}
+
 // OnNewGame -
 func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	basicComponentData.MapConfigVals = make(map[string]string)
@@ -102,6 +151,64 @@ func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Messa
 	return &sgc7pb.BasicComponentData{
 		BasicComponentData: basicComponentData.BuildPBBasicComponentData(),
 	}
+}
+
+// LoadPB
+func (basicComponentData *BasicComponentData) LoadPB(pb *anypb.Any) error {
+	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ComponentData" {
+		var msg sgc7pb.ComponentData
+
+		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
+		if err != nil {
+			goutils.Error("BasicComponentData.LoadPB:UnmarshalTo:ComponentData",
+				goutils.Err(err))
+
+			return err
+		}
+
+		return nil
+	}
+
+	goutils.Error("BasicComponentData.LoadPB",
+		goutils.Err(ErrInvalidPBComponentData))
+
+	return ErrInvalidPBComponentData
+}
+
+// LoadPB
+func (basicComponentData *BasicComponentData) LoadPBComponentData(pb *sgc7pb.ComponentData) error {
+	basicComponentData.CashWin = pb.CashWin
+	basicComponentData.CoinWin = int(pb.CoinWin)
+	basicComponentData.TargetSceneIndex = int(pb.TargetScene)
+	basicComponentData.Output = int(pb.Output)
+	basicComponentData.StrOutput = pb.StrOutput
+
+	basicComponentData.UsedOtherScenes = nil
+	for _, v := range pb.UsedOtherScenes {
+		basicComponentData.UsedOtherScenes = append(basicComponentData.UsedOtherScenes, int(v))
+	}
+
+	basicComponentData.UsedScenes = nil
+	for _, v := range pb.UsedScenes {
+		basicComponentData.UsedScenes = append(basicComponentData.UsedScenes, int(v))
+	}
+
+	basicComponentData.UsedResults = nil
+	for _, v := range pb.UsedResults {
+		basicComponentData.UsedResults = append(basicComponentData.UsedResults, int(v))
+	}
+
+	basicComponentData.UsedPrizeScenes = nil
+	for _, v := range pb.UsedPrizeScenes {
+		basicComponentData.UsedPrizeScenes = append(basicComponentData.UsedPrizeScenes, int(v))
+	}
+
+	basicComponentData.SrcScenes = nil
+	for _, v := range pb.SrcScenes {
+		basicComponentData.SrcScenes = append(basicComponentData.SrcScenes, int(v))
+	}
+
+	return nil
 }
 
 // BuildPBBasicComponentData

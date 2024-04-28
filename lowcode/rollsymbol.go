@@ -37,6 +37,18 @@ func (rollSymbolData *RollSymbolData) OnNewGame(gameProp *GameProperty, componen
 // 	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
 // }
 
+// Clone
+func (rollSymbolData *RollSymbolData) Clone() IComponentData {
+	target := &RollSymbolData{
+		BasicComponentData: rollSymbolData.CloneBasicComponentData(),
+	}
+
+	target.SymbolCodes = make([]int, len(rollSymbolData.SymbolCodes))
+	copy(target.SymbolCodes, rollSymbolData.SymbolCodes)
+
+	return target
+}
+
 // BuildPBComponentData
 func (rollSymbolData *RollSymbolData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RollSymbolData{

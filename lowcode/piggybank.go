@@ -43,6 +43,18 @@ func (piggyBankData *PiggyBankData) OnNewGame(gameProp *GameProperty, component 
 // 	// piggyBankData.WinMulti = 1
 // }
 
+// Clone
+func (piggyBankData *PiggyBankData) Clone() IComponentData {
+	target := &PiggyBankData{
+		BasicComponentData: piggyBankData.CloneBasicComponentData(),
+		Wins:               piggyBankData.Wins,
+		WinMulti:           piggyBankData.WinMulti,
+		SavedMoney:         piggyBankData.SavedMoney,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (piggyBankData *PiggyBankData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.PiggyBankData{

@@ -62,6 +62,17 @@ func (symbolValWinsData *SymbolValWinsData) onNewStep() {
 	// symbolValWinsData.CollectorNum = 0
 }
 
+// Clone
+func (symbolValWinsData *SymbolValWinsData) Clone() IComponentData {
+	target := &SymbolValWinsData{
+		BasicComponentData: symbolValWinsData.CloneBasicComponentData(),
+		SymbolNum:          symbolValWinsData.SymbolNum,
+		Wins:               symbolValWinsData.Wins,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.SymbolValWinsData{

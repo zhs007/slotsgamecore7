@@ -64,6 +64,17 @@ func (collectorData *CollectorData) SetConfigIntVal(key string, val int) {
 // 	}
 // }
 
+// Clone
+func (collectorData *CollectorData) Clone() IComponentData {
+	target := &CollectorData{
+		BasicComponentData: collectorData.CloneBasicComponentData(),
+		Val:                collectorData.Val,
+		NewCollector:       collectorData.NewCollector,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 	return &sgc7pb.CollectorData{

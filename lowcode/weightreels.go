@@ -34,6 +34,16 @@ func (weightReelsData *WeightReelsData) OnNewGame(gameProp *GameProperty, compon
 // 	weightReelsData.ReelSetIndex = -1
 // }
 
+// Clone
+func (weightReelsData *WeightReelsData) Clone() IComponentData {
+	target := &WeightReelsData{
+		BasicComponentData: weightReelsData.CloneBasicComponentData(),
+		ReelSetIndex:       weightReelsData.ReelSetIndex,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (weightReelsData *WeightReelsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightReelsData{

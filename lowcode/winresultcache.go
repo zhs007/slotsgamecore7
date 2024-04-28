@@ -39,6 +39,18 @@ func (winResultCacheData *WinResultCacheData) OnNewGame(gameProp *GameProperty, 
 // 	winResultCacheData.WinMulti = 1
 // }
 
+// Clone
+func (winResultCacheData *WinResultCacheData) Clone() IComponentData {
+	target := &WinResultCacheData{
+		BasicComponentData: winResultCacheData.CloneBasicComponentData(),
+		Wins:               winResultCacheData.Wins,
+		WinMulti:           winResultCacheData.WinMulti,
+		WinResultNum:       winResultCacheData.WinResultNum,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (winResultCacheData *WinResultCacheData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WinResultCacheData{

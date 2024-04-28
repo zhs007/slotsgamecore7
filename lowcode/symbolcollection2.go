@@ -43,6 +43,18 @@ func (symbolCollection2Data *SymbolCollection2Data) OnNewGame(gameProp *GameProp
 // 	// symbolCollection2Data
 // }
 
+// Clone
+func (symbolCollection2Data *SymbolCollection2Data) Clone() IComponentData {
+	target := &SymbolCollection2Data{
+		BasicComponentData: symbolCollection2Data.CloneBasicComponentData(),
+	}
+
+	target.SymbolCodes = make([]int, len(symbolCollection2Data.SymbolCodes))
+	copy(target.SymbolCodes, symbolCollection2Data.SymbolCodes)
+
+	return target
+}
+
 // BuildPBComponentData
 func (symbolCollection2Data *SymbolCollection2Data) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.SymbolCollection2Data{
