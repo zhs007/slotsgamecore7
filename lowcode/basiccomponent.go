@@ -104,6 +104,64 @@ func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Messa
 	}
 }
 
+// LoadPB
+func (basicComponentData *BasicComponentData) LoadPB(pb *anypb.Any) error {
+	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ComponentData" {
+		var msg sgc7pb.ComponentData
+
+		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
+		if err != nil {
+			goutils.Error("BasicComponentData.LoadPB:UnmarshalTo:ComponentData",
+				goutils.Err(err))
+
+			return err
+		}
+
+		return nil
+	}
+
+	goutils.Error("BasicComponentData.LoadPB",
+		goutils.Err(ErrInvalidPBComponentData))
+
+	return ErrInvalidPBComponentData
+}
+
+// LoadPB
+func (basicComponentData *BasicComponentData) LoadPBComponentData(pb *sgc7pb.ComponentData) error {
+	basicComponentData.CashWin = pb.CashWin
+	basicComponentData.CoinWin = int(pb.CoinWin)
+	basicComponentData.TargetSceneIndex = int(pb.TargetScene)
+	basicComponentData.Output = int(pb.Output)
+	basicComponentData.StrOutput = pb.StrOutput
+
+	basicComponentData.UsedOtherScenes = nil
+	for _, v := range pb.UsedOtherScenes {
+		basicComponentData.UsedOtherScenes = append(basicComponentData.UsedOtherScenes, int(v))
+	}
+
+	basicComponentData.UsedScenes = nil
+	for _, v := range pb.UsedScenes {
+		basicComponentData.UsedScenes = append(basicComponentData.UsedScenes, int(v))
+	}
+
+	basicComponentData.UsedResults = nil
+	for _, v := range pb.UsedResults {
+		basicComponentData.UsedResults = append(basicComponentData.UsedResults, int(v))
+	}
+
+	basicComponentData.UsedPrizeScenes = nil
+	for _, v := range pb.UsedPrizeScenes {
+		basicComponentData.UsedPrizeScenes = append(basicComponentData.UsedPrizeScenes, int(v))
+	}
+
+	basicComponentData.SrcScenes = nil
+	for _, v := range pb.SrcScenes {
+		basicComponentData.SrcScenes = append(basicComponentData.SrcScenes, int(v))
+	}
+
+	return nil
+}
+
 // BuildPBBasicComponentData
 func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7pb.ComponentData {
 	pbcd := &sgc7pb.ComponentData{}

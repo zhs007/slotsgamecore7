@@ -14,6 +14,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
 
@@ -67,6 +68,43 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 	}
 
 	return pbcd
+}
+
+// LoadPB
+func (clusterTriggerData *ClusterTriggerData) LoadPB(pb *anypb.Any) error {
+	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ClusterTriggerData" {
+		var msg sgc7pb.ClusterTriggerData
+
+		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
+		if err != nil {
+			goutils.Error("ClusterTriggerData.LoadPB:anypb.UnmarshalTo:ClusterTriggerData",
+				goutils.Err(err))
+
+			return err
+		}
+
+		err = clusterTriggerData.LoadPBComponentData(msg.BasicComponentData)
+		if err != nil {
+			goutils.Error("ClusterTriggerData.LoadPB:LoadPBComponentData",
+				goutils.Err(err))
+
+			return err
+		}
+
+		clusterTriggerData.NextComponent = msg.NextComponent
+		clusterTriggerData.SymbolNum = int(msg.SymbolNum)
+		clusterTriggerData.WildNum = int(msg.WildNum)
+		clusterTriggerData.RespinNum = int(msg.RespinNum)
+		clusterTriggerData.Wins = int(msg.Wins)
+		clusterTriggerData.WinMulti = int(msg.WinMulti)
+
+		return nil
+	}
+
+	goutils.Error("ClusterTriggerData.LoadPB",
+		goutils.Err(ErrInvalidPBComponentData))
+
+	return ErrInvalidPBComponentData
 }
 
 // GetVal -

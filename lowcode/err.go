@@ -163,6 +163,15 @@ var (
 	// ErrInvalidScriptParamType - invalid script param type
 	ErrInvalidScriptParamType = errors.New("invalid param type")
 
-	// ErrInvalidPosition - invalid invalid position
-	ErrInvalidPosition = errors.New("invalid invalid position")
+	// ErrInvalidPosition - invalid position
+	ErrInvalidPosition = errors.New("invalid position")
+
+	// ErrInvalidAnyProtoBuf - invalid AnyProtoBuf
+	ErrInvalidAnyProtoBuf = errors.New("invalid AnyProtoBuf")
+	// ErrInvalidPBComponentData - invalid invalid PB ComponentData
+	ErrInvalidPBComponentData = errors.New("invalid PB ComponentData")
+	// ErrInvalidFuncNewComponentData - invalid FuncNewComponentData
+	ErrInvalidFuncNewComponentData = errors.New("invalid FuncNewComponentData")
+	// ErrInvalidAnypbTypeURL - invalid anypb TypeURL
+	ErrInvalidAnypbTypeURL = errors.New("invalid anypb TypeURL")
 )
