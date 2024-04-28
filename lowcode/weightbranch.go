@@ -37,6 +37,16 @@ func (weightBranchData *WeightBranchData) OnNewGame(gameProp *GameProperty, comp
 // 	weightBranchData.BasicComponentData.OnNewStep(gameProp, component)
 // }
 
+// Clone
+func (weightBranchData *WeightBranchData) Clone() IComponentData {
+	target := &WeightBranchData{
+		BasicComponentData: weightBranchData.CloneBasicComponentData(),
+		Value:              weightBranchData.Value,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (weightBranchData *WeightBranchData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightBranchData{

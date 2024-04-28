@@ -52,6 +52,21 @@ func (scatterTriggerData *ScatterTriggerData) onNewStep() {
 	scatterTriggerData.WinMulti = 1
 }
 
+// Clone
+func (scatterTriggerData *ScatterTriggerData) Clone() IComponentData {
+	target := &ScatterTriggerData{
+		BasicComponentData: scatterTriggerData.CloneBasicComponentData(),
+		NextComponent:      scatterTriggerData.NextComponent,
+		SymbolNum:          scatterTriggerData.SymbolNum,
+		WildNum:            scatterTriggerData.WildNum,
+		RespinNum:          scatterTriggerData.RespinNum,
+		Wins:               scatterTriggerData.Wins,
+		WinMulti:           scatterTriggerData.WinMulti,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (scatterTriggerData *ScatterTriggerData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.ScatterTriggerData{

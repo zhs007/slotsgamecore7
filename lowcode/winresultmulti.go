@@ -41,6 +41,17 @@ func (winResultMultiData *WinResultMultiData) onNewStep() {
 	winResultMultiData.WinMulti = 1
 }
 
+// Clone
+func (winResultMultiData *WinResultMultiData) Clone() IComponentData {
+	target := &WinResultMultiData{
+		BasicComponentData: winResultMultiData.CloneBasicComponentData(),
+		Wins:               winResultMultiData.Wins,
+		WinMulti:           winResultMultiData.WinMulti,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (winResultMultiData *WinResultMultiData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WinResultMultiData{

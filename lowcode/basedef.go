@@ -145,7 +145,7 @@ type GameParams struct {
 
 func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
 	if !gIsReleaseMode {
-		gp.MapComponentData[name] = cd
+		gp.MapComponentData[name] = cd.Clone()
 	}
 
 	if gIsRTPMode {

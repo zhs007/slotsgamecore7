@@ -47,6 +47,16 @@ func (overlaySymbolData *OverlaySymbolData) onNewStep(gameProp *GameProperty, co
 	}
 }
 
+// Clone
+func (overlaySymbolData *OverlaySymbolData) Clone() IComponentData {
+	target := &OverlaySymbolData{
+		BasicComponentData: overlaySymbolData.CloneBasicComponentData(),
+		CurLevel:           overlaySymbolData.CurLevel,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (overlaySymbolData *OverlaySymbolData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.OverlaySymbolData{

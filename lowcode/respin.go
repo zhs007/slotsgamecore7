@@ -56,6 +56,25 @@ func (respinData *RespinData) onNewStep() {
 	respinData.CurAddRespinNum = 0
 }
 
+// Clone
+func (respinData *RespinData) Clone() IComponentData {
+	target := &RespinData{
+		BasicComponentData:    respinData.CloneBasicComponentData(),
+		LastRespinNum:         respinData.LastRespinNum,
+		CurRespinNum:          respinData.CurRespinNum,
+		CurAddRespinNum:       respinData.CurAddRespinNum,
+		TotalCoinWin:          respinData.TotalCoinWin,
+		RetriggerAddRespinNum: respinData.RetriggerAddRespinNum,
+		LastTriggerNum:        respinData.LastTriggerNum,
+		CurTriggerNum:         respinData.CurTriggerNum,
+	}
+
+	target.TriggerRespinNum = make([]int, len(respinData.TriggerRespinNum))
+	copy(target.TriggerRespinNum, respinData.TriggerRespinNum)
+
+	return target
+}
+
 // BuildPBComponentData
 func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RespinData{

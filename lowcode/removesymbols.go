@@ -50,6 +50,16 @@ func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 	}
 }
 
+// Clone
+func (removeSymbolsData *RemoveSymbolsData) Clone() IComponentData {
+	target := &RemoveSymbolsData{
+		BasicComponentData: removeSymbolsData.CloneBasicComponentData(),
+		RemovedNum:         removeSymbolsData.RemovedNum,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RemoveSymbolsData{

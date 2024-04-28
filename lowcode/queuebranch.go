@@ -51,6 +51,16 @@ func (queueBranchData *QueueBranchData) ChgConfigIntVal(key string, off int) {
 	}
 }
 
+// Clone
+func (queueBranchData *QueueBranchData) Clone() IComponentData {
+	target := &QueueBranchData{
+		BasicComponentData: queueBranchData.CloneBasicComponentData(),
+		Queue:              queueBranchData.Queue,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.QueueBranchData{

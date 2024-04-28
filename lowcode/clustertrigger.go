@@ -55,6 +55,21 @@ func (clusterTriggerData *ClusterTriggerData) onNewStep() {
 	// }
 }
 
+// Clone
+func (clusterTriggerData *ClusterTriggerData) Clone() IComponentData {
+	target := &ClusterTriggerData{
+		BasicComponentData: clusterTriggerData.CloneBasicComponentData(),
+		NextComponent:      clusterTriggerData.NextComponent,
+		SymbolNum:          clusterTriggerData.SymbolNum,
+		WildNum:            clusterTriggerData.WildNum,
+		RespinNum:          clusterTriggerData.RespinNum,
+		Wins:               clusterTriggerData.Wins,
+		WinMulti:           clusterTriggerData.WinMulti,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.ClusterTriggerData{

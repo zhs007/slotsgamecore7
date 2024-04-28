@@ -33,6 +33,18 @@ func (multiWeightAwardsData *MultiWeightAwardsData) OnNewGame(gameProp *GameProp
 // 	multiWeightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
 // }
 
+// Clone
+func (multiWeightAwardsData *MultiWeightAwardsData) Clone() IComponentData {
+	target := &MultiWeightAwardsData{
+		BasicComponentData: multiWeightAwardsData.CloneBasicComponentData(),
+	}
+
+	target.HasGot = make([]bool, len(multiWeightAwardsData.HasGot))
+	copy(target.HasGot, multiWeightAwardsData.HasGot)
+
+	return target
+}
+
 // BuildPBComponentData
 func (multiWeightAwardsData *MultiWeightAwardsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.MultiWeightAwardsData{

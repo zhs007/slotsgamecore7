@@ -54,6 +54,21 @@ func (linesTriggerData *LinesTriggerData) onNewStep() {
 	linesTriggerData.WinMulti = 1
 }
 
+// Clone
+func (linesTriggerData *LinesTriggerData) Clone() IComponentData {
+	target := &LinesTriggerData{
+		BasicComponentData: linesTriggerData.CloneBasicComponentData(),
+		NextComponent:      linesTriggerData.NextComponent,
+		SymbolNum:          linesTriggerData.SymbolNum,
+		WildNum:            linesTriggerData.WildNum,
+		RespinNum:          linesTriggerData.RespinNum,
+		Wins:               linesTriggerData.Wins,
+		WinMulti:           linesTriggerData.WinMulti,
+	}
+
+	return target
+}
+
 // BuildPBComponentData
 func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.LinesTriggerData{

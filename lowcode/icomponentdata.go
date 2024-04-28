@@ -17,6 +17,8 @@ type IComponentData interface {
 	BuildPBComponentData() proto.Message
 	// LoadPB
 	LoadPB(pb *anypb.Any) error
+	// Clone
+	Clone() IComponentData
 
 	// GetVal -
 	GetVal(key string) (int, bool)

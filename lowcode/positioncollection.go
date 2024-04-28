@@ -54,6 +54,18 @@ func (positionCollectionData *PositionCollectionData) OnNewGame(gameProp *GamePr
 // 	positionCollectionData.BasicComponentData.OnNewStep(gameProp, component)
 // }
 
+// Clone
+func (positionCollectionData *PositionCollectionData) Clone() IComponentData {
+	target := &PositionCollectionData{
+		BasicComponentData: positionCollectionData.CloneBasicComponentData(),
+	}
+
+	target.Pos = make([]int, len(positionCollectionData.Pos))
+	copy(target.Pos, positionCollectionData.Pos)
+
+	return target
+}
+
 // BuildPBComponentData
 func (positionCollectionData *PositionCollectionData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.PositionCollectionData{

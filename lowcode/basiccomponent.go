@@ -28,6 +28,55 @@ type BasicComponentData struct {
 	StrOutput             string
 }
 
+// Clone
+func (basicComponentData *BasicComponentData) CloneBasicComponentData() BasicComponentData {
+	target := BasicComponentData{
+		CashWin:               basicComponentData.CashWin,
+		CoinWin:               basicComponentData.CoinWin,
+		TargetSceneIndex:      basicComponentData.TargetSceneIndex,
+		TargetOtherSceneIndex: basicComponentData.TargetOtherSceneIndex,
+		MapConfigVals:         make(map[string]string),
+		MapConfigIntVals:      make(map[string]int),
+		Output:                basicComponentData.Output,
+		StrOutput:             basicComponentData.StrOutput,
+	}
+
+	target.UsedScenes = make([]int, len(basicComponentData.UsedScenes))
+	copy(target.UsedScenes, basicComponentData.UsedScenes)
+
+	target.UsedOtherScenes = make([]int, len(basicComponentData.UsedOtherScenes))
+	copy(target.UsedOtherScenes, basicComponentData.UsedOtherScenes)
+
+	target.UsedResults = make([]int, len(basicComponentData.UsedResults))
+	copy(target.UsedResults, basicComponentData.UsedResults)
+
+	target.UsedPrizeScenes = make([]int, len(basicComponentData.UsedPrizeScenes))
+	copy(target.UsedPrizeScenes, basicComponentData.UsedPrizeScenes)
+
+	target.RNG = make([]int, len(basicComponentData.RNG))
+	copy(target.RNG, basicComponentData.RNG)
+
+	for k, v := range basicComponentData.MapConfigVals {
+		target.MapConfigVals[k] = v
+	}
+
+	for k, v := range basicComponentData.MapConfigIntVals {
+		target.MapConfigIntVals[k] = v
+	}
+
+	target.SrcScenes = make([]int, len(basicComponentData.SrcScenes))
+	copy(target.SrcScenes, basicComponentData.SrcScenes)
+
+	return target
+}
+
+// Clone
+func (basicComponentData *BasicComponentData) Clone() IComponentData {
+	target := basicComponentData.CloneBasicComponentData()
+
+	return &target
+}
+
 // OnNewGame -
 func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	basicComponentData.MapConfigVals = make(map[string]string)
