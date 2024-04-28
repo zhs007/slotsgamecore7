@@ -209,8 +209,18 @@ func (gameProp *GameProperty) Respin(pr *sgc7game.PlayResult, gp *GameParams, re
 	}
 }
 
+func (gameProp *GameProperty) hasRespin(respinComponent string) bool {
+	if len(gameProp.RespinComponents) == 0 {
+		return false
+	}
+
+	return goutils.IndexOfStringSlice(gameProp.RespinComponents, respinComponent, 0) >= 0
+}
+
+// onTriggerRespin -
 func (gameProp *GameProperty) onTriggerRespin(respinComponent string) error {
-	if len(gameProp.RespinComponents) == 0 || gameProp.RespinComponents[len(gameProp.RespinComponents)-1] != respinComponent {
+	// 暂时不考虑respin的嵌套，respin的嵌套如果要处理，也需要callstack那个层面来处理
+	if !gameProp.hasRespin(respinComponent) {
 		gameProp.RespinComponents = append(gameProp.RespinComponents, respinComponent)
 	}
 
