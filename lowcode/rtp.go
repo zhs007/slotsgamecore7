@@ -265,7 +265,7 @@ type RTPConfig struct {
 // 	rtp.AddHitRateNode(cfgHitRateFeature.Name, newFuncHitRate(cfgHitRateFeature))
 // }
 
-func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64, funcNewRNG FuncNewRNG) error {
+func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64, funcNewRNG FuncNewRNG, wincap int64) error {
 	// SetRTPMode()
 	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
@@ -314,7 +314,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 			slog.Int64("total nums", totalnums),
 			slog.Int64("current nums", curnums),
 			slog.Duration("cost time", curtime))
-	}, true, 0)
+	}, true, wincap)
 
 	goutils.Info("finish.",
 		slog.Int64("total nums", ispinnums),
