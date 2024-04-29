@@ -100,6 +100,10 @@ func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
 	if t == OSMTAdd {
 		return func(src int, target int) int {
 			if target > 1 {
+				if src == 1 {
+					return target
+				}
+
 				return src + target
 			}
 
@@ -116,6 +120,10 @@ func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
 	} else if t == OSMTPowOf2Add {
 		return func(src int, target int) int {
 			if target >= 1 {
+				if src == 1 {
+					return PowInt(2, target)
+				}
+
 				return src + PowInt(2, target)
 			}
 

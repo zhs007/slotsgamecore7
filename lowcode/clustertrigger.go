@@ -374,8 +374,8 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sg
 
 			v.OtherMul = std.WinMulti * svm
 
-			v.CoinWin *= std.WinMulti
-			v.CashWin *= std.WinMulti
+			v.CoinWin *= v.OtherMul
+			v.CashWin *= v.OtherMul
 
 			std.Wins += v.CoinWin
 
