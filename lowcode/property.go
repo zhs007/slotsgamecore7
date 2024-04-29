@@ -237,7 +237,26 @@ func (gameProp *GameProperty) removeRespin(respinComponent string) error {
 	return nil
 }
 
+func (gameProp *GameProperty) procEndingRespin() {
+	if len(gameProp.RespinComponents) > 0 {
+		ei := len(gameProp.RespinComponents) - 1
+		for i := len(gameProp.RespinComponents) - 1; i >= 0; i-- {
+			if gameProp.IsEndingRespin(gameProp.RespinComponents[i]) {
+				ei--
+			} else {
+				break
+			}
+		}
+
+		if ei >= 0 {
+			gameProp.RespinComponents = gameProp.RespinComponents[:ei+1]
+		}
+	}
+}
+
 func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams) {
+	gameProp.procEndingRespin()
+
 	if len(gameProp.RespinComponents) > 0 {
 		gp.NextStepFirstComponent = gameProp.RespinComponents[len(gameProp.RespinComponents)-1]
 
