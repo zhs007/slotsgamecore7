@@ -304,3 +304,27 @@ func PowInt(v int, n int) int {
 
 	return t
 }
+
+func CmpVal(src int, op string, target int) bool {
+	if op == "==" {
+		return src == target
+	}
+
+	if op == ">" {
+		return src > target
+	}
+
+	if op == ">=" {
+		return src >= target
+	}
+
+	if op == "<" {
+		return src < target
+	}
+
+	if op == "<=" {
+		return src <= target
+	}
+
+	return false
+}
