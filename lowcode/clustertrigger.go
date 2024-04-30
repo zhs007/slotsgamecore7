@@ -26,6 +26,7 @@ const ClusterTriggerTypeName = "clusterTrigger"
 
 type ClusterTriggerData struct {
 	BasicComponentData
+	PosComponentData
 	NextComponent     string
 	SymbolNum         int
 	WildNum           int
@@ -50,9 +51,9 @@ func (clusterTriggerData *ClusterTriggerData) onNewStep() {
 	clusterTriggerData.Wins = 0
 	clusterTriggerData.WinMulti = 1
 
-	// if !gIsReleaseMode {
-	// 	clusterTriggerData.AvgSymbolValMulti = 100
-	// }
+	if !gIsReleaseMode {
+		clusterTriggerData.PosComponentData.Clear()
+	}
 }
 
 // Clone
@@ -65,6 +66,10 @@ func (clusterTriggerData *ClusterTriggerData) Clone() IComponentData {
 		RespinNum:          clusterTriggerData.RespinNum,
 		Wins:               clusterTriggerData.Wins,
 		WinMulti:           clusterTriggerData.WinMulti,
+	}
+
+	if !gIsReleaseMode {
+		target.PosComponentData = clusterTriggerData.PosComponentData.Clone()
 	}
 
 	return target
@@ -154,6 +159,11 @@ func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
 	} else if key == CVWins {
 		clusterTriggerData.Wins = val
 	}
+}
+
+// GetPos -
+func (clusterTriggerData *ClusterTriggerData) GetPos() []int {
+	return clusterTriggerData.Pos
 }
 
 // ClusterTriggerConfig - configuration for ClusterTrigger

@@ -12,6 +12,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -45,6 +47,53 @@ func parseChgSymbolValsSourceType(strType string) ChgSymbolValsSourceType {
 	}
 
 	return CSVSTypeWinResult
+}
+
+type ChgSymbolValsData struct {
+	BasicComponentData
+	PosComponentData
+}
+
+// OnNewGame -
+func (chgSymbolValsData *ChgSymbolValsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	chgSymbolValsData.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// onNewStep -
+func (chgSymbolValsData *ChgSymbolValsData) onNewStep() {
+	if !gIsReleaseMode {
+		chgSymbolValsData.PosComponentData.Clear()
+	}
+}
+
+// Clone
+func (chgSymbolValsData *ChgSymbolValsData) Clone() IComponentData {
+	if !gIsReleaseMode {
+		target := &ChgSymbolValsData{
+			BasicComponentData: chgSymbolValsData.CloneBasicComponentData(),
+			PosComponentData:   chgSymbolValsData.PosComponentData.Clone(),
+		}
+
+		return target
+	}
+
+	target := &ChgSymbolValsData{
+		BasicComponentData: chgSymbolValsData.CloneBasicComponentData(),
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (chgSymbolValsData *ChgSymbolValsData) BuildPBComponentData() proto.Message {
+	return &sgc7pb.BasicComponentData{
+		BasicComponentData: chgSymbolValsData.BuildPBBasicComponentData(),
+	}
+}
+
+// GetPos -
+func (chgSymbolValsData *ChgSymbolValsData) GetPos() []int {
+	return chgSymbolValsData.Pos
 }
 
 // ChgSymbolValsConfig - configuration for ChgSymbolVals
@@ -145,7 +194,9 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*ChgSymbolValsData)
+
+	cd.onNewStep()
 
 	os := chgSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
@@ -234,7 +285,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 			return nc, ErrComponentDoNothing
 		}
 
-		chgSymbolVals.AddOtherScene(gameProp, curpr, nos, cd)
+		chgSymbolVals.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 
 		nc := chgSymbolVals.onStepEnd(gameProp, curpr, gp, "")
 
@@ -249,13 +300,18 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 // OnAsciiGame - outpur to asciigame
 func (chgSymbolVals *ChgSymbolVals) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*ChgSymbolValsData)
 
 	if len(cd.UsedOtherScenes) > 0 {
 		asciigame.OutputOtherScene("after ChgSymbolVals", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil
+}
+
+// NewComponentData -
+func (chgSymbolVals *ChgSymbolVals) NewComponentData() IComponentData {
+	return &ChgSymbolValsData{}
 }
 
 // // OnStats
