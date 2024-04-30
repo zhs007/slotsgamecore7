@@ -347,6 +347,10 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sg
 
 			std.SymbolNum += v.SymbolNums
 			std.WildNum += v.Wilds
+
+			if !gIsReleaseMode {
+				cd.MergePosList(v.Pos)
+			}
 		}
 
 		return 0, nil
@@ -367,6 +371,10 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sg
 
 			std.SymbolNum += v.SymbolNums
 			std.WildNum += v.Wilds
+
+			if !gIsReleaseMode {
+				cd.MergePosList(v.Pos)
+			}
 		}
 	} else {
 		funcCalcMulti := GetSymbolValMultiFunc(clusterTrigger.Config.OSMulType)
@@ -393,6 +401,10 @@ func (clusterTrigger *ClusterTrigger) procWins(gameProp *GameProperty, curpr *sg
 
 			std.SymbolNum += v.SymbolNums
 			std.WildNum += v.Wilds
+
+			if !gIsReleaseMode {
+				cd.MergePosList(v.Pos)
+			}
 		}
 
 		if !gIsReleaseMode {

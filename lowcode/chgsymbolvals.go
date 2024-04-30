@@ -222,6 +222,10 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						for i := 0; i < len(npos)/2; i++ {
 							if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
 								nos.Arr[npos[i*2]][npos[i*2+1]]++
+
+								if !gIsReleaseMode {
+									cd.AddPos(npos[i*2], npos[i*2+1])
+								}
 							}
 						}
 					} else if chgSymbolVals.Config.Type == CSVTypeDec {
@@ -232,6 +236,10 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 								}
 
 								nos.Arr[npos[i*2]][npos[i*2+1]]--
+
+								if !gIsReleaseMode {
+									cd.AddPos(npos[i*2], npos[i*2+1])
+								}
 							}
 						}
 					}
@@ -261,6 +269,10 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 							for i := 0; i < len(npos)/2; i++ {
 								if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
 									nos.Arr[npos[i*2]][npos[i*2+1]]++
+
+									if !gIsReleaseMode {
+										cd.AddPos(npos[i*2], npos[i*2+1])
+									}
 								}
 							}
 						} else if chgSymbolVals.Config.Type == CSVTypeDec {
@@ -271,6 +283,10 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 									}
 
 									nos.Arr[npos[i*2]][npos[i*2+1]]--
+
+									if !gIsReleaseMode {
+										cd.AddPos(npos[i*2], npos[i*2+1])
+									}
 								}
 							}
 						}
