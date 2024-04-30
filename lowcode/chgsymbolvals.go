@@ -91,6 +91,11 @@ func (chgSymbolValsData *ChgSymbolValsData) BuildPBComponentData() proto.Message
 	}
 }
 
+// GetPos -
+func (chgSymbolValsData *ChgSymbolValsData) GetPos() []int {
+	return chgSymbolValsData.Pos
+}
+
 // ChgSymbolValsConfig - configuration for ChgSymbolVals
 type ChgSymbolValsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`

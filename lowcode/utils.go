@@ -328,3 +328,17 @@ func CmpVal(src int, op string, target int) bool {
 
 	return false
 }
+
+func HasSamePos(src []int, target []int) bool {
+	if len(src) == 0 || len(target) == 0 {
+		return false
+	}
+
+	for i := 0; i < len(src)/2; i++ {
+		if goutils.IndexOfInt2Slice(target, src[i*2], src[i*2+1], 0) >= 0 {
+			return true
+		}
+	}
+
+	return false
+}

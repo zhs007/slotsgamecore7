@@ -154,6 +154,22 @@ func (fo2 *ForceOutcome2) getComponentValEx(iStep int, component string, val str
 	return 0, false
 }
 
+func (fo2 *ForceOutcome2) getComponentData(iStep int, component string) IComponentData {
+	if iStep >= 0 && iStep < len(fo2.results) {
+		ret := fo2.results[iStep]
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k, v := range gp.MapComponentData {
+				if isComponent(k, component) {
+					return v
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (fo2 *ForceOutcome2) getComponentValNext(hasComponent string, component string, val string) int {
 	for i, ret := range fo2.results {
 		gp, isok := ret.CurGameModParams.(*GameParams)
@@ -257,6 +273,28 @@ func (fo2 *ForceOutcome2) countSymbolVal(op string, target int) int {
 	}
 
 	return num
+}
+
+func (fo2 *ForceOutcome2) hasSamePosNext(src string, target string) bool {
+	for i, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k, v := range gp.MapComponentData {
+				if isComponent(k, src) {
+					for ti := i + 1; ti < len(fo2.results); ti++ {
+						tcd := fo2.getComponentData(ti, target)
+						if tcd != nil {
+							if HasSamePos(v.GetPos(), tcd.GetPos()) {
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 func (fo2 *ForceOutcome2) newScriptVariables() []cel.EnvOption {
@@ -476,6 +514,43 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 					val := fo2.countSymbolVal(op, int(target))
 
 					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("hasSamePosNext",
+			cel.Overload("hasSamePosNext_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.BoolType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 2 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasSamePosNext",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Bool(false)
+					}
+
+					src, isok := params[0].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasSamePosNext",
+							slog.Int("i", 0),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Bool(false)
+					}
+
+					target, isok := params[1].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasSamePosNext",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Bool(false)
+					}
+
+					val := fo2.hasSamePosNext(src, target)
+
+					return types.Bool(val)
 				},
 				),
 			),
