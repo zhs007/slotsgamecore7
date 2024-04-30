@@ -166,6 +166,11 @@ func (clusterTriggerData *ClusterTriggerData) GetPos() []int {
 	return clusterTriggerData.Pos
 }
 
+// AddPos -
+func (clusterTriggerData *ClusterTriggerData) AddPos(x, y int) {
+	clusterTriggerData.PosComponentData.Add(x, y)
+}
+
 // ClusterTriggerConfig - configuration for ClusterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ClusterTriggerConfig struct {

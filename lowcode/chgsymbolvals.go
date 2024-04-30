@@ -96,6 +96,11 @@ func (chgSymbolValsData *ChgSymbolValsData) GetPos() []int {
 	return chgSymbolValsData.Pos
 }
 
+// AddPos -
+func (chgSymbolValsData *ChgSymbolValsData) AddPos(x, y int) {
+	chgSymbolValsData.PosComponentData.Add(x, y)
+}
+
 // ChgSymbolValsConfig - configuration for ChgSymbolVals
 type ChgSymbolValsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
