@@ -134,6 +134,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ChgSymbolValsTypeName, NewChgSymbolVals)
 	mgr.Reg(ChgSymbolsTypeName, NewChgSymbols)
 	mgr.Reg(GenSymbolValsWithSymbolTypeName, NewGenSymbolValsWithSymbol)
+	mgr.Reg(RebuildReelIndexTypeName, NewRebuildReelIndex)
 
 	return mgr
 }
