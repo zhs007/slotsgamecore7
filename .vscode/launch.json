@@ -40,7 +40,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/app",
             "env": {
-                "GAMECFG": "${workspaceFolder}/data/game002.json",
+                "GAMECFG": "${workspaceFolder}/data/game.json",
                 "TERM": "xterm-256color",
                 "AUTOSPIN": "1000",
                 "SKIPGETCHAR": "1",

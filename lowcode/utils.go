@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"context"
 	"log/slog"
 
 	"github.com/bytedance/sonic"
@@ -341,4 +342,45 @@ func HasSamePos(src []int, target []int) bool {
 	}
 
 	return false
+}
+
+func Shuffle(arr []int, plugin sgc7plugin.IPlugin) ([]int, error) {
+	dst := []int{}
+	for {
+		if len(arr) == 0 {
+			return dst, nil
+		}
+
+		cr, err := plugin.Random(context.Background(), len(arr))
+		if err != nil {
+			goutils.Error("Shuffle:Random",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		dst = append(dst, arr[cr])
+		arr = append(arr[:cr], arr[cr+1:]...)
+	}
+}
+
+// IsInitialArr - is the arr [0,1,2...]
+func IsInitialArr(arr []int) bool {
+	for i, v := range arr {
+		if i != v {
+			return false
+		}
+	}
+
+	return true
+}
+
+// GenInitialArr - return [0,1,2...]
+func GenInitialArr(len int) []int {
+	arr := []int{}
+	for i := 0; i < len; i++ {
+		arr = append(arr, i)
+	}
+
+	return arr
 }
