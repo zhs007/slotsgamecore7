@@ -13,6 +13,13 @@ type stackSymbolData struct {
 	num    int
 }
 
+func (ssd *stackSymbolData) clone() *stackSymbolData {
+	return &stackSymbolData{
+		symbol: ssd.symbol,
+		num:    ssd.num,
+	}
+}
+
 func rmstack(stack []int, num int) []int {
 	ns := []int{}
 
@@ -40,8 +47,16 @@ func genStackSymbol(symbol string, num int, stack []int) ([]*stackSymbolData, bo
 		}
 	}
 
+	// symbol数量太少
 	if len(newstack) == 0 {
 		return nil, false
+	}
+
+	if len(newstack) == 1 {
+		// 已经失败了，不能切分完全
+		if num%newstack[0] != 0 {
+			return nil, false
+		}
 	}
 
 	ssds := []*stackSymbolData{}
@@ -55,7 +70,12 @@ func genStackSymbol(symbol string, num int, stack []int) ([]*stackSymbolData, bo
 	nssds, isok := genStackSymbol(symbol, num-newstack[cr], newstack)
 	if !isok {
 		if len(newstack) > 1 {
-			newstack = rmstack(newstack, newstack[cr])
+			// 如果失败了，那么表示这一次的选择彻底错误，那么换一个选择
+			cr++
+			if cr >= len(newstack) {
+				cr = 0
+			}
+			// newstack = rmstack(newstack, newstack[cr])
 
 			return genStackSymbol(symbol, num, newstack)
 		}
@@ -68,12 +88,13 @@ func genStackSymbol(symbol string, num int, stack []int) ([]*stackSymbolData, bo
 	return ssds, true
 }
 
-func isUnable(ssds []*stackSymbolData, pres string) bool {
+func isUnable(ssds []*stackSymbolData) bool {
+	// 这个用来简单判断一下是否可以分，只判断了剩下2个symbol和剩下1个symbol的情况
 	mapSymbols := make(map[string]int)
 
-	if pres != "" {
-		mapSymbols[pres] = 1
-	}
+	// for _, v := range excludeSymbols {
+	// 	mapSymbols[v] = 1
+	// }
 
 	for _, v := range ssds {
 		_, isok := mapSymbols[v.symbol]
@@ -85,17 +106,19 @@ func isUnable(ssds []*stackSymbolData, pres string) bool {
 	}
 
 	if len(mapSymbols) == 1 {
+		// 如果只剩下1个symbol，那么有2组就只能失败
 		for _, v := range mapSymbols {
 			if v > 1 {
 				return true
 			}
 		}
 	} else if len(mapSymbols) == 2 {
+		// 如果剩下2个symbol，那么如果2组数量不相同，也只能失败
 		v0 := -1
 		for _, v := range mapSymbols {
 			if v0 < 0 {
 				v0 = v
-			} else if v0 != v {
+			} else if AbsInt(v0, v) > 1 {
 				return true
 			}
 		}
@@ -135,12 +158,17 @@ func chooseMore(ssds []*stackSymbolData) int {
 	return -1
 }
 
-func genReelSSD(ssds []*stackSymbolData, pres string) ([]string, bool) {
+func genReelSSD(ssds []*stackSymbolData, excludeSymbols []string, firstSymbol string) ([]*stackSymbolData, bool) {
+	if isUnable(ssds) {
+		return nil, false
+	}
+
 	assds := []*stackSymbolData{}
 	nssds := []*stackSymbolData{}
 
 	for _, v := range ssds {
-		if pres != v.symbol {
+		if goutils.IndexOfStringSlice(excludeSymbols, v.symbol, 0) < 0 {
+			// if pres != v.symbol {
 			assds = append(assds, v)
 		} else {
 			nssds = append(nssds, v)
@@ -151,45 +179,97 @@ func genReelSSD(ssds []*stackSymbolData, pres string) ([]string, bool) {
 		return nil, false
 	}
 
-	if isUnable(assds, pres) {
-		return nil, false
+	cr := rand.Int() % len(assds)
+	ssd := assds[cr].clone()
+
+	nassds := []*stackSymbolData{}
+	nassds = append(nassds, assds[:cr]...)
+	nassds = append(nassds, assds[cr+1:]...)
+	nassds = append(nassds, nssds...)
+
+	nextExcludeSym := []string{ssd.symbol}
+
+	if firstSymbol == "" {
+		firstSymbol = ssd.symbol
 	}
 
-	cr := rand.Int() % len(assds)
-	ssd := assds[cr]
+	if len(nassds) == 0 {
+		// nsyms := []string{}
+		// for i := 0; i < ssd.num; i++ {
+		// 	nsyms = append(nsyms, ssd.symbol)
+		// }
 
-	nassds := append(assds[:cr], assds[cr+1:]...)
-	nextssds := append(nssds, nassds...)
+		return []*stackSymbolData{ssd}, true
+	} else if len(nassds) == 1 {
+		nextExcludeSym = append(nextExcludeSym, firstSymbol)
+	}
 
-	if len(nextssds) == 0 {
-		nsyms := []string{}
-		for i := 0; i < ssd.num; i++ {
-			nsyms = append(nsyms, ssd.symbol)
+	target, isok := genReelSSD(nassds, nextExcludeSym, firstSymbol)
+	if !isok {
+		// 如果失败了，应该选择最多的那个
+		ci := chooseMore(assds)
+		if ci < 0 {
+			return nil, false
 		}
 
-		return nsyms, true
-	}
+		if ssd.symbol == assds[ci].symbol {
+			return nil, false
+		}
 
-	syms, isok := genReelSSD(nextssds, ssd.symbol)
-	if !isok {
-		ci := chooseMore(assds)
-		ssd = assds[ci]
+		ssd = assds[ci].clone()
 
-		nassds = append(assds[:ci], assds[ci+1:]...)
-		nextssds = append(nssds, nassds...)
+		nassds1 := []*stackSymbolData{}
+		nassds1 = append(nassds1, assds[:ci]...)
+		nassds1 = append(nassds1, assds[ci+1:]...)
+		nassds1 = append(nassds1, nssds...)
 
-		syms, isok = genReelSSD(nextssds, ssd.symbol)
+		// nassds = append(assds[:ci], assds[ci+1:]...)
+		// nextssds = append(nssds, nassds...)
+
+		nextExcludeSym = []string{ssd.symbol}
+		if len(nassds1) == 1 {
+			nextExcludeSym = append(nextExcludeSym, firstSymbol)
+		}
+		// nextssds = append(nextssds, ssd)
+
+		// ssd = ssd1
+
+		target, isok = genReelSSD(nassds1, nextExcludeSym, firstSymbol)
 		if !isok {
 			return nil, false
 		}
 	}
 
-	nsyms := []string{}
-	for i := 0; i < ssd.num; i++ {
-		nsyms = append(nsyms, ssd.symbol)
+	return append([]*stackSymbolData{ssd}, target...), true
+	// nsyms := []string{}
+	// for i := 0; i < ssd.num; i++ {
+	// 	nsyms = append(nsyms, ssd.symbol)
+	// }
+
+	// return append(nsyms, syms...), true
+}
+
+func checkSR(rs2 *ReelStats2, ssds []*stackSymbolData) bool {
+	tn0 := 0
+	for _, v := range rs2.MapSymbols {
+		tn0 += v
 	}
 
-	return append(nsyms, syms...), true
+	tn1 := 0
+	for _, v := range ssds {
+		tn1 += v.num
+	}
+
+	return tn0 == tn1
+}
+
+func checkSR2(rs2 *ReelStats2, arr []string) bool {
+	tn0 := 0
+	for _, v := range rs2.MapSymbols {
+		tn0 += v
+	}
+
+	return tn0 == len(arr)
 }
 
 func genStackReel(rs2 *ReelStats2, stack []int, excludeSymbol []string) ([]string, error) {
@@ -212,7 +292,7 @@ func genStackReel(rs2 *ReelStats2, stack []int, excludeSymbol []string) ([]strin
 		if goutils.IndexOfStringSlice(excludeSymbol, s, 0) < 0 {
 			nssds, isok := genStackSymbol(s, n, stack)
 			if !isok {
-				goutils.Error("GenStackReels:genStackReel",
+				goutils.Error("genStackReel:genStackSymbol",
 					goutils.Err(ErrGenStackReel))
 
 				return nil, ErrGenStackReel
@@ -222,12 +302,42 @@ func genStackReel(rs2 *ReelStats2, stack []int, excludeSymbol []string) ([]strin
 		}
 	}
 
-	reel, isok := genReelSSD(ssds, "")
+	isok := checkSR(rs2, ssds)
+	if !isok {
+		goutils.Error("genStackReel:checkSR",
+			goutils.Err(ErrGenStackReel))
+
+		return nil, ErrGenStackReel
+	}
+
+	target, isok := genReelSSD(ssds, nil, "")
 	if isok {
+		isok := checkSR(rs2, target)
+		if !isok {
+			goutils.Error("genStackReel:checkSR:2",
+				goutils.Err(ErrGenStackReel))
+
+			return nil, ErrGenStackReel
+		}
+
+		reel := []string{}
+		for _, v := range target {
+			for i := 0; i < v.num; i++ {
+				reel = append(reel, v.symbol)
+			}
+		}
+
+		if !checkSR2(rs2, reel) {
+			goutils.Error("genStackReel:checkSR2",
+				goutils.Err(ErrGenStackReel))
+
+			return nil, ErrGenStackReel
+		}
+
 		return reel, nil
 	}
 
-	goutils.Error("GenStackReels:genReelSSD",
+	goutils.Error("genStackReel:genReelSSD",
 		goutils.Err(ErrGenStackReel))
 
 	return nil, ErrGenStackReel
