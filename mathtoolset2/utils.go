@@ -93,3 +93,11 @@ func SaveReels(fn string, reels [][]string) error {
 
 	return f.SaveAs(fn)
 }
+
+func AbsInt(v0, v1 int) int {
+	if v0 > v1 {
+		return v0 - v1
+	}
+
+	return v1 - v0
+}

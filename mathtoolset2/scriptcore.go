@@ -133,6 +133,69 @@ func (sc *ScriptCore) newGenStackReels() cel.EnvOption {
 	)
 }
 
+// newGenStackReelsStrict - genStackReelsStrict(targetfn string, sourcefn string, stack []int, excludeSymbol []string)
+func (sc *ScriptCore) newGenStackReelsStrict() cel.EnvOption {
+	return cel.Function("genStackReelsStrict",
+		cel.Overload("genStackReelsStrict_string_string_list_list",
+			[]*cel.Type{cel.StringType, cel.StringType, cel.ListType(cel.IntType), cel.ListType(cel.StringType)},
+			cel.BoolType,
+			cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+
+				if len(params) != 4 {
+					goutils.Error("genStackReelsStrict",
+						goutils.Err(ErrInvalidFunctionParams))
+
+					sc.pushError(ErrInvalidFunctionParams)
+
+					return types.Bool(false)
+				}
+
+				targetfn := params[0].Value().(string)
+				srcfn := params[1].Value().(string)
+				stack := List2IntSlice(params[2])
+				excludeSymbol := List2StrSlice(params[3])
+
+				fd := sc.MapFiles.GetReader(srcfn)
+				if fd == nil {
+					goutils.Error("genStackReelsStrict:GetReader",
+						goutils.Err(ErrInvalidFileData))
+
+					sc.pushError(ErrInvalidFileData)
+
+					return types.Bool(false)
+				}
+
+				rd, err := genStackReelsStrict(fd, stack, excludeSymbol)
+				if err != nil {
+					goutils.Error("genStackReelsStrict:GenStackReels",
+						goutils.Err(err))
+
+					sc.pushError(err)
+
+					return types.Bool(false)
+				}
+
+				f := NewExcelFile(rd)
+
+				buf, err := f.WriteToBuffer()
+				if err != nil {
+					goutils.Error("genStackReelsStrict:WriteToBuffer",
+						goutils.Err(err))
+
+					sc.pushError(err)
+
+					return types.Bool(false)
+				}
+
+				sc.MapOutputFiles.AddBuffer(targetfn, buf)
+
+				return types.Bool(true)
+			},
+			),
+		),
+	)
+}
+
 // newGenStackReels - mergeReels(targetfn string, files []string)
 func (sc *ScriptCore) newMergeReels() cel.EnvOption {
 	return cel.Function("mergeReels",
@@ -192,6 +255,7 @@ func (sc *ScriptCore) newMergeReels() cel.EnvOption {
 func (sc *ScriptCore) newBasicScriptFuncs() []cel.EnvOption {
 	return []cel.EnvOption{
 		sc.newGenStackReels(),
+		sc.newGenStackReelsStrict(),
 		sc.newMergeReels(),
 	}
 }
