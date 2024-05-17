@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"log/slog"
+	"strings"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/common/types"
@@ -18,6 +19,7 @@ type ForceOutcome2 struct {
 }
 
 func (fo2 *ForceOutcome2) SetScript(code string) error {
+	code = strings.Replace(code, "has(", "hasComponent(", -1)
 	ast, issues := fo2.cel.Compile(code)
 	if issues != nil {
 		goutils.Error("ForceOutcome2.SetScript:Compile",
@@ -375,8 +377,8 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				),
 			),
 		),
-		cel.Function("has",
-			cel.Overload("has_string",
+		cel.Function("hasComponent",
+			cel.Overload("hasComponent_string",
 				[]*cel.Type{cel.StringType},
 				cel.BoolType,
 				cel.UnaryBinding(func(param ref.Val) ref.Val {
