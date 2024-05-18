@@ -91,7 +91,7 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	ngs := gs
 
 	for x := 0; x < gs.Width; x++ {
-		for y := gs.Width - 1; y >= 0; y-- {
+		for y := gs.Height - 1; y >= 0; y-- {
 			if ngs.Arr[x][y] == -1 {
 				if ngs == gs {
 					ngs = gs.CloneEx(gameProp.PoolScene)
