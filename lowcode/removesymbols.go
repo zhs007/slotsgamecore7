@@ -73,11 +73,13 @@ func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message
 // RemoveSymbolsConfig - configuration for RemoveSymbols
 type RemoveSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	JumpToComponent      string   `yaml:"jumpToComponent" json:"jumpToComponent"`   // jump to
-	TargetComponents     []string `yaml:"targetComponents" json:"targetComponents"` // 这些组件的中奖会需要参与remove
-	IgnoreSymbols        []string `yaml:"ignoreSymbols" json:"ignoreSymbols"`       // 忽略的symbol
-	IgnoreSymbolCodes    []int    `yaml:"-" json:"-"`                               // 忽略的symbol
-	Awards               []*Award `yaml:"awards" json:"awards"`                     // 新的奖励系统
+	JumpToComponent      string   `yaml:"jumpToComponent" json:"jumpToComponent"`           // jump to
+	TargetComponents     []string `yaml:"targetComponents" json:"targetComponents"`         // 这些组件的中奖会需要参与remove
+	IgnoreSymbols        []string `yaml:"ignoreSymbols" json:"ignoreSymbols"`               // 忽略的symbol
+	IgnoreSymbolCodes    []int    `yaml:"-" json:"-"`                                       // 忽略的symbol
+	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	Awards               []*Award `yaml:"awards" json:"awards"`                             // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -166,41 +168,87 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	totalHeight := 0
 
-	for _, cn := range removeSymbols.Config.TargetComponents {
-		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
-		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
-			continue
-		}
+	if removeSymbols.Config.IsNeedProcSymbolVals {
+		os := removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		nos := os
 
-		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
-		if ccd != nil {
-			lst := ccd.GetResults()
-			for _, ri := range lst {
-				for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-					x := curpr.Results[ri].Pos[pi*2]
-					y := curpr.Results[ri].Pos[pi*2+1]
-					if removeSymbols.canRemove(x, y, ngs) {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
+		for _, cn := range removeSymbols.Config.TargetComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
+			if ccd != nil {
+				lst := ccd.GetResults()
+				for _, ri := range lst {
+					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+						x := curpr.Results[ri].Pos[pi*2]
+						y := curpr.Results[ri].Pos[pi*2+1]
+						if removeSymbols.canRemove(x, y, ngs) {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+								nos = os.CloneEx(gameProp.PoolScene)
+							}
+
+							if !gIsReleaseMode {
+								totalHeight += y
+							}
+
+							ngs.Arr[x][y] = -1
+							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+							bcd.RemovedNum++
 						}
-
-						if !gIsReleaseMode {
-							totalHeight += y
-						}
-
-						ngs.Arr[x][y] = -1
-
-						bcd.RemovedNum++
 					}
 				}
 			}
 		}
-	}
 
-	if ngs == gs {
-		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+		if ngs == gs {
+			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return nc, ErrComponentDoNothing
+			return nc, ErrComponentDoNothing
+		}
+
+		removeSymbols.AddOtherScene(gameProp, curpr, nos, &bcd.BasicComponentData)
+	} else {
+		for _, cn := range removeSymbols.Config.TargetComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
+			if ccd != nil {
+				lst := ccd.GetResults()
+				for _, ri := range lst {
+					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+						x := curpr.Results[ri].Pos[pi*2]
+						y := curpr.Results[ri].Pos[pi*2+1]
+						if removeSymbols.canRemove(x, y, ngs) {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
+
+							if !gIsReleaseMode {
+								totalHeight += y
+							}
+
+							ngs.Arr[x][y] = -1
+
+							bcd.RemovedNum++
+						}
+					}
+				}
+			}
+		}
+
+		if ngs == gs {
+			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
 	}
 
 	if !gIsReleaseMode {
@@ -270,14 +318,18 @@ func NewRemoveSymbols(name string) IComponent {
 //		]
 //	},
 type jsonRemoveSymbols struct {
-	TargetComponents []string `json:"targetComponents"` // 这些组件的中奖会需要参与remove
-	IgnoreSymbols    []string `json:"ignoreSymbols"`    // 忽略的symbol
+	TargetComponents     []string `json:"targetComponents"`                                 // 这些组件的中奖会需要参与remove
+	IgnoreSymbols        []string `json:"ignoreSymbols"`                                    // 忽略的symbol
+	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 }
 
 func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	cfg := &RemoveSymbolsConfig{
-		TargetComponents: jcfg.TargetComponents,
-		IgnoreSymbols:    jcfg.IgnoreSymbols,
+		TargetComponents:     jcfg.TargetComponents,
+		IgnoreSymbols:        jcfg.IgnoreSymbols,
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
+		EmptySymbolVal:       jcfg.EmptySymbolVal,
 	}
 
 	// cfg.UseSceneV3 = true

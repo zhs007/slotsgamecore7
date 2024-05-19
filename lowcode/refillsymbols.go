@@ -19,6 +19,9 @@ const RefillSymbolsTypeName = "refillSymbols"
 // RefillSymbolsConfig - configuration for RefillSymbols
 type RefillSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
+	IsNeedProcSymbolVals bool `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	DefaultSymbolVal     int  `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
 }
 
 // SetLinkComponent
@@ -90,25 +93,56 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	gs := refillSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
-	for x := 0; x < gs.Width; x++ {
-		for y := gs.Height - 1; y >= 0; y-- {
-			if ngs.Arr[x][y] == -1 {
-				if ngs == gs {
-					ngs = gs.CloneEx(gameProp.PoolScene)
+	if refillSymbols.Config.IsNeedProcSymbolVals {
+		os := refillSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		nos := os
+
+		for x := 0; x < gs.Width; x++ {
+			for y := gs.Height - 1; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
+
+					cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+					ngs.Arr[x][y] = refillSymbols.getSymbol(cr, x, ngs.Indexes[x])
+					ngs.Indexes[x]--
+
+					nos.Arr[x][y] = refillSymbols.Config.DefaultSymbolVal
 				}
-
-				cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
-
-				ngs.Arr[x][y] = refillSymbols.getSymbol(cr, x, ngs.Indexes[x])
-				ngs.Indexes[x]--
 			}
 		}
-	}
 
-	if ngs == gs {
-		nc := refillSymbols.onStepEnd(gameProp, curpr, gp, "")
+		if ngs == gs {
+			nc := refillSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return nc, ErrComponentDoNothing
+			return nc, ErrComponentDoNothing
+		}
+
+		refillSymbols.AddOtherScene(gameProp, curpr, nos, bcd)
+	} else {
+		for x := 0; x < gs.Width; x++ {
+			for y := gs.Height - 1; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
+
+					cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+					ngs.Arr[x][y] = refillSymbols.getSymbol(cr, x, ngs.Indexes[x])
+					ngs.Indexes[x]--
+				}
+			}
+		}
+
+		if ngs == gs {
+			nc := refillSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
 	}
 
 	refillSymbols.AddScene(gameProp, curpr, ngs, bcd)
@@ -151,10 +185,17 @@ func NewRefillSymbols(name string) IComponent {
 
 // "configuration": {},
 type jsonRefillSymbols struct {
+	IsNeedProcSymbolVals bool `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	DefaultSymbolVal     int  `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
 }
 
 func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
-	cfg := &RefillSymbolsConfig{}
+	cfg := &RefillSymbolsConfig{
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
+		EmptySymbolVal:       jcfg.EmptySymbolVal,
+		DefaultSymbolVal:     jcfg.DefaultSymbolVal,
+	}
 
 	// cfg.UseSceneV3 = true
 
