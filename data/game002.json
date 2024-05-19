@@ -11746,41 +11746,41 @@
                 "fileName": "reelsweight",
                 "file": {
                     "file": {
-                        "uid": "rc-upload-1716019759899-2"
+                        "uid": "rc-upload-1716019759899-8"
                     },
                     "fileList": [
                         {
-                            "uid": "rc-upload-1716019759899-2",
+                            "uid": "rc-upload-1716019759899-8",
                             "fileJson": [
                                 {
                                     "val": "reels0",
-                                    "weight": 416375
+                                    "weight": 752923
                                 },
                                 {
                                     "val": "reels1",
-                                    "weight": 752923
+                                    "weight": 416375
                                 },
                                 {
                                     "val": "reels2",
                                     "weight": 94244
                                 }
                             ],
-                            "lastModified": 1716020089547,
-                            "lastModifiedDate": "2024-05-18T08:14:49.547Z",
+                            "lastModified": 1716022164175,
+                            "lastModifiedDate": "2024-05-18T08:49:24.175Z",
                             "name": "reelsweight.xlsx",
-                            "size": 6081,
+                            "size": 6082,
                             "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             "percent": 0,
                             "originFileObj": {
-                                "uid": "rc-upload-1716019759899-2",
+                                "uid": "rc-upload-1716019759899-8",
                                 "fileJson": [
                                     {
                                         "val": "reels0",
-                                        "weight": 416375
+                                        "weight": 752923
                                     },
                                     {
                                         "val": "reels1",
-                                        "weight": 752923
+                                        "weight": 416375
                                     },
                                     {
                                         "val": "reels2",
@@ -11794,11 +11794,11 @@
                 "fileJson": [
                     {
                         "val": "reels0",
-                        "weight": 416375
+                        "weight": 752923
                     },
                     {
                         "val": "reels1",
-                        "weight": 752923
+                        "weight": 416375
                     },
                     {
                         "val": "reels2",
@@ -11806,6 +11806,216 @@
                     }
                 ],
                 "name": "reelsweight.xlsx"
+            },
+            {
+                "type": "IntValWeight",
+                "fileName": "multiweight",
+                "file": {
+                    "file": {
+                        "uid": "rc-upload-1716019759899-11"
+                    },
+                    "fileList": [
+                        {
+                            "uid": "rc-upload-1716019759899-11",
+                            "fileJson": [
+                                {
+                                    "val": "2",
+                                    "weight": 500
+                                },
+                                {
+                                    "val": "3",
+                                    "weight": 300
+                                },
+                                {
+                                    "val": "4",
+                                    "weight": 200
+                                },
+                                {
+                                    "val": "5",
+                                    "weight": 50
+                                },
+                                {
+                                    "val": "6",
+                                    "weight": 15
+                                },
+                                {
+                                    "val": "8",
+                                    "weight": 10
+                                },
+                                {
+                                    "val": "10",
+                                    "weight": 9
+                                },
+                                {
+                                    "val": "12",
+                                    "weight": 8
+                                },
+                                {
+                                    "val": "15",
+                                    "weight": 7
+                                },
+                                {
+                                    "val": "20",
+                                    "weight": 6
+                                },
+                                {
+                                    "val": "25",
+                                    "weight": 5
+                                },
+                                {
+                                    "val": "50",
+                                    "weight": 4
+                                },
+                                {
+                                    "val": "100",
+                                    "weight": 3
+                                },
+                                {
+                                    "val": "250",
+                                    "weight": 2
+                                },
+                                {
+                                    "val": "500",
+                                    "weight": 1
+                                }
+                            ],
+                            "lastModified": 1716026855281,
+                            "lastModifiedDate": "2024-05-18T10:07:35.281Z",
+                            "name": "multiweight.xlsx",
+                            "size": 6045,
+                            "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "percent": 0,
+                            "originFileObj": {
+                                "uid": "rc-upload-1716019759899-11",
+                                "fileJson": [
+                                    {
+                                        "val": "2",
+                                        "weight": 400
+                                    },
+                                    {
+                                        "val": "3",
+                                        "weight": 250
+                                    },
+                                    {
+                                        "val": "4",
+                                        "weight": 200
+                                    },
+                                    {
+                                        "val": "5",
+                                        "weight": 50
+                                    },
+                                    {
+                                        "val": "6",
+                                        "weight": 15
+                                    },
+                                    {
+                                        "val": "8",
+                                        "weight": 10
+                                    },
+                                    {
+                                        "val": "10",
+                                        "weight": 9
+                                    },
+                                    {
+                                        "val": "12",
+                                        "weight": 8
+                                    },
+                                    {
+                                        "val": "15",
+                                        "weight": 7
+                                    },
+                                    {
+                                        "val": "20",
+                                        "weight": 6
+                                    },
+                                    {
+                                        "val": "25",
+                                        "weight": 5
+                                    },
+                                    {
+                                        "val": "50",
+                                        "weight": 4
+                                    },
+                                    {
+                                        "val": "100",
+                                        "weight": 3
+                                    },
+                                    {
+                                        "val": "250",
+                                        "weight": 2
+                                    },
+                                    {
+                                        "val": "500",
+                                        "weight": 1
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "fileJson": [
+                    {
+                        "val": "2",
+                        "weight": 900
+                    },
+                    {
+                        "val": "3",
+                        "weight": 500
+                    },
+                    {
+                        "val": "4",
+                        "weight": 200
+                    },
+                    {
+                        "val": "5",
+                        "weight": 50
+                    },
+                    {
+                        "val": "6",
+                        "weight": 15
+                    },
+                    {
+                        "val": "8",
+                        "weight": 10
+                    },
+                    {
+                        "val": "10",
+                        "weight": 9
+                    },
+                    {
+                        "val": "12",
+                        "weight": 8
+                    },
+                    {
+                        "val": "15",
+                        "weight": 7
+                    },
+                    {
+                        "val": "20",
+                        "weight": 6
+                    },
+                    {
+                        "val": "25",
+                        "weight": 5
+                    },
+                    {
+                        "val": "50",
+                        "weight": 4
+                    },
+                    {
+                        "val": "100",
+                        "weight": 3
+                    },
+                    {
+                        "val": "250",
+                        "weight": 2
+                    },
+                    {
+                        "val": "500",
+                        "weight": 1
+                    }
+                ],
+                "name": "multiweight.xlsx"
             }
         ]
     },
@@ -11832,26 +12042,6 @@
                         },
                         "target": {
                             "cell": "532607d6-fb93-49b1-a8e7-6073a718730a",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
-                        "id": "a5118ffd-25d3-425e-8fc3-12083d39998c",
-                        "zIndex": -1,
-                        "source": {
-                            "cell": "532607d6-fb93-49b1-a8e7-6073a718730a",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "8efa790a-f672-4905-a427-ddb3c8dcc26b",
                             "port": "component-groups-in"
                         }
                     },
@@ -11900,7 +12090,8 @@
                         "attrs": {
                             "line": {
                                 "stroke": "#0000FF",
-                                "strokeWidth": 3
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
                             }
                         },
                         "id": "c0608b34-b49b-4875-844c-eab0d60720d0",
@@ -11943,10 +12134,70 @@
                                 "strokeDasharray": 0
                             }
                         },
-                        "id": "0de6fcfd-8580-48c2-80a6-77cc44527df6",
+                        "id": "943496dc-e520-4106-b3f9-88ea2d1dcd8d",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "532607d6-fb93-49b1-a8e7-6073a718730a",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "19f6cc3b-315e-4db3-a57c-e5fdffe9af10",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "07f53f10-ecf9-45bf-9eb2-e6420b8f269d",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "8efa790a-f672-4905-a427-ddb3c8dcc26b",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "a67fb48b-6189-4fb1-bdb6-529bfb48e4fa",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "ee019017-aca7-47ae-bb43-94373a90f03c",
                         "zIndex": -1,
                         "source": {
                             "cell": "aa1c7ff0-951f-4f1f-8000-e2fe921d379b",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "19f6cc3b-315e-4db3-a57c-e5fdffe9af10",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3,
+                                "strokeDasharray": 0
+                            }
+                        },
+                        "id": "ed99f562-fedd-466d-9031-15fe5e981943",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "19f6cc3b-315e-4db3-a57c-e5fdffe9af10",
                             "port": "component-groups-out"
                         },
                         "target": {
@@ -12024,7 +12275,7 @@
                     {
                         "position": {
                             "x": 210,
-                            "y": -90
+                            "y": -190
                         },
                         "size": {
                             "width": 400,
@@ -12273,8 +12524,8 @@
                     },
                     {
                         "position": {
-                            "x": 800,
-                            "y": -190
+                            "x": 1240,
+                            "y": -120
                         },
                         "size": {
                             "width": 400,
@@ -12798,15 +13049,16 @@
                                     "G",
                                     "H",
                                     "I"
-                                ]
+                                ],
+                                "putMoneyInPiggyBank": "bg-bank"
                             },
                             "label": "bg-pay"
                         }
                     },
                     {
                         "position": {
-                            "x": 1430,
-                            "y": -10
+                            "x": 1750,
+                            "y": 30
                         },
                         "size": {
                             "width": 400,
@@ -13067,8 +13319,8 @@
                     },
                     {
                         "position": {
-                            "x": 1960,
-                            "y": 20
+                            "x": 2290,
+                            "y": 60
                         },
                         "size": {
                             "width": 400,
@@ -13313,8 +13565,8 @@
                     },
                     {
                         "position": {
-                            "x": 2490,
-                            "y": 50
+                            "x": 2820,
+                            "y": 80
                         },
                         "size": {
                             "width": 400,
@@ -13543,8 +13795,8 @@
                     },
                     {
                         "position": {
-                            "x": 3090,
-                            "y": 60
+                            "x": 3380,
+                            "y": 50
                         },
                         "size": {
                             "width": 400,
@@ -13764,6 +14016,521 @@
                             "labelIsError": false,
                             "configuration": {},
                             "label": "bg-refill"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 1740,
+                            "y": -450
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 165
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                }
+                            ]
+                        },
+                        "id": "a67fb48b-6189-4fb1-bdb6-529bfb48e4fa",
+                        "label": "PiggyBank",
+                        "item": {
+                            "key": "PiggyBank",
+                            "label": "PiggyBank",
+                            "out": [
+                                "totalWins"
+                            ],
+                            "configuration": [
+                                {
+                                    "label": "winMulti",
+                                    "type": "inputNumber1",
+                                    "defaultValue": 1
+                                }
+                            ],
+                            "componentval": [
+                                "winMulti",
+                                "savedMoney"
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 9,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "winMulti": 1,
+                                "initialWinMultiType": "sumSymbolVals"
+                            },
+                            "label": "bg-bank"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 740,
+                            "y": -230
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 405
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                }
+                            ]
+                        },
+                        "id": "19f6cc3b-315e-4db3-a57c-e5fdffe9af10",
+                        "label": "GenSymbolValsWithSymbol",
+                        "item": {
+                            "key": "GenSymbolValsWithSymbol",
+                            "label": "GenSymbolValsWithSymbol",
+                            "out": [
+                                "symbolVals"
+                            ],
+                            "configuration": [
+                                {
+                                    "label": "symbols",
+                                    "type": "selectSymbols"
+                                },
+                                {
+                                    "label": "type",
+                                    "type": "select",
+                                    "option": [
+                                        {
+                                            "label": "normal",
+                                            "value": "normal"
+                                        },
+                                        {
+                                            "label": "non-clear",
+                                            "value": "non-clear"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "label": "weight",
+                                    "type": "selectIntValWeight"
+                                },
+                                {
+                                    "label": "defaultVal",
+                                    "type": "inputInteger"
+                                },
+                                {
+                                    "label": "isUseSource",
+                                    "type": "boolean",
+                                    "defaultValue": "false"
+                                },
+                                {
+                                    "label": "isAlwaysGen",
+                                    "type": "boolean",
+                                    "defaultValue": "false"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 10,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "isAlwaysGen": "true",
+                                "isUseSource": "true",
+                                "symbols": [
+                                    "M"
+                                ],
+                                "type": "non-clear",
+                                "defaultVal": 0,
+                                "weight": "multiweight"
+                            },
+                            "label": "bg-genmulti"
                         }
                     }
                 ]

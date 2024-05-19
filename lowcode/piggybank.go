@@ -18,6 +18,21 @@ import (
 
 const PiggyBankTypeName = "piggyBank"
 
+type InitialWinMultiType int
+
+const (
+	InitialWinMultiTypeNone          InitialWinMultiType = 0
+	InitialWinMultiTypeSumSymbolVals InitialWinMultiType = 1
+)
+
+func parseInitialWinMultiType(str string) InitialWinMultiType {
+	if str == "sumSymbolVals" {
+		return InitialWinMultiTypeSumSymbolVals
+	}
+
+	return InitialWinMultiTypeNone
+}
+
 type PiggyBankData struct {
 	BasicComponentData
 	SavedMoney int
@@ -87,8 +102,10 @@ func (piggyBankData *PiggyBankData) SetVal(key string, val int) {
 
 // PiggyBankConfig - configuration for PiggyBank
 type PiggyBankConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	WinMulti             int `yaml:"winMulti" json:"winMulti"` // winMulti，最后的中奖倍数，默认为1
+	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	WinMulti               int                 `yaml:"winMulti" json:"winMulti"`                       // winMulti，最后的中奖倍数，默认为1
+	StrInitialWinMultiType string              `yaml:"initialWinMultiType" json:"initialWinMultiType"` // 如何初始化winmulti
+	InitialWinMultiType    InitialWinMultiType `yaml:"-" json:"-"`                                     // 如何初始化winmulti
 }
 
 // SetLinkComponent
@@ -133,6 +150,8 @@ func (piggyBank *PiggyBank) InitEx(cfg any, pool *GamePropertyPool) error {
 	piggyBank.Config = cfg.(*PiggyBankConfig)
 	piggyBank.Config.ComponentType = PiggyBankTypeName
 
+	piggyBank.Config.InitialWinMultiType = parseInitialWinMultiType(piggyBank.Config.StrInitialWinMultiType)
+
 	if piggyBank.Config.WinMulti <= 0 {
 		piggyBank.Config.WinMulti = 1
 	}
@@ -149,10 +168,28 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*PiggyBankData)
+	var winMulti int
+
+	if piggyBank.Config.InitialWinMultiType == InitialWinMultiTypeSumSymbolVals {
+		os := piggyBank.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		if os != nil {
+			winMulti = 0
+
+			for _, arr := range os.Arr {
+				for _, v := range arr {
+					winMulti += v
+				}
+			}
+		}
+
+		if winMulti == 0 {
+			winMulti = 1
+		}
+	} else {
+		winMulti = piggyBank.GetWinMulti(&cd.BasicComponentData)
+	}
 
 	// cd.onNewStep()
-
-	winMulti := piggyBank.GetWinMulti(&cd.BasicComponentData)
 
 	cd.WinMulti = winMulti
 	sm, isok := cd.GetConfigIntVal(CCVSavedMoney)
@@ -230,12 +267,14 @@ func NewPiggyBank(name string) IComponent {
 }
 
 type jsonPiggyBank struct {
-	WinMulti int `json:"winMulti"`
+	WinMulti               int    `json:"winMulti"`
+	StrInitialWinMultiType string `yaml:"initialWinMultiType" json:"initialWinMultiType"` // 如何初始化winmulti
 }
 
 func (jwt *jsonPiggyBank) build() *PiggyBankConfig {
 	cfg := &PiggyBankConfig{
-		WinMulti: jwt.WinMulti,
+		WinMulti:               jwt.WinMulti,
+		StrInitialWinMultiType: jwt.StrInitialWinMultiType,
 	}
 
 	// cfg.UseSceneV3 = true
