@@ -213,6 +213,10 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 			}
 		}
 
+		if nos == nil && genSymbolValsWithSymbol.Config.IsAlwaysGen {
+			nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
+		}
+
 		if nos == os {
 			nc := genSymbolValsWithSymbol.onStepEnd(gameProp, curpr, gp, "")
 
