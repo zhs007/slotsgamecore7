@@ -168,8 +168,12 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	totalHeight := 0
 
+	var os *sgc7game.GameScene
 	if removeSymbols.Config.IsNeedProcSymbolVals {
-		os := removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		os = removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	}
+
+	if os != nil {
 		nos := os
 
 		for _, cn := range removeSymbols.Config.TargetComponents {
@@ -320,7 +324,7 @@ func NewRemoveSymbols(name string) IComponent {
 type jsonRemoveSymbols struct {
 	TargetComponents     []string `json:"targetComponents"`                                 // 这些组件的中奖会需要参与remove
 	IgnoreSymbols        []string `json:"ignoreSymbols"`                                    // 忽略的symbol
-	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	IsNeedProcSymbolVals string   `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 }
 
@@ -328,7 +332,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	cfg := &RemoveSymbolsConfig{
 		TargetComponents:     jcfg.TargetComponents,
 		IgnoreSymbols:        jcfg.IgnoreSymbols,
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals == "true",
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 	}
 

@@ -93,8 +93,12 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	gs := refillSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
 
+	var os *sgc7game.GameScene
 	if refillSymbols.Config.IsNeedProcSymbolVals {
-		os := refillSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		os = refillSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	}
+
+	if os != nil {
 		nos := os
 
 		for x := 0; x < gs.Width; x++ {
@@ -185,14 +189,14 @@ func NewRefillSymbols(name string) IComponent {
 
 // "configuration": {},
 type jsonRefillSymbols struct {
-	IsNeedProcSymbolVals bool `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	DefaultSymbolVal     int  `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
+	IsNeedProcSymbolVals string `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int    `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	DefaultSymbolVal     int    `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
 }
 
 func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
 	cfg := &RefillSymbolsConfig{
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals == "true",
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		DefaultSymbolVal:     jcfg.DefaultSymbolVal,
 	}

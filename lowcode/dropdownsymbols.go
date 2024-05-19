@@ -100,8 +100,12 @@ func (dropDownSymbols *DropDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
+	var os *sgc7game.GameScene
 	if dropDownSymbols.Config.IsNeedProcSymbolVals {
-		os := dropDownSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		os = dropDownSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	}
+
+	if os != nil {
 		nos := os.CloneEx(gameProp.PoolScene)
 
 		for x, arr := range ngs.Arr {
@@ -199,14 +203,14 @@ func NewDropDownSymbols(name string) IComponent {
 // "configuration": {},
 type jsonDropDownSymbols struct {
 	HoldSymbols          []string `json:"holdSymbols"`                                      // 不需要下落的symbol
-	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	IsNeedProcSymbolVals string   `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 }
 
 func (jcfg *jsonDropDownSymbols) build() *DropDownSymbolsConfig {
 	cfg := &DropDownSymbolsConfig{
 		HoldSymbols:          jcfg.HoldSymbols,
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals == "true",
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 	}
 
