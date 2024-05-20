@@ -178,6 +178,16 @@ func (s2 *Stats) Merge(src *Stats) {
 			cv.Merge(v)
 		}
 	}
+
+	s2.TotalBet += src.TotalBet
+	s2.TotalWins += src.TotalWins
+	s2.BetTimes += src.BetTimes
+	if src.MaxWins > s2.MaxWins {
+		s2.MaxWins = src.MaxWins
+		s2.MaxWinTimes = src.MaxWinTimes
+	} else if src.MaxWins == s2.MaxWins {
+		s2.MaxWinTimes += src.MaxWinTimes
+	}
 }
 
 func (s2 *Stats) ToJson() string {

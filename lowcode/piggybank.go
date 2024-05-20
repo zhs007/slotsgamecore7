@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -27,9 +28,10 @@ const (
 )
 
 func parsePiggyBankType(str string) PiggyBankType {
-	if str == "winMulti = sum(symbolVals)" {
+	str = strings.ToLower(strings.ReplaceAll(str, " ", ""))
+	if str == "winmulti=sum(symbolvals)" {
 		return PiggyBankTypeSumSymbolVals
-	} else if str == "winMulti += sum(symbolVals)" {
+	} else if str == "winmulti+=sum(symbolvals)" {
 		return PiggyBankTypeAddSumSymbolVals
 	}
 
