@@ -70,12 +70,12 @@
             "args": [],
             "cwd": "${workspaceFolder}/app",
             "env": {
-                "GAMECFG": "${workspaceFolder}/data/game.json",
+                "GAMECFG": "${workspaceFolder}/data/game002.json",
                 "OUTPUTPATH": "${workspaceFolder}/output",
                 "SPINNUMS": "100000",
                 "CORE":"1",
                 "ALLOWSTATS2":"true",
-                "BET":"10",
+                "BET":"20",
             }
         },
         {
