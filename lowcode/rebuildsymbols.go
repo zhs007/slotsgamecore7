@@ -124,7 +124,9 @@ func (rebuildSymbols *RebuildSymbols) procCircle(gameProp *GameProperty, gs *sgc
 	for x, arr := range ngs.Arr {
 		for y, v := range arr {
 			srci := goutils.IndexOfIntSlice(rebuildSymbols.Config.SymbolCodes, v, 0)
-			ngs.Arr[x][y] = lst[srci]
+			if srci >= 0 {
+				ngs.Arr[x][y] = lst[srci]
+			}
 		}
 	}
 
@@ -149,7 +151,9 @@ func (rebuildSymbols *RebuildSymbols) procRandom(gameProp *GameProperty, gs *sgc
 	for x, arr := range ngs.Arr {
 		for y, v := range arr {
 			srci := goutils.IndexOfIntSlice(rebuildSymbols.Config.SymbolCodes, v, 0)
-			ngs.Arr[x][y] = lst[srci]
+			if srci >= 0 {
+				ngs.Arr[x][y] = lst[srci]
+			}
 		}
 	}
 
