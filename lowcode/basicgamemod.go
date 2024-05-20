@@ -113,8 +113,21 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	for {
 		isComponentDoNothing := false
+		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(curComponent.GetName())
+		if newComponent != "" {
+			c, isok := components.MapComponents[newComponent]
+			if !isok {
+				goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+					slog.String("newComponent", newComponent),
+					goutils.Err(ErrInvalidComponentName))
+
+				return nil, ErrInvalidComponentName
+			}
+
+			curComponent = c
+		}
+
 		cd := gameProp.callStack.GetCurComponentData(gameProp, curComponent)
-		isSetMode, set, currng := gameProp.rng.GetCurRNG(curComponent.GetName())
 
 		nextComponentName := ""
 		var err error
