@@ -79,4 +79,5 @@ func init() {
 	gJsonMgr.RegLoadComponent("gensymbolvalswithsymbol", parseGenSymbolValsWithSymbol)
 	gJsonMgr.RegLoadComponent("symbolvalswins", parseSymbolValWins)
 	gJsonMgr.RegLoadComponent("rebuildreelindex", parseRebuildReelIndex)
+	gJsonMgr.RegLoadComponent("gensymbolvals", parseGenSymbolVals)
 }

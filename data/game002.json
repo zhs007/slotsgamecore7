@@ -26873,58 +26873,6 @@
                                 "strokeDasharray": 0
                             }
                         },
-                        "id": "ef0fdd49-79f2-49c3-8e59-b014fae1bd97",
-                        "zIndex": -1,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "3aad5891-2134-409a-a3e6-70b5d4e4bc6b",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "1abfad57-b0db-46d4-9144-3e798fbc3b16",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
-                        "id": "d93930de-b3e2-4470-8d33-263a087b9983",
-                        "zIndex": -1,
-                        "labels": [
-                            {
-                                "position": 0.5,
-                                "data": null
-                            }
-                        ],
-                        "source": {
-                            "cell": "1abfad57-b0db-46d4-9144-3e798fbc3b16",
-                            "port": "component-groups-out"
-                        },
-                        "target": {
-                            "cell": "cfafc672-acb2-48d0-bfb8-072debd1f235",
-                            "port": "component-groups-in"
-                        }
-                    },
-                    {
-                        "shape": "edge",
-                        "attrs": {
-                            "line": {
-                                "stroke": "#DC143C",
-                                "strokeWidth": 3,
-                                "strokeDasharray": 0
-                            }
-                        },
                         "id": "9868f747-385b-4367-b0af-51d3acbe3c04",
                         "zIndex": -1,
                         "labels": [
@@ -27263,6 +27211,44 @@
                         },
                         "target": {
                             "cell": "5ee0f57b-ebb9-400f-9dc1-40319f3bcb1f",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3
+                            }
+                        },
+                        "id": "075824a7-4811-42a8-90f7-96c8495cc598",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "3aad5891-2134-409a-a3e6-70b5d4e4bc6b",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "7252a6df-fa8a-4dba-ad42-1fdfccc645e6",
+                            "port": "component-groups-in"
+                        }
+                    },
+                    {
+                        "shape": "edge",
+                        "attrs": {
+                            "line": {
+                                "stroke": "#DC143C",
+                                "strokeWidth": 3
+                            }
+                        },
+                        "id": "306dc375-63a5-46d5-a294-9d11868dd532",
+                        "zIndex": -1,
+                        "source": {
+                            "cell": "7252a6df-fa8a-4dba-ad42-1fdfccc645e6",
+                            "port": "component-groups-out"
+                        },
+                        "target": {
+                            "cell": "cfafc672-acb2-48d0-bfb8-072debd1f235",
                             "port": "component-groups-in"
                         }
                     },
@@ -29679,282 +29665,6 @@
                                     "valueNum": 0
                                 }
                             ]
-                        },
-                        "basicComponentData": null,
-                        "data": null,
-                        "tools": {
-                            "items": [
-                                {
-                                    "name": "button-remove",
-                                    "args": {
-                                        "x": 380,
-                                        "y": 18
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "position": {
-                            "x": 4410,
-                            "y": -840
-                        },
-                        "size": {
-                            "width": 400,
-                            "height": 405
-                        },
-                        "view": "react-shape-view",
-                        "shape": "custom-node",
-                        "ports": {
-                            "groups": {
-                                "domin": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "portBody"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "portBody": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": -5,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "domout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 394,
-                                                "y": 50
-                                            },
-                                            "angle": 0
-                                        }
-                                    }
-                                },
-                                "jumpout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "loopout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "foreachout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "magnet": true,
-                                            "fill": "#A9A9A9",
-                                            "x": -5,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": {
-                                        "args": {
-                                            "position": {
-                                                "x": 399,
-                                                "y": 80
-                                            },
-                                            "angle": 0
-                                        }
-                                    },
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                },
-                                "valsout": {
-                                    "markup": [
-                                        {
-                                            "tagName": "rect",
-                                            "selector": "rect"
-                                        }
-                                    ],
-                                    "attrs": {
-                                        "rect": {
-                                            "width": 10,
-                                            "height": 10,
-                                            "strokeWidth": 1,
-                                            "fill": "#A9A9A9",
-                                            "magnet": true,
-                                            "y": -5
-                                        }
-                                    },
-                                    "position": "rightPortPosition",
-                                    "label": {
-                                        "position": {
-                                            "name": "right"
-                                        }
-                                    }
-                                }
-                            },
-                            "items": [
-                                {
-                                    "id": "component-groups-in",
-                                    "group": "domin"
-                                },
-                                {
-                                    "id": "component-groups-out",
-                                    "group": "domout"
-                                }
-                            ]
-                        },
-                        "id": "1abfad57-b0db-46d4-9144-3e798fbc3b16",
-                        "label": "GenSymbolValsWithSymbol",
-                        "item": {
-                            "key": "GenSymbolValsWithSymbol",
-                            "label": "GenSymbolValsWithSymbol",
-                            "out": [
-                                "symbolVals"
-                            ],
-                            "configuration": [
-                                {
-                                    "label": "symbols",
-                                    "type": "selectSymbols"
-                                },
-                                {
-                                    "label": "type",
-                                    "type": "select",
-                                    "option": [
-                                        {
-                                            "label": "normal",
-                                            "value": "normal"
-                                        },
-                                        {
-                                            "label": "non-clear",
-                                            "value": "non-clear"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "label": "weight",
-                                    "type": "selectIntValWeight"
-                                },
-                                {
-                                    "label": "defaultVal",
-                                    "type": "inputInteger"
-                                },
-                                {
-                                    "label": "isUseSource",
-                                    "type": "boolean",
-                                    "defaultValue": "false"
-                                },
-                                {
-                                    "label": "isAlwaysGen",
-                                    "type": "boolean",
-                                    "defaultValue": "false"
-                                }
-                            ]
-                        },
-                        "zIndex": 14,
-                        "componentValues": {
-                            "labelIsError": false,
-                            "configuration": {
-                                "isAlwaysGen": "true",
-                                "isUseSource": "false",
-                                "symbols": [
-                                    "W"
-                                ],
-                                "type": "normal",
-                                "weight": "multiweight",
-                                "defaultVal": 0
-                            },
-                            "label": "fg-initmulti"
                         },
                         "basicComponentData": null,
                         "data": null,
@@ -33659,6 +33369,247 @@
                                 "type": "winMulti+=sum(symbolVals)"
                             },
                             "label": "fg-bank"
+                        }
+                    },
+                    {
+                        "position": {
+                            "x": 4380,
+                            "y": -850
+                        },
+                        "size": {
+                            "width": 400,
+                            "height": 207
+                        },
+                        "view": "react-shape-view",
+                        "shape": "custom-node",
+                        "ports": {
+                            "groups": {
+                                "domin": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "portBody"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "portBody": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": -5,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "domout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 394,
+                                                "y": 50
+                                            },
+                                            "angle": 0
+                                        }
+                                    }
+                                },
+                                "jumpout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "loopout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "foreachout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "magnet": true,
+                                            "fill": "#A9A9A9",
+                                            "x": -5,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": {
+                                        "args": {
+                                            "position": {
+                                                "x": 399,
+                                                "y": 80
+                                            },
+                                            "angle": 0
+                                        }
+                                    },
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                },
+                                "valsout": {
+                                    "markup": [
+                                        {
+                                            "tagName": "rect",
+                                            "selector": "rect"
+                                        }
+                                    ],
+                                    "attrs": {
+                                        "rect": {
+                                            "width": 10,
+                                            "height": 10,
+                                            "strokeWidth": 1,
+                                            "fill": "#A9A9A9",
+                                            "magnet": true,
+                                            "y": -5
+                                        }
+                                    },
+                                    "position": "rightPortPosition",
+                                    "label": {
+                                        "position": {
+                                            "name": "right"
+                                        }
+                                    }
+                                }
+                            },
+                            "items": [
+                                {
+                                    "id": "component-groups-in",
+                                    "group": "domin"
+                                },
+                                {
+                                    "id": "component-groups-out",
+                                    "group": "domout"
+                                }
+                            ]
+                        },
+                        "id": "7252a6df-fa8a-4dba-ad42-1fdfccc645e6",
+                        "label": "GenSymbolVals",
+                        "item": {
+                            "key": "GenSymbolVals",
+                            "label": "GenSymbolVals",
+                            "out": [
+                                "symbolVals"
+                            ],
+                            "configuration": [
+                                {
+                                    "label": "defaultVal",
+                                    "type": "inputInteger"
+                                },
+                                {
+                                    "label": "isAlwaysGen",
+                                    "type": "boolean",
+                                    "defaultValue": "false"
+                                }
+                            ]
+                        },
+                        "tools": {
+                            "items": [
+                                {
+                                    "name": "button-remove",
+                                    "args": {
+                                        "x": 380,
+                                        "y": 18
+                                    }
+                                }
+                            ]
+                        },
+                        "zIndex": 31,
+                        "componentValues": {
+                            "labelIsError": false,
+                            "configuration": {
+                                "isAlwaysGen": "true",
+                                "defaultVal": 0
+                            },
+                            "label": "fg-initmulti"
                         }
                     }
                 ]
