@@ -70,9 +70,9 @@
             "args": [],
             "cwd": "${workspaceFolder}/app",
             "env": {
-                "GAMECFG": "${workspaceFolder}/data/game002.json",
+                "GAMECFG": "${workspaceFolder}/data/game.json",
                 "OUTPUTPATH": "${workspaceFolder}/output",
-                "SPINNUMS": "100000",
+                "SPINNUMS": "10000000",
                 "CORE":"1",
                 "ALLOWSTATS2":"true",
                 "BET":"20",
