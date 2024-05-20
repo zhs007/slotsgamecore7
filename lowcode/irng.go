@@ -10,5 +10,5 @@ type IRNG interface {
 	// OnNewGame -
 	OnNewGame(plugin sgc7plugin.IPlugin) error
 	// GetCurRNG -
-	GetCurRNG(componentName string) (bool, int, sgc7plugin.IPlugin)
+	GetCurRNG(componentName string) (bool, int, sgc7plugin.IPlugin, string)
 }

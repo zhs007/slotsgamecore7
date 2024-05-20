@@ -216,7 +216,7 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		}
 
 		ccd := gameProp.GetCurComponentData(curComponent)
-		_, _, currng := gameProp.rng.GetCurRNG(curComponent.GetName())
+		_, _, currng, _ := gameProp.rng.GetCurRNG(curComponent.GetName())
 		nc, err := curComponent.OnPlayGame(gameProp, curpr, gp, currng, "", "", ps, stake, prs, ccd)
 		if err != nil {
 			if err != ErrComponentDoNothing {
