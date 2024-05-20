@@ -384,3 +384,18 @@ func GenInitialArr(len int) []int {
 
 	return arr
 }
+
+func IsSameIntArr(arr []int, arr1 []int) bool {
+	if len(arr) == len(arr1) {
+
+		for i, v := range arr {
+			if v != arr1[i] {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	return false
+}
