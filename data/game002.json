@@ -22888,7 +22888,8 @@
                                     "G",
                                     "H",
                                     "I"
-                                ]
+                                ],
+                                "putMoneyInPiggyBank": "fg-bank"
                             },
                             "label": "fg-pay"
                         }
