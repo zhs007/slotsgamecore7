@@ -42,7 +42,7 @@ func main() {
 
 	game, err := lowcode.NewGame2(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	}, lowcode.NewBasicRNG)
+	}, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel)
 	if err != nil {
 		goutils.Error("NewGame2",
 			slog.String("gamecfg", gamecfg),

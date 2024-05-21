@@ -66,6 +66,7 @@ type GameProperty struct {
 	stats2Cache            *stats2.Cache
 	usedComponent          []string
 	rng                    IRNG
+	featureLevel           IFeatureLevel
 }
 
 func (gameProp *GameProperty) GetBetMul() int {

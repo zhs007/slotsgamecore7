@@ -84,5 +84,5 @@ func main() {
 	lowcode.SetRTPMode()
 
 	// lowcode.SetForceDisableStats()
-	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, lowcode.NewBasicRNG, 0)
+	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, 0)
 }

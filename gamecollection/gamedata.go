@@ -72,10 +72,10 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 	return pr, nil
 }
 
-func NewGameData(gameCode string, data []byte, funcNewRNG lowcode.FuncNewRNG) (*GameData, error) {
+func NewGameData(gameCode string, data []byte, funcNewRNG lowcode.FuncNewRNG, funcNewFeatureLevel lowcode.FuncNewFeatureLevel) (*GameData, error) {
 	game, err := lowcode.NewGame2WithData(data, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	}, funcNewRNG)
+	}, funcNewRNG, funcNewFeatureLevel)
 	if err != nil {
 		goutils.Error("NewGameData:NewGame2WithData",
 			slog.String("gameCode", gameCode),
@@ -97,10 +97,10 @@ func NewGameData(gameCode string, data []byte, funcNewRNG lowcode.FuncNewRNG) (*
 	return gameD, nil
 }
 
-func NewGameDataWithHash(gameCode string, data []byte, hash string, funcNewRNG lowcode.FuncNewRNG) (*GameData, error) {
+func NewGameDataWithHash(gameCode string, data []byte, hash string, funcNewRNG lowcode.FuncNewRNG, funcNewFeatureLevel lowcode.FuncNewFeatureLevel) (*GameData, error) {
 	game, err := lowcode.NewGame2WithData(data, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	}, funcNewRNG)
+	}, funcNewRNG, funcNewFeatureLevel)
 	if err != nil {
 		goutils.Error("NewGameDataWithHash:NewGame2WithData",
 			slog.String("gameCode", gameCode),

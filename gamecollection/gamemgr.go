@@ -12,8 +12,9 @@ import (
 
 type GameMgr struct {
 	sync.Mutex
-	MapGames map[string]*GameData
-	newRNG   lowcode.FuncNewRNG
+	MapGames        map[string]*GameData
+	newRNG          lowcode.FuncNewRNG
+	newFeatureLevel lowcode.FuncNewFeatureLevel
 }
 
 func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
@@ -35,7 +36,7 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 		// goutils.Info("GameMgr.InitGame",
 		// 	slog.String("data", string(data)))
 
-		gameD1, err := NewGameDataWithHash(gameCode, data, hash, mgr.newRNG)
+		gameD1, err := NewGameDataWithHash(gameCode, data, hash, mgr.newRNG, mgr.newFeatureLevel)
 		if err != nil {
 			goutils.Error("GameMgr.InitGame:NewGameDataWithHash",
 				goutils.Err(err))
@@ -54,7 +55,7 @@ func (mgr *GameMgr) InitGame(gameCode string, data []byte) error {
 	// goutils.Info("GameMgr.InitGame",
 	// 	slog.String("data", string(data)))
 
-	gameD1, err := NewGameData(gameCode, data, mgr.newRNG)
+	gameD1, err := NewGameData(gameCode, data, mgr.newRNG, mgr.newFeatureLevel)
 	if err != nil {
 		goutils.Error("GameMgr.InitGame:NewGameData",
 			goutils.Err(err))
@@ -135,9 +136,10 @@ func (mgr *GameMgr) PlayGame(gameCode string, req *sgc7pb.RequestPlay) (*sgc7pb.
 	return reply, nil
 }
 
-func NewGameMgr(funcNewRNG lowcode.FuncNewRNG) *GameMgr {
+func NewGameMgr(funcNewRNG lowcode.FuncNewRNG, funcNewFeatureLevel lowcode.FuncNewFeatureLevel) *GameMgr {
 	return &GameMgr{
-		MapGames: make(map[string]*GameData),
-		newRNG:   funcNewRNG,
+		MapGames:        make(map[string]*GameData),
+		newRNG:          funcNewRNG,
+		newFeatureLevel: funcNewFeatureLevel,
 	}
 }
