@@ -12,7 +12,7 @@ func Test_ParseStepParentChildren(t *testing.T) {
 
 	game, err := NewGame2("../unittestdata/testgame.json", func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
-	}, NewBasicRNG)
+	}, NewBasicRNG, NewEmptyFeatureLevel)
 	assert.NoError(t, err)
 	assert.NotNil(t, game)
 

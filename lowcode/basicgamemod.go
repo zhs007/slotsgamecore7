@@ -113,7 +113,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	for {
 		isComponentDoNothing := false
-		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(curComponent.GetName())
+		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(curComponent.GetName(), gameProp.featureLevel)
 		if newComponent != "" {
 			c, isok := components.MapComponents[newComponent]
 			if !isok {
@@ -313,6 +313,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	// 		gameProp.PoolScene.Put(s)
 	// 	}
 	// }
+
+	gameProp.featureLevel.OnResult(pr)
 
 	return pr, nil
 }

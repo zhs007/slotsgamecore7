@@ -1040,7 +1040,7 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	return nil
 }
 
-func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG) (*Game, error) {
+func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*Game, error) {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("NewGame2:ReadFile",
@@ -1050,7 +1050,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG Func
 		return nil, err
 	}
 
-	return NewGame2WithData(data, funcNewPlugin, funcNewRNG)
+	return NewGame2WithData(data, funcNewPlugin, funcNewRNG, funcNewFeatureLevel)
 }
 
 // func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
@@ -1082,7 +1082,7 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG Func
 // 	return NewGameExForRTP(bet, fn, funcNewPlugin)
 // }
 
-func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG) (*Game, error) {
+func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*Game, error) {
 	game := &Game{
 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
 		MgrComponent: NewComponentMgr(),
@@ -1191,7 +1191,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcN
 
 	// cfg.RTP = &RTPConfig{}
 
-	err = game.Init2(cfg, funcNewRNG)
+	err = game.Init2(cfg, funcNewRNG, funcNewFeatureLevel)
 	if err != nil {
 		goutils.Error("NewGame2WithData:Init2",
 			goutils.Err(err))

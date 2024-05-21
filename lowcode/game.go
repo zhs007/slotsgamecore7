@@ -101,8 +101,8 @@ type Game struct {
 // }
 
 // Init - initial game
-func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG) error {
-	pool, err := newGamePropertyPool2(cfg, funcNewRNG)
+func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) error {
+	pool, err := newGamePropertyPool2(cfg, funcNewRNG, funcNewFeatureLevel)
 	if err != nil {
 		goutils.Error("Game.Init2:NewGamePropertyPool2",
 			goutils.Err(err))

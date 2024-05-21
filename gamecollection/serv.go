@@ -23,7 +23,7 @@ type Serv struct {
 }
 
 // NewServ -
-func NewServ(bindaddr string, version string, useOpenTelemetry bool, funcNewRNG lowcode.FuncNewRNG) (*Serv, error) {
+func NewServ(bindaddr string, version string, useOpenTelemetry bool, funcNewRNG lowcode.FuncNewRNG, funcNewFeatureLevel lowcode.FuncNewFeatureLevel) (*Serv, error) {
 	// lowcode.SetJsonMode()
 
 	lis, err := net.Listen("tcp", bindaddr)
@@ -50,7 +50,7 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool, funcNewRNG 
 	serv := &Serv{
 		lis:      lis,
 		grpcServ: grpcServ,
-		mgrGame:  NewGameMgr(funcNewRNG),
+		mgrGame:  NewGameMgr(funcNewRNG, funcNewFeatureLevel),
 	}
 
 	sgc7pb.RegisterGameLogicCollectionServer(grpcServ, serv)
