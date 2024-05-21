@@ -9,4 +9,6 @@ type IFeatureLevel interface {
 	Init()
 	// OnResult -
 	OnResult(pr *sgc7game.PlayResult)
+	// CountLevel -
+	CountLevel() int
 }
