@@ -15,6 +15,11 @@ func (fl *EmptyFeatureLevel) OnResult(pr *sgc7game.PlayResult) {
 
 }
 
+// CountLevel -
+func (fl *EmptyFeatureLevel) CountLevel() int {
+	return 0
+}
+
 func NewEmptyFeatureLevel() IFeatureLevel {
 	return &EmptyFeatureLevel{}
 }

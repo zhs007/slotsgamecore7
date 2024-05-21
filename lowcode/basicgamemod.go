@@ -56,6 +56,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	if len(prs) == 0 {
 		bgm.OnNewGame(gameProp, stake, plugin)
+
+		gameProp.featureLevel.Init()
 	}
 
 	bgm.OnNewStep(gameProp, stake)
