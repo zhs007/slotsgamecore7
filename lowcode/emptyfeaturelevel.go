@@ -1,7 +1,5 @@
 package lowcode
 
-import sgc7game "github.com/zhs007/slotsgamecore7/game"
-
 type EmptyFeatureLevel struct {
 }
 
@@ -10,8 +8,8 @@ func (fl *EmptyFeatureLevel) Init() {
 
 }
 
-// OnResult -
-func (fl *EmptyFeatureLevel) OnResult(pr *sgc7game.PlayResult) {
+// OnStepEnd -
+func (fl *EmptyFeatureLevel) OnStepEnd(gameProp *GameProperty, gp *GameParams) {
 
 }
 

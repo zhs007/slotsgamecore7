@@ -316,8 +316,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	// 	}
 	// }
 
-	gameProp.featureLevel.OnResult(pr)
-
 	return pr, nil
 }
 
