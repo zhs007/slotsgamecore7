@@ -784,7 +784,7 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 }
 
 func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {
-	gameProp.featureLevel.OnStepEnd(gameProp, gp)
+	gameProp.featureLevel.OnStepEnd(gameProp, gp, pr)
 
 	if gAllowStats2 {
 		for _, v := range gp.HistoryComponents {
