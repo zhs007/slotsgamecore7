@@ -25,6 +25,6 @@ unittestdata/*-output.xlsx
 app/stats.xlsx
 output/*.xlsx
 output/*.csv
-__debug_bin
+__debug_bin*
 .DS_Store
 data/game.json

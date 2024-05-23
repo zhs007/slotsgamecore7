@@ -30,4 +30,5 @@ const (
 	CVAvgSymbolValMulti     string = "avgSymbolValMulti"     // avgSymbolValMulti
 	CVAvgHeight             string = "avgHeight"             // avgHeight
 	CVWinMulti              string = "winMulti"              // winMulti
+	CVNumber                string = "number"                // number
 )

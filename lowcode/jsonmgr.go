@@ -81,4 +81,5 @@ func init() {
 	gJsonMgr.RegLoadComponent("rebuildreelindex", parseRebuildReelIndex)
 	gJsonMgr.RegLoadComponent("gensymbolvals", parseGenSymbolVals)
 	gJsonMgr.RegLoadComponent("rebuildsymbols", parseRebuildSymbols)
+	gJsonMgr.RegLoadComponent("rollnumber", parseRollNumber)
 }
