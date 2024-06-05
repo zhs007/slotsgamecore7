@@ -174,4 +174,6 @@ var (
 	ErrInvalidFuncNewComponentData = errors.New("invalid FuncNewComponentData")
 	// ErrInvalidAnypbTypeURL - invalid anypb TypeURL
 	ErrInvalidAnypbTypeURL = errors.New("invalid anypb TypeURL")
+	// ErrNoWeight - no weight
+	ErrNoWeight = errors.New("no weight")
 )

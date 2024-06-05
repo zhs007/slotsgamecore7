@@ -101,6 +101,11 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 
 		chgSymbols.Config.WeightVW2 = vw2
+	} else {
+		goutils.Error("ChgSymbols.InitEx",
+		goutils.Err(ErrNoWeight))
+
+	return ErrNoWeight
 	}
 
 	for _, award := range chgSymbols.Config.Controllers {
