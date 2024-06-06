@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"log/slog"
+	"strings"
 
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
@@ -84,4 +85,5 @@ func init() {
 	gJsonMgr.RegLoadComponent("rollnumber", parseRollNumber)
 	gJsonMgr.RegLoadComponent("controllerworker", parseControllerWorker)
 	gJsonMgr.RegLoadComponent("catchsymbols", parseCatchSymbols)
+	gJsonMgr.RegLoadComponent(strings.ToLower(BurstSymbolsTypeName), parseBurstSymbols)
 }

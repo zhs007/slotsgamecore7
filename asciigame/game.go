@@ -63,7 +63,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 	cmd := "SPIN"
 	cmdparam := ""
-	ps := game.NewPlayerState()
+	ps := game.Initialize()
 	results := []*sgc7game.PlayResult{}
 
 	curgamenum := 1
