@@ -139,6 +139,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RebuildSymbolsTypeName, NewRebuildSymbols)
 	mgr.Reg(RollNumberTypeName, NewRollNumber)
 	mgr.Reg(ControllerWorkerTypeName, NewControllerWorker)
+	mgr.Reg(CatchSymbolsTypeName, NewCatchSymbols)
 
 	return mgr
 }
