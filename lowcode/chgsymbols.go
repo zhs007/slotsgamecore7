@@ -103,9 +103,9 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		chgSymbols.Config.WeightVW2 = vw2
 	} else {
 		goutils.Error("ChgSymbols.InitEx",
-		goutils.Err(ErrNoWeight))
+			goutils.Err(ErrNoWeight))
 
-	return ErrNoWeight
+		return ErrNoWeight
 	}
 
 	for _, award := range chgSymbols.Config.Controllers {
@@ -115,6 +115,17 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	chgSymbols.onInit(&chgSymbols.Config.BasicComponentConfig)
 
 	return nil
+}
+
+func (chgSymbols *ChgSymbols) GetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(CCVWeight)
+	if str != "" {
+		vw2, _ := gameProp.Pool.LoadIntWeights(str, chgSymbols.Config.UseFileMapping)
+
+		return vw2
+	}
+
+	return chgSymbols.Config.WeightVW2
 }
 
 // playgame
@@ -132,7 +143,8 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		for x, arr := range gs.Arr {
 			for y, s := range arr {
 				if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-					curs, err := chgSymbols.Config.WeightVW2.RandVal(plugin)
+					vw2 := chgSymbols.GetWeight(gameProp, cd)
+					curs, err := vw2.RandVal(plugin)
 					if err != nil {
 						goutils.Error("ChgSymbols.OnPlayGame:RandVal",
 							goutils.Err(err))

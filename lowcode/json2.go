@@ -92,7 +92,7 @@ type jsonControllerData struct {
 	TriggerNum string   `json:"triggerNum"`
 	Target     string   `json:"target"`
 	TargetArr  []string `json:"targetArr"`
-	Value      int      `json:"value"`
+	Value      string   `json:"value"`
 	Times      int      `json:"times"`
 	ValueNum   int      `json:"valueNum"`
 	Source     []string `json:"source"`
@@ -130,6 +130,19 @@ func (jcd *jsonControllerData) build() *Award {
 
 		return &Award{
 			AwardType:     "setComponentConfigIntVal",
+			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
+			ComponentVals: []string{strings.Join(jcd.Source, ".")},
+		}
+	} else if jcd.Type == "setComponentConfigVal" {
+		if len(jcd.Source) == 0 {
+			return &Award{
+				AwardType: "setComponentConfigVal",
+				StrParams: []string{strings.Join(jcd.TargetArr, "."), jcd.Value},
+			}
+		}
+
+		return &Award{
+			AwardType:     "setComponentConfigVal",
 			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
 			ComponentVals: []string{strings.Join(jcd.Source, ".")},
 		}

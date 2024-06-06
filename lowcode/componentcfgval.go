@@ -15,6 +15,7 @@ const (
 	CCVLastRespinNum         string = "lastRespinNum"         // 可以修改配置项里的 lastRespinNum
 	CCVRetriggerAddRespinNum string = "retriggerAddRespinNum" // 可以修改配置项里的 retriggerAddRespinNum
 	CCVLastTriggerNum        string = "lastTriggerNum"        // 可以修改配置项里的 lastTriggerNum
+	CCVWeight                string = "weight"                // 可以修改配置项里的 weight
 )
 
 const (
