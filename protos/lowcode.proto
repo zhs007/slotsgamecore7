@@ -286,6 +286,12 @@ message RollNumberData {
 	int32 number = 2;
 }
 
+// GenGigaSymbolData
+message GenGigaSymbolData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

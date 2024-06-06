@@ -11,6 +11,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,6 +31,63 @@ func parseGenGigaSymbolType(strType string) GenGigaSymbolType {
 	}
 
 	return GGSTypeExpand
+}
+
+type GenGigaSymbolData struct {
+	BasicComponentData
+	Pos []int
+}
+
+// OnNewGame -
+func (genGigaSymbolData *GenGigaSymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	genGigaSymbolData.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// OnNewStep -
+func (genGigaSymbolData *GenGigaSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
+	// positionCollectionData.BasicComponentData.OnNewStep(gameProp, component)
+	genGigaSymbolData.UsedScenes = nil
+	genGigaSymbolData.Pos = nil
+}
+
+// Clone
+func (genGigaSymbolData *GenGigaSymbolData) Clone() IComponentData {
+	target := &GenGigaSymbolData{
+		BasicComponentData: genGigaSymbolData.CloneBasicComponentData(),
+	}
+
+	target.Pos = make([]int, len(genGigaSymbolData.Pos))
+	copy(target.Pos, genGigaSymbolData.Pos)
+
+	return target
+}
+
+// BuildPBComponentData
+func (genGigaSymbolData *GenGigaSymbolData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.GenGigaSymbolData{
+		BasicComponentData: genGigaSymbolData.BuildPBBasicComponentData(),
+	}
+
+	for _, s := range genGigaSymbolData.Pos {
+		pbcd.Pos = append(pbcd.Pos, int32(s))
+	}
+
+	return pbcd
+}
+
+// GetPos -
+func (genGigaSymbolData *GenGigaSymbolData) GetPos() []int {
+	return genGigaSymbolData.Pos
+}
+
+// HasPos -
+func (genGigaSymbolData *GenGigaSymbolData) HasPos(x int, y int) bool {
+	return goutils.IndexOfInt2Slice(genGigaSymbolData.Pos, x, y, 0) >= 0
+}
+
+// AddPos -
+func (genGigaSymbolData *GenGigaSymbolData) AddPos(x int, y int) {
+	genGigaSymbolData.Pos = append(genGigaSymbolData.Pos, x, y)
 }
 
 // GenGigaSymbolConfig - configuration for GenGigaSymbol
@@ -169,9 +228,9 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	// replaceReelWithMask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := icd.(*BasicComponentData)
+	ggsd := icd.(*GenGigaSymbolData)
 
-	cd.UsedScenes = nil
+	ggsd.OnNewStep(gameProp, genGigaSymbol)
 
 	gs := genGigaSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs == nil {
@@ -222,6 +281,8 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 				ngs.Arr[x+tx][y+ty] = s
 			}
 		}
+
+		ggsd.AddPos(x+genGigaSymbol.Config.GigaWidth/2, y+genGigaSymbol.Config.GigaHeight/2)
 	} else {
 		// 需要考虑相互不覆盖
 
@@ -268,19 +329,24 @@ func (genGigaSymbol *GenGigaSymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return nc, ErrComponentDoNothing
 	}
 
-	genGigaSymbol.AddScene(gameProp, curpr, ngs, cd)
+	genGigaSymbol.AddScene(gameProp, curpr, ngs, &ggsd.BasicComponentData)
 
 	nc := genGigaSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
 }
 
+// NewComponentData -
+func (genGigaSymbol *GenGigaSymbol) NewComponentData() IComponentData {
+	return &GenGigaSymbolData{}
+}
+
 // OnAsciiGame - outpur to asciigame
 func (genGigaSymbol *GenGigaSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	cd := icd.(*BasicComponentData)
+	ggsd := icd.(*GenGigaSymbolData)
 
-	if len(cd.UsedScenes) > 0 {
-		asciigame.OutputScene("after genGigaSymbol", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
+	if len(ggsd.UsedScenes) > 0 {
+		asciigame.OutputScene("after genGigaSymbol", pr.Scenes[ggsd.UsedScenes[0]], mapSymbolColor)
 	}
 
 	return nil
