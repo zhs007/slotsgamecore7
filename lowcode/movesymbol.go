@@ -10,6 +10,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,6 +22,111 @@ const (
 	SelectSymbolL2R = "selectSymbolL2R"
 	SelectWithXY    = "selectWithXY"
 )
+
+type MoveSymbolData struct {
+	BasicComponentData
+	Pos [][]int
+}
+
+// OnNewGame -
+func (moveSymbolData *MoveSymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	moveSymbolData.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// OnNewStep -
+func (moveSymbolData *MoveSymbolData) OnNewStep() {
+	moveSymbolData.UsedScenes = nil
+	moveSymbolData.Pos = nil
+}
+
+// Clone
+func (moveSymbolData *MoveSymbolData) Clone() IComponentData {
+	target := &MoveSymbolData{
+		BasicComponentData: moveSymbolData.CloneBasicComponentData(),
+	}
+
+	target.Pos = make([][]int, len(moveSymbolData.Pos))
+	for _, arr := range moveSymbolData.Pos {
+		dstarr := make([]int, len(arr))
+		copy(dstarr, arr)
+		target.Pos = append(target.Pos, dstarr)
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (moveSymbolData *MoveSymbolData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.MoveSymbolData{
+		BasicComponentData: moveSymbolData.BuildPBBasicComponentData(),
+	}
+
+	num := 0
+	for _, arr := range moveSymbolData.Pos {
+		num += len(arr)
+		num++
+	}
+
+	pbcd.Pos = make([]int32, 0, num)
+
+	for _, arr := range moveSymbolData.Pos {
+		for _, s := range arr {
+			pbcd.Pos = append(pbcd.Pos, int32(s))
+		}
+
+		pbcd.Pos = append(pbcd.Pos, -1)
+	}
+
+	return pbcd
+}
+
+// GetPos -
+func (moveSymbolData *MoveSymbolData) GetPos() []int {
+	num := 0
+	for _, arr := range moveSymbolData.Pos {
+		num += len(arr)
+	}
+
+	newpos := make([]int, 0, num)
+
+	for _, arr := range moveSymbolData.Pos {
+		newpos = append(newpos, arr...)
+	}
+
+	return newpos
+}
+
+// HasPos -
+func (moveSymbolData *MoveSymbolData) HasPos(x int, y int) bool {
+	for _, arr := range moveSymbolData.Pos {
+		if goutils.IndexOfInt2Slice(arr, x, y, 0) >= 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
+// AddPos -
+func (moveSymbolData *MoveSymbolData) AddPos(x int, y int) {
+	if len(moveSymbolData.Pos) == 0 {
+		moveSymbolData.Pos = append(moveSymbolData.Pos, []int{})
+	}
+
+	moveSymbolData.Pos[len(moveSymbolData.Pos)-1] = append(moveSymbolData.Pos[len(moveSymbolData.Pos)-1], x, y)
+}
+
+// AddPosEx -
+func (moveSymbolData *MoveSymbolData) AddPosEx(x int, y int) {
+	if goutils.IndexOfInt2Slice(moveSymbolData.Pos[len(moveSymbolData.Pos)-1], x, y, 0) < 0 {
+		moveSymbolData.Pos[len(moveSymbolData.Pos)-1] = append(moveSymbolData.Pos[len(moveSymbolData.Pos)-1], x, y)
+	}
+}
+
+// newData -
+func (moveSymbolData *MoveSymbolData) newData() {
+	moveSymbolData.Pos = append(moveSymbolData.Pos, []int{})
+}
 
 type SelectPosData struct {
 	Type       string `yaml:"type" json:"type"`
@@ -65,37 +172,49 @@ type MoveData struct {
 	OverridePath     bool           `yaml:"overridePath" json:"overridePath"`
 }
 
-func (md *MoveData) moveX(gs *sgc7game.GameScene, sx, tx int, y int, symbolCode int) {
+func (md *MoveData) moveX(gs *sgc7game.GameScene, sx, tx int, y int, symbolCode int, msd *MoveSymbolData) {
 	if tx > sx {
 		for x := sx + 1; x < tx; x++ {
 			gs.Arr[x][y] = symbolCode
+
+			msd.AddPosEx(x, y)
 		}
 	} else if tx < sx {
 		for x := sx - 1; x > tx; x-- {
 			gs.Arr[x][y] = symbolCode
+
+			msd.AddPosEx(x, y)
 		}
 	}
 }
 
-func (md *MoveData) moveY(gs *sgc7game.GameScene, sy, ty int, x int, symbolCode int) {
+func (md *MoveData) moveY(gs *sgc7game.GameScene, sy, ty int, x int, symbolCode int, msd *MoveSymbolData) {
 	if ty > sy {
 		for y := sy + 1; y < ty; y++ {
 			gs.Arr[x][y] = symbolCode
+
+			msd.AddPosEx(x, y)
 		}
 	} else if ty < sy {
 		for y := sy - 1; y > ty; y-- {
 			gs.Arr[x][y] = symbolCode
+
+			msd.AddPosEx(x, y)
 		}
 	}
 }
 
-func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode int) {
+func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode int, msd *MoveSymbolData) {
 	if md.OverrideSrc {
 		gs.Arr[sx][sy] = symbolCode
+
+		msd.AddPosEx(sx, sy)
 	}
 
 	if md.OverrideTarget {
 		gs.Arr[tx][ty] = symbolCode
+
+		msd.AddPosEx(tx, ty)
 	}
 
 	if !md.OverridePath {
@@ -103,20 +222,24 @@ func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode 
 	}
 
 	if md.MoveType == MoveTypeXY {
-		md.moveX(gs, sx, tx, sy, symbolCode) // sx,sy -> tx,sy
+		md.moveX(gs, sx, tx, sy, symbolCode, msd) // sx,sy -> tx,sy
 
 		if sy != ty {
 			gs.Arr[tx][sy] = symbolCode
 
-			md.moveY(gs, sy, ty, tx, symbolCode) // tx,sy -> tx,ty
+			msd.AddPosEx(tx, sy)
+
+			md.moveY(gs, sy, ty, tx, symbolCode, msd) // tx,sy -> tx,ty
 		}
 	} else if md.MoveType == MoveTypeYX {
-		md.moveY(gs, sy, ty, sx, symbolCode) // sx,sy -> sx,ty
+		md.moveY(gs, sy, ty, sx, symbolCode, msd) // sx,sy -> sx,ty
 
 		if sx != tx {
 			gs.Arr[sx][ty] = symbolCode
 
-			md.moveX(gs, sx, tx, ty, symbolCode) // sx,sy -> sx,ty
+			msd.AddPosEx(sx, ty)
+
+			md.moveX(gs, sx, tx, ty, symbolCode, msd) // sx,sy -> sx,ty
 		}
 	}
 }
@@ -215,11 +338,13 @@ func (moveSymbol *MoveSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // playgame
 func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	// moveSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	bcd := cd.(*BasicComponentData)
+	msd := icd.(*MoveSymbolData)
+
+	msd.OnNewStep()
 
 	gs := moveSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -236,6 +361,8 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			continue
 		}
 
+		msd.newData()
+
 		symbolCode := v.TargetSymbolCode
 		if symbolCode == -1 {
 			symbolCode = gs.Arr[srcx][srcy]
@@ -244,10 +371,14 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		if srcx == targetx && srcy == targety {
 			if v.OverrideSrc {
 				gs.Arr[srcx][srcy] = symbolCode
+
+				msd.AddPosEx(srcx, srcy)
 			}
 
 			if v.OverrideTarget {
 				gs.Arr[targetx][targety] = symbolCode
+
+				msd.AddPosEx(targetx, targety)
 			}
 
 			continue
@@ -257,7 +388,7 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			sc2 = gs.CloneEx(gameProp.PoolScene)
 		}
 
-		v.Move(sc2, srcx, srcy, targetx, targety, symbolCode)
+		v.Move(sc2, srcx, srcy, targetx, targety, symbolCode, msd)
 	}
 
 	if sc2 == gs {
@@ -266,18 +397,23 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		return nc, ErrComponentDoNothing
 	}
 
-	moveSymbol.AddScene(gameProp, curpr, sc2, bcd)
+	moveSymbol.AddScene(gameProp, curpr, sc2, &msd.BasicComponentData)
 
 	nc := moveSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
 }
 
-// OnAsciiGame - outpur to asciigame
-func (moveSymbol *MoveSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
-	bcd := cd.(*BasicComponentData)
+// NewComponentData -
+func (moveSymbol *MoveSymbol) NewComponentData() IComponentData {
+	return &MoveSymbolData{}
+}
 
-	asciigame.OutputScene("after moveSymbol", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
+// OnAsciiGame - outpur to asciigame
+func (moveSymbol *MoveSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+	msd := icd.(*MoveSymbolData)
+
+	asciigame.OutputScene("after moveSymbol", pr.Scenes[msd.UsedScenes[0]], mapSymbolColor)
 
 	return nil
 }
