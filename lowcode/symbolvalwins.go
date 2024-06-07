@@ -56,6 +56,8 @@ func (symbolValWinsData *SymbolValWinsData) onNewStep() {
 	// symbolValWinsData.BasicComponentData.OnNewStep(gameProp, component)
 
 	symbolValWinsData.UsedResults = nil
+	symbolValWinsData.SymbolNum = 0
+	symbolValWinsData.Wins = 0
 
 	// symbolValWinsData.SymbolNum = 0
 	// symbolValWinsData.Wins = 0
@@ -197,8 +199,8 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// isTrigger := true
 	// symbolnum := 0
 
-	svwd.SymbolNum = 0
-	svwd.Wins = 0
+	// svwd.SymbolNum = 0
+	// svwd.Wins = 0
 	// svwd.CollectorNum = 0
 
 	// if symbolValWins.TriggerSymbolCode >= 0 {
@@ -220,17 +222,21 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// if isTrigger {
 	// svwd.CollectorNum = symbolnum
 
+	var gs *sgc7game.GameScene
 	os := symbolValWins.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	if os != nil {
+		collectorpos := []int{}
 		mul := 0
 		if symbolValWins.Config.Type == SVWTypeCollector {
-			gs := symbolValWins.GetTargetScene3(gameProp, curpr, prs, 0)
+			gs = symbolValWins.GetTargetScene3(gameProp, curpr, prs, 0)
 			if gs != nil {
-				for _, arr := range gs.Arr {
-					for _, s := range arr {
+				for x, arr := range gs.Arr {
+					for y, s := range arr {
 						if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
 							mul++
+
+							collectorpos = append(collectorpos, x, y)
 						}
 					}
 				}
@@ -254,31 +260,57 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if totalvals > 0 && mul > 0 {
-			ret := &sgc7game.Result{
-				Symbol:     -1, //gs.Arr[pos[0]][pos[1]],
-				Type:       sgc7game.RTSymbolVal,
-				LineIndex:  -1,
-				Pos:        pos,
-				SymbolNums: len(pos) / 2,
-				Mul:        mul,
+			bet := gameProp.GetBet2(stake, symbolValWins.Config.BetType)
+			othermul := symbolValWins.GetWinMulti(&svwd.BasicComponentData)
+
+			for i := 0; i < mul; i++ {
+				newpos := make([]int, 0, len(pos)+2)
+
+				newpos = append(newpos, collectorpos[i*2], collectorpos[i*2+1])
+				newpos = append(newpos, pos...)
+
+				ret := &sgc7game.Result{
+					// Symbol:     gs.Arr[newpos[0]][newpos[1]],
+					Type:       sgc7game.RTSymbolVal,
+					LineIndex:  -1,
+					Pos:        pos,
+					SymbolNums: len(newpos) / 2,
+					Mul:        1,
+				}
+
+				if gs != nil {
+					ret.Symbol = gs.Arr[newpos[0]][newpos[1]]
+				}
+
+				ret.CoinWin = totalvals * othermul
+				ret.CashWin = ret.CoinWin * bet
+				ret.OtherMul = othermul
+
+				svwd.Wins += ret.CoinWin
+
+				symbolValWins.AddResult(curpr, ret, &svwd.BasicComponentData)
 			}
 
-			bet := gameProp.GetBet2(stake, symbolValWins.Config.BetType)
-
-			othermul := symbolValWins.GetWinMulti(&svwd.BasicComponentData) //1 //gameProp.GetVal(GamePropGameCoinMulti) * gameProp.GetVal(GamePropStepCoinMulti)
-
-			// if symbolValWins.Config.IsTriggerSymbolNumMulti {
-			// 	ret.CoinWin = totalvals * symbolnum * mul
-			// 	ret.CashWin = ret.CoinWin * bet
-			// } else {
-			ret.CoinWin = totalvals * mul * othermul
-			ret.CashWin = ret.CoinWin * bet
-			ret.OtherMul = othermul
+			// ret := &sgc7game.Result{
+			// 	Symbol:     -1, //gs.Arr[pos[0]][pos[1]],
+			// 	Type:       sgc7game.RTSymbolVal,
+			// 	LineIndex:  -1,
+			// 	Pos:        pos,
+			// 	SymbolNums: len(pos) / 2,
+			// 	Mul:        mul,
 			// }
 
-			svwd.Wins = ret.CoinWin
+			// bet := gameProp.GetBet2(stake, symbolValWins.Config.BetType)
 
-			symbolValWins.AddResult(curpr, ret, &svwd.BasicComponentData)
+			// othermul := symbolValWins.GetWinMulti(&svwd.BasicComponentData)
+
+			// ret.CoinWin = totalvals * mul * othermul
+			// ret.CashWin = ret.CoinWin * bet
+			// ret.OtherMul = othermul
+
+			// svwd.Wins = ret.CoinWin
+
+			// symbolValWins.AddResult(curpr, ret, &svwd.BasicComponentData)
 
 			nc := symbolValWins.onStepEnd(gameProp, curpr, gp, "")
 
