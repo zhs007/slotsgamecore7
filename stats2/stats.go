@@ -21,6 +21,7 @@ type Stats struct {
 	MaxWinTimes    int64               `json:"maxWinTimes"`
 	BetEndingTimes int64               `json:"-"`
 	Components     []string            `json:"components"`
+	Wins           *StatsWins          `json:"wins"`
 }
 
 func (s2 *Stats) PushBet(bet int) {
@@ -47,6 +48,8 @@ func (s2 *Stats) onCache(cache *Cache) {
 	}
 
 	s2.TotalWins += cache.TotalWin
+
+	s2.Wins.AddWin(cache.TotalWin)
 }
 
 func (s2 *Stats) SaveExcel(fn string) error {
@@ -98,10 +101,18 @@ func (s2 *Stats) saveBasicSheet(f *excelize.File) {
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 5), s2.MaxWinTimes)
 }
 
+func (s2 *Stats) saveWins(f *excelize.File) {
+	sheet := "totalWins"
+	f.NewSheet(sheet)
+
+	s2.Wins.SaveSheet(f, sheet, s2.TotalBet)
+}
+
 func (s2 *Stats) ExportExcel() ([]byte, error) {
 	f := excelize.NewFile()
 
 	s2.saveBasicSheet(f)
+	s2.saveWins(f)
 
 	f.DeleteSheet(f.GetSheetName(0))
 
@@ -188,6 +199,8 @@ func (s2 *Stats) Merge(src *Stats) {
 	} else if src.MaxWins == s2.MaxWins {
 		s2.MaxWinTimes += src.MaxWinTimes
 	}
+
+	s2.Wins.Merge(src.Wins)
 }
 
 func (s2 *Stats) ToJson() string {
@@ -202,6 +215,7 @@ func NewStats(components []string) *Stats {
 		chanBet:    make(chan int, 1024),
 		chanCache:  make(chan *Cache, 1024),
 		Components: components,
+		Wins:       NewStatsWins(),
 	}
 
 	return s2
