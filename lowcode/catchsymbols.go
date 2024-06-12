@@ -288,12 +288,12 @@ func (catchSymbolsData *CatchSymbolsData) AddPos(x int, y int) {
 	catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
 }
 
-// AddPosEx -
-func (catchSymbolsData *CatchSymbolsData) AddPosEx(x int, y int) {
-	if goutils.IndexOfInt2Slice(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y, 0) < 0 {
-		catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
-	}
-}
+// // AddPosEx -
+// func (catchSymbolsData *CatchSymbolsData) AddPosEx(x int, y int) {
+// 	if goutils.IndexOfInt2Slice(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y, 0) < 0 {
+// 		catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
+// 	}
+// }
 
 // newData -
 func (catchSymbolsData *CatchSymbolsData) newData() {

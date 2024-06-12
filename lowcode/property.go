@@ -768,6 +768,19 @@ func (gameProp *GameProperty) GetComponentSymbols(componentName string) []int {
 	return cd.GetSymbols()
 }
 
+func (gameProp *GameProperty) GetComponentPos(componentName string) []int {
+	cd := gameProp.GetCurComponentDataWithName(componentName)
+	if cd == nil {
+		goutils.Error("GameProperty.GetComponentPos",
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
+
+		return nil
+	}
+
+	return cd.GetPos()
+}
+
 func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCode int) {
 	cd := gameProp.GetCurComponentDataWithName(componentName)
 	if cd == nil {

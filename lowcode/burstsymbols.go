@@ -10,6 +10,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,6 +50,193 @@ func parseBurstSymbolsSourceType(str string) BurstSymbolsSourceType {
 	return BSSTypeSymbols
 }
 
+var gDiffusionPos [][]int
+
+func init() {
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(1, 0)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(1, 1)...)
+
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(2, 0)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(2, 1)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(2, 2)...)
+
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(3, 0)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(3, 1)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(3, 2)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(3, 3)...)
+
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(4, 0)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(4, 1)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(4, 2)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(4, 3)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(4, 4)...)
+
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(5, 0)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(5, 1)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(5, 2)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(5, 3)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(5, 4)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(5, 5)...)
+
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 0)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 1)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 2)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 3)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 4)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 5)...)
+	gDiffusionPos = append(gDiffusionPos, getDiffusionPosOffset2(6, 6)...)
+}
+
+func getDiffusionPosOffset2(instance int, off int) [][]int {
+	pos := [][]int{}
+
+	if off == 0 {
+		pos = append(pos, []int{0, -instance})
+		pos = append(pos, []int{instance, 0})
+		pos = append(pos, []int{0, instance})
+		pos = append(pos, []int{-instance, 0})
+	}
+
+	pos = append(pos, []int{off, -instance})
+	pos = append(pos, []int{instance, off})
+	pos = append(pos, []int{-off, instance})
+	pos = append(pos, []int{-instance, -off})
+
+	return nil
+}
+
+func getDiffusionPosOffset(index int) (int, int) {
+	return gDiffusionPos[index][0], gDiffusionPos[index][1]
+}
+
+func burstDiffusion(gs *sgc7game.GameScene, x int, y int, num int, overrideSym int, ignoreSyms []int, bsd *BurstSymbolsData) {
+	bsd.newData()
+
+	curnum := 0
+
+	for i := 0; i < len(gDiffusionPos); i++ {
+		cx, cy := getDiffusionPosOffset(i)
+		if cx >= 0 && cy >= 0 && cx < gs.Width && cy < gs.Height {
+			tx := x + cx
+			ty := y + cy
+			if goutils.IndexOfIntSlice(ignoreSyms, gs.Arr[tx][ty], 0) < 0 {
+				bsd.AddPos(tx, ty)
+				gs.Arr[tx][ty] = overrideSym
+				curnum++
+
+				if curnum >= num {
+					return
+				}
+			}
+		}
+	}
+}
+
+type BurstSymbolsData struct {
+	BasicComponentData
+	Pos [][]int
+}
+
+// OnNewGame -
+func (burstSymbolsData *BurstSymbolsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	burstSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// OnNewStep -
+func (burstSymbolsData *BurstSymbolsData) OnNewStep() {
+	burstSymbolsData.UsedScenes = nil
+	burstSymbolsData.Pos = nil
+}
+
+// Clone
+func (burstSymbolsData *BurstSymbolsData) Clone() IComponentData {
+	target := &BurstSymbolsData{
+		BasicComponentData: burstSymbolsData.CloneBasicComponentData(),
+	}
+
+	target.Pos = make([][]int, len(burstSymbolsData.Pos))
+	for _, arr := range burstSymbolsData.Pos {
+		dstarr := make([]int, len(arr))
+		copy(dstarr, arr)
+		target.Pos = append(target.Pos, dstarr)
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (burstSymbolsData *BurstSymbolsData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.BurstSymbolsData{
+		BasicComponentData: burstSymbolsData.BuildPBBasicComponentData(),
+	}
+
+	num := 0
+	for _, arr := range burstSymbolsData.Pos {
+		num += len(arr)
+		num++
+	}
+
+	pbcd.Pos = make([]int32, 0, num)
+
+	for _, arr := range burstSymbolsData.Pos {
+		for _, s := range arr {
+			pbcd.Pos = append(pbcd.Pos, int32(s))
+		}
+
+		pbcd.Pos = append(pbcd.Pos, -1)
+	}
+
+	return pbcd
+}
+
+// GetPos -
+func (burstSymbolsData *BurstSymbolsData) GetPos() []int {
+	num := 0
+	for _, arr := range burstSymbolsData.Pos {
+		num += len(arr)
+	}
+
+	newpos := make([]int, 0, num)
+
+	for _, arr := range burstSymbolsData.Pos {
+		newpos = append(newpos, arr...)
+	}
+
+	return newpos
+}
+
+// HasPos -
+func (burstSymbolsData *BurstSymbolsData) HasPos(x int, y int) bool {
+	for _, arr := range burstSymbolsData.Pos {
+		if goutils.IndexOfInt2Slice(arr, x, y, 0) >= 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
+// AddPos -
+func (burstSymbolsData *BurstSymbolsData) AddPos(x int, y int) {
+	if len(burstSymbolsData.Pos) == 0 {
+		burstSymbolsData.Pos = append(burstSymbolsData.Pos, []int{})
+	}
+
+	burstSymbolsData.Pos[len(burstSymbolsData.Pos)-1] = append(burstSymbolsData.Pos[len(burstSymbolsData.Pos)-1], x, y)
+}
+
+// // AddPosEx -
+// func (catchSymbolsData *CatchSymbolsData) AddPosEx(x int, y int) {
+// 	if goutils.IndexOfInt2Slice(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y, 0) < 0 {
+// 		catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
+// 	}
+// }
+
+// newData -
+func (burstSymbolsData *BurstSymbolsData) newData() {
+	burstSymbolsData.Pos = append(burstSymbolsData.Pos, []int{})
+}
+
 // BurstSymbolsConfig - configuration for BurstSymbols
 type BurstSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -58,10 +247,10 @@ type BurstSymbolsConfig struct {
 	SourceType           BurstSymbolsSourceType `yaml:"-" json:"-"`
 	SourceSymbols        []string               `yaml:"sourceSymbols" json:"sourceSymbols"`
 	SourceSymbolCodes    []int                  `yaml:"-" json:"-"`
-	ExcludeSymbols       []string               `yaml:"excludeSymbols" json:"excludeSymbols"`
-	excludeSymbolCodes   []int                  `yaml:"-" json:"-"`
-	TargetSymbol         string                 `yaml:"targetSymbol" json:"targetSymbol"`
-	TargetSymbolCode     int                    `yaml:"-" json:"-"`
+	IgnoreSymbols        []string               `yaml:"ignoreSymbols" json:"ignoreSymbols"`
+	IgnoreSymbolCodes    []int                  `yaml:"-" json:"-"`
+	OverrideSymbol       string                 `yaml:"overrideSymbol" json:"overrideSymbol"`
+	OverrideSymbolCode   int                    `yaml:"-" json:"-"`
 	PositionCollection   string                 `yaml:"positionCollection" json:"positionCollection"`
 	Controllers          []*Award               `yaml:"controllers" json:"controllers"`         // 新的奖励系统
 	JumpToComponent      string                 `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
@@ -114,44 +303,42 @@ func (burstSymbols *BurstSymbols) InitEx(cfg any, pool *GamePropertyPool) error 
 	burstSymbols.Config.BurstType = parseBurstSymbolsType(burstSymbols.Config.StrBurstType)
 	burstSymbols.Config.SourceType = parseBurstSymbolsSourceType(burstSymbols.Config.StrSourceType)
 
-	// for _, v := range moveSymbol.Config.MoveData {
-	// 	if v.Src.Type != SelectWithXY {
-	// 		sc, isok := pool.DefaultPaytables.MapSymbols[v.Src.Symbol]
-	// 		if !isok {
-	// 			goutils.Error("ReplaceReel.InitEx:Src.Symbol",
-	// 				slog.String("symbol", v.Src.Symbol),
-	// 				goutils.Err(ErrInvalidSymbol))
+	for _, s := range burstSymbols.Config.SourceSymbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("BurstSymbols.InitEx:SourceSymbols.Symbol",
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
 
-	// 			return ErrInvalidSymbol
-	// 		}
+			return ErrInvalidSymbol
+		}
 
-	// 		v.Src.SymbolCode = sc
-	// 	} else {
-	// 		v.Src.SymbolCode = -1
-	// 	}
+		burstSymbols.Config.SourceSymbolCodes = append(burstSymbols.Config.SourceSymbolCodes, sc)
+	}
 
-	// 	if v.Target.Type != SelectWithXY {
-	// 		sc, isok := pool.DefaultPaytables.MapSymbols[v.Target.Symbol]
-	// 		if !isok {
-	// 			goutils.Error("ReplaceReel.InitEx:Target.Symbol",
-	// 				slog.String("symbol", v.Target.Symbol),
-	// 				goutils.Err(ErrInvalidSymbol))
+	for _, s := range burstSymbols.Config.IgnoreSymbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("BurstSymbols.InitEx:IgnoreSymbols.Symbol",
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
 
-	// 			return ErrInvalidSymbol
-	// 		}
+			return ErrInvalidSymbol
+		}
 
-	// 		v.Target.SymbolCode = sc
-	// 	} else {
-	// 		v.Target.SymbolCode = -1
-	// 	}
+		burstSymbols.Config.IgnoreSymbolCodes = append(burstSymbols.Config.IgnoreSymbolCodes, sc)
+	}
 
-	// 	sc, isok := pool.DefaultPaytables.MapSymbols[v.TargetSymbol]
-	// 	if isok {
-	// 		v.TargetSymbolCode = sc
-	// 	} else {
-	// 		v.TargetSymbolCode = -1
-	// 	}
-	// }
+	sc0, isok := pool.DefaultPaytables.MapSymbols[burstSymbols.Config.OverrideSymbol]
+	if !isok {
+		goutils.Error("BurstSymbols.InitEx:OverrideSymbol",
+			slog.String("symbol", burstSymbols.Config.OverrideSymbol),
+			goutils.Err(ErrInvalidSymbol))
+
+		return ErrInvalidSymbol
+	}
+
+	burstSymbols.Config.OverrideSymbolCode = sc0
 
 	for _, ctrl := range burstSymbols.Config.Controllers {
 		ctrl.Init()
@@ -168,11 +355,37 @@ func (burstSymbols *BurstSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	// moveSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	bcd := cd.(*BasicComponentData)
+	bsd := cd.(*BurstSymbolsData)
 
 	gs := burstSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	sc2 := gs
+	if burstSymbols.Config.SourceType == BSSTypePositionCollection {
+		pos := gameProp.GetComponentPos(burstSymbols.Config.PositionCollection)
+		if len(pos) >= 2 {
+			sc2 := gs.CloneEx(gameProp.PoolScene)
+
+			for i := 0; i < len(pos)/2; i++ {
+				x := pos[i*2]
+				y := pos[i*2+1]
+
+				burstDiffusion(sc2, x, y, burstSymbols.Config.BurstNumber, burstSymbols.Config.OverrideSymbolCode, burstSymbols.Config.IgnoreSymbolCodes, bsd)
+			}
+
+			burstSymbols.AddScene(gameProp, curpr, sc2, &bsd.BasicComponentData)
+
+			if len(burstSymbols.Config.Controllers) > 0 {
+				gameProp.procAwards(plugin, burstSymbols.Config.Controllers, curpr, gp)
+			}
+
+			nc := burstSymbols.onStepEnd(gameProp, curpr, gp, burstSymbols.Config.JumpToComponent)
+
+			return nc, nil
+		}
+	}
+
+	nc := burstSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, ErrComponentDoNothing
 
 	// for _, v := range moveSymbol.Config.MoveData {
 	// 	srcok, srcx, srcy := v.Src.Select(sc2)
@@ -209,30 +422,35 @@ func (burstSymbols *BurstSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	// 	v.Move(sc2, srcx, srcy, targetx, targety, symbolCode)
 	// }
 
-	if sc2 == gs {
-		nc := burstSymbols.onStepEnd(gameProp, curpr, gp, "")
+	// if sc2 == gs {
+	// 	nc := burstSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-		return nc, ErrComponentDoNothing
-	}
+	// 	return nc, ErrComponentDoNothing
+	// }
 
-	burstSymbols.AddScene(gameProp, curpr, sc2, bcd)
+	// burstSymbols.AddScene(gameProp, curpr, sc2, &bsd.BasicComponentData)
 
-	if len(burstSymbols.Config.Controllers) > 0 {
-		gameProp.procAwards(plugin, burstSymbols.Config.Controllers, curpr, gp)
-	}
+	// if len(burstSymbols.Config.Controllers) > 0 {
+	// 	gameProp.procAwards(plugin, burstSymbols.Config.Controllers, curpr, gp)
+	// }
 
-	nc := burstSymbols.onStepEnd(gameProp, curpr, gp, "")
+	// nc := burstSymbols.onStepEnd(gameProp, curpr, gp, burstSymbols.Config.JumpToComponent)
 
-	return nc, nil
+	// return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
 func (burstSymbols *BurstSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
-	bcd := cd.(*BasicComponentData)
+	bsd := cd.(*BurstSymbolsData)
 
-	asciigame.OutputScene("after burstSymbols", pr.Scenes[bcd.UsedScenes[0]], mapSymbolColor)
+	asciigame.OutputScene("after burstSymbols", pr.Scenes[bsd.UsedScenes[0]], mapSymbolColor)
 
 	return nil
+}
+
+// NewComponentData -
+func (burstSymbols *BurstSymbols) NewComponentData() IComponentData {
+	return &BurstSymbolsData{}
 }
 
 // // OnStats
@@ -277,54 +495,24 @@ func NewBurstSymbols(name string) IComponent {
 //		]
 //	},
 type jsonBurstSymbols struct {
-	SourceType     string   `json:"burstSymbolsSourceType"`
-	BurstType      string   `json:"burstType"`
-	BurstNumber    int      `json:"burstNumber"`
-	SourceSymbols  []string `json:"sourceSymbols"`
-	TargetSymbols  []string `json:"targetSymbol"`
-	ExcludeSymbols []string `json:"excludeSymbols"`
+	SourceType         string   `json:"burstSymbolsSourceType"`
+	BurstType          string   `json:"burstType"`
+	BurstNumber        int      `json:"burstNumber"`
+	SourceSymbols      []string `json:"sourceSymbols"`
+	TargetSymbols      []string `json:"targetSymbol"`
+	ExcludeSymbols     []string `json:"excludeSymbols"`
+	PositionCollection string   `json:"positionCollection"`
 }
 
 func (jcfg *jsonBurstSymbols) build() *BurstSymbolsConfig {
 	cfg := &BurstSymbolsConfig{
-		StrBurstType:   jcfg.BurstType,
-		StrSourceType:  jcfg.SourceType,
-		SourceSymbols:  jcfg.SourceSymbols,
-		TargetSymbol:   jcfg.TargetSymbols[0],
-		ExcludeSymbols: jcfg.ExcludeSymbols,
+		StrBurstType:       jcfg.BurstType,
+		StrSourceType:      jcfg.SourceType,
+		SourceSymbols:      jcfg.SourceSymbols,
+		OverrideSymbol:     jcfg.TargetSymbols[0],
+		IgnoreSymbols:      jcfg.ExcludeSymbols,
+		PositionCollection: jcfg.PositionCollection,
 	}
-
-	// for _, v := range jms.MoveData {
-	// 	cmd := &MoveData{
-	// 		Src:            v.Src,
-	// 		Target:         v.Target,
-	// 		MoveType:       v.MoveType,
-	// 		TargetSymbol:   v.TargetSymbol,
-	// 		OverrideSrc:    v.OverrideSrc == "true",
-	// 		OverrideTarget: v.OverrideTarget == "true",
-	// 		OverridePath:   v.OverridePath == "true",
-	// 	}
-
-	// 	if cmd.Src.X > 0 {
-	// 		cmd.Src.X--
-	// 	}
-
-	// 	if cmd.Src.Y > 0 {
-	// 		cmd.Src.Y--
-	// 	}
-
-	// 	if cmd.Target.X > 0 {
-	// 		cmd.Target.X--
-	// 	}
-
-	// 	if cmd.Target.Y > 0 {
-	// 		cmd.Target.Y--
-	// 	}
-
-	// 	cfg.MoveData = append(cfg.MoveData, cmd)
-	// }
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
