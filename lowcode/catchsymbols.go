@@ -484,6 +484,10 @@ func (catchSymbols *CatchSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 			si = cr
 		}
 
+		if catchSymbols.Config.PositionCollection != "" {
+			gameProp.AddComponentPos(catchSymbols.Config.PositionCollection, targetpos)
+		}
+
 		if len(targetpos) > 2 {
 			sx := srcpos[si*2]
 			sy := srcpos[si*2+1]
@@ -491,7 +495,7 @@ func (catchSymbols *CatchSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 			if len(srcpos) > 2 {
 				procOneCatchAll(sc2, sx, sy, mergePosWithoutSelected(srcpos, targetpos, si), catchSymbols.Config.OverrideSymbolCode, catchSymbols.Config.UpgradeSymbolCode, catchSymbols.Config.IgnoreSymbolCodes, csd)
 			} else {
-				procOneCatchAll(sc2, sx, sy, mergePosWithoutSelected(srcpos, targetpos, si), catchSymbols.Config.OverrideSymbolCode, gs.Arr[sx][sy], catchSymbols.Config.IgnoreSymbolCodes, csd)
+				procOneCatchAll(sc2, sx, sy, targetpos, catchSymbols.Config.OverrideSymbolCode, gs.Arr[sx][sy], catchSymbols.Config.IgnoreSymbolCodes, csd)
 			}
 		} else if len(targetpos) == 2 {
 			if len(srcpos) > 2 {
@@ -500,7 +504,7 @@ func (catchSymbols *CatchSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 				sx := srcpos[si*2]
 				sy := srcpos[si*2+1]
 
-				procOneCatchAll(sc2, sx, sy, mergePosWithoutSelected(srcpos, targetpos, si), catchSymbols.Config.OverrideSymbolCode, gs.Arr[sx][sy], catchSymbols.Config.IgnoreSymbolCodes, csd)
+				procOneCatchAll(sc2, sx, sy, targetpos, catchSymbols.Config.OverrideSymbolCode, gs.Arr[sx][sy], catchSymbols.Config.IgnoreSymbolCodes, csd)
 			}
 		}
 	}
@@ -569,22 +573,24 @@ func NewCatchSymbols(name string) IComponent {
 //		]
 //	},
 type jsonCatchSymbols struct {
-	CatchType      string   `json:"catchType"`
-	SourceSymbols  []string `json:"sourceSymbols"`
-	TargetSymbols  []string `json:"targetSymbol"`
-	IgnoreSymbols  []string `json:"ignoreSymbols"`
-	OverrideSymbol string   `json:"overrideSymbol"`
-	UpgradeSymbol  string   `json:"upgradeSymbol"`
+	CatchType          string   `json:"catchType"`
+	SourceSymbols      []string `json:"sourceSymbols"`
+	TargetSymbols      []string `json:"targetSymbol"`
+	IgnoreSymbols      []string `json:"ignoreSymbols"`
+	OverrideSymbol     string   `json:"overrideSymbol"`
+	UpgradeSymbol      string   `json:"upgradeSymbol"`
+	PositionCollection string   `json:"positionCollection"`
 }
 
 func (jcfg *jsonCatchSymbols) build() *CatchSymbolsConfig {
 	cfg := &CatchSymbolsConfig{
-		StrCatchType:   jcfg.CatchType,
-		SourceSymbols:  jcfg.SourceSymbols,
-		TargetSymbols:  jcfg.TargetSymbols,
-		IgnoreSymbols:  jcfg.IgnoreSymbols,
-		OverrideSymbol: jcfg.OverrideSymbol,
-		UpgradeSymbol:  jcfg.UpgradeSymbol,
+		StrCatchType:       jcfg.CatchType,
+		SourceSymbols:      jcfg.SourceSymbols,
+		TargetSymbols:      jcfg.TargetSymbols,
+		IgnoreSymbols:      jcfg.IgnoreSymbols,
+		OverrideSymbol:     jcfg.OverrideSymbol,
+		UpgradeSymbol:      jcfg.UpgradeSymbol,
+		PositionCollection: jcfg.PositionCollection,
 	}
 
 	// for _, v := range jms.MoveData {

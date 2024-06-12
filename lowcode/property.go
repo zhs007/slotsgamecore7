@@ -783,6 +783,23 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 	cd.AddSymbol(symbolCode)
 }
 
+func (gameProp *GameProperty) AddComponentPos(componentName string, pos []int) {
+	cd := gameProp.GetCurComponentDataWithName(componentName)
+	if cd == nil {
+		goutils.Error("GameProperty.AddComponentPos",
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
+
+		return
+	}
+
+	gameProp.UseComponent(componentName)
+
+	for i := 0; i < len(pos)/2; i++ {
+		cd.AddPos(pos[i*2], pos[i*2+1])
+	}
+}
+
 func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {
 	gameProp.featureLevel.OnStepEnd(gameProp, gp, pr)
 
