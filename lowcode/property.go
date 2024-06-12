@@ -768,6 +768,19 @@ func (gameProp *GameProperty) GetComponentSymbols(componentName string) []int {
 	return cd.GetSymbols()
 }
 
+func (gameProp *GameProperty) GetComponentPos(componentName string) []int {
+	cd := gameProp.GetCurComponentDataWithName(componentName)
+	if cd == nil {
+		goutils.Error("GameProperty.GetComponentPos",
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
+
+		return nil
+	}
+
+	return cd.GetPos()
+}
+
 func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCode int) {
 	cd := gameProp.GetCurComponentDataWithName(componentName)
 	if cd == nil {
@@ -781,6 +794,23 @@ func (gameProp *GameProperty) AddComponentSymbol(componentName string, symbolCod
 	gameProp.UseComponent(componentName)
 
 	cd.AddSymbol(symbolCode)
+}
+
+func (gameProp *GameProperty) AddComponentPos(componentName string, pos []int) {
+	cd := gameProp.GetCurComponentDataWithName(componentName)
+	if cd == nil {
+		goutils.Error("GameProperty.AddComponentPos",
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
+
+		return
+	}
+
+	gameProp.UseComponent(componentName)
+
+	for i := 0; i < len(pos)/2; i++ {
+		cd.AddPos(pos[i*2], pos[i*2+1])
+	}
 }
 
 func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {

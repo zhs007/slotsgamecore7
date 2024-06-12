@@ -15,9 +15,26 @@ import (
 
 const ChgSymbolsTypeName = "chgSymbols"
 
+type ChgSymbolsType int
+
+const (
+	ChgSymTypeNormal  ChgSymbolsType = 0
+	ChgSymTypeMystery ChgSymbolsType = 1
+)
+
+func parseChgSymbolsType(str string) ChgSymbolsType {
+	if str == "mystery" {
+		return ChgSymTypeMystery
+	}
+
+	return ChgSymTypeNormal
+}
+
 // ChgSymbolsConfig - configuration for ChgSymbols
 type ChgSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
+	StrType              string                `yaml:"chgSymbolsType" json:"chgSymbolsType"`
+	Type                 ChgSymbolsType        `yaml:"-" json:"-"`
 	Symbols              []string              `yaml:"symbols" json:"symbols"`
 	SymbolCodes          []int                 `yaml:"-" json:"-"`
 	BlankSymbol          string                `yaml:"blankSymbol" json:"blankSymbol"`
@@ -71,6 +88,8 @@ func (chgSymbols *ChgSymbols) Init(fn string, pool *GamePropertyPool) error {
 func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	chgSymbols.Config = cfg.(*ChgSymbolsConfig)
 	chgSymbols.Config.ComponentType = ChgSymbolsTypeName
+
+	chgSymbols.Config.Type = parseChgSymbolsType(chgSymbols.Config.StrType)
 
 	for _, s := range chgSymbols.Config.Symbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
@@ -140,25 +159,48 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	if gs != nil {
 		ngs := gs
 
-		for x, arr := range gs.Arr {
-			for y, s := range arr {
-				if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-					vw2 := chgSymbols.GetWeight(gameProp, cd)
-					curs, err := vw2.RandVal(plugin)
-					if err != nil {
-						goutils.Error("ChgSymbols.OnPlayGame:RandVal",
-							goutils.Err(err))
+		if chgSymbols.Config.Type == ChgSymTypeMystery {
+			vw2 := chgSymbols.GetWeight(gameProp, cd)
+			curs, err := vw2.RandVal(plugin)
+			if err != nil {
+				goutils.Error("ChgSymbols.OnPlayGame:RandVal",
+					goutils.Err(err))
 
-						return "", err
+				return "", err
+			}
+
+			cursc := curs.Int()
+
+			ngs = gs.CloneEx(gameProp.PoolScene)
+
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
+						ngs.Arr[x][y] = cursc
 					}
+				}
+			}
+		} else {
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
+						vw2 := chgSymbols.GetWeight(gameProp, cd)
+						curs, err := vw2.RandVal(plugin)
+						if err != nil {
+							goutils.Error("ChgSymbols.OnPlayGame:RandVal",
+								goutils.Err(err))
 
-					cursc := curs.Int()
-					if cursc != chgSymbols.Config.BlankSymbolCode {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
+							return "", err
 						}
 
-						ngs.Arr[x][y] = cursc
+						cursc := curs.Int()
+						if cursc != chgSymbols.Config.BlankSymbolCode {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
+
+							ngs.Arr[x][y] = cursc
+						}
 					}
 				}
 			}
@@ -230,6 +272,7 @@ type jsonChgSymbols struct {
 	Symbols     []string `json:"symbols"`
 	BlankSymbol string   `yaml:"blankSymbol" json:"blankSymbol"`
 	Weight      string   `yaml:"weight" json:"weight"`
+	StrType     string   `json:"chgSymbolsType"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
@@ -237,6 +280,7 @@ func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 		Symbols:     jcfg.Symbols,
 		BlankSymbol: jcfg.BlankSymbol,
 		Weight:      jcfg.Weight,
+		StrType:     jcfg.StrType,
 	}
 
 	// cfg.UseSceneV3 = true

@@ -298,6 +298,18 @@ message MoveSymbolData {
     repeated int32 pos = 2;
 }
 
+// CatchSymbolsData
+message CatchSymbolsData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
+// BurstSymbolsData
+message BurstSymbolsData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
