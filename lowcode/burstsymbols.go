@@ -95,6 +95,8 @@ func getDiffusionPosOffset2(instance int, off int) [][]int {
 		pos = append(pos, []int{instance, 0})
 		pos = append(pos, []int{0, instance})
 		pos = append(pos, []int{-instance, 0})
+
+		return pos
 	}
 
 	pos = append(pos, []int{off, -instance})
@@ -102,7 +104,7 @@ func getDiffusionPosOffset2(instance int, off int) [][]int {
 	pos = append(pos, []int{-off, instance})
 	pos = append(pos, []int{-instance, -off})
 
-	return nil
+	return pos
 }
 
 func getDiffusionPosOffset(index int) (int, int) {
@@ -116,9 +118,11 @@ func burstDiffusion(gs *sgc7game.GameScene, x int, y int, num int, overrideSym i
 
 	for i := 0; i < len(gDiffusionPos); i++ {
 		cx, cy := getDiffusionPosOffset(i)
-		if cx >= 0 && cy >= 0 && cx < gs.Width && cy < gs.Height {
-			tx := x + cx
-			ty := y + cy
+
+		tx := x + cx
+		ty := y + cy
+
+		if tx >= 0 && ty >= 0 && tx < gs.Width && ty < gs.Height {
 			if goutils.IndexOfIntSlice(ignoreSyms, gs.Arr[tx][ty], 0) < 0 {
 				bsd.AddPos(tx, ty)
 				gs.Arr[tx][ty] = overrideSym
@@ -501,13 +505,14 @@ type jsonBurstSymbols struct {
 	SourceSymbols      []string `json:"sourceSymbols"`
 	TargetSymbols      []string `json:"targetSymbol"`
 	ExcludeSymbols     []string `json:"excludeSymbols"`
-	PositionCollection string   `json:"positionCollection"`
+	PositionCollection string   `json:"sourcePositionCollection"`
 }
 
 func (jcfg *jsonBurstSymbols) build() *BurstSymbolsConfig {
 	cfg := &BurstSymbolsConfig{
 		StrBurstType:       jcfg.BurstType,
 		StrSourceType:      jcfg.SourceType,
+		BurstNumber:        jcfg.BurstNumber,
 		SourceSymbols:      jcfg.SourceSymbols,
 		OverrideSymbol:     jcfg.TargetSymbols[0],
 		IgnoreSymbols:      jcfg.ExcludeSymbols,
