@@ -18,9 +18,11 @@ const ReplaceReelWithMaskTypeName = "replaceReelWithMask"
 // ReplaceReelWithMaskConfig - configuration for ReplaceReelWithMask
 type ReplaceReelWithMaskConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbol               string `yaml:"symbol" json:"symbol"`
-	SymbolCode           int    `yaml:"-" json:"-"`
-	Mask                 string `yaml:"mask" json:"mask"`
+	Symbol               string   `yaml:"symbol" json:"symbol"`
+	SymbolCode           int      `yaml:"-" json:"-"`
+	Mask                 string   `yaml:"mask" json:"mask"`
+	IgnoreSymbols        []string `yaml:"ignoreSymbols" json:"ignoreSymbols"`
+	IgnoreSymbolCodes    []int    `yaml:"-" json:"-"`
 }
 
 // SetLinkComponent
@@ -76,6 +78,19 @@ func (replaceReelWithMask *ReplaceReelWithMask) InitEx(cfg any, pool *GameProper
 
 	replaceReelWithMask.Config.SymbolCode = sc
 
+	for _, s := range replaceReelWithMask.Config.IgnoreSymbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("ReplaceReelWithMask.InitEx:IgnoreSymbols.Symbol",
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		replaceReelWithMask.Config.IgnoreSymbolCodes = append(replaceReelWithMask.Config.IgnoreSymbolCodes, sc)
+	}
+
 	replaceReelWithMask.onInit(&replaceReelWithMask.Config.BasicComponentConfig)
 
 	return nil
@@ -119,7 +134,9 @@ func (replaceReelWithMask *ReplaceReelWithMask) OnPlayGame(gameProp *GamePropert
 
 			arr := ngs.Arr[x]
 			for y := range arr {
-				ngs.Arr[x][y] = replaceReelWithMask.getSymbol(gameProp)
+				if goutils.IndexOfIntSlice(replaceReelWithMask.Config.IgnoreSymbolCodes, ngs.Arr[x][y], 0) < 0 {
+					ngs.Arr[x][y] = replaceReelWithMask.getSymbol(gameProp)
+				}
 			}
 		}
 	}
@@ -159,19 +176,26 @@ func NewReplaceReelWithMask(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"targetSymbols": "J",
-//		"srcMask": "fg-bookof"
-//	},
+// "targetSymbols": "E",
+// "srcMask": "fg-bmmask",
+// "ignoreSymbols": [
+//
+//	"OM",
+//	"MM",
+//	"BM"
+//
+// ]
 type jsonReplaceReelWithMask struct {
-	TargetSymbols string `json:"targetSymbols"`
-	SrcMask       string `json:"srcMask"`
+	TargetSymbols string   `json:"targetSymbols"`
+	SrcMask       string   `json:"srcMask"`
+	IgnoreSymbols []string `json:"ignoreSymbols"`
 }
 
 func (jcfg *jsonReplaceReelWithMask) build() *ReplaceReelWithMaskConfig {
 	cfg := &ReplaceReelWithMaskConfig{
-		Symbol: jcfg.TargetSymbols,
-		Mask:   jcfg.SrcMask,
+		Symbol:        jcfg.TargetSymbols,
+		Mask:          jcfg.SrcMask,
+		IgnoreSymbols: jcfg.IgnoreSymbols,
 	}
 
 	// cfg.UseSceneV3 = true
