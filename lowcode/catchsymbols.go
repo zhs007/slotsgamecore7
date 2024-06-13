@@ -561,21 +561,30 @@ func NewCatchSymbols(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"catchType": "nearest",
-//		"sourceSymbols": [
-//			"RW"
-//		],
-//		"selectSourceNumber": 1,
-//		"targetSymbol": [
-//			"RW",
-//			"MM"
-//		]
-//	},
+// "catchType": "normal",
+// "sourceSymbols": [
+//
+//	"RW",
+//	"RW2"
+//
+// ],
+// "targetSymbols": [
+//
+//	"MM"
+//
+// ],
+// "ignoreSymbols": [
+//
+//	"SC"
+//
+// ],
+// "overrideSymbol": "MY",
+// "upgradeSymbol": "RW2",
+// "positionCollection": "bg-burstpos"
 type jsonCatchSymbols struct {
 	CatchType          string   `json:"catchType"`
 	SourceSymbols      []string `json:"sourceSymbols"`
-	TargetSymbols      []string `json:"targetSymbol"`
+	TargetSymbols      []string `json:"targetSymbols"`
 	IgnoreSymbols      []string `json:"ignoreSymbols"`
 	OverrideSymbol     string   `json:"overrideSymbol"`
 	UpgradeSymbol      string   `json:"upgradeSymbol"`
