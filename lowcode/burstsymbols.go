@@ -484,28 +484,28 @@ func NewBurstSymbols(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"burstSymbolsSourceType": "symbols",
-//		"burstType": "diffusion",
-//		"burstNumber": 4,
-//		"targetSymbol": [
-//			"MM"
-//		],
-//		"excludeSymbols": [
-//			"MM",
-//			"RW",
-//			"SC",
-//			"MY"
-//		]
-//	},
+// "burstSymbolsSourceType": "positionCollection",
+// "burstType": "diffusion",
+// "burstNumber": 4,
+// "sourcePositionCollection": "bg-burstpos",
+// "ignoreSymbols": [
+//
+//	"RW",
+//	"MY",
+//	"SC",
+//	"RW2",
+//	"MM"
+//
+// ],
+// "overrideSymbol": "MY"
 type jsonBurstSymbols struct {
-	SourceType         string   `json:"burstSymbolsSourceType"`
-	BurstType          string   `json:"burstType"`
-	BurstNumber        int      `json:"burstNumber"`
-	SourceSymbols      []string `json:"sourceSymbols"`
-	TargetSymbols      []string `json:"targetSymbol"`
-	ExcludeSymbols     []string `json:"excludeSymbols"`
-	PositionCollection string   `json:"sourcePositionCollection"`
+	SourceType               string   `json:"burstSymbolsSourceType"`
+	BurstType                string   `json:"burstType"`
+	BurstNumber              int      `json:"burstNumber"`
+	SourceSymbols            []string `json:"sourceSymbols"`
+	OverrideSymbol           string   `json:"overrideSymbol"`
+	IgnoreSymbols            []string `json:"ignoreSymbols"`
+	SourcePositionCollection string   `json:"sourcePositionCollection"`
 }
 
 func (jcfg *jsonBurstSymbols) build() *BurstSymbolsConfig {
@@ -514,9 +514,9 @@ func (jcfg *jsonBurstSymbols) build() *BurstSymbolsConfig {
 		StrSourceType:      jcfg.SourceType,
 		BurstNumber:        jcfg.BurstNumber,
 		SourceSymbols:      jcfg.SourceSymbols,
-		OverrideSymbol:     jcfg.TargetSymbols[0],
-		IgnoreSymbols:      jcfg.ExcludeSymbols,
-		PositionCollection: jcfg.PositionCollection,
+		OverrideSymbol:     jcfg.OverrideSymbol,
+		IgnoreSymbols:      jcfg.IgnoreSymbols,
+		PositionCollection: jcfg.SourcePositionCollection,
 	}
 
 	return cfg
