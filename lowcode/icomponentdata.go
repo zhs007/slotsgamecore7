@@ -93,4 +93,10 @@ type IComponentData interface {
 	// PiggyBank
 
 	PutInMoney(coins int)
+
+	//----------------------------
+	// Branch
+
+	// ForceBranch -
+	ForceBranch(branchIndex int)
 }

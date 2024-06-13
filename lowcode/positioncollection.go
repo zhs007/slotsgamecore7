@@ -49,6 +49,11 @@ func (positionCollectionData *PositionCollectionData) OnNewGame(gameProp *GamePr
 	positionCollectionData.Pos = append(positionCollectionData.Pos, positionCollection.Config.InitPositions...)
 }
 
+func (positionCollectionData *PositionCollectionData) clear(pos []int) {
+	positionCollectionData.Pos = nil
+	positionCollectionData.Pos = append(positionCollectionData.Pos, pos...)
+}
+
 // // OnNewStep -
 // func (positionCollectionData *PositionCollectionData) OnNewStep(gameProp *GameProperty, component IComponent) {
 // 	positionCollectionData.BasicComponentData.OnNewStep(gameProp, component)
@@ -99,6 +104,7 @@ type PositionCollectionConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string                 `yaml:"type" json:"type"`                         // type
 	Type                 PositionCollectionType `yaml:"-" json:"-"`                               // type
+	IsNeedClear          bool                   `yaml:"isNeedClear" json:"isNeedClear"`           // isNeedClear
 	InitPositions        []int                  `yaml:"initPositions" json:"initPositions"`       // 初始化
 	ForeachComponent     string                 `yaml:"foreachComponent" json:"foreachComponent"` // foreach
 	Children             []string               `yaml:"-" json:"-"`                               //
@@ -172,6 +178,11 @@ func (positionCollection *PositionCollection) OnPlayGame(gameProp *GameProperty,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	// symbolCollection2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	if positionCollection.Config.IsNeedClear {
+		cd := icd.(*PositionCollectionData)
+
+		cd.clear(positionCollection.Config.InitPositions)
+	}
 
 	nc := positionCollection.onStepEnd(gameProp, curpr, gp, "")
 
@@ -253,12 +264,14 @@ func NewPositionCollection(name string) IComponent {
 // ]
 type jsonPositionCollection struct {
 	Type          string  `json:"type"`          // type
+	IsNeedClear   string  `json:"isNeedClear"`   // isNeedClear
 	InitPositions [][]int `json:"initPositions"` // initPositions
 }
 
 func (jcfg *jsonPositionCollection) build() *PositionCollectionConfig {
 	cfg := &PositionCollectionConfig{
-		StrType: jcfg.Type,
+		StrType:     jcfg.Type,
+		IsNeedClear: jcfg.IsNeedClear == "true",
 	}
 
 	for _, arr := range jcfg.InitPositions {

@@ -160,16 +160,17 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		ngs := gs
 
 		if chgSymbols.Config.Type == ChgSymTypeMystery {
-			vw2 := chgSymbols.GetWeight(gameProp, cd)
-			curs, err := vw2.RandVal(plugin)
+			cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
+			// vw2 := chgSymbols.GetWeight(gameProp, cd)
+			// curs, err := vw2.RandVal(plugin)
 			if err != nil {
-				goutils.Error("ChgSymbols.OnPlayGame:RandVal",
+				goutils.Error("ChgSymbols.OnPlayGame:RollSymbol",
 					goutils.Err(err))
 
 				return "", err
 			}
 
-			cursc := curs.Int()
+			// cursc := curs.Int()
 
 			ngs = gs.CloneEx(gameProp.PoolScene)
 
@@ -184,16 +185,25 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-						vw2 := chgSymbols.GetWeight(gameProp, cd)
-						curs, err := vw2.RandVal(plugin)
+						// vw2 := chgSymbols.GetWeight(gameProp, cd)
+						// curs, err := vw2.RandVal(plugin)
+						// if err != nil {
+						// 	goutils.Error("ChgSymbols.OnPlayGame:RandVal",
+						// 		goutils.Err(err))
+
+						// 	return "", err
+						// }
+
+						// cursc := curs.Int()
+
+						cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
 						if err != nil {
-							goutils.Error("ChgSymbols.OnPlayGame:RandVal",
+							goutils.Error("ChgSymbols.OnPlayGame:RollSymbol",
 								goutils.Err(err))
 
 							return "", err
 						}
 
-						cursc := curs.Int()
 						if cursc != chgSymbols.Config.BlankSymbolCode {
 							if ngs == gs {
 								ngs = gs.CloneEx(gameProp.PoolScene)
@@ -255,24 +265,48 @@ func (chgSymbols *ChgSymbols) GetNextLinkComponents() []string {
 	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
 }
 
+// GetBranchNum -
+func (chgSymbols *ChgSymbols) GetBranchNum() int {
+	return len(chgSymbols.Config.WeightVW2.Vals)
+}
+
+// RollSymbol -
+func (chgSymbols *ChgSymbols) RollSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData) (int, error) {
+	if bcd.ForceBranchIndex > 0 && !gIsReleaseMode {
+		vw2 := chgSymbols.GetWeight(gameProp, bcd)
+		return vw2.Vals[bcd.ForceBranchIndex-1].Int(), nil
+	}
+
+	vw2 := chgSymbols.GetWeight(gameProp, bcd)
+	curs, err := vw2.RandVal(plugin)
+	if err != nil {
+		goutils.Error("ChgSymbols.RollSymbol:RandVal",
+			goutils.Err(err))
+
+		return 0, err
+	}
+
+	return curs.Int(), nil
+}
+
 func NewChgSymbols(name string) IComponent {
 	return &ChgSymbols{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
 }
 
+// "type": "mystery",
 // "symbols": [
 //
-//	"E"
+//	"MY"
 //
 // ],
-// "blankSymbol": "BN",
-// "weight": "bgchgsymweight"
+// "weight": "mweight"
 type jsonChgSymbols struct {
 	Symbols     []string `json:"symbols"`
 	BlankSymbol string   `yaml:"blankSymbol" json:"blankSymbol"`
 	Weight      string   `yaml:"weight" json:"weight"`
-	StrType     string   `json:"chgSymbolsType"`
+	StrType     string   `json:"type"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
