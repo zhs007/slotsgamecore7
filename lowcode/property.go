@@ -813,6 +813,23 @@ func (gameProp *GameProperty) AddComponentPos(componentName string, pos []int) {
 	}
 }
 
+func (gameProp *GameProperty) ForceComponentBranch(componentName string, branchIndex int) {
+	if gIsReleaseMode {
+		return
+	}
+
+	cd := gameProp.GetCurComponentDataWithName(componentName)
+	if cd == nil {
+		goutils.Error("GameProperty.ForceComponentBranch",
+			slog.String("componentConfigVal", componentName),
+			goutils.Err(ErrInvalidComponent))
+
+		return
+	}
+
+	cd.ForceBranch(branchIndex)
+}
+
 func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {
 	gameProp.featureLevel.OnStepEnd(gameProp, gp, pr)
 
