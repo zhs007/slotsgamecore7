@@ -295,18 +295,18 @@ func NewChgSymbols(name string) IComponent {
 	}
 }
 
+// "type": "mystery",
 // "symbols": [
 //
-//	"E"
+//	"MY"
 //
 // ],
-// "blankSymbol": "BN",
-// "weight": "bgchgsymweight"
+// "weight": "mweight"
 type jsonChgSymbols struct {
 	Symbols     []string `json:"symbols"`
 	BlankSymbol string   `yaml:"blankSymbol" json:"blankSymbol"`
 	Weight      string   `yaml:"weight" json:"weight"`
-	StrType     string   `json:"chgSymbolsType"`
+	StrType     string   `json:"type"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
