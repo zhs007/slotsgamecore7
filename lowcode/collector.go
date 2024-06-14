@@ -192,7 +192,7 @@ func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 	if num > 0 && !noProcLevelUp {
 		for i := 1; i <= num; i++ {
 			cl := oldval + i
-			if cl > collector.Config.MaxVal {
+			if cl >= collector.Config.MaxVal {
 				collector.onLevelUp(plugin, gameProp, curpr, gp, -1, false)
 
 				break
