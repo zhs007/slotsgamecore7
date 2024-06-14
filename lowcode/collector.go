@@ -180,7 +180,7 @@ func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 	oldval := cd.Val
 	cd.Val += num
 	if collector.Config.MaxVal > 0 {
-		if cd.Val > collector.Config.MaxVal {
+		if cd.Val >= collector.Config.MaxVal {
 			if collector.Config.IsCycle {
 				cd.Val -= collector.Config.MaxVal
 			} else {
