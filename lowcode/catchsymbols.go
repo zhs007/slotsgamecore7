@@ -80,9 +80,15 @@ func findNearest(sx int, sy int, targetpos []int) int {
 	return ci
 }
 
-func moveToX(gs *sgc7game.GameScene, sx int, sy int, tx int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData) {
+func moveToX(gs *sgc7game.GameScene, sx int, sy int, tx int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData, ignoreStart bool) {
 	if sx > tx {
 		for x := sx; x >= tx; x-- {
+			if ignoreStart {
+				ignoreStart = false
+
+				continue
+			}
+
 			if goutils.IndexOfIntSlice(ignoreSyms, gs.Arr[x][sy], 0) < 0 {
 				if x == tx {
 					gs.Arr[x][sy] = endingSym
@@ -95,6 +101,12 @@ func moveToX(gs *sgc7game.GameScene, sx int, sy int, tx int, overrideSym int, en
 		}
 	} else if sx < tx {
 		for x := sx; x <= tx; x++ {
+			if ignoreStart {
+				ignoreStart = false
+
+				continue
+			}
+
 			if goutils.IndexOfIntSlice(ignoreSyms, gs.Arr[x][sy], 0) < 0 {
 				if x == tx {
 					gs.Arr[x][sy] = endingSym
@@ -112,9 +124,15 @@ func moveToX(gs *sgc7game.GameScene, sx int, sy int, tx int, overrideSym int, en
 	}
 }
 
-func moveToY(gs *sgc7game.GameScene, sx int, sy int, ty int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData) {
+func moveToY(gs *sgc7game.GameScene, sx int, sy int, ty int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData, ignoreStart bool) {
 	if sy > ty {
 		for y := sy; y >= ty; y-- {
+			if ignoreStart {
+				ignoreStart = false
+
+				continue
+			}
+
 			if goutils.IndexOfIntSlice(ignoreSyms, gs.Arr[sx][y], 0) < 0 {
 				if y == ty {
 					gs.Arr[sx][y] = endingSym
@@ -127,6 +145,12 @@ func moveToY(gs *sgc7game.GameScene, sx int, sy int, ty int, overrideSym int, en
 		}
 	} else if sy < ty {
 		for y := sy; y <= ty; y++ {
+			if ignoreStart {
+				ignoreStart = false
+
+				continue
+			}
+
 			if goutils.IndexOfIntSlice(ignoreSyms, gs.Arr[sx][y], 0) < 0 {
 				if y == ty {
 					gs.Arr[sx][y] = endingSym
@@ -144,21 +168,22 @@ func moveToY(gs *sgc7game.GameScene, sx int, sy int, ty int, overrideSym int, en
 	}
 }
 
-func moveTo(gs *sgc7game.GameScene, sx int, sy int, tx int, ty int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData) {
+func moveTo(gs *sgc7game.GameScene, sx int, sy int, tx int, ty int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData, ignoreStart bool) {
 	if sx != tx && sy != ty {
-		moveToX(gs, sx, sy, tx, overrideSym, overrideSym, ignoreSyms, csd)
+		moveToX(gs, sx, sy, tx, overrideSym, overrideSym, ignoreSyms, csd, ignoreStart)
 		sx = tx
 
-		moveToY(gs, sx, sy, ty, overrideSym, endingSym, ignoreSyms, csd)
+		moveToY(gs, sx, sy, ty, overrideSym, endingSym, ignoreSyms, csd, true)
 	} else if sx != tx {
-		moveToX(gs, sx, sy, tx, overrideSym, endingSym, ignoreSyms, csd)
+		moveToX(gs, sx, sy, tx, overrideSym, endingSym, ignoreSyms, csd, ignoreStart)
 	} else if sy != ty {
-		moveToY(gs, sx, sy, ty, overrideSym, endingSym, ignoreSyms, csd)
+		moveToY(gs, sx, sy, ty, overrideSym, endingSym, ignoreSyms, csd, ignoreStart)
 	}
 }
 
 func procOneCatchAll(gs *sgc7game.GameScene, sx int, sy int, targetpos []int, overrideSym int, endingSym int, ignoreSyms []int, csd *CatchSymbolsData) {
 	csd.newData()
+	ignoreStart := false
 
 	for {
 		if len(targetpos) == 0 {
@@ -170,17 +195,19 @@ func procOneCatchAll(gs *sgc7game.GameScene, sx int, sy int, targetpos []int, ov
 		ty := targetpos[ti*2+1]
 
 		if len(targetpos) == 2 {
-			moveTo(gs, sx, sy, tx, ty, overrideSym, endingSym, ignoreSyms, csd)
+			moveTo(gs, sx, sy, tx, ty, overrideSym, endingSym, ignoreSyms, csd, ignoreStart)
 
 			break
 		}
 
-		moveTo(gs, sx, sy, tx, ty, overrideSym, overrideSym, ignoreSyms, csd)
+		moveTo(gs, sx, sy, tx, ty, overrideSym, overrideSym, ignoreSyms, csd, ignoreStart)
 
 		sx = tx
 		sy = ty
 
 		targetpos = append(targetpos[0:ti*2], targetpos[(ti+1)*2:]...)
+
+		ignoreStart = true
 	}
 }
 
@@ -191,7 +218,7 @@ func procAllCatchOne(gs *sgc7game.GameScene, srcpos []int, tx int, ty int, overr
 		sx := srcpos[i*2]
 		sy := srcpos[i*2+1]
 
-		moveTo(gs, sx, sy, tx, ty, overrideSym, endingSym, ignoreSyms, csd)
+		moveTo(gs, sx, sy, tx, ty, overrideSym, endingSym, ignoreSyms, csd, false)
 	}
 }
 
