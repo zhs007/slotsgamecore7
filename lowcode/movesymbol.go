@@ -361,6 +361,10 @@ func (moveSymbol *MoveSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			continue
 		}
 
+		if targetx == srcx && targety == srcy {
+			continue
+		}
+
 		msd.newData()
 
 		symbolCode := v.TargetSymbolCode
