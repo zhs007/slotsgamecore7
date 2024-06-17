@@ -273,8 +273,8 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					// Symbol:     gs.Arr[newpos[0]][newpos[1]],
 					Type:       sgc7game.RTSymbolVal,
 					LineIndex:  -1,
-					Pos:        pos,
-					SymbolNums: len(newpos) / 2,
+					Pos:        newpos,
+					SymbolNums: len(pos) / 2,
 					Mul:        1,
 				}
 

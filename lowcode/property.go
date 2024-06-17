@@ -415,9 +415,9 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		if !isok {
 			goutils.Error("GameProperty.SetStrVal:GamePropCurLineData",
 				slog.String("val", val),
-				goutils.Err(ErrInvalidPaytables))
+				goutils.Err(ErrInvalidLineData))
 
-			return ErrInvalidPaytables
+			return ErrInvalidLineData
 		}
 
 		gameProp.CurLineData = v

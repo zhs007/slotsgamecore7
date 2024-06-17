@@ -24,6 +24,9 @@ var (
 	// ErrInvalidPaytables - invalid paytables
 	ErrInvalidPaytables = errors.New("invalid paytables")
 
+	// ErrInvalidLineData - invalid line data
+	ErrInvalidLineData = errors.New("invalid line data")
+
 	// ErrInvalidGamePropertyString - invalid gameProperty string
 	ErrInvalidGamePropertyString = errors.New("invalid gameProperty string")
 
