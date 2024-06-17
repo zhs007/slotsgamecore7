@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -183,41 +184,120 @@ func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
 	return paytables, nil
 }
 
-func loadPaytables(cfg *Config, lstPaytables *ast.Node) error {
-	lst, err := lstPaytables.ArrayUseNode()
+func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
+	if n == nil {
+		goutils.Error("parsePaytable2",
+			goutils.Err(ErrIvalidPayTables))
+
+		return nil, ErrIvalidPayTables
+	}
+
+	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("loadPaytables:ArrayUseNode",
+		goutils.Error("parsePaytable2:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	dataPaytables := []map[string]string{}
+
+	err = sonic.Unmarshal(buf, &dataPaytables)
+	if err != nil {
+		goutils.Error("parsePaytable2:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	paytables := &sgc7game.PayTables{
+		MapPay:     make(map[int][]int),
+		MapSymbols: make(map[string]int),
+	}
+
+	for _, node := range dataPaytables {
+		code, err := goutils.String2Int64(node["Code"])
+		if err != nil {
+			goutils.Error("parsePaytable2:String2Int64:code",
+				slog.String("code", node["Code"]),
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		arr := []int{}
+
+		n := 1
+		for {
+			key := fmt.Sprintf("X%v", n)
+			v, isok := node[key]
+			if !isok {
+				break
+			}
+
+			i64, err := goutils.String2Int64(v)
+			if err != nil {
+				goutils.Error("parsePaytable2:String2Int64:X",
+					slog.String("X", v),
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			arr = append(arr, int(i64))
+
+			n++
+		}
+
+		paytables.MapPay[int(code)] = arr
+
+		// n := 1
+		// for {
+
+		// }
+
+		paytables.MapSymbols[node["Symbol"]] = int(code)
+	}
+
+	return paytables, nil
+}
+
+func loadPaytables(cfg *Config, paytableData *ast.Node) error {
+
+	// lst, err := lstPaytables.ArrayUseNode()
+	// if err != nil {
+	// 	goutils.Error("loadPaytables:ArrayUseNode",
+	// 		goutils.Err(err))
+
+	// 	return err
+	// }
+
+	// for i, v := range lst {
+	// 	name, err := v.Get("fileName").String()
+	// 	if err != nil {
+	// 		goutils.Error("loadPaytables:fileName",
+	// 			slog.Int("i", i),
+	// 			goutils.Err(err))
+
+	// 		return err
+	// 	}
+
+	paytables, err := parsePaytable2(paytableData)
+	if err != nil {
+		goutils.Error("loadPaytables:parsePaytable2",
+			// slog.Int("i", i),
 			goutils.Err(err))
 
 		return err
 	}
 
-	for i, v := range lst {
-		name, err := v.Get("fileName").String()
-		if err != nil {
-			goutils.Error("loadPaytables:fileName",
-				slog.Int("i", i),
-				goutils.Err(err))
+	cfg.Paytables["default"] = "default"
+	cfg.MapPaytables["default"] = paytables
 
-			return err
-		}
-
-		paytables, err := parsePaytables(v.Get("fileJson"))
-		if err != nil {
-			goutils.Error("loadPaytables:parsePaytables",
-				slog.Int("i", i),
-				goutils.Err(err))
-
-			return err
-		}
-
-		cfg.Paytables[name] = name
-		cfg.MapPaytables[name] = paytables
-
-		if i == 0 {
-			cfg.DefaultPaytables = name
-		}
-	}
+	// if i == 0 {
+	cfg.DefaultPaytables = "default"
+	// }
+	// }
 
 	return nil
 }
@@ -1114,7 +1194,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcN
 		return nil, err
 	}
 
-	lstPaytables, err := sonic.Get(data, "repository", "paytableList")
+	paytableData, err := sonic.Get(data, "repository", "paytableData")
 	if err != nil {
 		goutils.Error("NewGame2WithData:Get",
 			slog.String("key", "repository.paytableList"),
@@ -1123,7 +1203,7 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcN
 		return nil, err
 	}
 
-	err = loadPaytables(cfg, &lstPaytables)
+	err = loadPaytables(cfg, &paytableData)
 	if err != nil {
 		goutils.Error("NewGame2WithData:loadPaytables",
 			goutils.Err(err))
