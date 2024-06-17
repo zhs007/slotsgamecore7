@@ -145,44 +145,44 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 // 	return strarr, nil
 // }
 
-func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
-	if n == nil {
-		goutils.Error("parsePaytables",
-			goutils.Err(ErrIvalidPayTables))
+// func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
+// 	if n == nil {
+// 		goutils.Error("parsePaytables",
+// 			goutils.Err(ErrIvalidPayTables))
 
-		return nil, ErrIvalidPayTables
-	}
+// 		return nil, ErrIvalidPayTables
+// 	}
 
-	buf, err := n.MarshalJSON()
-	if err != nil {
-		goutils.Error("parsePaytables:MarshalJSON",
-			goutils.Err(err))
+// 	buf, err := n.MarshalJSON()
+// 	if err != nil {
+// 		goutils.Error("parsePaytables:MarshalJSON",
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	dataPaytables := []*paytableData{}
+// 	dataPaytables := []*paytableData{}
 
-	err = sonic.Unmarshal(buf, &dataPaytables)
-	if err != nil {
-		goutils.Error("parsePaytables:Unmarshal",
-			goutils.Err(err))
+// 	err = sonic.Unmarshal(buf, &dataPaytables)
+// 	if err != nil {
+// 		goutils.Error("parsePaytables:Unmarshal",
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	paytables := &sgc7game.PayTables{
-		MapPay:     make(map[int][]int),
-		MapSymbols: make(map[string]int),
-	}
+// 	paytables := &sgc7game.PayTables{
+// 		MapPay:     make(map[int][]int),
+// 		MapSymbols: make(map[string]int),
+// 	}
 
-	for _, node := range dataPaytables {
-		paytables.MapPay[node.Code] = node.Data
-		paytables.MapSymbols[node.Symbol] = node.Code
-	}
+// 	for _, node := range dataPaytables {
+// 		paytables.MapPay[node.Code] = node.Data
+// 		paytables.MapSymbols[node.Symbol] = node.Code
+// 	}
 
-	return paytables, nil
-}
+// 	return paytables, nil
+// }
 
 func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
 	if n == nil {
