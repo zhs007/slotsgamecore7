@@ -100,6 +100,45 @@ func parseReelSetWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 	return sgc7game.NewValWeights2(vals, weights)
 }
 
+func parseReelSetWeights2(n *ast.Node) (*sgc7game.ValWeights2, error) {
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReelSetWeights2:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	lst := []map[string]string{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseReelSetWeights2:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	vals := []sgc7game.IVal{}
+	weights := []int{}
+
+	for _, v := range lst {
+		vals = append(vals, sgc7game.NewStrValEx(v["val"]))
+		i64, err := goutils.String2Int64(v["weight"])
+		if err != nil {
+			goutils.Error("parseReelSetWeights2:String2Int64",
+				slog.String("weight", v["weight"]),
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		weights = append(weights, int(i64))
+	}
+
+	return sgc7game.NewValWeights2(vals, weights)
+}
+
 func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ValWeights2, error) {
 	buf, err := n.MarshalJSON()
 	if err != nil {

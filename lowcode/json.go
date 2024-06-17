@@ -302,6 +302,37 @@ func loadPaytables(cfg *Config, paytableData *ast.Node) error {
 	return nil
 }
 
+func parseLineData2(n *ast.Node, _ int) (*sgc7game.LineData, error) {
+	if n == nil {
+		goutils.Error("parseLineData",
+			goutils.Err(ErrIvalidReels))
+
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseLineData:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	dataLines := [][]int{}
+
+	err = sonic.Unmarshal(buf, &dataLines)
+	if err != nil {
+		goutils.Error("parseLineData:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	return &sgc7game.LineData{
+		Lines: dataLines,
+	}, nil
+}
+
 func parseLineData(n *ast.Node, _ int) (*sgc7game.LineData, error) {
 	if n == nil {
 		goutils.Error("parseLineData",
@@ -538,7 +569,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			} else {
 				rd, err := parseReels2(v.Get("excelJson"), cfg.GetDefaultPaytables())
 				if err != nil {
-					goutils.Error("loadOtherList:parseReels",
+					goutils.Error("loadOtherList:parseReels2",
 						slog.Int("i", i),
 						goutils.Err(err))
 
@@ -560,16 +591,29 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 			cfg.mapValWeights[name] = vw2
 		} else if t == "ReelSetWeight" {
-			vw2, err := parseReelSetWeights(v.Get("fileJson"))
-			if err != nil {
-				goutils.Error("loadOtherList:parseReelSetWeights",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				vw2, err := parseReelSetWeights(v.Get("fileJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseReelSetWeights",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.mapReelSetWeights[name] = vw2
+			} else {
+				vw2, err := parseReelSetWeights2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseReelSetWeights2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapReelSetWeights[name] = vw2
 			}
-
-			cfg.mapReelSetWeights[name] = vw2
 		} else if t == "SymbolWeight" {
 			vw2, err := parseSymbolWeights(v.Get("fileJson"), cfg.GetDefaultPaytables())
 			if err != nil {
