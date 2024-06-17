@@ -384,6 +384,100 @@ func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData
 	return reelsd, nil
 }
 
+func getReel2Width(dataReels []map[string]string) int {
+	w := 1
+	for _, v := range dataReels {
+		x := 1
+		for ; x < 99; x++ {
+			_, isok := v[fmt.Sprintf("R%v", x)]
+			if !isok {
+				break
+			}
+		}
+
+		if w < x {
+			w = x
+		}
+	}
+
+	return w
+}
+
+func parseReel2(dataReels []map[string]string, x int, paytables *sgc7game.PayTables) ([]int, error) {
+	arr := []int{}
+	for y, obj := range dataReels {
+		str, isok := obj[fmt.Sprintf("R%v", x)]
+		if !isok {
+			return arr, nil
+		}
+
+		str = strings.TrimSpace(str)
+		if str == "" {
+			return arr, nil
+		}
+
+		sc, isok := paytables.MapSymbols[str]
+		if !isok {
+			goutils.Error("parseReel2:MapSymbols",
+				slog.Int("x", x),
+				slog.Int("y", y),
+				goutils.Err(ErrIvalidSymbolInReels))
+
+			return nil, ErrIvalidSymbolInReels
+		}
+
+		arr = append(arr, sc)
+	}
+
+	return arr, nil
+}
+
+func parseReels2(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
+	if n == nil {
+		goutils.Error("parseReels2",
+			goutils.Err(ErrIvalidReels))
+
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReels2:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	dataReels := []map[string]string{}
+
+	err = sonic.Unmarshal(buf, &dataReels)
+	if err != nil {
+		goutils.Error("parseReels2:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	w := getReel2Width(dataReels)
+
+	reelsd := &sgc7game.ReelsData{}
+
+	for x := 1; x <= w; x++ {
+		arr, err := parseReel2(dataReels, x, paytables)
+		if err != nil {
+			goutils.Error("parseReels2:parseReel2",
+				slog.Int("x", x),
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		reelsd.Reels = append(reelsd.Reels, arr)
+	}
+
+	return reelsd, nil
+}
+
 func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 	lst, err := lstOther.ArrayUseNode()
 	if err != nil {
@@ -429,17 +523,31 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 				cfg.DefaultLinedata = name
 			}
 		} else if t == "Reels" {
-			rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
-			if err != nil {
-				goutils.Error("loadOtherList:parseReels",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
+				if err != nil {
+					goutils.Error("loadOtherList:parseReels",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.Reels[name] = name
+				cfg.MapReels[name] = rd
+			} else {
+				rd, err := parseReels2(v.Get("excelJson"), cfg.GetDefaultPaytables())
+				if err != nil {
+					goutils.Error("loadOtherList:parseReels",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.Reels[name] = name
+				cfg.MapReels[name] = rd
 			}
-
-			cfg.Reels[name] = name
-			cfg.MapReels[name] = rd
 		} else if t == "Weights" {
 			vw2, err := parseValWeights(v.Get("fileJson"))
 			if err != nil {
