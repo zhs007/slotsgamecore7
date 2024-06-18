@@ -216,7 +216,7 @@ func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
 	}
 
 	for _, node := range dataPaytables {
-		code, err := goutils.String2Int64(node["Code"])
+		code, err := goutils.String2Int64(strings.TrimSpace(node["Code"]))
 		if err != nil {
 			goutils.Error("parsePaytable2:String2Int64:code",
 				slog.String("code", node["Code"]),
@@ -302,6 +302,76 @@ func loadPaytables(cfg *Config, paytableData *ast.Node) error {
 	return nil
 }
 
+func getLineData2Width(dataLines []map[string]string) int {
+	w := 1
+	for _, v := range dataLines {
+		x := 1
+		for ; x < 99; x++ {
+			_, isok := v[fmt.Sprintf("R%v", x)]
+			if !isok {
+				x--
+
+				break
+			}
+		}
+
+		if w < x {
+			w = x
+		}
+	}
+
+	return w
+}
+
+func parseLineData2(n *ast.Node) (*sgc7game.LineData, error) {
+	if n == nil {
+		goutils.Error("parseLineData2",
+			goutils.Err(ErrIvalidReels))
+
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseLineData2:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	dataLines := []map[string]string{}
+
+	err = sonic.Unmarshal(buf, &dataLines)
+	if err != nil {
+		goutils.Error("parseLineData2:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	w := getLineData2Width(dataLines)
+	ld := &sgc7game.LineData{}
+
+	for _, linedata := range dataLines {
+		arr := []int{}
+		for x := 1; x <= w; x++ {
+			i64, err := goutils.String2Int64(strings.TrimSpace(linedata[fmt.Sprintf("R%v", x)]))
+			if err != nil {
+				goutils.Error("parseLineData2:String2Int64",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			arr = append(arr, int(i64))
+		}
+
+		ld.Lines = append(ld.Lines, arr)
+	}
+
+	return ld, nil
+}
+
 func parseLineData(n *ast.Node, _ int) (*sgc7game.LineData, error) {
 	if n == nil {
 		goutils.Error("parseLineData",
@@ -384,6 +454,102 @@ func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData
 	return reelsd, nil
 }
 
+func getReel2Width(dataReels []map[string]string) int {
+	w := 1
+	for _, v := range dataReels {
+		x := 1
+		for ; x < 99; x++ {
+			_, isok := v[fmt.Sprintf("R%v", x)]
+			if !isok {
+				x--
+
+				break
+			}
+		}
+
+		if w < x {
+			w = x
+		}
+	}
+
+	return w
+}
+
+func parseReel2(dataReels []map[string]string, x int, paytables *sgc7game.PayTables) ([]int, error) {
+	arr := []int{}
+	for y, obj := range dataReels {
+		str, isok := obj[fmt.Sprintf("R%v", x)]
+		if !isok {
+			return arr, nil
+		}
+
+		str = strings.TrimSpace(str)
+		if str == "" {
+			return arr, nil
+		}
+
+		sc, isok := paytables.MapSymbols[str]
+		if !isok {
+			goutils.Error("parseReel2:MapSymbols",
+				slog.Int("x", x),
+				slog.Int("y", y),
+				goutils.Err(ErrIvalidSymbolInReels))
+
+			return nil, ErrIvalidSymbolInReels
+		}
+
+		arr = append(arr, sc)
+	}
+
+	return arr, nil
+}
+
+func parseReels2(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
+	if n == nil {
+		goutils.Error("parseReels2",
+			goutils.Err(ErrIvalidReels))
+
+		return nil, ErrIvalidReels
+	}
+
+	buf, err := n.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReels2:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	dataReels := []map[string]string{}
+
+	err = sonic.Unmarshal(buf, &dataReels)
+	if err != nil {
+		goutils.Error("parseReels2:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	w := getReel2Width(dataReels)
+
+	reelsd := &sgc7game.ReelsData{}
+
+	for x := 1; x <= w; x++ {
+		arr, err := parseReel2(dataReels, x, paytables)
+		if err != nil {
+			goutils.Error("parseReels2:parseReel2",
+				slog.Int("x", x),
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		reelsd.Reels = append(reelsd.Reels, arr)
+	}
+
+	return reelsd, nil
+}
+
 func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 	lst, err := lstOther.ArrayUseNode()
 	if err != nil {
@@ -413,33 +579,61 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 		}
 
 		if t == "Linedata" {
-			ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
-			if err != nil {
-				goutils.Error("loadOtherList:parseLineData",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
+				if err != nil {
+					goutils.Error("loadOtherList:parseLineData",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.Linedata[name] = name
+				cfg.MapLinedate[name] = ld
+			} else {
+				ld, err := parseLineData2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseLineData2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.Linedata[name] = name
+				cfg.MapLinedate[name] = ld
 			}
-
-			cfg.Linedata[name] = name
-			cfg.MapLinedate[name] = ld
 
 			if len(cfg.Linedata) == 1 {
 				cfg.DefaultLinedata = name
 			}
 		} else if t == "Reels" {
-			rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
-			if err != nil {
-				goutils.Error("loadOtherList:parseReels",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
+				if err != nil {
+					goutils.Error("loadOtherList:parseReels",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.Reels[name] = name
+				cfg.MapReels[name] = rd
+			} else {
+				rd, err := parseReels2(v.Get("excelJson"), cfg.GetDefaultPaytables())
+				if err != nil {
+					goutils.Error("loadOtherList:parseReels2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.Reels[name] = name
+				cfg.MapReels[name] = rd
 			}
-
-			cfg.Reels[name] = name
-			cfg.MapReels[name] = rd
 		} else if t == "Weights" {
 			vw2, err := parseValWeights(v.Get("fileJson"))
 			if err != nil {
@@ -452,31 +646,129 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 			cfg.mapValWeights[name] = vw2
 		} else if t == "ReelSetWeight" {
-			vw2, err := parseReelSetWeights(v.Get("fileJson"))
-			if err != nil {
-				goutils.Error("loadOtherList:parseReelSetWeights",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				vw2, err := parseReelSetWeights(v.Get("fileJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseReelSetWeights",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.mapReelSetWeights[name] = vw2
+			} else {
+				vw2, err := parseReelSetWeights2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseReelSetWeights2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapReelSetWeights[name] = vw2
 			}
-
-			cfg.mapReelSetWeights[name] = vw2
 		} else if t == "SymbolWeight" {
-			vw2, err := parseSymbolWeights(v.Get("fileJson"), cfg.GetDefaultPaytables())
-			if err != nil {
-				goutils.Error("loadOtherList:parseSymbolWeights",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				vw2, err := parseSymbolWeights(v.Get("fileJson"), cfg.GetDefaultPaytables())
+				if err != nil {
+					goutils.Error("loadOtherList:parseSymbolWeights",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.mapValWeights[name] = vw2
+			} else {
+				vw2, err := parseSymbolWeights2(v.Get("excelJson"), cfg.GetDefaultPaytables())
+				if err != nil {
+					goutils.Error("loadOtherList:parseSymbolWeights2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapValWeights[name] = vw2
 			}
-
-			cfg.mapValWeights[name] = vw2
 		} else if t == "IntValMappingFile" {
-			vm2, err := parseIntValMappingFile(v.Get("fileJson"))
+			if v.Get("fileJson") != nil {
+				vm2, err := parseIntValMappingFile(v.Get("fileJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseSymbolWeights",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapIntMapping[name] = vm2
+			} else {
+				vm2, err := parseIntValMappingFile2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseIntValMappingFile2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapIntMapping[name] = vm2
+			}
+		} else if t == "StringValWeight" {
+			if v.Get("fileJson") != nil {
+				vm2, err := parseStrWeights(v.Get("fileJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseStrWeights",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapStrWeights[name] = vm2
+			} else {
+				vm2, err := parseStrWeights2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseStrWeights2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapStrWeights[name] = vm2
+			}
+		} else if t == "IntValWeight" {
+			if v.Get("fileJson") != nil {
+				vm2, err := parseIntValWeights(v.Get("fileJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseIntValWeights",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapValWeights[name] = vm2
+			} else {
+				vm2, err := parseIntValWeights2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseIntValWeights2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.mapValWeights[name] = vm2
+			}
+		} else if t == "StringValMappingFile" {
+			vm2, err := parseStringValMappingFile2(v.Get("excelJson"))
 			if err != nil {
-				goutils.Error("loadOtherList:parseSymbolWeights",
+				goutils.Error("loadOtherList:parseStringValMappingFile2",
 					slog.Int("i", i),
 					goutils.Err(err))
 
@@ -484,28 +776,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapIntMapping[name] = vm2
-		} else if t == "StringValWeight" {
-			vm2, err := parseStrWeights(v.Get("fileJson"))
-			if err != nil {
-				goutils.Error("loadOtherList:parseStrWeights",
-					slog.Int("i", i),
-					goutils.Err(err))
 
-				return err
-			}
-
-			cfg.mapStrWeights[name] = vm2
-		} else if t == "IntValWeight" {
-			vm2, err := parseIntValWeights(v.Get("fileJson"))
-			if err != nil {
-				goutils.Error("loadOtherList:parseIntValWeights",
-					slog.Int("i", i),
-					goutils.Err(err))
-
-				return err
-			}
-
-			cfg.mapValWeights[name] = vm2
 		} else {
 			goutils.Error("loadOtherList",
 				slog.Int("i", i),

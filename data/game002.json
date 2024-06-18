@@ -27550,7 +27550,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isExpandReel": "false",
+                                "isExpandReel": false,
                                 "reelSetWeight": "reelsweight"
                             },
                             "label": "bg-spin"
@@ -29651,7 +29651,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isExpandReel": "false",
+                                "isExpandReel": false,
                                 "reelSetWeight": "fgreelsweight"
                             },
                             "label": "fg-spin",

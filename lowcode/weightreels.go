@@ -246,13 +246,13 @@ func NewWeightReels(name string) IComponent {
 //	}
 type jsonWeightReels struct {
 	ReelSetWeight string `json:"reelSetWeight"`
-	IsExpandReel  string `json:"isExpandReel"`
+	IsExpandReel  bool   `json:"isExpandReel"`
 }
 
 func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 	cfg := &WeightReelsConfig{
 		ReelSetsWeight: jwr.ReelSetWeight,
-		IsExpandReel:   jwr.IsExpandReel == "true",
+		IsExpandReel:   jwr.IsExpandReel,
 	}
 
 	// cfg.UseSceneV3 = true

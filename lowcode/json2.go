@@ -10,9 +10,15 @@ import (
 )
 
 func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
-	componentValues := cell.Get("componentValues")
+	var componentValues *ast.Node
+	if cell.Get("componentValues") != nil {
+		componentValues = cell.Get("componentValues")
+	} else {
+		componentValues = cell.Get("data")
+	}
+
 	if componentValues == nil {
-		goutils.Error("getConfigInCell:componentValues",
+		goutils.Error("getConfigInCell:componentValues|data",
 			goutils.Err(ErrNoComponentValues))
 
 		return nil, "", nil, ErrNoComponentValues
