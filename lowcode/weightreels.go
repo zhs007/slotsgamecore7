@@ -260,6 +260,22 @@ func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 	return cfg
 }
 
+type jsonWeightReels2 struct {
+	ReelSetWeight string `json:"reelSetWeight"`
+	IsExpandReel  string `json:"isExpandReel"`
+}
+
+func (jwr *jsonWeightReels2) build() *WeightReelsConfig {
+	cfg := &WeightReelsConfig{
+		ReelSetsWeight: jwr.ReelSetWeight,
+		IsExpandReel:   jwr.IsExpandReel == "true",
+	}
+
+	// cfg.UseSceneV3 = true
+
+	return cfg
+}
+
 func parseWeightReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
@@ -278,16 +294,24 @@ func parseWeightReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	data := &jsonWeightReels{}
+	var cfgd *WeightReelsConfig
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
-		goutils.Error("parseWeightReels:Unmarshal",
-			goutils.Err(err))
+		data2 := &jsonWeightReels2{}
 
-		return "", err
+		err = sonic.Unmarshal(buf, data2)
+		if err != nil {
+			goutils.Error("parseWeightReels:Unmarshal",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd = data2.build()
+	} else {
+		cfgd = data.build()
 	}
-
-	cfgd := data.build()
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
