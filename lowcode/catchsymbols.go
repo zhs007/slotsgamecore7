@@ -471,6 +471,8 @@ func (catchSymbols *CatchSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	csd := cd.(*CatchSymbolsData)
 
+	csd.OnNewStep()
+
 	gs := catchSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	srcpos := []int{}
