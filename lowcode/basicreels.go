@@ -226,6 +226,22 @@ func (jbr *jsonBasicReels) build() *BasicReelsConfig {
 	return cfg
 }
 
+type jsonBasicReels2 struct {
+	ReelSet      string `json:"reelSet"`
+	IsExpandReel string `json:"isExpandReel"`
+}
+
+func (jbr *jsonBasicReels2) build() *BasicReelsConfig {
+	cfg := &BasicReelsConfig{
+		ReelSet:      jbr.ReelSet,
+		IsExpandReel: jbr.IsExpandReel == "true",
+	}
+
+	// cfg.UseSceneV3 = true
+
+	return cfg
+}
+
 func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
@@ -244,16 +260,24 @@ func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	data := &jsonBasicReels{}
+	var cfgd *BasicReelsConfig
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
-		goutils.Error("parseBasicReels:Unmarshal",
-			goutils.Err(err))
+		data2 := &jsonBasicReels2{}
 
-		return "", err
+		err = sonic.Unmarshal(buf, data2)
+		if err != nil {
+			goutils.Error("parseBasicReels:Unmarshal",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd = data2.build()
+	} else {
+		cfgd = data.build()
 	}
-
-	cfgd := data.build()
 
 	if ctrls != nil {
 		awards, err := parseControllers(ctrls)

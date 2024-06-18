@@ -361,6 +361,8 @@ func (burstSymbols *BurstSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	bsd := cd.(*BurstSymbolsData)
 
+	bsd.OnNewStep()
+
 	gs := burstSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if burstSymbols.Config.SourceType == BSSTypePositionCollection {
