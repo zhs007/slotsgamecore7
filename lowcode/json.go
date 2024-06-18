@@ -302,9 +302,30 @@ func loadPaytables(cfg *Config, paytableData *ast.Node) error {
 	return nil
 }
 
-func parseLineData2(n *ast.Node, _ int) (*sgc7game.LineData, error) {
+func getLineData2Width(dataLines []map[string]string) int {
+	w := 1
+	for _, v := range dataLines {
+		x := 1
+		for ; x < 99; x++ {
+			_, isok := v[fmt.Sprintf("R%v", x)]
+			if !isok {
+				x--
+
+				break
+			}
+		}
+
+		if w < x {
+			w = x
+		}
+	}
+
+	return w
+}
+
+func parseLineData2(n *ast.Node) (*sgc7game.LineData, error) {
 	if n == nil {
-		goutils.Error("parseLineData",
+		goutils.Error("parseLineData2",
 			goutils.Err(ErrIvalidReels))
 
 		return nil, ErrIvalidReels
@@ -312,25 +333,43 @@ func parseLineData2(n *ast.Node, _ int) (*sgc7game.LineData, error) {
 
 	buf, err := n.MarshalJSON()
 	if err != nil {
-		goutils.Error("parseLineData:MarshalJSON",
+		goutils.Error("parseLineData2:MarshalJSON",
 			goutils.Err(err))
 
 		return nil, err
 	}
 
-	dataLines := [][]int{}
+	dataLines := []map[string]string{}
 
 	err = sonic.Unmarshal(buf, &dataLines)
 	if err != nil {
-		goutils.Error("parseLineData:Unmarshal",
+		goutils.Error("parseLineData2:Unmarshal",
 			goutils.Err(err))
 
 		return nil, err
 	}
 
-	return &sgc7game.LineData{
-		Lines: dataLines,
-	}, nil
+	w := getLineData2Width(dataLines)
+	ld := &sgc7game.LineData{}
+
+	for _, linedata := range dataLines {
+		arr := []int{}
+		for x := 1; x <= w; x++ {
+			i64, err := goutils.String2Int64(linedata[fmt.Sprintf("R%v", x)])
+			if err != nil {
+				goutils.Error("parseLineData2:String2Int64",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			arr = append(arr, int(i64))
+		}
+
+		ld.Lines = append(ld.Lines, arr)
+	}
+
+	return ld, nil
 }
 
 func parseLineData(n *ast.Node, _ int) (*sgc7game.LineData, error) {
@@ -422,6 +461,8 @@ func getReel2Width(dataReels []map[string]string) int {
 		for ; x < 99; x++ {
 			_, isok := v[fmt.Sprintf("R%v", x)]
 			if !isok {
+				x--
+
 				break
 			}
 		}
@@ -538,17 +579,31 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 		}
 
 		if t == "Linedata" {
-			ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
-			if err != nil {
-				goutils.Error("loadOtherList:parseLineData",
-					slog.Int("i", i),
-					goutils.Err(err))
+			if v.Get("fileJson") != nil {
+				ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
+				if err != nil {
+					goutils.Error("loadOtherList:parseLineData",
+						slog.Int("i", i),
+						goutils.Err(err))
 
-				return err
+					return err
+				}
+
+				cfg.Linedata[name] = name
+				cfg.MapLinedate[name] = ld
+			} else {
+				ld, err := parseLineData2(v.Get("excelJson"))
+				if err != nil {
+					goutils.Error("loadOtherList:parseLineData2",
+						slog.Int("i", i),
+						goutils.Err(err))
+
+					return err
+				}
+
+				cfg.Linedata[name] = name
+				cfg.MapLinedate[name] = ld
 			}
-
-			cfg.Linedata[name] = name
-			cfg.MapLinedate[name] = ld
 
 			if len(cfg.Linedata) == 1 {
 				cfg.DefaultLinedata = name
