@@ -92,6 +92,8 @@ func (scatterTriggerData *ScatterTriggerData) GetVal(key string) (int, bool) {
 		return scatterTriggerData.RespinNum, true
 	} else if key == CVWins {
 		return scatterTriggerData.Wins, true
+	} else if key == CVResultNum {
+		return len(scatterTriggerData.UsedResults), true
 	}
 
 	return 0, false

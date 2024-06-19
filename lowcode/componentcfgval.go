@@ -32,4 +32,5 @@ const (
 	CVAvgHeight             string = "avgHeight"             // avgHeight
 	CVWinMulti              string = "winMulti"              // winMulti
 	CVNumber                string = "number"                // number
+	CVResultNum             string = "resultNum"             // 触发后，中奖的数量
 )
