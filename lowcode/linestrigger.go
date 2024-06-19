@@ -94,6 +94,8 @@ func (linesTriggerData *LinesTriggerData) GetVal(key string) (int, bool) {
 		return linesTriggerData.RespinNum, true
 	} else if key == CVWins {
 		return linesTriggerData.Wins, true
+	} else if key == CVResultNum {
+		return len(linesTriggerData.UsedResults), true
 	}
 
 	return 0, false

@@ -96,6 +96,8 @@ func (symbolValWinsData *SymbolValWinsData) GetVal(key string) (int, bool) {
 		return symbolValWinsData.SymbolNum, true
 	} else if key == SVWDVWins {
 		return symbolValWinsData.Wins, true
+	} else if key == CVResultNum {
+		return len(symbolValWinsData.UsedResults), true
 	}
 	// } else if key == SVWDVCollectorNum {
 	// 	return symbolValWinsData.CollectorNum

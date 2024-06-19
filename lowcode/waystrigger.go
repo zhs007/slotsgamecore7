@@ -91,6 +91,8 @@ func (waysTriggerData *WaysTriggerData) GetVal(key string) (int, bool) {
 		return waysTriggerData.RespinNum, true
 	} else if key == CVWins {
 		return waysTriggerData.Wins, true
+	} else if key == CVResultNum {
+		return len(waysTriggerData.UsedResults), true
 	}
 
 	return 0, false
