@@ -12207,8 +12207,8 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "false",
-                                "isUseSource": "false",
+                                "isAlwaysGen": false,
+                                "isUseSource": false,
                                 "symbols": [
                                     "E"
                                 ],
@@ -13064,8 +13064,8 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "false",
-                                "isUseSource": "false",
+                                "isAlwaysGen": false,
+                                "isUseSource": false,
                                 "symbols": [
                                     "E"
                                 ],
@@ -14691,7 +14691,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isCycle": "false",
+                                "isCycle": false,
                                 "maxVal": 12
                             },
                             "label": "fg-collect"
@@ -15739,8 +15739,8 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "false",
-                                "isUseSource": "true",
+                                "isAlwaysGen": false,
+                                "isUseSource": true,
                                 "symbols": [
                                     "E"
                                 ],
@@ -16865,8 +16865,8 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "false",
-                                "isUseSource": "true",
+                                "isAlwaysGen": false,
+                                "isUseSource": true,
                                 "symbols": [
                                     "E"
                                 ],
