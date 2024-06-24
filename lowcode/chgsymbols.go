@@ -270,6 +270,11 @@ func (chgSymbols *ChgSymbols) GetBranchNum() int {
 	return len(chgSymbols.Config.WeightVW2.Vals)
 }
 
+// GetBranchWeights -
+func (chgSymbols *ChgSymbols) GetBranchWeights() []int {
+	return chgSymbols.Config.WeightVW2.Weights
+}
+
 // RollSymbol -
 func (chgSymbols *ChgSymbols) RollSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData) (int, error) {
 	if bcd.ForceBranchIndex > 0 && !gIsReleaseMode {

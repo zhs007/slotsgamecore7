@@ -60,6 +60,9 @@ var (
 	// ErrIvalidGameData - invalid gameData
 	ErrIvalidGameData = errors.New("invalid gameData")
 
+	// ErrIvalidSimpleRNG - invalid SimpleRNG
+	ErrIvalidSimpleRNG = errors.New("invalid SimpleRNG")
+
 	// ErrIvalidCmd - invalid cmd
 	ErrIvalidCmd = errors.New("invalid cmd")
 	// ErrIvalidCmdParam - invalid cmdparam
