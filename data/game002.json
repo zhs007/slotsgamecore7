@@ -28603,8 +28603,8 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "true",
-                                "isUseSource": "true",
+                                "isAlwaysGen": true,
+                                "isUseSource": true,
                                 "symbols": [
                                     "M"
                                 ],
@@ -29931,8 +29931,8 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "false",
-                                "isUseSource": "true",
+                                "isAlwaysGen": false,
+                                "isUseSource": true,
                                 "symbols": [
                                     "M"
                                 ],
@@ -33606,7 +33606,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isAlwaysGen": "true",
+                                "isAlwaysGen": true,
                                 "defaultVal": 0
                             },
                             "label": "fg-initmulti"
