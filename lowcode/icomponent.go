@@ -98,4 +98,6 @@ type IComponent interface {
 
 	// GetBranchNum -
 	GetBranchNum() int
+	// GetBranchWeights -
+	GetBranchWeights() []int
 }

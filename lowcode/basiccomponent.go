@@ -481,6 +481,11 @@ func (basicComponent *BasicComponent) GetBranchNum() int {
 	return 0
 }
 
+// GetBranchWeights -
+func (basicComponent *BasicComponent) GetBranchWeights() []int {
+	return nil
+}
+
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
 		Name:        name,
