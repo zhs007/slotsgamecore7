@@ -324,7 +324,7 @@ func NewRemoveSymbols(name string) IComponent {
 type jsonRemoveSymbols struct {
 	TargetComponents     []string `json:"targetComponents"`                                 // 这些组件的中奖会需要参与remove
 	IgnoreSymbols        []string `json:"ignoreSymbols"`                                    // 忽略的symbol
-	IsNeedProcSymbolVals string   `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 }
 
@@ -332,7 +332,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	cfg := &RemoveSymbolsConfig{
 		TargetComponents:     jcfg.TargetComponents,
 		IgnoreSymbols:        jcfg.IgnoreSymbols,
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals == "true",
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 	}
 

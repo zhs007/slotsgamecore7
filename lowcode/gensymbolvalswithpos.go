@@ -244,8 +244,8 @@ type jsonGenSymbolValsWithPos struct {
 	TargetComponents []string `json:"targetComponents"`
 	StrType          string   `json:"genType"`
 	ValMapping       string   `json:"valMapping"`
-	IsUseSource      string   `json:"isUseSource"`
-	IsAlwaysGen      string   `json:"isAlwaysGen"`
+	IsUseSource      bool     `json:"isUseSource"`
+	IsAlwaysGen      bool     `json:"isAlwaysGen"`
 	DefaultVal       int      `json:"defaultVal"`
 	MaxVal           int      `json:"maxVal"`
 	MinVal           int      `json:"minVal"`
@@ -256,8 +256,8 @@ func (jcfg *jsonGenSymbolValsWithPos) build() *GenSymbolValsWithPosConfig {
 		StrType:          jcfg.StrType,
 		TargetComponents: jcfg.TargetComponents,
 		ValMapping:       jcfg.ValMapping,
-		IsUseSource:      jcfg.IsUseSource == "true",
-		IsAlwaysGen:      jcfg.IsAlwaysGen == "true",
+		IsUseSource:      jcfg.IsUseSource,
+		IsAlwaysGen:      jcfg.IsAlwaysGen,
 		DefaultVal:       jcfg.DefaultVal,
 		MaxVal:           jcfg.MaxVal,
 		MinVal:           jcfg.MinVal,

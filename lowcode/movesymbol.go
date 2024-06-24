@@ -513,9 +513,9 @@ type jsonMoveData struct {
 	Target         *SelectPosData `json:"target"`
 	MoveType       string         `json:"moveType"`
 	TargetSymbol   string         `json:"targetSymbol"`
-	OverrideSrc    string         `json:"overrideSrc"`
-	OverrideTarget string         `json:"overrideTarget"`
-	OverridePath   string         `json:"overridePath"`
+	OverrideSrc    bool           `json:"overrideSrc"`
+	OverrideTarget bool           `json:"overrideTarget"`
+	OverridePath   bool           `json:"overridePath"`
 }
 type jsonMoveSymbol struct {
 	MoveData []*jsonMoveData `json:"moveData"`
@@ -530,9 +530,9 @@ func (jms *jsonMoveSymbol) build() *MoveSymbolConfig {
 			Target:         v.Target,
 			MoveType:       v.MoveType,
 			TargetSymbol:   v.TargetSymbol,
-			OverrideSrc:    v.OverrideSrc == "true",
-			OverrideTarget: v.OverrideTarget == "true",
-			OverridePath:   v.OverridePath == "true",
+			OverrideSrc:    v.OverrideSrc,
+			OverrideTarget: v.OverrideTarget,
+			OverridePath:   v.OverridePath,
 		}
 
 		if cmd.Src.X > 0 {
