@@ -263,8 +263,8 @@ type jsonGenSymbolValsWithSymbol struct {
 	Symbols     []string `json:"symbols"`
 	Weight      string   `json:"weight"`
 	DefaultVal  int      `json:"defaultVal"`
-	IsUseSource string   `json:"isUseSource"`
-	IsAlwaysGen string   `json:"isAlwaysGen"`
+	IsUseSource bool     `json:"isUseSource"`
+	IsAlwaysGen bool     `json:"isAlwaysGen"`
 }
 
 func (jcfg *jsonGenSymbolValsWithSymbol) build() *GenSymbolValsWithSymbolConfig {
@@ -273,8 +273,8 @@ func (jcfg *jsonGenSymbolValsWithSymbol) build() *GenSymbolValsWithSymbolConfig 
 		Symbols:     jcfg.Symbols,
 		Weight:      jcfg.Weight,
 		DefaultVal:  jcfg.DefaultVal,
-		IsUseSource: jcfg.IsUseSource == "true",
-		IsAlwaysGen: jcfg.IsAlwaysGen == "true",
+		IsUseSource: jcfg.IsUseSource,
+		IsAlwaysGen: jcfg.IsAlwaysGen,
 	}
 
 	// cfg.UseSceneV3 = true
