@@ -264,14 +264,14 @@ func NewPositionCollection(name string) IComponent {
 // ]
 type jsonPositionCollection struct {
 	Type          string  `json:"type"`          // type
-	IsNeedClear   string  `json:"isNeedClear"`   // isNeedClear
+	IsNeedClear   bool    `json:"isNeedClear"`   // isNeedClear
 	InitPositions [][]int `json:"initPositions"` // initPositions
 }
 
 func (jcfg *jsonPositionCollection) build() *PositionCollectionConfig {
 	cfg := &PositionCollectionConfig{
 		StrType:     jcfg.Type,
-		IsNeedClear: jcfg.IsNeedClear == "true",
+		IsNeedClear: jcfg.IsNeedClear,
 	}
 
 	for _, arr := range jcfg.InitPositions {

@@ -189,14 +189,14 @@ func NewRefillSymbols(name string) IComponent {
 
 // "configuration": {},
 type jsonRefillSymbols struct {
-	IsNeedProcSymbolVals string `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int    `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	DefaultSymbolVal     int    `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
+	IsNeedProcSymbolVals bool `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	DefaultSymbolVal     int  `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
 }
 
 func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
 	cfg := &RefillSymbolsConfig{
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals == "true",
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		DefaultSymbolVal:     jcfg.DefaultSymbolVal,
 	}

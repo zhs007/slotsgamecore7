@@ -31529,7 +31529,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isNeedProcSymbolVals": "true",
+                                "isNeedProcSymbolVals": true,
                                 "targetComponents": [
                                     "bg-pay"
                                 ],
@@ -31794,7 +31794,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isNeedProcSymbolVals": "true",
+                                "isNeedProcSymbolVals": true,
                                 "emptySymbolVal": -1
                             },
                             "label": "bg-dropdown"
@@ -32053,7 +32053,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isNeedProcSymbolVals": "true",
+                                "isNeedProcSymbolVals": true,
                                 "emptySymbolVal": -1,
                                 "defaultSymbolVal": 0
                             },
@@ -32583,7 +32583,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isNeedProcSymbolVals": "true",
+                                "isNeedProcSymbolVals": true,
                                 "emptySymbolVal": -1
                             },
                             "label": "fg-rmsyms",
@@ -32845,7 +32845,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isNeedProcSymbolVals": "true",
+                                "isNeedProcSymbolVals": true,
                                 "emptySymbolVal": -1
                             },
                             "label": "fg-dropdown"
@@ -33104,7 +33104,7 @@
                         "componentValues": {
                             "labelIsError": false,
                             "configuration": {
-                                "isNeedProcSymbolVals": "true",
+                                "isNeedProcSymbolVals": true,
                                 "emptySymbolVal": -1,
                                 "defaultSymbolVal": 0
                             },

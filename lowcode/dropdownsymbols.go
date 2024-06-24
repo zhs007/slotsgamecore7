@@ -203,14 +203,14 @@ func NewDropDownSymbols(name string) IComponent {
 // "configuration": {},
 type jsonDropDownSymbols struct {
 	HoldSymbols          []string `json:"holdSymbols"`                                      // 不需要下落的symbol
-	IsNeedProcSymbolVals string   `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 }
 
 func (jcfg *jsonDropDownSymbols) build() *DropDownSymbolsConfig {
 	cfg := &DropDownSymbolsConfig{
 		HoldSymbols:          jcfg.HoldSymbols,
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals == "true",
+		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 	}
 
