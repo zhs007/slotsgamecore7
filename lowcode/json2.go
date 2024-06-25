@@ -25,12 +25,12 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 	}
 
 	cfg := componentValues.Get("configuration")
-	if cfg == nil {
-		goutils.Error("getConfigInCell:configuration",
-			goutils.Err(ErrInvalidJsonNode))
+	// if cfg == nil {
+	// 	goutils.Error("getConfigInCell:configuration",
+	// 		goutils.Err(ErrInvalidJsonNode))
 
-		return nil, "", nil, ErrInvalidJsonNode
-	}
+	// 	return nil, "", nil, ErrInvalidJsonNode
+	// }
 
 	label := componentValues.Get("label")
 	if label == nil {
