@@ -40,9 +40,9 @@ func (rng *SimpleRNG) GetCurRNG(curComponent IComponent, cd IComponentData, fl I
 					rng.curIndex++
 				}
 			}
-		}
 
-		return false, -1, rng.plugin, ""
+			return false, -1, rng.plugin, ""
+		}
 	}
 
 	return false, -1, rng.curPlugin, ""
