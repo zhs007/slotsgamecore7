@@ -217,7 +217,15 @@ func (winResultMulti *WinResultMulti) NewComponentData() IComponentData {
 func (winResultMulti *WinResultMulti) GetWinMulti(basicCD *BasicComponentData) int {
 	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
+		if winMulti <= 0 {
+			return 1
+		}
+		
 		return winMulti
+	}
+
+	if winResultMulti.Config.WinMulti <= 0 {
+		return 1
 	}
 
 	return winResultMulti.Config.WinMulti

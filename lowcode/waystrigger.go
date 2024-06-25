@@ -761,7 +761,15 @@ func (waysTrigger *WaysTrigger) NewComponentData() IComponentData {
 func (waysTrigger *WaysTrigger) GetWinMulti(basicCD *BasicComponentData) int {
 	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
+		if winMulti <= 0 {
+			return 1
+		}
+
 		return winMulti
+	}
+
+	if waysTrigger.Config.WinMulti <= 0 {
+		return 1
 	}
 
 	return waysTrigger.Config.WinMulti
