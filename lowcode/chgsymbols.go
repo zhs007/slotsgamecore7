@@ -155,6 +155,9 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := icd.(*BasicComponentData)
 
+	cd.UsedScenes = nil
+	cd.SrcScenes = nil
+
 	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs != nil {
 		ngs := gs
