@@ -63,7 +63,7 @@ func (rollNumberData *RollNumberData) BuildPBComponentData() proto.Message {
 
 // GetVal -
 func (rollNumberData *RollNumberData) GetVal(key string) (int, bool) {
-	if key == CVNumber {
+	if key == CVNumber || key == CVOutputInt {
 		return rollNumberData.Number, true
 	}
 
@@ -82,6 +82,7 @@ type RollNumberConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Weight               string                `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2 `json:"-"`
+	Awards               []*Award              `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -142,6 +143,10 @@ func (rollNumber *RollNumber) InitEx(cfg any, pool *GamePropertyPool) error {
 			goutils.Err(ErrIvalidComponentConfig))
 
 		return ErrIvalidComponentConfig
+	}
+
+	for _, award := range rollNumber.Config.Awards {
+		award.Init()
 	}
 
 	rollNumber.onInit(&rollNumber.Config.BasicComponentConfig)
@@ -247,6 +252,10 @@ func (rollSymbol *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	// 	return nc, ErrComponentDoNothing
 	// }
 
+	if len(rollSymbol.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, rollSymbol.Config.Awards, curpr, gp)
+	}
+
 	nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
@@ -305,7 +314,7 @@ func (jcfg *jsonRollNumber) build() *RollNumberConfig {
 }
 
 func parseRollNumber(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRollNumber:getConfigInCell",
 			goutils.Err(err))
@@ -332,6 +341,18 @@ func parseRollNumber(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseRollNumber:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig

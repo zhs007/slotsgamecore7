@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
@@ -211,7 +210,7 @@ func (jcfg *jsonQueueBranch) build() *QueueBranchConfig {
 }
 
 func parseQueueBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	_, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseQueueBranch:getConfigInCell",
 			goutils.Err(err))
@@ -219,23 +218,23 @@ func parseQueueBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		return "", err
 	}
 
-	buf, err := cfg.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseQueueBranch:MarshalJSON",
-			goutils.Err(err))
+	// buf, err := cfg.MarshalJSON()
+	// if err != nil {
+	// 	goutils.Error("parseQueueBranch:MarshalJSON",
+	// 		goutils.Err(err))
 
-		return "", err
-	}
+	// 	return "", err
+	// }
 
 	data := &jsonQueueBranch{}
 
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseQueueBranch:Unmarshal",
-			goutils.Err(err))
+	// err = sonic.Unmarshal(buf, data)
+	// if err != nil {
+	// 	goutils.Error("parseQueueBranch:Unmarshal",
+	// 		goutils.Err(err))
 
-		return "", err
-	}
+	// 	return "", err
+	// }
 
 	cfgd := data.build()
 

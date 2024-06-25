@@ -50,9 +50,15 @@ func (piggyBankData *PiggyBankData) OnNewGame(gameProp *GameProperty, component 
 	piggyBankData.BasicComponentData.OnNewGame(gameProp, component)
 
 	piggyBankData.Wins = 0
-	piggyBankData.WinMulti = 1
 
-	piggyBankData.SetConfigIntVal(CCVWinMulti, 1)
+	piggyBank, isok := component.(*PiggyBank)
+	if isok {
+		piggyBankData.WinMulti = piggyBank.Config.WinMulti
+		piggyBankData.SetConfigIntVal(CCVWinMulti, piggyBank.Config.WinMulti)
+	} else {
+		piggyBankData.WinMulti = 1
+		piggyBankData.SetConfigIntVal(CCVWinMulti, 1)
+	}
 }
 
 // // onNewStep -
@@ -102,6 +108,8 @@ func (piggyBankData *PiggyBankData) GetVal(key string) (int, bool) {
 func (piggyBankData *PiggyBankData) SetVal(key string, val int) {
 	if key == CVWins {
 		piggyBankData.Wins = val
+	} else if key == CVWinMulti {
+		piggyBankData.WinMulti = val
 	}
 }
 
@@ -157,8 +165,8 @@ func (piggyBank *PiggyBank) InitEx(cfg any, pool *GamePropertyPool) error {
 
 	piggyBank.Config.Type = parsePiggyBankType(piggyBank.Config.StrType)
 
-	if piggyBank.Config.WinMulti <= 0 {
-		piggyBank.Config.WinMulti = 1
+	if piggyBank.Config.WinMulti < 0 {
+		piggyBank.Config.WinMulti = 0
 	}
 
 	piggyBank.onInit(&piggyBank.Config.BasicComponentConfig)
@@ -276,7 +284,15 @@ func (piggyBank *PiggyBank) NewComponentData() IComponentData {
 func (piggyBank *PiggyBank) GetWinMulti(basicCD *BasicComponentData) int {
 	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
+		if winMulti <= 0 {
+			return 1
+		}
+
 		return winMulti
+	}
+
+	if piggyBank.Config.WinMulti <= 0 {
+		return 1
 	}
 
 	return piggyBank.Config.WinMulti
