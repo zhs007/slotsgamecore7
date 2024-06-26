@@ -89,6 +89,7 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	bcd := cd.(*BasicComponentData)
 
 	bcd.UsedScenes = nil
+	bcd.UsedOtherScenes = nil
 
 	gs := refillSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	ngs := gs
