@@ -27,7 +27,7 @@ func (rng *SimpleRNG) OnNewGame(plugin sgc7plugin.IPlugin) error {
 }
 
 // GetCurRNG -
-func (rng *SimpleRNG) GetCurRNG(curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
+func (rng *SimpleRNG) GetCurRNG(gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
 	if curComponent.GetName() == rng.IterateComponent {
 		if curComponent.GetBranchNum() > 0 {
 			if len(rng.weights) == 0 {
@@ -56,7 +56,7 @@ func (rng *SimpleRNG) IsIterateEnding() bool {
 	return rng.curIndex < len(rng.weights)
 }
 
-func NewSimpleRNG(iterateComponent string) *SimpleRNG {
+func NewSimpleRNG(iterateComponent string) IRNG {
 	return &SimpleRNG{
 		IterateComponent: iterateComponent,
 		plugin:           sgc7plugin.NewFastPlugin(),

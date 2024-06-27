@@ -115,7 +115,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	for {
 		isComponentDoNothing := false
-		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(curComponent, gameProp.callStack.GetCurComponentData(gameProp, curComponent), gameProp.featureLevel)
+		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(gameProp, curComponent, gameProp.callStack.GetCurComponentData(gameProp, curComponent), gameProp.featureLevel)
 		if newComponent != "" {
 			c, isok := components.MapComponents[newComponent]
 			if !isok {
