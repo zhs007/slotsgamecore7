@@ -12,6 +12,12 @@ type BasicRNG struct {
 	curPlugin sgc7plugin.IPlugin
 }
 
+func (rng *BasicRNG) Clone() IRNG {
+	return &BasicRNG{
+		curPlugin: rng.curPlugin,
+	}
+}
+
 // OnNewGame -
 func (rng *BasicRNG) OnNewGame(plugin sgc7plugin.IPlugin) error {
 	rng.curPlugin = plugin

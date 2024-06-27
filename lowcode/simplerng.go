@@ -12,7 +12,7 @@ type SimpleRNG struct {
 	curIndex         int
 }
 
-func (rng *SimpleRNG) Clone() *SimpleRNG {
+func (rng *SimpleRNG) Clone() IRNG {
 	return &SimpleRNG{
 		IterateComponent: rng.IterateComponent,
 		plugin:           rng.plugin,
