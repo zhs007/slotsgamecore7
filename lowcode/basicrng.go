@@ -20,6 +20,6 @@ func (rng *BasicRNG) OnNewGame(plugin sgc7plugin.IPlugin) error {
 }
 
 // GetCurRNG -
-func (rng *BasicRNG) GetCurRNG(curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
+func (rng *BasicRNG) GetCurRNG(gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
 	return false, -1, rng.curPlugin, ""
 }
