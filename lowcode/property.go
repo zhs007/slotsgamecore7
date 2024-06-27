@@ -531,6 +531,34 @@ func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Aw
 	}
 }
 
+func (gameProp *GameProperty) RunController(award *Award) {
+	if award.Type == AwardSetComponentConfigVal {
+		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.StrParams[1])
+		if err != nil {
+			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:SetComponentConfigVal",
+				goutils.Err(err))
+
+			return
+		}
+	} else if award.Type == AwardSetComponentConfigIntVal {
+		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0))
+		if err != nil {
+			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:AwardSetComponentConfigIntVal",
+				goutils.Err(err))
+
+			return
+		}
+	} else if award.Type == AwardChgComponentConfigIntVal {
+		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0))
+		if err != nil {
+			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:AwardChgComponentConfigIntVal",
+				goutils.Err(err))
+
+			return
+		}
+	}
+}
+
 func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award, curpr *sgc7game.PlayResult, gp *GameParams, skipTriggerRespin bool) {
 	if !skipTriggerRespin && award.OnTriggerRespin != "" {
 		component, isok := gameProp.Components.MapComponents[award.OnTriggerRespin]
