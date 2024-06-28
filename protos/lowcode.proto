@@ -310,6 +310,13 @@ message BurstSymbolsData {
     repeated int32 pos = 2;
 }
 
+// WinResultModifierData
+message WinResultModifierData {
+    ComponentData basicComponentData = 1;
+    int32 wins = 2;
+    int32 winMulti = 3;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
