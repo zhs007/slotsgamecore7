@@ -407,3 +407,16 @@ func AbsInt(n int) int {
 
 	return n
 }
+
+func HasSymbolsInResult(gs *sgc7game.GameScene, symbols []int, ret *sgc7game.Result) bool {
+	for i := 0; i < len(ret.Pos)/2; i++ {
+		x := ret.Pos[i*2]
+		y := ret.Pos[i*2+1]
+
+		if goutils.IndexOfIntSlice(symbols, gs.Arr[x][y], 0) >= 0 {
+			return true
+		}
+	}
+
+	return false
+}

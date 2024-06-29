@@ -141,6 +141,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ControllerWorkerTypeName, NewControllerWorker)
 	mgr.Reg(CatchSymbolsTypeName, NewCatchSymbols)
 	mgr.Reg(BurstSymbolsTypeName, NewBurstSymbols)
+	mgr.Reg(WinResultModifierTypeName, NewWinResultModifier)
 
 	return mgr
 }
