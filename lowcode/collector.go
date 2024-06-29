@@ -57,6 +57,11 @@ func (collectorData *CollectorData) SetConfigIntVal(key string, val int) {
 	}
 }
 
+// GetOutput -
+func (collectorData *CollectorData) GetOutput() int {
+	return collectorData.Val
+}
+
 // // ChgConfigIntVal -
 // func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
 // 	if key == CCVValueNum {
