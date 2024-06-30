@@ -188,6 +188,7 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 	}
 
 	gs := winResultModifier.GetTargetScene3(gameProp, curpr, prs, 0)
+	isproced := false
 
 	for _, cn := range winResultModifier.Config.SourceComponents {
 		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
@@ -205,8 +206,16 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 				curpr.Results[ri].OtherMul *= winMulti
 
 				std.Wins += curpr.Results[ri].CoinWin
+
+				isproced = true
 			}
 		}
+	}
+
+	if !isproced {
+		nc := winResultModifier.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
 	}
 
 	nc := winResultModifier.onStepEnd(gameProp, curpr, gp, "")
