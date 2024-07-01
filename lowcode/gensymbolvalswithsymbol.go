@@ -125,6 +125,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 
 	cd := icd.(*BasicComponentData)
 
+	cd.UsedOtherScenes = nil
+
 	gs := genSymbolValsWithSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs != nil {
 		var os *sgc7game.GameScene
