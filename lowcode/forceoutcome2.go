@@ -237,6 +237,35 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 	return 0
 }
 
+func (fo2 *ForceOutcome2) getMinComponentVal(component string, val string) int {
+	hasval := false
+	minval := 0
+	for _, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k, v := range gp.MapComponentData {
+				if isComponent(k, component) {
+					curval, isok2 := v.GetVal(val)
+					if isok2 {
+						if !hasval {
+							minval = curval
+							hasval = true
+						} else if minval > curval {
+							minval = curval
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if hasval {
+		return minval
+	}
+
+	return 0
+}
+
 func (fo2 *ForceOutcome2) getLatestSymbolVal() *sgc7game.GameScene {
 	if len(fo2.results) == 0 {
 		return nil
@@ -325,6 +354,18 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				cel.IntType,
 				cel.BinaryBinding(func(param0 ref.Val, param1 ref.Val) ref.Val {
 					val := fo2.getMaxComponentVal(param0.Value().(string), param1.Value().(string))
+
+					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("getMin",
+			cel.Overload("getMin_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.IntType,
+				cel.BinaryBinding(func(param0 ref.Val, param1 ref.Val) ref.Val {
+					val := fo2.getMinComponentVal(param0.Value().(string), param1.Value().(string))
 
 					return types.Int(val)
 				},
