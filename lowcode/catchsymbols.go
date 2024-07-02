@@ -224,7 +224,8 @@ func procAllCatchOne(gs *sgc7game.GameScene, srcpos []int, tx int, ty int, overr
 
 type CatchSymbolsData struct {
 	BasicComponentData
-	Pos [][]int
+	Pos       [][]int
+	SymbolNum int
 }
 
 // OnNewGame -
@@ -236,6 +237,7 @@ func (catchSymbolsData *CatchSymbolsData) OnNewGame(gameProp *GameProperty, comp
 func (catchSymbolsData *CatchSymbolsData) OnNewStep() {
 	catchSymbolsData.UsedScenes = nil
 	catchSymbolsData.Pos = nil
+	catchSymbolsData.SymbolNum = 0
 }
 
 // Clone
@@ -313,6 +315,16 @@ func (catchSymbolsData *CatchSymbolsData) AddPos(x int, y int) {
 	}
 
 	catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
+	catchSymbolsData.SymbolNum++
+}
+
+// GetVal -
+func (catchSymbolsData *CatchSymbolsData) GetVal(key string) (int, bool) {
+	if key == CVSymbolNum {
+		return catchSymbolsData.SymbolNum, true
+	}
+
+	return 0, false
 }
 
 // // AddPosEx -
