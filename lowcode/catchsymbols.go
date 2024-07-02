@@ -244,13 +244,14 @@ func (catchSymbolsData *CatchSymbolsData) OnNewStep() {
 func (catchSymbolsData *CatchSymbolsData) Clone() IComponentData {
 	target := &CatchSymbolsData{
 		BasicComponentData: catchSymbolsData.CloneBasicComponentData(),
+		SymbolNum:          catchSymbolsData.SymbolNum,
 	}
 
 	target.Pos = make([][]int, len(catchSymbolsData.Pos))
-	for _, arr := range catchSymbolsData.Pos {
+	for i, arr := range catchSymbolsData.Pos {
 		dstarr := make([]int, len(arr))
 		copy(dstarr, arr)
-		target.Pos = append(target.Pos, dstarr)
+		target.Pos[i] = dstarr
 	}
 
 	return target
