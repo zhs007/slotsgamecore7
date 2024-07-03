@@ -859,6 +859,14 @@ func (gameProp *GameProperty) ForceComponentBranch(componentName string, branchI
 }
 
 func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, _ []*sgc7game.PlayResult) {
+	pr.CashWin = 0
+	pr.CashWin = 0
+
+	for _, v := range pr.Results {
+		pr.CashWin += int64(v.CashWin)
+		pr.CoinWin += v.CoinWin
+	}
+
 	gameProp.featureLevel.OnStepEnd(gameProp, gp, pr)
 
 	if gAllowStats2 {

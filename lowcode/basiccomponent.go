@@ -164,8 +164,8 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 	basicCD.CoinWin += ret.CoinWin
 	basicCD.CashWin += int64(ret.CashWin)
 
-	curpr.CashWin += int64(ret.CashWin)
-	curpr.CoinWin += ret.CoinWin
+	// curpr.CashWin += int64(ret.CashWin)
+	// curpr.CoinWin += ret.CoinWin
 
 	basicCD.UsedResults = append(basicCD.UsedResults, len(curpr.Results))
 
