@@ -279,6 +279,19 @@ func (fo2 *ForceOutcome2) getLatestSymbolVal() *sgc7game.GameScene {
 	return ret.OtherScenes[len(ret.OtherScenes)-1]
 }
 
+func (fo2 *ForceOutcome2) getLatestSymbols() *sgc7game.GameScene {
+	if len(fo2.results) == 0 {
+		return nil
+	}
+
+	ret := fo2.results[len(fo2.results)-1]
+	if len(ret.Scenes) <= 0 {
+		return nil
+	}
+
+	return ret.Scenes[len(ret.Scenes)-1]
+}
+
 func (fo2 *ForceOutcome2) getSymbolVal(x, y int, defval int) int {
 	os := fo2.getLatestSymbolVal()
 	if os == nil {
@@ -298,6 +311,24 @@ func (fo2 *ForceOutcome2) countSymbolVal(op string, target int) int {
 	for _, arr := range os.Arr {
 		for _, v := range arr {
 			if CmpVal(v, op, target) {
+				num++
+			}
+		}
+	}
+
+	return num
+}
+
+func (fo2 *ForceOutcome2) countSymbol(symbol int) int {
+	gs := fo2.getLatestSymbols()
+	if gs == nil {
+		return 0
+	}
+
+	num := 0
+	for _, arr := range gs.Arr {
+		for _, v := range arr {
+			if v == symbol {
 				num++
 			}
 		}
@@ -594,6 +625,34 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 					val := fo2.hasSamePosNext(src, target)
 
 					return types.Bool(val)
+				},
+				),
+			),
+		),
+		cel.Function("countSymbol",
+			cel.Overload("countSymbol_int",
+				[]*cel.Type{cel.StringType, cel.IntType},
+				cel.IntType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 1 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbol",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					symbol, isok := params[0].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbol",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					val := fo2.countSymbol(int(symbol))
+
+					return types.Int(val)
 				},
 				),
 			),
