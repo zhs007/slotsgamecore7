@@ -631,7 +631,7 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 		),
 		cel.Function("countSymbol",
 			cel.Overload("countSymbol_int",
-				[]*cel.Type{cel.StringType, cel.IntType},
+				[]*cel.Type{cel.IntType},
 				cel.IntType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
 					if len(params) != 1 {
