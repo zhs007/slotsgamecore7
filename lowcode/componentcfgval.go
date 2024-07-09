@@ -34,4 +34,5 @@ const (
 	CVNumber                string = "number"                // number
 	CVResultNum             string = "resultNum"             // 触发后，中奖的数量
 	CVOutputInt             string = "outputInt"             // outputInt
+	CVSelectedIndex         string = "selectedIndex"         // selectedIndex，一般用于各种权重组件里，最后被选中的index
 )

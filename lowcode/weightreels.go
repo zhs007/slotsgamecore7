@@ -27,12 +27,20 @@ func (weightReelsData *WeightReelsData) OnNewGame(gameProp *GameProperty, compon
 	weightReelsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// // OnNewStep -
-// func (weightReelsData *WeightReelsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	weightReelsData.BasicComponentData.OnNewStep(gameProp, component)
+// OnNewStep -
+func (weightReelsData *WeightReelsData) onNewStep() {
+	weightReelsData.UsedScenes = nil
+	weightReelsData.ReelSetIndex = -1
+}
 
-// 	weightReelsData.ReelSetIndex = -1
-// }
+// GetVal -
+func (weightReelsData *WeightReelsData) GetVal(key string) (int, bool) {
+	if key == CVSelectedIndex {
+		return weightReelsData.ReelSetIndex, true
+	}
+
+	return 0, false
+}
 
 // Clone
 func (weightReelsData *WeightReelsData) Clone() IComponentData {
@@ -139,8 +147,7 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	wrd := icd.(*WeightReelsData)
 
-	wrd.UsedScenes = nil
-	wrd.ReelSetIndex = -1
+	wrd.onNewStep()
 
 	reelname := ""
 	if weightReels.Config.ReelSetsWeightVW != nil {
