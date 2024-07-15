@@ -75,6 +75,7 @@ type BranchNode struct {
 // WeightBranchConfig - configuration for WeightBranch
 type WeightBranchConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
+	ForceBranch          string                 `yaml:"forceBranch" json:"forceBranch"`
 	Weight               string                 `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2  `json:"-"`
 	MapBranchs           map[string]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"` // 可以不用配置全，如果没有配置的，就跳转默认的next
@@ -100,8 +101,12 @@ func (cfg *WeightBranchConfig) SetLinkComponent(link string, componentName strin
 			cfg.MapBranchs = make(map[string]*BranchNode)
 		}
 
-		cfg.MapBranchs[link] = &BranchNode{
-			JumpToComponent: componentName,
+		if cfg.MapBranchs[link] == nil {
+			cfg.MapBranchs[link] = &BranchNode{
+				JumpToComponent: componentName,
+			}
+		} else {
+			cfg.MapBranchs[link].JumpToComponent = componentName
 		}
 	}
 
@@ -173,6 +178,15 @@ func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
+func (weightBranch *WeightBranch) getForceBrach(wbd *WeightBranchData) string {
+	val := wbd.BasicComponentData.GetConfigVal(CCVForceBranch)
+	if val != "" {
+		return val
+	}
+
+	return weightBranch.Config.ForceBranch
+}
+
 // playgame
 func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -181,15 +195,20 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	wbd := icd.(*WeightBranchData)
 
-	cr, err := weightBranch.Config.WeightVW.RandVal(plugin)
-	if err != nil {
-		goutils.Error("WeightBranch.OnPlayGame:RandVal",
-			goutils.Err(err))
+	forceBranch := weightBranch.getForceBrach(wbd)
+	if forceBranch == "" {
+		cr, err := weightBranch.Config.WeightVW.RandVal(plugin)
+		if err != nil {
+			goutils.Error("WeightBranch.OnPlayGame:RandVal",
+				goutils.Err(err))
 
-		return "", err
+			return "", err
+		}
+
+		wbd.Value = cr.String()
+	} else {
+		wbd.Value = forceBranch
 	}
-
-	wbd.Value = cr.String()
 
 	nextComponent := ""
 
@@ -260,14 +279,18 @@ func NewWeightBranch(name string) IComponent {
 
 // "configuration": {
 // "weight": "greenweight"
+// "forceBranch": "continue"
 // }
 type jsonWeightBranch struct {
-	Weight string `json:"weight"`
+	Weight      string `json:"weight"`
+	ForceBranch string `json:"forceBranch"`
 }
 
 func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 	cfg := &WeightBranchConfig{
-		Weight: jwr.Weight,
+		Weight:      jwr.Weight,
+		ForceBranch: jwr.ForceBranch,
+		MapBranchs:  make(map[string]*BranchNode),
 	}
 
 	// cfg.UseSceneV3 = true
@@ -276,7 +299,7 @@ func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 }
 
 func parseWeightBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("WeightBranch:getConfigInCell",
 			goutils.Err(err))
@@ -303,6 +326,28 @@ func parseWeightBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		mapAwards, err := parseMapControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseBasicReels:parseMapControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		for k, arr := range mapAwards {
+			if cfgd.MapBranchs[k] == nil {
+				cfgd.MapBranchs[k] = &BranchNode{
+					Awards: arr,
+				}
+			} else {
+				cfgd.MapBranchs[k].Awards = arr
+			}
+		}
+
+		// cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
