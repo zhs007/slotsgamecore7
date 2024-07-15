@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
@@ -109,14 +108,13 @@ func NewControllerWorker(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//	}
+// "configuration": {
+// }
 type jsonControllerWorker struct {
 }
 
 func (jbr *jsonControllerWorker) build() *ControllerWorkerConfig {
-	cfg := &ControllerWorkerConfig{
-	}
+	cfg := &ControllerWorkerConfig{}
 
 	// cfg.UseSceneV3 = true
 
@@ -124,7 +122,7 @@ func (jbr *jsonControllerWorker) build() *ControllerWorkerConfig {
 }
 
 func parseControllerWorker(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, ctrls, err := getConfigInCell(cell)
+	_, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseControllerWorker:getConfigInCell",
 			goutils.Err(err))
@@ -132,25 +130,26 @@ func parseControllerWorker(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		return "", err
 	}
 
-	buf, err := cfg.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseControllerWorker:MarshalJSON",
-			goutils.Err(err))
+	// buf, err := cfg.MarshalJSON()
+	// if err != nil {
+	// 	goutils.Error("parseControllerWorker:MarshalJSON",
+	// 		goutils.Err(err))
 
-		return "", err
-	}
+	// 	return "", err
+	// }
 
-	data := &jsonControllerWorker{}
+	// data := &jsonControllerWorker{}
 
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseControllerWorker:Unmarshal",
-			goutils.Err(err))
+	// err = sonic.Unmarshal(buf, data)
+	// if err != nil {
+	// 	goutils.Error("parseControllerWorker:Unmarshal",
+	// 		goutils.Err(err))
 
-		return "", err
-	}
+	// 	return "", err
+	// }
 
-	cfgd := data.build()
+	// cfgd := data.build()
+	cfgd := &ControllerWorkerConfig{}
 
 	if ctrls != nil {
 		awards, err := parseControllers(ctrls)

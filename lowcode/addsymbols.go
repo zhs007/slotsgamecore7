@@ -268,7 +268,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 				ngs.Arr[xarr[cxi]][cy] = addSymbols.Config.SymbolCode
 
-				if len(xarr) <= 1 {
+				if len(xarr) <= 1 || i == num-1 {
 					break
 				}
 
