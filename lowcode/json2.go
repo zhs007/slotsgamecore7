@@ -102,6 +102,7 @@ type jsonControllerData struct {
 	Times      int      `json:"times"`
 	ValueNum   int      `json:"valueNum"`
 	Source     []string `json:"source"`
+	StringVal  string   `json:"stringVal"`
 }
 
 func (jcd *jsonControllerData) build() *Award {
@@ -171,6 +172,18 @@ func (jcd *jsonControllerData) build4Collector() (string, *Award) {
 	}
 
 	return jcd.TriggerNum, jcd.build()
+}
+
+func (jcd *jsonControllerData) build4Map() (string, *Award) {
+	if jcd.StringVal == "" {
+		goutils.Error("jsonControllerData.build4Map",
+			slog.Any("stringVal", jcd.StringVal),
+			goutils.Err(ErrUnsupportedControllerType))
+
+		return "", nil
+	}
+
+	return jcd.StringVal, jcd.build()
 }
 
 func parseControllers(controller *ast.Node) ([]*Award, error) {
@@ -262,4 +275,41 @@ func parseCollectorControllers(controller *ast.Node) ([]*Award, map[int][]*Award
 	}
 
 	return awards, mapawards, nil
+}
+
+func parseMapControllers(controller *ast.Node) (map[string][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseMapControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseMapControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	mapawards := make(map[string][]*Award)
+
+	for i, v := range lst {
+		str, a := v.build4Map()
+		if a != nil {
+			mapawards[str] = append(mapawards[str], a)
+		} else {
+			goutils.Error("parseMapControllers:build4Map",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return mapawards, nil
 }

@@ -154,6 +154,40 @@ func (vw *ValWeights2) Clone() *ValWeights2 {
 	return nvw
 }
 
+func (vw *ValWeights2) getValidWeightNum() int {
+	num := 0
+
+	for _, v := range vw.Weights {
+		if v > 0 {
+			num++
+		}
+	}
+
+	return num
+}
+
+func (vw *ValWeights2) Normalize() {
+	vnum := vw.getValidWeightNum()
+	if vnum != len(vw.Weights) {
+		vals := make([]IVal, vnum)
+		weights := make([]int, vnum)
+
+		vw.MaxWeight = 0
+
+		for i, v := range vw.Weights {
+			if v > 0 {
+				vals = append(vals, vw.Vals[i])
+				weights = append(weights, v)
+
+				vw.MaxWeight += v
+			}
+		}
+
+		vw.Vals = vals
+		vw.Weights = weights
+	}
+}
+
 func (vw *ValWeights2) RandVal(plugin sgc7plugin.IPlugin) (IVal, error) {
 	if len(vw.Vals) == 1 {
 		return vw.Vals[0], nil

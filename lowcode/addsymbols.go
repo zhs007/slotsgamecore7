@@ -16,9 +16,29 @@ import (
 
 const AddSymbolsTypeName = "addSymbols"
 
+type AddSymbolsType int
+
+const (
+	AddSymbolsTypeNormal              AddSymbolsType = 0 // 普通
+	AddSymbolsTypeNoSameReel          AddSymbolsType = 1 // 不能加在同一轴上
+	AddSymbolsTypeNoSameReelAndIgnore AddSymbolsType = 2 // 也不能加在和ignore symbol同一轴上
+)
+
+func parseAddSymbolsType(str string) AddSymbolsType {
+	if str == "noSameReel" {
+		return AddSymbolsTypeNoSameReel
+	} else if str == "noSameReelAndIgnore" {
+		return AddSymbolsTypeNoSameReelAndIgnore
+	}
+
+	return AddSymbolsTypeNormal
+}
+
 // AddSymbolsConfig - configuration for AddSymbols
 type AddSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
+	StrType              string                `yaml:"type" json:"type"`
+	Type                 AddSymbolsType        `yaml:"-" json:"-"`
 	Symbol               string                `yaml:"symbol" json:"symbol"`
 	SymbolCode           int                   `yaml:"-" json:"-"`
 	SymbolNum            int                   `yaml:"symbolNum" json:"symbolNum"`
@@ -69,6 +89,8 @@ func (addSymbols *AddSymbols) Init(fn string, pool *GamePropertyPool) error {
 func (addSymbols *AddSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	addSymbols.Config = cfg.(*AddSymbolsConfig)
 	addSymbols.Config.ComponentType = AddSymbolsTypeName
+
+	addSymbols.Config.Type = parseAddSymbolsType(addSymbols.Config.StrType)
 
 	sc, isok := pool.DefaultPaytables.MapSymbols[addSymbols.Config.Symbol]
 	if !isok {
@@ -144,42 +166,118 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		return nc, ErrComponentDoNothing
 	}
 
-	pos := make([]int, 0, gs.Width*gs.Height*2)
-	for x, arr := range gs.Arr {
-		for y, s := range arr {
-			if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
-				pos = append(pos, x, y)
+	if addSymbols.Config.Type == AddSymbolsTypeNormal {
+		pos := make([]int, 0, gs.Width*gs.Height*2)
+
+		for x, arr := range gs.Arr {
+			for y, s := range arr {
+				if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
+					pos = append(pos, x, y)
+				}
 			}
 		}
-	}
-
-	if len(pos) <= 0 {
-		nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-		return nc, ErrComponentDoNothing
-	}
-
-	ngs := gs.CloneEx(gameProp.PoolScene)
-
-	for i := 0; i < num; i++ {
-		cr, err := plugin.Random(context.Background(), len(pos)/2)
-		if err != nil {
-			goutils.Error("AddSymbols.OnPlayGame:Random",
-				goutils.Err(err))
-
-			return "", err
-		}
-
-		ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
-
-		pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
 
 		if len(pos) <= 0 {
-			break
-		}
-	}
+			nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	addSymbols.AddScene(gameProp, curpr, ngs, cd)
+			return nc, ErrComponentDoNothing
+		}
+
+		ngs := gs.CloneEx(gameProp.PoolScene)
+
+		for i := 0; i < num; i++ {
+			cr, err := plugin.Random(context.Background(), len(pos)/2)
+			if err != nil {
+				goutils.Error("AddSymbols.OnPlayGame:Random",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
+
+			pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
+
+			if len(pos) <= 0 {
+				break
+			}
+		}
+
+		addSymbols.AddScene(gameProp, curpr, ngs, cd)
+	} else {
+		xarr := make([]int, 0, gs.Width)
+
+		if addSymbols.Config.Type == AddSymbolsTypeNoSameReel {
+			for x := range gs.Arr {
+				xarr = append(xarr, x)
+			}
+		} else if addSymbols.Config.Type == AddSymbolsTypeNoSameReelAndIgnore {
+			for x, arr := range gs.Arr {
+				hasIgnore := false
+				for _, s := range arr {
+					if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) >= 0 {
+						hasIgnore = true
+
+						break
+					}
+				}
+
+				if !hasIgnore {
+					xarr = append(xarr, x)
+				}
+			}
+		}
+
+		if len(xarr) <= 0 {
+			nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
+		ngs := gs.CloneEx(gameProp.PoolScene)
+
+		if len(xarr) <= num {
+			for x := range xarr {
+				cy, err := plugin.Random(context.Background(), gs.Height)
+				if err != nil {
+					goutils.Error("AddSymbols.OnPlayGame:Random",
+						goutils.Err(err))
+
+					return "", err
+				}
+
+				ngs.Arr[x][cy] = addSymbols.Config.SymbolCode
+			}
+		} else {
+			for i := 0; i < num; i++ {
+				cxi, err := plugin.Random(context.Background(), len(xarr))
+				if err != nil {
+					goutils.Error("AddSymbols.OnPlayGame:Random",
+						goutils.Err(err))
+
+					return "", err
+				}
+
+				cy, err := plugin.Random(context.Background(), gs.Height)
+				if err != nil {
+					goutils.Error("AddSymbols.OnPlayGame:Random",
+						goutils.Err(err))
+
+					return "", err
+				}
+
+				ngs.Arr[xarr[cxi]][cy] = addSymbols.Config.SymbolCode
+
+				if len(xarr) <= 1 || i == num-1 {
+					break
+				}
+
+				xarr = append(xarr[:cxi], xarr[cxi+1:]...)
+			}
+		}
+
+		addSymbols.AddScene(gameProp, curpr, ngs, cd)
+	}
 
 	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -208,6 +306,7 @@ func NewAddSymbols(name string) IComponent {
 	}
 }
 
+// "type": "noSameReel",
 // "symbol": "WL",
 // "symbolNumType": "number",
 // "symbolNum": 1,
@@ -218,6 +317,7 @@ func NewAddSymbols(name string) IComponent {
 //
 // ]
 type jsonAddSymbols struct {
+	Type            string   `json:"type"`
 	Symbol          string   `json:"symbol"`
 	SymbolNum       int      `json:"symbolNum"`
 	SymbolNumWeight string   `json:"symbolNumWeight"`
@@ -226,6 +326,7 @@ type jsonAddSymbols struct {
 
 func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
 	cfg := &AddSymbolsConfig{
+		StrType:         jcfg.Type,
 		Symbol:          jcfg.Symbol,
 		SymbolNum:       jcfg.SymbolNum,
 		SymbolNumWeight: jcfg.SymbolNumWeight,
