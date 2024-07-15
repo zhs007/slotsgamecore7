@@ -275,6 +275,8 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				xarr = append(xarr[:cxi], xarr[cxi+1:]...)
 			}
 		}
+
+		addSymbols.AddScene(gameProp, curpr, ngs, cd)
 	}
 
 	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
