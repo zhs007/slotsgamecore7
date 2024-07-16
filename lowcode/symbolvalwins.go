@@ -268,12 +268,15 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 			for i := 0; i < mul; i++ {
 				newpos := make([]int, 0, len(pos)+2)
 
-				newpos = append(newpos, collectorpos[i*2], collectorpos[i*2+1])
+				if symbolValWins.Config.Type == SVWTypeCollector {
+					newpos = append(newpos, collectorpos[i*2], collectorpos[i*2+1])
+				}
+
 				newpos = append(newpos, pos...)
 
 				ret := &sgc7game.Result{
 					// Symbol:     gs.Arr[newpos[0]][newpos[1]],
-					Type:       sgc7game.RTSymbolVal,
+					Type:       sgc7game.RTCoins,
 					LineIndex:  -1,
 					Pos:        newpos,
 					SymbolNums: len(pos) / 2,

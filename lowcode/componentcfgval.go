@@ -17,6 +17,7 @@ const (
 	CCVLastTriggerNum        string = "lastTriggerNum"        // 可以修改配置项里的 lastTriggerNum
 	CCVWeight                string = "weight"                // 可以修改配置项里的 weight
 	CCVForceBranch           string = "forceBranch"           // 可以修改配置项里的 forceBranch
+	CCVWins                  string = "wins"                  // 可以修改配置项里的 wins
 )
 
 const (

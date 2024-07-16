@@ -235,7 +235,7 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	ret := &sgc7game.Result{
 		Symbol:    -1,
-		Type:      sgc7game.RTSymbolVal,
+		Type:      sgc7game.RTCoins,
 		LineIndex: -1,
 		CoinWin:   cd.Wins,
 		CashWin:   cd.Wins * bet,

@@ -142,6 +142,8 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(CatchSymbolsTypeName, NewCatchSymbols)
 	mgr.Reg(BurstSymbolsTypeName, NewBurstSymbols)
 	mgr.Reg(WinResultModifierTypeName, NewWinResultModifier)
+	mgr.Reg(ReelTriggerTypeName, NewReelTrigger)
+	mgr.Reg(JackpotTypeName, NewJackpot)
 
 	return mgr
 }

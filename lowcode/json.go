@@ -81,10 +81,10 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 					slog.Int("i", i),
 					goutils.Err(err))
 
-				return ErrIvalidDefaultScene
+				// return ErrIvalidDefaultScene
+			} else {
+				cfg.DefaultScene = scene
 			}
-
-			cfg.DefaultScene = scene
 		}
 	}
 
@@ -1255,11 +1255,16 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 				if len(arr) == 2 {
 					ldid.add(arr[1], source, target)
 				} else {
-					goutils.Error("loadCells:sourcePort",
-						slog.String("sourcePort", sourcePort),
-						goutils.Err(ErrUnsupportedLinkType))
+					arr1 := strings.Split(sourcePort, "reelTrigger-component-groups-out-")
+					if len(arr1) == 2 {
+						ldid.add(arr1[1], source, target)
+					} else {
+						goutils.Error("loadCells:sourcePort",
+							slog.String("sourcePort", sourcePort),
+							goutils.Err(ErrUnsupportedLinkType))
 
-					return ErrUnsupportedLinkType
+						return ErrUnsupportedLinkType
+					}
 				}
 			}
 		}

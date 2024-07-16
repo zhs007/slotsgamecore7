@@ -317,6 +317,21 @@ message WinResultModifierData {
     int32 winMulti = 3;
 }
 
+// ReelTriggerData
+message ReelTriggerData {
+    ComponentData basicComponentData = 1;
+    string nextComponent = 2;
+    repeated bool masks = 3;
+    int32 number = 4;
+}
+
+// JackpotData
+message JackpotData {
+    ComponentData basicComponentData = 1;
+    int32 wins = 2;
+    int32 winMulti = 3;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
