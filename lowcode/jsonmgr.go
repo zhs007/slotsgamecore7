@@ -87,4 +87,5 @@ func init() {
 	gJsonMgr.RegLoadComponent("catchsymbols", parseCatchSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(BurstSymbolsTypeName), parseBurstSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(WinResultModifierTypeName), parseWinResultModifier)
+	gJsonMgr.RegLoadComponent(strings.ToLower(ReelTriggerTypeName), parseReelTrigger)
 }

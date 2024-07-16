@@ -162,9 +162,9 @@ func (jcd *jsonControllerData) build() *Award {
 	return nil
 }
 
-func (jcd *jsonControllerData) build4Collector() (string, *Award) {
+func (jcd *jsonControllerData) buildWithTriggerNum() (string, *Award) {
 	if jcd.TriggerNum == "" {
-		goutils.Error("jsonControllerData.build4Collector",
+		goutils.Error("jsonControllerData.buildWithTriggerNum",
 			slog.Any("triggerNum", jcd.TriggerNum),
 			goutils.Err(ErrUnsupportedControllerType))
 
@@ -246,7 +246,7 @@ func parseCollectorControllers(controller *ast.Node) ([]*Award, map[int][]*Award
 	mapawards := make(map[int][]*Award)
 
 	for i, v := range lst {
-		str, a := v.build4Collector()
+		str, a := v.buildWithTriggerNum()
 		if a != nil {
 			if str == "per" {
 				awards = append(awards, a)
@@ -266,7 +266,7 @@ func parseCollectorControllers(controller *ast.Node) ([]*Award, map[int][]*Award
 				mapawards[int(i64)] = append(mapawards[int(i64)], a)
 			}
 		} else {
-			goutils.Error("parseControllers:build4Collector",
+			goutils.Error("parseControllers:buildWithTriggerNum",
 				slog.Int("i", i),
 				goutils.Err(ErrUnsupportedControllerType))
 
@@ -304,6 +304,74 @@ func parseMapControllers(controller *ast.Node) (map[string][]*Award, error) {
 			mapawards[str] = append(mapawards[str], a)
 		} else {
 			goutils.Error("parseMapControllers:build4Map",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return mapawards, nil
+}
+
+func parseReelTriggerControllers(controller *ast.Node) (map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseReelTriggerControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseReelTriggerControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	mapawards := make(map[int][]*Award)
+
+	for i, v := range lst {
+		str, a := v.buildWithTriggerNum()
+		if a != nil {
+			if strings.HasPrefix(str, "row") {
+				arr := strings.Split(str, "row")
+				if len(arr) == 2 {
+					i64, err := goutils.String2Int64(arr[1])
+					if err != nil {
+						goutils.Error("parseReelTriggerControllers:String2Int64",
+							slog.Int("i", i),
+							slog.String("str", str),
+							goutils.Err(err))
+
+						return nil, err
+					}
+
+					mapawards[int(i64)] = append(mapawards[int(i64)], a)
+				}
+			} else if strings.HasPrefix(str, "column") {
+				arr := strings.Split(str, "column")
+				if len(arr) == 2 {
+					i64, err := goutils.String2Int64(arr[1])
+					if err != nil {
+						goutils.Error("parseReelTriggerControllers:String2Int64",
+							slog.Int("i", i),
+							slog.String("str", str),
+							goutils.Err(err))
+
+						return nil, err
+					}
+
+					mapawards[int(i64)] = append(mapawards[int(i64)], a)
+				}
+			}
+
+		} else {
+			goutils.Error("parseReelTriggerControllers:buildWithTriggerNum",
 				slog.Int("i", i),
 				goutils.Err(ErrUnsupportedControllerType))
 
