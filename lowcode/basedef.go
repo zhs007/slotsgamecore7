@@ -1,6 +1,8 @@
 package lowcode
 
 import (
+	"strings"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -18,19 +20,22 @@ const DefaultCmd = "SPIN"
 type SymbolTriggerType int
 
 const (
-	STTypeUnknow             SymbolTriggerType = 0 // 非法
-	STTypeLines              SymbolTriggerType = 1 // 线中奖判断，一定是判断全部线，且读paytable来判断是否可以中奖
-	STTypeWays               SymbolTriggerType = 2 // ways中奖判断，且读paytable来判断是否可以中奖
-	STTypeScatters           SymbolTriggerType = 3 // scatter中奖判断，且读paytable来判断是否可以中奖
-	STTypeCountScatter       SymbolTriggerType = 4 // scatter判断，需要传入minnum，不读paytable
-	STTypeCountScatterInArea SymbolTriggerType = 5 // 区域内的scatter判断，需要传入minnum，不读paytable
-	STTypeCheckLines         SymbolTriggerType = 6 // 线判断，一定是判断全部线，需要传入minnum，不读paytable
-	STTypeCheckWays          SymbolTriggerType = 7 // ways判断，需要传入minnum，不读paytable
-	STTypeCluster            SymbolTriggerType = 8 // cluster，且读paytable来判断是否可以中奖
-	STTypeReelScatters       SymbolTriggerType = 9 // scatter中奖判断，且一轴上只算1个scatter，且读paytable来判断是否可以中奖
+	STTypeUnknow             SymbolTriggerType = 0  // 非法
+	STTypeLines              SymbolTriggerType = 1  // 线中奖判断，一定是判断全部线，且读paytable来判断是否可以中奖
+	STTypeWays               SymbolTriggerType = 2  // ways中奖判断，且读paytable来判断是否可以中奖
+	STTypeScatters           SymbolTriggerType = 3  // scatter中奖判断，且读paytable来判断是否可以中奖
+	STTypeCountScatter       SymbolTriggerType = 4  // scatter判断，需要传入minnum，不读paytable
+	STTypeCountScatterInArea SymbolTriggerType = 5  // 区域内的scatter判断，需要传入minnum，不读paytable
+	STTypeCheckLines         SymbolTriggerType = 6  // 线判断，一定是判断全部线，需要传入minnum，不读paytable
+	STTypeCheckWays          SymbolTriggerType = 7  // ways判断，需要传入minnum，不读paytable
+	STTypeCluster            SymbolTriggerType = 8  // cluster，且读paytable来判断是否可以中奖
+	STTypeReelScatters       SymbolTriggerType = 9  // scatter中奖判断，且一轴上只算1个scatter，且读paytable来判断是否可以中奖
+	STTypeCountScatterReels  SymbolTriggerType = 10 // scatter中奖判断，且一轴上只算1个scatter，不读paytable
 )
 
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
+	str = strings.ToLower(str)
+
 	if str == "lines" {
 		return STTypeLines
 	} else if str == "ways" {
@@ -39,16 +44,18 @@ func ParseSymbolTriggerType(str string) SymbolTriggerType {
 		return STTypeScatters
 	} else if str == "countscatter" {
 		return STTypeCountScatter
-	} else if str == "countscatterInArea" {
+	} else if str == strings.ToLower("countscatterInArea") {
 		return STTypeCountScatterInArea
-	} else if str == "checkLines" {
+	} else if str == strings.ToLower("checkLines") {
 		return STTypeCheckLines
-	} else if str == "checkWays" {
+	} else if str == strings.ToLower("checkWays") {
 		return STTypeCheckWays
 	} else if str == "cluster" {
 		return STTypeCluster
 	} else if str == "reelscatters" {
 		return STTypeReelScatters
+	} else if str == "countscatterReels" {
+		return STTypeCountScatterReels
 	}
 
 	return STTypeUnknow
