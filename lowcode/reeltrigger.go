@@ -49,7 +49,7 @@ func parseReelTriggerType(str string) ReelTriggerType {
 type ReelTriggerData struct {
 	BasicComponentData
 	NextComponent string
-	Mask          []bool
+	Masks         []bool
 	Number        int
 }
 
@@ -60,9 +60,9 @@ func (reelTriggerData *ReelTriggerData) OnNewGame(gameProp *GameProperty, compon
 	reelTrigger := component.(*ReelTrigger)
 
 	if reelTrigger.Config.Type == RTTypeRow || reelTrigger.Config.Type == RTTypeRowNumber {
-		reelTriggerData.Mask = make([]bool, gameProp.GetVal(GamePropHeight))
+		reelTriggerData.Masks = make([]bool, gameProp.GetVal(GamePropHeight))
 	} else if reelTrigger.Config.Type == RTTypeColumn || reelTrigger.Config.Type == RTTypeColumnNumber {
-		reelTriggerData.Mask = make([]bool, gameProp.GetVal(GamePropWidth))
+		reelTriggerData.Masks = make([]bool, gameProp.GetVal(GamePropWidth))
 	}
 
 	reelTriggerData.Number = 0
@@ -76,20 +76,28 @@ func (reelTriggerData *ReelTriggerData) onNewStep() {
 
 // Clone
 func (reelTriggerData *ReelTriggerData) Clone() IComponentData {
-	target := &ClusterTriggerData{
+	target := &ReelTriggerData{
 		BasicComponentData: reelTriggerData.CloneBasicComponentData(),
 		NextComponent:      reelTriggerData.NextComponent,
+		Masks:              make([]bool, len(reelTriggerData.Masks)),
+		Number:             reelTriggerData.Number,
 	}
+
+	copy(target.Masks, reelTriggerData.Masks)
 
 	return target
 }
 
 // BuildPBComponentData
 func (reelTriggerData *ReelTriggerData) BuildPBComponentData() proto.Message {
-	pbcd := &sgc7pb.ClusterTriggerData{
+	pbcd := &sgc7pb.ReelTriggerData{
 		BasicComponentData: reelTriggerData.BuildPBBasicComponentData(),
 		NextComponent:      reelTriggerData.NextComponent,
+		Masks:              make([]bool, len(reelTriggerData.Masks)),
+		Number:             int32(reelTriggerData.Number),
 	}
+
+	copy(pbcd.Masks, reelTriggerData.Masks)
 
 	return pbcd
 }
@@ -217,7 +225,7 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 }
 
 func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.GameScene) ([]bool, int) {
-	triggerArr := make([]bool, len(rtdata.Mask))
+	triggerArr := make([]bool, len(rtdata.Masks))
 	triggerNum := 0
 
 	for y := 0; y < gs.Height; y++ {
@@ -246,8 +254,8 @@ func (reelTrigger *ReelTrigger) procRow(gameProp *GameProperty, curpr *sgc7game.
 	isTrigger := false
 
 	for i, v := range triggerArr {
-		if !rtdata.Mask[i] && v {
-			rtdata.Mask[i] = true
+		if !rtdata.Masks[i] && v {
+			rtdata.Masks[i] = true
 
 			if reelTrigger.Config.MapBranchs[i+1] != nil {
 				gameProp.procAwards(plugin, reelTrigger.Config.MapBranchs[i+1].Awards, curpr, gp)
@@ -271,7 +279,7 @@ func (reelTrigger *ReelTrigger) procRowNumber(gameProp *GameProperty, curpr *sgc
 
 	rtdata.NextComponent = ""
 
-	rtdata.Mask = triggerArr
+	rtdata.Masks = triggerArr
 
 	if triggerNum > rtdata.Number {
 		for i := rtdata.Number; i < triggerNum; i++ {
@@ -291,7 +299,7 @@ func (reelTrigger *ReelTrigger) procRowNumber(gameProp *GameProperty, curpr *sgc
 }
 
 func (reelTrigger *ReelTrigger) calcColumn(rtdata *ReelTriggerData, gs *sgc7game.GameScene) ([]bool, int) {
-	triggerArr := make([]bool, len(rtdata.Mask))
+	triggerArr := make([]bool, len(rtdata.Masks))
 	triggerNum := 0
 
 	for x := 0; x < gs.Width; x++ {
@@ -320,8 +328,8 @@ func (reelTrigger *ReelTrigger) procColumn(gameProp *GameProperty, curpr *sgc7ga
 	isTrigger := false
 
 	for i, v := range triggerArr {
-		if !rtdata.Mask[i] && v {
-			rtdata.Mask[i] = true
+		if !rtdata.Masks[i] && v {
+			rtdata.Masks[i] = true
 
 			if reelTrigger.Config.MapBranchs[i+1] != nil {
 				gameProp.procAwards(plugin, reelTrigger.Config.MapBranchs[i+1].Awards, curpr, gp)
@@ -345,7 +353,7 @@ func (reelTrigger *ReelTrigger) procColumnNumber(gameProp *GameProperty, curpr *
 
 	rtdata.NextComponent = ""
 
-	rtdata.Mask = triggerArr
+	rtdata.Masks = triggerArr
 
 	if triggerNum > rtdata.Number {
 		for i := rtdata.Number; i < triggerNum; i++ {
