@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/asciigame"
@@ -626,7 +625,7 @@ func (jr *jsonRespin) build() *RespinConfig {
 }
 
 func parseRespin(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	_, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRespin2:getConfigInCell",
 			goutils.Err(err))
@@ -634,25 +633,25 @@ func parseRespin(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		return "", err
 	}
 
-	buf, err := cfg.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseRespin2:MarshalJSON",
-			goutils.Err(err))
+	// buf, err := cfg.MarshalJSON()
+	// if err != nil {
+	// 	goutils.Error("parseRespin2:MarshalJSON",
+	// 		goutils.Err(err))
 
-		return "", err
-	}
+	// 	return "", err
+	// }
 
-	data := &jsonRespin{}
+	// data := &jsonRespin{}
 
-	err = sonic.Unmarshal(buf, data)
-	if err != nil {
-		goutils.Error("parseRespin2:Unmarshal",
-			goutils.Err(err))
+	// err = sonic.Unmarshal(buf, data)
+	// if err != nil {
+	// 	goutils.Error("parseRespin2:Unmarshal",
+	// 		goutils.Err(err))
 
-		return "", err
-	}
+	// 	return "", err
+	// }
 
-	cfgd := data.build()
+	cfgd := &RespinConfig{}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
