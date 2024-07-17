@@ -44,17 +44,17 @@ func ParseSymbolTriggerType(str string) SymbolTriggerType {
 		return STTypeScatters
 	} else if str == "countscatter" {
 		return STTypeCountScatter
-	} else if str == strings.ToLower("countscatterInArea") {
+	} else if str == "countscatterinarea" {
 		return STTypeCountScatterInArea
-	} else if str == strings.ToLower("checkLines") {
+	} else if str == "checklines" {
 		return STTypeCheckLines
-	} else if str == strings.ToLower("checkWays") {
+	} else if str == "checkways" {
 		return STTypeCheckWays
 	} else if str == "cluster" {
 		return STTypeCluster
 	} else if str == "reelscatters" {
 		return STTypeReelScatters
-	} else if str == "countscatterReels" {
+	} else if str == "countscatterreels" {
 		return STTypeCountScatterReels
 	}
 
