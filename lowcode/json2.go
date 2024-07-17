@@ -92,66 +92,74 @@ func getConfigInCell(cell *ast.Node) (*ast.Node, string, *ast.Node, error) {
 //
 // ]
 type jsonControllerData struct {
-	Type       string   `json:"type"`
-	StrParams  string   `json:"strParams"`
-	Vals       int      `json:"vals"`
-	TriggerNum string   `json:"triggerNum"`
-	Target     string   `json:"target"`
-	TargetArr  []string `json:"targetArr"`
-	Value      string   `json:"value"`
-	Times      int      `json:"times"`
-	ValueNum   int      `json:"valueNum"`
-	Source     []string `json:"source"`
-	StringVal  string   `json:"stringVal"`
+	Type            string   `json:"type"`
+	StrParams       string   `json:"strParams"`
+	Vals            int      `json:"vals"`
+	TriggerNum      string   `json:"triggerNum"`
+	Target          string   `json:"target"`
+	TargetArr       []string `json:"targetArr"`
+	Value           string   `json:"value"`
+	Times           int      `json:"times"`
+	ValueNum        int      `json:"valueNum"`
+	Source          []string `json:"source"`
+	StringVal       string   `json:"stringVal"`
+	OnTriggerRespin string   `json:"onTriggerRespin"`
 }
 
 func (jcd *jsonControllerData) build() *Award {
 	if jcd.Type == "addRespinTimes" {
 		return &Award{
-			AwardType: "respinTimes",
-			Vals:      []int{jcd.Times},
-			StrParams: []string{jcd.Target},
+			AwardType:       "respinTimes",
+			Vals:            []int{jcd.Times},
+			StrParams:       []string{jcd.Target},
+			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
 	} else if jcd.Type == "chgComponentConfigIntVal" {
 		if len(jcd.Source) == 0 {
 			return &Award{
-				AwardType: "chgComponentConfigIntVal",
-				Vals:      []int{jcd.ValueNum},
-				StrParams: []string{strings.Join(jcd.TargetArr, ".")},
+				AwardType:       "chgComponentConfigIntVal",
+				Vals:            []int{jcd.ValueNum},
+				StrParams:       []string{strings.Join(jcd.TargetArr, ".")},
+				OnTriggerRespin: jcd.OnTriggerRespin,
 			}
 		}
 
 		return &Award{
-			AwardType:     "chgComponentConfigIntVal",
-			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
-			ComponentVals: []string{strings.Join(jcd.Source, ".")},
+			AwardType:       "chgComponentConfigIntVal",
+			StrParams:       []string{strings.Join(jcd.TargetArr, ".")},
+			ComponentVals:   []string{strings.Join(jcd.Source, ".")},
+			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
 	} else if jcd.Type == "setComponentConfigIntVal" {
 		if len(jcd.Source) == 0 {
 			return &Award{
-				AwardType: "setComponentConfigIntVal",
-				Vals:      []int{jcd.ValueNum},
-				StrParams: []string{strings.Join(jcd.TargetArr, ".")},
+				AwardType:       "setComponentConfigIntVal",
+				Vals:            []int{jcd.ValueNum},
+				StrParams:       []string{strings.Join(jcd.TargetArr, ".")},
+				OnTriggerRespin: jcd.OnTriggerRespin,
 			}
 		}
 
 		return &Award{
-			AwardType:     "setComponentConfigIntVal",
-			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
-			ComponentVals: []string{strings.Join(jcd.Source, ".")},
+			AwardType:       "setComponentConfigIntVal",
+			StrParams:       []string{strings.Join(jcd.TargetArr, ".")},
+			ComponentVals:   []string{strings.Join(jcd.Source, ".")},
+			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
 	} else if jcd.Type == "setComponentConfigVal" {
 		if len(jcd.Source) == 0 {
 			return &Award{
-				AwardType: "setComponentConfigVal",
-				StrParams: []string{strings.Join(jcd.TargetArr, "."), jcd.Value},
+				AwardType:       "setComponentConfigVal",
+				StrParams:       []string{strings.Join(jcd.TargetArr, "."), jcd.Value},
+				OnTriggerRespin: jcd.OnTriggerRespin,
 			}
 		}
 
 		return &Award{
-			AwardType:     "setComponentConfigVal",
-			StrParams:     []string{strings.Join(jcd.TargetArr, ".")},
-			ComponentVals: []string{strings.Join(jcd.Source, ".")},
+			AwardType:       "setComponentConfigVal",
+			StrParams:       []string{strings.Join(jcd.TargetArr, ".")},
+			ComponentVals:   []string{strings.Join(jcd.Source, ".")},
+			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
 	}
 
