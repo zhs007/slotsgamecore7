@@ -225,7 +225,7 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 
 	stt := ParseSymbolTriggerType(scatterTrigger.Config.Type)
 	if stt == STTypeUnknow {
-		goutils.Error("SpSymbolTrigger.InitEx:WildSymbols",
+		goutils.Error("ScatterTrigger.InitEx:WildSymbols",
 			slog.String("SymbolTriggerType", scatterTrigger.Config.Type),
 			goutils.Err(ErrIvalidSymbolTriggerType))
 
