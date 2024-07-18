@@ -24,11 +24,14 @@ type ChgSymbolValsType int
 const (
 	CSVTypeInc ChgSymbolValsType = 0 // ++
 	CSVTypeDec ChgSymbolValsType = 1 // --
+	CSVTypeMul ChgSymbolValsType = 2 // *= multi
 )
 
 func parseChgSymbolValsType(strType string) ChgSymbolValsType {
 	if strType == "dec" {
 		return CSVTypeDec
+	} else if strType == "mul" {
+		return CSVTypeMul
 	}
 
 	return CSVTypeInc
@@ -39,11 +42,17 @@ type ChgSymbolValsSourceType int
 const (
 	CSVSTypePositionCollection ChgSymbolValsSourceType = 0 // positionCollection
 	CSVSTypeWinResult          ChgSymbolValsSourceType = 1 // winResult
+	CSVSTypeRow                ChgSymbolValsSourceType = 2 // row
+	CSVSTypeColumn             ChgSymbolValsSourceType = 3 // column
 )
 
 func parseChgSymbolValsSourceType(strType string) ChgSymbolValsSourceType {
 	if strType == "positioncollection" {
 		return CSVSTypePositionCollection
+	} else if strType == "row" {
+		return CSVSTypeRow
+	} else if strType == "column" {
+		return CSVSTypeColumn
 	}
 
 	return CSVSTypeWinResult
@@ -113,6 +122,9 @@ type ChgSymbolValsConfig struct {
 	MaxNumber            int                     `yaml:"maxNumber" json:"maxNumber"`
 	MaxVal               int                     `yaml:"maxVal" json:"maxVal"`
 	MinVal               int                     `yaml:"minVal" json:"minVal"`
+	Row                  int                     `yaml:"minVal" json:"row"`
+	Column               int                     `yaml:"minVal" json:"column"`
+	Multi                int                     `yaml:"multi" json:"multi"`
 }
 
 // SetLinkComponent
@@ -193,6 +205,15 @@ func (chgSymbolVals *ChgSymbolVals) rebuildPos(pos []int, plugin sgc7plugin.IPlu
 	return npos, nil
 }
 
+func (chgSymbolVals *ChgSymbolVals) GetMulti(basicCD *BasicComponentData) int {
+	multi, isok := basicCD.GetConfigIntVal(CCVMulti)
+	if isok {
+		return multi
+	}
+
+	return chgSymbolVals.Config.Multi
+}
+
 // playgame
 func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -222,9 +243,11 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 
 					if chgSymbolVals.Config.Type == CSVTypeInc {
-						nos = os.CloneEx(gameProp.PoolScene)
-
 						for i := 0; i < len(npos)/2; i++ {
+							if nos == os {
+								nos = os.CloneEx(gameProp.PoolScene)
+							}
+
 							if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
 								nos.Arr[npos[i*2]][npos[i*2+1]]++
 
@@ -247,10 +270,28 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 								}
 							}
 						}
+					} else if chgSymbolVals.Config.Type == CSVTypeMul {
+						multi := chgSymbolVals.GetMulti(&cd.BasicComponentData)
+
+						for i := 0; i < len(npos)/2; i++ {
+							if nos == os {
+								nos = os.CloneEx(gameProp.PoolScene)
+							}
+
+							nos.Arr[npos[i*2]][npos[i*2+1]] *= multi
+
+							if nos.Arr[npos[i*2]][npos[i*2+1]] > chgSymbolVals.Config.MaxVal {
+								nos.Arr[npos[i*2]][npos[i*2+1]] = chgSymbolVals.Config.MaxVal
+							}
+
+							if !gIsReleaseMode {
+								cd.AddPos(npos[i*2], npos[i*2+1])
+							}
+						}
 					}
 				}
 			}
-		} else {
+		} else if chgSymbolVals.Config.SourceType == CSVSTypeWinResult {
 			for _, cn := range chgSymbolVals.Config.WinResultComponents {
 				ccd := gameProp.GetComponentDataWithName(cn)
 				// ccd := gameProp.MapComponentData[cn]
@@ -267,12 +308,12 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 
 						if chgSymbolVals.Config.Type == CSVTypeInc {
-							if nos == os {
-								nos = os.CloneEx(gameProp.PoolScene)
-							}
-
 							for i := 0; i < len(npos)/2; i++ {
 								if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
+									if nos == os {
+										nos = os.CloneEx(gameProp.PoolScene)
+									}
+
 									nos.Arr[npos[i*2]][npos[i*2+1]]++
 
 									if !gIsReleaseMode {
@@ -294,7 +335,132 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 									}
 								}
 							}
+						} else if chgSymbolVals.Config.Type == CSVTypeMul {
+							multi := chgSymbolVals.GetMulti(&cd.BasicComponentData)
+
+							for i := 0; i < len(npos)/2; i++ {
+								if nos == os {
+									nos = os.CloneEx(gameProp.PoolScene)
+								}
+
+								nos.Arr[npos[i*2]][npos[i*2+1]] *= multi
+
+								if nos.Arr[npos[i*2]][npos[i*2+1]] > chgSymbolVals.Config.MaxVal {
+									nos.Arr[npos[i*2]][npos[i*2+1]] = chgSymbolVals.Config.MaxVal
+								}
+
+								if !gIsReleaseMode {
+									cd.AddPos(npos[i*2], npos[i*2+1])
+								}
+							}
 						}
+					}
+				}
+			}
+		} else if chgSymbolVals.Config.SourceType == CSVSTypeRow {
+			if chgSymbolVals.Config.Type == CSVTypeInc {
+				if nos == os {
+					nos = os.CloneEx(gameProp.PoolScene)
+				}
+
+				y := chgSymbolVals.Config.Row
+
+				for x := 0; x < os.Width; x++ {
+					if nos.Arr[x][y] < chgSymbolVals.Config.MaxVal {
+						nos.Arr[x][y]++
+
+						if !gIsReleaseMode {
+							cd.AddPos(x, y)
+						}
+					}
+				}
+			} else if chgSymbolVals.Config.Type == CSVTypeDec {
+				if nos == os {
+					nos = os.CloneEx(gameProp.PoolScene)
+				}
+
+				y := chgSymbolVals.Config.Row
+
+				for x := 0; x < os.Width; x++ {
+					if nos.Arr[x][y] > chgSymbolVals.Config.MinVal {
+						nos.Arr[x][y]--
+
+						if !gIsReleaseMode {
+							cd.AddPos(x, y)
+						}
+					}
+				}
+			} else if chgSymbolVals.Config.Type == CSVTypeMul {
+				multi := chgSymbolVals.GetMulti(&cd.BasicComponentData)
+
+				if nos == os {
+					nos = os.CloneEx(gameProp.PoolScene)
+				}
+
+				y := chgSymbolVals.Config.Row
+
+				for x := 0; x < os.Width; x++ {
+					nos.Arr[x][y] *= multi
+					if nos.Arr[x][y] > chgSymbolVals.Config.MaxVal {
+						nos.Arr[x][y] = chgSymbolVals.Config.MaxVal
+					}
+
+					if !gIsReleaseMode {
+						cd.AddPos(x, y)
+					}
+				}
+
+			}
+		} else if chgSymbolVals.Config.SourceType == CSVSTypeColumn {
+			if chgSymbolVals.Config.Type == CSVTypeInc {
+				if nos == os {
+					nos = os.CloneEx(gameProp.PoolScene)
+				}
+
+				x := chgSymbolVals.Config.Column
+
+				for y := 0; y < os.Height; y++ {
+					if nos.Arr[x][y] < chgSymbolVals.Config.MaxVal {
+						nos.Arr[x][y]++
+
+						if !gIsReleaseMode {
+							cd.AddPos(x, y)
+						}
+					}
+				}
+			} else if chgSymbolVals.Config.Type == CSVTypeDec {
+				if nos == os {
+					nos = os.CloneEx(gameProp.PoolScene)
+				}
+
+				x := chgSymbolVals.Config.Column
+
+				for y := 0; y < os.Height; y++ {
+					if nos.Arr[x][y] > chgSymbolVals.Config.MinVal {
+						nos.Arr[x][y]--
+
+						if !gIsReleaseMode {
+							cd.AddPos(x, y)
+						}
+					}
+				}
+			} else if chgSymbolVals.Config.Type == CSVTypeMul {
+				multi := chgSymbolVals.GetMulti(&cd.BasicComponentData)
+
+				if nos == os {
+					nos = os.CloneEx(gameProp.PoolScene)
+				}
+
+				x := chgSymbolVals.Config.Column
+
+				for y := 0; y < os.Height; y++ {
+					nos.Arr[x][y] *= multi
+					if nos.Arr[x][y] > chgSymbolVals.Config.MaxVal {
+						nos.Arr[x][y] = chgSymbolVals.Config.MaxVal
+					}
+
+					if !gIsReleaseMode {
+						cd.AddPos(x, y)
 					}
 				}
 			}
@@ -346,6 +512,12 @@ func NewChgSymbolVals(name string) IComponent {
 	}
 }
 
+// "maxNumber": 0,
+// "maxVal": 99,
+// "type": "mul",
+// "sourceType": "row",
+// "multi": 1,
+// "row": "row4"
 type jsonChgSymbolVals struct {
 	Type                string   `json:"type"`
 	SourceType          string   `json:"sourceType"`
@@ -354,6 +526,47 @@ type jsonChgSymbolVals struct {
 	MaxNumber           int      `json:"maxNumber"`
 	MaxVal              int      `json:"maxVal"`
 	MinVal              int      `json:"minVal"`
+	Row                 string   `json:"row"`
+	Column              string   `json:"column"`
+	Multi               int      `json:"multi"`
+}
+
+func (jcfg *jsonChgSymbolVals) parseRow() int {
+	if jcfg.Row != "" {
+		arr := strings.Split(jcfg.Row, "row")
+		if len(arr) == 2 {
+			i64, err := goutils.String2Int64(arr[1])
+			if err != nil {
+				goutils.Error("jsonChgSymbolVals.parseRow:String2Int64",
+					goutils.Err(err))
+
+				return 0
+			}
+
+			return int(i64) - 1
+		}
+	}
+
+	return 0
+}
+
+func (jcfg *jsonChgSymbolVals) parseColumn() int {
+	if jcfg.Column != "" {
+		arr := strings.Split(jcfg.Column, "column")
+		if len(arr) == 2 {
+			i64, err := goutils.String2Int64(arr[1])
+			if err != nil {
+				goutils.Error("jsonChgSymbolVals.parseColumn:String2Int64",
+					goutils.Err(err))
+
+				return 0
+			}
+
+			return int(i64) - 1
+		}
+	}
+
+	return 0
 }
 
 func (jcfg *jsonChgSymbolVals) build() *ChgSymbolValsConfig {
@@ -365,6 +578,9 @@ func (jcfg *jsonChgSymbolVals) build() *ChgSymbolValsConfig {
 		MaxNumber:           jcfg.MaxNumber,
 		MaxVal:              jcfg.MaxVal,
 		MinVal:              jcfg.MinVal,
+		Row:                 jcfg.parseRow(),
+		Column:              jcfg.parseColumn(),
+		Multi:               jcfg.Multi,
 	}
 
 	// cfg.UseSceneV3 = true

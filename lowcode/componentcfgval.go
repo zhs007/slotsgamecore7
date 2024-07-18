@@ -18,6 +18,7 @@ const (
 	CCVWeight                string = "weight"                // 可以修改配置项里的 weight
 	CCVForceBranch           string = "forceBranch"           // 可以修改配置项里的 forceBranch
 	CCVWins                  string = "wins"                  // 可以修改配置项里的 wins
+	CCVMulti                 string = "multi"                 // 可以修改配置项里的 multi
 )
 
 const (
