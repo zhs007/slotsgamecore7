@@ -141,9 +141,9 @@ func CalcLine2(scene *GameScene, pt *PayTables, ld []int, bet int,
 	for x := 1; x < len(ld); x++ {
 		cs := scene.Arr[sx+x][ld[sx+x]]
 
-		if !isValidSymbol(cs) && !isWild(cs) {
-			break
-		}
+		// if !isValidSymbol(cs) && !isWild(cs) {
+		// 	break
+		// }
 
 		if isSameSymbol(cs, s0) {
 			if isWild(cs) {
@@ -319,9 +319,9 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 	for x := 1; x < len(ld); x++ {
 		cs := scene.Arr[sx-x][ld[sx-x]]
 
-		if !isValidSymbol(cs) && !isWild(cs) {
-			break
-		}
+		// if !isValidSymbol(cs) && !isWild(cs) {
+		// 	break
+		// }
 
 		if isSameSymbol(cs, s0) {
 			if isWild(cs) {

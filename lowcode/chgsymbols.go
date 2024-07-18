@@ -41,6 +41,7 @@ type ChgSymbolsConfig struct {
 	BlankSymbolCode      int                   `yaml:"-" json:"-"`
 	Weight               string                `yaml:"weight" json:"weight"`
 	WeightVW2            *sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	MaxNumber            int                   `yaml:"maxNumber" json:"maxNumber"`
 	Controllers          []*Award              `yaml:"controllers" json:"controllers"`
 	JumpToComponent      string                `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
@@ -185,6 +186,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				}
 			}
 		} else {
+			curNumber := 0
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
@@ -213,10 +215,18 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 							}
 
 							ngs.Arr[x][y] = cursc
+
+							curNumber++
+
+							if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
+								goto breakMaxNumber
+							}
 						}
 					}
 				}
 			}
+
+		breakMaxNumber:
 		}
 
 		if ngs == gs {
@@ -309,12 +319,14 @@ func NewChgSymbols(name string) IComponent {
 //	"MY"
 //
 // ],
-// "weight": "mweight"
+// "weight": "mweight",
+// "maxNumber": 0
 type jsonChgSymbols struct {
 	Symbols     []string `json:"symbols"`
 	BlankSymbol string   `yaml:"blankSymbol" json:"blankSymbol"`
 	Weight      string   `yaml:"weight" json:"weight"`
 	StrType     string   `json:"type"`
+	MaxNumber   int      `json:"maxNumber"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
@@ -323,6 +335,7 @@ func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 		BlankSymbol: jcfg.BlankSymbol,
 		Weight:      jcfg.Weight,
 		StrType:     jcfg.StrType,
+		MaxNumber:   jcfg.MaxNumber,
 	}
 
 	// cfg.UseSceneV3 = true
