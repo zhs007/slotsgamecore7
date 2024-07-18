@@ -72,6 +72,8 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 	autotimes := autogametimes
 
+	plugin.SetCache([]int{24, 60, 35, 15, 1})
+
 	for {
 		if autotimes <= 0 && !isSkipGetChar {
 			fmt.Printf("please press %v to start spin, or press %v to spin 100 times, or press %v to spin 1000 times, or press %v to quit.\n",
