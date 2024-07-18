@@ -72,7 +72,7 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 
 	autotimes := autogametimes
 
-	plugin.SetCache([]int{24, 60, 35, 15, 1})
+	// plugin.SetCache([]int{24, 60, 35, 15, 1})
 
 	for {
 		if autotimes <= 0 && !isSkipGetChar {
