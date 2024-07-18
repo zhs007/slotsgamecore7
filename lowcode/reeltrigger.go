@@ -210,12 +210,12 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	}
 
 	if reelTrigger.Config.Type == RTTypeRow || reelTrigger.Config.Type == RTTypeRowNumber {
-		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Height {
-			reelTrigger.Config.MinSymbolNum = pool.Config.Height
-		}
-	} else if reelTrigger.Config.Type == RTTypeColumn || reelTrigger.Config.Type == RTTypeColumnNumber {
 		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Width {
 			reelTrigger.Config.MinSymbolNum = pool.Config.Width
+		}
+	} else if reelTrigger.Config.Type == RTTypeColumn || reelTrigger.Config.Type == RTTypeColumnNumber {
+		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Height {
+			reelTrigger.Config.MinSymbolNum = pool.Config.Height
 		}
 	}
 
