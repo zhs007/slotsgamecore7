@@ -471,7 +471,7 @@ func NewReelTrigger(name string) IComponent {
 // "minSymbolNum": 4,
 // "symbols": "CASH"
 type jsonReelTrigger struct {
-	Symbol       string   `json:"symbols"`
+	Symbols      []string `json:"symbols"`
 	TriggerType  string   `json:"triggerType"`
 	MinSymbolNum int      `json:"minSymbolNum"`
 	WildSymbols  []string `json:"wildSymbols"`
@@ -480,7 +480,7 @@ type jsonReelTrigger struct {
 
 func (jcfg *jsonReelTrigger) build() *ReelTriggerConfig {
 	cfg := &ReelTriggerConfig{
-		Symbol:       jcfg.Symbol,
+		Symbol:       jcfg.Symbols[0],
 		StrType:      jcfg.TriggerType,
 		WildSymbols:  jcfg.WildSymbols,
 		MinSymbolNum: jcfg.MinSymbolNum,
