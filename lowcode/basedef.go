@@ -271,6 +271,9 @@ const MaxComponentNumInStep = 100
 
 const BasicGameModName = "basic"
 
+// FuncOnChgComponentIntVal - 当这个接口处理完数据，需要返回true，这时底层就不会再处理了
+type FuncOnChgComponentIntVal func(componentName string, valName string, off int) bool
+
 func init() {
 	initCheckWinType()
 }
