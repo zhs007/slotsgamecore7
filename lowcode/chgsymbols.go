@@ -42,6 +42,7 @@ type ChgSymbolsConfig struct {
 	Weight               string                `yaml:"weight" json:"weight"`
 	WeightVW2            *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	MaxNumber            int                   `yaml:"maxNumber" json:"maxNumber"`
+	IsAlwaysGen          bool                  `yaml:"isAlwaysGen" json:"isAlwaysGen"`
 	Controllers          []*Award              `yaml:"controllers" json:"controllers"`
 	JumpToComponent      string                `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
@@ -163,6 +164,10 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	if gs != nil {
 		ngs := gs
 
+		if chgSymbols.Config.IsAlwaysGen {
+			ngs = gs.CloneEx(gameProp.PoolScene)
+		}
+
 		if chgSymbols.Config.Type == ChgSymTypeMystery {
 			cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
 			// vw2 := chgSymbols.GetWeight(gameProp, cd)
@@ -176,7 +181,9 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			// cursc := curs.Int()
 
-			ngs = gs.CloneEx(gameProp.PoolScene)
+			if ngs == gs {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
 
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
@@ -186,21 +193,14 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				}
 			}
 		} else {
+			if chgSymbols.Config.IsAlwaysGen {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
+
 			curNumber := 0
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-						// vw2 := chgSymbols.GetWeight(gameProp, cd)
-						// curs, err := vw2.RandVal(plugin)
-						// if err != nil {
-						// 	goutils.Error("ChgSymbols.OnPlayGame:RandVal",
-						// 		goutils.Err(err))
-
-						// 	return "", err
-						// }
-
-						// cursc := curs.Int()
-
 						cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
 						if err != nil {
 							goutils.Error("ChgSymbols.OnPlayGame:RollSymbol",
@@ -320,13 +320,15 @@ func NewChgSymbols(name string) IComponent {
 //
 // ],
 // "weight": "mweight",
-// "maxNumber": 0
+// "maxNumber": 0,
+// "isAlwaysGen": true,
 type jsonChgSymbols struct {
 	Symbols     []string `json:"symbols"`
 	BlankSymbol string   `yaml:"blankSymbol" json:"blankSymbol"`
 	Weight      string   `yaml:"weight" json:"weight"`
 	StrType     string   `json:"type"`
 	MaxNumber   int      `json:"maxNumber"`
+	IsAlwaysGen bool     `json:"isAlwaysGen"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
@@ -336,6 +338,7 @@ func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 		Weight:      jcfg.Weight,
 		StrType:     jcfg.StrType,
 		MaxNumber:   jcfg.MaxNumber,
+		IsAlwaysGen: jcfg.IsAlwaysGen,
 	}
 
 	// cfg.UseSceneV3 = true
