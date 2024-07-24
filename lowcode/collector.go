@@ -227,6 +227,22 @@ func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameP
 		for _, v := range sp {
 			gameProp.procAward(plugin, v, curpr, gp, false)
 		}
+	} else {
+		if newLevel == -1 {
+			sp1, isok1 := collector.Config.MapSPLevelAwards[collector.Config.MaxVal]
+			if isok1 {
+				for _, v := range sp1 {
+					gameProp.procAward(plugin, v, curpr, gp, false)
+				}
+			}
+		} else if newLevel == collector.Config.MaxVal {
+			sp1, isok1 := collector.Config.MapSPLevelAwards[-1]
+			if isok1 {
+				for _, v := range sp1 {
+					gameProp.procAward(plugin, v, curpr, gp, false)
+				}
+			}
+		}
 	}
 
 	return nil
