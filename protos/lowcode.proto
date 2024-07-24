@@ -332,6 +332,12 @@ message JackpotData {
     int32 winMulti = 3;
 }
 
+// CheckValData
+message CheckValData {
+    ComponentData basicComponentData = 1;
+    bool isTrigger = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
