@@ -159,6 +159,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd.UsedScenes = nil
 	cd.SrcScenes = nil
+	isRealGen := false
 
 	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs != nil {
@@ -181,14 +182,20 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			// cursc := curs.Int()
 
-			if ngs == gs {
-				ngs = gs.CloneEx(gameProp.PoolScene)
-			}
+			// if ngs == gs {
+			// 	ngs = gs.CloneEx(gameProp.PoolScene)
+			// }
 
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
 						ngs.Arr[x][y] = cursc
+
+						isRealGen = true
 					}
 				}
 			}
@@ -218,6 +225,8 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 							curNumber++
 
+							isRealGen = true
+
 							if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
 								goto breakMaxNumber
 							}
@@ -237,8 +246,10 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, cd)
 
-		if len(chgSymbols.Config.Controllers) > 0 {
-			gameProp.procAwards(plugin, chgSymbols.Config.Controllers, curpr, gp)
+		if !isRealGen {
+			if len(chgSymbols.Config.Controllers) > 0 {
+				gameProp.procAwards(plugin, chgSymbols.Config.Controllers, curpr, gp)
+			}
 		}
 
 		nc := chgSymbols.onStepEnd(gameProp, curpr, gp, chgSymbols.Config.JumpToComponent)
