@@ -106,14 +106,14 @@ func (symbolValWinsData *SymbolValWinsData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
-	if key == CVWins {
-		symbolValWinsData.Wins = val
-	} else if key == CVSymbolNum {
-		symbolValWinsData.SymbolNum = val
-	}
-}
+// // SetVal -
+// func (symbolValWinsData *SymbolValWinsData) SetVal(key string, val int) {
+// 	if key == CVWins {
+// 		symbolValWinsData.Wins = val
+// 	} else if key == CVSymbolNum {
+// 		symbolValWinsData.SymbolNum = val
+// 	}
+// }
 
 // SymbolValWinsConfig - configuration for SymbolValWins
 type SymbolValWinsConfig struct {

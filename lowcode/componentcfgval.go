@@ -22,7 +22,7 @@ const (
 )
 
 const (
-	CVSymbolNum             string = "symbolNum"             // 触发后，中奖的符号数量
+	CVSymbolNum             string = "symbolNum"             // 触发后，符号数量
 	CVWildNum               string = "wildNum"               // 触发后，中奖符号里的wild数量
 	CVRespinNum             string = "respinNum"             // 触发后，如果有产生respin的逻辑，这就是最终respin的次数
 	CVWins                  string = "wins"                  // 中奖的数值，线注的倍数

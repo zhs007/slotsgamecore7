@@ -72,12 +72,12 @@ func (winResultCacheData *WinResultCacheData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (winResultCacheData *WinResultCacheData) SetVal(key string, val int) {
-	if key == CVWins {
-		winResultCacheData.Wins = val
-	}
-}
+// // SetVal -
+// func (winResultCacheData *WinResultCacheData) SetVal(key string, val int) {
+// 	if key == CVWins {
+// 		winResultCacheData.Wins = val
+// 	}
+// }
 
 // WinResultCacheConfig - configuration for WinResultCache
 type WinResultCacheConfig struct {

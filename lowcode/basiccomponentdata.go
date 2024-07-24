@@ -106,11 +106,6 @@ func (basicComponentData *BasicComponentData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (basicComponentData *BasicComponentData) SetVal(key string, val int) {
-
-}
-
 // GetConfigVal -
 func (basicComponentData *BasicComponentData) GetConfigVal(key string) string {
 	return basicComponentData.MapConfigVals[key]

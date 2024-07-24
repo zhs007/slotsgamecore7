@@ -98,18 +98,18 @@ func (waysTriggerData *WaysTriggerData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (waysTriggerData *WaysTriggerData) SetVal(key string, val int) {
-	if key == CVSymbolNum {
-		waysTriggerData.SymbolNum = val
-	} else if key == CVWildNum {
-		waysTriggerData.WildNum = val
-	} else if key == CVRespinNum {
-		waysTriggerData.RespinNum = val
-	} else if key == CVWins {
-		waysTriggerData.Wins = val
-	}
-}
+// // SetVal -
+// func (waysTriggerData *WaysTriggerData) SetVal(key string, val int) {
+// 	if key == CVSymbolNum {
+// 		waysTriggerData.SymbolNum = val
+// 	} else if key == CVWildNum {
+// 		waysTriggerData.WildNum = val
+// 	} else if key == CVRespinNum {
+// 		waysTriggerData.RespinNum = val
+// 	} else if key == CVWins {
+// 		waysTriggerData.Wins = val
+// 	}
+// }
 
 // WaysTriggerConfig - configuration for WaysTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理

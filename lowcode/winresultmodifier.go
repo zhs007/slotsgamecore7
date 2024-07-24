@@ -82,12 +82,12 @@ func (winResultModifierData *WinResultModifierData) GetVal(key string) (int, boo
 	return 0, false
 }
 
-// SetVal -
-func (winResultModifierData *WinResultModifierData) SetVal(key string, val int) {
-	if key == CVWins {
-		winResultModifierData.Wins = val
-	}
-}
+// // SetVal -
+// func (winResultModifierData *WinResultModifierData) SetVal(key string, val int) {
+// 	if key == CVWins {
+// 		winResultModifierData.Wins = val
+// 	}
+// }
 
 // WinResultModifierConfig - configuration for WinResultModifier
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理

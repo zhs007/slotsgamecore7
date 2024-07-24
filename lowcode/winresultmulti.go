@@ -72,12 +72,12 @@ func (winResultMultiData *WinResultMultiData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (winResultMultiData *WinResultMultiData) SetVal(key string, val int) {
-	if key == CVWins {
-		winResultMultiData.Wins = val
-	}
-}
+// // SetVal -
+// func (winResultMultiData *WinResultMultiData) SetVal(key string, val int) {
+// 	if key == CVWins {
+// 		winResultMultiData.Wins = val
+// 	}
+// }
 
 // WinResultMultiConfig - configuration for WinResultMulti
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
@@ -220,7 +220,7 @@ func (winResultMulti *WinResultMulti) GetWinMulti(basicCD *BasicComponentData) i
 		if winMulti <= 0 {
 			return 1
 		}
-		
+
 		return winMulti
 	}
 

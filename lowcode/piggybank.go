@@ -104,14 +104,14 @@ func (piggyBankData *PiggyBankData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (piggyBankData *PiggyBankData) SetVal(key string, val int) {
-	if key == CVWins {
-		piggyBankData.Wins = val
-	} else if key == CVWinMulti {
-		piggyBankData.WinMulti = val
-	}
-}
+// // SetVal -
+// func (piggyBankData *PiggyBankData) SetVal(key string, val int) {
+// 	if key == CVWins {
+// 		piggyBankData.Wins = val
+// 	} else if key == CVWinMulti {
+// 		piggyBankData.WinMulti = val
+// 	}
+// }
 
 // PiggyBankConfig - configuration for PiggyBank
 type PiggyBankConfig struct {

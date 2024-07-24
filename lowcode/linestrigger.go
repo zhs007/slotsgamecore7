@@ -101,18 +101,18 @@ func (linesTriggerData *LinesTriggerData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
-	if key == CVSymbolNum {
-		linesTriggerData.SymbolNum = val
-	} else if key == CVWildNum {
-		linesTriggerData.WildNum = val
-	} else if key == CVRespinNum {
-		linesTriggerData.RespinNum = val
-	} else if key == CVWins {
-		linesTriggerData.Wins = val
-	}
-}
+// // SetVal -
+// func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
+// 	if key == CVSymbolNum {
+// 		linesTriggerData.SymbolNum = val
+// 	} else if key == CVWildNum {
+// 		linesTriggerData.WildNum = val
+// 	} else if key == CVRespinNum {
+// 		linesTriggerData.RespinNum = val
+// 	} else if key == CVWins {
+// 		linesTriggerData.Wins = val
+// 	}
+// }
 
 // LinesTriggerConfig - configuration for LinesTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
