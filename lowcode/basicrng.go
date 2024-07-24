@@ -29,3 +29,8 @@ func (rng *BasicRNG) OnNewGame(plugin sgc7plugin.IPlugin) error {
 func (rng *BasicRNG) GetCurRNG(gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
 	return false, -1, rng.curPlugin, ""
 }
+
+// OnChoiceBranch -
+func (rng *BasicRNG) OnChoiceBranch(curComponent IComponent, branchName string) error {
+	return nil
+}
