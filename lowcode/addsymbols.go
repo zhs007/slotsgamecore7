@@ -47,6 +47,12 @@ func (addSymbolsData *AddSymbolsData) OnNewGame(gameProp *GameProperty, componen
 	addSymbolsData.SymbolNum = 0
 }
 
+// onNewStep -
+func (addSymbolsData *AddSymbolsData) onNewStep() {
+	addSymbolsData.SymbolNum = 0
+	addSymbolsData.UsedScenes = nil
+}
+
 // Clone
 func (addSymbolsData *AddSymbolsData) Clone() IComponentData {
 	target := &AddSymbolsData{
@@ -184,7 +190,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd := icd.(*AddSymbolsData)
 
-	cd.UsedScenes = nil
+	cd.onNewStep()
 
 	gs := addSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -237,6 +243,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
+			cd.SymbolNum++
 
 			pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
 
@@ -289,6 +296,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				}
 
 				ngs.Arr[x][cy] = addSymbols.Config.SymbolCode
+				cd.SymbolNum++
 			}
 		} else {
 			for i := 0; i < num; i++ {
@@ -309,6 +317,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				}
 
 				ngs.Arr[xarr[cxi]][cy] = addSymbols.Config.SymbolCode
+				cd.SymbolNum++
 
 				if len(xarr) <= 1 || i == num-1 {
 					break
