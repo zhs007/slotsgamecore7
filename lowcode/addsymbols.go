@@ -11,6 +11,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -32,6 +34,46 @@ func parseAddSymbolsType(str string) AddSymbolsType {
 	}
 
 	return AddSymbolsTypeNormal
+}
+
+type AddSymbolsData struct {
+	BasicComponentData
+	SymbolNum int
+}
+
+// OnNewGame -
+func (addSymbolsData *AddSymbolsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	addSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
+	addSymbolsData.SymbolNum = 0
+}
+
+// Clone
+func (addSymbolsData *AddSymbolsData) Clone() IComponentData {
+	target := &AddSymbolsData{
+		BasicComponentData: addSymbolsData.CloneBasicComponentData(),
+		SymbolNum:          addSymbolsData.SymbolNum,
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (addSymbolsData *AddSymbolsData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.AddSymbolsData{
+		BasicComponentData: addSymbolsData.BuildPBBasicComponentData(),
+		SymbolNum:          int32(addSymbolsData.SymbolNum),
+	}
+
+	return pbcd
+}
+
+// GetVal -
+func (addSymbolsData *AddSymbolsData) GetVal(key string) (int, bool) {
+	if key == CVSymbolNum {
+		return addSymbolsData.SymbolNum, true
+	}
+
+	return 0, false
 }
 
 // AddSymbolsConfig - configuration for AddSymbols
@@ -140,7 +182,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	// replaceReelWithMask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*AddSymbolsData)
 
 	cd.UsedScenes = nil
 
@@ -203,7 +245,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 		}
 
-		addSymbols.AddScene(gameProp, curpr, ngs, cd)
+		addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	} else {
 		xarr := make([]int, 0, gs.Width)
 
@@ -276,7 +318,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 		}
 
-		addSymbols.AddScene(gameProp, curpr, ngs, cd)
+		addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	}
 
 	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
@@ -286,7 +328,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 // OnAsciiGame - outpur to asciigame
 func (addSymbols *AddSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*AddSymbolsData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after addSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
@@ -295,10 +337,10 @@ func (addSymbols *AddSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	return nil
 }
 
-// // OnStats
-// func (addSymbols *AddSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
+// NewComponentData -
+func (addSymbols *AddSymbols) NewComponentData() IComponentData {
+	return &AddSymbolsData{}
+}
 
 func NewAddSymbols(name string) IComponent {
 	return &AddSymbols{

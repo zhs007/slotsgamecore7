@@ -150,18 +150,18 @@ func (clusterTriggerData *ClusterTriggerData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
-	if key == CVSymbolNum {
-		clusterTriggerData.SymbolNum = val
-	} else if key == CVWildNum {
-		clusterTriggerData.WildNum = val
-	} else if key == CVRespinNum {
-		clusterTriggerData.RespinNum = val
-	} else if key == CVWins {
-		clusterTriggerData.Wins = val
-	}
-}
+// // SetVal -
+// func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
+// 	if key == CVSymbolNum {
+// 		clusterTriggerData.SymbolNum = val
+// 	} else if key == CVWildNum {
+// 		clusterTriggerData.WildNum = val
+// 	} else if key == CVRespinNum {
+// 		clusterTriggerData.RespinNum = val
+// 	} else if key == CVWins {
+// 		clusterTriggerData.Wins = val
+// 	}
+// }
 
 // GetPos -
 func (clusterTriggerData *ClusterTriggerData) GetPos() []int {

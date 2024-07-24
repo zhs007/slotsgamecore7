@@ -68,9 +68,9 @@ func (rollSymbolData *RollSymbolData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (rollSymbolData *RollSymbolData) SetVal(key string, val int) {
-}
+// // SetVal -
+// func (rollSymbolData *RollSymbolData) SetVal(key string, val int) {
+// }
 
 // RollSymbolConfig - configuration for RollSymbol
 type RollSymbolConfig struct {

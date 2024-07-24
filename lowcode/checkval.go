@@ -28,11 +28,6 @@ func (checkValData *CheckValData) OnNewGame(gameProp *GameProperty, component IC
 	checkValData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// // OnNewStep -
-// func (weightBranchData *WeightBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	weightBranchData.BasicComponentData.OnNewStep(gameProp, component)
-// }
-
 // Clone
 func (checkValData *CheckValData) Clone() IComponentData {
 	target := &CheckValData{
@@ -56,10 +51,6 @@ func (checkValData *CheckValData) BuildPBComponentData() proto.Message {
 // GetVal -
 func (checkValData *CheckValData) GetVal(key string) (int, bool) {
 	return 0, false
-}
-
-// SetVal -
-func (checkValData *CheckValData) SetVal(key string, val int) {
 }
 
 // CheckValConfig - configuration for CheckVal

@@ -53,9 +53,9 @@ func (weightBranchData *WeightBranchData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (weightBranchData *WeightBranchData) SetVal(key string, val int) {
-}
+// // SetVal -
+// func (weightBranchData *WeightBranchData) SetVal(key string, val int) {
+// }
 
 // GetStrVal -
 func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {

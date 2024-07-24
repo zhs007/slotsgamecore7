@@ -73,14 +73,14 @@ func (jackpotData *JackpotData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (jackpotData *JackpotData) SetVal(key string, val int) {
-	if key == CVWins {
-		jackpotData.Wins = val
-	} else if key == CVWinMulti {
-		jackpotData.WinMulti = val
-	}
-}
+// // SetVal -
+// func (jackpotData *JackpotData) SetVal(key string, val int) {
+// 	if key == CVWins {
+// 		jackpotData.Wins = val
+// 	} else if key == CVWinMulti {
+// 		jackpotData.WinMulti = val
+// 	}
+// }
 
 // JackpotConfig - configuration for Jackpot
 type JackpotConfig struct {

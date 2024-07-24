@@ -99,18 +99,18 @@ func (scatterTriggerData *ScatterTriggerData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (scatterTriggerData *ScatterTriggerData) SetVal(key string, val int) {
-	if key == CVSymbolNum {
-		scatterTriggerData.SymbolNum = val
-	} else if key == CVWildNum {
-		scatterTriggerData.WildNum = val
-	} else if key == CVRespinNum {
-		scatterTriggerData.RespinNum = val
-	} else if key == CVWins {
-		scatterTriggerData.Wins = val
-	}
-}
+// // SetVal -
+// func (scatterTriggerData *ScatterTriggerData) SetVal(key string, val int) {
+// 	if key == CVSymbolNum {
+// 		scatterTriggerData.SymbolNum = val
+// 	} else if key == CVWildNum {
+// 		scatterTriggerData.WildNum = val
+// 	} else if key == CVRespinNum {
+// 		scatterTriggerData.RespinNum = val
+// 	} else if key == CVWins {
+// 		scatterTriggerData.Wins = val
+// 	}
+// }
 
 // ScatterTriggerConfig - configuration for ScatterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理

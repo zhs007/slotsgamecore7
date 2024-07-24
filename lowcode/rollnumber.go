@@ -70,12 +70,12 @@ func (rollNumberData *RollNumberData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// SetVal -
-func (rollNumberData *RollNumberData) SetVal(key string, val int) {
-	if key == CVNumber {
-		rollNumberData.Number = val
-	}
-}
+// // SetVal -
+// func (rollNumberData *RollNumberData) SetVal(key string, val int) {
+// 	if key == CVNumber {
+// 		rollNumberData.Number = val
+// 	}
+// }
 
 // RollNumberConfig - configuration for RollNumber
 type RollNumberConfig struct {
