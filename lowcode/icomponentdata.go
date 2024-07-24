@@ -25,6 +25,9 @@ type IComponentData interface {
 	// SetVal -
 	SetVal(key string, val int)
 
+	// GetStrVal -
+	GetStrVal(key string) (string, bool)
+
 	// GetConfigVal -
 	GetConfigVal(key string) string
 	// SetConfigVal -

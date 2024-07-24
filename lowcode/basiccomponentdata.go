@@ -349,3 +349,8 @@ func (basicComponentData *BasicComponentData) ForceBranch(branchIndex int) {
 		basicComponentData.ForceBranchIndex = branchIndex
 	}
 }
+
+// GetStrVal -
+func (basicComponentData *BasicComponentData) GetStrVal(key string) (string, bool) {
+	return "", false
+}

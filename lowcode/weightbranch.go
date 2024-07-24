@@ -18,10 +18,6 @@ import (
 
 const WeightBranchTypeName = "weightBranch"
 
-const (
-	WBDVValue string = "value" // 权重表最终的value
-)
-
 type WeightBranchData struct {
 	BasicComponentData
 	Value string
@@ -31,11 +27,6 @@ type WeightBranchData struct {
 func (weightBranchData *WeightBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	weightBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
-
-// // OnNewStep -
-// func (weightBranchData *WeightBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	weightBranchData.BasicComponentData.OnNewStep(gameProp, component)
-// }
 
 // Clone
 func (weightBranchData *WeightBranchData) Clone() IComponentData {
@@ -64,6 +55,15 @@ func (weightBranchData *WeightBranchData) GetVal(key string) (int, bool) {
 
 // SetVal -
 func (weightBranchData *WeightBranchData) SetVal(key string, val int) {
+}
+
+// GetStrVal -
+func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
+	if key == CSVValue {
+		return weightBranchData.Value, true
+	}
+
+	return "", false
 }
 
 // BranchNode -
