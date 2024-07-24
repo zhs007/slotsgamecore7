@@ -210,6 +210,8 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		wbd.Value = forceBranch
 	}
 
+	gameProp.rng.OnChoiceBranch(weightBranch, wbd.Value)
+
 	nextComponent := ""
 
 	branch, isok := weightBranch.Config.MapBranchs[wbd.Value]

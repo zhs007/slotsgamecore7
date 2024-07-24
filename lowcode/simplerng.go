@@ -56,6 +56,11 @@ func (rng *SimpleRNG) IsIterateEnding() bool {
 	return rng.curIndex < len(rng.weights)
 }
 
+// OnChoiceBranch -
+func (rng *SimpleRNG) OnChoiceBranch(curComponent IComponent, branchName string) error {
+	return nil
+}
+
 func NewSimpleRNG(iterateComponent string) IRNG {
 	return &SimpleRNG{
 		IterateComponent: iterateComponent,
