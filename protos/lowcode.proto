@@ -338,6 +338,12 @@ message CheckValData {
     bool isTrigger = 2;
 }
 
+// AddSymbolsData
+message AddSymbolsData {
+    ComponentData basicComponentData = 1;
+    int32 symbolNum = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
