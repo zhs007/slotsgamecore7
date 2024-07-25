@@ -17,6 +17,13 @@ func SpinWithSeed(game *Game, ips sgc7game.IPlayerState, seed int, stake *sgc7ga
 	lst := []*WeightResults{}
 
 	gameData := game.NewGameData(stake)
+	if gameData == nil {
+		goutils.Error("SpinWithSeed:NewGameData",
+			goutils.Err(sgc7game.ErrInvalidStake))
+
+		return nil, sgc7game.ErrInvalidStake
+	}
+
 	defer game.DeleteGameData(gameData)
 
 	gameProp, isok := gameData.(*GameProperty)

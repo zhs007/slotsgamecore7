@@ -24,6 +24,15 @@ func startWorker(game sgc7game.IGame, rtp *RTP, spinnums int64, stake *sgc7game.
 		// ps := sgc7game.NewBasicPlayerState("bg")
 		results := []*sgc7game.PlayResult{}
 		gameData := game.NewGameData(stake)
+		if gameData == nil {
+			goutils.Error("startWorker:NewGameData",
+				goutils.Err(sgc7game.ErrInvalidStake))
+
+			ch <- currtp
+
+			return
+		}
+
 		defer game.DeleteGameData(gameData)
 		cmd := "SPIN"
 		cmdparam := ""

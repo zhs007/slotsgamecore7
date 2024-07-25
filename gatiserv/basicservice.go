@@ -99,6 +99,13 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 	results := []*sgc7game.PlayResult{}
 	gameData := sv.Game.NewGameData(stake)
+	if gameData == nil {
+		goutils.Error("BasicService.Play:NewGameData",
+			goutils.Err(sgc7game.ErrInvalidStake))
+
+		return nil, sgc7game.ErrInvalidStake
+	}
+
 	defer sv.Game.DeleteGameData(gameData)
 
 	cmd := params.Cmd
