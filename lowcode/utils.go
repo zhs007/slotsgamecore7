@@ -167,6 +167,12 @@ func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) (*ForceOutcome2, error) 
 func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stake *sgc7game.Stake, cmd string, params string) ([]*sgc7game.PlayResult, error) {
 	results := []*sgc7game.PlayResult{}
 	gameData := game.NewGameData(stake)
+	if gameData == nil {
+		goutils.Error("procSpin:NewGameData",
+			goutils.Err(sgc7game.ErrInvalidStake))
+
+		return nil, sgc7game.ErrInvalidStake
+	}
 	defer game.DeleteGameData(gameData)
 
 	for {

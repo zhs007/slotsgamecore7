@@ -123,6 +123,12 @@ func StartGame(game sgc7game.IGame, stake *sgc7game.Stake, onResult FuncOnResult
 		balance -= int(stake.CashBet)
 		spinwins := 0
 		gameData := game.NewGameData(stake)
+		if gameData == nil {
+			goutils.Error("StartGame.Play:NewGameData:no gamedata")
+
+			break
+		}
+
 		defer game.DeleteGameData(gameData)
 
 		plugin.ClearUsedRngs()

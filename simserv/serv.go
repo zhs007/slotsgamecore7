@@ -165,6 +165,13 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 	results := []*sgc7game.PlayResult{}
 	gameData := serv.Service.GetGame().NewGameData(stake)
+	if gameData == nil {
+		goutils.Error("BasicService.onPlay:NewGameData",
+			goutils.Err(sgc7game.ErrInvalidStake))
+
+		return nil, err
+	}
+
 	defer serv.Service.GetGame().DeleteGameData(gameData)
 
 	cmd := req.Command

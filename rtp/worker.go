@@ -51,6 +51,15 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
 			gameData := game.NewGameData(stake)
+			if gameData == nil {
+				goutils.Error("StartRTP:NewGameData",
+					goutils.Err(sgc7game.ErrInvalidStake))
+
+				ch <- currtp
+
+				return
+			}
+
 			defer game.DeleteGameData(gameData)
 			cmd := "SPIN"
 			cmdparam := ""
@@ -241,6 +250,15 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 			// ps := sgc7game.NewBasicPlayerState("bg")
 			results := []*sgc7game.PlayResult{}
 			gameData := game.NewGameData(stake)
+			if gameData == nil {
+				goutils.Error("StartScaleRTPDown:NewGameData",
+					goutils.Err(sgc7game.ErrInvalidStake))
+
+				ch <- currtp
+
+				return
+			}
+
 			defer game.DeleteGameData(gameData)
 			cmd := "SPIN"
 			off := 0

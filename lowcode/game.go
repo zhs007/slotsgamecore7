@@ -253,7 +253,12 @@ func (game *Game) OnAsciiGame(gameProp *GameProperty, stake *sgc7game.Stake, pr 
 
 // NewGameData - new GameData
 func (game *Game) NewGameData(stake *sgc7game.Stake) sgc7game.IGameData {
-	gameProp := game.Pool.MapGamePropPool[int(stake.CashBet)/int(stake.CoinBet)].Get().(*GameProperty)
+	pool, isok := game.Pool.MapGamePropPool[int(stake.CashBet)/int(stake.CoinBet)]
+	if !isok {
+		return nil
+	}
+
+	gameProp := pool.Get().(*GameProperty)
 
 	return gameProp
 }
