@@ -181,6 +181,10 @@ func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 	// 	cd = gameProp.MapComponentData[collector.Name].(*CollectorData)
 	// }
 
+	if collector.Config.MaxVal > 0 && !collector.Config.IsCycle && cd.Val == collector.Config.MaxVal {
+		return nil
+	}
+
 	cd.NewCollector += num
 	oldval := cd.Val
 	cd.Val += num
