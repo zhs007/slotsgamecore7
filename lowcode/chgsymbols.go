@@ -246,7 +246,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, cd)
 
-		if !isRealGen {
+		if isRealGen {
 			if len(chgSymbols.Config.Controllers) > 0 {
 				gameProp.procAwards(plugin, chgSymbols.Config.Controllers, curpr, gp)
 			}
