@@ -105,6 +105,7 @@ func (sv *BasicService) Play(params *PlayParams) (*PlayResult, error) {
 
 		return nil, sgc7game.ErrInvalidStake
 	}
+
 	defer sv.Game.DeleteGameData(gameData)
 
 	cmd := params.Cmd

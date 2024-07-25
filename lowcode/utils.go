@@ -173,6 +173,7 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 
 		return nil, sgc7game.ErrInvalidStake
 	}
+
 	defer game.DeleteGameData(gameData)
 
 	for {
