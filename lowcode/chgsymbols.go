@@ -205,6 +205,8 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			curNumber := 0
+			isNeedBreak := false
+
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
@@ -228,14 +230,18 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 							isRealGen = true
 
 							if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
-								goto breakMaxNumber
+								isNeedBreak = true
+
+								break
 							}
 						}
 					}
 				}
-			}
 
-		breakMaxNumber:
+				if isNeedBreak {
+					break
+				}
+			}
 		}
 
 		if ngs == gs {
