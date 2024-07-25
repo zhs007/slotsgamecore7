@@ -198,7 +198,7 @@ func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 		}
 	}
 
-	if num > 0 && !noProcLevelUp {
+	if num > 0 && !noProcLevelUp && oldval != cd.Val {
 		for i := 1; i <= num; i++ {
 			cl := oldval + i
 			if cl >= collector.Config.MaxVal {
