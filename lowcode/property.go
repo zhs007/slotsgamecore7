@@ -704,7 +704,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 	} else if award.Type == AwardChgComponentConfigIntVal {
 		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, off int) bool {
 			if valName == CCVLastTriggerNum {
-				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
+				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, 0)
 				if err != nil {
 					goutils.Error("GameProperty.procAward:AwardChgComponentConfigIntVal:PushTrigger",
 						goutils.Err(err))
