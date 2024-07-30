@@ -8,10 +8,10 @@ import (
 )
 
 type ComponentList struct {
-	Components    []IComponent
-	MapComponents map[string]IComponent
-	Stats2        *stats2.Stats
-	statsNodeData *SPCNode
+	Components    []IComponent          `yaml:"-" json:"-"`
+	MapComponents map[string]IComponent `yaml:"mapComponents" json:"mapComponents"`
+	Stats2        *stats2.Stats         `yaml:"-" json:"-"`
+	statsNodeData *SPCNode              `yaml:"-" json:"-"`
 }
 
 func (lst *ComponentList) AddComponent(name string, component IComponent) {
