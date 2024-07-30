@@ -13,14 +13,13 @@ import (
 )
 
 type GamePropertyPool struct {
-	MapGamePropPool  map[int]*sync.Pool
-	Config           *Config
-	DefaultPaytables *sgc7game.PayTables
-	DefaultLineData  *sgc7game.LineData
-	SymbolsViewer    *SymbolsViewer
-	MapSymbolColor   *asciigame.SymbolColorMap
-	mapComponents    map[int]*ComponentList
-	// lock                sync.RWMutex
+	MapGamePropPool     map[int]*sync.Pool
+	Config              *Config
+	DefaultPaytables    *sgc7game.PayTables
+	DefaultLineData     *sgc7game.LineData
+	SymbolsViewer       *SymbolsViewer
+	MapSymbolColor      *asciigame.SymbolColorMap
+	mapComponents       map[int]*ComponentList
 	mapStrValWeights    map[string]*sgc7game.ValWeights2
 	mapIntValWeights    map[string]*sgc7game.ValWeights2
 	mapSymbolValWeights map[string]*sgc7game.ValWeights2
