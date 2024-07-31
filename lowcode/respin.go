@@ -133,7 +133,7 @@ func (respinData *RespinData) ChgConfigIntVal(key string, off int) {
 // SetConfigIntVal -
 func (respinData *RespinData) SetConfigIntVal(key string, val int) {
 	if key == CCVLastRespinNum {
-		respinData.AddRespinTimes(val)
+		respinData.ResetRespinTimes(val)
 	} else if key == CCVRetriggerAddRespinNum {
 		respinData.RetriggerAddRespinNum = val
 	} else {
@@ -157,6 +157,16 @@ func (respinData *RespinData) AddTriggerRespinAward(award *Award) {
 func (respinData *RespinData) AddRespinTimes(num int) {
 	respinData.LastRespinNum += num
 	respinData.CurAddRespinNum += num
+}
+
+// ResetRespinTimes -
+func (respinData *RespinData) ResetRespinTimes(num int) {
+	if respinData.LastRespinNum >= num {
+		respinData.LastRespinNum = num
+	} else {
+		off := num - respinData.LastRespinNum
+		respinData.AddRespinTimes(off)
+	}
 }
 
 // OnTriggerRespin
