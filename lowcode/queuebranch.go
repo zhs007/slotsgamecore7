@@ -159,7 +159,7 @@ func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	nc := queueBranch.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, nil
+	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame

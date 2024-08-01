@@ -1381,7 +1381,7 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	}
 
 	cfg.Bets = append(cfg.Bets, int(bet))
-	// cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
 
 	err = loadCells(betcfg, betMethod.Get("graph").Get("cells"))
 	if err != nil {
