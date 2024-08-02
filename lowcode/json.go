@@ -1381,7 +1381,22 @@ func loadBetMethod(cfg *Config, betMethod *ast.Node) error {
 	}
 
 	cfg.Bets = append(cfg.Bets, int(bet))
-	cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+
+	nodeTotalBetInWins := betMethod.Get("totalBetInWins")
+	if nodeTotalBetInWins != nil {
+		totalBetInWins, err := nodeTotalBetInWins.Int64()
+		if err != nil {
+			goutils.Error("loadBetMethod:Get:totalBetInWins",
+				goutils.Err(err))
+
+			return err
+		}
+
+		betcfg.TotalBetInWins = int(totalBetInWins)
+		cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(totalBetInWins))
+	} else {
+		cfg.TotalBetInWins = append(cfg.TotalBetInWins, int(bet))
+	}
 
 	err = loadCells(betcfg, betMethod.Get("graph").Get("cells"))
 	if err != nil {
