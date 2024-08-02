@@ -427,3 +427,18 @@ func HasSymbolsInResult(gs *sgc7game.GameScene, symbols []int, ret *sgc7game.Res
 
 	return false
 }
+
+func CountSymbolsInResult(gs *sgc7game.GameScene, symbols []int, ret *sgc7game.Result) int {
+	num := 0
+
+	for i := 0; i < len(ret.Pos)/2; i++ {
+		x := ret.Pos[i*2]
+		y := ret.Pos[i*2+1]
+
+		if goutils.IndexOfIntSlice(symbols, gs.Arr[x][y], 0) >= 0 {
+			num++
+		}
+	}
+
+	return num
+}

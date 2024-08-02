@@ -21,12 +21,18 @@ const WinResultModifierTypeName = "winResultModifier"
 type WinResultModifierType int
 
 const (
-	WRMTypeExistSymbol WinResultModifierType = 0
+	WRMTypeExistSymbol    WinResultModifierType = 0
+	WRMTypeAddSymbolMulti WinResultModifierType = 1
+	WRMTypeMulSymbolMulti WinResultModifierType = 2
 )
 
 func parseWinResultModifierType(str string) WinResultModifierType {
 	if str == "existSymbol" {
 		return WRMTypeExistSymbol
+	} else if str == "addSymbolMulti" {
+		return WRMTypeAddSymbolMulti
+	} else if str == "mulSymbolMulti" {
+		return WRMTypeMulSymbolMulti
 	}
 
 	return WRMTypeExistSymbol
@@ -190,24 +196,72 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 	gs := winResultModifier.GetTargetScene3(gameProp, curpr, prs, 0)
 	isproced := false
 
-	for _, cn := range winResultModifier.Config.SourceComponents {
-		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
-		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
-			continue
+	if winResultModifier.Config.Type == WRMTypeExistSymbol {
+		for _, cn := range winResultModifier.Config.SourceComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetComponentDataWithName(cn)
+			// ccd := gameProp.MapComponentData[cn]
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				if HasSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri]) {
+					curpr.Results[ri].CashWin *= winMulti
+					curpr.Results[ri].CoinWin *= winMulti
+					curpr.Results[ri].OtherMul *= winMulti
+
+					std.Wins += curpr.Results[ri].CoinWin
+
+					isproced = true
+				}
+			}
 		}
+	} else if winResultModifier.Config.Type == WRMTypeAddSymbolMulti {
+		for _, cn := range winResultModifier.Config.SourceComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
 
-		ccd := gameProp.GetComponentDataWithName(cn)
-		// ccd := gameProp.MapComponentData[cn]
-		lst := ccd.GetResults()
-		for _, ri := range lst {
-			if HasSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri]) {
-				curpr.Results[ri].CashWin *= winMulti
-				curpr.Results[ri].CoinWin *= winMulti
-				curpr.Results[ri].OtherMul *= winMulti
+			ccd := gameProp.GetComponentDataWithName(cn)
+			// ccd := gameProp.MapComponentData[cn]
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				num := CountSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri])
+				if num > 0 {
+					curpr.Results[ri].CashWin *= winMulti * num
+					curpr.Results[ri].CoinWin *= winMulti * num
+					curpr.Results[ri].OtherMul *= winMulti * num
 
-				std.Wins += curpr.Results[ri].CoinWin
+					std.Wins += curpr.Results[ri].CoinWin
 
-				isproced = true
+					isproced = true
+				}
+			}
+		}
+	} else if winResultModifier.Config.Type == WRMTypeMulSymbolMulti {
+		for _, cn := range winResultModifier.Config.SourceComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetComponentDataWithName(cn)
+			// ccd := gameProp.MapComponentData[cn]
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				num := CountSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri])
+				if num > 0 {
+					curpr.Results[ri].CashWin *= winMulti ^ num
+					curpr.Results[ri].CoinWin *= winMulti ^ num
+					curpr.Results[ri].OtherMul *= winMulti ^ num
+
+					std.Wins += curpr.Results[ri].CoinWin
+
+					isproced = true
+				}
 			}
 		}
 	}
