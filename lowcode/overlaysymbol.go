@@ -192,8 +192,6 @@ func (overlaySymbol *OverlaySymbol) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	nc := overlaySymbol.onStepEnd(gameProp, curpr, gp, "")
 
-	// gp.AddComponentData(overlaySymbol.Name, &osd.BasicComponentData)
-
 	return nc, nil
 }
 

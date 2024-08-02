@@ -177,8 +177,6 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	nc := basicReels.onStepEnd(gameProp, curpr, gp, "")
 
-	// gp.AddComponentData(basicReels.Name, cd)
-
 	return nc, nil
 }
 

@@ -226,14 +226,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.BuildGameParam(gp)
 
 	err := gameProp.callStack.Each(gameProp, func(tag string, gameProp *GameProperty, ic IComponent, cd IComponentData) error {
-		// err := ic.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs, cd)
-		// if err != nil {
-		// 	goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
-		// 		goutils.Err(err))
-
-		// 	return err
-		// }
-
 		gp.AddComponentData(tag, cd)
 
 		return nil
@@ -244,27 +236,6 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		return nil, err
 	}
-
-	// for _, v := range gameProp.HistoryComponents {
-	// 	if v.ForeachIndex < 0 {
-	// 		err := v.Component.OnPlayGameEnd(gameProp, pr, gp, plugin, cmd, param, ps, stake, prs)
-	// 		if err != nil {
-	// 			goutils.Error("BasicGameMod.OnPlay:OnPlayGameEnd",
-	// 				goutils.Err(err))
-
-	// 			return nil, err
-	// 		}
-
-	// 		cn := v.Component.GetName()
-	// 		gp.AddComponentData(cn, gameProp.MapComponentData[cn])
-
-	// 		if gAllowStats2 {
-	// 			v.Component.OnStats2(gameProp.MapComponentData[cn], components.Stats2)
-	// 			// components.Stats2.onStepStats(v, gameProp.MapComponentData[cn])
-	// 			gameProp.stats2SpinData.OnStepTrigger(cn)
-	// 		}
-	// 	}
-	// }
 
 	gameProp.ProcRespin(pr, gp)
 
@@ -280,41 +251,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		gameProp.stats2Cache.ProcStatsOnEnding(totalwins)
 
 		components.Stats2.PushCache(gameProp.stats2Cache)
-
-		// gameProp.stats2SpinData.OnBetEnding(components.Stats2)
-
-		// for _, curpr := range prs {
-		// 	curpr.
-		// }
 	}
-
-	// if pr.IsFinish {
-	// 	for _, curpr := range prs {
-	// 		for _, s := range curpr.Scenes {
-	// 			gameProp.PoolScene.Put(s)
-	// 		}
-
-	// 		for _, s := range curpr.OtherScenes {
-	// 			gameProp.PoolScene.Put(s)
-	// 		}
-
-	// 		for _, s := range curpr.PrizeScenes {
-	// 			gameProp.PoolScene.Put(s)
-	// 		}
-	// 	}
-
-	// 	for _, s := range pr.Scenes {
-	// 		gameProp.PoolScene.Put(s)
-	// 	}
-
-	// 	for _, s := range pr.OtherScenes {
-	// 		gameProp.PoolScene.Put(s)
-	// 	}
-
-	// 	for _, s := range pr.PrizeScenes {
-	// 		gameProp.PoolScene.Put(s)
-	// 	}
-	// }
 
 	return pr, nil
 }

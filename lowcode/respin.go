@@ -349,8 +349,6 @@ recheck:
 
 	nc := respin.onStepEnd(gameProp, curpr, gp, nextComponent)
 
-	// gp.AddComponentData(respin.Name, cd)
-
 	return nc, nil
 }
 

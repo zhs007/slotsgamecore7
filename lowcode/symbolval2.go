@@ -167,9 +167,6 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	nc := symbolVal2.onStepEnd(gameProp, curpr, gp, "")
 
-	// gp.AddComponentData(symbolVal2.Name, cd)
-	// symbolMulti.BuildPBComponent(gp)
-
 	return nc, nil
 }
 

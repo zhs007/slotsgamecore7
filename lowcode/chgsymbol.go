@@ -82,7 +82,6 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	gs := chgSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	cgs := gs.CloneEx(gameProp.PoolScene)
-	// cgs := gs.Clone()
 
 	for _, v := range chgSymbol.Config.Nodes {
 		cgs.Arr[v.X][v.Y] = v.SymbolCode
@@ -91,9 +90,6 @@ func (chgSymbol *ChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	chgSymbol.AddScene(gameProp, curpr, cgs, bcd)
 
 	nc := chgSymbol.onStepEnd(gameProp, curpr, gp, "")
-
-	// gp.AddComponentData(chgSymbol.Name, cd)
-	// symbolMulti.BuildPBComponent(gp)
 
 	return nc, nil
 }
