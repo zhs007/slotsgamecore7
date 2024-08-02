@@ -106,6 +106,8 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake, curPlugin sgc7plu
 
 	gameProp.callStack.OnNewGame()
 
+	gameProp.usedComponent = nil
+
 	// gameProp.rng = gameProp.newRNG()
 
 	gameProp.rng.OnNewGame(curPlugin)
