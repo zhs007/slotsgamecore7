@@ -106,8 +106,6 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	nc := weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
 
-	// gp.AddComponentData(weightTrigger.Name, cd)
-
 	return nc, nil
 }
 

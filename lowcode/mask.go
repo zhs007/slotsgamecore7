@@ -287,13 +287,8 @@ func (mask *Mask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 
 	mcd := cd.(*MaskData)
 	mcd.onNewStep()
-	// mask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
-	// mask.ProcMask(plugin, gameProp, curpr, prs, gp, "")
 
 	nc := mask.onStepEnd(gameProp, curpr, gp, "")
-
-	// gp.AddComponentData(mask.Name, gameProp.MapComponentData[mask.Name])
 
 	return nc, nil
 }

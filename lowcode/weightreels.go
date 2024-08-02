@@ -213,8 +213,6 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	nc := weightReels.onStepEnd(gameProp, curpr, gp, "")
 
-	// gp.AddComponentData(basicReels.Name, cd)
-
 	return nc, nil
 }
 

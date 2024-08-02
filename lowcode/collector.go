@@ -256,8 +256,6 @@ func (collector *Collector) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *GameP
 func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	// collector.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	ccd := cd.(*CollectorData)
 	ccd.onNewStep()
 
@@ -280,33 +278,9 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		return cursymbol == collector.SymbolCode
 	})
 
-	// oldval := cd.Val
-	// cd.NewCollector = nn
-
 	collector.add(plugin, nn, ccd, gameProp, curpr, gp, false)
-	// cd.Val += nn
-	// if collector.Config.MaxVal > 0 {
-	// 	if cd.Val > collector.Config.MaxVal {
-	// 		cd.Val = collector.Config.MaxVal
-	// 	}
-	// }
-
-	// if nn > 0 {
-	// 	for i := 1; i <= nn; i++ {
-	// 		cl := oldval + i
-	// 		if cl > collector.Config.MaxVal {
-	// 			collector.onLevelUp(gameProp, curpr, gp, collector.Config.MaxVal, true)
-	// 		} else {
-	// 			collector.onLevelUp(gameProp, curpr, gp, cl, false)
-	// 		}
-	// 	}
-	// }
-
-	// gameProp.SetStrVal(GamePropNextComponent, collector.Config.DefaultNextComponent)
 
 	nc := collector.onStepEnd(gameProp, curpr, gp, "")
-
-	// gp.AddComponentData(collector.Name, gameProp.MapComponentData[collector.Name])
 
 	return nc, nil
 }

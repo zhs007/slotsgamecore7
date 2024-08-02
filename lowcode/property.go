@@ -120,6 +120,8 @@ func (gameProp *GameProperty) OnNewStep() error {
 
 	gameProp.callStack.OnNewStep()
 
+	gameProp.usedComponent = nil
+
 	return nil
 }
 
