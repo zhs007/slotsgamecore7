@@ -33,13 +33,13 @@ func parseChgSymbolsType(str string) ChgSymbolsType {
 // ChgSymbolsConfig - configuration for ChgSymbols
 type ChgSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrType              string                `yaml:"chgSymbolsType" json:"chgSymbolsType"`
-	Type                 ChgSymbolsType        `yaml:"-" json:"-"`
-	Symbols              []string              `yaml:"symbols" json:"symbols"`
-	SymbolCodes          []int                 `yaml:"-" json:"-"`
-	BlankSymbol          string                `yaml:"blankSymbol" json:"blankSymbol"`
-	BlankSymbolCode      int                   `yaml:"-" json:"-"`
-	Weight               string                `yaml:"weight" json:"weight"`
+	StrType              string                `yaml:"chgSymbolsType" json:"-"`
+	Type                 ChgSymbolsType        `yaml:"-" json:"chgSymbolsType"`
+	Symbols              []string              `yaml:"symbols" json:"-"`
+	SymbolCodes          []int                 `yaml:"-" json:"symbols"`
+	BlankSymbol          string                `yaml:"blankSymbol" json:"-"`
+	BlankSymbolCode      int                   `yaml:"-" json:"blankSymbol"`
+	Weight               string                `yaml:"weight" json:"-"`
 	WeightVW2            *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	MaxNumber            int                   `yaml:"maxNumber" json:"maxNumber"`
 	IsAlwaysGen          bool                  `yaml:"isAlwaysGen" json:"isAlwaysGen"`
