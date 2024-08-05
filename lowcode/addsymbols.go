@@ -36,6 +36,24 @@ func parseAddSymbolsType(str string) AddSymbolsType {
 	return AddSymbolsTypeNormal
 }
 
+type AddSymbolNumType int
+
+const (
+	AddSymbolNumTypeNumber            AddSymbolNumType = 0 // 数字
+	AddSymbolNumTypeWeight            AddSymbolNumType = 1 // 权重表
+	AddSymbolNumTypeIncUntilTriggered AddSymbolNumType = 2 // 不停的加数量，直到触发器触发
+)
+
+func parseAddSymbolNumType(str string) AddSymbolNumType {
+	if str == "weight" {
+		return AddSymbolNumTypeWeight
+	} else if str == "incUntilTriggered" {
+		return AddSymbolNumTypeIncUntilTriggered
+	}
+
+	return AddSymbolNumTypeNumber
+}
+
 type AddSymbolsData struct {
 	BasicComponentData
 	SymbolNum int
@@ -89,11 +107,14 @@ type AddSymbolsConfig struct {
 	Type                 AddSymbolsType        `yaml:"-" json:"-"`
 	Symbol               string                `yaml:"symbol" json:"symbol"`
 	SymbolCode           int                   `yaml:"-" json:"-"`
+	StrSymbolNumType     string                `yaml:"symbolNumType" json:"symbolNumType"`
+	SymbolNumType        AddSymbolNumType      `yaml:"-" json:"-"`
 	SymbolNum            int                   `yaml:"symbolNum" json:"symbolNum"`
 	SymbolNumWeight      string                `yaml:"symbolNumWeight" json:"symbolNumWeight"`
 	SymbolNumWeightVW    *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	IgnoreSymbols        []string              `yaml:"ignoreSymbols" json:"ignoreSymbols"`
 	IgnoreSymbolCodes    []int                 `yaml:"-" json:"-"`
+	SymbolNumTrigger     string                `json:"symbolNumTrigger" json:"symbolNumTrigger"`
 }
 
 // SetLinkComponent
@@ -139,6 +160,7 @@ func (addSymbols *AddSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	addSymbols.Config.ComponentType = AddSymbolsTypeName
 
 	addSymbols.Config.Type = parseAddSymbolsType(addSymbols.Config.StrType)
+	addSymbols.Config.SymbolNumType = parseAddSymbolNumType(addSymbols.Config.StrSymbolNumType)
 
 	sc, isok := pool.DefaultPaytables.MapSymbols[addSymbols.Config.Symbol]
 	if !isok {
@@ -194,18 +216,82 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := addSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	num := addSymbols.Config.SymbolNum
+	if addSymbols.Config.SymbolNumType == AddSymbolNumTypeIncUntilTriggered {
+		if addSymbols.Config.Type == AddSymbolsTypeNormal {
+			pos := make([]int, 0, gs.Width*gs.Height*2)
 
-	if addSymbols.Config.SymbolNumWeightVW != nil {
-		cv, err := addSymbols.Config.SymbolNumWeightVW.RandVal(plugin)
-		if err != nil {
-			goutils.Error("AddSymbols.OnPlayGame:SymbolNumWeightVW",
-				goutils.Err(err))
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
+						pos = append(pos, x, y)
+					}
+				}
+			}
 
-			return "", err
+			if len(pos) <= 0 {
+				nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+				return nc, ErrComponentDoNothing
+			}
+
+			ngs := gs.CloneEx(gameProp.PoolScene)
+			isTrigger := false
+
+			for i := 0; i < len(pos)/2; i++ {
+				cr, err := plugin.Random(context.Background(), len(pos)/2)
+				if err != nil {
+					goutils.Error("AddSymbols.OnPlayGame:Random",
+						goutils.Err(err))
+
+					return "", err
+				}
+
+				ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
+				cd.SymbolNum++
+
+				pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
+
+				if len(pos) <= 0 {
+					break
+				}
+
+				if addSymbols.canTrigger(gameProp, ngs, curpr, stake) {
+					isTrigger = true
+
+					break
+				}
+			}
+
+			if isTrigger {
+				addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+				nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+				return nc, nil
+			}
+
+			nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
+	}
 
-		num = cv.Int()
+	var num int
+
+	if addSymbols.Config.SymbolNumType == AddSymbolNumTypeNumber {
+		num = addSymbols.Config.SymbolNum
+	} else if addSymbols.Config.SymbolNumType == AddSymbolNumTypeWeight {
+		if addSymbols.Config.SymbolNumWeightVW != nil {
+			cv, err := addSymbols.Config.SymbolNumWeightVW.RandVal(plugin)
+			if err != nil {
+				goutils.Error("AddSymbols.OnPlayGame:SymbolNumWeightVW",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			num = cv.Int()
+		}
 	}
 
 	if num <= 0 {
@@ -335,6 +421,11 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	return nc, nil
 }
 
+// canTrigger
+func (addSymbols *AddSymbols) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
+	return gameProp.CanTrigger(addSymbols.Config.SymbolNumTrigger, gs, curpr, stake)
+}
+
 // OnAsciiGame - outpur to asciigame
 func (addSymbols *AddSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	cd := icd.(*AddSymbolsData)
@@ -368,20 +459,24 @@ func NewAddSymbols(name string) IComponent {
 //
 // ]
 type jsonAddSymbols struct {
-	Type            string   `json:"type"`
-	Symbol          string   `json:"symbol"`
-	SymbolNum       int      `json:"symbolNum"`
-	SymbolNumWeight string   `json:"symbolNumWeight"`
-	IgnoreSymbols   []string `json:"ignoreSymbols"`
+	Type             string   `json:"type"`
+	SymbolNumType    string   `json:"symbolNumType"`
+	Symbol           string   `json:"symbol"`
+	SymbolNum        int      `json:"symbolNum"`
+	SymbolNumWeight  string   `json:"symbolNumWeight"`
+	IgnoreSymbols    []string `json:"ignoreSymbols"`
+	SymbolNumTrigger string   `json:"symbolNumTrigger"`
 }
 
 func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
 	cfg := &AddSymbolsConfig{
-		StrType:         jcfg.Type,
-		Symbol:          jcfg.Symbol,
-		SymbolNum:       jcfg.SymbolNum,
-		SymbolNumWeight: jcfg.SymbolNumWeight,
-		IgnoreSymbols:   jcfg.IgnoreSymbols,
+		StrType:          jcfg.Type,
+		Symbol:           jcfg.Symbol,
+		StrSymbolNumType: jcfg.SymbolNumType,
+		SymbolNum:        jcfg.SymbolNum,
+		SymbolNumWeight:  jcfg.SymbolNumWeight,
+		IgnoreSymbols:    jcfg.IgnoreSymbols,
+		SymbolNumTrigger: jcfg.SymbolNumTrigger,
 	}
 
 	// cfg.UseSceneV3 = true
