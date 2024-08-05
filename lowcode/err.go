@@ -182,4 +182,7 @@ var (
 	ErrInvalidAnypbTypeURL = errors.New("invalid anypb TypeURL")
 	// ErrNoWeight - no weight
 	ErrNoWeight = errors.New("no weight")
+
+	// ErrNoComponent - no component
+	ErrNoComponent = errors.New("no component")
 )

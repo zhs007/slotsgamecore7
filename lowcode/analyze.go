@@ -254,7 +254,11 @@ func parseNextComponents(lst *ComponentList, start string, historys []string) (*
 
 func ParseStepParentChildren(lst *ComponentList, start string) (*SPCNode, error) {
 	if lst == nil || len(lst.MapComponents) <= 0 {
-		return nil, nil
+		goutils.Error("ParseStepParentChildren",
+			slog.String("name", start),
+			goutils.Err(ErrNoComponent))
+
+		return nil, ErrNoComponent
 	}
 
 	node, _, err := parseNextComponents(lst, start, []string{})
