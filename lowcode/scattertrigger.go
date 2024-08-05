@@ -521,6 +521,7 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 			if err != nil {
 				goutils.Error("ScatterTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
 					slog.Int("SymbolNum", ret.SymbolNums),
+					slog.String("componentName", scatterTrigger.GetName()),
 					goutils.Err(err))
 
 				return 0, err
@@ -530,6 +531,7 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 		} else {
 			goutils.Error("ScatterTrigger.calcRespinNum:RespinNumWeightWithScatterNumVW",
 				slog.Int("SymbolNum", ret.SymbolNums),
+				slog.String("componentName", scatterTrigger.GetName()),
 				goutils.Err(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
@@ -539,6 +541,7 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 		if !isok {
 			goutils.Error("ScatterTrigger.calcRespinNum:RespinNumWithScatterNum",
 				slog.Int("SymbolNum", ret.SymbolNums),
+				slog.String("componentName", scatterTrigger.GetName()),
 				goutils.Err(ErrInvalidSymbolNum))
 
 			return 0, ErrInvalidSymbolNum
@@ -549,6 +552,7 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 		cr, err := scatterTrigger.Config.RespinNumWeightVW.RandVal(plugin)
 		if err != nil {
 			goutils.Error("ScatterTrigger.calcRespinNum:RespinNumWeightVW",
+				slog.String("componentName", scatterTrigger.GetName()),
 				goutils.Err(err))
 
 			return 0, err
