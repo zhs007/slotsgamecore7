@@ -4,7 +4,6 @@ import (
 	"log/slog"
 
 	"github.com/zhs007/goutils"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type ComponentMgr struct {
@@ -33,34 +32,34 @@ func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent 
 	return nil
 }
 
-// LoadPB
-func (mgr *ComponentMgr) LoadPB(pb *anypb.Any) (IComponentData, error) {
-	funcCD, isok := mgr.MapComponentData[pb.TypeUrl]
-	if isok {
-		icd := funcCD()
-		if icd == nil {
-			goutils.Error("ComponentMgr.LoadPB",
-				goutils.Err(ErrInvalidFuncNewComponentData))
+// // LoadPB
+// func (mgr *ComponentMgr) LoadPB(pb *anypb.Any) (IComponentData, error) {
+// 	funcCD, isok := mgr.MapComponentData[pb.TypeUrl]
+// 	if isok {
+// 		icd := funcCD()
+// 		if icd == nil {
+// 			goutils.Error("ComponentMgr.LoadPB",
+// 				goutils.Err(ErrInvalidFuncNewComponentData))
 
-			return nil, ErrInvalidFuncNewComponentData
-		}
+// 			return nil, ErrInvalidFuncNewComponentData
+// 		}
 
-		err := icd.LoadPB(pb)
-		if icd == nil {
-			goutils.Error("ComponentMgr.LoadPB:LoadPB",
-				goutils.Err(err))
+// 		err := icd.LoadPB(pb)
+// 		if icd == nil {
+// 			goutils.Error("ComponentMgr.LoadPB:LoadPB",
+// 				goutils.Err(err))
 
-			return nil, err
-		}
+// 			return nil, err
+// 		}
 
-		return icd, nil
-	}
+// 		return icd, nil
+// 	}
 
-	goutils.Error("ComponentMgr.LoadPB",
-		goutils.Err(ErrInvalidAnypbTypeURL))
+// 	goutils.Error("ComponentMgr.LoadPB",
+// 		goutils.Err(ErrInvalidAnypbTypeURL))
 
-	return nil, ErrInvalidAnypbTypeURL
-}
+// 	return nil, ErrInvalidAnypbTypeURL
+// }
 
 func NewComponentMgr() *ComponentMgr {
 	mgr := &ComponentMgr{

@@ -26,6 +26,8 @@ const (
 	RTFreeGame = 9
 	// RTBonus - 直接奖励
 	RTBonus = 10
+	// RTAdjacentPay - AdjacentPay
+	RTAdjacentPay = 11
 )
 
 // Result - result for slots game
