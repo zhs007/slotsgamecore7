@@ -451,11 +451,11 @@ func (adjacentPayTrigger *AdjacentPayTrigger) CanTriggerWithScene(gameProp *Game
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
-	if adjacentPayTrigger.Config.TriggerType == STTypeCluster {
+	if adjacentPayTrigger.Config.TriggerType == STTypeAdjacentPay {
 
 		symbols := adjacentPayTrigger.getSymbols(gameProp)
 
-		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, adjacentPayTrigger.Config.BetType),
+		currets, err := sgc7game.CalcAdjacentPay(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, adjacentPayTrigger.Config.BetType),
 			func(cursymbol int) bool {
 				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 			}, func(cursymbol int) bool {
@@ -470,15 +470,11 @@ func (adjacentPayTrigger *AdjacentPayTrigger) CanTriggerWithScene(gameProp *Game
 				return cursymbol
 			})
 		if err != nil {
-			goutils.Error("AdjacentPayTrigger.CanTriggerWithScene:CalcClusterResult",
+			goutils.Error("AdjacentPayTrigger.CanTriggerWithScene:CalcAdjacentPay",
 				goutils.Err(err))
 
 			return false, nil
 		}
-
-		// for _, v := range currets {
-		// 	gameProp.ProcMulti(v)
-		// }
 
 		lst = append(lst, currets...)
 
@@ -524,7 +520,6 @@ func NewAdjacentPayTrigger(name string) IComponent {
 //	},
 type jsonAdjacentPayTrigger struct {
 	Symbols             []string `json:"symbols"`
-	TriggerType         string   `json:"triggerType"`
 	BetType             string   `json:"betType"`
 	SymbolValsMulti     string   `json:"symbolValsMulti"`
 	MinNum              int      `json:"minNum"`
@@ -536,7 +531,7 @@ type jsonAdjacentPayTrigger struct {
 func (jcfg *jsonAdjacentPayTrigger) build() *AdjacentPayTriggerConfig {
 	cfg := &AdjacentPayTriggerConfig{
 		Symbols:            jcfg.Symbols,
-		Type:               jcfg.TriggerType,
+		Type:               "adjacentpay",
 		BetTypeString:      jcfg.BetType,
 		OSMulTypeString:    jcfg.SymbolValsMulti,
 		MinNum:             jcfg.MinNum,
@@ -596,7 +591,7 @@ func parseAdjacentPayTrigger(gamecfg *BetConfig, cell *ast.Node) (string, error)
 
 	ccfg := &ComponentConfig{
 		Name: label,
-		Type: ClusterTriggerTypeName,
+		Type: AdjacentPayTriggerTypeName,
 	}
 
 	gamecfg.Components = append(gamecfg.Components, ccfg)

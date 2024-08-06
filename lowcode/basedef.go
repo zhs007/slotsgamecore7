@@ -31,6 +31,7 @@ const (
 	STTypeCluster            SymbolTriggerType = 8  // cluster，且读paytable来判断是否可以中奖
 	STTypeReelScatters       SymbolTriggerType = 9  // scatter中奖判断，且一轴上只算1个scatter，且读paytable来判断是否可以中奖
 	STTypeCountScatterReels  SymbolTriggerType = 10 // scatter中奖判断，且一轴上只算1个scatter，不读paytable
+	STTypeAdjacentPay        SymbolTriggerType = 11 // adjacentPay，且读paytable来判断是否可以中奖
 )
 
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
@@ -56,6 +57,8 @@ func ParseSymbolTriggerType(str string) SymbolTriggerType {
 		return STTypeReelScatters
 	} else if str == "countscatterreels" {
 		return STTypeCountScatterReels
+	} else if str == "adjacentpay" {
+		return STTypeAdjacentPay
 	}
 
 	return STTypeUnknow
