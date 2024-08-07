@@ -15,10 +15,29 @@ import (
 
 const GenSymbolValsTypeName = "genSymbolVals"
 
+type GenSymbolValsType int
+
+const (
+	GSVTypeBasic  GenSymbolValsType = 0
+	GSVTypeWeight GenSymbolValsType = 1
+)
+
+func parseGenSymbolValsType(strType string) GenSymbolValsType {
+	if strType == "weight" {
+		return GSVTypeWeight
+	}
+
+	return GSVTypeBasic
+}
+
 // GenSymbolValsConfig - configuration for GenSymbolVals
 type GenSymbolValsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	DefaultVal           int `yaml:"defaultVal" json:"defaultVal"`
+	StrType              string                `yaml:"type" json:"type"`
+	Type                 GenSymbolValsType     `yaml:"-" json:"-"`
+	DefaultVal           int                   `yaml:"defaultVal" json:"defaultVal"`
+	Weight               string                `yaml:"weight" json:"weight"`
+	WeightVW             *sgc7game.ValWeights2 `json:"-"`
 }
 
 // SetLinkComponent
@@ -63,6 +82,26 @@ func (genSymbolVals *GenSymbolVals) InitEx(cfg any, pool *GamePropertyPool) erro
 	genSymbolVals.Config = cfg.(*GenSymbolValsConfig)
 	genSymbolVals.Config.ComponentType = GenSymbolValsTypeName
 
+	genSymbolVals.Config.Type = parseGenSymbolValsType(genSymbolVals.Config.StrType)
+
+	if genSymbolVals.Config.Weight != "" {
+		vw2, err := pool.LoadIntWeights(genSymbolVals.Config.Weight, genSymbolVals.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("GenSymbolVals.Init:LoadStrWeights",
+				slog.String("Weight", genSymbolVals.Config.Weight),
+				goutils.Err(err))
+
+			return err
+		}
+
+		genSymbolVals.Config.WeightVW = vw2
+	} else {
+		goutils.Error("GenSymbolVals.InitEx:Weight",
+			goutils.Err(ErrIvalidComponentConfig))
+
+		return ErrIvalidComponentConfig
+	}
+
 	genSymbolVals.onInit(&genSymbolVals.Config.BasicComponentConfig)
 
 	return nil
@@ -72,118 +111,36 @@ func (genSymbolVals *GenSymbolVals) InitEx(cfg any, pool *GamePropertyPool) erro
 func (genSymbolVals *GenSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
 
-	// gs := genSymbolVals.GetTargetScene3(gameProp, curpr, prs, 0)
-	// if gs != nil {
-	os := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolVals.Config.DefaultVal)
+	if genSymbolVals.Config.Type == GSVTypeBasic {
+		os := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolVals.Config.DefaultVal)
 
-	// if genSymbolValsWithSymbol.Config.IsUseSource {
-	// 	os = genSymbolValsWithSymbol.GetTargetOtherScene3(gameProp, curpr, prs, 0)
-	// }
+		genSymbolVals.AddOtherScene(gameProp, curpr, os, cd)
+	} else if genSymbolVals.Config.Type == GSVTypeWeight {
+		os := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
 
-	// nos := os
+		for x, arr := range os.Arr {
+			for y := range arr {
+				ival, err := genSymbolVals.Config.WeightVW.RandVal(plugin)
+				if err != nil {
+					goutils.Error("GenSymbolVals.OnPlayGame:RandVal",
+						goutils.Err(err))
 
-	// if genSymbolValsWithSymbol.Config.Type == GSVWSTypeNormal {
-	// 	for x, arr := range gs.Arr {
-	// 		for y, s := range arr {
-	// 			if goutils.IndexOfIntSlice(genSymbolValsWithSymbol.Config.SymbolCodes, s, 0) >= 0 {
-	// 				if nos == nil {
-	// 					curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
-	// 					if err != nil {
-	// 						goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-	// 							goutils.Err(err))
+					return "", err
+				}
 
-	// 						return "", err
-	// 					}
+				os.Arr[x][y] = ival.Int()
 
-	// 					nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
+			}
+		}
 
-	// 					nos.Arr[x][y] = curv.Int()
-	// 				} else if nos.Arr[x][y] == genSymbolValsWithSymbol.Config.DefaultVal {
-	// 					if nos == os {
-	// 						nos = os.CloneEx(gameProp.PoolScene)
-	// 					}
-
-	// 					curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
-	// 					if err != nil {
-	// 						goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-	// 							goutils.Err(err))
-
-	// 						return "", err
-	// 					}
-
-	// 					nos.Arr[x][y] = curv.Int()
-	// 				}
-	// 			} else {
-	// 				if nos != nil && nos.Arr[x][y] != genSymbolValsWithSymbol.Config.DefaultVal {
-	// 					if nos == os {
-	// 						nos = os.CloneEx(gameProp.PoolScene)
-	// 					}
-
-	// 					nos.Arr[x][y] = genSymbolValsWithSymbol.Config.DefaultVal
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// } else if genSymbolValsWithSymbol.Config.Type == GSVWSTypeNonClear {
-	// 	for x, arr := range gs.Arr {
-	// 		for y, s := range arr {
-	// 			if goutils.IndexOfIntSlice(genSymbolValsWithSymbol.Config.SymbolCodes, s, 0) >= 0 {
-	// 				if nos == nil {
-	// 					curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
-	// 					if err != nil {
-	// 						goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-	// 							goutils.Err(err))
-
-	// 						return "", err
-	// 					}
-
-	// 					nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
-
-	// 					nos.Arr[x][y] = curv.Int()
-	// 				} else if nos.Arr[x][y] == genSymbolValsWithSymbol.Config.DefaultVal {
-	// 					if nos == os {
-	// 						nos = os.CloneEx(gameProp.PoolScene)
-	// 					}
-
-	// 					curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
-	// 					if err != nil {
-	// 						goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
-	// 							goutils.Err(err))
-
-	// 						return "", err
-	// 					}
-
-	// 					nos.Arr[x][y] = curv.Int()
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// if nos == nil && genSymbolValsWithSymbol.Config.IsAlwaysGen {
-	// 	nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
-	// }
-
-	// if nos == os {
-	// 	nc := genSymbolValsWithSymbol.onStepEnd(gameProp, curpr, gp, "")
-
-	// 	return nc, ErrComponentDoNothing
-	// }
-
-	genSymbolVals.AddOtherScene(gameProp, curpr, os, cd)
+		genSymbolVals.AddOtherScene(gameProp, curpr, os, cd)
+	}
 
 	nc := genSymbolVals.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
-	// }
-
-	// nc := genSymbolValsWithSymbol.onStepEnd(gameProp, curpr, gp, "")
-
-	// return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -198,27 +155,27 @@ func (genSymbolVals *GenSymbolVals) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
-// // OnStats
-// func (genSymbolValsWithPos *GenSymbolValsWithSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 func NewGenSymbolVals(name string) IComponent {
 	return &GenSymbolVals{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
 }
 
+// "isAlwaysGen": true,
+// "type": "weight",
+// "weight": "hotzone"
 type jsonGenSymbolVals struct {
-	DefaultVal int `json:"defaultVal"`
+	Type       string `json:"type"`
+	Weight     string `json:"weight"`
+	DefaultVal int    `json:"defaultVal"`
 }
 
 func (jcfg *jsonGenSymbolVals) build() *GenSymbolValsConfig {
 	cfg := &GenSymbolValsConfig{
+		StrType:    jcfg.Type,
+		Weight:     jcfg.Weight,
 		DefaultVal: jcfg.DefaultVal,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
