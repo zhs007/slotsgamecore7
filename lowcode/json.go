@@ -91,99 +91,6 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 	return nil
 }
 
-// func parse2IntSlice(n *ast.Node) ([]int, error) {
-// 	arr, err := n.ArrayUseNode()
-// 	if err != nil {
-// 		goutils.Error("parse2IntSlice:Array",
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	iarr := []int{}
-
-// 	for i, v := range arr {
-// 		iv, err := v.Int64()
-// 		if err != nil {
-// 			goutils.Error("parse2IntSlice:Int64",
-// 				slog.Int("i", i),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-
-// 		iarr = append(iarr, int(iv))
-// 	}
-
-// 	return iarr, nil
-// }
-
-// func parse2StringSlice(n *ast.Node) ([]string, error) {
-// 	arr, err := n.ArrayUseNode()
-// 	if err != nil {
-// 		goutils.Error("parse2StringSlice:Array",
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	strarr := []string{}
-
-// 	for i, v := range arr {
-// 		strv, err := v.String()
-// 		if err != nil {
-// 			goutils.Error("parse2StringSlice:String",
-// 				slog.Int("i", i),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-
-// 		strarr = append(strarr, (strv))
-// 	}
-
-// 	return strarr, nil
-// }
-
-// func parsePaytables(n *ast.Node) (*sgc7game.PayTables, error) {
-// 	if n == nil {
-// 		goutils.Error("parsePaytables",
-// 			goutils.Err(ErrIvalidPayTables))
-
-// 		return nil, ErrIvalidPayTables
-// 	}
-
-// 	buf, err := n.MarshalJSON()
-// 	if err != nil {
-// 		goutils.Error("parsePaytables:MarshalJSON",
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	dataPaytables := []*paytableData{}
-
-// 	err = sonic.Unmarshal(buf, &dataPaytables)
-// 	if err != nil {
-// 		goutils.Error("parsePaytables:Unmarshal",
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	paytables := &sgc7game.PayTables{
-// 		MapPay:     make(map[int][]int),
-// 		MapSymbols: make(map[string]int),
-// 	}
-
-// 	for _, node := range dataPaytables {
-// 		paytables.MapPay[node.Code] = node.Data
-// 		paytables.MapSymbols[node.Symbol] = node.Code
-// 	}
-
-// 	return paytables, nil
-// }
-
 func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
 	if n == nil {
 		goutils.Error("parsePaytable2",
@@ -251,11 +158,6 @@ func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
 
 		paytables.MapPay[int(code)] = arr
 
-		// n := 1
-		// for {
-
-		// }
-
 		paytables.MapSymbols[node["Symbol"]] = int(code)
 	}
 
@@ -263,29 +165,9 @@ func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
 }
 
 func loadPaytables(cfg *Config, paytableData *ast.Node) error {
-
-	// lst, err := lstPaytables.ArrayUseNode()
-	// if err != nil {
-	// 	goutils.Error("loadPaytables:ArrayUseNode",
-	// 		goutils.Err(err))
-
-	// 	return err
-	// }
-
-	// for i, v := range lst {
-	// 	name, err := v.Get("fileName").String()
-	// 	if err != nil {
-	// 		goutils.Error("loadPaytables:fileName",
-	// 			slog.Int("i", i),
-	// 			goutils.Err(err))
-
-	// 		return err
-	// 	}
-
 	paytables, err := parsePaytable2(paytableData)
 	if err != nil {
 		goutils.Error("loadPaytables:parsePaytable2",
-			// slog.Int("i", i),
 			goutils.Err(err))
 
 		return err
@@ -294,10 +176,7 @@ func loadPaytables(cfg *Config, paytableData *ast.Node) error {
 	cfg.Paytables["default"] = "default"
 	cfg.MapPaytables["default"] = paytables
 
-	// if i == 0 {
 	cfg.DefaultPaytables = "default"
-	// }
-	// }
 
 	return nil
 }
@@ -841,9 +720,6 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 			return err
 		}
 
-		// if shape == "custom-node-width-start" {
-		// 	startid = id
-		// } else
 		if shape == "custom-node" {
 			componentType, err := cell.Get("label").String()
 			if err != nil {
@@ -866,355 +742,6 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 			}
 
 			mapComponentName[id] = componentName
-
-			// if componentType == "weightreels" {
-			// 	componentName, err := parseWeightReels(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseWeightReels",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "basicreels" {
-			// 	componentName, err := parseBasicReels(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseBasicReels",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "scattertrigger" {
-			// 	componentName, err := parseScatterTrigger(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseScatterTrigger",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "linestrigger" {
-			// 	componentName, err := parseLinesTrigger(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseLinesTrigger",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "waystrigger" {
-			// 	componentName, err := parseWaysTrigger(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseWaysTrigger",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "movesymbol" {
-			// 	componentName, err := parseMoveSymbol(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseMoveSymbol",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "respin" {
-			// 	componentName, err := parseRespin(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseRespin",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "symbolcollection" {
-			// 	componentName, err := parseSymbolCollection2(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseSymbolCollection2",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "removesymbols" {
-			// 	componentName, err := parseRemoveSymbols(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseRemoveSymbols",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "dropdownsymbols" {
-			// 	componentName, err := parseDropDownSymbols(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseDropDownSymbols",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "refillsymbols" {
-			// 	componentName, err := parseRefillSymbols(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseRefillSymbols",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "collector" {
-			// 	componentName, err := parseCollector(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseCollector",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "queuebranch" || componentType == "delayqueue" {
-			// 	componentName, err := parseQueueBranch(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseQueueBranch",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "replacesymbolgroup" {
-			// 	componentName, err := parseReplaceSymbolGroup(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseReplaceSymbolGroup",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "rollsymbol" {
-			// 	componentName, err := parseRollSymbol(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseRollSymbol",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "mask" {
-			// 	componentName, err := parseMask(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseMask",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "replacereelwithmask" {
-			// 	componentName, err := parseReplaceReelWithMask(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseReplaceReelWithMask",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "piggybank" {
-			// 	componentName, err := parsePiggyBank(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parsePiggyBank",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "addsymbols" {
-			// 	componentName, err := parseAddSymbols(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseAddSymbols",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "intvalmapping" {
-			// 	componentName, err := parseIntValMapping(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseIntValMapping",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "weightbranch" {
-			// 	componentName, err := parseWeightBranch(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseWeightBranch",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "clustertrigger" {
-			// 	componentName, err := parseClusterTrigger(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseClusterTrigger",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "gengigasymbol" {
-			// 	componentName, err := parseGenGigaSymbol(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseGenGigaSymbol",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "winresultcache" {
-			// 	componentName, err := parseWinResultCache(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseWinResultCache",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "gensymbolvalswithwinresult" {
-			// 	componentName, err := parseGenSymbolValsWithPos(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseGenSymbolValsWithPos",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "checksymbolvals" {
-			// 	componentName, err := parseCheckSymbolVals(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseCheckSymbolVals",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "positioncollection" {
-			// 	componentName, err := parsePositionCollection(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parsePositionCollection",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "chgsymbolvals" {
-			// 	componentName, err := parseChgSymbolVals(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseChgSymbolVals",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "chgsymbols" {
-			// 	componentName, err := parseChgSymbols(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseChgSymbols",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "gensymbolvalswithsymbol" {
-			// 	componentName, err := parseGenSymbolValsWithSymbol(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseGenSymbolValsWithSymbol",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else if componentType == "symbolvalswins" {
-			// 	componentName, err := parseSymbolValWins(cfg, &cell)
-			// 	if err != nil {
-			// 		goutils.Error("loadCells:parseSymbolValWins",
-			// 			slog.Int("i", i),
-			// 			goutils.Err(err))
-
-			// 		return err
-			// 	}
-
-			// 	mapComponentName[id] = componentName
-			// } else {
-			// 	goutils.Error("loadCells:ErrUnsupportedComponentType",
-			// 		slog.String("componentType", componentType),
-			// 		goutils.Err(ErrUnsupportedComponentType))
-
-			// 	return ErrUnsupportedComponentType
-			// }
 		} else if shape == "edge" {
 			source, err := cell.Get("source").Get("cell").String()
 			if err != nil {
@@ -1283,84 +810,6 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 		}
 	}
 
-	// for _, arr := range linkComponent {
-	// 	icfg, isok := cfg.mapConfig[arr[0]]
-	// 	if isok {
-	// 		icfg.SetLinkComponent("next", arr[1])
-	// 	}
-	// }
-
-	// for _, arr := range jumpComponent {
-	// 	icfg, isok := cfg.mapConfig[arr[0]]
-	// 	if isok {
-	// 		icfg.SetLinkComponent("jump", arr[1])
-	// 	}
-	// }
-
-	// for _, arr := range loopComponent {
-	// 	icfg, isok := cfg.mapConfig[arr[0]]
-	// 	if isok {
-	// 		icfg.SetLinkComponent("loop", arr[1])
-	// 	}
-	// }
-
-	// for _, arr := range linkScene {
-	// 	sourceCfg, isok0 := cfg.mapBasicConfig[arr[0]]
-	// 	if isok0 {
-	// 		sourceCfg.TagScenes = append(sourceCfg.TagScenes, arr[0])
-	// 	}
-
-	// 	targetCfg := cfg.mapBasicConfig[arr[1]]
-	// 	if targetCfg != nil {
-	// 		targetCfg.TargetScene = arr[0]
-	// 	}
-
-	// 	triggerCfg := mapTriggerID[arr[1]]
-	// 	if triggerCfg != nil {
-	// 		triggerCfg.TargetScene = arr[0]
-	// 	}
-	// }
-
-	// for _, arr := range linkOtherScene {
-	// 	sourceCfg := cfg.mapBasicConfig[arr[0]]
-	// 	if sourceCfg != nil {
-	// 		sourceCfg.TagOtherScenes = append(sourceCfg.TagOtherScenes, arr[0])
-	// 	}
-
-	// 	targetCfg := cfg.mapBasicConfig[arr[1]]
-	// 	if targetCfg != nil {
-	// 		targetCfg.TargetOtherScene = arr[0]
-	// 	}
-	// }
-
-	// for _, basicWinsCfg := range lstBasicWins {
-	// 	for _, k := range basicWinsCfg.BeforMainTriggerName {
-	// 		cfg, isok := mapTrigger[k]
-	// 		if !isok {
-	// 			goutils.Error("loadCells:BeforMain",
-	// 				slog.String("label", k),
-	// 				goutils.Err(ErrIvalidTriggerLabel))
-
-	// 			return ErrIvalidTriggerLabel
-	// 		}
-
-	// 		basicWinsCfg.BeforMain = append(basicWinsCfg.BeforMain, cfg)
-	// 	}
-
-	// 	for _, k := range basicWinsCfg.AfterMainTriggerName {
-	// 		cfg, isok := mapTrigger[k]
-	// 		if !isok {
-	// 			goutils.Error("loadCells:AfterMain",
-	// 				slog.String("label", k),
-	// 				goutils.Err(ErrIvalidTriggerLabel))
-
-	// 			return ErrIvalidTriggerLabel
-	// 		}
-
-	// 		basicWinsCfg.AfterMain = append(basicWinsCfg.AfterMain, cfg)
-	// 	}
-	// }
-
 	return nil
 }
 
@@ -1424,35 +873,6 @@ func NewGame2(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG Func
 	return NewGame2WithData(data, funcNewPlugin, funcNewRNG, funcNewFeatureLevel)
 }
 
-// func NewGame2ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-// 	data, err := os.ReadFile(fn)
-// 	if err != nil {
-// 		goutils.Error("NewGame2:ReadFile",
-// 			slog.String("fn", fn),
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	return NewGame2WithData(data, funcNewPlugin)
-// }
-
-// func NewGame3(fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-// 	if strings.Contains(fn, ".json") {
-// 		return NewGame2(fn, funcNewPlugin)
-// 	}
-
-// 	return NewGameEx(fn, funcNewPlugin)
-// }
-
-// func NewGame3ForRTP(bet int, fn string, funcNewPlugin sgc7plugin.FuncNewPlugin) (*Game, error) {
-// 	if strings.Contains(fn, ".json") {
-// 		return NewGame2(fn, funcNewPlugin)
-// 	}
-
-// 	return NewGameExForRTP(bet, fn, funcNewPlugin)
-// }
-
 func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*Game, error) {
 	game := &Game{
 		BasicGame:    sgc7game.NewBasicGame(funcNewPlugin),
@@ -1460,21 +880,17 @@ func NewGame2WithData(data []byte, funcNewPlugin sgc7plugin.FuncNewPlugin, funcN
 	}
 
 	cfg := &Config{
-		Paytables:    make(map[string]string),
-		MapPaytables: make(map[string]*sgc7game.PayTables),
-		Linedata:     make(map[string]string),
-		MapLinedate:  make(map[string]*sgc7game.LineData),
-		Reels:        make(map[string]string),
-		MapReels:     make(map[string]*sgc7game.ReelsData),
-		// mapConfig:         make(map[string]IComponentConfig),
-		// StartComponents: make(map[int]string),
-		// mapBasicConfig:    make(map[string]*BasicComponentConfig),
+		Paytables:         make(map[string]string),
+		MapPaytables:      make(map[string]*sgc7game.PayTables),
+		Linedata:          make(map[string]string),
+		MapLinedate:       make(map[string]*sgc7game.LineData),
+		Reels:             make(map[string]string),
+		MapReels:          make(map[string]*sgc7game.ReelsData),
 		mapValWeights:     make(map[string]*sgc7game.ValWeights2),
 		mapReelSetWeights: make(map[string]*sgc7game.ValWeights2),
 		mapStrWeights:     make(map[string]*sgc7game.ValWeights2),
 		mapIntMapping:     make(map[string]*sgc7game.ValMapping2),
 		MapBetConfigs:     make(map[int]*BetConfig),
-		// mapBetConfig:    make(map[int]*BetDataConfig),
 	}
 
 	err := loadBasicInfo(cfg, data)

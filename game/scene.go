@@ -3,6 +3,7 @@ package sgc7game
 import (
 	"context"
 
+	"github.com/bytedance/sonic"
 	goutils "github.com/zhs007/goutils"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
@@ -847,4 +848,17 @@ func (gs *GameScene) Clear(s int) {
 			gs.Arr[x][y] = s
 		}
 	}
+}
+
+// ToString - to string int[][]
+func (gs *GameScene) ToString() string {
+	str, err := sonic.MarshalString(gs.Arr)
+	if err != nil {
+		goutils.Error("game.scene.ToString",
+			goutils.Err(err))
+
+		return ""
+	}
+
+	return str
 }
