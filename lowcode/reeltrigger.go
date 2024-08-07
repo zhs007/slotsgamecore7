@@ -178,14 +178,18 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 
 	reelTrigger.Config.Type = parseReelTriggerType(reelTrigger.Config.StrType)
 
-	sc, isok := pool.DefaultPaytables.MapSymbols[reelTrigger.Config.Symbol]
-	if !isok {
-		goutils.Error("ReelTrigger.InitEx:Symbol",
-			slog.String("symbol", reelTrigger.Config.Symbol),
-			goutils.Err(ErrIvalidSymbol))
-	}
+	if reelTrigger.Config.Symbol != "" {
+		sc, isok := pool.DefaultPaytables.MapSymbols[reelTrigger.Config.Symbol]
+		if !isok {
+			goutils.Error("ReelTrigger.InitEx:Symbol",
+				slog.String("symbol", reelTrigger.Config.Symbol),
+				goutils.Err(ErrIvalidSymbol))
+		}
 
-	reelTrigger.Config.SymbolCode = sc
+		reelTrigger.Config.SymbolCode = sc
+	} else {
+		reelTrigger.Config.SymbolCode = -1
+	}
 
 	for _, s := range reelTrigger.Config.WildSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
@@ -487,13 +491,16 @@ type jsonReelTrigger struct {
 
 func (jcfg *jsonReelTrigger) build() *ReelTriggerConfig {
 	cfg := &ReelTriggerConfig{
-		Symbol:             jcfg.Symbols[0],
 		StrType:            jcfg.TriggerType,
 		WildSymbols:        jcfg.WildSymbols,
 		MinSymbolNum:       jcfg.MinSymbolNum,
 		TargetMask:         jcfg.TargetMask,
 		MapBranchs:         make(map[int]*BranchNode),
 		IsCheckEmptySymbol: jcfg.IsCheckEmptySymbol,
+	}
+
+	if len(jcfg.Symbols) > 0 {
+		cfg.Symbol = jcfg.Symbols[0]
 	}
 
 	return cfg
