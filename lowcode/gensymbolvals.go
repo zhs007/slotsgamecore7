@@ -95,11 +95,6 @@ func (genSymbolVals *GenSymbolVals) InitEx(cfg any, pool *GamePropertyPool) erro
 		}
 
 		genSymbolVals.Config.WeightVW = vw2
-	} else {
-		goutils.Error("GenSymbolVals.InitEx:Weight",
-			goutils.Err(ErrIvalidComponentConfig))
-
-		return ErrIvalidComponentConfig
 	}
 
 	genSymbolVals.onInit(&genSymbolVals.Config.BasicComponentConfig)
