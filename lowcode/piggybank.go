@@ -22,9 +22,10 @@ const PiggyBankTypeName = "piggyBank"
 type PiggyBankType int
 
 const (
-	PiggyBankTypeNone             PiggyBankType = 0
-	PiggyBankTypeSumSymbolVals    PiggyBankType = 1
-	PiggyBankTypeAddSumSymbolVals PiggyBankType = 2
+	PiggyBankTypeNone                   PiggyBankType = 0
+	PiggyBankTypeSumSymbolVals          PiggyBankType = 1
+	PiggyBankTypeAddSumSymbolVals       PiggyBankType = 2
+	PiggyBankTypeSumEmptyWithSymbolVals PiggyBankType = 3
 )
 
 func parsePiggyBankType(str string) PiggyBankType {
@@ -33,6 +34,8 @@ func parsePiggyBankType(str string) PiggyBankType {
 		return PiggyBankTypeSumSymbolVals
 	} else if str == "winmulti+=sum(symbolvals)" {
 		return PiggyBankTypeAddSumSymbolVals
+	} else if str == "winMulti=sum(emptySymbol(symbolVals))" {
+		return PiggyBankTypeSumEmptyWithSymbolVals
 	}
 
 	return PiggyBankTypeNone
@@ -60,14 +63,6 @@ func (piggyBankData *PiggyBankData) OnNewGame(gameProp *GameProperty, component 
 		piggyBankData.SetConfigIntVal(CCVWinMulti, 1)
 	}
 }
-
-// // onNewStep -
-// func (piggyBankData *PiggyBankData) onNewStep() {
-// 	// piggyBankData.BasicComponentData.OnNewStep(gameProp, component)
-
-// 	// piggyBankData.Wins = 0
-// 	// piggyBankData.WinMulti = 1
-// }
 
 // Clone
 func (piggyBankData *PiggyBankData) Clone() IComponentData {
@@ -103,15 +98,6 @@ func (piggyBankData *PiggyBankData) GetVal(key string) (int, bool) {
 
 	return 0, false
 }
-
-// // SetVal -
-// func (piggyBankData *PiggyBankData) SetVal(key string, val int) {
-// 	if key == CVWins {
-// 		piggyBankData.Wins = val
-// 	} else if key == CVWinMulti {
-// 		piggyBankData.WinMulti = val
-// 	}
-// }
 
 // PiggyBankConfig - configuration for PiggyBank
 type PiggyBankConfig struct {
@@ -178,8 +164,6 @@ func (piggyBank *PiggyBank) InitEx(cfg any, pool *GamePropertyPool) error {
 func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*PiggyBankData)
 	var winMulti int
 
@@ -215,11 +199,28 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		}
 
 		winMulti += initWinMulti
+	} else if piggyBank.Config.Type == PiggyBankTypeSumEmptyWithSymbolVals {
+		gs := piggyBank.GetTargetScene3(gameProp, curpr, prs, 0)
+
+		os := piggyBank.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		if os != nil {
+			winMulti = 0
+
+			for x, arr := range os.Arr {
+				for y, v := range arr {
+					if gs.Arr[x][y] < 0 {
+						winMulti += v
+					}
+				}
+			}
+		}
+
+		if winMulti == 0 {
+			winMulti = 1
+		}
 	} else {
 		winMulti = piggyBank.GetWinMulti(&cd.BasicComponentData)
 	}
-
-	// cd.onNewStep()
 
 	cd.WinMulti = winMulti
 	sm, isok := cd.GetConfigIntVal(CCVSavedMoney)
@@ -258,24 +259,6 @@ func (piggyBank *PiggyBank) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 	return nil
 }
 
-// // OnStatsWithPB -
-// func (piggyBank *PiggyBank) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.PiggyBankData)
-// 	if !isok {
-// 		goutils.Error("PiggyBank.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
-
-// 		return 0, ErrIvalidProto
-// 	}
-
-// 	return piggyBank.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
-// // OnStats
-// func (piggyBank *PiggyBank) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 // NewComponentData -
 func (piggyBank *PiggyBank) NewComponentData() IComponentData {
 	return &PiggyBankData{}
@@ -304,6 +287,8 @@ func NewPiggyBank(name string) IComponent {
 	}
 }
 
+// "type": "winMulti=sum(emptySymbol(symbolVals))",
+// "winMulti": 0
 type jsonPiggyBank struct {
 	WinMulti int    `json:"winMulti"`
 	StrType  string `yaml:"type" json:"type"` // 如何初始化winmulti
@@ -314,8 +299,6 @@ func (jwt *jsonPiggyBank) build() *PiggyBankConfig {
 		WinMulti: jwt.WinMulti,
 		StrType:  jwt.StrType,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -55,8 +55,6 @@ func (removeSymbolsData *RemoveSymbolsData) OnNewGame(gameProp *GameProperty, co
 
 // onNewStep -
 func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
-	// removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
-
 	removeSymbolsData.RemovedNum = 0
 	removeSymbolsData.UsedScenes = nil
 	removeSymbolsData.UsedOtherScenes = nil
