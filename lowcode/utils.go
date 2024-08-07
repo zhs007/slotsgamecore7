@@ -164,6 +164,30 @@ func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) (*ForceOutcome2, error) 
 	return nil, nil
 }
 
+func GenDefaultScene(game *Game, bet int) (*sgc7game.GameScene, error) {
+	stake := &sgc7game.Stake{
+		CoinBet:  1,
+		CashBet:  int64(bet),
+		Currency: "EUR",
+	}
+
+	ips := game.Initialize()
+
+	for {
+		rets, err := procSpin(game, ips, game.NewPlugin(), stake, "", "")
+		if err != nil {
+			goutils.Error("GenDefaultScene:procSpin",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		if len(rets) == 1 && rets[0].CoinWin == 0 {
+			return rets[0].Scenes[len(rets[0].Scenes)-1], nil
+		}
+	}
+}
+
 func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stake *sgc7game.Stake, cmd string, params string) ([]*sgc7game.PlayResult, error) {
 	results := []*sgc7game.PlayResult{}
 	gameData := game.NewGameData(stake)

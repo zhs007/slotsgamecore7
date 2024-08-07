@@ -61,6 +61,20 @@ func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel 
 
 	pool.onInit()
 
+	if cfg.DefaultScene == "" {
+		gs, err := GenDefaultScene(game, cfg.Bets[0])
+		if err != nil {
+			goutils.Error("Game.Init2:GenDefaultScene",
+				goutils.Err(err))
+
+			return nil
+		}
+
+		cfg.DefaultScene = gs.ToString()
+
+		game.Cfg.SetDefaultSceneString(cfg.DefaultScene)
+	}
+
 	return nil
 }
 

@@ -18,6 +18,21 @@ import (
 
 const RemoveSymbolsTypeName = "removeSymbols"
 
+type RemoveSymbolsType int
+
+const (
+	RSTypeBasic       RemoveSymbolsType = 0
+	RSTypeAdjacentPay RemoveSymbolsType = 1
+)
+
+func parseRemoveSymbolsType(strType string) RemoveSymbolsType {
+	if strType == "adjacentPay" {
+		return RSTypeAdjacentPay
+	}
+
+	return RSTypeBasic
+}
+
 type RemoveSymbolsData struct {
 	BasicComponentData
 	RemovedNum int
@@ -40,8 +55,6 @@ func (removeSymbolsData *RemoveSymbolsData) OnNewGame(gameProp *GameProperty, co
 
 // onNewStep -
 func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
-	// removeSymbolsData.BasicComponentData.OnNewStep(gameProp, component)
-
 	removeSymbolsData.RemovedNum = 0
 	removeSymbolsData.UsedScenes = nil
 	removeSymbolsData.UsedOtherScenes = nil
@@ -74,13 +87,17 @@ func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message
 // RemoveSymbolsConfig - configuration for RemoveSymbols
 type RemoveSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	JumpToComponent      string   `yaml:"jumpToComponent" json:"jumpToComponent"`           // jump to
-	TargetComponents     []string `yaml:"targetComponents" json:"targetComponents"`         // 这些组件的中奖会需要参与remove
-	IgnoreSymbols        []string `yaml:"ignoreSymbols" json:"ignoreSymbols"`               // 忽略的symbol
-	IgnoreSymbolCodes    []int    `yaml:"-" json:"-"`                                       // 忽略的symbol
-	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	Awards               []*Award `yaml:"awards" json:"awards"`                             // 新的奖励系统
+	StrType              string            `yaml:"type" json:"type"`
+	Type                 RemoveSymbolsType `yaml:"-" json:"-"`
+	AddedSymbol          string            `yaml:"addedSymbol" json:"addedSymbol"`
+	AddedSymbolCode      int               `yaml:"-" json:"-"`
+	JumpToComponent      string            `yaml:"jumpToComponent" json:"jumpToComponent"`           // jump to
+	TargetComponents     []string          `yaml:"targetComponents" json:"targetComponents"`         // 这些组件的中奖会需要参与remove
+	IgnoreSymbols        []string          `yaml:"ignoreSymbols" json:"ignoreSymbols"`               // 忽略的symbol
+	IgnoreSymbolCodes    []int             `yaml:"-" json:"-"`                                       // 忽略的symbol
+	IsNeedProcSymbolVals bool              `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int               `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	Awards               []*Award          `yaml:"awards" json:"awards"`                             // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -127,6 +144,9 @@ func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) erro
 	removeSymbols.Config = cfg.(*RemoveSymbolsConfig)
 	removeSymbols.Config.ComponentType = RemoveSymbolsTypeName
 
+	removeSymbols.Config.AddedSymbolCode = pool.DefaultPaytables.MapSymbols[removeSymbols.Config.AddedSymbol]
+	removeSymbols.Config.Type = parseRemoveSymbolsType(removeSymbols.Config.StrType)
+
 	for _, v := range removeSymbols.Config.IgnoreSymbols {
 		removeSymbols.Config.IgnoreSymbolCodes = append(removeSymbols.Config.IgnoreSymbolCodes, pool.DefaultPaytables.MapSymbols[v])
 	}
@@ -157,8 +177,6 @@ func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) 
 func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	// removeSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	bcd := cd.(*RemoveSymbolsData)
 	bcd.onNewStep()
 
@@ -187,23 +205,56 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 			if ccd != nil {
 				lst := ccd.GetResults()
 				for _, ri := range lst {
-					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-						x := curpr.Results[ri].Pos[pi*2]
-						y := curpr.Results[ri].Pos[pi*2+1]
-						if removeSymbols.canRemove(x, y, ngs) {
-							if ngs == gs {
-								ngs = gs.CloneEx(gameProp.PoolScene)
-								nos = os.CloneEx(gameProp.PoolScene)
+					if removeSymbols.Config.Type == RSTypeBasic {
+						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+							x := curpr.Results[ri].Pos[pi*2]
+							y := curpr.Results[ri].Pos[pi*2+1]
+							if removeSymbols.canRemove(x, y, ngs) {
+								if ngs == gs {
+									ngs = gs.CloneEx(gameProp.PoolScene)
+									nos = os.CloneEx(gameProp.PoolScene)
+								}
+
+								if !gIsReleaseMode {
+									totalHeight += y
+								}
+
+								ngs.Arr[x][y] = -1
+								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+								bcd.RemovedNum++
 							}
+						}
+					} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+							x := curpr.Results[ri].Pos[pi*2]
+							y := curpr.Results[ri].Pos[pi*2+1]
+							if removeSymbols.canRemove(x, y, ngs) {
+								if ngs == gs {
+									ngs = gs.CloneEx(gameProp.PoolScene)
+									nos = os.CloneEx(gameProp.PoolScene)
+								}
 
-							if !gIsReleaseMode {
-								totalHeight += y
+								if !gIsReleaseMode {
+									totalHeight += y
+								}
+
+								isNeedRMOtherScene := true
+								if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
+									isNeedRMOtherScene = false
+								} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
+									isNeedRMOtherScene = false
+								}
+
+								if isNeedRMOtherScene {
+									ngs.Arr[x][y] = -1
+									nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+								} else {
+									ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+								}
+
+								bcd.RemovedNum++
 							}
-
-							ngs.Arr[x][y] = -1
-							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
-
-							bcd.RemovedNum++
 						}
 					}
 				}
@@ -228,21 +279,52 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 			if ccd != nil {
 				lst := ccd.GetResults()
 				for _, ri := range lst {
-					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-						x := curpr.Results[ri].Pos[pi*2]
-						y := curpr.Results[ri].Pos[pi*2+1]
-						if removeSymbols.canRemove(x, y, ngs) {
-							if ngs == gs {
-								ngs = gs.CloneEx(gameProp.PoolScene)
+					if removeSymbols.Config.Type == RSTypeBasic {
+						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+							x := curpr.Results[ri].Pos[pi*2]
+							y := curpr.Results[ri].Pos[pi*2+1]
+							if removeSymbols.canRemove(x, y, ngs) {
+								if ngs == gs {
+									ngs = gs.CloneEx(gameProp.PoolScene)
+								}
+
+								if !gIsReleaseMode {
+									totalHeight += y
+								}
+
+								ngs.Arr[x][y] = -1
+
+								bcd.RemovedNum++
 							}
+						}
+					} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+							x := curpr.Results[ri].Pos[pi*2]
+							y := curpr.Results[ri].Pos[pi*2+1]
+							if removeSymbols.canRemove(x, y, ngs) {
+								if ngs == gs {
+									ngs = gs.CloneEx(gameProp.PoolScene)
+								}
 
-							if !gIsReleaseMode {
-								totalHeight += y
+								if !gIsReleaseMode {
+									totalHeight += y
+								}
+
+								isNeedRMOtherScene := true
+								if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
+									isNeedRMOtherScene = false
+								} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
+									isNeedRMOtherScene = false
+								}
+
+								if isNeedRMOtherScene {
+									ngs.Arr[x][y] = -1
+								} else {
+									ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+								}
+
+								bcd.RemovedNum++
 							}
-
-							ngs.Arr[x][y] = -1
-
-							bcd.RemovedNum++
 						}
 					}
 				}
@@ -282,16 +364,6 @@ func (removeSymbols *RemoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
-// // OnStats
-// func (removeSymbols *RemoveSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // OnStatsWithPB -
-// func (removeSymbols *RemoveSymbols) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	return 0, nil
-// }
-
 // NewComponentData -
 func (removeSymbols *RemoveSymbols) NewComponentData() IComponentData {
 	return &RemoveSymbolsData{}
@@ -317,12 +389,18 @@ func NewRemoveSymbols(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"targetComponents": [
-//			"bg-payblue"
-//		]
-//	},
+// "isNeedProcSymbolVals": false,
+// "emptySymbolVal": -1,
+// "targetComponents": [
+//
+//	"bg-pay"
+//
+// ],
+// "type": "adjacentPay",
+// "addedSymbol": "WL"
 type jsonRemoveSymbols struct {
+	Type                 string   `json:"type"`                                             // type
+	AddedSymbol          string   `json:"addedSymbol"`                                      // addedSymbol
 	TargetComponents     []string `json:"targetComponents"`                                 // 这些组件的中奖会需要参与remove
 	IgnoreSymbols        []string `json:"ignoreSymbols"`                                    // 忽略的symbol
 	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
@@ -331,13 +409,13 @@ type jsonRemoveSymbols struct {
 
 func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	cfg := &RemoveSymbolsConfig{
+		StrType:              jcfg.Type,
 		TargetComponents:     jcfg.TargetComponents,
 		IgnoreSymbols:        jcfg.IgnoreSymbols,
 		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
+		AddedSymbol:          jcfg.AddedSymbol,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -1,12 +1,10 @@
 package lowcode
 
 import (
-	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type BasicComponentData struct {
@@ -151,27 +149,27 @@ func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Messa
 	}
 }
 
-// LoadPB
-func (basicComponentData *BasicComponentData) LoadPB(pb *anypb.Any) error {
-	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ComponentData" {
-		var msg sgc7pb.ComponentData
+// // LoadPB
+// func (basicComponentData *BasicComponentData) LoadPB(pb *anypb.Any) error {
+// 	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ComponentData" {
+// 		var msg sgc7pb.ComponentData
 
-		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
-		if err != nil {
-			goutils.Error("BasicComponentData.LoadPB:UnmarshalTo:ComponentData",
-				goutils.Err(err))
+// 		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
+// 		if err != nil {
+// 			goutils.Error("BasicComponentData.LoadPB:UnmarshalTo:ComponentData",
+// 				goutils.Err(err))
 
-			return err
-		}
+// 			return err
+// 		}
 
-		return nil
-	}
+// 		return nil
+// 	}
 
-	goutils.Error("BasicComponentData.LoadPB",
-		goutils.Err(ErrInvalidPBComponentData))
+// 	goutils.Error("BasicComponentData.LoadPB",
+// 		goutils.Err(ErrInvalidPBComponentData))
 
-	return ErrInvalidPBComponentData
-}
+// 	return ErrInvalidPBComponentData
+// }
 
 // LoadPB
 func (basicComponentData *BasicComponentData) LoadPBComponentData(pb *sgc7pb.ComponentData) error {
