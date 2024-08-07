@@ -42,10 +42,6 @@ func parseReelTriggerType(str string) ReelTriggerType {
 	return RTTypeRow
 }
 
-// const (
-// 	CTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-// )
-
 type ReelTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -106,15 +102,16 @@ func (reelTriggerData *ReelTriggerData) BuildPBComponentData() proto.Message {
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ReelTriggerConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbol               string              `yaml:"symbol" json:"symbol"`             // symbol
-	SymbolCode           int                 `yaml:"-" json:"-"`                       // symbol code
-	StrType              string              `yaml:"type" json:"type"`                 // ReelTriggerType
-	Type                 ReelTriggerType     `yaml:"-" json:"-"`                       // ReelTriggerType
-	WildSymbols          []string            `yaml:"wildSymbols" json:"wildSymbols"`   // wild etc
-	WildSymbolCodes      []int               `yaml:"-" json:"-"`                       // wild symbolCode
-	MinSymbolNum         int                 `yaml:"minSymbolNum" json:"minSymbolNum"` // minSymbolNum
-	TargetMask           string              `yaml:"targetMask" json:"targetMask"`     // 可以把结果传递给一个mask
-	MapBranchs           map[int]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"`     // mapBranchs
+	Symbol               string              `yaml:"symbol" json:"symbol"`                         // symbol
+	SymbolCode           int                 `yaml:"-" json:"-"`                                   // symbol code
+	StrType              string              `yaml:"type" json:"type"`                             // ReelTriggerType
+	Type                 ReelTriggerType     `yaml:"-" json:"-"`                                   // ReelTriggerType
+	WildSymbols          []string            `yaml:"wildSymbols" json:"wildSymbols"`               // wild etc
+	WildSymbolCodes      []int               `yaml:"-" json:"-"`                                   // wild symbolCode
+	MinSymbolNum         int                 `yaml:"minSymbolNum" json:"minSymbolNum"`             // minSymbolNum
+	TargetMask           string              `yaml:"targetMask" json:"targetMask"`                 // 可以把结果传递给一个mask
+	MapBranchs           map[int]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"`                 // mapBranchs
+	IsCheckEmptySymbol   bool                `yaml:"isCheckEmptySymbol" json:"isCheckEmptySymbol"` //
 }
 
 // SetLinkComponent
@@ -231,7 +228,11 @@ func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.Ga
 	for y := 0; y < gs.Height; y++ {
 		num := 0
 		for x := 0; x < gs.Width; x++ {
-			if gs.Arr[x][y] == reelTrigger.Config.SymbolCode {
+			if reelTrigger.Config.IsCheckEmptySymbol {
+				if gs.Arr[x][y] < 0 {
+					num++
+				}
+			} else if gs.Arr[x][y] == reelTrigger.Config.SymbolCode {
 				num++
 			}
 		}
@@ -305,7 +306,11 @@ func (reelTrigger *ReelTrigger) calcColumn(rtdata *ReelTriggerData, gs *sgc7game
 	for x := 0; x < gs.Width; x++ {
 		num := 0
 		for y := 0; y < gs.Height; y++ {
-			if gs.Arr[x][y] == reelTrigger.Config.SymbolCode {
+			if reelTrigger.Config.IsCheckEmptySymbol {
+				if gs.Arr[x][y] < 0 {
+					num++
+				}
+			} else if gs.Arr[x][y] == reelTrigger.Config.SymbolCode {
 				num++
 			}
 		}
@@ -452,14 +457,14 @@ func (reelTrigger *ReelTrigger) GetNextLinkComponents() []string {
 	return lst
 }
 
-func (reelTrigger *ReelTrigger) getSymbols(gameProp *GameProperty) []int {
-	s := gameProp.GetCurCallStackSymbol()
-	if s >= 0 {
-		return []int{s}
-	}
+// func (reelTrigger *ReelTrigger) getSymbols(gameProp *GameProperty) []int {
+// 	s := gameProp.GetCurCallStackSymbol()
+// 	if s >= 0 {
+// 		return []int{s}
+// 	}
 
-	return []int{reelTrigger.Config.SymbolCode}
-}
+// 	return []int{reelTrigger.Config.SymbolCode}
+// }
 
 func NewReelTrigger(name string) IComponent {
 	return &ReelTrigger{
@@ -470,25 +475,26 @@ func NewReelTrigger(name string) IComponent {
 // "triggerType": "rowNumber",
 // "minSymbolNum": 4,
 // "symbols": "CASH"
+// "IsCheckEmptySymbol": true
 type jsonReelTrigger struct {
-	Symbols      []string `json:"symbols"`
-	TriggerType  string   `json:"triggerType"`
-	MinSymbolNum int      `json:"minSymbolNum"`
-	WildSymbols  []string `json:"wildSymbols"`
-	TargetMask   string   `json:"targetMask"` // 可以把结果传递给一个mask
+	Symbols            []string `json:"symbols"`
+	TriggerType        string   `json:"triggerType"`
+	MinSymbolNum       int      `json:"minSymbolNum"`
+	WildSymbols        []string `json:"wildSymbols"`
+	TargetMask         string   `json:"targetMask"` // 可以把结果传递给一个mask
+	IsCheckEmptySymbol bool     `json:"IsCheckEmptySymbol"`
 }
 
 func (jcfg *jsonReelTrigger) build() *ReelTriggerConfig {
 	cfg := &ReelTriggerConfig{
-		Symbol:       jcfg.Symbols[0],
-		StrType:      jcfg.TriggerType,
-		WildSymbols:  jcfg.WildSymbols,
-		MinSymbolNum: jcfg.MinSymbolNum,
-		TargetMask:   jcfg.TargetMask,
-		MapBranchs:   make(map[int]*BranchNode),
+		Symbol:             jcfg.Symbols[0],
+		StrType:            jcfg.TriggerType,
+		WildSymbols:        jcfg.WildSymbols,
+		MinSymbolNum:       jcfg.MinSymbolNum,
+		TargetMask:         jcfg.TargetMask,
+		MapBranchs:         make(map[int]*BranchNode),
+		IsCheckEmptySymbol: jcfg.IsCheckEmptySymbol,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
