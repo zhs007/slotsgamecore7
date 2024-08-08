@@ -461,10 +461,9 @@ func (waysTrigger *WaysTrigger) procWins(gameProp *GameProperty, curpr *sgc7game
 
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
 
-			// for _, v := range lst {
-			// 	curpr.CashWin -= int64(v.CashWin)
-			// 	curpr.CoinWin -= v.CoinWin
-			// }
+			for _, v := range lst {
+				v.IsNoPayNow = true
+			}
 
 			gameProp.UseComponent(waysTrigger.Config.PiggyBankComponent)
 		}

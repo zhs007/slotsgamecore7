@@ -337,6 +337,10 @@ func (adjacentPayTrigger *AdjacentPayTrigger) procWins(gameProp *GameProperty, c
 				return 0, ErrInvalidComponent
 			}
 
+			for _, v := range lst {
+				v.IsNoPayNow = true
+			}
+
 			cd.ChgConfigIntVal(CCVSavedMoney, std.Wins)
 
 			gameProp.UseComponent(adjacentPayTrigger.Config.PiggyBankComponent)
