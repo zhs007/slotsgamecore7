@@ -34,7 +34,7 @@ func parsePiggyBankType(str string) PiggyBankType {
 		return PiggyBankTypeSumSymbolVals
 	} else if str == "winmulti+=sum(symbolvals)" {
 		return PiggyBankTypeAddSumSymbolVals
-	} else if str == "winMulti=sum(emptySymbol(symbolVals))" {
+	} else if str == "winmulti=sum(emptysymbol(symbolvals))" {
 		return PiggyBankTypeSumEmptyWithSymbolVals
 	}
 
