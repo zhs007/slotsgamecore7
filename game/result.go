@@ -43,4 +43,5 @@ type Result struct {
 	Wilds      int        `json:"wilds"`
 	SymbolNums int        `json:"symbolnums"`
 	Value      int        `json:"value"`
+	IsNoPayNow bool       `json:"isNoPayNow"`
 }
