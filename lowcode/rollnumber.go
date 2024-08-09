@@ -263,23 +263,12 @@ func (rollSymbol *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 // OnAsciiGame - outpur to asciigame
 func (rollSymbol *RollNumber) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	rsd := icd.(*RollSymbolData)
+	rsd := icd.(*RollNumberData)
 
-	fmt.Printf("rollSymbol %v, got ", rollSymbol.GetName())
-
-	for _, v := range rsd.SymbolCodes {
-		fmt.Printf("%v ", gameProp.Pool.DefaultPaytables.GetStringFromInt(v))
-	}
-
-	fmt.Print("\n")
+	fmt.Printf("rollSymbol %v, got %v\n", rollSymbol.GetName(), rsd.Number)
 
 	return nil
 }
-
-// // OnStats
-// func (rollSymbol *RollSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // NewComponentData -
 func (rollSymbol *RollNumber) NewComponentData() IComponentData {
