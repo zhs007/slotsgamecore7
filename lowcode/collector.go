@@ -30,21 +30,20 @@ func (collectorData *CollectorData) OnNewGame(gameProp *GameProperty, component 
 	collectorData.BasicComponentData.OnNewGame(gameProp, component)
 
 	collectorData.Val = 0
+	collectorData.NewCollector = 0
 }
 
 // onNewStep -
 func (collectorData *CollectorData) onNewStep() {
-	// collectorData.BasicComponentData.OnNewStep(gameProp, component)
-
 	collectorData.NewCollector = 0
 }
 
 // // ChgConfigIntVal -
 // func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
-// 	if key == CCVLastRespinNum {
-// 		respinData.AddRespinTimes(off)
+// 	if key == CCVValueNum {
+// 		// collectorData.AddRespinTimes(off)
 // 	} else {
-// 		respinData.BasicComponentData.ChgConfigIntVal(key, off)
+// 		collectorData.BasicComponentData.ChgConfigIntVal(key, off)
 // 	}
 // }
 
@@ -91,11 +90,11 @@ func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 // CollectorConfig - configuration for Collector
 type CollectorConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbol               string           `yaml:"symbol" json:"symbol"`
-	MaxVal               int              `yaml:"maxVal" json:"maxVal"`
-	PerLevelAwards       []*Award         `yaml:"perLevelAwards" json:"perLevelAwards"`
-	MapSPLevelAwards     map[int][]*Award `yaml:"mapSPLevelAwards" json:"mapSPLevelAwards"`
-	IsCycle              bool             `yaml:"isCycle" json:"isCycle"`
+	// Symbol               string           `yaml:"symbol" json:"symbol"`
+	MaxVal           int              `yaml:"maxVal" json:"maxVal"`
+	PerLevelAwards   []*Award         `yaml:"perLevelAwards" json:"perLevelAwards"`
+	MapSPLevelAwards map[int][]*Award `yaml:"mapSPLevelAwards" json:"mapSPLevelAwards"`
+	IsCycle          bool             `yaml:"isCycle" json:"isCycle"`
 }
 
 // SetLinkComponent
@@ -108,7 +107,7 @@ func (cfg *CollectorConfig) SetLinkComponent(link string, componentName string) 
 type Collector struct {
 	*BasicComponent `json:"-"`
 	Config          *CollectorConfig `json:"config"`
-	SymbolCode      int              `json:"-"`
+	// SymbolCode      int              `json:"-"`
 }
 
 // Init -
@@ -141,7 +140,7 @@ func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
 	collector.Config = cfg.(*CollectorConfig)
 	collector.Config.ComponentType = CollectorTypeName
 
-	collector.SymbolCode = pool.DefaultPaytables.MapSymbols[collector.Config.Symbol]
+	// collector.SymbolCode = pool.DefaultPaytables.MapSymbols[collector.Config.Symbol]
 
 	if collector.Config.PerLevelAwards != nil {
 		for _, v := range collector.Config.PerLevelAwards {
@@ -272,13 +271,13 @@ func (collector *Collector) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 		ccd.ClearConfigIntVal(CCVValueNum)
 	}
 
-	gs := collector.GetTargetScene3(gameProp, curpr, prs, 0)
+	// gs := collector.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	nn := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
-		return cursymbol == collector.SymbolCode
-	})
+	// nn := gs.CountSymbolEx(func(cursymbol int, x, y int) bool {
+	// 	return cursymbol == collector.SymbolCode
+	// })
 
-	collector.add(plugin, nn, ccd, gameProp, curpr, gp, false)
+	// collector.add(plugin, nn, ccd, gameProp, curpr, gp, false)
 
 	nc := collector.onStepEnd(gameProp, curpr, gp, "")
 
