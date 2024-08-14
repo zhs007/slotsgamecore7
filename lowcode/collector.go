@@ -61,6 +61,15 @@ func (collectorData *CollectorData) GetOutput() int {
 	return collectorData.Val
 }
 
+// GetVal -
+func (collectorData *CollectorData) GetVal(key string) (int, bool) {
+	if key == CVValue {
+		return collectorData.Val, true
+	}
+
+	return 0, false
+}
+
 // // ChgConfigIntVal -
 // func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
 // 	if key == CCVValueNum {
