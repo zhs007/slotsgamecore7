@@ -70,14 +70,14 @@ func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// // GetVal -
-// func (queueBranchData *QueueBranchData) GetVal(key string) int {
-// 	if key == QBDVQueue {
-// 		return queueBranchData.Queue
-// 	}
+// GetVal -
+func (queueBranchData *QueueBranchData) GetVal(key string) (int, bool) {
+	if key == CVValue {
+		return queueBranchData.Queue, true
+	}
 
-// 	return 0
-// }
+	return 0, false
+}
 
 // // SetVal -
 // func (queueBranchData *QueueBranchData) SetVal(key string, val int) {
