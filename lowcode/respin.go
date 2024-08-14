@@ -26,11 +26,10 @@ type RespinData struct {
 	CurAddRespinNum       int
 	RetriggerAddRespinNum int // 再次触发时增加的次数
 	TotalCoinWin          int64
-	// TotalCashWin          int64
-	LastTriggerNum   int      // 剩余的触发次数，respin有2种模式，一种是直接增加免费次数，一种是累积整体触发次数
-	CurTriggerNum    int      // 当前已经触发次数
-	Awards           []*Award // 当前已经触发次数
-	TriggerRespinNum []int    // 配合LastTriggerNum用的respin次数，-1表示用当前的RetriggerAddRespinNum，否则就是具体值
+	LastTriggerNum        int      // 剩余的触发次数，respin有2种模式，一种是直接增加免费次数，一种是累积整体触发次数
+	CurTriggerNum         int      // 当前已经触发次数
+	Awards                []*Award // 当前已经触发次数
+	TriggerRespinNum      []int    // 配合LastTriggerNum用的respin次数，-1表示用当前的RetriggerAddRespinNum，否则就是具体值
 }
 
 // OnNewGame -
