@@ -172,6 +172,11 @@ var (
 	// ErrInvalidPosition - invalid position
 	ErrInvalidPosition = errors.New("invalid position")
 
+	// ErrInvalidCollectorVal - invalid Collector.Val
+	ErrInvalidCollectorVal = errors.New("invalid Collector.Val")
+	// ErrInvalidCollectorLogic - invalid Collector logic
+	ErrInvalidCollectorLogic = errors.New("invalid Collector logic")
+
 	// ErrInvalidAnyProtoBuf - invalid AnyProtoBuf
 	ErrInvalidAnyProtoBuf = errors.New("invalid AnyProtoBuf")
 	// ErrInvalidPBComponentData - invalid invalid PB ComponentData
