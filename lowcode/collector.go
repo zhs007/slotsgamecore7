@@ -38,15 +38,6 @@ func (collectorData *CollectorData) onNewStep() {
 	collectorData.NewCollector = 0
 }
 
-// // ChgConfigIntVal -
-// func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
-// 	if key == CCVValueNum {
-// 		// collectorData.AddRespinTimes(off)
-// 	} else {
-// 		collectorData.BasicComponentData.ChgConfigIntVal(key, off)
-// 	}
-// }
-
 // SetConfigIntVal -
 func (collectorData *CollectorData) SetConfigIntVal(key string, val int) {
 	if key == CCVValueNum {
@@ -70,13 +61,6 @@ func (collectorData *CollectorData) GetVal(key string) (int, bool) {
 	return 0, false
 }
 
-// // ChgConfigIntVal -
-// func (collectorData *CollectorData) ChgConfigIntVal(key string, off int) {
-// 	if key == CCVValueNum {
-// 		collectorData.Val += off
-// 	}
-// }
-
 // Clone
 func (collectorData *CollectorData) Clone() IComponentData {
 	target := &CollectorData{
@@ -99,11 +83,10 @@ func (collectorData *CollectorData) BuildPBComponentData() proto.Message {
 // CollectorConfig - configuration for Collector
 type CollectorConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	// Symbol               string           `yaml:"symbol" json:"symbol"`
-	MaxVal           int              `yaml:"maxVal" json:"maxVal"`
-	PerLevelAwards   []*Award         `yaml:"perLevelAwards" json:"perLevelAwards"`
-	MapSPLevelAwards map[int][]*Award `yaml:"mapSPLevelAwards" json:"mapSPLevelAwards"`
-	IsCycle          bool             `yaml:"isCycle" json:"isCycle"`
+	MaxVal               int              `yaml:"maxVal" json:"maxVal"`
+	PerLevelAwards       []*Award         `yaml:"perLevelAwards" json:"perLevelAwards"`
+	MapSPLevelAwards     map[int][]*Award `yaml:"mapSPLevelAwards" json:"mapSPLevelAwards"`
+	IsCycle              bool             `yaml:"isCycle" json:"isCycle"`
 }
 
 // SetLinkComponent
@@ -116,7 +99,6 @@ func (cfg *CollectorConfig) SetLinkComponent(link string, componentName string) 
 type Collector struct {
 	*BasicComponent `json:"-"`
 	Config          *CollectorConfig `json:"config"`
-	// SymbolCode      int              `json:"-"`
 }
 
 // Init -
@@ -149,8 +131,6 @@ func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
 	collector.Config = cfg.(*CollectorConfig)
 	collector.Config.ComponentType = CollectorTypeName
 
-	// collector.SymbolCode = pool.DefaultPaytables.MapSymbols[collector.Config.Symbol]
-
 	if collector.Config.PerLevelAwards != nil {
 		for _, v := range collector.Config.PerLevelAwards {
 			v.Init()
@@ -170,45 +150,11 @@ func (collector *Collector) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-// // OnNewGame - 因为 BasicComponent 考虑到效率，没有执行ComponentData的OnNewGame，所以这里需要特殊处理
-// func (collector *Collector) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.MapComponentData[collector.Name]
-
-// 	cd.OnNewGame()
-
-// 	return nil
-// }
-
 // add -
-func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
-	if num <= 0 {
-		return nil
-	}
-
-	// if cd == nil {
-	// 	cd = gameProp.MapComponentData[collector.Name].(*CollectorData)
-	// }
-
-	if collector.Config.MaxVal > 0 && !collector.Config.IsCycle && cd.Val == collector.Config.MaxVal {
-		return nil
-	}
-
-	cd.NewCollector += num
-	oldval := cd.Val
-	cd.Val += num
-	if collector.Config.MaxVal > 0 {
-		if cd.Val >= collector.Config.MaxVal {
-			if collector.Config.IsCycle {
-				cd.Val -= collector.Config.MaxVal
-			} else {
-				cd.Val = collector.Config.MaxVal
-			}
-		}
-	}
-
-	if num > 0 && !noProcLevelUp && oldval != cd.Val {
+func (collector *Collector) onAdd(plugin sgc7plugin.IPlugin, startVal int, num int, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams) {
+	if num > 0 {
 		for i := 1; i <= num; i++ {
-			cl := oldval + i
+			cl := startVal + i
 			if cl >= collector.Config.MaxVal {
 				collector.onLevelUp(plugin, gameProp, curpr, gp, -1, false)
 
@@ -217,6 +163,88 @@ func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *Collecto
 				collector.onLevelUp(plugin, gameProp, curpr, gp, cl, false)
 			}
 		}
+	}
+}
+
+// add -
+func (collector *Collector) add(plugin sgc7plugin.IPlugin, num int, cd *CollectorData, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, noProcLevelUp bool) error {
+	if num <= 0 {
+		return nil
+	}
+
+	if collector.Config.MaxVal > 0 {
+		if collector.Config.IsCycle {
+			if cd.Val+num >= collector.Config.MaxVal {
+				cd.NewCollector += num
+				oldval := cd.Val
+				cd.Val += num
+
+				for {
+					if cd.Val >= collector.Config.MaxVal {
+						if !noProcLevelUp {
+							collector.onAdd(plugin, oldval, collector.Config.MaxVal-oldval, gameProp, curpr, gp)
+						}
+
+						if cd.Val == collector.Config.MaxVal {
+							cd.Val = 0
+
+							break
+						}
+
+						oldval = 0
+
+						cd.Val -= collector.Config.MaxVal
+					} else {
+						if !noProcLevelUp {
+							collector.onAdd(plugin, oldval, cd.Val-oldval, gameProp, curpr, gp)
+						}
+
+						break
+					}
+				}
+
+				return nil
+			}
+
+		} else {
+			if cd.Val == collector.Config.MaxVal {
+				return nil
+			}
+
+			if cd.Val > collector.Config.MaxVal {
+				goutils.Error("Collector.add",
+					goutils.Err(ErrInvalidCollectorVal))
+
+				return ErrInvalidCollectorVal
+			}
+
+			if cd.Val+num >= collector.Config.MaxVal {
+				oldval := cd.Val
+				cd.NewCollector += num
+				cd.Val = collector.Config.MaxVal
+
+				if !noProcLevelUp {
+					collector.onAdd(plugin, oldval, cd.Val-oldval, gameProp, curpr, gp)
+				}
+
+				return nil
+			}
+		}
+	}
+
+	// 到这里就不会有超过maxVal的情况了
+	cd.NewCollector += num
+	oldval := cd.Val
+	cd.Val += num
+	if collector.Config.MaxVal > 0 && cd.Val >= collector.Config.MaxVal {
+		goutils.Error("Collector.add",
+			goutils.Err(ErrInvalidCollectorLogic))
+
+		return ErrInvalidCollectorLogic
+	}
+
+	if num > 0 && !noProcLevelUp && oldval != cd.Val {
+		collector.onAdd(plugin, oldval, num, gameProp, curpr, gp)
 	}
 
 	return nil
@@ -306,64 +334,6 @@ func (collector *Collector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 
 	return nil
 }
-
-// // OnStats
-// func (collector *Collector) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	if feature != nil && len(lst) > 0 {
-// 		if feature.RespinEndingStatus != nil {
-// 			pbcd, lastpr := findLastPBComponentDataEx(lst, feature.RespinEndingName, collector.Name)
-
-// 			if pbcd != nil {
-// 				collector.OnStatsWithPB(feature, pbcd, lastpr)
-// 			}
-// 		}
-
-// 		if feature.RespinStartStatus != nil {
-// 			pbcd, lastpr := findFirstPBComponentDataEx(lst, feature.RespinStartName, collector.Name)
-
-// 			if pbcd != nil {
-// 				collector.OnStatsWithPB(feature, pbcd, lastpr)
-// 			}
-// 		}
-
-// 		if feature.RespinStartStatusEx != nil {
-// 			pbs, prs := findAllPBComponentDataEx(lst, feature.RespinStartNameEx, collector.Name)
-
-// 			if len(pbs) > 0 {
-// 				for i, v := range pbs {
-// 					collector.OnStatsWithPB(feature, v, prs[i])
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return false, 0, 0
-// }
-
-// // OnStatsWithPB -
-// func (collector *Collector) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.CollectorData)
-// 	if !isok {
-// 		goutils.Error("Collector.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
-
-// 		return 0, ErrIvalidProto
-// 	}
-
-// 	if feature.RespinEndingStatus != nil {
-// 		feature.RespinEndingStatus.AddStatus(int(pbcd.Val))
-// 	}
-
-// 	if feature.RespinStartStatus != nil {
-// 		feature.RespinStartStatus.AddStatus(int(pbcd.Val - pbcd.NewCollector))
-// 	}
-
-// 	if feature.RespinStartStatusEx != nil {
-// 		feature.RespinStartStatusEx.AddStatus(int(pbcd.Val - pbcd.NewCollector))
-// 	}
-
-// 	return 0, nil
-// }
 
 // NewComponentData -
 func (collector *Collector) NewComponentData() IComponentData {
