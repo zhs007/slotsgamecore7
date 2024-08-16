@@ -38,7 +38,7 @@ func (collectorData *CollectorData) onNewStep() {
 	collectorData.NewCollector = 0
 }
 
-// SetConfigIntVal -
+// SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，后面需要改成一样的
 func (collectorData *CollectorData) SetConfigIntVal(key string, val int) {
 	if key == CCVValueNum {
 		collectorData.Val = val
