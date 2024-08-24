@@ -9,14 +9,18 @@ type Cache struct {
 	RespinArr []string
 }
 
-func (s2 *Cache) RemoveRespin(name string) {
-	for i, v := range s2.RespinArr {
-		if v == name {
-			s2.RespinArr = append(s2.RespinArr[0:i], s2.RespinArr[i+1:]...)
-
-			return
+func (s2 *Cache) OnStepEnd(respinArr []string) {
+	newArr := []string{}
+	for _, v := range s2.RespinArr {
+		f, isok := s2.MapStats[v]
+		if isok {
+			if !(!f.RootTrigger.IsStarted && goutils.IndexOfStringSlice(respinArr, v, 0) < 0) {
+				newArr = append(newArr, v)
+			}
 		}
 	}
+
+	s2.RespinArr = newArr
 }
 
 func (s2 *Cache) GetFeature(name string) *Feature {

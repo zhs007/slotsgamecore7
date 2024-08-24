@@ -987,6 +987,8 @@ func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult,
 				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache, gameProp, gp, pr)
 			}
 		}
+
+		gameProp.stats2Cache.OnStepEnd(gp.RespinComponents)
 	}
 
 	if pr.IsFinish {
