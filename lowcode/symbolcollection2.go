@@ -238,7 +238,7 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 			// 	curComponent.OnStats2(ccd, gameProp.stats2Cache)
 			// }
 
-			gameProp.OnCallEnd(curComponent, ccd, gp)
+			gameProp.OnCallEnd(curComponent, ccd, gp, curpr)
 		}
 
 		ccn = nc
@@ -355,7 +355,7 @@ func (symbolCollection2 *SymbolCollection2) NewStats2(parent string) *stats2.Fea
 }
 
 // OnStats2
-func (symbolCollection2 *SymbolCollection2) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+func (symbolCollection2 *SymbolCollection2) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
 	cd := icd.(*SymbolCollection2Data)
 
 	s2.ProcStatsForeachTrigger(symbolCollection2.Name, len(cd.SymbolCodes), 0)

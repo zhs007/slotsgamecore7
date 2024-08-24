@@ -780,8 +780,8 @@ func (waysTrigger *WaysTrigger) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (waysTrigger *WaysTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-	waysTrigger.BasicComponent.OnStats2(icd, s2)
+func (waysTrigger *WaysTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	waysTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
 
 	cd := icd.(*WaysTriggerData)
 

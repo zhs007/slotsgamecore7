@@ -187,6 +187,24 @@ func (weightBranch *WeightBranch) getForceBrach(wbd *WeightBranchData) string {
 	return weightBranch.Config.ForceBranch
 }
 
+func (weightBranch *WeightBranch) getWeight(gameProp *GameProperty, wbd *WeightBranchData) *sgc7game.ValWeights2 {
+	val := wbd.BasicComponentData.GetConfigVal(CCVWeight)
+	if val != "" {
+		vw2, err := gameProp.Pool.LoadStrWeights(val, weightBranch.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("WeightBranch.getWeight:LoadStrWeights",
+				slog.String("Weight", val),
+				goutils.Err(err))
+
+			return nil
+		}
+
+		return vw2
+	}
+
+	return weightBranch.Config.WeightVW
+}
+
 // playgame
 func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -197,7 +215,8 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	forceBranch := weightBranch.getForceBrach(wbd)
 	if forceBranch == "" {
-		cr, err := weightBranch.Config.WeightVW.RandVal(plugin)
+		vw2 := weightBranch.getWeight(gameProp, wbd)
+		cr, err := vw2.RandVal(plugin)
 		if err != nil {
 			goutils.Error("WeightBranch.OnPlayGame:RandVal",
 				goutils.Err(err))

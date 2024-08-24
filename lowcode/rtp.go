@@ -266,8 +266,6 @@ type RTPConfig struct {
 // }
 
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel, wincap int64) error {
-	// SetRTPMode()
-	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2(gamecfg, func() sgc7plugin.IPlugin {
@@ -293,22 +291,6 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		Currency: "EUR",
 	}
 
-	// if game.Pool.Stats != nil {
-	// 	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData any) {
-	// 		game.Pool.Stats.Push(stake, lst)
-	// 	}
-	// }
-
-	// if game.Pool.Config.RTP != nil {
-	// 	for _, m := range game.Pool.Config.RTP.Modules {
-	// 		newRTPGameModule(rtp, game.Pool, m)
-	// 	}
-
-	// 	for _, hr := range game.Pool.Config.RTP.HitRateFeatures {
-	// 		procHitRate(rtp, game.Pool, hr)
-	// 	}
-	// }
-
 	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
 		goutils.Info("processing...",
 			slog.Int64("total nums", totalnums),
@@ -325,15 +307,6 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 
 	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
-	// if game.Pool.Stats != nil {
-	// 	game.Pool.Stats.Wait()
-
-	// 	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
-
-	// 	goutils.Info("finish.",
-	// 		slog.Int64("total nums", game.Pool.Stats.TotalNum))
-	// }
-
 	if gAllowStats2 {
 		components := game.Pool.mapComponents[int(bet)]
 		components.Stats2.WaitEnding()
@@ -348,8 +321,6 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 }
 
 func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*stats2.Stats, error) {
-	// SetRTPMode()
-	// IsStatsComponentMsg = true
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2WithData(gamecfg, func() sgc7plugin.IPlugin {
@@ -374,22 +345,6 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 		Currency: "EUR",
 	}
 
-	// if game.Pool.Stats != nil {
-	// 	rtp.FuncRTPResults = func(lst []*sgc7game.PlayResult, gameData any) {
-	// 		game.Pool.Stats.Push(stake, lst)
-	// 	}
-	// }
-
-	// if game.Pool.Config.RTP != nil {
-	// 	for _, m := range game.Pool.Config.RTP.Modules {
-	// 		newRTPGameModule(rtp, game.Pool, m)
-	// 	}
-
-	// 	for _, hr := range game.Pool.Config.RTP.HitRateFeatures {
-	// 		procHitRate(rtp, game.Pool, hr)
-	// 	}
-	// }
-
 	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, 0)
 
 	goutils.Info("finish.",
@@ -397,28 +352,8 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 		slog.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
 		slog.Duration("cost time", d))
 
-	// curtime := time.Now()
-
-	// rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
-
-	// if game.Pool.Stats != nil {
-	// 	game.Pool.Stats.Wait()
-
-	// 	game.Pool.Stats.Root.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-stats-%v.xlsx", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
-
-	// 	goutils.Info("finish.",
-	// 		slog.Int64("total nums", game.Pool.Stats.TotalNum))
-	// }
-
-	// if gAllowStats2 {
 	components := game.Pool.mapComponents[int(bet)]
 	components.Stats2.WaitEnding()
-
-	// components.Stats2.SaveExcel(path.Join(outputPath, fmt.Sprintf("%v-%v-stats-%v.xlsx", game.Pool.Config.Name, bet, curtime.Format("2006-01-02_15_04_05"))))
-
-	// goutils.Info("finish.",
-	// 	slog.Int64("total nums", components.Stats2.BetTimes))
-	// }
 
 	return components.Stats2, nil
 }

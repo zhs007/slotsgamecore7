@@ -405,8 +405,8 @@ func (symbolValWins *SymbolValWins) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (symbolValWins *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-	symbolValWins.BasicComponent.OnStats2(icd, s2)
+func (symbolValWins *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	symbolValWins.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
 
 	svwd := icd.(*SymbolValWinsData)
 
