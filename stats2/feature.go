@@ -34,10 +34,12 @@ func (f2 *Feature) procCacheStatsRespinTrigger(isRunning bool, wins int64, isEnd
 			f2.RootTrigger.RunTimes++
 		}
 
+		if f2.RootTrigger.IsStarted {
+			f2.RootTrigger.TotalWins += wins
+		}
+
 		if isEnding {
 			f2.RootTrigger.IsStarted = false
-		} else {
-			f2.RootTrigger.TotalWins += wins
 		}
 	}
 }
