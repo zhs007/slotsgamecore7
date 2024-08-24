@@ -309,13 +309,16 @@ func (gameProp *GameProperty) procRespinBeforeStepEnding(pr *sgc7game.PlayResult
 	return "", nil
 }
 
-func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData, gp *GameParams) {
+// OnCallEnd - call after the component onPlay
+func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData, gp *GameParams, pr *sgc7game.PlayResult) {
 	if !component.IsRespin() && gAllowStats2 {
 		if !gameProp.stats2Cache.HasFeature(component.GetName()) {
-			gameProp.stats2Cache.AddFeature(component.GetName(), component.NewStats2(gameProp.Components.statsNodeData.GetParent(component.GetName())))
+			gameProp.stats2Cache.AddFeature(component.GetName(),
+				component.NewStats2(gameProp.Components.statsNodeData.GetParent(component.GetName())),
+				false)
 		}
 
-		component.OnStats2(cd, gameProp.stats2Cache)
+		component.OnStats2(cd, gameProp.stats2Cache, gameProp, gp, pr)
 	}
 
 	tag := gameProp.callStack.OnCallEnd(component, cd)
@@ -965,14 +968,23 @@ func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult,
 	gameProp.featureLevel.OnStepEnd(gameProp, gp, pr)
 
 	if gAllowStats2 {
-		for _, v := range gp.HistoryComponents {
+		for _, v := range gp.RespinComponents {
 			ic, isok := gameProp.Components.MapComponents[v]
 			if isok && ic.IsRespin() {
 				if !gameProp.stats2Cache.HasFeature(v) {
-					gameProp.stats2Cache.AddFeature(v, ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)))
+					gameProp.stats2Cache.AddFeature(v,
+						ic.NewStats2(gameProp.Components.statsNodeData.GetParent(v)),
+						true)
 				}
 
-				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache)
+				// ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache, gameProp, gp)
+			}
+		}
+
+		for _, v := range gameProp.stats2Cache.RespinArr {
+			ic, isok := gameProp.Components.MapComponents[v]
+			if isok {
+				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache, gameProp, gp, pr)
 			}
 		}
 	}

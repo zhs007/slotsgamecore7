@@ -363,7 +363,7 @@ func (basicComponent *BasicComponent) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
 	s2.ProcStatsTrigger(basicComponent.Name)
 }
 

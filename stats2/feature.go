@@ -13,32 +13,6 @@ type Feature struct {
 	Wins        *StatsWins        `json:"wins"`        // wins
 }
 
-// func (f2 *Feature) onStatsGame(cache *Cache) {
-// 	if f2.Parent != "" {
-// 		p := cache.GetFeature(f2.Parent)
-
-// 		if p != nil && p.RootTrigger != nil {
-// 			if f2.Trigger != nil {
-// 				f2.Trigger.TotalTimes += p.RootTrigger.RunTimes
-// 			}
-
-// 			if f2.RootTrigger != nil {
-// 				f2.RootTrigger.TotalTimes += p.RootTrigger.RunTimes
-// 			}
-
-// 			return
-// 		}
-// 	}
-
-// 	if f2.Trigger != nil {
-// 		f2.Trigger.TotalTimes++
-// 	}
-
-// 	if f2.RootTrigger != nil {
-// 		f2.RootTrigger.TotalTimes++
-// 	}
-// }
-
 func (f2 *Feature) procCacheStatsWins(win int64) {
 	if f2.Wins != nil {
 		f2.Wins.AddWin(win)
@@ -49,18 +23,21 @@ func (f2 *Feature) procCacheStatsTrigger() {
 	f2.Trigger.TriggerTimes++
 }
 
-func (f2 *Feature) procCacheStatsRootTrigger(wins int64, isEnding bool) {
+func (f2 *Feature) procCacheStatsRespinTrigger(isRunning bool, wins int64, isEnding bool) {
 	if f2.RootTrigger != nil {
-		if !f2.RootTrigger.IsStarted {
-			f2.RootTrigger.TriggerTimes++
-			f2.RootTrigger.IsStarted = true
-		}
+		if isRunning {
+			if !f2.RootTrigger.IsStarted {
+				f2.RootTrigger.TriggerTimes++
+				f2.RootTrigger.IsStarted = true
+			}
 
-		f2.RootTrigger.RunTimes++
+			f2.RootTrigger.RunTimes++
+		}
 
 		if isEnding {
 			f2.RootTrigger.IsStarted = false
-			f2.RootTrigger.TotalWins = wins
+		} else {
+			f2.RootTrigger.TotalWins += wins
 		}
 	}
 }
@@ -72,24 +49,6 @@ func (f2 *Feature) procCacheStatsForeachTrigger(runtimes int, win int64) {
 		f2.RootTrigger.TotalWins += win
 	}
 }
-
-// func (f2 *Feature) Clone() *Feature {
-// 	target := &Feature{}
-
-// 	if f2.Trigger != nil {
-// 		target.Trigger = f2.Trigger.Clone()
-// 	}
-
-// 	if f2.RootTrigger != nil {
-// 		target.RootTrigger = f2.RootTrigger.Clone()
-// 	}
-
-// 	if f2.Wins != nil {
-// 		target.Wins = f2.Wins.Clone()
-// 	}
-
-// 	return target
-// }
 
 func (f2 *Feature) Merge(src *Feature) {
 	if f2.Trigger != nil && src.Trigger != nil {

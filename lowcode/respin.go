@@ -477,14 +477,27 @@ func (respin *Respin) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-	rcd := icd.(*RespinData)
+func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	isRunning := false
+	isEdning := false
 
-	if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
-		s2.ProcStatsRootTrigger(respin.Name, rcd.TotalCoinWin, true)
-	} else {
-		s2.ProcStatsRootTrigger(respin.Name, 0, false)
+	if goutils.IndexOfStringSlice(gp.HistoryComponents, respin.Name, 0) >= 0 {
+		isRunning = true
 	}
+
+	if goutils.IndexOfStringSlice(gp.RespinComponents, respin.Name, 0) < 0 {
+		isEdning = true
+	}
+
+	s2.ProcStatsRespinTrigger(respin.Name, isRunning, int64(pr.CoinWin), isEdning)
+
+	// rcd := icd.(*RespinData)
+
+	// if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
+	// 	s2.ProcStatsRootTrigger(respin.Name, rcd.TotalCoinWin, true)
+	// } else {
+	// 	s2.ProcStatsRootTrigger(respin.Name, 0, false)
+	// }
 }
 
 // // IsTriggerRespin -

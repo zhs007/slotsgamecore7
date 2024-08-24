@@ -152,15 +152,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		}
 
 		if !isComponentDoNothing {
-			// if gAllowStats2 {
-			// 	if !gameProp.stats2Cache.HasFeature(curComponent.GetName()) {
-			// 		gameProp.stats2Cache.AddFeature(curComponent.GetName(), curComponent.NewStats2(gameProp.Components.statsNodeData.GetParent(curComponent.GetName())))
-			// 	}
-
-			// 	curComponent.OnStats2(cd, gameProp.stats2Cache)
-			// }
-
-			gameProp.OnCallEnd(curComponent, cd, gp)
+			gameProp.OnCallEnd(curComponent, cd, gp, pr)
 
 			err := curComponent.EachSymbols(gameProp, pr, gp, currng, ps, stake, prs, cd)
 			if err != nil {
@@ -276,94 +268,19 @@ func (bgm *BasicGameMod) OnNewGame(gameProp *GameProperty, stake *sgc7game.Stake
 		gameProp.Components.Stats2.PushBet(int(stake.CashBet / stake.CoinBet))
 
 		gameProp.stats2Cache = stats2.NewCache(int(stake.CashBet / stake.CoinBet))
-		// if gameProp.stats2SpinData == nil {
-		// 	gameProp.stats2SpinData = stats2.NewSpinCache()
-		// } else {
-		// 	gameProp.stats2SpinData.Clear()
-		// }
 	}
 
 	gameProp.OnNewGame(stake, curPlugin)
-
-	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
-
-	// for i, v := range gameProp.Components.Components {
-	// 	err := v.OnNewGame(gameProp)
-	// 	if err != nil {
-	// 		goutils.Error("BasicGameMod.OnNewGame:OnNewGame",
-	// 			slog.Int("i", i),
-	// 			goutils.Err(err))
-
-	// 		return err
-	// 	}
-	// }
 
 	return nil
 }
 
 // OnNewStep -
 func (bgm *BasicGameMod) OnNewStep(gameProp *GameProperty, stake *sgc7game.Stake) error {
-	// if gAllowStats2 {
-	// 	gameProp.Components.Stats2.PushStep()
-	// }
-
 	gameProp.OnNewStep()
-
-	// components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
-
-	// for i, v := range gameProp.Components.Components {
-	// 	err := v.OnNewStep(gameProp)
-	// 	if err != nil {
-	// 		goutils.Error("BasicGameMod.OnNewStep:OnNewStep",
-	// 			slog.Int("i", i),
-	// 			goutils.Err(err))
-
-	// 		return err
-	// 	}
-	// }
 
 	return nil
 }
-
-// // NewBasicGameMod - new BaseGame
-// func NewBasicGameMod(pool *GamePropertyPool, cfgGameMod *GameModConfig, mgrComponent *ComponentMgr) *BasicGameMod {
-// 	bgm := &BasicGameMod{
-// 		BasicGameMod:  sgc7game.NewBasicGameMod(cfgGameMod.Type, pool.Config.Width, pool.Config.Height),
-// 		Pool:          pool,
-// 		MapComponents: make(map[int]*ComponentList),
-// 	}
-
-// 	for _, bet := range pool.Config.Bets {
-// 		components := NewComponentList()
-// 		mapComponentMapping := pool.Config.ComponentsMapping[bet]
-
-// 		for _, v := range cfgGameMod.Components {
-// 			c := mgrComponent.NewComponent(v)
-// 			configfn := v.Config
-// 			if mapComponentMapping != nil {
-// 				mappingfn, isok := mapComponentMapping[v.Name]
-// 				if isok {
-// 					configfn = mappingfn
-// 				}
-// 			}
-
-// 			err := c.Init(pool.Config.GetPath(configfn, false), pool)
-// 			if err != nil {
-// 				goutils.Error("NewBasicGameMod:Init",
-// 					goutils.Err(err))
-
-// 				return nil
-// 			}
-
-// 			components.AddComponent(v.Name, c)
-// 		}
-
-// 		bgm.MapComponents[bet] = components
-// 		pool.onAddComponentList(bet, components)
-// 	}
-
-// 	return bgm
-// }
 
 // NewBasicGameMod2 - new BaseGame
 func NewBasicGameMod2(pool *GamePropertyPool, mgrComponent *ComponentMgr) (*BasicGameMod, error) {

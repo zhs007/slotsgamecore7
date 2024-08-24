@@ -12,14 +12,6 @@ type StatsRootTrigger struct {
 	IsStarted    bool  `json:"-"`
 }
 
-// func (trigger *StatsRootTrigger) Clone() *StatsRootTrigger {
-// 	return &StatsRootTrigger{
-// 		RunTimes:     trigger.RunTimes,
-// 		TriggerTimes: trigger.TriggerTimes,
-// 		TotalWins:    trigger.TotalWins,
-// 	}
-// }
-
 func (trigger *StatsRootTrigger) Merge(src *StatsRootTrigger) {
 	trigger.RunTimes += src.RunTimes
 	trigger.TriggerTimes += src.TriggerTimes

@@ -733,8 +733,8 @@ func (clusterTrigger *ClusterTrigger) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (clusterTrigger *ClusterTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-	clusterTrigger.BasicComponent.OnStats2(icd, s2)
+func (clusterTrigger *ClusterTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	clusterTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
 
 	cd := icd.(*ClusterTriggerData)
 

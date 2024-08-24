@@ -9,7 +9,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"github.com/zhs007/slotsgamecore7/stats2"
 	"gopkg.in/yaml.v2"
 )
 
@@ -320,11 +319,11 @@ func (symbolModifier *SymbolModifier) OnAsciiGame(gameProp *GameProperty, pr *sg
 // 	return stats2.NewFeature(parent, nil)
 // }
 
-// OnStats2
-func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-	// s2.PushTrigger(symbolModifier.Name, true)
-	s2.ProcStatsTrigger(symbolModifier.Name)
-}
+// // OnStats2
+// func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *stats2.Cache) {
+// 	// s2.PushTrigger(symbolModifier.Name, true)
+// 	s2.ProcStatsTrigger(symbolModifier.Name)
+// }
 
 // // OnStats2Trigger
 // func (symbolModifier *SymbolModifier) OnStats2Trigger(s2 *Stats2) {
