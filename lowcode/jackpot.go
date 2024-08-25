@@ -12,6 +12,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -223,6 +224,20 @@ func (jackpot *Jackpot) GetWins(basicCD *BasicComponentData) int {
 	}
 
 	return jackpot.Config.Wins
+}
+
+// NewStats2 -
+func (jackpot *Jackpot) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins})
+}
+
+// OnStats2
+func (jackpot *Jackpot) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	jackpot.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+
+	cd := icd.(*JackpotData)
+
+	s2.ProcStatsWins(jackpot.Name, int64(cd.Wins))
 }
 
 func NewJackpot(name string) IComponent {
