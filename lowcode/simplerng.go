@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
@@ -58,6 +59,11 @@ func (rng *SimpleRNG) IsIterateEnding() bool {
 
 // OnChoiceBranch -
 func (rng *SimpleRNG) OnChoiceBranch(curComponent IComponent, branchName string) error {
+	return nil
+}
+
+// OnStepEnd -
+func (rng *SimpleRNG) OnStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) error {
 	return nil
 }
 

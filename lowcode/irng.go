@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
@@ -15,4 +16,6 @@ type IRNG interface {
 	GetCurRNG(gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string)
 	// OnChoiceBranch -
 	OnChoiceBranch(curComponent IComponent, branchName string) error
+	// OnStepEnd -
+	OnStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) error
 }
