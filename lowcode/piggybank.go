@@ -232,7 +232,7 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 
 	cd.Wins = sm * winMulti
 
-	bet := gameProp.GetBet2(stake, BTypeBet)
+	bet := gameProp.GetBet3(stake, BTypeBet)
 
 	ret := &sgc7game.Result{
 		Symbol:    -1,

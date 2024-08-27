@@ -459,7 +459,7 @@ func (adjacentPayTrigger *AdjacentPayTrigger) CanTriggerWithScene(gameProp *Game
 
 		symbols := adjacentPayTrigger.getSymbols(gameProp)
 
-		currets, err := sgc7game.CalcAdjacentPay(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, adjacentPayTrigger.Config.BetType),
+		currets, err := sgc7game.CalcAdjacentPay(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, adjacentPayTrigger.Config.BetType),
 			func(cursymbol int) bool {
 				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 			}, func(cursymbol int) bool {

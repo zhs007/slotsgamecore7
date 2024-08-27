@@ -335,7 +335,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 
 	if scatterTrigger.Config.TriggerType == STTypeScatters {
 		for _, s := range symbols {
-			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
+			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet3(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
 					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 				}, false)
@@ -355,7 +355,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 		}
 	} else if scatterTrigger.Config.TriggerType == STTypeReelScatters {
 		for _, s := range symbols {
-			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet2(stake, scatterTrigger.Config.BetType),
+			ret := sgc7game.CalcScatter4(gs, gameProp.CurPaytables, s, gameProp.GetBet3(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
 					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 				}, true)
@@ -386,7 +386,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
 					ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
 					ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
+					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet3(stake, scatterTrigger.Config.BetType)
 				}
 
 				// gameProp.ProcMulti(ret)
@@ -406,7 +406,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
 					ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
 					ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
+					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet3(stake, scatterTrigger.Config.BetType)
 				}
 			}
 
@@ -431,7 +431,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
 					ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
 					ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet2(stake, scatterTrigger.Config.BetType)
+					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet3(stake, scatterTrigger.Config.BetType)
 				}
 
 				// gameProp.ProcMulti(ret)

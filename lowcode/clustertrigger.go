@@ -769,7 +769,7 @@ func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty
 
 		symbols := clusterTrigger.getSymbols(gameProp)
 
-		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, clusterTrigger.Config.BetType),
+		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, clusterTrigger.Config.BetType),
 			func(cursymbol int) bool {
 				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 			}, func(cursymbol int) bool {
