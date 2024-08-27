@@ -160,7 +160,7 @@ func (jackpot *Jackpot) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	cd.Wins = wins * winMulti
 
-	bet := gameProp.GetBet2(stake, jackpot.Config.BetType)
+	bet := gameProp.GetBet3(stake, jackpot.Config.BetType)
 
 	ret := &sgc7game.Result{
 		Symbol:    -1,

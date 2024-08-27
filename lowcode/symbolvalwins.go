@@ -262,7 +262,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if totalvals > 0 && mul > 0 {
-			bet := gameProp.GetBet2(stake, symbolValWins.Config.BetType)
+			bet := gameProp.GetBet3(stake, symbolValWins.Config.BetType)
 			othermul := symbolValWins.GetWinMulti(&svwd.BasicComponentData)
 
 			for i := 0; i < mul; i++ {

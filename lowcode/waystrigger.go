@@ -326,7 +326,7 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		// os := waysTrigger.GetTargetOtherScene2(gameProp, curpr, &std.BasicComponentData, waysTrigger.Name, "")
 
 		if os != nil {
-			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, waysTrigger.Config.BetType),
+			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
 					// return true
 					return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
@@ -352,7 +352,7 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 
 			lst = append(lst, currets...)
 		} else {
-			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet2(stake, waysTrigger.Config.BetType),
+			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
 					return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 				}, func(cursymbol int) bool {

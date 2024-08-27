@@ -742,6 +742,14 @@ func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
 	return 0
 }
 
+func (gameProp *GameProperty) GetBet3(stake *sgc7game.Stake, bt BetType) int {
+	if bt == BTypeTotalBet || bt == BTypeBet {
+		return int(stake.CoinBet)
+	}
+
+	return 0
+}
+
 func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
 	component, isok := gameProp.Components.MapComponents[respinComponent]
 	if isok {

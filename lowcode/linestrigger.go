@@ -334,7 +334,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
 					for i, v := range gameProp.CurLineData.Lines {
-						ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType), cs,
+						ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType), cs,
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 							}, func(cursymbol int, startsymbol int) bool {
@@ -358,7 +358,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 			} else {
 				for i, v := range gameProp.CurLineData.Lines {
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
-						ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
+						ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 							}, func(cursymbol int) bool {
@@ -382,7 +382,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					}
 
 					if linesTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
-						ret := sgc7game.CalcLineRLEx(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
+						ret := sgc7game.CalcLineRLEx(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 							}, func(cursymbol int) bool {
@@ -410,7 +410,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
 					for i, v := range gameProp.CurLineData.Lines {
-						ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType), cs,
+						ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType), cs,
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 							}, func(cursymbol int, startsymbol int) bool {
@@ -437,7 +437,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 				for i, v := range gameProp.CurLineData.Lines {
 					isTriggerFull := false
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
-						ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
+						ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
@@ -472,7 +472,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					}
 
 					if !isTriggerFull && linesTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
-						ret := sgc7game.CalcLineRL2(gs, gameProp.CurPaytables, v, gameProp.GetBet2(stake, linesTrigger.Config.BetType),
+						ret := sgc7game.CalcLineRL2(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
