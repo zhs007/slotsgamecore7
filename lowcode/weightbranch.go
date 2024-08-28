@@ -213,6 +213,8 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	wbd := icd.(*WeightBranchData)
 
+	curBetMode := int(stake.CashBet / stake.CoinBet)
+
 	forceBranch := weightBranch.getForceBrach(wbd)
 	if forceBranch == "" {
 		vw2 := weightBranch.getWeight(gameProp, wbd)
@@ -230,7 +232,7 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	}
 
 	if gameProp.rng != nil {
-		gameProp.rng.OnChoiceBranch(weightBranch, wbd.Value)
+		gameProp.rng.OnChoiceBranch(curBetMode, weightBranch, wbd.Value)
 	}
 
 	nextComponent := ""

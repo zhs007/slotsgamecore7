@@ -11,11 +11,11 @@ type IRNG interface {
 	// Clone -
 	Clone() IRNG
 	// OnNewGame -
-	OnNewGame(plugin sgc7plugin.IPlugin) error
+	OnNewGame(betMode int, plugin sgc7plugin.IPlugin) error
 	// GetCurRNG -
-	GetCurRNG(gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string)
+	GetCurRNG(betMode int, gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string)
 	// OnChoiceBranch -
-	OnChoiceBranch(curComponent IComponent, branchName string) error
+	OnChoiceBranch(betMode int, curComponent IComponent, branchName string) error
 	// OnStepEnd -
-	OnStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) error
+	OnStepEnd(betMode int, gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) error
 }

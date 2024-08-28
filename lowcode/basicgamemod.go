@@ -51,7 +51,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		return nil, ErrIvalidGameData
 	}
 
-	components := bgm.MapComponents[int(stake.CashBet/stake.CoinBet)]
+	curBetMode := int(stake.CashBet / stake.CoinBet)
+
+	components := bgm.MapComponents[curBetMode]
 	gameProp.Components = components
 
 	if len(prs) == 0 {
@@ -115,7 +117,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	for {
 		isComponentDoNothing := false
-		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(gameProp, curComponent, gameProp.callStack.GetCurComponentData(gameProp, curComponent), gameProp.featureLevel)
+		isSetMode, set, currng, newComponent := gameProp.rng.GetCurRNG(curBetMode, gameProp, curComponent, gameProp.callStack.GetCurComponentData(gameProp, curComponent), gameProp.featureLevel)
 		if newComponent != "" {
 			c, isok := components.MapComponents[newComponent]
 			if !isok {
@@ -231,7 +233,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	gameProp.ProcRespin(pr, gp)
 
-	gameProp.onStepEnd(gp, pr, prs)
+	gameProp.onStepEnd(curBetMode, gp, pr, prs)
 
 	if gAllowStats2 && pr.IsFinish {
 		totalwins := int64(pr.CoinWin)
