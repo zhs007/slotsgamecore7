@@ -43,7 +43,7 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		OtherSceneStack:  NewSceneStack(true),
 		callStack:        NewCallStack(),
 		rng:              pool.newRNG(),
-		featureLevel:     pool.newFeatureLevel(),
+		featureLevel:     pool.newFeatureLevel(betMul),
 	}
 
 	if gameProp.CurLineData != nil {
