@@ -2,7 +2,7 @@ package lowcode
 
 import sgc7game "github.com/zhs007/slotsgamecore7/game"
 
-type FuncNewFeatureLevel func(bet int) IFeatureLevel
+type FuncNewFeatureLevel func(betMode int) IFeatureLevel
 
 type IFeatureLevel interface {
 	// Init -

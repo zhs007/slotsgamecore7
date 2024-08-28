@@ -110,7 +110,7 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake, curPlugin sgc7plu
 
 	// gameProp.rng = gameProp.newRNG()
 
-	gameProp.rng.OnNewGame(curPlugin)
+	gameProp.rng.OnNewGame(int(curBet), curPlugin)
 	// gameProp = nil
 
 	return nil
@@ -962,7 +962,7 @@ func (gameProp *GameProperty) ForceComponentBranch(componentName string, branchI
 	cd.ForceBranch(branchIndex)
 }
 
-func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
+func (gameProp *GameProperty) onStepEnd(curBetMode int, gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
 	pr.CashWin = 0
 	pr.CashWin = 0
 
@@ -974,7 +974,7 @@ func (gameProp *GameProperty) onStepEnd(gp *GameParams, pr *sgc7game.PlayResult,
 	}
 
 	gameProp.featureLevel.OnStepEnd(gameProp, gp, pr)
-	gameProp.rng.OnStepEnd(gp, pr, prs)
+	gameProp.rng.OnStepEnd(curBetMode, gp, pr, prs)
 
 	if gAllowStats2 {
 		for _, v := range gp.RespinComponents {

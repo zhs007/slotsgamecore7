@@ -207,6 +207,7 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	ccn := symbolCollection2.Config.ForeachComponent
+	curBetMode := int(stake.CashBet / stake.CoinBet)
 
 	for {
 		isComponentDoNothing := false
@@ -216,7 +217,7 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		}
 
 		ccd := gameProp.GetCurComponentData(curComponent)
-		_, _, currng, _ := gameProp.rng.GetCurRNG(gameProp, curComponent, ccd, gameProp.featureLevel)
+		_, _, currng, _ := gameProp.rng.GetCurRNG(curBetMode, gameProp, curComponent, ccd, gameProp.featureLevel)
 		nc, err := curComponent.OnPlayGame(gameProp, curpr, gp, currng, "", "", ps, stake, prs, ccd)
 		if err != nil {
 			if err != ErrComponentDoNothing {

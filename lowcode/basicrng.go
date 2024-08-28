@@ -20,23 +20,23 @@ func (rng *BasicRNG) Clone() IRNG {
 }
 
 // OnNewGame -
-func (rng *BasicRNG) OnNewGame(plugin sgc7plugin.IPlugin) error {
+func (rng *BasicRNG) OnNewGame(betMode int, plugin sgc7plugin.IPlugin) error {
 	rng.curPlugin = plugin
 
 	return nil
 }
 
 // GetCurRNG -
-func (rng *BasicRNG) GetCurRNG(gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
+func (rng *BasicRNG) GetCurRNG(betMode int, gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
 	return false, -1, rng.curPlugin, ""
 }
 
 // OnChoiceBranch -
-func (rng *BasicRNG) OnChoiceBranch(curComponent IComponent, branchName string) error {
+func (rng *BasicRNG) OnChoiceBranch(betMode int, curComponent IComponent, branchName string) error {
 	return nil
 }
 
 // OnStepEnd -
-func (rng *BasicRNG) OnStepEnd(gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) error {
+func (rng *BasicRNG) OnStepEnd(betMode int, gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) error {
 	return nil
 }
