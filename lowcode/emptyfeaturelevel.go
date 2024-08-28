@@ -20,6 +20,6 @@ func (fl *EmptyFeatureLevel) CountLevel() int {
 	return 0
 }
 
-func NewEmptyFeatureLevel() IFeatureLevel {
+func NewEmptyFeatureLevel(bet int) IFeatureLevel {
 	return &EmptyFeatureLevel{}
 }
