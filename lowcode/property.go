@@ -323,11 +323,11 @@ func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData,
 
 	tag := gameProp.callStack.OnCallEnd(component, cd)
 
+	gp.HistoryComponents = append(gp.HistoryComponents, tag)
+
 	if gAllowFullComponentHistory {
 		gp.HistoryComponentsEx = append(gp.HistoryComponentsEx, tag)
 	}
-
-	gp.HistoryComponents = append(gp.HistoryComponents, tag)
 }
 
 func (gameProp *GameProperty) TriggerRespin(plugin sgc7plugin.IPlugin, pr *sgc7game.PlayResult, gp *GameParams, respinNum int, respinComponent string, usePushTrigger bool) error {

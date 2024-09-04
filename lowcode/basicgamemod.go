@@ -163,6 +163,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 				return nil, err
 			}
+		} else if gAllowFullComponentHistory {
+			gp.HistoryComponentsEx = append(gp.HistoryComponentsEx, curComponent.GetName())
 		}
 
 		if !gIsReleaseMode {
