@@ -174,7 +174,7 @@ func GenDefaultScene(game *Game, bet int) (*sgc7game.GameScene, error) {
 	ips := game.Initialize()
 
 	for {
-		rets, err := procSpin(game, ips, game.NewPlugin(), stake, "", "")
+		rets, err := procSpin(game, ips, sgc7plugin.NewFastPlugin(), stake, "", "")
 		if err != nil {
 			goutils.Error("GenDefaultScene:procSpin",
 				goutils.Err(err))
