@@ -322,6 +322,11 @@ func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData,
 	}
 
 	tag := gameProp.callStack.OnCallEnd(component, cd)
+
+	if gAllowFullComponentHistory {
+		gp.HistoryComponentsEx = append(gp.HistoryComponentsEx, tag)
+	}
+
 	gp.HistoryComponents = append(gp.HistoryComponents, tag)
 }
 

@@ -364,4 +364,5 @@ message GameParam {
     repeated string respinComponents = 5;
     map<int32, int32> mapVals = 6;
     map<string, int32> mapStrVals = 7;
+    repeated string historyComponentsEx = 8;
 }
