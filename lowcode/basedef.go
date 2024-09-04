@@ -279,6 +279,9 @@ type FuncOnChgComponentIntVal func(componentName string, valName string, off int
 
 var gAllowFullComponentHistory bool
 
+func SetAllowFullComponentHistory() {
+	gAllowFullComponentHistory = true
+}
 
 func init() {
 	initCheckWinType()
