@@ -1,6 +1,7 @@
 package stats2
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/xuri/excelize/v2"
@@ -8,8 +9,10 @@ import (
 )
 
 type StatsWins struct {
-	TotalWin    int64       `json:"totalWin"`
-	MapWinTimes map[int]int `json:"mapWinTimes"`
+	TotalWin      int64          `json:"totalWin"`
+	MapWinTimes   map[int]int    `json:"mapWinTimes"`
+	MapWinTimesEx map[string]int `json:"MapWinTimesEx"`
+	MapWinEx      map[string]int `json:"MapWinEx"`
 }
 
 func (wins *StatsWins) AddWin(win int64) {
@@ -17,12 +20,37 @@ func (wins *StatsWins) AddWin(win int64) {
 	wins.MapWinTimes[int(win)]++
 }
 
-// func (wins *StatsWins) Clone() *StatsWins {
-// 	return &StatsWins{
-// 		TotalWin: wins.TotalWin,
-// 		TotalBet: wins.TotalBet,
-// 	}
-// }
+func (wins *StatsWins) genRange(totalBet int) {
+	wins.MapWinTimesEx = make(map[string]int)
+	wins.MapWinEx = make(map[string]int)
+
+	for win, times := range wins.MapWinTimes {
+		if win == 0 {
+			wins.MapWinTimesEx["noWins"] += times
+			wins.MapWinEx["noWins"] = 0
+		} else {
+			curWins := float64(win) / float64(totalBet)
+
+			for i := 0; i < len(gWinRange); i++ {
+				if curWins > float64(gWinRange[i]) {
+					if i < len(gWinRange)-1 && curWins <= float64(gWinRange[i+1]) {
+						k := fmt.Sprintf("(%v,%v]", gWinRange[i], gWinRange[i+1])
+						wins.MapWinTimesEx[k] += times
+						wins.MapWinEx[k] += win * times
+
+						break
+					} else if i == len(gWinRange)-1 {
+						k := fmt.Sprintf(">%v", gWinRange[i])
+						wins.MapWinTimesEx[k] += times
+						wins.MapWinEx[k] += win * times
+
+						break
+					}
+				}
+			}
+		}
+	}
+}
 
 func (wins *StatsWins) Merge(src *StatsWins) {
 	wins.TotalWin += src.TotalWin
@@ -84,6 +112,69 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, tot
 			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), float64(k*v)/float64(totalBet))
 		} else {
 			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), 0)
+		}
+
+		y++
+	}
+
+	wins.genRange(int(totalBet))
+
+	tx := sx + 8
+
+	f.SetCellValue(sheet, goutils.Pos2Cell(tx+1, sy+5), "win")
+	f.SetCellValue(sheet, goutils.Pos2Cell(tx+2, sy+5), "times")
+	f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+5), "trigger chance")
+	f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+5), "total wins")
+	f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+5), "rtp")
+
+	{
+		y = 6
+		k := "noWins"
+
+		v := wins.MapWinTimesEx[k]
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+1, sy+y), k)
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+2, sy+y), v)
+
+		if totalTimes > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), float64(v)/float64(totalTimes))
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), 0)
+		}
+
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), 0)
+
+		if totalBet > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+		}
+	}
+
+	y++
+	for i := 0; i < len(gWinRange); i++ {
+		var k string
+		if i < len(gWinRange)-1 {
+			k = fmt.Sprintf("(%v,%v]", gWinRange[i], gWinRange[i+1])
+		} else {
+			k = fmt.Sprintf(">%v", gWinRange[i])
+		}
+
+		v := wins.MapWinTimesEx[k]
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+1, sy+y), k)
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+2, sy+y), v)
+
+		if totalTimes > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), float64(v)/float64(totalTimes))
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), 0)
+		}
+
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), wins.MapWinEx[k])
+
+		if totalBet > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), float64(wins.MapWinEx[k])/float64(totalBet))
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
 		}
 
 		y++
