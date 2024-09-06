@@ -33,16 +33,20 @@ func (wins *StatsWins) Merge(src *StatsWins) {
 }
 
 func (wins *StatsWins) SaveSheet(f *excelize.File, sheet string, totalBet int64) {
-	f.SetCellValue(sheet, goutils.Pos2Cell(0, 0), "win")
-	f.SetCellValue(sheet, goutils.Pos2Cell(0, 1), "bet")
-	f.SetCellValue(sheet, goutils.Pos2Cell(0, 2), "rtp")
+	wins.saveSheet(f, sheet, 0, 0, totalBet)
+}
 
-	f.SetCellValue(sheet, goutils.Pos2Cell(1, 0), wins.TotalWin)
-	f.SetCellValue(sheet, goutils.Pos2Cell(1, 1), totalBet)
+func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, totalBet int64) {
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+0), "win")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+1), "bet")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+2), "rtp")
+
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+0), wins.TotalWin)
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+1), totalBet)
 	if totalBet > 0 {
-		f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), float64(wins.TotalWin)/float64(totalBet))
+		f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+2), float64(wins.TotalWin)/float64(totalBet))
 	} else {
-		f.SetCellValue(sheet, goutils.Pos2Cell(1, 2), 0)
+		f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+2), 0)
 	}
 
 	totalTimes := int64(0)
@@ -56,30 +60,30 @@ func (wins *StatsWins) SaveSheet(f *excelize.File, sheet string, totalBet int64)
 		return lstwins[i] < lstwins[j]
 	})
 
-	f.SetCellValue(sheet, goutils.Pos2Cell(3, 5), "win")
-	f.SetCellValue(sheet, goutils.Pos2Cell(4, 5), "times")
-	f.SetCellValue(sheet, goutils.Pos2Cell(5, 5), "trigger chance")
-	f.SetCellValue(sheet, goutils.Pos2Cell(6, 5), "total wins")
-	f.SetCellValue(sheet, goutils.Pos2Cell(7, 5), "rtp")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+3, sy+5), "win")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+4, sy+5), "times")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+5, sy+5), "trigger chance")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+6, sy+5), "total wins")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+5), "rtp")
 
 	y := 6
 	for _, k := range lstwins {
 		v := wins.MapWinTimes[k]
-		f.SetCellValue(sheet, goutils.Pos2Cell(3, y), k)
-		f.SetCellValue(sheet, goutils.Pos2Cell(4, y), v)
+		f.SetCellValue(sheet, goutils.Pos2Cell(sx+3, sy+y), k)
+		f.SetCellValue(sheet, goutils.Pos2Cell(sx+4, sy+y), v)
 
 		if totalTimes > 0 {
-			f.SetCellValue(sheet, goutils.Pos2Cell(5, y), float64(v)/float64(totalTimes))
+			f.SetCellValue(sheet, goutils.Pos2Cell(sx+5, sy+y), float64(v)/float64(totalTimes))
 		} else {
-			f.SetCellValue(sheet, goutils.Pos2Cell(5, y), 0)
+			f.SetCellValue(sheet, goutils.Pos2Cell(sx+5, sy+y), 0)
 		}
 
-		f.SetCellValue(sheet, goutils.Pos2Cell(6, y), k*v)
+		f.SetCellValue(sheet, goutils.Pos2Cell(sx+6, sy+y), k*v)
 
 		if totalBet > 0 {
-			f.SetCellValue(sheet, goutils.Pos2Cell(7, y), float64(k*v)/float64(totalBet))
+			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), float64(k*v)/float64(totalBet))
 		} else {
-			f.SetCellValue(sheet, goutils.Pos2Cell(7, y), 0)
+			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), 0)
 		}
 
 		y++

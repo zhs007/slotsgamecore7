@@ -6,16 +6,20 @@ import (
 )
 
 type StatsRootTrigger struct {
-	RunTimes     int64 `json:"runTimes"`
-	TriggerTimes int64 `json:"triggerTimes"`
-	TotalWins    int64 `json:"totalWins"`
-	IsStarted    bool  `json:"-"`
+	RunTimes     int64      `json:"runTimes"`
+	TriggerTimes int64      `json:"triggerTimes"`
+	TotalWins    int64      `json:"totalWins"`
+	CurWins      int64      `json:"-"`
+	IsStarted    bool       `json:"-"`
+	Wins         *StatsWins `json:"-"`
 }
 
 func (trigger *StatsRootTrigger) Merge(src *StatsRootTrigger) {
 	trigger.RunTimes += src.RunTimes
 	trigger.TriggerTimes += src.TriggerTimes
 	trigger.TotalWins += src.TotalWins
+
+	trigger.Wins.Merge(src.Wins)
 }
 
 func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, parent string, s2 *Stats) {
@@ -67,8 +71,12 @@ func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, paren
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 8), 0)
 	}
+
+	trigger.Wins.saveSheet(f, sheet, 3, 0, s2.TotalBet)
 }
 
 func NewStatsRootTrigger() *StatsRootTrigger {
-	return &StatsRootTrigger{}
+	return &StatsRootTrigger{
+		Wins: NewStatsWins(),
+	}
 }
