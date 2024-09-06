@@ -72,7 +72,7 @@ func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, paren
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, 8), 0)
 	}
 
-	trigger.Wins.saveSheet(f, sheet, 3, 0, s2.TotalBet)
+	trigger.Wins.saveSheet(f, sheet, 3, 0, s2)
 }
 
 func NewStatsRootTrigger() *StatsRootTrigger {

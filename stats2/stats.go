@@ -105,7 +105,7 @@ func (s2 *Stats) saveWins(f *excelize.File) {
 	sheet := "totalWins"
 	f.NewSheet(sheet)
 
-	s2.Wins.SaveSheet(f, sheet, s2.TotalBet)
+	s2.Wins.SaveSheet(f, sheet, s2)
 }
 
 func (s2 *Stats) ExportExcel() ([]byte, error) {

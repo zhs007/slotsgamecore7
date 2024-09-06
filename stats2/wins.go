@@ -20,7 +20,7 @@ func (wins *StatsWins) AddWin(win int64) {
 	wins.MapWinTimes[int(win)]++
 }
 
-func (wins *StatsWins) genRange(totalBet int) {
+func (wins *StatsWins) genRange(bet int) {
 	wins.MapWinTimesEx = make(map[string]int)
 	wins.MapWinEx = make(map[string]int)
 
@@ -29,7 +29,7 @@ func (wins *StatsWins) genRange(totalBet int) {
 			wins.MapWinTimesEx["noWins"] += times
 			wins.MapWinEx["noWins"] = 0
 		} else {
-			curWins := float64(win) / float64(totalBet)
+			curWins := float64(win) / float64(bet)
 
 			for i := 0; i < len(gWinRange); i++ {
 				if curWins > float64(gWinRange[i]) {
@@ -60,11 +60,14 @@ func (wins *StatsWins) Merge(src *StatsWins) {
 	}
 }
 
-func (wins *StatsWins) SaveSheet(f *excelize.File, sheet string, totalBet int64) {
-	wins.saveSheet(f, sheet, 0, 0, totalBet)
+func (wins *StatsWins) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
+	wins.saveSheet(f, sheet, 0, 0, s2)
 }
 
-func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, totalBet int64) {
+func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 *Stats) {
+	totalBet := s2.TotalBet
+	bet := s2.TotalBet / s2.BetTimes
+
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+0), "win")
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+1), "bet")
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+2), "rtp")
@@ -117,7 +120,7 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, tot
 		y++
 	}
 
-	wins.genRange(int(totalBet))
+	wins.genRange(int(bet))
 
 	tx := sx + 8
 

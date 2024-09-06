@@ -89,7 +89,7 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
 		sn := fmt.Sprintf("%v - wins", sheet)
 		f.NewSheet(sn)
 
-		f2.Wins.SaveSheet(f, sn, s2.TotalBet)
+		f2.Wins.SaveSheet(f, sn, s2)
 	}
 }
 
