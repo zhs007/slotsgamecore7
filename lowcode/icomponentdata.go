@@ -9,6 +9,14 @@ import (
 type FuncOnEachUsedResult func(*sgc7game.Result)
 type FuncNewComponentData func() IComponentData
 
+type GetComponentValType int
+
+const (
+	GCVTypeNormal GetComponentValType = 0
+	GCVTypeMin    GetComponentValType = 1
+	GCVTypeMax    GetComponentValType = 2
+)
+
 type IComponentData interface {
 	// OnNewGame -
 	OnNewGame(gameProp *GameProperty, component IComponent)
@@ -21,6 +29,8 @@ type IComponentData interface {
 
 	// GetVal -
 	GetVal(key string) (int, bool)
+	// GetValEx -
+	GetValEx(key string, getType GetComponentValType) (int, bool)
 
 	// GetStrVal -
 	GetStrVal(key string) (string, bool)

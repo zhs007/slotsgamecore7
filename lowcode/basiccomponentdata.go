@@ -99,6 +99,11 @@ func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, 
 // 	basicComponentData.initSrcScenes()
 // }
 
+// GetValEx -
+func (basicComponentData *BasicComponentData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	return basicComponentData.GetVal(key)
+}
+
 // GetVal -
 func (basicComponentData *BasicComponentData) GetVal(key string) (int, bool) {
 	return 0, false
