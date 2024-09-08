@@ -48,8 +48,8 @@ func (weightBranchData *WeightBranchData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (weightBranchData *WeightBranchData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (weightBranchData *WeightBranchData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	return 0, false
 }
 

@@ -81,8 +81,8 @@ func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (waysTriggerData *WaysTriggerData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (waysTriggerData *WaysTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return waysTriggerData.SymbolNum, true
 	} else if key == CVWildNum {

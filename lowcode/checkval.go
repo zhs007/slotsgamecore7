@@ -48,8 +48,8 @@ func (checkValData *CheckValData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (checkValData *CheckValData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (checkValData *CheckValData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	return 0, false
 }
 

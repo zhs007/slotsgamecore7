@@ -82,8 +82,8 @@ func (scatterTriggerData *ScatterTriggerData) BuildPBComponentData() proto.Messa
 	return pbcd
 }
 
-// GetVal -
-func (scatterTriggerData *ScatterTriggerData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (scatterTriggerData *ScatterTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return scatterTriggerData.SymbolNum, true
 	} else if key == CVWildNum {

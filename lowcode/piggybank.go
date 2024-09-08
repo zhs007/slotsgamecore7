@@ -88,8 +88,8 @@ func (piggyBankData *PiggyBankData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (piggyBankData *PiggyBankData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (piggyBankData *PiggyBankData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return piggyBankData.Wins, true
 	} else if key == CVWinMulti {

@@ -91,8 +91,8 @@ func (addSymbolsData *AddSymbolsData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (addSymbolsData *AddSymbolsData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (addSymbolsData *AddSymbolsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return addSymbolsData.SymbolNum, true
 	}

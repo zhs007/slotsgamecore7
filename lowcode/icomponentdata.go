@@ -27,8 +27,6 @@ type IComponentData interface {
 	// Clone
 	Clone() IComponentData
 
-	// GetVal -
-	GetVal(key string) (int, bool)
 	// GetValEx -
 	GetValEx(key string, getType GetComponentValType) (int, bool)
 

@@ -319,8 +319,8 @@ func (catchSymbolsData *CatchSymbolsData) AddPos(x int, y int) {
 	catchSymbolsData.SymbolNum++
 }
 
-// GetVal -
-func (catchSymbolsData *CatchSymbolsData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (catchSymbolsData *CatchSymbolsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return catchSymbolsData.SymbolNum, true
 	}

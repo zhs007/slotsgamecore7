@@ -33,8 +33,8 @@ func (weightReelsData *WeightReelsData) onNewStep() {
 	weightReelsData.ReelSetIndex = -1
 }
 
-// GetVal -
-func (weightReelsData *WeightReelsData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (weightReelsData *WeightReelsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSelectedIndex {
 		return weightReelsData.ReelSetIndex, true
 	}

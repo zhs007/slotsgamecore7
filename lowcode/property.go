@@ -500,7 +500,7 @@ func (gameProp *GameProperty) GetComponentVal(componentVal string) (int, error) 
 
 	cd := gameProp.callStack.GetComponentData(gameProp, component)
 
-	v, isok := cd.GetVal(arr[1])
+	v, isok := cd.GetValEx(arr[1], GCVTypeNormal)
 	if !isok {
 		goutils.Error("GameProperty.GetComponentVal:GetVal",
 			slog.String("componentVal", componentVal),
@@ -524,7 +524,7 @@ func (gameProp *GameProperty) GetComponentVal2(component string, val string) (in
 
 	cd := gameProp.callStack.GetComponentData(gameProp, ic)
 
-	v, isok := cd.GetVal(val)
+	v, isok := cd.GetValEx(val, GCVTypeNormal)
 	if !isok {
 		goutils.Error("GameProperty.GetComponentVal:GetVal",
 			slog.String("component", component),

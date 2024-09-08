@@ -79,8 +79,8 @@ func (winResultModifierData *WinResultModifierData) BuildPBComponentData() proto
 	return pbcd
 }
 
-// GetVal -
-func (winResultModifierData *WinResultModifierData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (winResultModifierData *WinResultModifierData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return winResultModifierData.Wins, true
 	}

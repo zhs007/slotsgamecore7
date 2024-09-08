@@ -70,8 +70,8 @@ func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (queueBranchData *QueueBranchData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (queueBranchData *QueueBranchData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVValue {
 		return queueBranchData.Queue, true
 	}
