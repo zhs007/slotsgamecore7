@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -10,6 +11,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,6 +30,64 @@ func parseGenSymbolValsWithSymbolType(strType string) GenSymbolValsWithSymbolTyp
 	}
 
 	return GSVWSTypeNormal
+}
+
+type GenSymbolValsWithSymbolData struct {
+	BasicComponentData
+	GenVals []int
+}
+
+// OnNewGame -
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	genSymbolValsWithSymbolData.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// OnNewStep -
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) onNewStep() {
+	genSymbolValsWithSymbolData.UsedOtherScenes = nil
+	genSymbolValsWithSymbolData.GenVals = nil
+}
+
+// Clone
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) Clone() IComponentData {
+	target := &GenSymbolValsWithSymbolData{
+		BasicComponentData: genSymbolValsWithSymbolData.CloneBasicComponentData(),
+	}
+
+	target.GenVals = make([]int, len(genSymbolValsWithSymbolData.GenVals))
+	copy(target.GenVals, genSymbolValsWithSymbolData.GenVals)
+
+	return target
+}
+
+// BuildPBComponentData
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) BuildPBComponentData() proto.Message {
+	return genSymbolValsWithSymbolData.BasicComponentData.BuildPBComponentData()
+}
+
+// addVal
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) addVal(val int) {
+	genSymbolValsWithSymbolData.GenVals = append(genSymbolValsWithSymbolData.GenVals, val)
+}
+
+// GetValEx -
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) GetVal(key string) (int, bool) {
+	return genSymbolValsWithSymbolData.GetValEx(key, GCVTypeNormal)
+}
+
+// GetValEx -
+func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVSymbolVal && len(genSymbolValsWithSymbolData.GenVals) > 0 {
+		if getType == GCVTypeMin {
+			return slices.Min(genSymbolValsWithSymbolData.GenVals), true
+		} else if getType == GCVTypeMax {
+			return slices.Max(genSymbolValsWithSymbolData.GenVals), true
+		} else {
+			return genSymbolValsWithSymbolData.GenVals[len(genSymbolValsWithSymbolData.GenVals)-1], true
+		}
+	}
+
+	return 0, false
 }
 
 // GenSymbolValsWithSymbolConfig - configuration for GenSymbolValsWithSymbol
@@ -121,11 +181,9 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) InitEx(cfg any, pool *Ga
 func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
+	cd := icd.(*GenSymbolValsWithSymbolData)
 
-	cd := icd.(*BasicComponentData)
-
-	cd.UsedOtherScenes = nil
+	cd.onNewStep()
 
 	gs := genSymbolValsWithSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs != nil {
@@ -152,6 +210,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 
 							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
 
+							cd.addVal(curv.Int())
 							nos.Arr[x][y] = curv.Int()
 						} else if nos.Arr[x][y] == genSymbolValsWithSymbol.Config.DefaultVal {
 							if nos == os {
@@ -166,6 +225,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 								return "", err
 							}
 
+							cd.addVal(curv.Int())
 							nos.Arr[x][y] = curv.Int()
 						}
 					} else {
@@ -194,6 +254,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 
 							nos = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithSymbol.Config.DefaultVal)
 
+							cd.addVal(curv.Int())
 							nos.Arr[x][y] = curv.Int()
 						} else if nos.Arr[x][y] == genSymbolValsWithSymbol.Config.DefaultVal {
 							if nos == os {
@@ -208,6 +269,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 								return "", err
 							}
 
+							cd.addVal(curv.Int())
 							nos.Arr[x][y] = curv.Int()
 						}
 					}
@@ -225,7 +287,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 			return nc, ErrComponentDoNothing
 		}
 
-		genSymbolValsWithSymbol.AddOtherScene(gameProp, curpr, nos, cd)
+		genSymbolValsWithSymbol.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 
 		nc := genSymbolValsWithSymbol.onStepEnd(gameProp, curpr, gp, "")
 
@@ -249,10 +311,10 @@ func (genSymbolValsWithPos *GenSymbolValsWithSymbol) OnAsciiGame(gameProp *GameP
 	return nil
 }
 
-// // OnStats
-// func (genSymbolValsWithPos *GenSymbolValsWithSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
+// NewComponentData -
+func (genSymbolValsWithPos *GenSymbolValsWithSymbol) NewComponentData() IComponentData {
+	return &GenSymbolValsWithSymbolData{}
+}
 
 func NewGenSymbolValsWithSymbol(name string) IComponent {
 	return &GenSymbolValsWithSymbol{
