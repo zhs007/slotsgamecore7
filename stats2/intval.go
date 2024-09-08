@@ -63,7 +63,7 @@ func (intVal *StatsIntVal) saveSheet(f *excelize.File, sheet string, sx, sy int,
 	}
 }
 
-func NewStatsStatsIntVal() *StatsIntVal {
+func NewStatsIntVal() *StatsIntVal {
 	return &StatsIntVal{
 		MapUsedTimes: make(map[int]int64),
 	}
