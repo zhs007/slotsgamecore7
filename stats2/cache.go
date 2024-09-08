@@ -61,6 +61,13 @@ func (s2 *Cache) ProcStatsTrigger(name string) {
 	}
 }
 
+func (s2 *Cache) ProcStatsIntVal(name string, val int) {
+	f2, isok := s2.MapStats[name]
+	if isok {
+		f2.procCacheStatsIntVal(val)
+	}
+}
+
 func (s2 *Cache) ProcStatsRespinTrigger(name string, isRunning bool, wins int64, isEnding bool) {
 	f2, isok := s2.MapStats[name]
 	if isok {

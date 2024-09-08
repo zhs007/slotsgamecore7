@@ -11,6 +11,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -300,7 +301,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 }
 
 // OnAsciiGame - outpur to asciigame
-func (genSymbolValsWithPos *GenSymbolValsWithSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
 	cd := icd.(*BasicComponentData)
 
@@ -312,8 +313,24 @@ func (genSymbolValsWithPos *GenSymbolValsWithSymbol) OnAsciiGame(gameProp *GameP
 }
 
 // NewComponentData -
-func (genSymbolValsWithPos *GenSymbolValsWithSymbol) NewComponentData() IComponentData {
+func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) NewComponentData() IComponentData {
 	return &GenSymbolValsWithSymbolData{}
+}
+
+// OnStats2
+func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	genSymbolValsWithSymbol.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+
+	cd := icd.(*GenSymbolValsWithSymbolData)
+
+	for _, v := range cd.GenVals {
+		s2.ProcStatsIntVal(genSymbolValsWithSymbol.GetName(), v)
+	}
+}
+
+// NewStats2 -
+func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, []stats2.Option{stats2.OptIntVal})
 }
 
 func NewGenSymbolValsWithSymbol(name string) IComponent {

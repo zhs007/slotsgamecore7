@@ -11,6 +11,13 @@ type Feature struct {
 	RootTrigger *StatsRootTrigger `json:"rootTrigger"` // 只有respin和foreach才需要这个
 	Trigger     *StatsTrigger     `json:"trigger"`     // 普通的trigger，如果在respin或foreach下面，则需要配合它们才能得到正确的统计
 	Wins        *StatsWins        `json:"wins"`        // wins
+	IntVal      *StatsIntVal      `json:"intVal"`      // intVal
+}
+
+func (f2 *Feature) procCacheStatsIntVal(val int) {
+	if f2.IntVal != nil {
+		f2.IntVal.UseVal(val)
+	}
 }
 
 func (f2 *Feature) procCacheStatsWins(win int64) {
@@ -68,6 +75,10 @@ func (f2 *Feature) Merge(src *Feature) {
 	if f2.Wins != nil && src.Wins != nil {
 		f2.Wins.Merge(src.Wins)
 	}
+
+	if f2.IntVal != nil && src.IntVal != nil {
+		f2.IntVal.Merge(src.IntVal)
+	}
 }
 
 func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
@@ -91,6 +102,13 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
 
 		f2.Wins.SaveSheet(f, sn, s2)
 	}
+
+	if f2.IntVal != nil {
+		sn := fmt.Sprintf("%v - intVal", sheet)
+		f.NewSheet(sn)
+
+		f2.IntVal.SaveSheet(f, sn, s2)
+	}
 }
 
 func NewFeature(parent string, opts Options) *Feature {
@@ -106,6 +124,10 @@ func NewFeature(parent string, opts Options) *Feature {
 		f2.RootTrigger = NewStatsRootTrigger()
 	} else {
 		f2.Trigger = NewStatsTrigger()
+	}
+
+	if opts.Has(OptIntVal) {
+		f2.IntVal = NewStatsIntVal()
 	}
 
 	return f2

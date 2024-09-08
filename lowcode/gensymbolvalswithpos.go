@@ -220,11 +220,6 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) OnAsciiGame(gameProp *GameProp
 	return nil
 }
 
-// // OnStats
-// func (genSymbolValsWithPos *GenSymbolValsWithPos) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 func NewGenSymbolValsWithPos(name string) IComponent {
 	return &GenSymbolValsWithPos{
 		BasicComponent: NewBasicComponent(name, 1),
