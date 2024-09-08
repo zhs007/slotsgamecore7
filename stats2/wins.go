@@ -9,10 +9,10 @@ import (
 )
 
 type StatsWins struct {
-	TotalWin      int64          `json:"totalWin"`
-	MapWinTimes   map[int]int    `json:"mapWinTimes"`
-	MapWinTimesEx map[string]int `json:"MapWinTimesEx"`
-	MapWinEx      map[string]int `json:"MapWinEx"`
+	TotalWin      int64            `json:"totalWin"`
+	MapWinTimes   map[int]int64    `json:"mapWinTimes"`
+	MapWinTimesEx map[string]int64 `json:"MapWinTimesEx"`
+	MapWinEx      map[string]int64 `json:"MapWinEx"`
 }
 
 func (wins *StatsWins) AddWin(win int64) {
@@ -21,8 +21,8 @@ func (wins *StatsWins) AddWin(win int64) {
 }
 
 func (wins *StatsWins) genRange(bet int) {
-	wins.MapWinTimesEx = make(map[string]int)
-	wins.MapWinEx = make(map[string]int)
+	wins.MapWinTimesEx = make(map[string]int64)
+	wins.MapWinEx = make(map[string]int64)
 
 	for win, times := range wins.MapWinTimes {
 		if win == 0 {
@@ -36,13 +36,13 @@ func (wins *StatsWins) genRange(bet int) {
 					if i < len(gWinRange)-1 && curWins <= float64(gWinRange[i+1]) {
 						k := fmt.Sprintf("(%v,%v]", gWinRange[i], gWinRange[i+1])
 						wins.MapWinTimesEx[k] += times
-						wins.MapWinEx[k] += win * times
+						wins.MapWinEx[k] += int64(win) * times
 
 						break
 					} else if i == len(gWinRange)-1 {
 						k := fmt.Sprintf(">%v", gWinRange[i])
 						wins.MapWinTimesEx[k] += times
-						wins.MapWinEx[k] += win * times
+						wins.MapWinEx[k] += int64(win) * times
 
 						break
 					}
@@ -109,10 +109,10 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 			f.SetCellValue(sheet, goutils.Pos2Cell(sx+5, sy+y), 0)
 		}
 
-		f.SetCellValue(sheet, goutils.Pos2Cell(sx+6, sy+y), k*v)
+		f.SetCellValue(sheet, goutils.Pos2Cell(sx+6, sy+y), int64(k)*v)
 
 		if totalBet > 0 {
-			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), float64(k*v)/float64(totalBet))
+			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), float64(int64(k)*v)/float64(totalBet))
 		} else {
 			f.SetCellValue(sheet, goutils.Pos2Cell(sx+7, sy+y), 0)
 		}
@@ -186,6 +186,6 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 
 func NewStatsWins() *StatsWins {
 	return &StatsWins{
-		MapWinTimes: make(map[int]int),
+		MapWinTimes: make(map[int]int64),
 	}
 }
