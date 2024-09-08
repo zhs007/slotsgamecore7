@@ -94,8 +94,8 @@ func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (respinData *RespinData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (respinData *RespinData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVCurRespinNum {
 		return respinData.CurRespinNum, true
 	}

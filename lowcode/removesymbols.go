@@ -39,8 +39,8 @@ type RemoveSymbolsData struct {
 	AvgHeight  int // 平均移除图标的高度，用int表示浮点数，因此100表示1
 }
 
-// GetVal -
-func (removeSymbolsData *RemoveSymbolsData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (removeSymbolsData *RemoveSymbolsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVAvgHeight {
 		return removeSymbolsData.AvgHeight, true
 	}

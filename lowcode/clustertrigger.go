@@ -126,8 +126,8 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 // 	return ErrInvalidPBComponentData
 // }
 
-// GetVal -
-func (clusterTriggerData *ClusterTriggerData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (clusterTriggerData *ClusterTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return clusterTriggerData.SymbolNum, true
 	} else if key == CVWildNum {

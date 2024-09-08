@@ -52,8 +52,8 @@ func (collectorData *CollectorData) GetOutput() int {
 	return collectorData.Val
 }
 
-// GetVal -
-func (collectorData *CollectorData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (collectorData *CollectorData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVValue {
 		return collectorData.Val, true
 	}

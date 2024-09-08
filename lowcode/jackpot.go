@@ -63,8 +63,8 @@ func (jackpotData *JackpotData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (jackpotData *JackpotData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (jackpotData *JackpotData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return jackpotData.Wins, true
 	} else if key == CVWinMulti {

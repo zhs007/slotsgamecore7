@@ -72,11 +72,6 @@ func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) addVal(val int) 
 }
 
 // GetValEx -
-func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) GetVal(key string) (int, bool) {
-	return genSymbolValsWithSymbolData.GetValEx(key, GCVTypeNormal)
-}
-
-// GetValEx -
 func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolVal && len(genSymbolValsWithSymbolData.GenVals) > 0 {
 		if getType == GCVTypeMin {

@@ -63,8 +63,8 @@ func (winResultMultiData *WinResultMultiData) BuildPBComponentData() proto.Messa
 	return pbcd
 }
 
-// GetVal -
-func (winResultMultiData *WinResultMultiData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (winResultMultiData *WinResultMultiData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return winResultMultiData.Wins, true
 	}

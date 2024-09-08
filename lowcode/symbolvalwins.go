@@ -90,8 +90,8 @@ func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message
 	return pbcd
 }
 
-// GetVal -
-func (symbolValWinsData *SymbolValWinsData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (symbolValWinsData *SymbolValWinsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == SVWDVSymbolNum {
 		return symbolValWinsData.SymbolNum, true
 	} else if key == SVWDVWins {
@@ -99,9 +99,6 @@ func (symbolValWinsData *SymbolValWinsData) GetVal(key string) (int, bool) {
 	} else if key == CVResultNum {
 		return len(symbolValWinsData.UsedResults), true
 	}
-	// } else if key == SVWDVCollectorNum {
-	// 	return symbolValWinsData.CollectorNum
-	// }
 
 	return 0, false
 }

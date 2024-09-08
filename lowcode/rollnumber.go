@@ -61,8 +61,8 @@ func (rollNumberData *RollNumberData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (rollNumberData *RollNumberData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (rollNumberData *RollNumberData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVNumber || key == CVOutputInt {
 		return rollNumberData.Number, true
 	}

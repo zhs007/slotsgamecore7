@@ -85,8 +85,8 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) BuildPBComponentData() pro
 	return pbcd
 }
 
-// GetVal -
-func (adjacentPayTriggerData *AdjacentPayTriggerData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (adjacentPayTriggerData *AdjacentPayTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return adjacentPayTriggerData.SymbolNum, true
 	} else if key == CVWildNum {

@@ -63,8 +63,8 @@ func (winResultCacheData *WinResultCacheData) BuildPBComponentData() proto.Messa
 	return pbcd
 }
 
-// GetVal -
-func (winResultCacheData *WinResultCacheData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (winResultCacheData *WinResultCacheData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return winResultCacheData.Wins, true
 	}

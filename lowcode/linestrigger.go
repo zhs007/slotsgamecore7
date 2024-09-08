@@ -84,8 +84,8 @@ func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetVal -
-func (linesTriggerData *LinesTriggerData) GetVal(key string) (int, bool) {
+// GetValEx -
+func (linesTriggerData *LinesTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
 		return linesTriggerData.SymbolNum, true
 	} else if key == CVWildNum {
