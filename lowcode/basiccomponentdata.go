@@ -84,21 +84,6 @@ func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, 
 	basicComponentData.MapConfigIntVals = make(map[string]int)
 }
 
-// // OnNewStep -
-// func (basicComponentData *BasicComponentData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	basicComponentData.UsedScenes = nil
-// 	basicComponentData.UsedOtherScenes = nil
-// 	basicComponentData.UsedResults = nil
-// 	basicComponentData.UsedPrizeScenes = nil
-// 	basicComponentData.CashWin = 0
-// 	basicComponentData.CoinWin = 0
-// 	basicComponentData.TargetSceneIndex = -1
-// 	basicComponentData.TargetOtherSceneIndex = -1
-// 	basicComponentData.RNG = nil
-
-// 	basicComponentData.initSrcScenes()
-// }
-
 // GetValEx -
 func (basicComponentData *BasicComponentData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	return 0, false
@@ -135,41 +120,12 @@ func (basicComponentData *BasicComponentData) ClearConfigIntVal(key string) {
 	delete(basicComponentData.MapConfigIntVals, key)
 }
 
-// // InitSrcScenes -
-// func (basicComponentData *BasicComponentData) initSrcScenes() {
-// 	for i := range basicComponentData.SrcScenes {
-// 		basicComponentData.SrcScenes[i] = -1
-// 	}
-// }
-
 // BuildPBComponentData
 func (basicComponentData *BasicComponentData) BuildPBComponentData() proto.Message {
 	return &sgc7pb.BasicComponentData{
 		BasicComponentData: basicComponentData.BuildPBBasicComponentData(),
 	}
 }
-
-// // LoadPB
-// func (basicComponentData *BasicComponentData) LoadPB(pb *anypb.Any) error {
-// 	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ComponentData" {
-// 		var msg sgc7pb.ComponentData
-
-// 		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
-// 		if err != nil {
-// 			goutils.Error("BasicComponentData.LoadPB:UnmarshalTo:ComponentData",
-// 				goutils.Err(err))
-
-// 			return err
-// 		}
-
-// 		return nil
-// 	}
-
-// 	goutils.Error("BasicComponentData.LoadPB",
-// 		goutils.Err(ErrInvalidPBComponentData))
-
-// 	return ErrInvalidPBComponentData
-// }
 
 // LoadPB
 func (basicComponentData *BasicComponentData) LoadPBComponentData(pb *sgc7pb.ComponentData) error {
@@ -294,11 +250,6 @@ func (basicComponentData *BasicComponentData) IsRespinStarted() bool {
 	return false
 }
 
-// // AddRetriggerRespinNum -
-// func (basicComponentData *BasicComponentData) AddRetriggerRespinNum(num int) {
-
-// }
-
 // AddTriggerRespinAward -
 func (basicComponentData *BasicComponentData) AddTriggerRespinAward(award *Award) {
 
@@ -318,9 +269,6 @@ func (basicComponentData *BasicComponentData) TriggerRespin(gameProp *GameProper
 func (basicComponentData *BasicComponentData) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
 
 }
-
-// // SaveRetriggerRespinNum -
-// func (basicComponentData *BasicComponentData) SaveRetriggerRespinNum()
 
 // GetMask -
 func (basicComponentData *BasicComponentData) GetMask() []bool {

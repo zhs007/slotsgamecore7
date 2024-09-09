@@ -12,6 +12,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
@@ -342,6 +343,22 @@ func (collector *Collector) NewComponentData() IComponentData {
 
 // EachUsedResults -
 func (collector *Collector) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+}
+
+// OnStats2
+func (collector *Collector) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+	collector.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+
+	if pr.IsFinish {
+		cd := icd.(*CollectorData)
+
+		s2.ProcStatsIntVal(collector.GetName(), cd.Val)
+	}
+}
+
+// NewStats2 -
+func (collector *Collector) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, []stats2.Option{stats2.OptIntVal})
 }
 
 func NewCollector(name string) IComponent {
