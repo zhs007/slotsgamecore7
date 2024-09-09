@@ -219,27 +219,6 @@ func (rebuildSymbols *RebuildSymbols) OnAsciiGame(gameProp *GameProperty, pr *sg
 	return nil
 }
 
-// // OnStats
-// func (reelModifier *ReelModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // NewStats2 -
-// func (reelModifier *ReelModifier) NewStats2(parent string) *stats2.Feature {
-// 	return stats2.NewFeature(parent, nil)
-// }
-
-// // OnStats2
-// func (reelModifier *ReelModifier) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-// 	// s2.PushStepTrigger(reelModifier.Name, true)
-// 	s2.ProcStatsTrigger(reelModifier.Name)
-// }
-
-// // OnStats2Trigger
-// func (reelModifier *ReelModifier) OnStats2Trigger(s2 *Stats2) {
-// 	s2.pushTriggerStats(reelModifier.Name, true)
-// }
-
 func NewRebuildSymbols(name string) IComponent {
 	return &RebuildSymbols{
 		BasicComponent: NewBasicComponent(name, 1),

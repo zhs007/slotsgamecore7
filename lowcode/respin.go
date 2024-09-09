@@ -477,7 +477,7 @@ func (respin *Respin) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
 	isRunning := false
 	isEnding := false
 

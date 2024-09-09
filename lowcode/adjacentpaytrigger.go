@@ -423,8 +423,8 @@ func (adjacentPayTrigger *AdjacentPayTrigger) NewStats2(parent string) *stats2.F
 }
 
 // OnStats2
-func (adjacentPayTrigger *AdjacentPayTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
-	adjacentPayTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+func (adjacentPayTrigger *AdjacentPayTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	adjacentPayTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
 	cd := icd.(*AdjacentPayTriggerData)
 

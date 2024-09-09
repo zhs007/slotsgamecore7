@@ -313,8 +313,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) NewComponentData() IComp
 }
 
 // OnStats2
-func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
-	genSymbolValsWithSymbol.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	genSymbolValsWithSymbol.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
 	cd := icd.(*GenSymbolValsWithSymbolData)
 
