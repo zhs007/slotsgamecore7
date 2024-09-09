@@ -826,8 +826,8 @@ func (scatterTrigger *ScatterTrigger) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (scatterTrigger *ScatterTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
-	scatterTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+func (scatterTrigger *ScatterTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	scatterTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
 	cd := icd.(*ScatterTriggerData)
 

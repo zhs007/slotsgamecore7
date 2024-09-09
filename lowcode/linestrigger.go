@@ -972,8 +972,8 @@ func (linesTrigger *LinesTrigger) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (linesTrigger *LinesTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
-	linesTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+func (linesTrigger *LinesTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	linesTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
 	cd := icd.(*LinesTriggerData)
 

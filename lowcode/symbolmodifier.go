@@ -309,27 +309,6 @@ func (symbolModifier *SymbolModifier) OnAsciiGame(gameProp *GameProperty, pr *sg
 	return nil
 }
 
-// // OnStats
-// func (symbolModifier *SymbolModifier) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // NewStats2 -
-// func (symbolModifier *SymbolModifier) NewStats2(parent string) *stats2.Feature {
-// 	return stats2.NewFeature(parent, nil)
-// }
-
-// // OnStats2
-// func (symbolModifier *SymbolModifier) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-// 	// s2.PushTrigger(symbolModifier.Name, true)
-// 	s2.ProcStatsTrigger(symbolModifier.Name)
-// }
-
-// // OnStats2Trigger
-// func (symbolModifier *SymbolModifier) OnStats2Trigger(s2 *Stats2) {
-// 	s2.pushTriggerStats(symbolModifier.Name, true)
-// }
-
 func NewSymbolModifier(name string) IComponent {
 	return &SymbolModifier{
 		BasicComponent: NewBasicComponent(name, 1),

@@ -48,7 +48,9 @@ type IComponent interface {
 	// NewStats2 -
 	NewStats2(parent string) *stats2.Feature
 	// OnStats2 - 除respin外，其它component都是在onPlayGame后调用；respin会在onStepEnd这个环节调用，而且是遍历Respin队列
-	OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult)
+	OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool)
+	// IsNeedOnStepEndStats2 - 除respin外，如果也有component也需要在stepEnd调用的话，这里需要返回true
+	IsNeedOnStepEndStats2() bool
 
 	// GetAllLinkComponents - get all link components
 	GetAllLinkComponents() []string

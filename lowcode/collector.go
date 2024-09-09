@@ -346,10 +346,10 @@ func (collector *Collector) EachUsedResults(pr *sgc7game.PlayResult, pbComponent
 }
 
 // OnStats2
-func (collector *Collector) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
-	collector.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+func (collector *Collector) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	collector.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
-	if pr.IsFinish {
+	if isOnStepEnd && pr.IsFinish {
 		cd := icd.(*CollectorData)
 
 		s2.ProcStatsIntVal(collector.GetName(), cd.Val)
@@ -359,6 +359,11 @@ func (collector *Collector) OnStats2(icd IComponentData, s2 *stats2.Cache, gameP
 // NewStats2 -
 func (collector *Collector) NewStats2(parent string) *stats2.Feature {
 	return stats2.NewFeature(parent, []stats2.Option{stats2.OptIntVal})
+}
+
+// IsNeedOnStepEndStats2 - 除respin外，如果也有component也需要在stepEnd调用的话，这里需要返回true
+func (collector *Collector) IsNeedOnStepEndStats2() bool {
+	return true
 }
 
 func NewCollector(name string) IComponent {

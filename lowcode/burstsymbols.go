@@ -459,27 +459,6 @@ func (burstSymbols *BurstSymbols) NewComponentData() IComponentData {
 	return &BurstSymbolsData{}
 }
 
-// // OnStats
-// func (moveSymbol *MoveSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // NewStats2 -
-// func (moveSymbol *MoveSymbol) NewStats2(parent string) *stats2.Feature {
-// 	return stats2.NewFeature(parent, nil)
-// }
-
-// // OnStats2
-// func (moveSymbol *MoveSymbol) OnStats2(icd IComponentData, s2 *stats2.Cache) {
-// 	s2.ProcStatsTrigger(moveSymbol.Name)
-// 	// s2.PushStepTrigger(moveSymbol.Name, true)
-// }
-
-// // OnStats2Trigger
-// func (moveSymbol *MoveSymbol) OnStats2Trigger(s2 *Stats2) {
-// 	s2.pushTriggerStats(moveSymbol.Name, true)
-// }
-
 func NewBurstSymbols(name string) IComponent {
 	return &BurstSymbols{
 		BasicComponent: NewBasicComponent(name, 1),

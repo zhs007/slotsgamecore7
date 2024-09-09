@@ -435,8 +435,8 @@ func (reelTrigger *ReelTrigger) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (reelTrigger *ReelTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
-	reelTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr)
+func (reelTrigger *ReelTrigger) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	reelTrigger.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 }
 
 // GetAllLinkComponents - get all link components

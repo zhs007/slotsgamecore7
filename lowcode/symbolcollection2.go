@@ -356,7 +356,7 @@ func (symbolCollection2 *SymbolCollection2) NewStats2(parent string) *stats2.Fea
 }
 
 // OnStats2
-func (symbolCollection2 *SymbolCollection2) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+func (symbolCollection2 *SymbolCollection2) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
 	cd := icd.(*SymbolCollection2Data)
 
 	s2.ProcStatsForeachTrigger(symbolCollection2.Name, len(cd.SymbolCodes), 0)

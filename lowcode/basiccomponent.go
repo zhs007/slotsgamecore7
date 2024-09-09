@@ -363,8 +363,13 @@ func (basicComponent *BasicComponent) NewStats2(parent string) *stats2.Feature {
 }
 
 // OnStats2
-func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult) {
+func (basicComponent *BasicComponent) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
 	s2.ProcStatsTrigger(basicComponent.Name)
+}
+
+// IsNeedOnStepEndStats2 - 除respin外，如果也有component也需要在stepEnd调用的话，这里需要返回true
+func (basicComponent *BasicComponent) IsNeedOnStepEndStats2() bool {
+	return false
 }
 
 // // OnStats2Trigger

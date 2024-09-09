@@ -42,31 +42,32 @@ type HistoryComponentData struct {
 }
 
 type GameProperty struct {
-	CurBetMul              int
-	Pool                   *GamePropertyPool
-	MapVals                map[int]int
-	MapStrVals             map[int]string
-	CurPaytables           *sgc7game.PayTables
-	CurLineData            *sgc7game.LineData
-	CurReels               *sgc7game.ReelsData
-	MapIntValWeights       map[string]*sgc7game.ValWeights2
-	MapStats               map[string]*sgc7stats.Feature
-	mapInt                 map[string]int
-	mapStr                 map[string]string
-	mapGlobalStr           map[string]string
-	mapGlobalScene         map[string]*sgc7game.GameScene // v0.13开始弃用
-	mapComponentScene      map[string]*sgc7game.GameScene
-	mapComponentOtherScene map[string]*sgc7game.GameScene
-	callStack              *CallStack
-	RespinComponents       []string
-	PoolScene              *sgc7game.GameScenePoolEx
-	Components             *ComponentList
-	SceneStack             *SceneStack
-	OtherSceneStack        *SceneStack
-	stats2Cache            *stats2.Cache
-	usedComponent          []string
-	rng                    IRNG
-	featureLevel           IFeatureLevel
+	CurBetMul                        int
+	Pool                             *GamePropertyPool
+	MapVals                          map[int]int
+	MapStrVals                       map[int]string
+	CurPaytables                     *sgc7game.PayTables
+	CurLineData                      *sgc7game.LineData
+	CurReels                         *sgc7game.ReelsData
+	MapIntValWeights                 map[string]*sgc7game.ValWeights2
+	MapStats                         map[string]*sgc7stats.Feature
+	mapInt                           map[string]int
+	mapStr                           map[string]string
+	mapGlobalStr                     map[string]string
+	mapGlobalScene                   map[string]*sgc7game.GameScene // v0.13开始弃用
+	mapComponentScene                map[string]*sgc7game.GameScene
+	mapComponentOtherScene           map[string]*sgc7game.GameScene
+	callStack                        *CallStack
+	RespinComponents                 []string
+	PoolScene                        *sgc7game.GameScenePoolEx
+	Components                       *ComponentList
+	SceneStack                       *SceneStack
+	OtherSceneStack                  *SceneStack
+	stats2Cache                      *stats2.Cache
+	usedComponent                    []string
+	rng                              IRNG
+	featureLevel                     IFeatureLevel
+	lstNeedOnStepEndStats2Components []string
 }
 
 func (gameProp *GameProperty) GetBetMul() int {
@@ -107,6 +108,7 @@ func (gameProp *GameProperty) OnNewGame(stake *sgc7game.Stake, curPlugin sgc7plu
 	gameProp.callStack.OnNewGame()
 
 	gameProp.usedComponent = nil
+	gameProp.lstNeedOnStepEndStats2Components = nil
 
 	// gameProp.rng = gameProp.newRNG()
 
@@ -318,7 +320,14 @@ func (gameProp *GameProperty) OnCallEnd(component IComponent, cd IComponentData,
 				false)
 		}
 
-		component.OnStats2(cd, gameProp.stats2Cache, gameProp, gp, pr)
+		componentName := component.GetName()
+		if component.IsNeedOnStepEndStats2() &&
+			goutils.IndexOfStringSlice(gameProp.lstNeedOnStepEndStats2Components, componentName, 0) < 0 {
+
+			gameProp.lstNeedOnStepEndStats2Components = append(gameProp.lstNeedOnStepEndStats2Components, componentName)
+		} else {
+			component.OnStats2(cd, gameProp.stats2Cache, gameProp, gp, pr, false)
+		}
 	}
 
 	tag := gameProp.callStack.OnCallEnd(component, cd)
@@ -998,7 +1007,14 @@ func (gameProp *GameProperty) onStepEnd(curBetMode int, gp *GameParams, pr *sgc7
 		for _, v := range gameProp.stats2Cache.RespinArr {
 			ic, isok := gameProp.Components.MapComponents[v]
 			if isok {
-				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache, gameProp, gp, pr)
+				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache, gameProp, gp, pr, true)
+			}
+		}
+
+		for _, v := range gameProp.lstNeedOnStepEndStats2Components {
+			ic, isok := gameProp.Components.MapComponents[v]
+			if isok {
+				ic.OnStats2(gameProp.GetComponentData(ic), gameProp.stats2Cache, gameProp, gp, pr, true)
 			}
 		}
 
