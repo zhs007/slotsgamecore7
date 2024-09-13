@@ -9,9 +9,9 @@ type StatsRootTrigger struct {
 	RunTimes     int64      `json:"runTimes"`
 	TriggerTimes int64      `json:"triggerTimes"`
 	TotalWins    int64      `json:"totalWins"`
+	Wins         *StatsWins `json:"wins"`
 	CurWins      int64      `json:"-"`
 	IsStarted    bool       `json:"-"`
-	Wins         *StatsWins `json:"-"`
 }
 
 func (trigger *StatsRootTrigger) Merge(src *StatsRootTrigger) {
