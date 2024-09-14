@@ -22,7 +22,7 @@ type BasicComponentData struct {
 	SrcScenes             []int
 	Output                int
 	StrOutput             string
-	ForceBranchIndex      int
+	// ForceBranchIndex      int
 }
 
 // Clone
@@ -64,9 +64,9 @@ func (basicComponentData *BasicComponentData) CloneBasicComponentData() BasicCom
 	target.SrcScenes = make([]int, len(basicComponentData.SrcScenes))
 	copy(target.SrcScenes, basicComponentData.SrcScenes)
 
-	if !gIsReleaseMode {
-		target.ForceBranchIndex = basicComponentData.ForceBranchIndex
-	}
+	// if !gIsReleaseMode {
+	// 	target.ForceBranchIndex = basicComponentData.ForceBranchIndex
+	// }
 
 	return target
 }
@@ -284,12 +284,12 @@ func (basicComponentData *BasicComponentData) PutInMoney(coins int) {
 
 }
 
-// ForceBranch -
-func (basicComponentData *BasicComponentData) ForceBranch(branchIndex int) {
-	if !gIsReleaseMode {
-		basicComponentData.ForceBranchIndex = branchIndex
-	}
-}
+// // ForceBranch -
+// func (basicComponentData *BasicComponentData) ForceBranch(branchIndex int) {
+// 	if !gIsReleaseMode {
+// 		basicComponentData.ForceBranchIndex = branchIndex
+// 	}
+// }
 
 // GetStrVal -
 func (basicComponentData *BasicComponentData) GetStrVal(key string) (string, bool) {

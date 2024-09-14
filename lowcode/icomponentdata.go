@@ -102,9 +102,9 @@ type IComponentData interface {
 
 	PutInMoney(coins int)
 
-	//----------------------------
-	// Branch
+	// //----------------------------
+	// // Branch
 
-	// ForceBranch -
-	ForceBranch(branchIndex int)
+	// // ForceBranch -
+	// ForceBranch(branchIndex int)
 }
