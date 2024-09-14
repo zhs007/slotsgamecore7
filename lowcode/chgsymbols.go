@@ -242,47 +242,65 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 	curNumber := 0
 	isNeedBreak := false
 
+	srcVW2 := chgSymbols.GetWeight(gameProp, cd)
+
 	for x, arr := range gs.Arr {
 		for y, s := range arr {
 			if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-				cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
-				if err != nil {
-					goutils.Error("ChgSymbols.procNormal:RollSymbol",
-						goutils.Err(err))
 
-					return nil, false, err
-				}
+				vw2 := srcVW2.Clone()
 
-				if cursc != chgSymbols.Config.BlankSymbolCode {
-					if ngs == gs {
-						ngs = gs.CloneEx(gameProp.PoolScene)
+				for {
+					curscv, err := vw2.RandVal(plugin)
+					if err != nil {
+						goutils.Error("ChgSymbols.procNormal:RollSymbol",
+							goutils.Err(err))
+
+						return nil, false, err
 					}
 
-					ngs.Arr[x][y] = cursc
+					cursc := curscv.Int()
 
-					isTrigger := false
-					for _, trigger := range chgSymbols.Config.StrTriggers {
-						if gameProp.CanTrigger(trigger, ngs, curpr, stake) {
-							isTrigger = true
+					if cursc != chgSymbols.Config.BlankSymbolCode {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = cursc
+
+						isTrigger := false
+						for _, trigger := range chgSymbols.Config.StrTriggers {
+							if gameProp.CanTrigger(trigger, ngs, curpr, stake) {
+								isTrigger = true
+
+								break
+							}
+						}
+
+						if isTrigger {
+							if len(vw2.Vals) == 1 {
+								break
+							}
+
+							vw2.RemoveVal(curscv)
+
+							continue
+						}
+
+						curNumber++
+
+						isRealGen = true
+
+						if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
+							isNeedBreak = true
 
 							break
 						}
 					}
+				}
 
-					if isTrigger {
-
-						continue
-					}
-
-					curNumber++
-
-					isRealGen = true
-
-					if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
-						isNeedBreak = true
-
-						break
-					}
+				if isNeedBreak {
+					break
 				}
 			}
 		}

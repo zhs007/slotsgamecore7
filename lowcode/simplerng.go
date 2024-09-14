@@ -6,17 +6,17 @@ import (
 )
 
 type SimpleRNG struct {
-	IterateComponent string
-	curPlugin        sgc7plugin.IPlugin
-	plugin           *sgc7plugin.FastPlugin
-	weights          []int
-	curIndex         int
+	// IterateComponent string
+	curPlugin sgc7plugin.IPlugin
+	plugin    *sgc7plugin.FastPlugin
+	weights   []int
+	curIndex  int
 }
 
 func (rng *SimpleRNG) Clone() IRNG {
 	return &SimpleRNG{
-		IterateComponent: rng.IterateComponent,
-		plugin:           rng.plugin,
+		// IterateComponent: rng.IterateComponent,
+		plugin: rng.plugin,
 	}
 }
 
@@ -69,7 +69,7 @@ func (rng *SimpleRNG) OnStepEnd(curBetMode int, gp *GameParams, pr *sgc7game.Pla
 
 func NewSimpleRNG(iterateComponent string) IRNG {
 	return &SimpleRNG{
-		IterateComponent: iterateComponent,
-		plugin:           sgc7plugin.NewFastPlugin(),
+		// IterateComponent: iterateComponent,
+		plugin: sgc7plugin.NewFastPlugin(),
 	}
 }
