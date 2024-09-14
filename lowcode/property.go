@@ -959,22 +959,22 @@ func (gameProp *GameProperty) AddComponentPos(componentName string, pos []int) {
 	}
 }
 
-func (gameProp *GameProperty) ForceComponentBranch(componentName string, branchIndex int) {
-	if gIsReleaseMode {
-		return
-	}
+// func (gameProp *GameProperty) ForceComponentBranch(componentName string, branchIndex int) {
+// 	if gIsReleaseMode {
+// 		return
+// 	}
 
-	cd := gameProp.GetCurComponentDataWithName(componentName)
-	if cd == nil {
-		goutils.Error("GameProperty.ForceComponentBranch",
-			slog.String("componentConfigVal", componentName),
-			goutils.Err(ErrInvalidComponent))
+// 	cd := gameProp.GetCurComponentDataWithName(componentName)
+// 	if cd == nil {
+// 		goutils.Error("GameProperty.ForceComponentBranch",
+// 			slog.String("componentConfigVal", componentName),
+// 			goutils.Err(ErrInvalidComponent))
 
-		return
-	}
+// 		return
+// 	}
 
-	cd.ForceBranch(branchIndex)
-}
+// 	cd.ForceBranch(branchIndex)
+// }
 
 func (gameProp *GameProperty) onStepEnd(curBetMode int, gp *GameParams, pr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) {
 	pr.CashWin = 0

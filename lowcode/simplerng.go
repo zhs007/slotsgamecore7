@@ -6,17 +6,17 @@ import (
 )
 
 type SimpleRNG struct {
-	IterateComponent string
-	curPlugin        sgc7plugin.IPlugin
-	plugin           *sgc7plugin.FastPlugin
-	weights          []int
-	curIndex         int
+	// IterateComponent string
+	curPlugin sgc7plugin.IPlugin
+	plugin    *sgc7plugin.FastPlugin
+	weights   []int
+	curIndex  int
 }
 
 func (rng *SimpleRNG) Clone() IRNG {
 	return &SimpleRNG{
-		IterateComponent: rng.IterateComponent,
-		plugin:           rng.plugin,
+		// IterateComponent: rng.IterateComponent,
+		plugin: rng.plugin,
 	}
 }
 
@@ -29,22 +29,22 @@ func (rng *SimpleRNG) OnNewGame(curBetMode int, plugin sgc7plugin.IPlugin) error
 
 // GetCurRNG -
 func (rng *SimpleRNG) GetCurRNG(curBetMode int, gameProp *GameProperty, curComponent IComponent, cd IComponentData, fl IFeatureLevel) (bool, int, sgc7plugin.IPlugin, string) {
-	if curComponent.GetName() == rng.IterateComponent {
-		if curComponent.GetBranchNum() > 0 {
-			if len(rng.weights) == 0 {
-				rng.weights = curComponent.GetBranchWeights()
-				rng.curIndex = 0
-			} else {
-				if rng.curIndex < len(rng.weights) {
-					cd.ForceBranch(rng.curIndex)
+	// if curComponent.GetName() == rng.IterateComponent {
+	// 	if curComponent.GetBranchNum() > 0 {
+	// 		if len(rng.weights) == 0 {
+	// 			rng.weights = curComponent.GetBranchWeights()
+	// 			rng.curIndex = 0
+	// 		} else {
+	// 			if rng.curIndex < len(rng.weights) {
+	// 				cd.ForceBranch(rng.curIndex)
 
-					rng.curIndex++
-				}
-			}
+	// 				rng.curIndex++
+	// 			}
+	// 		}
 
-			return false, -1, rng.plugin, ""
-		}
-	}
+	// 		return false, -1, rng.plugin, ""
+	// 	}
+	// }
 
 	return false, -1, rng.curPlugin, ""
 }
@@ -69,7 +69,7 @@ func (rng *SimpleRNG) OnStepEnd(curBetMode int, gp *GameParams, pr *sgc7game.Pla
 
 func NewSimpleRNG(iterateComponent string) IRNG {
 	return &SimpleRNG{
-		IterateComponent: iterateComponent,
-		plugin:           sgc7plugin.NewFastPlugin(),
+		// IterateComponent: iterateComponent,
+		plugin: sgc7plugin.NewFastPlugin(),
 	}
 }

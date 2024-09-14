@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -18,13 +19,16 @@ const ChgSymbolsTypeName = "chgSymbols"
 type ChgSymbolsType int
 
 const (
-	ChgSymTypeNormal  ChgSymbolsType = 0
-	ChgSymTypeMystery ChgSymbolsType = 1
+	ChgSymTypeNormal              ChgSymbolsType = 0
+	ChgSymTypeMystery             ChgSymbolsType = 1
+	ChgSymTypeRandomWithNoTrigger ChgSymbolsType = 2
 )
 
 func parseChgSymbolsType(str string) ChgSymbolsType {
 	if str == "mystery" {
 		return ChgSymTypeMystery
+	} else if str == "randomwithnotrigger" {
+		return ChgSymTypeRandomWithNoTrigger
 	}
 
 	return ChgSymTypeNormal
@@ -45,6 +49,7 @@ type ChgSymbolsConfig struct {
 	IsAlwaysGen          bool                  `yaml:"isAlwaysGen" json:"isAlwaysGen"`
 	Controllers          []*Award              `yaml:"controllers" json:"controllers"`
 	JumpToComponent      string                `yaml:"jumpToComponent" json:"jumpToComponent"`
+	StrTriggers          []string              `yaml:"triggers" json:"-"`
 }
 
 // SetLinkComponent
@@ -149,11 +154,168 @@ func (chgSymbols *ChgSymbols) GetWeight(gameProp *GameProperty, basicCD *BasicCo
 	return chgSymbols.Config.WeightVW2
 }
 
+func (chgSymbols *ChgSymbols) procMystery(gameProp *GameProperty, cd *BasicComponentData, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene) (*sgc7game.GameScene, bool, error) {
+	cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
+	if err != nil {
+		goutils.Error("ChgSymbols.procMystery:RollSymbol",
+			goutils.Err(err))
+
+		return nil, false, err
+	}
+
+	isRealGen := false
+	ngs := gs
+
+	for x, arr := range gs.Arr {
+		for y, s := range arr {
+			if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				ngs.Arr[x][y] = cursc
+
+				isRealGen = true
+			}
+		}
+	}
+
+	return ngs, isRealGen, nil
+}
+
+func (chgSymbols *ChgSymbols) procNormal(gameProp *GameProperty, cd *BasicComponentData, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene) (*sgc7game.GameScene, bool, error) {
+	ngs := gs
+	if chgSymbols.Config.IsAlwaysGen {
+		ngs = gs.CloneEx(gameProp.PoolScene)
+	}
+
+	isRealGen := false
+	curNumber := 0
+	isNeedBreak := false
+
+	for x, arr := range gs.Arr {
+		for y, s := range arr {
+			if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
+				cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
+				if err != nil {
+					goutils.Error("ChgSymbols.procNormal:RollSymbol",
+						goutils.Err(err))
+
+					return nil, false, err
+				}
+
+				if cursc != chgSymbols.Config.BlankSymbolCode {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[x][y] = cursc
+
+					curNumber++
+
+					isRealGen = true
+
+					if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
+						isNeedBreak = true
+
+						break
+					}
+				}
+			}
+		}
+
+		if isNeedBreak {
+			break
+		}
+	}
+
+	return ngs, isRealGen, nil
+}
+
+func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd *BasicComponentData, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, gs *sgc7game.GameScene) (*sgc7game.GameScene, bool, error) {
+	ngs := gs
+	if chgSymbols.Config.IsAlwaysGen {
+		ngs = gs.CloneEx(gameProp.PoolScene)
+	}
+
+	isRealGen := false
+	curNumber := 0
+	isNeedBreak := false
+
+	srcVW2 := chgSymbols.GetWeight(gameProp, cd)
+
+	for x, arr := range gs.Arr {
+		for y, s := range arr {
+			if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
+
+				vw2 := srcVW2.Clone()
+
+				for {
+					curscv, err := vw2.RandVal(plugin)
+					if err != nil {
+						goutils.Error("ChgSymbols.procNormal:RollSymbol",
+							goutils.Err(err))
+
+						return nil, false, err
+					}
+
+					cursc := curscv.Int()
+
+					if cursc != chgSymbols.Config.BlankSymbolCode {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = cursc
+
+						isTrigger := false
+						for _, trigger := range chgSymbols.Config.StrTriggers {
+							if gameProp.CanTrigger(trigger, ngs, curpr, stake) {
+								isTrigger = true
+
+								break
+							}
+						}
+
+						if isTrigger {
+							if len(vw2.Vals) == 1 {
+								break
+							}
+
+							vw2.RemoveVal(curscv)
+
+							continue
+						}
+
+						curNumber++
+
+						isRealGen = true
+
+						if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
+							isNeedBreak = true
+
+							break
+						}
+					}
+				}
+
+				if isNeedBreak {
+					break
+				}
+			}
+		}
+
+		if isNeedBreak {
+			break
+		}
+	}
+
+	return ngs, isRealGen, nil
+}
+
 // playgame
 func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*BasicComponentData)
 
@@ -170,78 +332,38 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		}
 
 		if chgSymbols.Config.Type == ChgSymTypeMystery {
-			cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
-			// vw2 := chgSymbols.GetWeight(gameProp, cd)
-			// curs, err := vw2.RandVal(plugin)
+			ngs1, isRealGen1, err := chgSymbols.procMystery(gameProp, cd, plugin, gs)
 			if err != nil {
-				goutils.Error("ChgSymbols.OnPlayGame:RollSymbol",
+				goutils.Error("ChgSymbols.OnPlayGame:procMystery",
 					goutils.Err(err))
 
 				return "", err
 			}
 
-			// cursc := curs.Int()
+			ngs = ngs1
+			isRealGen = isRealGen1
+		} else if chgSymbols.Config.Type == ChgSymTypeRandomWithNoTrigger {
+			ngs2, isRealGen2, err := chgSymbols.procRandomWithNoTrigger(gameProp, cd, plugin, curpr, stake, gs)
+			if err != nil {
+				goutils.Error("ChgSymbols.OnPlayGame:procRandomWithNoTrigger",
+					goutils.Err(err))
 
-			// if ngs == gs {
-			// 	ngs = gs.CloneEx(gameProp.PoolScene)
-			// }
-
-			for x, arr := range gs.Arr {
-				for y, s := range arr {
-					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
-						}
-
-						ngs.Arr[x][y] = cursc
-
-						isRealGen = true
-					}
-				}
+				return "", err
 			}
+
+			ngs = ngs2
+			isRealGen = isRealGen2
 		} else {
-			if chgSymbols.Config.IsAlwaysGen {
-				ngs = gs.CloneEx(gameProp.PoolScene)
+			ngs3, isRealGen3, err := chgSymbols.procNormal(gameProp, cd, plugin, gs)
+			if err != nil {
+				goutils.Error("ChgSymbols.OnPlayGame:procNormal",
+					goutils.Err(err))
+
+				return "", err
 			}
 
-			curNumber := 0
-			isNeedBreak := false
-
-			for x, arr := range gs.Arr {
-				for y, s := range arr {
-					if goutils.IndexOfIntSlice(chgSymbols.Config.SymbolCodes, s, 0) >= 0 {
-						cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
-						if err != nil {
-							goutils.Error("ChgSymbols.OnPlayGame:RollSymbol",
-								goutils.Err(err))
-
-							return "", err
-						}
-
-						if cursc != chgSymbols.Config.BlankSymbolCode {
-							if ngs == gs {
-								ngs = gs.CloneEx(gameProp.PoolScene)
-							}
-
-							ngs.Arr[x][y] = cursc
-
-							curNumber++
-
-							isRealGen = true
-
-							if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
-								isNeedBreak = true
-
-								break
-							}
-						}
-					}
-				}
-
-				if isNeedBreak {
-					break
-				}
-			}
+			ngs = ngs3
+			isRealGen = isRealGen3
 		}
 
 		if ngs == gs {
@@ -280,11 +402,6 @@ func (chgSymbols *ChgSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	return nil
 }
 
-// // OnStats
-// func (chgSymbols *ChgSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 // GetAllLinkComponents - get all link components
 func (chgSymbols *ChgSymbols) GetAllLinkComponents() []string {
 	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
@@ -307,10 +424,10 @@ func (chgSymbols *ChgSymbols) GetBranchWeights() []int {
 
 // RollSymbol -
 func (chgSymbols *ChgSymbols) RollSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData) (int, error) {
-	if bcd.ForceBranchIndex > 0 && !gIsReleaseMode {
-		vw2 := chgSymbols.GetWeight(gameProp, bcd)
-		return vw2.Vals[bcd.ForceBranchIndex-1].Int(), nil
-	}
+	// if bcd.ForceBranchIndex > 0 && !gIsReleaseMode {
+	// 	vw2 := chgSymbols.GetWeight(gameProp, bcd)
+	// 	return vw2.Vals[bcd.ForceBranchIndex-1].Int(), nil
+	// }
 
 	vw2 := chgSymbols.GetWeight(gameProp, bcd)
 	curs, err := vw2.RandVal(plugin)
@@ -346,6 +463,7 @@ type jsonChgSymbols struct {
 	StrType     string   `json:"type"`
 	MaxNumber   int      `json:"maxNumber"`
 	IsAlwaysGen bool     `json:"isAlwaysGen"`
+	StrTriggers []string `json:"trigger"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
@@ -353,12 +471,11 @@ func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 		Symbols:     jcfg.Symbols,
 		BlankSymbol: jcfg.BlankSymbol,
 		Weight:      jcfg.Weight,
-		StrType:     jcfg.StrType,
+		StrType:     strings.ToLower(jcfg.StrType),
 		MaxNumber:   jcfg.MaxNumber,
 		IsAlwaysGen: jcfg.IsAlwaysGen,
+		StrTriggers: jcfg.StrTriggers,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
