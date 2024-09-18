@@ -42,6 +42,7 @@ const (
 	CVSelectedIndex         string = "selectedIndex"         // selectedIndex，一般用于各种权重组件里，最后被选中的index
 	CVValue                 string = "value"                 // value
 	CVSymbolVal             string = "symbolVal"             // symbolVal
+	CVWinResultNum          string = "winResultNum"          // winResultNum
 )
 
 const (
