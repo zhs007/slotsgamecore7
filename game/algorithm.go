@@ -225,6 +225,63 @@ func CalcScatter4(scene *GameScene, pt *PayTables, scatter int, bet int,
 	return nil
 }
 
+// CalcScatter5 - calc scatter
+func CalcScatter5(scene *GameScene, pt *PayTables, scatter int, bet int,
+	isScatter FuncIsScatter, isOnlyOneOnReel bool, height int) *Result {
+
+	nums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+
+	if height <= 0 || height > len(scene.Arr[0]) {
+		height = len(scene.Arr[0])
+	}
+
+	if isOnlyOneOnReel {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := 0; y < height; y++ {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					nums++
+
+					pos = append(pos, x, y)
+
+					break
+				}
+			}
+		}
+	} else {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := 0; y < height; y++ {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					nums++
+
+					pos = append(pos, x, y)
+				}
+			}
+		}
+	}
+
+	if nums > len(pt.MapPay[scatter]) {
+		nums = len(pt.MapPay[scatter])
+	}
+
+	if nums > 0 && pt.MapPay[scatter][nums-1] > 0 {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatter,
+			LineIndex:  -1,
+			Mul:        pt.MapPay[scatter][nums-1],
+			CoinWin:    pt.MapPay[scatter][nums-1],
+			CashWin:    pt.MapPay[scatter][nums-1] * bet,
+			Pos:        pos,
+			SymbolNums: nums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcScatterEx - calc scatter
 func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter) *Result {
 	curnums := 0
@@ -254,12 +311,80 @@ func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScat
 	return nil
 }
 
+// CalcScatterEx2 - calc scatter
+func CalcScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter, height int) *Result {
+	if height <= 0 || height > len(scene.Arr[0]) {
+		height = len(scene.Arr[0])
+	}
+
+	curnums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+	for x := 0; x < len(scene.Arr); x++ {
+		for y := 0; y < height; y++ {
+			if isScatter(scatter, scene.Arr[x][y]) {
+				curnums++
+
+				pos = append(pos, x, y)
+			}
+		}
+	}
+
+	if curnums >= nums {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatterEx,
+			LineIndex:  -1,
+			Pos:        pos,
+			SymbolNums: curnums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcReelScatterEx - calc scatter
 func CalcReelScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter) *Result {
 	curnums := 0
 	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
 	for x := 0; x < len(scene.Arr); x++ {
 		for y := 0; y < len(scene.Arr[x]); y++ {
+			if isScatter(scatter, scene.Arr[x][y]) {
+				curnums++
+
+				pos = append(pos, x, y)
+
+				break
+			}
+		}
+	}
+
+	if curnums >= nums {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatterEx,
+			LineIndex:  -1,
+			Pos:        pos,
+			SymbolNums: curnums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
+// CalcReelScatterEx2 - calc scatter
+func CalcReelScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter, height int) *Result {
+	if height <= 0 || height > len(scene.Arr[0]) {
+		height = len(scene.Arr[0])
+	}
+
+	curnums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+	for x := 0; x < len(scene.Arr); x++ {
+		for y := 0; y < height; y++ {
 			if isScatter(scatter, scene.Arr[x][y]) {
 				curnums++
 

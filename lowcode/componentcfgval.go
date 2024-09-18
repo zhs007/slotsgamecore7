@@ -20,6 +20,7 @@ const (
 	CCVWins                  string = "wins"                  // 可以修改配置项里的 wins
 	CCVMulti                 string = "multi"                 // 可以修改配置项里的 multi
 	CCVNumber                string = "number"                // 可以修改配置项里的 number
+	CCVHeight                string = "height"                // 可以修改配置项里的 height
 )
 
 const (
