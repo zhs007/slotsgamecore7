@@ -188,6 +188,9 @@ var (
 	// ErrNoWeight - no weight
 	ErrNoWeight = errors.New("no weight")
 
+	// ErrInvalidBranch - invalid branch
+	ErrInvalidBranch = errors.New("invalid branch")
+
 	// ErrNoComponent - no component
 	ErrNoComponent = errors.New("no component")
 )
