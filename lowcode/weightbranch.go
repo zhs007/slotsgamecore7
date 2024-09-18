@@ -20,12 +20,17 @@ const WeightBranchTypeName = "weightBranch"
 
 type WeightBranchData struct {
 	BasicComponentData
-	Value string
+	Value         string
+	WeightVW      *sgc7game.ValWeights2
+	IgnoreBranchs []string
 }
 
 // OnNewGame -
 func (weightBranchData *WeightBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	weightBranchData.BasicComponentData.OnNewGame(gameProp, component)
+
+	weightBranchData.WeightVW = nil
+	weightBranchData.IgnoreBranchs = nil
 }
 
 // Clone
@@ -53,10 +58,6 @@ func (weightBranchData *WeightBranchData) GetValEx(key string, getType GetCompon
 	return 0, false
 }
 
-// // SetVal -
-// func (weightBranchData *WeightBranchData) SetVal(key string, val int) {
-// }
-
 // GetStrVal -
 func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
 	if key == CSVValue {
@@ -64,6 +65,15 @@ func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
 	}
 
 	return "", false
+}
+
+// SetConfigVal -
+func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
+	if key == CCVWeight {
+		weightBranchData.WeightVW = nil
+	}
+
+	weightBranchData.BasicComponentData.SetConfigVal(key, val)
 }
 
 // BranchNode -
@@ -79,18 +89,8 @@ type WeightBranchConfig struct {
 	Weight               string                 `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2  `json:"-"`
 	MapBranchs           map[string]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"` // 可以不用配置全，如果没有配置的，就跳转默认的next
+	ForceTriggerOnce     []string               `yaml:"forceTriggerOnce" json:"forceTriggerOnce"`
 }
-
-// // SetLinkComponent
-// func (cfg *WeightBranchConfig) hasValWeight(val string) bool {
-// 	for _, v := range cfg.WeightVW.Vals {
-// 		if v.String() == val {
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
 
 // SetLinkComponent
 func (cfg *WeightBranchConfig) SetLinkComponent(link string, componentName string) {
@@ -109,9 +109,6 @@ func (cfg *WeightBranchConfig) SetLinkComponent(link string, componentName strin
 			cfg.MapBranchs[link].JumpToComponent = componentName
 		}
 	}
-
-	// if cfg.hasValWeight(link) {
-	// }
 }
 
 type WeightBranch struct {
@@ -188,6 +185,10 @@ func (weightBranch *WeightBranch) getForceBrach(wbd *WeightBranchData) string {
 }
 
 func (weightBranch *WeightBranch) getWeight(gameProp *GameProperty, wbd *WeightBranchData) *sgc7game.ValWeights2 {
+	if wbd.WeightVW != nil {
+		return wbd.WeightVW
+	}
+
 	val := wbd.BasicComponentData.GetConfigVal(CCVWeight)
 	if val != "" {
 		vw2, err := gameProp.Pool.LoadStrWeights(val, weightBranch.Config.UseFileMapping)
@@ -205,11 +206,55 @@ func (weightBranch *WeightBranch) getWeight(gameProp *GameProperty, wbd *WeightB
 	return weightBranch.Config.WeightVW
 }
 
+func (weightBranch *WeightBranch) onBranch(branch string, wbd *WeightBranchData, vw2 *sgc7game.ValWeights2) error {
+	if len(weightBranch.Config.ForceTriggerOnce) > 0 {
+		if goutils.IndexOfStringSlice(weightBranch.Config.ForceTriggerOnce, branch, 0) >= 0 {
+			if goutils.IndexOfStringSlice(wbd.IgnoreBranchs, branch, 0) >= 0 {
+				goutils.Error("WeightBranch.onBranch",
+					slog.String("branch", branch),
+					goutils.Err(ErrInvalidBranch))
+
+				return ErrInvalidBranch
+			}
+
+			wbd.IgnoreBranchs = append(wbd.IgnoreBranchs, branch)
+
+			if wbd.WeightVW != nil {
+				nvw2, err := wbd.WeightVW.CloneExcludeVal(sgc7game.NewStrValEx(branch))
+				if err != nil {
+					goutils.Error("WeightBranch.CloneExcludeVal",
+						slog.String("branch", branch),
+						goutils.Err(err))
+
+					return err
+				}
+
+				wbd.WeightVW = nvw2
+			} else {
+				nvw2 := vw2.Clone()
+
+				for _, v := range wbd.IgnoreBranchs {
+					err := nvw2.RemoveVal(sgc7game.NewStrValEx(v))
+					if err != nil {
+						goutils.Error("WeightBranch.RemoveVal",
+							slog.String("branch", branch),
+							goutils.Err(err))
+
+						return err
+					}
+				}
+
+				wbd.WeightVW = nvw2
+			}
+		}
+	}
+
+	return nil
+}
+
 // playgame
 func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// weightBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	wbd := icd.(*WeightBranchData)
 
@@ -227,6 +272,8 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		}
 
 		wbd.Value = cr.String()
+
+		weightBranch.onBranch(wbd.Value, wbd, vw2)
 	} else {
 		wbd.Value = forceBranch
 	}
@@ -259,11 +306,6 @@ func (weightBranch *WeightBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 
 	return nil
 }
-
-// // OnStats
-// func (weightBranch *WeightBranch) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // NewComponentData -
 func (weightBranch *WeightBranch) NewComponentData() IComponentData {
@@ -307,18 +349,18 @@ func NewWeightBranch(name string) IComponent {
 // "forceBranch": "continue"
 // }
 type jsonWeightBranch struct {
-	Weight      string `json:"weight"`
-	ForceBranch string `json:"forceBranch"`
+	Weight           string   `json:"weight"`
+	ForceBranch      string   `json:"forceBranch"`
+	ForceTriggerOnce []string `json:"forceTriggerOnce"`
 }
 
 func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 	cfg := &WeightBranchConfig{
-		Weight:      jwr.Weight,
-		ForceBranch: jwr.ForceBranch,
-		MapBranchs:  make(map[string]*BranchNode),
+		Weight:           jwr.Weight,
+		ForceBranch:      jwr.ForceBranch,
+		ForceTriggerOnce: jwr.ForceTriggerOnce,
+		MapBranchs:       make(map[string]*BranchNode),
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
@@ -370,8 +412,6 @@ func parseWeightBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 				cfgd.MapBranchs[k].Awards = arr
 			}
 		}
-
-		// cfgd.Awards = awards
 	}
 
 	gamecfg.mapConfig[label] = cfgd

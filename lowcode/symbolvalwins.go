@@ -411,7 +411,7 @@ func (symbolValWins *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cach
 }
 
 func (symbolValWins *SymbolValWins) GetWinMulti(basicCD *BasicComponentData) int {
-	winMulti, isok := basicCD.GetConfigIntVal(STCVWinMulti)
+	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
 		return winMulti
 	}
