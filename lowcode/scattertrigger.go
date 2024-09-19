@@ -32,6 +32,13 @@ type ScatterTriggerData struct {
 // OnNewGame -
 func (scatterTriggerData *ScatterTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	scatterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
+
+	scatterTrigger, isok := component.(*ScatterTrigger)
+	if isok {
+		if scatterTrigger.Config.Height > 0 {
+			scatterTriggerData.SetConfigIntVal(CCVHeight, scatterTrigger.Config.Height)
+		}
+	}
 }
 
 // onNewStep -

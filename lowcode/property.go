@@ -832,6 +832,8 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 
 	gameProp.UseComponent(arr[0])
 
+	arr[1] = strings.ToLower(arr[1])
+
 	cd.SetConfigVal(arr[1], val)
 
 	return nil
@@ -857,6 +859,8 @@ func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName st
 	}
 
 	gameProp.UseComponent(arr[0])
+
+	arr[1] = strings.ToLower(arr[1])
 
 	if onProc != nil {
 		if onProc(arr[0], arr[1], val) {
@@ -889,6 +893,8 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 	}
 
 	gameProp.UseComponent(arr[0])
+
+	arr[1] = strings.ToLower(arr[1])
 
 	if onProc != nil {
 		if onProc(arr[0], arr[1], off) {
