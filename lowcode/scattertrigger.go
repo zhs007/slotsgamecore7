@@ -114,6 +114,7 @@ type ScatterTriggerConfig struct {
 	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
 	Height                          int                           `yaml:"Height" json:"Height"`                                               // Height
 	MaxHeight                       int                           `yaml:"MaxHeight" json:"MaxHeight"`                                         // MaxHeight
+	IsReversalHeight                bool                          `yaml:"isReversalHeight" json:"isReversalHeight"`                           // isReversalHeight
 	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
 	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
@@ -312,7 +313,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 			ret := sgc7game.CalcScatter5(gs, gameProp.CurPaytables, s, gameProp.GetBet3(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
 					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, false, scatterTrigger.GetHeight(&std.BasicComponentData))
+				}, false, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
 
 			if ret != nil {
 				isTrigger = true
@@ -325,7 +326,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 			ret := sgc7game.CalcScatter5(gs, gameProp.CurPaytables, s, gameProp.GetBet3(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
 					return cursymbol == scatter || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, true, scatterTrigger.GetHeight(&std.BasicComponentData))
+				}, true, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
 
 			if ret != nil {
 				isTrigger = true
@@ -336,7 +337,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 	} else if scatterTrigger.Config.TriggerType == STTypeCountScatter {
 		ret := sgc7game.CalcScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
 			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		}, scatterTrigger.GetHeight(&std.BasicComponentData))
+		}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
 
 		if ret != nil {
 			if scatterTrigger.Config.BetType != BTypeNoPay {
@@ -354,7 +355,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 	} else if scatterTrigger.Config.TriggerType == STTypeCountScatterReels {
 		ret := sgc7game.CalcReelScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
 			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		}, scatterTrigger.GetHeight(&std.BasicComponentData))
+		}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
 
 		if ret != nil {
 			if scatterTrigger.Config.BetType != BTypeNoPay {
@@ -717,6 +718,7 @@ type jsonScatterTrigger struct {
 	RespinNumWeightWithScatterNum [][]string `json:"respinNumWeightWithScatterNum"`
 	Height                        int        `json:"Height"`
 	MaxHeight                     int        `json:"MaxHeight"`
+	IsReversalHeight              bool       `json:"isReversalHeight"`
 }
 
 func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
@@ -738,6 +740,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		OSMulTypeString:    jcfg.SymbolValsMulti,
 		Height:             jcfg.Height,
 		MaxHeight:          jcfg.MaxHeight,
+		IsReversalHeight:   jcfg.IsReversalHeight,
 	}
 
 	if jcfg.RespinNumWithScatterNum != nil {

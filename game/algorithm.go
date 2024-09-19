@@ -227,7 +227,7 @@ func CalcScatter4(scene *GameScene, pt *PayTables, scatter int, bet int,
 
 // CalcScatter5 - calc scatter
 func CalcScatter5(scene *GameScene, pt *PayTables, scatter int, bet int,
-	isScatter FuncIsScatter, isOnlyOneOnReel bool, height int) *Result {
+	isScatter FuncIsScatter, isOnlyOneOnReel bool, height int, isReversalHeight bool) *Result {
 
 	nums := 0
 	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
@@ -237,24 +237,50 @@ func CalcScatter5(scene *GameScene, pt *PayTables, scatter int, bet int,
 	}
 
 	if isOnlyOneOnReel {
-		for x := 0; x < len(scene.Arr); x++ {
-			for y := 0; y < height; y++ {
-				if isScatter(scatter, scene.Arr[x][y]) {
-					nums++
+		if isReversalHeight {
+			for x := 0; x < len(scene.Arr); x++ {
+				for y := len(scene.Arr[0]) - 1; y >= len(scene.Arr[0])-height; y-- {
+					if isScatter(scatter, scene.Arr[x][y]) {
+						nums++
 
-					pos = append(pos, x, y)
+						pos = append(pos, x, y)
 
-					break
+						break
+					}
+				}
+			}
+		} else {
+			for x := 0; x < len(scene.Arr); x++ {
+				for y := 0; y < height; y++ {
+					if isScatter(scatter, scene.Arr[x][y]) {
+						nums++
+
+						pos = append(pos, x, y)
+
+						break
+					}
 				}
 			}
 		}
 	} else {
-		for x := 0; x < len(scene.Arr); x++ {
-			for y := 0; y < height; y++ {
-				if isScatter(scatter, scene.Arr[x][y]) {
-					nums++
+		if isReversalHeight {
+			for x := 0; x < len(scene.Arr); x++ {
+				for y := len(scene.Arr[0]) - 1; y >= len(scene.Arr[0])-height; y-- {
+					if isScatter(scatter, scene.Arr[x][y]) {
+						nums++
 
-					pos = append(pos, x, y)
+						pos = append(pos, x, y)
+					}
+				}
+			}
+		} else {
+			for x := 0; x < len(scene.Arr); x++ {
+				for y := 0; y < height; y++ {
+					if isScatter(scatter, scene.Arr[x][y]) {
+						nums++
+
+						pos = append(pos, x, y)
+					}
 				}
 			}
 		}
@@ -312,19 +338,31 @@ func CalcScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScat
 }
 
 // CalcScatterEx2 - calc scatter
-func CalcScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter, height int) *Result {
+func CalcScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter, height int, isReversalHeight bool) *Result {
 	if height <= 0 || height > len(scene.Arr[0]) {
 		height = len(scene.Arr[0])
 	}
 
 	curnums := 0
 	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
-	for x := 0; x < len(scene.Arr); x++ {
-		for y := 0; y < height; y++ {
-			if isScatter(scatter, scene.Arr[x][y]) {
-				curnums++
+	if isReversalHeight {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := len(scene.Arr[0]) - 1; y >= len(scene.Arr[0])-height; y-- {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					curnums++
 
-				pos = append(pos, x, y)
+					pos = append(pos, x, y)
+				}
+			}
+		}
+	} else {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := 0; y < height; y++ {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					curnums++
+
+					pos = append(pos, x, y)
+				}
 			}
 		}
 	}
@@ -376,21 +414,35 @@ func CalcReelScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIs
 }
 
 // CalcReelScatterEx2 - calc scatter
-func CalcReelScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter, height int) *Result {
+func CalcReelScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter, height int, isReversalHeight bool) *Result {
 	if height <= 0 || height > len(scene.Arr[0]) {
 		height = len(scene.Arr[0])
 	}
 
 	curnums := 0
 	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
-	for x := 0; x < len(scene.Arr); x++ {
-		for y := 0; y < height; y++ {
-			if isScatter(scatter, scene.Arr[x][y]) {
-				curnums++
+	if isReversalHeight {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := len(scene.Arr[0]) - 1; y >= len(scene.Arr[0])-height; y-- {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					curnums++
 
-				pos = append(pos, x, y)
+					pos = append(pos, x, y)
 
-				break
+					break
+				}
+			}
+		}
+	} else {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := 0; y < height; y++ {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					curnums++
+
+					pos = append(pos, x, y)
+
+					break
+				}
 			}
 		}
 	}
