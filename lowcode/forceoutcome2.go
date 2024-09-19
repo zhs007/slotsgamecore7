@@ -144,7 +144,7 @@ func (fo2 *ForceOutcome2) getComponentValEx(iStep int, component string, val str
 		if isok {
 			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := v.GetValEx(val, GCVTypeNormal)
+					curval, isok2 := v.GetValEx(strings.ToLower(val), GCVTypeNormal)
 					if isok2 {
 						return curval, true
 					}
@@ -196,7 +196,7 @@ func (fo2 *ForceOutcome2) getComponentVal(component string, val string) int {
 		if isok {
 			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := v.GetValEx(val, GCVTypeNormal)
+					curval, isok2 := v.GetValEx(strings.ToLower(val), GCVTypeNormal)
 					if isok2 {
 						return curval
 					}
@@ -216,7 +216,7 @@ func (fo2 *ForceOutcome2) getComponentValAtEnding(component string, val string) 
 		if isok {
 			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := v.GetValEx(val, GCVTypeNormal)
+					curval, isok2 := v.GetValEx(strings.ToLower(val), GCVTypeNormal)
 					if isok2 {
 						retVal = curval
 						hasVal = true
@@ -237,7 +237,7 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 		if isok {
 			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := v.GetValEx(val, GCVTypeMax)
+					curval, isok2 := v.GetValEx(strings.ToLower(val), GCVTypeMax)
 					if isok2 {
 						if !hasval {
 							maxval = curval
@@ -266,7 +266,7 @@ func (fo2 *ForceOutcome2) getMinComponentVal(component string, val string) int {
 		if isok {
 			for k, v := range gp.MapComponentData {
 				if isComponent(k, component) {
-					curval, isok2 := v.GetValEx(val, GCVTypeMin)
+					curval, isok2 := v.GetValEx(strings.ToLower(val), GCVTypeMin)
 					if isok2 {
 						if !hasval {
 							minval = curval
