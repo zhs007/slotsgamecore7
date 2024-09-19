@@ -29,7 +29,7 @@ func (val *StrVal) Type() string {
 
 func (val *StrVal) IsSame(right IVal) bool {
 	if right.Type() == StrValType {
-		return val.Int64() == right.Int64()
+		return val.Val == right.String()
 	}
 
 	return false
