@@ -43,6 +43,7 @@ const (
 	CVValue                 string = "value"                 // value
 	CVSymbolVal             string = "symbolVal"             // symbolVal
 	CVWinResultNum          string = "winResultNum"          // winResultNum
+	CCValueNum              string = "valueNum"              // valueNum
 )
 
 const (
