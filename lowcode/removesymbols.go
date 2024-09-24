@@ -226,6 +226,8 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 							}
 						}
 					} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+						npos := []int{}
+
 						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
 							x := curpr.Results[ri].Pos[pi*2]
 							y := curpr.Results[ri].Pos[pi*2+1]
@@ -250,11 +252,16 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 									ngs.Arr[x][y] = -1
 									nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
 								} else {
-									ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+									npos = append(npos, x, y)
+									// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
 								}
 
 								bcd.RemovedNum++
 							}
+						}
+
+						for pi := 0; pi < len(npos)/2; pi++ {
+							ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
 						}
 					}
 				}
@@ -298,6 +305,8 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 							}
 						}
 					} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+						npos := []int{}
+
 						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
 							x := curpr.Results[ri].Pos[pi*2]
 							y := curpr.Results[ri].Pos[pi*2+1]
@@ -320,11 +329,16 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 								if isNeedRMOtherScene {
 									ngs.Arr[x][y] = -1
 								} else {
-									ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+									// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+									npos = append(npos, x, y)
 								}
 
 								bcd.RemovedNum++
 							}
+						}
+
+						for pi := 0; pi < len(npos)/2; pi++ {
+							ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
 						}
 					}
 				}
