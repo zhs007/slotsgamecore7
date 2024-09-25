@@ -90,6 +90,8 @@ func calcAdjacentPayWithX(scene *GameScene, x, y int, symbol int, pt *PayTables,
 
 				return r
 			}
+
+			return nil
 		}
 
 		nums := len(pos) / 2
@@ -238,6 +240,8 @@ func calcAdjacentPayWithY(scene *GameScene, x, y int, symbol int, pt *PayTables,
 
 				return r
 			}
+
+			return nil
 		}
 
 		nums := len(pos) / 2
