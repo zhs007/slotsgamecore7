@@ -118,6 +118,7 @@ func newMaskData(num int) *MaskData {
 type MaskConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Num                  int              `yaml:"num" json:"num"`
+	IgnoreFalse          bool             `yaml:"ignoreFalse" json:"ignoreFalse"`
 	PerMaskAwards        []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
 	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
 }
@@ -275,9 +276,17 @@ func (mask *Mask) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, 
 func (mask *Mask) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, arrMask []bool) error {
 	mcd := cd.(*MaskData)
 
-	for x, v := range arrMask {
-		if mcd.ChgMask(x, v) {
-			mask.onMaskChg(plugin, gameProp, curpr, gp, x)
+	if mask.Config.IgnoreFalse {
+		for x, v := range arrMask {
+			if v && mcd.ChgMask(x, v) {
+				mask.onMaskChg(plugin, gameProp, curpr, gp, x)
+			}
+		}
+	} else {
+		for x, v := range arrMask {
+			if mcd.ChgMask(x, v) {
+				mask.onMaskChg(plugin, gameProp, curpr, gp, x)
+			}
 		}
 	}
 
@@ -318,13 +327,14 @@ func NewMask(name string) IComponent {
 //		"length": 5
 //	},
 type jsonMask struct {
-	Length int `json:"length"`
+	Length      int  `json:"length"`
+	IgnoreFalse bool `json:"ignoreFalse"`
 }
 
 func (jcfg *jsonMask) build() *MaskConfig {
 	cfg := &MaskConfig{
-		Num: jcfg.Length,
-		// MaskType: "symbolInReel",
+		Num:         jcfg.Length,
+		IgnoreFalse: jcfg.IgnoreFalse,
 	}
 
 	// cfg.UseSceneV3 = true
