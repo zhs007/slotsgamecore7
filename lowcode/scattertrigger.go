@@ -750,25 +750,27 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		IsReversalHeight:   jcfg.IsReversalHeight,
 	}
 
-	if jcfg.RespinNumWithScatterNum != nil {
-		cfg.RespinNumWithScatterNum = make(map[int]int)
-		for _, arr := range jcfg.RespinNumWithScatterNum {
-			cfg.RespinNumWithScatterNum[arr[0]] = arr[1]
-		}
-	}
-
-	if jcfg.RespinNumWeightWithScatterNum != nil {
-		cfg.RespinNumWeightWithScatterNum = make(map[int]string)
-		for _, arr := range jcfg.RespinNumWeightWithScatterNum {
-			i64, err := goutils.String2Int64(arr[0])
-			if err != nil {
-				goutils.Error("jsonScatterTrigger:RespinNumWeightWithScatterNum:String2Int64",
-					goutils.Err(err))
-
-				return nil
+	if jcfg.TriggerRespinType != "none" {
+		if jcfg.RespinNumWithScatterNum != nil {
+			cfg.RespinNumWithScatterNum = make(map[int]int)
+			for _, arr := range jcfg.RespinNumWithScatterNum {
+				cfg.RespinNumWithScatterNum[arr[0]] = arr[1]
 			}
+		}
 
-			cfg.RespinNumWeightWithScatterNum[int(i64)] = arr[1]
+		if jcfg.RespinNumWeightWithScatterNum != nil {
+			cfg.RespinNumWeightWithScatterNum = make(map[int]string)
+			for _, arr := range jcfg.RespinNumWeightWithScatterNum {
+				i64, err := goutils.String2Int64(arr[0])
+				if err != nil {
+					goutils.Error("jsonScatterTrigger:RespinNumWeightWithScatterNum:String2Int64",
+						goutils.Err(err))
+
+					return nil
+				}
+
+				cfg.RespinNumWeightWithScatterNum[int(i64)] = arr[1]
+			}
 		}
 	}
 

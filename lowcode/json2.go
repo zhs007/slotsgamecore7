@@ -389,3 +389,45 @@ func parseReelTriggerControllers(controller *ast.Node) (map[int][]*Award, error)
 
 	return mapawards, nil
 }
+
+func parseMaskControllers(controller *ast.Node) ([]*Award, map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseMaskControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseMaskControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	mapawards := make(map[int][]*Award)
+	perAwards := []*Award{}
+
+	for i, v := range lst {
+		str, a := v.buildWithTriggerNum()
+		if a != nil {
+			if str == "per" {
+				perAwards = append(perAwards, a)
+			} else if str == "all" {
+				mapawards[-1] = append(mapawards[-1], a)
+			}
+		} else {
+			goutils.Error("parseMaskControllers:build4Map",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return perAwards, mapawards, nil
+}
