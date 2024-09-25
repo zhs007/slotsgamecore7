@@ -63,6 +63,10 @@ func calcAdjacentPayWithX(scene *GameScene, x, y int, symbol int, pt *PayTables,
 		wpos := []int{x, y}
 		curs := -1
 		for tx := 1; x+tx < scene.Width; tx++ {
+			if scene.Arr[x+tx][y] < 0 {
+				break
+			}
+
 			if curs == -1 {
 				if isWild(scene.Arr[x+tx][y]) {
 					wpos = append(wpos, x+tx, y)
@@ -173,6 +177,10 @@ func calcAdjacentPayWithX(scene *GameScene, x, y int, symbol int, pt *PayTables,
 	}
 
 	for tx := 1; x+tx < scene.Width; tx++ {
+		if scene.Arr[x+tx][y] < 0 {
+			break
+		}
+
 		if isSameSymbol(scene.Arr[x+tx][y], symbol) {
 			pos = append(pos, x+tx, y)
 		} else {
@@ -213,6 +221,10 @@ func calcAdjacentPayWithY(scene *GameScene, x, y int, symbol int, pt *PayTables,
 		curs := -1
 
 		for ty := 1; y+ty < scene.Height; ty++ {
+			if scene.Arr[x][y+ty] < 0 {
+				break
+			}
+
 			if curs == -1 {
 				if isWild(scene.Arr[x][y+ty]) {
 					wpos = append(wpos, x, y+ty)
@@ -323,6 +335,10 @@ func calcAdjacentPayWithY(scene *GameScene, x, y int, symbol int, pt *PayTables,
 	}
 
 	for ty := 1; y+ty < scene.Height; ty++ {
+		if scene.Arr[x][y+ty] < 0 {
+			break
+		}
+
 		if isSameSymbol(scene.Arr[x][y+ty], symbol) {
 			pos = append(pos, x, y+ty)
 		} else {
