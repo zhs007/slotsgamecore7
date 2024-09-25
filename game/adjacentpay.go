@@ -14,7 +14,6 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 		for y := range arr {
 			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
 				crx := calcAdjacentPayWithX(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol, isWild)
-				cry := calcAdjacentPayWithY(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol, isWild)
 
 				if crx != nil {
 					results = append(results, crx)
@@ -25,6 +24,16 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 						}
 					}
 				}
+			}
+		}
+	}
+
+	scene0 = scene.Clone()
+
+	for x, arr := range scene.Arr {
+		for y := range arr {
+			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
+				cry := calcAdjacentPayWithY(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol, isWild)
 
 				if cry != nil {
 					results = append(results, cry)
@@ -147,14 +156,14 @@ func calcAdjacentPayWithX(scene *GameScene, x, y int, symbol int, pt *PayTables,
 
 		if pt.MapPay[curs][nums-1] > 0 {
 			r := &Result{
-				Symbol:     symbol,
+				Symbol:     curs,
 				Type:       RTAdjacentPay,
 				LineIndex:  -1,
-				Pos:        wpos,
-				SymbolNums: wnums,
-				Mul:        pt.MapPay[symbol][wnums-1],
-				CoinWin:    pt.MapPay[symbol][wnums-1],
-				CashWin:    pt.MapPay[symbol][wnums-1] * bet,
+				Pos:        pos,
+				SymbolNums: nums,
+				Mul:        pt.MapPay[curs][nums-1],
+				CoinWin:    pt.MapPay[curs][nums-1],
+				CashWin:    pt.MapPay[curs][nums-1] * bet,
 			}
 
 			return r
@@ -297,14 +306,14 @@ func calcAdjacentPayWithY(scene *GameScene, x, y int, symbol int, pt *PayTables,
 
 		if pt.MapPay[curs][nums-1] > 0 {
 			r := &Result{
-				Symbol:     symbol,
+				Symbol:     curs,
 				Type:       RTAdjacentPay,
 				LineIndex:  -1,
-				Pos:        wpos,
-				SymbolNums: wnums,
-				Mul:        pt.MapPay[symbol][wnums-1],
-				CoinWin:    pt.MapPay[symbol][wnums-1],
-				CashWin:    pt.MapPay[symbol][wnums-1] * bet,
+				Pos:        pos,
+				SymbolNums: nums,
+				Mul:        pt.MapPay[curs][nums-1],
+				CoinWin:    pt.MapPay[curs][nums-1],
+				CashWin:    pt.MapPay[curs][nums-1] * bet,
 			}
 
 			return r
