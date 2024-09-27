@@ -130,6 +130,17 @@ func (weightReels *WeightReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (weightReels *WeightReels) GetReelSetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(CCVReelSetWeight)
+	if str != "" {
+		vw2, _ := gameProp.Pool.LoadStrWeights(str, weightReels.Config.UseFileMapping)
+
+		return vw2
+	}
+
+	return weightReels.Config.ReelSetsWeightVW
+}
+
 // func (weightReels *WeightReels) GetReelSet(basicCD *BasicComponentData) string {
 // 	str := basicCD.GetConfigVal(BRCVReelSet)
 // 	if str != "" {
@@ -150,8 +161,9 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	wrd.onNewStep()
 
 	reelname := ""
-	if weightReels.Config.ReelSetsWeightVW != nil {
-		val, si, err := weightReels.Config.ReelSetsWeightVW.RandValEx(plugin)
+	vw2 := weightReels.GetReelSetWeight(gameProp, &wrd.BasicComponentData)
+	if vw2 != nil {
+		val, si, err := vw2.RandValEx(plugin)
 		if err != nil {
 			goutils.Error("WeightReels.OnPlayGame:ReelSetWeights.RandVal",
 				goutils.Err(err))

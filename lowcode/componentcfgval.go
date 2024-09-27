@@ -21,6 +21,7 @@ const (
 	CCVMulti                 string = "multi"                 // 可以修改配置项里的 multi
 	CCVNumber                string = "number"                // 可以修改配置项里的 number
 	CCVHeight                string = "height"                // 可以修改配置项里的 height
+	CCVReelSetWeight         string = "reelsetweight"         // 可以修改配置项里的 reelSetWeight
 )
 
 const (
