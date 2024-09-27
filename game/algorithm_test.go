@@ -957,3 +957,78 @@ func Test_CalcFullLineEx2w(t *testing.T) {
 
 	t.Logf("Test_CalcFullLineEx OK")
 }
+
+func Test_CalcFullLineExWithMulti(t *testing.T) {
+	scene, err := NewGameSceneWithArr2([][]int{
+		{1, 10, 7},
+		{11, 10, 0},
+		{10, 4, 7},
+		{7, 8, 7},
+		{1, 9, 5},
+	})
+	assert.NoError(t, err)
+
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// 0,1,1,1,9 => 1x4
+	results := CalcFullLineExWithMulti(scene, pt, 1,
+		func(cs int, scene *GameScene, x, y int) bool {
+			return cs != 11
+		},
+		func(cs int) bool {
+			return cs == 0
+		},
+		func(s int, cs int) bool {
+			return cs == s || s == 0
+		}, func(x, y int) int {
+			return 1
+		})
+
+	assert.Equal(t, len(results), 2)
+
+	assert.Equal(t, len(results[0].Pos), 8)
+	assert.Equal(t, results[0].Symbol, 10)
+	assert.Equal(t, results[0].Mul, 5)
+	assert.Equal(t, results[0].CoinWin, 2*5)
+
+	assert.Equal(t, len(results[1].Pos), 10)
+	assert.Equal(t, results[1].Symbol, 7)
+	assert.Equal(t, results[1].Mul, 30)
+	assert.Equal(t, results[1].CoinWin, 30*2)
+
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3, 4},
+		{11, 11, 11, 11},
+		{3, 3, 2, 5},
+		{0, 0, 0, 0},
+		{6, 7, 8, 9},
+	})
+	assert.NoError(t, err)
+
+	results2 := CalcFullLineExWithMulti(scene2, pt, 1,
+		func(cs int, scene *GameScene, x, y int) bool {
+			return cs >= 0
+		},
+		func(cs int) bool {
+			return cs == 0 || cs == 11
+		},
+		func(cs int, s int) bool {
+			return cs == s || cs == 0 || cs == 11
+		}, func(x, y int) int {
+			return 1
+		})
+	assert.Equal(t, len(results2), 2)
+
+	assert.Equal(t, len(results2[0].Pos), 20)
+	assert.Equal(t, results2[0].Symbol, 2)
+	assert.Equal(t, results2[0].Mul, 100)
+	assert.Equal(t, results2[0].CoinWin, 100*16)
+
+	assert.Equal(t, len(results2[1].Pos), 22)
+	assert.Equal(t, results2[1].Symbol, 3)
+	assert.Equal(t, results2[1].Mul, 60)
+	assert.Equal(t, results2[1].CoinWin, 60*32)
+
+	t.Logf("Test_CalcFullLineExWithMulti OK")
+}

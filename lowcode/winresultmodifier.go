@@ -3,6 +3,7 @@ package lowcode
 import (
 	"fmt"
 	"log/slog"
+	"math"
 	"os"
 
 	"github.com/bytedance/sonic"
@@ -254,9 +255,10 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 			for _, ri := range lst {
 				num := CountSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri])
 				if num > 0 {
-					curpr.Results[ri].CashWin *= winMulti ^ num
-					curpr.Results[ri].CoinWin *= winMulti ^ num
-					curpr.Results[ri].OtherMul *= winMulti ^ num
+					m := int(math.Pow(float64(winMulti), float64(num)))
+					curpr.Results[ri].CashWin *= m
+					curpr.Results[ri].CoinWin *= m
+					curpr.Results[ri].OtherMul *= m
 
 					std.Wins += curpr.Results[ri].CoinWin
 
