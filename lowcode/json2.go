@@ -419,6 +419,15 @@ func parseMaskControllers(controller *ast.Node) ([]*Award, map[int][]*Award, err
 				perAwards = append(perAwards, a)
 			} else if str == "all" {
 				mapawards[-1] = append(mapawards[-1], a)
+			} else {
+				i64, err := goutils.String2Int64(str)
+				if err != nil {
+					goutils.Error("parseMaskControllers:String2Int64",
+						slog.String("str", str),
+						goutils.Err(err))
+				}
+
+				mapawards[int(i64)-1] = append(mapawards[int(i64)-1], a)
 			}
 		} else {
 			goutils.Error("parseMaskControllers:build4Map",
