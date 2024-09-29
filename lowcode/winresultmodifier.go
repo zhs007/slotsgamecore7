@@ -22,9 +22,10 @@ const WinResultModifierTypeName = "winResultModifier"
 type WinResultModifierType int
 
 const (
-	WRMTypeExistSymbol    WinResultModifierType = 0
-	WRMTypeAddSymbolMulti WinResultModifierType = 1
-	WRMTypeMulSymbolMulti WinResultModifierType = 2
+	WRMTypeExistSymbol       WinResultModifierType = 0
+	WRMTypeAddSymbolMulti    WinResultModifierType = 1
+	WRMTypeMulSymbolMulti    WinResultModifierType = 2
+	WRMTypeSymbolMultiOnWays WinResultModifierType = 3
 )
 
 func parseWinResultModifierType(str string) WinResultModifierType {
@@ -34,6 +35,8 @@ func parseWinResultModifierType(str string) WinResultModifierType {
 		return WRMTypeAddSymbolMulti
 	} else if str == "mulSymbolMulti" {
 		return WRMTypeMulSymbolMulti
+	} else if str == "symbolMultiOnWays" {
+		return WRMTypeSymbolMultiOnWays
 	}
 
 	return WRMTypeExistSymbol
@@ -264,6 +267,44 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 
 					isproced = true
 				}
+			}
+		}
+	} else if winResultModifier.Config.Type == WRMTypeSymbolMultiOnWays {
+		for _, cn := range winResultModifier.Config.SourceComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetComponentDataWithName(cn)
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				mul := 1
+
+				for x, arr := range gs.Arr {
+					curmul := 0
+
+					for i := 0; i < len(curpr.Results[ri].Pos)/2; i++ {
+						if curpr.Results[ri].Pos[i*2] == x {
+							if goutils.IndexOfIntSlice(winResultModifier.Config.TargetSymbolCodes, arr[curpr.Results[ri].Pos[i*2+1]], 0) >= 0 {
+								curmul += winMulti
+							} else {
+								curmul++
+							}
+						}
+					}
+
+					if curmul > 0 {
+						mul *= curmul
+					}
+				}
+
+				curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin / curpr.Results[ri].Mul * mul
+				curpr.Results[ri].CashWin = curpr.Results[ri].CashWin / curpr.Results[ri].Mul * mul
+
+				std.Wins += curpr.Results[ri].CoinWin
+
+				isproced = true
 			}
 		}
 	}
