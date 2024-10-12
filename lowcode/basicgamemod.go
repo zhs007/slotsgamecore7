@@ -97,6 +97,17 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				}
 
 				curComponent = c
+			} else {
+				c, isok1 := components.MapComponents[cmd]
+				if !isok1 {
+					goutils.Error("BasicGameMod.OnPlay:OnPlayGame",
+						slog.String("cmd", cmd),
+						goutils.Err(ErrInvalidComponentName))
+
+					return nil, ErrInvalidComponentName
+				}
+
+				curComponent = c
 			}
 		} else {
 			startComponent := gameProp.Pool.Config.MapBetConfigs[int(stake.CashBet/stake.CoinBet)].Start
