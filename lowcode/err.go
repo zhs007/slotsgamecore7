@@ -191,6 +191,9 @@ var (
 	// ErrInvalidBranch - invalid branch
 	ErrInvalidBranch = errors.New("invalid branch")
 
+	// ErrInvalidCommand - invalid command
+	ErrInvalidCommand = errors.New("invalid command")
+
 	// ErrNoComponent - no component
 	ErrNoComponent = errors.New("no component")
 )

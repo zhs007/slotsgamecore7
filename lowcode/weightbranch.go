@@ -90,6 +90,7 @@ type WeightBranchConfig struct {
 	WeightVW             *sgc7game.ValWeights2  `json:"-"`
 	MapBranchs           map[string]*BranchNode `yaml:"mapBranchs" json:"mapBranchs"` // 可以不用配置全，如果没有配置的，就跳转默认的next
 	ForceTriggerOnce     []string               `yaml:"forceTriggerOnce" json:"forceTriggerOnce"`
+	IsNeedPlayerSelect   bool                   `yaml:"isNeedPlayerSelect" json:"isNeedPlayerSelect"`
 }
 
 // SetLinkComponent
@@ -263,17 +264,66 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	forceBranch := weightBranch.getForceBrach(wbd)
 	if forceBranch == "" {
 		vw2 := weightBranch.getWeight(gameProp, wbd)
-		cr, err := vw2.RandVal(plugin)
-		if err != nil {
-			goutils.Error("WeightBranch.OnPlayGame:RandVal",
-				goutils.Err(err))
 
-			return "", err
+		if weightBranch.Config.IsNeedPlayerSelect {
+			if cmd == DefaultCmd {
+				lstcmd := []string{}
+				lstparam := []string{}
+
+				for w, v := range vw2.Vals {
+					if w > 0 {
+						lstcmd = append(lstcmd, weightBranch.Name)
+						lstparam = append(lstparam, v.String())
+					}
+				}
+
+				curpr.NextCmds = lstcmd
+				curpr.NextCmdParams = lstparam
+				curpr.IsFinish = false
+				curpr.IsWait = true
+
+				nc := weightBranch.onStepEnd(gameProp, curpr, gp, "")
+
+				return nc, nil
+			} else if cmd == weightBranch.Name {
+				isSelectOK := false
+				for w, v := range vw2.Vals {
+					if w > 0 && param == v.String() {
+						wbd.Value = param
+
+						isSelectOK = true
+
+						break
+					}
+				}
+
+				if !isSelectOK {
+					goutils.Error("WeightBranch.OnPlayGame:IsNeedPlayerSelect",
+						slog.String("branch", param),
+						goutils.Err(ErrInvalidBranch))
+
+					return "", ErrInvalidBranch
+				}
+			} else {
+				goutils.Error("WeightBranch.OnPlayGame:IsNeedPlayerSelect",
+					slog.String("cmd", cmd),
+					goutils.Err(ErrInvalidCommand))
+
+				return "", ErrInvalidCommand
+			}
+		} else {
+			cr, err := vw2.RandVal(plugin)
+			if err != nil {
+				goutils.Error("WeightBranch.OnPlayGame:RandVal",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			wbd.Value = cr.String()
+
+			weightBranch.onBranch(wbd.Value, wbd, vw2)
 		}
-
-		wbd.Value = cr.String()
-
-		weightBranch.onBranch(wbd.Value, wbd, vw2)
 	} else {
 		wbd.Value = forceBranch
 	}
@@ -347,19 +397,22 @@ func NewWeightBranch(name string) IComponent {
 // "configuration": {
 // "weight": "greenweight"
 // "forceBranch": "continue"
+// isNeedPlayerSelect
 // }
 type jsonWeightBranch struct {
-	Weight           string   `json:"weight"`
-	ForceBranch      string   `json:"forceBranch"`
-	ForceTriggerOnce []string `json:"forceTriggerOnce"`
+	Weight             string   `json:"weight"`
+	ForceBranch        string   `json:"forceBranch"`
+	ForceTriggerOnce   []string `json:"forceTriggerOnce"`
+	IsNeedPlayerSelect bool     `json:"isNeedPlayerSelect"`
 }
 
 func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 	cfg := &WeightBranchConfig{
-		Weight:           jwr.Weight,
-		ForceBranch:      jwr.ForceBranch,
-		ForceTriggerOnce: jwr.ForceTriggerOnce,
-		MapBranchs:       make(map[string]*BranchNode),
+		Weight:             jwr.Weight,
+		ForceBranch:        jwr.ForceBranch,
+		ForceTriggerOnce:   jwr.ForceTriggerOnce,
+		MapBranchs:         make(map[string]*BranchNode),
+		IsNeedPlayerSelect: jwr.IsNeedPlayerSelect,
 	}
 
 	return cfg
