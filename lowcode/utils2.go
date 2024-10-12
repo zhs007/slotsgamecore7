@@ -35,6 +35,7 @@ func SpinWithSeed(game *Game, ips sgc7game.IPlayerState, seed int, stake *sgc7ga
 	}
 
 	cmd := "SPIN"
+	params := ""
 
 	for {
 		results := []*sgc7game.PlayResult{}
@@ -46,7 +47,7 @@ func SpinWithSeed(game *Game, ips sgc7game.IPlayerState, seed int, stake *sgc7ga
 				cmd = "SPIN"
 			}
 
-			pr, err := game.Play(plugin, cmd, "", ips, stake, results, gameData)
+			pr, err := game.Play(plugin, cmd, params, ips, stake, results, gameData)
 			if err != nil {
 				goutils.Error("SpinWithSeed:Play",
 					slog.Int("results", len(results)),
@@ -64,14 +65,21 @@ func SpinWithSeed(game *Game, ips sgc7game.IPlayerState, seed int, stake *sgc7ga
 				break
 			}
 
-			if pr.IsWait {
-				break
-			}
+			// if pr.IsWait {
+			// 	break
+			// }
 
 			if len(pr.NextCmds) > 0 {
 				cmd = pr.NextCmds[0]
+
+				if len(pr.NextCmdParams) > 0 {
+					params = pr.NextCmdParams[0]
+				} else {
+					params = ""
+				}
 			} else {
-				cmd = ""
+				cmd = "SPIN"
+				params = ""
 			}
 
 			if len(results) >= MaxStepNum {

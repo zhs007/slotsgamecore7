@@ -223,14 +223,21 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 			break
 		}
 
-		if pr.IsWait {
-			break
-		}
+		// if pr.IsWait {
+		// 	break
+		// }
 
 		if len(pr.NextCmds) > 0 {
 			cmd = pr.NextCmds[0]
+
+			if len(pr.NextCmdParams) > 0 {
+				params = pr.NextCmdParams[0]
+			} else {
+				params = ""
+			}
 		} else {
-			cmd = ""
+			cmd = "SPIN"
+			params = ""
 		}
 
 		if len(results) >= MaxStepNum {
