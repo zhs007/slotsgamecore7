@@ -294,7 +294,7 @@ func (piggyBank *PiggyBank) OnStats2(icd IComponentData, s2 *stats2.Cache, gameP
 	cd := icd.(*PiggyBankData)
 
 	s2.ProcStatsWins(piggyBank.Name, int64(cd.Wins))
-	s2.ProcStatsIntVal(piggyBank.Name, piggyBank.GetWinMulti(&cd.BasicComponentData))
+	s2.ProcStatsIntVal(piggyBank.Name, cd.WinMulti)
 }
 
 func NewPiggyBank(name string) IComponent {
