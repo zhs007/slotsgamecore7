@@ -284,7 +284,7 @@ func (piggyBank *PiggyBank) GetWinMulti(basicCD *BasicComponentData) int {
 
 // NewStats2 -
 func (piggyBank *PiggyBank) NewStats2(parent string) *stats2.Feature {
-	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins})
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins, stats2.OptIntVal})
 }
 
 // OnStats2
@@ -294,6 +294,7 @@ func (piggyBank *PiggyBank) OnStats2(icd IComponentData, s2 *stats2.Cache, gameP
 	cd := icd.(*PiggyBankData)
 
 	s2.ProcStatsWins(piggyBank.Name, int64(cd.Wins))
+	s2.ProcStatsIntVal(piggyBank.Name, piggyBank.GetWinMulti(&cd.BasicComponentData))
 }
 
 func NewPiggyBank(name string) IComponent {
