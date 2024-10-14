@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"github.com/bytedance/sonic"
+	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
@@ -143,6 +144,68 @@ func (game *Game) BuildGameConfigData() error {
 	}
 
 	game.Cfg.Data = string(buf)
+
+	return nil
+}
+
+func (game *Game) SaveParSheet(f *excelize.File) error {
+	err := SavePaytable(f, "paytable", game.Cfg.PayTables)
+	if err != nil {
+		goutils.Error("Game.SaveParSheet:SavePaytable",
+			goutils.Err(err))
+
+		return err
+	}
+
+	for rn, r := range game.Pool.Config.MapReels {
+		err = SaveReels(f, rn, game.Cfg.PayTables, r)
+		if err != nil {
+			goutils.Error("Game.SaveParSheet:SaveReels",
+				goutils.Err(err))
+
+			return err
+		}
+	}
+
+	for ln, l := range game.Pool.Config.MapLinedate {
+		err = SaveLineData(f, ln, l)
+		if err != nil {
+			goutils.Error("Game.SaveParSheet:SaveLineData",
+				goutils.Err(err))
+
+			return err
+		}
+	}
+
+	for vn, vw := range game.Pool.mapSymbolValWeights {
+		err = SaveSymbolWeights(f, vn, game.Cfg.PayTables, vw)
+		if err != nil {
+			goutils.Error("Game.SaveParSheet:SaveSymbolWeights",
+				goutils.Err(err))
+
+			return err
+		}
+	}
+
+	for vn, vw := range game.Pool.mapIntValWeights {
+		err = SaveIntWeights(f, vn, vw)
+		if err != nil {
+			goutils.Error("Game.SaveParSheet:SaveIntWeights",
+				goutils.Err(err))
+
+			return err
+		}
+	}
+
+	for vn, vw := range game.Pool.mapStrValWeights {
+		err = SaveStrWeights(f, vn, vw)
+		if err != nil {
+			goutils.Error("Game.SaveParSheet:SaveStrWeights",
+				goutils.Err(err))
+
+			return err
+		}
+	}
 
 	return nil
 }
