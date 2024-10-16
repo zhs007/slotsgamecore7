@@ -270,8 +270,8 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 				lstcmd := []string{}
 				lstparam := []string{}
 
-				for w, v := range vw2.Vals {
-					if w > 0 {
+				for i, v := range vw2.Vals {
+					if vw2.Weights[i] > 0 {
 						lstcmd = append(lstcmd, weightBranch.Name)
 						lstparam = append(lstparam, v.String())
 					}
