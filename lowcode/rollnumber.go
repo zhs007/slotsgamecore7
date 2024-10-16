@@ -28,20 +28,12 @@ func (rollNumberData *RollNumberData) OnNewGame(gameProp *GameProperty, componen
 	rollNumberData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// // OnNewStep -
-// func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
-// }
-
 // Clone
 func (rollNumberData *RollNumberData) Clone() IComponentData {
 	target := &RollNumberData{
 		BasicComponentData: rollNumberData.CloneBasicComponentData(),
 		Number:             rollNumberData.Number,
 	}
-
-	// target.SymbolCodes = make([]int, len(rollSymbolData.SymbolCodes))
-	// copy(target.SymbolCodes, rollSymbolData.SymbolCodes)
 
 	return target
 }
@@ -51,12 +43,7 @@ func (rollNumberData *RollNumberData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RollNumberData{
 		BasicComponentData: rollNumberData.BuildPBBasicComponentData(),
 		Number:             int32(rollNumberData.Number),
-		// SymbolCode:         int32(rollSymbolData.SymbolCode),
 	}
-
-	// for _, v := range rollSymbolData.SymbolCodes {
-	// 	pbcd.SymbolCodes = append(pbcd.SymbolCodes, int32(v))
-	// }
 
 	return pbcd
 }
@@ -70,19 +57,13 @@ func (rollNumberData *RollNumberData) GetValEx(key string, getType GetComponentV
 	return 0, false
 }
 
-// // SetVal -
-// func (rollNumberData *RollNumberData) SetVal(key string, val int) {
-// 	if key == CVNumber {
-// 		rollNumberData.Number = val
-// 	}
-// }
-
 // RollNumberConfig - configuration for RollNumber
 type RollNumberConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Weight               string                `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2 `json:"-"`
 	Awards               []*Award              `yaml:"awards" json:"awards"` // 新的奖励系统
+	ForceVal             int                   `yaml:"forceVal" json:"forceVal"`
 }
 
 // SetLinkComponent
@@ -154,124 +135,67 @@ func (rollNumber *RollNumber) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-// func (rollSymbol *RollNumber) getValWeight(gameProp *GameProperty) *sgc7game.ValWeights2 {
-// 	if rollSymbol.Config.SrcSymbolCollection == "" && rollSymbol.Config.IgnoreSymbolCollection == "" {
-// 		return rollSymbol.Config.WeightVW
-// 	}
+func (rollNumber *RollNumber) getForceVal(basicCD *BasicComponentData) int {
+	v, isok := basicCD.GetConfigIntVal(CCVForceVal)
+	if isok && v != -1 {
+		return v
+	}
 
-// 	var vw *sgc7game.ValWeights2
+	v, isok = basicCD.GetConfigIntVal(CCVForceValNow)
+	if isok && v != -1 {
+		return v
+	}
 
-// 	if rollSymbol.Config.SrcSymbolCollection != "" {
-// 		symbols := gameProp.GetComponentSymbols(rollSymbol.Config.SrcSymbolCollection)
+	if rollNumber.Config.ForceVal != -1 {
+		return rollNumber.Config.ForceVal
+	}
 
-// 		vw = rollSymbol.Config.WeightVW.CloneWithIntArray(symbols)
-// 	}
-
-// 	if vw == nil {
-// 		vw = rollSymbol.Config.WeightVW.Clone()
-// 	}
-
-// 	if rollSymbol.Config.IgnoreSymbolCollection != "" {
-// 		symbols := gameProp.GetComponentSymbols(rollSymbol.Config.IgnoreSymbolCollection)
-
-// 		if len(symbols) > 0 {
-// 			vw = vw.CloneWithoutIntArray(symbols)
-// 		}
-// 	}
-
-// 	if len(vw.Vals) == 0 {
-// 		return nil
-// 	}
-
-// 	return vw
-// }
-
-// func (rollSymbol *RollNumber) getSymbolNum(gameProp *GameProperty, basicCD *BasicComponentData) int {
-// 	v, isok := basicCD.GetConfigIntVal(CCVSymbolNum)
-// 	if isok {
-// 		return v
-// 	}
-
-// 	if rollSymbol.Config.SymbolNumComponent != "" {
-// 		cd := gameProp.GetComponentDataWithName(rollSymbol.Config.SymbolNumComponent)
-// 		if cd != nil {
-// 			return cd.GetOutput()
-// 		}
-// 	}
-
-// 	return rollSymbol.Config.SymbolNum
-// }
+	return -1
+}
 
 // playgame
-func (rollSymbol *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// rollSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	rnd := icd.(*RollNumberData)
 
 	rnd.Number = 0
 
-	cr, err := rollSymbol.Config.WeightVW.RandVal(plugin)
-	if err != nil {
-		goutils.Error("RollNumber.OnPlayGame:RandVal",
-			goutils.Err(err))
+	forceVal := rollNumber.getForceVal(&rnd.BasicComponentData)
+	if forceVal == -1 {
+		cr, err := rollNumber.Config.WeightVW.RandVal(plugin)
+		if err != nil {
+			goutils.Error("RollNumber.OnPlayGame:RandVal",
+				goutils.Err(err))
 
-		return "", err
+			return "", err
+		}
+
+		rnd.Number = cr.Int()
+	} else {
+		rnd.Number = forceVal
 	}
 
-	rnd.Number = cr.Int()
-
-	// sn := rollSymbol.getSymbolNum(gameProp, &rsd.BasicComponentData)
-	// for i := 0; i < sn; i++ {
-	// 	vw := rollSymbol.getValWeight(gameProp)
-	// 	if vw == nil {
-	// 		break
-	// 	}
-
-	// 	cr, err := vw.RandVal(plugin)
-	// 	if err != nil {
-	// 		goutils.Error("RollSymbol.OnPlayGame:RandVal",
-	// 			goutils.Err(err))
-
-	// 		return "", err
-	// 	}
-
-	// 	sc := cr.Int()
-
-	// 	rsd.SymbolCodes = append(rsd.SymbolCodes, sc)
-
-	// 	if rollSymbol.Config.TargetSymbolCollection != "" {
-	// 		gameProp.AddComponentSymbol(rollSymbol.Config.TargetSymbolCollection, sc)
-	// 	}
-	// }
-
-	// if len(rsd.SymbolCodes) == 0 {
-	// 	nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
-
-	// 	return nc, ErrComponentDoNothing
-	// }
-
-	if len(rollSymbol.Config.Awards) > 0 {
-		gameProp.procAwards(plugin, rollSymbol.Config.Awards, curpr, gp)
+	if len(rollNumber.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
 	}
 
-	nc := rollSymbol.onStepEnd(gameProp, curpr, gp, "")
+	nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (rollSymbol *RollNumber) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+func (rollNumber *RollNumber) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	rsd := icd.(*RollNumberData)
 
-	fmt.Printf("rollSymbol %v, got %v\n", rollSymbol.GetName(), rsd.Number)
+	fmt.Printf("rollNumber %v, got %v\n", rollNumber.GetName(), rsd.Number)
 
 	return nil
 }
 
 // NewComponentData -
-func (rollSymbol *RollNumber) NewComponentData() IComponentData {
+func (rollNumber *RollNumber) NewComponentData() IComponentData {
 	return &RollNumberData{}
 }
 
@@ -282,22 +206,19 @@ func NewRollNumber(name string) IComponent {
 }
 
 //	"configuration": {
+//		"forceVal": -1,
 //		"weight": "fgbookofsymbol",
-//		"symbolNum": 3,
-//	    "symbolNumComponent": "bg-symnum",
-//		"ignoreSymbolCollection": "fg-syms",
-//		"targetSymbolCollection": "fg-syms"
 //	},
 type jsonRollNumber struct {
-	Weight string `json:"weight"`
+	Weight   string `json:"weight"`
+	ForceVal int    `json:"forceVal"`
 }
 
 func (jcfg *jsonRollNumber) build() *RollNumberConfig {
 	cfg := &RollNumberConfig{
-		Weight: jcfg.Weight,
+		Weight:   jcfg.Weight,
+		ForceVal: jcfg.ForceVal,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

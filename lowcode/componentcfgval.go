@@ -22,6 +22,8 @@ const (
 	CCVNumber                string = "number"                // 可以修改配置项里的 number
 	CCVHeight                string = "height"                // 可以修改配置项里的 height
 	CCVReelSetWeight         string = "reelsetweight"         // 可以修改配置项里的 reelSetWeight
+	CCVForceVal              string = "forceVal"              // 可以修改配置项里的 forceVal
+	CCVForceValNow           string = "forceValNow"           // 可以修改配置项里的 forceValNow
 )
 
 const (
