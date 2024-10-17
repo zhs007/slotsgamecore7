@@ -277,6 +277,12 @@ const BasicGameModName = "basic"
 // FuncOnChgComponentIntVal - 当这个接口处理完数据，需要返回true，这时底层就不会再处理了
 type FuncOnChgComponentIntVal func(componentName string, valName string, off int) bool
 
+// FuncOnSettedComponentIntVal - 处理完后才调用这个接口，val 是最终数值
+type FuncOnSettedComponentIntVal func(componentName string, valName string, val int)
+
+// FuncOnChgedComponentIntVal - 处理完后才调用这个接口，val 是最终数值
+type FuncOnChgedComponentIntVal func(componentName string, valName string, val int, off int)
+
 var gAllowFullComponentHistory bool
 
 func SetAllowFullComponentHistory() {

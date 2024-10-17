@@ -57,12 +57,33 @@ func (rollNumberData *RollNumberData) GetValEx(key string, getType GetComponentV
 	return 0, false
 }
 
+// SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
+func (rollNumberData *RollNumberData) SetConfigIntVal(key string, val int) {
+	if key == CCVForceValNow {
+		rollNumberData.Number = val
+	} else {
+		rollNumberData.BasicComponentData.SetConfigIntVal(key, val)
+	}
+}
+
+// ChgConfigIntVal -
+func (rollNumberData *RollNumberData) ChgConfigIntVal(key string, off int) int {
+	if key == CCVForceValNow {
+		rollNumberData.Number += off
+
+		return rollNumberData.Number
+	}
+
+	return rollNumberData.BasicComponentData.ChgConfigIntVal(key, off)
+}
+
 // RollNumberConfig - configuration for RollNumber
 type RollNumberConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Weight               string                `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2 `json:"-"`
-	Awards               []*Award              `yaml:"awards" json:"awards"` // 新的奖励系统
+	Awards               []*Award              `yaml:"awards" json:"awards"`             // 新的奖励系统
+	MapValAwards         map[int][]*Award      `yaml:"mapValAwards" json:"mapValAwards"` // 新的奖励系统
 	ForceVal             int                   `yaml:"forceVal" json:"forceVal"`
 }
 
@@ -130,6 +151,12 @@ func (rollNumber *RollNumber) InitEx(cfg any, pool *GamePropertyPool) error {
 		award.Init()
 	}
 
+	for _, awards := range rollNumber.Config.MapValAwards {
+		for _, award := range awards {
+			award.Init()
+		}
+	}
+
 	rollNumber.onInit(&rollNumber.Config.BasicComponentConfig)
 
 	return nil
@@ -141,16 +168,34 @@ func (rollNumber *RollNumber) getForceVal(basicCD *BasicComponentData) int {
 		return v
 	}
 
-	v, isok = basicCD.GetConfigIntVal(CCVForceValNow)
-	if isok && v != -1 {
-		return v
-	}
+	// v, isok = basicCD.GetConfigIntVal(CCVForceValNow)
+	// if isok && v != -1 {
+	// 	return v
+	// }
 
 	if rollNumber.Config.ForceVal != -1 {
 		return rollNumber.Config.ForceVal
 	}
 
 	return -1
+}
+
+func (rollNumber *RollNumber) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	val := basicCD.GetConfigVal(CCVWeight)
+	if val != "" {
+		vw2, err := gameProp.Pool.LoadStrWeights(val, rollNumber.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("RollNumber.getWeight:LoadStrWeights",
+				slog.String("Weight", val),
+				goutils.Err(err))
+
+			return nil
+		}
+
+		return vw2
+	}
+
+	return rollNumber.Config.WeightVW
 }
 
 // playgame
@@ -163,7 +208,14 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	forceVal := rollNumber.getForceVal(&rnd.BasicComponentData)
 	if forceVal == -1 {
-		cr, err := rollNumber.Config.WeightVW.RandVal(plugin)
+		vw := rollNumber.getWeight(gameProp, &rnd.BasicComponentData)
+		if vw.MaxWeight == 0 {
+			nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
+		cr, err := vw.RandVal(plugin)
 		if err != nil {
 			goutils.Error("RollNumber.OnPlayGame:RandVal",
 				goutils.Err(err))
@@ -176,13 +228,31 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		rnd.Number = forceVal
 	}
 
-	if len(rollNumber.Config.Awards) > 0 {
-		gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
-	}
+	rollNumber.ProcControllers(gameProp, plugin, curpr, gp, rnd.Number, "")
+	// if len(rollNumber.Config.Awards) > 0 {
+	// 	gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
+	// }
+
+	// awards, isok := rollNumber.Config.MapValAwards[rnd.Number]
+	// if isok {
+	// 	gameProp.procAwards(plugin, awards, curpr, gp)
+	// }
 
 	nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
+}
+
+// OnProcControllers -
+func (rollNumber *RollNumber) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(rollNumber.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
+	}
+
+	awards, isok := rollNumber.Config.MapValAwards[val]
+	if isok {
+		gameProp.procAwards(plugin, awards, curpr, gp)
+	}
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -253,15 +323,16 @@ func parseRollNumber(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(ctrls)
+		awards, mapAwards, err := parseIntValAndAllControllers(ctrls)
 		if err != nil {
-			goutils.Error("parseRollNumber:parseControllers",
+			goutils.Error("parseRollNumber:parseIntValAndAllControllers",
 				goutils.Err(err))
 
 			return "", err
 		}
 
 		cfgd.Awards = awards
+		cfgd.MapValAwards = mapAwards
 	}
 
 	gamecfg.mapConfig[label] = cfgd

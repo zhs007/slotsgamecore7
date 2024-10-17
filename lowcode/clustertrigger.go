@@ -493,6 +493,13 @@ func (clusterTrigger *ClusterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 	return 0, nil
 }
 
+// OnProcControllers -
+func (clusterTrigger *ClusterTrigger) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(clusterTrigger.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, clusterTrigger.Config.Awards, curpr, gp)
+	}
+}
+
 // playgame
 func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -537,9 +544,10 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 		// 	gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
 		// }
 
-		if len(clusterTrigger.Config.Awards) > 0 {
-			gameProp.procAwards(plugin, clusterTrigger.Config.Awards, curpr, gp)
-		}
+		clusterTrigger.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		// if len(clusterTrigger.Config.Awards) > 0 {
+		// 	gameProp.procAwards(plugin, clusterTrigger.Config.Awards, curpr, gp)
+		// }
 
 		// if clusterTrigger.Config.SymbolAwardsWeights != nil {
 		// 	for i := 0; i < lst[0].SymbolNums; i++ {

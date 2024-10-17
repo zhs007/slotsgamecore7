@@ -358,13 +358,21 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &bcd.BasicComponentData)
 
-	if len(removeSymbols.Config.Awards) > 0 {
-		gameProp.procAwards(plugin, removeSymbols.Config.Awards, curpr, gp)
-	}
+	removeSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+	// if len(removeSymbols.Config.Awards) > 0 {
+	// 	gameProp.procAwards(plugin, removeSymbols.Config.Awards, curpr, gp)
+	// }
 
 	nc := removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
 
 	return nc, nil
+}
+
+// OnProcControllers -
+func (removeSymbols *RemoveSymbols) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(removeSymbols.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, removeSymbols.Config.Awards, curpr, gp)
+	}
 }
 
 // OnAsciiGame - outpur to asciigame

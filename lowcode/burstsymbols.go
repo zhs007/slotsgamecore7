@@ -353,6 +353,13 @@ func (burstSymbols *BurstSymbols) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
+// OnProcControllers -
+func (burstSymbols *BurstSymbols) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(burstSymbols.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, burstSymbols.Config.Controllers, curpr, gp)
+	}
+}
+
 // playgame
 func (burstSymbols *BurstSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -379,9 +386,10 @@ func (burstSymbols *BurstSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 			burstSymbols.AddScene(gameProp, curpr, sc2, &bsd.BasicComponentData)
 
-			if len(burstSymbols.Config.Controllers) > 0 {
-				gameProp.procAwards(plugin, burstSymbols.Config.Controllers, curpr, gp)
-			}
+			burstSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+			// if len(burstSymbols.Config.Controllers) > 0 {
+			// 	gameProp.procAwards(plugin, burstSymbols.Config.Controllers, curpr, gp)
+			// }
 
 			nc := burstSymbols.onStepEnd(gameProp, curpr, gp, burstSymbols.Config.JumpToComponent)
 

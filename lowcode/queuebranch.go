@@ -44,10 +44,14 @@ func (queueBranchData *QueueBranchData) SetConfigIntVal(key string, val int) {
 }
 
 // ChgConfigIntVal -
-func (queueBranchData *QueueBranchData) ChgConfigIntVal(key string, off int) {
+func (queueBranchData *QueueBranchData) ChgConfigIntVal(key string, off int) int {
 	if key == CCVQueue {
 		queueBranchData.Queue += off
+
+		return queueBranchData.Queue
 	}
+
+	return queueBranchData.ChgConfigIntVal(key, off)
 }
 
 // Clone

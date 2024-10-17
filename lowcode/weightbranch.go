@@ -76,6 +76,26 @@ func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 	weightBranchData.BasicComponentData.SetConfigVal(key, val)
 }
 
+// SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
+func (weightBranchData *WeightBranchData) SetConfigIntVal(key string, val int) {
+	if key == CCVClearForceTriggerOnceCache {
+		weightBranchData.IgnoreBranchs = nil
+	} else {
+		weightBranchData.BasicComponentData.SetConfigIntVal(key, val)
+	}
+}
+
+// ChgConfigIntVal -
+func (weightBranchData *WeightBranchData) ChgConfigIntVal(key string, off int) int {
+	if key == CCVClearForceTriggerOnceCache {
+		weightBranchData.IgnoreBranchs = nil
+
+		return 0
+	}
+
+	return weightBranchData.BasicComponentData.ChgConfigIntVal(key, off)
+}
+
 // BranchNode -
 type BranchNode struct {
 	Awards          []*Award `yaml:"awards" json:"awards"` // 新的奖励系统
@@ -334,11 +354,13 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	nextComponent := ""
 
+	weightBranch.ProcControllers(gameProp, plugin, curpr, gp, -1, wbd.Value)
+
 	branch, isok := weightBranch.Config.MapBranchs[wbd.Value]
 	if isok {
-		if len(branch.Awards) > 0 {
-			gameProp.procAwards(plugin, branch.Awards, curpr, gp)
-		}
+		// if len(branch.Awards) > 0 {
+		// 	gameProp.procAwards(plugin, branch.Awards, curpr, gp)
+		// }
 
 		nextComponent = branch.JumpToComponent
 	}
@@ -346,6 +368,16 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	nc := weightBranch.onStepEnd(gameProp, curpr, gp, nextComponent)
 
 	return nc, nil
+}
+
+// OnProcControllers -
+func (weightBranch *WeightBranch) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	branch, isok := weightBranch.Config.MapBranchs[strVal]
+	if isok {
+		if len(branch.Awards) > 0 {
+			gameProp.procAwards(plugin, branch.Awards, curpr, gp)
+		}
+	}
 }
 
 // OnAsciiGame - outpur to asciigame

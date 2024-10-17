@@ -372,6 +372,11 @@ func (basicComponent *BasicComponent) IsNeedOnStepEndStats2() bool {
 	return false
 }
 
+// OnProcControllers -
+func (basicComponent *BasicComponent) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+
+}
+
 // // OnStats2Trigger
 // func (basicComponent *BasicComponent) OnStats2Trigger(s2 *Stats2) {
 

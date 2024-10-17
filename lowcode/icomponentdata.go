@@ -42,7 +42,7 @@ type IComponentData interface {
 	// SetConfigIntVal -
 	SetConfigIntVal(key string, val int)
 	// ChgConfigIntVal -
-	ChgConfigIntVal(key string, off int)
+	ChgConfigIntVal(key string, off int) int
 	// ClearConfigIntVal -
 	ClearConfigIntVal(key string)
 
