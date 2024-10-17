@@ -74,6 +74,13 @@ func (maskBranch *MaskBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+// // OnProcControllers -
+// func (maskBranch *MaskBranch) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int) {
+// 	if len(linesTrigger.Config.Awards) > 0 {
+// 		gameProp.procAwards(plugin, linesTrigger.Config.Awards, curpr, gp)
+// 	}
+// }
+
 // playgame
 func (maskBranch *MaskBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {

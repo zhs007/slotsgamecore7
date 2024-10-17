@@ -350,6 +350,13 @@ func (adjacentPayTrigger *AdjacentPayTrigger) procWins(gameProp *GameProperty, c
 	return std.Wins, nil
 }
 
+// OnProcControllers -
+func (adjacentPayTrigger *AdjacentPayTrigger) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(adjacentPayTrigger.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, adjacentPayTrigger.Config.Awards, curpr, gp)
+	}
+}
+
 // playgame
 func (adjacentPayTrigger *AdjacentPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -365,9 +372,10 @@ func (adjacentPayTrigger *AdjacentPayTrigger) OnPlayGame(gameProp *GameProperty,
 	if isTrigger {
 		adjacentPayTrigger.procWins(gameProp, curpr, std, lst, os)
 
-		if len(adjacentPayTrigger.Config.Awards) > 0 {
-			gameProp.procAwards(plugin, adjacentPayTrigger.Config.Awards, curpr, gp)
-		}
+		adjacentPayTrigger.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		// if len(adjacentPayTrigger.Config.Awards) > 0 {
+		// 	gameProp.procAwards(plugin, adjacentPayTrigger.Config.Awards, curpr, gp)
+		// }
 
 		if adjacentPayTrigger.Config.JumpToComponent != "" {
 			std.NextComponent = adjacentPayTrigger.Config.JumpToComponent

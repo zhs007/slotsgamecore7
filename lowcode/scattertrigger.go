@@ -103,30 +103,30 @@ func (scatterTriggerData *ScatterTriggerData) GetValEx(key string, getType GetCo
 // ScatterTriggerConfig - configuration for ScatterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ScatterTriggerConfig struct {
-	BasicComponentConfig            `yaml:",inline" json:",inline"`
-	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
-	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
-	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
-	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
-	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
-	BetType                         BetType                       `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
-	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`                             // OtherSceneMultiType
-	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                                         // OtherSceneMultiType
-	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
-	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
-	PosArea                         []int                         `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
-	CountScatterPayAs               string                        `yaml:"countScatterPayAs" json:"countScatterPayAs"`                         // countscatter时，按什么符号赔付
-	SymbolCodeCountScatterPayAs     int                           `yaml:"-" json:"-"`                                                         // countscatter时，按什么符号赔付
-	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
-	Height                          int                           `yaml:"Height" json:"Height"`                                               // Height
-	MaxHeight                       int                           `yaml:"MaxHeight" json:"MaxHeight"`                                         // MaxHeight
-	IsReversalHeight                bool                          `yaml:"isReversalHeight" json:"isReversalHeight"`                           // isReversalHeight
-	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
-	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
-	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
-	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
-	SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
+	BasicComponentConfig        `yaml:",inline" json:",inline"`
+	Symbols                     []string            `yaml:"symbols" json:"symbols"`                       // like scatter
+	SymbolCodes                 []int               `yaml:"-" json:"-"`                                   // like scatter
+	Type                        string              `yaml:"type" json:"type"`                             // like scatters
+	TriggerType                 SymbolTriggerType   `yaml:"-" json:"-"`                                   // SymbolTriggerType
+	BetTypeString               string              `yaml:"betType" json:"betType"`                       // bet or totalBet or noPay
+	BetType                     BetType             `yaml:"-" json:"-"`                                   // bet or totalBet or noPay
+	OSMulTypeString             string              `yaml:"symbolValsMulti" json:"symbolValsMulti"`       // OtherSceneMultiType
+	OSMulType                   OtherSceneMultiType `yaml:"-" json:"-"`                                   // OtherSceneMultiType
+	MinNum                      int                 `yaml:"minNum" json:"minNum"`                         // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols                 []string            `yaml:"wildSymbols" json:"wildSymbols"`               // wild etc
+	WildSymbolCodes             []int               `yaml:"-" json:"-"`                                   // wild symbolCode
+	PosArea                     []int               `yaml:"posArea" json:"posArea"`                       // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
+	CountScatterPayAs           string              `yaml:"countScatterPayAs" json:"countScatterPayAs"`   // countscatter时，按什么符号赔付
+	SymbolCodeCountScatterPayAs int                 `yaml:"-" json:"-"`                                   // countscatter时，按什么符号赔付
+	WinMulti                    int                 `yaml:"winMulti" json:"winMulti"`                     // winMulti，最后的中奖倍数，默认为1
+	Height                      int                 `yaml:"Height" json:"Height"`                         // Height
+	MaxHeight                   int                 `yaml:"MaxHeight" json:"MaxHeight"`                   // MaxHeight
+	IsReversalHeight            bool                `yaml:"isReversalHeight" json:"isReversalHeight"`     // isReversalHeight
+	JumpToComponent             string              `yaml:"jumpToComponent" json:"jumpToComponent"`       // jump to
+	PiggyBankComponent          string              `yaml:"piggyBankComponent" json:"piggyBankComponent"` // piggyBank component
+	ForceToNext                 bool                `yaml:"forceToNext" json:"forceToNext"`               // 如果触发，默认跳转jump to，这里可以强制走next分支
+	Awards                      []*Award            `yaml:"awards" json:"awards"`                         // 新的奖励系统
+	// SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
@@ -231,9 +231,9 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		award.Init()
 	}
 
-	if scatterTrigger.Config.SymbolAwardsWeights != nil {
-		scatterTrigger.Config.SymbolAwardsWeights.Init()
-	}
+	// if scatterTrigger.Config.SymbolAwardsWeights != nil {
+	// 	scatterTrigger.Config.SymbolAwardsWeights.Init()
+	// }
 
 	if scatterTrigger.Config.RespinNumWeight != "" {
 		vw2, err := pool.LoadIntWeights(scatterTrigger.Config.RespinNumWeight, scatterTrigger.Config.UseFileMapping)
@@ -518,6 +518,13 @@ func (scatterTrigger *ScatterTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, r
 	return 0, nil
 }
 
+// OnProcControllers -
+func (scatterTrigger *ScatterTrigger) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(scatterTrigger.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, scatterTrigger.Config.Awards, curpr, gp)
+	}
+}
+
 // playgame
 func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -551,23 +558,24 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			return "", err
 		}
 
-		if len(scatterTrigger.Config.Awards) > 0 {
-			gameProp.procAwards(plugin, scatterTrigger.Config.Awards, curpr, gp)
-		}
+		scatterTrigger.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		// if len(scatterTrigger.Config.Awards) > 0 {
+		// 	gameProp.procAwards(plugin, scatterTrigger.Config.Awards, curpr, gp)
+		// }
 
-		if scatterTrigger.Config.SymbolAwardsWeights != nil {
-			for i := 0; i < lst[0].SymbolNums; i++ {
-				node, err := scatterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
-				if err != nil {
-					goutils.Error("ScatterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-						goutils.Err(err))
+		// if scatterTrigger.Config.SymbolAwardsWeights != nil {
+		// 	for i := 0; i < lst[0].SymbolNums; i++ {
+		// 		node, err := scatterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
+		// 		if err != nil {
+		// 			goutils.Error("ScatterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
+		// 				goutils.Err(err))
 
-					return "", err
-				}
+		// 			return "", err
+		// 		}
 
-				gameProp.procAwards(plugin, node.Awards, curpr, gp)
-			}
-		}
+		// 		gameProp.procAwards(plugin, node.Awards, curpr, gp)
+		// 	}
+		// }
 
 		if scatterTrigger.Config.RespinComponent != "" {
 			if gameProp.IsRespin(scatterTrigger.Config.RespinComponent) {

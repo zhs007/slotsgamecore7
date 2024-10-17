@@ -114,25 +114,25 @@ func (waysTriggerData *WaysTriggerData) GetValEx(key string, getType GetComponen
 // WaysTriggerConfig - configuration for WaysTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type WaysTriggerConfig struct {
-	BasicComponentConfig            `yaml:",inline" json:",inline"`
-	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
-	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
-	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
-	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
-	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
-	BetType                         BetType                       `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
-	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`                             // OtherSceneMultiType
-	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                                         // OtherSceneMultiType
-	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
-	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
-	StrCheckWinType                 string                        `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
-	CheckWinType                    CheckWinType                  `yaml:"-" json:"-"`                                                         //
-	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
-	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
-	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
-	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
-	SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	Symbols              []string            `yaml:"symbols" json:"symbols"`                 // like scatter
+	SymbolCodes          []int               `yaml:"-" json:"-"`                             // like scatter
+	Type                 string              `yaml:"type" json:"type"`                       // like scatters
+	TriggerType          SymbolTriggerType   `yaml:"-" json:"-"`                             // SymbolTriggerType
+	BetTypeString        string              `yaml:"betType" json:"betType"`                 // bet or totalBet or noPay
+	BetType              BetType             `yaml:"-" json:"-"`                             // bet or totalBet or noPay
+	OSMulTypeString      string              `yaml:"symbolValsMulti" json:"symbolValsMulti"` // OtherSceneMultiType
+	OSMulType            OtherSceneMultiType `yaml:"-" json:"-"`                             // OtherSceneMultiType
+	MinNum               int                 `yaml:"minNum" json:"minNum"`                   // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols          []string            `yaml:"wildSymbols" json:"wildSymbols"`         // wild etc
+	WildSymbolCodes      []int               `yaml:"-" json:"-"`                             // wild symbolCode
+	StrCheckWinType      string              `yaml:"checkWinType" json:"checkWinType"`       // left2right or right2left or all
+	CheckWinType         CheckWinType        `yaml:"-" json:"-"`                             //
+	WinMulti             int                 `yaml:"winMulti" json:"winMulti"`               // winMulti，最后的中奖倍数，默认为1
+	JumpToComponent      string              `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
+	ForceToNext          bool                `yaml:"forceToNext" json:"forceToNext"`         // 如果触发，默认跳转jump to，这里可以强制走next分支
+	Awards               []*Award            `yaml:"awards" json:"awards"`                   // 新的奖励系统
+	// SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
@@ -232,9 +232,9 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		award.Init()
 	}
 
-	if waysTrigger.Config.SymbolAwardsWeights != nil {
-		waysTrigger.Config.SymbolAwardsWeights.Init()
-	}
+	// if waysTrigger.Config.SymbolAwardsWeights != nil {
+	// 	waysTrigger.Config.SymbolAwardsWeights.Init()
+	// }
 
 	// waysTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, waysTrigger.Config.SymbolCodes)
 
@@ -580,19 +580,19 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			gameProp.procAwards(plugin, waysTrigger.Config.Awards, curpr, gp)
 		}
 
-		if waysTrigger.Config.SymbolAwardsWeights != nil {
-			for i := 0; i < lst[0].SymbolNums; i++ {
-				node, err := waysTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
-				if err != nil {
-					goutils.Error("WaysTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-						goutils.Err(err))
+		// if waysTrigger.Config.SymbolAwardsWeights != nil {
+		// 	for i := 0; i < lst[0].SymbolNums; i++ {
+		// 		node, err := waysTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
+		// 		if err != nil {
+		// 			goutils.Error("WaysTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
+		// 				goutils.Err(err))
 
-					return "", err
-				}
+		// 			return "", err
+		// 		}
 
-				gameProp.procAwards(plugin, node.Awards, curpr, gp)
-			}
-		}
+		// 		gameProp.procAwards(plugin, node.Awards, curpr, gp)
+		// 	}
+		// }
 
 		if waysTrigger.Config.JumpToComponent != "" {
 			if gameProp.IsRespin(waysTrigger.Config.JumpToComponent) {

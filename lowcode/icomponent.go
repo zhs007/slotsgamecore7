@@ -63,6 +63,9 @@ type IComponent interface {
 	// CanTriggerWithScene -
 	CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result)
 
+	// ProcControllers -
+	ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string)
+
 	//----------------------------
 	// for mask
 

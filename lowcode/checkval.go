@@ -115,6 +115,13 @@ func (checkVal *CheckVal) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+// OnProcControllers -
+func (checkVal *CheckVal) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(checkVal.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, checkVal.Config.Controllers, curpr, gp)
+	}
+}
+
 // playgame
 func (checkVal *CheckVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -146,9 +153,10 @@ func (checkVal *CheckVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 
 		nextComponent = checkVal.Config.JumpToComponent
 
-		if len(checkVal.Config.Controllers) > 0 {
-			gameProp.procAwards(plugin, checkVal.Config.Controllers, curpr, gp)
-		}
+		checkVal.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		// if len(checkVal.Config.Controllers) > 0 {
+		// 	gameProp.procAwards(plugin, checkVal.Config.Controllers, curpr, gp)
+		// }
 	}
 
 	nc := checkVal.onStepEnd(gameProp, curpr, gp, nextComponent)

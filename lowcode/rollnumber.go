@@ -57,6 +57,24 @@ func (rollNumberData *RollNumberData) GetValEx(key string, getType GetComponentV
 	return 0, false
 }
 
+// SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
+func (rollNumberData *RollNumberData) SetConfigIntVal(key string, val int) {
+	if key == CCVForceValNow {
+		rollNumberData.Number = val
+	} else {
+		rollNumberData.BasicComponentData.SetConfigIntVal(key, val)
+	}
+}
+
+// ChgConfigIntVal -
+func (rollNumberData *RollNumberData) ChgConfigIntVal(key string, off int) {
+	if key == CCVForceValNow {
+		rollNumberData.Number += off
+	} else {
+		rollNumberData.BasicComponentData.ChgConfigIntVal(key, off)
+	}
+}
+
 // RollNumberConfig - configuration for RollNumber
 type RollNumberConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -131,6 +149,12 @@ func (rollNumber *RollNumber) InitEx(cfg any, pool *GamePropertyPool) error {
 		award.Init()
 	}
 
+	for _, awards := range rollNumber.Config.MapValAwards {
+		for _, award := range awards {
+			award.Init()
+		}
+	}
+
 	rollNumber.onInit(&rollNumber.Config.BasicComponentConfig)
 
 	return nil
@@ -142,10 +166,10 @@ func (rollNumber *RollNumber) getForceVal(basicCD *BasicComponentData) int {
 		return v
 	}
 
-	v, isok = basicCD.GetConfigIntVal(CCVForceValNow)
-	if isok && v != -1 {
-		return v
-	}
+	// v, isok = basicCD.GetConfigIntVal(CCVForceValNow)
+	// if isok && v != -1 {
+	// 	return v
+	// }
 
 	if rollNumber.Config.ForceVal != -1 {
 		return rollNumber.Config.ForceVal
@@ -202,18 +226,31 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		rnd.Number = forceVal
 	}
 
-	if len(rollNumber.Config.Awards) > 0 {
-		gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
-	}
+	rollNumber.ProcControllers(gameProp, plugin, curpr, gp, rnd.Number, "")
+	// if len(rollNumber.Config.Awards) > 0 {
+	// 	gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
+	// }
 
-	awards, isok := rollNumber.Config.MapValAwards[rnd.Number]
-	if isok {
-		gameProp.procAwards(plugin, awards, curpr, gp)
-	}
+	// awards, isok := rollNumber.Config.MapValAwards[rnd.Number]
+	// if isok {
+	// 	gameProp.procAwards(plugin, awards, curpr, gp)
+	// }
 
 	nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
+}
+
+// OnProcControllers -
+func (rollNumber *RollNumber) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(rollNumber.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
+	}
+
+	awards, isok := rollNumber.Config.MapValAwards[val]
+	if isok {
+		gameProp.procAwards(plugin, awards, curpr, gp)
+	}
 }
 
 // OnAsciiGame - outpur to asciigame

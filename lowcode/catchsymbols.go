@@ -476,6 +476,13 @@ func (catchSymbols *CatchSymbols) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
+// OnProcControllers -
+func (catchSymbols *CatchSymbols) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(catchSymbols.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, catchSymbols.Config.Controllers, curpr, gp)
+	}
+}
+
 // playgame
 func (catchSymbols *CatchSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -553,9 +560,10 @@ func (catchSymbols *CatchSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	catchSymbols.AddScene(gameProp, curpr, sc2, &csd.BasicComponentData)
 
-	if len(catchSymbols.Config.Controllers) > 0 {
-		gameProp.procAwards(plugin, catchSymbols.Config.Controllers, curpr, gp)
-	}
+	catchSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+	// if len(catchSymbols.Config.Controllers) > 0 {
+	// 	gameProp.procAwards(plugin, catchSymbols.Config.Controllers, curpr, gp)
+	// }
 
 	nc := catchSymbols.onStepEnd(gameProp, curpr, gp, catchSymbols.Config.JumpToComponent)
 
