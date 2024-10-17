@@ -153,6 +153,24 @@ func (rollNumber *RollNumber) getForceVal(basicCD *BasicComponentData) int {
 	return -1
 }
 
+func (rollNumber *RollNumber) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	val := basicCD.GetConfigVal(CCVWeight)
+	if val != "" {
+		vw2, err := gameProp.Pool.LoadStrWeights(val, rollNumber.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("RollNumber.getWeight:LoadStrWeights",
+				slog.String("Weight", val),
+				goutils.Err(err))
+
+			return nil
+		}
+
+		return vw2
+	}
+
+	return rollNumber.Config.WeightVW
+}
+
 // playgame
 func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -163,7 +181,8 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	forceVal := rollNumber.getForceVal(&rnd.BasicComponentData)
 	if forceVal == -1 {
-		cr, err := rollNumber.Config.WeightVW.RandVal(plugin)
+		vw := rollNumber.getWeight(gameProp, &rnd.BasicComponentData)
+		cr, err := vw.RandVal(plugin)
 		if err != nil {
 			goutils.Error("RollNumber.OnPlayGame:RandVal",
 				goutils.Err(err))
