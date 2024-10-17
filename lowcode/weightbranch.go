@@ -76,6 +76,26 @@ func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 	weightBranchData.BasicComponentData.SetConfigVal(key, val)
 }
 
+// SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
+func (weightBranchData *WeightBranchData) SetConfigIntVal(key string, val int) {
+	if key == CCVClearForceTriggerOnceCache {
+		weightBranchData.IgnoreBranchs = nil
+	} else {
+		weightBranchData.BasicComponentData.SetConfigIntVal(key, val)
+	}
+}
+
+// ChgConfigIntVal -
+func (weightBranchData *WeightBranchData) ChgConfigIntVal(key string, off int) int {
+	if key == CCVClearForceTriggerOnceCache {
+		weightBranchData.IgnoreBranchs = nil
+
+		return 0
+	}
+
+	return weightBranchData.BasicComponentData.ChgConfigIntVal(key, off)
+}
+
 // BranchNode -
 type BranchNode struct {
 	Awards          []*Award `yaml:"awards" json:"awards"` // 新的奖励系统

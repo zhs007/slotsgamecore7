@@ -1,29 +1,30 @@
 package lowcode
 
 const (
-	CCVReelSet               string = "reelset"               // 可以修改配置项里的 reelSet
-	CCVWeightVal             string = "weightval"             // 可以修改配置项里的 weightVal
-	CCVMapChgWeight          string = "mapchgweight"          // 可以修改配置项里的 mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
-	CCVTriggerWeight         string = "triggerweight"         // 可以修改配置项里的 triggerWeight
-	CCVRetriggerRespinNum    string = "retriggerrespinnum"    // 可以修改配置项里的 retriggerRespinNum
-	CCVWinMulti              string = "winmulti"              // 可以修改配置项里的 winMulti
-	CCVSavedMoney            string = "savedmoney"            // 可以修改配置项里的 savedMoney
-	CCVSymbolNum             string = "symbolnum"             // 可以修改配置项里的 symbolNum
-	CCVInputVal              string = "inputval"              // 可以修改配置项里的 inputVal
-	CCVValueNum              string = "valuenum"              // 可以修改配置项里的 valueNum
-	CCVQueue                 string = "queue"                 // 可以修改配置项里的 queue
-	CCVLastRespinNum         string = "lastrespinnum"         // 可以修改配置项里的 lastRespinNum
-	CCVRetriggerAddRespinNum string = "retriggeraddrespinnum" // 可以修改配置项里的 retriggerAddRespinNum
-	CCVLastTriggerNum        string = "lasttriggernum"        // 可以修改配置项里的 lastTriggerNum
-	CCVWeight                string = "weight"                // 可以修改配置项里的 weight
-	CCVForceBranch           string = "forcebranch"           // 可以修改配置项里的 forceBranch
-	CCVWins                  string = "wins"                  // 可以修改配置项里的 wins
-	CCVMulti                 string = "multi"                 // 可以修改配置项里的 multi
-	CCVNumber                string = "number"                // 可以修改配置项里的 number
-	CCVHeight                string = "height"                // 可以修改配置项里的 height
-	CCVReelSetWeight         string = "reelsetweight"         // 可以修改配置项里的 reelSetWeight
-	CCVForceVal              string = "forceVal"              // 可以修改配置项里的 forceVal
-	CCVForceValNow           string = "forceValNow"           // 可以修改配置项里的 forceValNow
+	CCVReelSet                    string = "reelset"                    // 可以修改配置项里的 reelSet
+	CCVWeightVal                  string = "weightval"                  // 可以修改配置项里的 weightVal
+	CCVMapChgWeight               string = "mapchgweight"               // 可以修改配置项里的 mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
+	CCVTriggerWeight              string = "triggerweight"              // 可以修改配置项里的 triggerWeight
+	CCVRetriggerRespinNum         string = "retriggerrespinnum"         // 可以修改配置项里的 retriggerRespinNum
+	CCVWinMulti                   string = "winmulti"                   // 可以修改配置项里的 winMulti
+	CCVSavedMoney                 string = "savedmoney"                 // 可以修改配置项里的 savedMoney
+	CCVSymbolNum                  string = "symbolnum"                  // 可以修改配置项里的 symbolNum
+	CCVInputVal                   string = "inputval"                   // 可以修改配置项里的 inputVal
+	CCVValueNum                   string = "valuenum"                   // 可以修改配置项里的 valueNum
+	CCVQueue                      string = "queue"                      // 可以修改配置项里的 queue
+	CCVLastRespinNum              string = "lastrespinnum"              // 可以修改配置项里的 lastRespinNum
+	CCVRetriggerAddRespinNum      string = "retriggeraddrespinnum"      // 可以修改配置项里的 retriggerAddRespinNum
+	CCVLastTriggerNum             string = "lasttriggernum"             // 可以修改配置项里的 lastTriggerNum
+	CCVWeight                     string = "weight"                     // 可以修改配置项里的 weight
+	CCVForceBranch                string = "forcebranch"                // 可以修改配置项里的 forceBranch
+	CCVWins                       string = "wins"                       // 可以修改配置项里的 wins
+	CCVMulti                      string = "multi"                      // 可以修改配置项里的 multi
+	CCVNumber                     string = "number"                     // 可以修改配置项里的 number
+	CCVHeight                     string = "height"                     // 可以修改配置项里的 height
+	CCVReelSetWeight              string = "reelsetweight"              // 可以修改配置项里的 reelSetWeight
+	CCVForceVal                   string = "forceval"                   // 可以修改配置项里的 forceVal
+	CCVForceValNow                string = "forcevalnow"                // 可以修改配置项里的 forceValNow
+	CCVClearForceTriggerOnceCache string = "clearforcetriggeroncecache" // 可以修改配置项里的 clearForceTriggerOnceCache
 )
 
 const (
