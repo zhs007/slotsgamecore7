@@ -593,13 +593,19 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 				if err != nil {
 					goutils.Error("GameProperty.RunController:AwardSetComponentConfigIntVal:PushTrigger",
 						goutils.Err(err))
-
 				}
 
 				return true
 			}
 
 			return false
+		}, func(componentName string, valName string, val int) {
+			if valName == CCVForceValNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
+				}
+			}
 		})
 		if err != nil {
 			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:AwardSetComponentConfigIntVal",
@@ -621,6 +627,13 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 			}
 
 			return false
+		}, func(componentName string, valName string, off int, val int) {
+			if valName == CCVForceValNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
+				}
+			}
 		})
 		if err != nil {
 			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:AwardChgComponentConfigIntVal",
@@ -715,6 +728,13 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			}
 
 			return false
+		}, func(componentName string, valName string, val int) {
+			if valName == CCVForceValNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
+				}
+			}
 		})
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardSetComponentConfigIntVal",
@@ -736,6 +756,13 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			}
 
 			return false
+		}, func(componentName string, valName string, off int, val int) {
+			if valName == CCVForceValNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
+				}
+			}
 		})
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:AwardChgComponentConfigIntVal",
@@ -839,7 +866,7 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 	return nil
 }
 
-func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName string, val int, onProc FuncOnChgComponentIntVal) error {
+func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName string, val int, onProc FuncOnChgComponentIntVal, onProced FuncOnSettedComponentIntVal) error {
 	arr := strings.Split(componentConfigValName, ".")
 	if len(arr) != 2 {
 		goutils.Error("GameProperty.SetComponentConfigIntVal",
@@ -870,10 +897,14 @@ func (gameProp *GameProperty) SetComponentConfigIntVal(componentConfigValName st
 
 	cd.SetConfigIntVal(arr[1], val)
 
+	if onProced != nil {
+		onProced(arr[0], arr[1], val)
+	}
+
 	return nil
 }
 
-func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName string, off int, onProc FuncOnChgComponentIntVal) error {
+func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName string, off int, onProc FuncOnChgComponentIntVal, onProced FuncOnChgedComponentIntVal) error {
 	arr := strings.Split(componentConfigValName, ".")
 	if len(arr) != 2 {
 		goutils.Error("GameProperty.SetComponentConfigIntVal",
@@ -902,7 +933,11 @@ func (gameProp *GameProperty) ChgComponentConfigIntVal(componentConfigValName st
 		}
 	}
 
-	cd.ChgConfigIntVal(arr[1], off)
+	nval := cd.ChgConfigIntVal(arr[1], off)
+
+	if onProced != nil {
+		onProced(arr[0], arr[1], off, nval)
+	}
 
 	return nil
 }

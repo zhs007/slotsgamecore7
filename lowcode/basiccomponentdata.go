@@ -111,8 +111,10 @@ func (basicComponentData *BasicComponentData) SetConfigIntVal(key string, val in
 }
 
 // ChgConfigIntVal -
-func (basicComponentData *BasicComponentData) ChgConfigIntVal(key string, off int) {
+func (basicComponentData *BasicComponentData) ChgConfigIntVal(key string, off int) int {
 	basicComponentData.MapConfigIntVals[key] += off
+
+	return basicComponentData.MapConfigIntVals[key]
 }
 
 // ClearConfigIntVal -

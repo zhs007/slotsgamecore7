@@ -67,12 +67,14 @@ func (rollNumberData *RollNumberData) SetConfigIntVal(key string, val int) {
 }
 
 // ChgConfigIntVal -
-func (rollNumberData *RollNumberData) ChgConfigIntVal(key string, off int) {
+func (rollNumberData *RollNumberData) ChgConfigIntVal(key string, off int) int {
 	if key == CCVForceValNow {
 		rollNumberData.Number += off
-	} else {
-		rollNumberData.BasicComponentData.ChgConfigIntVal(key, off)
+
+		return rollNumberData.Number
 	}
+
+	return rollNumberData.BasicComponentData.ChgConfigIntVal(key, off)
 }
 
 // RollNumberConfig - configuration for RollNumber
