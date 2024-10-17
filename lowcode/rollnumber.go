@@ -62,7 +62,8 @@ type RollNumberConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Weight               string                `yaml:"weight" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2 `json:"-"`
-	Awards               []*Award              `yaml:"awards" json:"awards"` // 新的奖励系统
+	Awards               []*Award              `yaml:"awards" json:"awards"`             // 新的奖励系统
+	MapValAwards         map[int][]*Award      `yaml:"mapValAwards" json:"mapValAwards"` // 新的奖励系统
 	ForceVal             int                   `yaml:"forceVal" json:"forceVal"`
 }
 
@@ -182,6 +183,12 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	forceVal := rollNumber.getForceVal(&rnd.BasicComponentData)
 	if forceVal == -1 {
 		vw := rollNumber.getWeight(gameProp, &rnd.BasicComponentData)
+		if vw.MaxWeight == 0 {
+			nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
 		cr, err := vw.RandVal(plugin)
 		if err != nil {
 			goutils.Error("RollNumber.OnPlayGame:RandVal",
@@ -197,6 +204,11 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	if len(rollNumber.Config.Awards) > 0 {
 		gameProp.procAwards(plugin, rollNumber.Config.Awards, curpr, gp)
+	}
+
+	awards, isok := rollNumber.Config.MapValAwards[rnd.Number]
+	if isok {
+		gameProp.procAwards(plugin, awards, curpr, gp)
 	}
 
 	nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
@@ -272,15 +284,16 @@ func parseRollNumber(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(ctrls)
+		awards, mapAwards, err := parseIntValAndAllControllers(ctrls)
 		if err != nil {
-			goutils.Error("parseRollNumber:parseControllers",
+			goutils.Error("parseRollNumber:parseIntValAndAllControllers",
 				goutils.Err(err))
 
 			return "", err
 		}
 
 		cfgd.Awards = awards
+		cfgd.MapValAwards = mapAwards
 	}
 
 	gamecfg.mapConfig[label] = cfgd

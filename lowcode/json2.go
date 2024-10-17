@@ -285,6 +285,58 @@ func parseCollectorControllers(controller *ast.Node) ([]*Award, map[int][]*Award
 	return awards, mapawards, nil
 }
 
+func parseIntValAndAllControllers(controller *ast.Node) ([]*Award, map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseIntValAndAllControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseIntValAndAllControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	awards := []*Award{}
+	mapawards := make(map[int][]*Award)
+
+	for i, v := range lst {
+		str, a := v.buildWithTriggerNum()
+		if a != nil {
+			if str == "all" {
+				awards = append(awards, a)
+			} else {
+				i64, err := goutils.String2Int64(str)
+				if err != nil {
+					goutils.Error("parseIntValAndAllControllers:String2Int64",
+						slog.Int("i", i),
+						slog.String("str", str),
+						goutils.Err(err))
+
+					return nil, nil, err
+				}
+
+				mapawards[int(i64)] = append(mapawards[int(i64)], a)
+			}
+		} else {
+			goutils.Error("parseIntValAndAllControllers:buildWithTriggerNum",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return awards, mapawards, nil
+}
+
 func parseMapControllers(controller *ast.Node) (map[string][]*Award, error) {
 	buf, err := controller.MarshalJSON()
 	if err != nil {
