@@ -182,6 +182,18 @@ func (jcd *jsonControllerData) buildWithTriggerNum() (string, *Award) {
 	return jcd.TriggerNum, jcd.build()
 }
 
+func (jcd *jsonControllerData) buildWithStringVal() (string, *Award) {
+	if jcd.StringVal == "" {
+		goutils.Error("jsonControllerData.buildWithStringVal",
+			slog.Any("stringVal", jcd.StringVal),
+			goutils.Err(ErrUnsupportedControllerType))
+
+		return "", nil
+	}
+
+	return jcd.StringVal, jcd.build()
+}
+
 func (jcd *jsonControllerData) build4Map() (string, *Award) {
 	if jcd.StringVal == "" {
 		goutils.Error("jsonControllerData.build4Map",
@@ -308,9 +320,9 @@ func parseIntValAndAllControllers(controller *ast.Node) ([]*Award, map[int][]*Aw
 	mapawards := make(map[int][]*Award)
 
 	for i, v := range lst {
-		str, a := v.buildWithTriggerNum()
+		str, a := v.buildWithStringVal()
 		if a != nil {
-			if str == "all" {
+			if str == "all" || str == "" {
 				awards = append(awards, a)
 			} else {
 				i64, err := goutils.String2Int64(str)
