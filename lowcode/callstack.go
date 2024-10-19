@@ -60,12 +60,22 @@ func (csn *callStackNode) genTag(ic IComponent) string {
 	return fmt.Sprintf("%v/%v", csn.Name, ic.GetName())
 }
 
-func (csn *callStackNode) GetComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
+func (csn *callStackNode) getComponentData(gameProp *GameProperty, ic IComponent, cs *CallStack) IComponentData {
 	name := ic.GetName()
 	cd, isok := csn.MapComponentData[name]
 	if !isok {
+		// 以前没有考虑 step 的情况，所以在 global 时需要 new 一个
 		if csn.isNoAutoNew {
 			return nil
+		}
+
+		ncd := cs.getComponentDataFromPreSteps(gameProp, ic)
+		if ncd != nil {
+			csn.MapComponentData[name] = ncd
+
+			csn.mapHistory[name] = ncd
+
+			return ncd
 		}
 
 		cd = ic.NewComponentData()
@@ -76,14 +86,6 @@ func (csn *callStackNode) GetComponentData(gameProp *GameProperty, ic IComponent
 
 		csn.mapHistory[name] = cd
 	}
-	// else {
-	// 	_, isok := csn.mapHistory[name]
-	// 	if !isok {
-	// 		cd.OnNewStep(gameProp, ic)
-
-	// 		csn.mapHistory[name] = cd
-	// 	}
-	// }
 
 	return cd
 }
@@ -120,27 +122,37 @@ type callStackHistoryNode struct {
 }
 
 type CallStack struct {
-	nodes        []*callStackNode
-	historyNodes []*callStackHistoryNode
+	nodes          []*callStackNode
+	historyNodes   []*callStackHistoryNode
+	StepsCallStack []*CallStack
 }
 
 // GetGlobalComponentData -
 func (cs *CallStack) GetGlobalComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
-	return cs.nodes[0].GetComponentData(gameProp, ic)
+	return cs.nodes[0].getComponentData(gameProp, ic, cs)
 }
 
 func (cs *CallStack) GetCurComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
-	return cs.nodes[len(cs.nodes)-1].GetComponentData(gameProp, ic)
+	return cs.nodes[len(cs.nodes)-1].getComponentData(gameProp, ic, cs)
+}
+
+func (cs *CallStack) getComponentDataFromPreSteps(gameProp *GameProperty, ic IComponent) IComponentData {
+	if len(cs.StepsCallStack) == 0 {
+		return nil
+	}
+
+	return cs.StepsCallStack[len(cs.StepsCallStack)-1].GetComponentData(gameProp, ic)
+
 }
 
 func (cs *CallStack) GetComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
 	if len(cs.nodes) == 1 {
-		return cs.nodes[0].GetComponentData(gameProp, ic)
+		return cs.nodes[0].getComponentData(gameProp, ic, cs)
 	}
 
-	cd := cs.nodes[len(cs.nodes)-1].GetComponentData(gameProp, ic)
+	cd := cs.nodes[len(cs.nodes)-1].getComponentData(gameProp, ic, cs)
 	if cd == nil {
-		return cs.nodes[0].GetComponentData(gameProp, ic)
+		return cs.nodes[0].getComponentData(gameProp, ic, cs)
 	}
 
 	return cd
@@ -158,12 +170,25 @@ func (cs *CallStack) OnNewGame() {
 	cs.historyNodes = nil
 }
 
-func (cs *CallStack) OnNewStep() {
-	cs.nodes = cs.nodes[0:1]
+func (cs *CallStack) OnNewStep() *CallStack {
+	newCS := NewCallStack()
+	newCS.OnNewGame()
 
-	cs.nodes[0].OnNewStep()
+	if len(cs.StepsCallStack) > 1 {
+		newCS.StepsCallStack = make([]*CallStack, len(cs.StepsCallStack), len(cs.StepsCallStack)+1)
+		copy(newCS.StepsCallStack, cs.StepsCallStack)
+		newCS.StepsCallStack = append(newCS.StepsCallStack, cs)
+	} else {
+		newCS.StepsCallStack = []*CallStack{cs}
+	}
 
-	cs.historyNodes = nil
+	// cs.nodes = cs.nodes[0:1]
+
+	// cs.nodes[0].OnNewStep()
+
+	// cs.historyNodes = nil
+
+	return newCS
 }
 
 func (cs *CallStack) Each(gameProp *GameProperty, onEach FuncOnEachHistoryComponent) error {
