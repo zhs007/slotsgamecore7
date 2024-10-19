@@ -183,9 +183,9 @@ func (rollNumber *RollNumber) getForceVal(basicCD *BasicComponentData) int {
 func (rollNumber *RollNumber) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	val := basicCD.GetConfigVal(CCVWeight)
 	if val != "" {
-		vw2, err := gameProp.Pool.LoadStrWeights(val, rollNumber.Config.UseFileMapping)
+		vw2, err := gameProp.Pool.LoadIntWeights(val, rollNumber.Config.UseFileMapping)
 		if err != nil {
-			goutils.Error("RollNumber.getWeight:LoadStrWeights",
+			goutils.Error("RollNumber.getWeight:LoadIntWeights",
 				slog.String("Weight", val),
 				goutils.Err(err))
 
@@ -209,6 +209,13 @@ func (rollNumber *RollNumber) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	forceVal := rollNumber.getForceVal(&rnd.BasicComponentData)
 	if forceVal == -1 {
 		vw := rollNumber.getWeight(gameProp, &rnd.BasicComponentData)
+		if vw == nil {
+			goutils.Error("RollNumber.OnPlayGame:getWeight",
+				goutils.Err(ErrInvalidGameConfig))
+
+			return "", ErrInvalidGameConfig
+		}
+
 		if vw.MaxWeight == 0 {
 			nc := rollNumber.onStepEnd(gameProp, curpr, gp, "")
 
