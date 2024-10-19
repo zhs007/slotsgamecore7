@@ -122,7 +122,7 @@ func (gameProp *GameProperty) OnNewStep() error {
 	gameProp.mapInt = make(map[string]int)
 	gameProp.mapStr = make(map[string]string)
 
-	gameProp.callStack.OnNewStep()
+	gameProp.callStack = gameProp.callStack.OnNewStep()
 
 	gameProp.usedComponent = nil
 
