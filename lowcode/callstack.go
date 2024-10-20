@@ -69,14 +69,14 @@ func (csn *callStackNode) getComponentData(gameProp *GameProperty, ic IComponent
 			return nil
 		}
 
-		ncd := cs.getComponentDataFromPreSteps(gameProp, ic)
-		if ncd != nil {
-			csn.MapComponentData[name] = ncd
+		// ncd := cs.getComponentDataFromPreSteps(gameProp, ic)
+		// if ncd != nil {
+		// 	csn.MapComponentData[name] = ncd
 
-			csn.mapHistory[name] = ncd
+		// 	csn.mapHistory[name] = ncd
 
-			return ncd
-		}
+		// 	return ncd
+		// }
 
 		cd = ic.NewComponentData()
 
@@ -122,9 +122,10 @@ type callStackHistoryNode struct {
 }
 
 type CallStack struct {
-	nodes          []*callStackNode
-	historyNodes   []*callStackHistoryNode
-	StepsCallStack []*CallStack
+	nodes        []*callStackNode
+	historyNodes []*callStackHistoryNode
+	// stepsCallStack []*CallStack
+	// isNew          bool
 }
 
 // GetGlobalComponentData -
@@ -136,14 +137,14 @@ func (cs *CallStack) GetCurComponentData(gameProp *GameProperty, ic IComponent) 
 	return cs.nodes[len(cs.nodes)-1].getComponentData(gameProp, ic, cs)
 }
 
-func (cs *CallStack) getComponentDataFromPreSteps(gameProp *GameProperty, ic IComponent) IComponentData {
-	if len(cs.StepsCallStack) == 0 {
-		return nil
-	}
+// func (cs *CallStack) getComponentDataFromPreSteps(gameProp *GameProperty, ic IComponent) IComponentData {
+// 	if len(cs.stepsCallStack) == 0 {
+// 		return nil
+// 	}
 
-	return cs.StepsCallStack[len(cs.StepsCallStack)-1].GetComponentData(gameProp, ic)
+// 	return cs.stepsCallStack[len(cs.stepsCallStack)-1].GetComponentData(gameProp, ic)
 
-}
+// }
 
 func (cs *CallStack) GetComponentData(gameProp *GameProperty, ic IComponent) IComponentData {
 	if len(cs.nodes) == 1 {
@@ -168,27 +169,30 @@ func (cs *CallStack) OnNewGame() {
 	cs.nodes = append(cs.nodes, newGlobalCallStackNode())
 
 	cs.historyNodes = nil
+
+	// cs.isNew = true
 }
 
 func (cs *CallStack) OnNewStep() *CallStack {
-	newCS := NewCallStack()
-	newCS.OnNewGame()
+	// if
+	// newCS := NewCallStack()
+	// newCS.OnNewGame()
 
-	if len(cs.StepsCallStack) > 1 {
-		newCS.StepsCallStack = make([]*CallStack, len(cs.StepsCallStack), len(cs.StepsCallStack)+1)
-		copy(newCS.StepsCallStack, cs.StepsCallStack)
-		newCS.StepsCallStack = append(newCS.StepsCallStack, cs)
-	} else {
-		newCS.StepsCallStack = []*CallStack{cs}
-	}
+	// if len(cs.stepsCallStack) > 1 {
+	// 	newCS.stepsCallStack = make([]*CallStack, len(cs.stepsCallStack), len(cs.stepsCallStack)+1)
+	// 	copy(newCS.stepsCallStack, cs.stepsCallStack)
+	// 	newCS.stepsCallStack = append(newCS.stepsCallStack, cs)
+	// } else {
+	// 	newCS.stepsCallStack = []*CallStack{cs}
+	// }
 
-	// cs.nodes = cs.nodes[0:1]
+	cs.nodes = cs.nodes[0:1]
 
-	// cs.nodes[0].OnNewStep()
+	cs.nodes[0].OnNewStep()
 
-	// cs.historyNodes = nil
+	cs.historyNodes = nil
 
-	return newCS
+	return nil
 }
 
 func (cs *CallStack) Each(gameProp *GameProperty, onEach FuncOnEachHistoryComponent) error {
