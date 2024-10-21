@@ -77,6 +77,11 @@ func (rollNumberData *RollNumberData) ChgConfigIntVal(key string, off int) int {
 	return rollNumberData.BasicComponentData.ChgConfigIntVal(key, off)
 }
 
+// GetOutput -
+func (rollNumberData *RollNumberData) GetOutput() int {
+	return rollNumberData.Number
+}
+
 // RollNumberConfig - configuration for RollNumber
 type RollNumberConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
