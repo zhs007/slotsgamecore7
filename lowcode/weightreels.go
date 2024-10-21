@@ -68,6 +68,7 @@ type WeightReelsConfig struct {
 	ReelSetsWeight       string                `yaml:"reelSetWeight" json:"reelSetWeight"`
 	ReelSetsWeightVW     *sgc7game.ValWeights2 `json:"-"`
 	IsExpandReel         bool                  `yaml:"isExpandReel" json:"isExpandReel"`
+	Awards               []*Award              `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -125,6 +126,10 @@ func (weightReels *WeightReels) InitEx(cfg any, pool *GamePropertyPool) error {
 		weightReels.Config.ReelSetsWeightVW = vw2
 	}
 
+	for _, award := range weightReels.Config.Awards {
+		award.Init()
+	}
+
 	weightReels.onInit(&weightReels.Config.BasicComponentConfig)
 
 	return nil
@@ -149,6 +154,13 @@ func (weightReels *WeightReels) GetReelSetWeight(gameProp *GameProperty, basicCD
 
 // 	return weightReels.Config.ReelSetsWeightVW.Vals[]
 // }
+
+// OnProcControllers -
+func (weightReels *WeightReels) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(weightReels.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, weightReels.Config.Awards, curpr, gp)
+	}
+}
 
 // playgame
 func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -223,6 +235,8 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	weightReels.AddScene(gameProp, curpr, sc, &wrd.BasicComponentData)
 
+	weightReels.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+
 	nc := weightReels.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
@@ -294,7 +308,7 @@ func (jwr *jsonWeightReels2) build() *WeightReelsConfig {
 }
 
 func parseWeightReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWeightReels:getConfigInCell",
 			goutils.Err(err))
@@ -328,6 +342,18 @@ func parseWeightReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		cfgd = data2.build()
 	} else {
 		cfgd = data.build()
+	}
+
+	if ctrls != nil {
+		awards, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseWeightReels:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
 	}
 
 	gamecfg.mapConfig[label] = cfgd
