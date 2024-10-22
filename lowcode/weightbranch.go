@@ -71,6 +71,7 @@ func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
 func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 	if key == CCVWeight {
 		weightBranchData.WeightVW = nil
+		weightBranchData.WeightVW = nil
 	}
 
 	weightBranchData.BasicComponentData.SetConfigVal(key, val)
@@ -79,6 +80,7 @@ func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 // SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
 func (weightBranchData *WeightBranchData) SetConfigIntVal(key string, val int) {
 	if key == CCVClearForceTriggerOnceCache {
+		weightBranchData.WeightVW = nil
 		weightBranchData.IgnoreBranchs = nil
 	} else {
 		weightBranchData.BasicComponentData.SetConfigIntVal(key, val)
