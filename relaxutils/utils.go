@@ -39,6 +39,52 @@ func BuildPayouts(pt *sgc7game.PayTables) *Payouts {
 	return po
 }
 
+func BuildPayoutsEx(pt *sgc7game.PayTables, num int) *Payouts {
+	po := &Payouts{}
+
+	for k, arr := range pt.MapPay {
+		s := pt.GetStringFromInt(k)
+
+		p := &Payout{
+			Name: s,
+		}
+
+		for i := range arr {
+			if arr[i] > 0 {
+				pw := &PayoutWin{
+					Count:  i + 1,
+					Payout: arr[i],
+				}
+
+				p.Wins = append(p.Wins, pw)
+			}
+		}
+
+		if len(arr) < num {
+			for n := len(arr) + 1; n <= num; n++ {
+				if arr[len(arr)-1] > 0 {
+					pw := &PayoutWin{
+						Count:  n,
+						Payout: arr[len(arr)-1],
+					}
+
+					p.Wins = append(p.Wins, pw)
+				}
+			}
+		}
+
+		if len(p.Wins) > 0 {
+			po.Payouts = append(po.Payouts, p)
+		}
+	}
+
+	sort.Slice(po.Payouts, func(i, j int) bool {
+		return po.Payouts[i].Name < po.Payouts[j].Name
+	})
+
+	return po
+}
+
 func BuildSymbols(symbols []string) *Symbols {
 	ret := &Symbols{}
 
