@@ -507,7 +507,7 @@ type jsonAddSymbols struct {
 	SymbolNumWeight  string   `json:"symbolNumWeight"`
 	IgnoreSymbols    []string `json:"ignoreSymbols"`
 	SymbolNumTrigger string   `json:"symbolNumTrigger"`
-	Height           int      `json:"height"`
+	Height           int      `json:"Height"`
 }
 
 func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
