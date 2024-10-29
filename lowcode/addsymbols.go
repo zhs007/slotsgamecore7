@@ -114,7 +114,8 @@ type AddSymbolsConfig struct {
 	SymbolNumWeightVW    *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	IgnoreSymbols        []string              `yaml:"ignoreSymbols" json:"ignoreSymbols"`
 	IgnoreSymbolCodes    []int                 `yaml:"-" json:"-"`
-	SymbolNumTrigger     string                `json:"symbolNumTrigger" json:"symbolNumTrigger"`
+	SymbolNumTrigger     string                `yaml:"symbolNumTrigger" json:"symbolNumTrigger"`
+	Height               int                   `yaml:"height" json:"height"`
 }
 
 // SetLinkComponent
@@ -204,11 +205,205 @@ func (addSymbols *AddSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (addSymbols *AddSymbols) onIncUntilTriggeredNormal(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	stake *sgc7game.Stake, cd *AddSymbolsData, gs *sgc7game.GameScene, height int) (string, error) {
+
+	pos := make([]int, 0, gs.Width*height*2)
+
+	for x, arr := range gs.Arr {
+		for y := 0; y < height; y++ {
+			s := arr[y]
+
+			if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
+				pos = append(pos, x, y)
+			}
+		}
+	}
+
+	if len(pos) <= 0 {
+		nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
+	ngs := gs.CloneEx(gameProp.PoolScene)
+	isTrigger := false
+
+	for i := 0; i < len(pos)/2; i++ {
+		cr, err := plugin.Random(context.Background(), len(pos)/2)
+		if err != nil {
+			goutils.Error("AddSymbols.onIncUntilTriggeredNormal:Random",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
+		cd.SymbolNum++
+
+		pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
+
+		if len(pos) <= 0 {
+			break
+		}
+
+		if addSymbols.canTrigger(gameProp, ngs, curpr, stake) {
+			isTrigger = true
+
+			break
+		}
+	}
+
+	if isTrigger {
+		addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+		nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
+	}
+
+	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, ErrComponentDoNothing
+}
+
+func (addSymbols *AddSymbols) onNormal(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cd *AddSymbolsData, gs *sgc7game.GameScene, height int, num int) (string, error) {
+
+	pos := make([]int, 0, gs.Width*height*2)
+
+	for x, arr := range gs.Arr {
+		for y := 0; y < height; y++ {
+			s := arr[y]
+
+			if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
+				pos = append(pos, x, y)
+			}
+		}
+	}
+
+	if len(pos) <= 0 {
+		nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
+	ngs := gs.CloneEx(gameProp.PoolScene)
+
+	for i := 0; i < num; i++ {
+		cr, err := plugin.Random(context.Background(), len(pos)/2)
+		if err != nil {
+			goutils.Error("AddSymbols.onNormal:Random",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
+		cd.SymbolNum++
+
+		pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
+
+		if len(pos) <= 0 {
+			break
+		}
+	}
+
+	addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, ErrComponentDoNothing
+}
+
+func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cd *AddSymbolsData, gs *sgc7game.GameScene, height int, num int) (string, error) {
+
+	xarr := make([]int, 0, gs.Width)
+
+	if addSymbols.Config.Type == AddSymbolsTypeNoSameReel {
+		for x := range gs.Arr {
+			xarr = append(xarr, x)
+		}
+	} else if addSymbols.Config.Type == AddSymbolsTypeNoSameReelAndIgnore {
+		for x, arr := range gs.Arr {
+			hasIgnore := false
+			for y := 0; y < height; y++ {
+				s := arr[y]
+
+				if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) >= 0 {
+					hasIgnore = true
+
+					break
+				}
+			}
+
+			if !hasIgnore {
+				xarr = append(xarr, x)
+			}
+		}
+	}
+
+	if len(xarr) <= 0 {
+		nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
+	ngs := gs.CloneEx(gameProp.PoolScene)
+
+	if len(xarr) <= num {
+		for x := range xarr {
+			cy, err := plugin.Random(context.Background(), height)
+			if err != nil {
+				goutils.Error("AddSymbols.onOthers:Random",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ngs.Arr[x][cy] = addSymbols.Config.SymbolCode
+			cd.SymbolNum++
+		}
+	} else {
+		for i := 0; i < num; i++ {
+			cxi, err := plugin.Random(context.Background(), len(xarr))
+			if err != nil {
+				goutils.Error("AddSymbols.onOthers:Random",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			cy, err := plugin.Random(context.Background(), height)
+			if err != nil {
+				goutils.Error("AddSymbols.onOthers:Random",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ngs.Arr[xarr[cxi]][cy] = addSymbols.Config.SymbolCode
+			cd.SymbolNum++
+
+			if len(xarr) <= 1 || i == num-1 {
+				break
+			}
+
+			xarr = append(xarr[:cxi], xarr[cxi+1:]...)
+		}
+	}
+
+	addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, ErrComponentDoNothing
+}
+
 // playgame
 func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// replaceReelWithMask.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*AddSymbolsData)
 
@@ -216,63 +411,14 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := addSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
+	height := addSymbols.getHeight(&cd.BasicComponentData)
+	if height <= 0 || height > gs.Height {
+		height = gs.Height
+	}
+
 	if addSymbols.Config.SymbolNumType == AddSymbolNumTypeIncUntilTriggered {
 		if addSymbols.Config.Type == AddSymbolsTypeNormal {
-			pos := make([]int, 0, gs.Width*gs.Height*2)
-
-			for x, arr := range gs.Arr {
-				for y, s := range arr {
-					if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
-						pos = append(pos, x, y)
-					}
-				}
-			}
-
-			if len(pos) <= 0 {
-				nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, ErrComponentDoNothing
-			}
-
-			ngs := gs.CloneEx(gameProp.PoolScene)
-			isTrigger := false
-
-			for i := 0; i < len(pos)/2; i++ {
-				cr, err := plugin.Random(context.Background(), len(pos)/2)
-				if err != nil {
-					goutils.Error("AddSymbols.OnPlayGame:Random",
-						goutils.Err(err))
-
-					return "", err
-				}
-
-				ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
-				cd.SymbolNum++
-
-				pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
-
-				if len(pos) <= 0 {
-					break
-				}
-
-				if addSymbols.canTrigger(gameProp, ngs, curpr, stake) {
-					isTrigger = true
-
-					break
-				}
-			}
-
-			if isTrigger {
-				addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-
-				nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, nil
-			}
-
-			nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
+			return addSymbols.onIncUntilTriggeredNormal(gameProp, curpr, gp, plugin, stake, cd, gs, height)
 		}
 	}
 
@@ -301,124 +447,19 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	}
 
 	if addSymbols.Config.Type == AddSymbolsTypeNormal {
-		pos := make([]int, 0, gs.Width*gs.Height*2)
-
-		for x, arr := range gs.Arr {
-			for y, s := range arr {
-				if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
-					pos = append(pos, x, y)
-				}
-			}
-		}
-
-		if len(pos) <= 0 {
-			nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
-		}
-
-		ngs := gs.CloneEx(gameProp.PoolScene)
-
-		for i := 0; i < num; i++ {
-			cr, err := plugin.Random(context.Background(), len(pos)/2)
-			if err != nil {
-				goutils.Error("AddSymbols.OnPlayGame:Random",
-					goutils.Err(err))
-
-				return "", err
-			}
-
-			ngs.Arr[pos[cr*2]][pos[cr*2+1]] = addSymbols.Config.SymbolCode
-			cd.SymbolNum++
-
-			pos = append(pos[:cr*2], pos[(cr+1)*2:]...)
-
-			if len(pos) <= 0 {
-				break
-			}
-		}
-
-		addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-	} else {
-		xarr := make([]int, 0, gs.Width)
-
-		if addSymbols.Config.Type == AddSymbolsTypeNoSameReel {
-			for x := range gs.Arr {
-				xarr = append(xarr, x)
-			}
-		} else if addSymbols.Config.Type == AddSymbolsTypeNoSameReelAndIgnore {
-			for x, arr := range gs.Arr {
-				hasIgnore := false
-				for _, s := range arr {
-					if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) >= 0 {
-						hasIgnore = true
-
-						break
-					}
-				}
-
-				if !hasIgnore {
-					xarr = append(xarr, x)
-				}
-			}
-		}
-
-		if len(xarr) <= 0 {
-			nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
-		}
-
-		ngs := gs.CloneEx(gameProp.PoolScene)
-
-		if len(xarr) <= num {
-			for x := range xarr {
-				cy, err := plugin.Random(context.Background(), gs.Height)
-				if err != nil {
-					goutils.Error("AddSymbols.OnPlayGame:Random",
-						goutils.Err(err))
-
-					return "", err
-				}
-
-				ngs.Arr[x][cy] = addSymbols.Config.SymbolCode
-				cd.SymbolNum++
-			}
-		} else {
-			for i := 0; i < num; i++ {
-				cxi, err := plugin.Random(context.Background(), len(xarr))
-				if err != nil {
-					goutils.Error("AddSymbols.OnPlayGame:Random",
-						goutils.Err(err))
-
-					return "", err
-				}
-
-				cy, err := plugin.Random(context.Background(), gs.Height)
-				if err != nil {
-					goutils.Error("AddSymbols.OnPlayGame:Random",
-						goutils.Err(err))
-
-					return "", err
-				}
-
-				ngs.Arr[xarr[cxi]][cy] = addSymbols.Config.SymbolCode
-				cd.SymbolNum++
-
-				if len(xarr) <= 1 || i == num-1 {
-					break
-				}
-
-				xarr = append(xarr[:cxi], xarr[cxi+1:]...)
-			}
-		}
-
-		addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		return addSymbols.onNormal(gameProp, curpr, gp, plugin, cd, gs, height, num)
 	}
 
-	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+	return addSymbols.onOthers(gameProp, curpr, gp, plugin, cd, gs, height, num)
+}
 
-	return nc, nil
+func (addSymbols *AddSymbols) getHeight(basicCD *BasicComponentData) int {
+	height, isok := basicCD.GetConfigIntVal(CCVHeight)
+	if isok {
+		return height
+	}
+
+	return addSymbols.Config.Height
 }
 
 // canTrigger
@@ -466,6 +507,7 @@ type jsonAddSymbols struct {
 	SymbolNumWeight  string   `json:"symbolNumWeight"`
 	IgnoreSymbols    []string `json:"ignoreSymbols"`
 	SymbolNumTrigger string   `json:"symbolNumTrigger"`
+	Height           int      `json:"Height"`
 }
 
 func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
@@ -477,6 +519,7 @@ func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
 		SymbolNumWeight:  jcfg.SymbolNumWeight,
 		IgnoreSymbols:    jcfg.IgnoreSymbols,
 		SymbolNumTrigger: jcfg.SymbolNumTrigger,
+		Height:           jcfg.Height,
 	}
 
 	// cfg.UseSceneV3 = true
