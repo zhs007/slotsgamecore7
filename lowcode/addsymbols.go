@@ -211,7 +211,7 @@ func (addSymbols *AddSymbols) onIncUntilTriggeredNormal(gameProp *GameProperty, 
 	pos := make([]int, 0, gs.Width*height*2)
 
 	for x, arr := range gs.Arr {
-		for y := 0; y < height; y++ {
+		for y := len(arr) - 1; y >= len(arr)-height; y-- {
 			s := arr[y]
 
 			if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
@@ -273,7 +273,7 @@ func (addSymbols *AddSymbols) onNormal(gameProp *GameProperty, curpr *sgc7game.P
 	pos := make([]int, 0, gs.Width*height*2)
 
 	for x, arr := range gs.Arr {
-		for y := 0; y < height; y++ {
+		for y := len(arr) - 1; y >= len(arr)-height; y-- {
 			s := arr[y]
 
 			if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
@@ -328,7 +328,7 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 	} else if addSymbols.Config.Type == AddSymbolsTypeNoSameReelAndIgnore {
 		for x, arr := range gs.Arr {
 			hasIgnore := false
-			for y := 0; y < height; y++ {
+			for y := len(arr) - 1; y >= len(arr)-height; y-- {
 				s := arr[y]
 
 				if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) >= 0 {
@@ -362,7 +362,7 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 				return "", err
 			}
 
-			ngs.Arr[x][cy] = addSymbols.Config.SymbolCode
+			ngs.Arr[x][len(ngs.Arr[x])-1-cy] = addSymbols.Config.SymbolCode
 			cd.SymbolNum++
 		}
 	} else {
@@ -383,7 +383,7 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 				return "", err
 			}
 
-			ngs.Arr[xarr[cxi]][cy] = addSymbols.Config.SymbolCode
+			ngs.Arr[xarr[cxi]][len(ngs.Arr[xarr[cxi]])-1-cy] = addSymbols.Config.SymbolCode
 			cd.SymbolNum++
 
 			if len(xarr) <= 1 || i == num-1 {
