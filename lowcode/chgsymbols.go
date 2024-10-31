@@ -487,7 +487,7 @@ func (chgSymbols *ChgSymbols) ProcControllers(gameProp *GameProperty, plugin sgc
 func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*ChgSymbolsData)
 
 	cd.UsedScenes = nil
 	cd.SrcScenes = nil
@@ -495,7 +495,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs != nil {
-		height := chgSymbols.getHeight(cd)
+		height := chgSymbols.getHeight(&cd.BasicComponentData)
 		if height <= 0 || height > gs.Height {
 			height = gs.Height
 		}
@@ -507,7 +507,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		// }
 
 		if chgSymbols.Config.Type == ChgSymTypeMystery {
-			ngs1, err := chgSymbols.procMystery(gameProp, cd, plugin, gs, height)
+			ngs1, err := chgSymbols.procMystery(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procMystery",
 					goutils.Err(err))
@@ -518,7 +518,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			ngs = ngs1
 			// isRealGen = isRealGen1
 		} else if chgSymbols.Config.Type == ChgSymTypeRandomWithNoTrigger {
-			ngs2, err := chgSymbols.procRandomWithNoTrigger(gameProp, cd, plugin, curpr, stake,
+			ngs2, err := chgSymbols.procRandomWithNoTrigger(gameProp, &cd.BasicComponentData, plugin, curpr, stake,
 				gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procRandomWithNoTrigger",
@@ -530,7 +530,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			ngs = ngs2
 			// isRealGen = isRealGen2
 		} else if chgSymbols.Config.Type == ChgSymTypeUpgradeSymbolOfCategory {
-			ngs1, err := chgSymbols.procUpgradeSymbolOfCategory(gameProp, cd, plugin, gs, height)
+			ngs1, err := chgSymbols.procUpgradeSymbolOfCategory(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procUpgradeSymbolOfCategory",
 					goutils.Err(err))
@@ -541,7 +541,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			ngs = ngs1
 			// isRealGen = isRealGen1
 		} else {
-			ngs3, err := chgSymbols.procNormal(gameProp, cd, plugin, gs, height)
+			ngs3, err := chgSymbols.procNormal(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procNormal",
 					goutils.Err(err))
@@ -557,7 +557,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			if chgSymbols.Config.IsAlwaysGen {
 				ngs = gs.CloneEx(gameProp.PoolScene)
 
-				chgSymbols.AddScene(gameProp, curpr, ngs, cd)
+				chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 			}
 
 			nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
@@ -565,7 +565,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			return nc, ErrComponentDoNothing
 		}
 
-		chgSymbols.AddScene(gameProp, curpr, ngs, cd)
+		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
 		chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
 		// if isRealGen {
@@ -587,7 +587,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 // OnAsciiGame - outpur to asciigame
 func (chgSymbols *ChgSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*ChgSymbolsData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after ChgSymbols", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
