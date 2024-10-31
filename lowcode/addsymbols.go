@@ -57,6 +57,7 @@ func parseAddSymbolNumType(str string) AddSymbolNumType {
 type AddSymbolsData struct {
 	BasicComponentData
 	SymbolNum int
+	cfg       *AddSymbolsConfig
 }
 
 // OnNewGame -
@@ -98,6 +99,17 @@ func (addSymbolsData *AddSymbolsData) GetValEx(key string, getType GetComponentV
 	}
 
 	return 0, false
+}
+
+// ChgConfigIntVal -
+func (addSymbolsData *AddSymbolsData) ChgConfigIntVal(key string, off int) int {
+	if key == CCVHeight {
+		if addSymbolsData.cfg.Height > 0 {
+			addSymbolsData.MapConfigIntVals[key] = addSymbolsData.cfg.Height
+		}
+	}
+
+	return addSymbolsData.BasicComponentData.ChgConfigIntVal(key, off)
 }
 
 // AddSymbolsConfig - configuration for AddSymbols
@@ -480,7 +492,9 @@ func (addSymbols *AddSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 
 // NewComponentData -
 func (addSymbols *AddSymbols) NewComponentData() IComponentData {
-	return &AddSymbolsData{}
+	return &AddSymbolsData{
+		cfg: addSymbols.Config,
+	}
 }
 
 func NewAddSymbols(name string) IComponent {

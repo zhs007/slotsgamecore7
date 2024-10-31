@@ -11,6 +11,7 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -35,6 +36,42 @@ func parseChgSymbolsType(str string) ChgSymbolsType {
 	}
 
 	return ChgSymTypeNormal
+}
+
+type ChgSymbolsData struct {
+	BasicComponentData
+	cfg *ChgSymbolsConfig
+}
+
+// OnNewGame -
+func (chgSymbolsData *ChgSymbolsData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	chgSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// Clone
+func (chgSymbolsData *ChgSymbolsData) Clone() IComponentData {
+	target := &ChgSymbolsData{
+		BasicComponentData: chgSymbolsData.CloneBasicComponentData(),
+		cfg:                chgSymbolsData.cfg,
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (chgSymbolsData *ChgSymbolsData) BuildPBComponentData() proto.Message {
+	return chgSymbolsData.BuildPBBasicComponentData()
+}
+
+// ChgConfigIntVal -
+func (chgSymbolsData *ChgSymbolsData) ChgConfigIntVal(key string, off int) int {
+	if key == CCVHeight {
+		if chgSymbolsData.cfg.Height > 0 {
+			chgSymbolsData.MapConfigIntVals[key] = chgSymbolsData.cfg.Height
+		}
+	}
+
+	return chgSymbolsData.BasicComponentData.ChgConfigIntVal(key, off)
 }
 
 // ChgSymbolsConfig - configuration for ChgSymbols
@@ -632,6 +669,13 @@ func (chgSymbols *ChgSymbols) RollUpgradeSymbol(gameProp *GameProperty, plugin s
 	}
 
 	return curs.Int(), nil
+}
+
+// NewComponentData -
+func (chgSymbols *ChgSymbols) NewComponentData() IComponentData {
+	return &ChgSymbolsData{
+		cfg: chgSymbols.Config,
+	}
 }
 
 func NewChgSymbols(name string) IComponent {
