@@ -545,7 +545,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			goutils.Error("ScatterTrigger.OnPlayGame:calcRespinNum",
 				goutils.Err(err))
 
-			return "", nil
+			return "", err
 		}
 
 		std.RespinNum = respinNum
