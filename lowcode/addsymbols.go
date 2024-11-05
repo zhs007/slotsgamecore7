@@ -276,7 +276,7 @@ func (addSymbols *AddSymbols) onIncUntilTriggeredNormal(gameProp *GameProperty, 
 
 	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, ErrComponentDoNothing
+	return nc, nil
 }
 
 func (addSymbols *AddSymbols) onNormal(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -325,7 +325,7 @@ func (addSymbols *AddSymbols) onNormal(gameProp *GameProperty, curpr *sgc7game.P
 
 	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, ErrComponentDoNothing
+	return nc, nil
 }
 
 func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -410,7 +410,7 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 
 	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
 
-	return nc, ErrComponentDoNothing
+	return nc, nil
 }
 
 // playgame
