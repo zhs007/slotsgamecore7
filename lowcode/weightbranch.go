@@ -309,7 +309,9 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 				return nc, nil
 			} else if cmd == weightBranch.Name {
 				isSelectOK := false
-				for w, v := range vw2.Vals {
+				for i, v := range vw2.Vals {
+					w := vw2.Weights[i]
+
 					if w > 0 && param == v.String() {
 						wbd.Value = param
 
