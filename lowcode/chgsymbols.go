@@ -11,7 +11,6 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
-	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -58,10 +57,12 @@ func (chgSymbolsData *ChgSymbolsData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
-func (chgSymbolsData *ChgSymbolsData) BuildPBComponentData() proto.Message {
-	return chgSymbolsData.BuildPBBasicComponentData()
-}
+// // BuildPBComponentData
+// func (chgSymbolsData *ChgSymbolsData) BuildPBComponentData() proto.Message {
+// 	return &sgc7pb.BasicComponentData{
+// 		BasicComponentData: chgSymbolsData.BuildPBBasicComponentData(),
+// 	}
+// }
 
 // ChgConfigIntVal -
 func (chgSymbolsData *ChgSymbolsData) ChgConfigIntVal(key string, off int) int {
