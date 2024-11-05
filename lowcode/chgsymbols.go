@@ -559,6 +559,10 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 				ngs = gs.CloneEx(gameProp.PoolScene)
 
 				chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+				nc := chgSymbols.onStepEnd(gameProp, curpr, gp, chgSymbols.Config.JumpToComponent)
+
+				return nc, nil
 			}
 
 			nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
