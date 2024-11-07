@@ -256,7 +256,7 @@ func (gameProp *GameProperty) procEndingRespin() {
 			}
 		}
 
-		if ei >= 0 {
+		if ei >= 0 && ei < len(gameProp.RespinComponents)-1 {
 			gameProp.RespinComponents = gameProp.RespinComponents[:ei+1]
 		}
 	}
@@ -285,24 +285,24 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 func (gameProp *GameProperty) procRespinBeforeStepEnding(pr *sgc7game.PlayResult, gp *GameParams) (string, error) {
 	if len(gameProp.RespinComponents) > 0 {
 		nextComponent := ""
-		for i := len(gameProp.RespinComponents) - 1; i >= 0; i-- {
-			curRespin := gameProp.RespinComponents[i]
+		//! 这里不能全部遍历完，因为有可能在 next 分支里，会产生外层 respin的增加，这里只能处理当前这一级
+		ci := len(gameProp.RespinComponents) - 1
+		curRespin := gameProp.RespinComponents[ci]
 
-			cr, isok := gameProp.Components.MapComponents[curRespin]
-			if isok {
-				cd := gameProp.GetGlobalComponentData(cr)
-				nc, err := cr.ProcRespinOnStepEnd(gameProp, pr, gp, cd, nextComponent == "")
-				if err != nil {
-					goutils.Error("GameProperty.procRespinBeforeStepEnding:ProcRespinOnStepEnd",
-						slog.String("respin", curRespin),
-						goutils.Err(err))
+		cr, isok := gameProp.Components.MapComponents[curRespin]
+		if isok {
+			cd := gameProp.GetGlobalComponentData(cr)
+			nc, err := cr.ProcRespinOnStepEnd(gameProp, pr, gp, cd, nextComponent == "")
+			if err != nil {
+				goutils.Error("GameProperty.procRespinBeforeStepEnding:ProcRespinOnStepEnd",
+					slog.String("respin", curRespin),
+					goutils.Err(err))
 
-					return "", err
-				}
+				return "", err
+			}
 
-				if nextComponent == "" {
-					nextComponent = nc
-				}
+			if nextComponent == "" {
+				nextComponent = nc
 			}
 		}
 
