@@ -396,11 +396,7 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 	}
 
 	ngs := gs
-	// if chgSymbols.Config.IsAlwaysGen {
-	// 	ngs = gs.CloneEx(gameProp.PoolScene)
-	// }
 
-	// isRealGen := false
 	curNumber := 0
 	isNeedBreak := false
 
@@ -417,7 +413,7 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 				for {
 					curscv, err := vw2.RandVal(plugin)
 					if err != nil {
-						goutils.Error("ChgSymbols.procNormal:RollSymbol",
+						goutils.Error("ChgSymbols.procRandomWithNoTrigger:RollSymbol",
 							goutils.Err(err))
 
 						return nil, err
@@ -443,6 +439,9 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 
 						if isTrigger {
 							if len(vw2.Vals) == 1 {
+
+								ngs.Arr[x][y] = s
+
 								break
 							}
 
@@ -452,8 +451,6 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 						}
 
 						curNumber++
-
-						// isRealGen = true
 
 						if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
 							isNeedBreak = true
@@ -492,7 +489,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	cd.UsedScenes = nil
 	cd.SrcScenes = nil
-	// isRealGen := false
 
 	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs != nil {
@@ -502,10 +498,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		}
 
 		ngs := gs
-
-		// if chgSymbols.Config.IsAlwaysGen {
-		// 	ngs = gs.CloneEx(gameProp.PoolScene)
-		// }
 
 		if chgSymbols.Config.Type == ChgSymTypeMystery {
 			ngs1, err := chgSymbols.procMystery(gameProp, &cd.BasicComponentData, plugin, gs, height)
@@ -517,7 +509,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
-			// isRealGen = isRealGen1
 		} else if chgSymbols.Config.Type == ChgSymTypeRandomWithNoTrigger {
 			ngs2, err := chgSymbols.procRandomWithNoTrigger(gameProp, &cd.BasicComponentData, plugin, curpr, stake,
 				gs, height)
@@ -529,7 +520,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs2
-			// isRealGen = isRealGen2
 		} else if chgSymbols.Config.Type == ChgSymTypeUpgradeSymbolOfCategory {
 			ngs1, err := chgSymbols.procUpgradeSymbolOfCategory(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
@@ -540,7 +530,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
-			// isRealGen = isRealGen1
 		} else {
 			ngs3, err := chgSymbols.procNormal(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
@@ -551,7 +540,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs3
-			// isRealGen = isRealGen3
 		}
 
 		if ngs == gs {
@@ -573,11 +561,6 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
 		chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-		// if isRealGen {
-		// if len(chgSymbols.Config.Controllers) > 0 {
-		// 	gameProp.procAwards(plugin, chgSymbols.Config.Controllers, curpr, gp)
-		// }
-		// }
 
 		nc := chgSymbols.onStepEnd(gameProp, curpr, gp, chgSymbols.Config.JumpToComponent)
 
