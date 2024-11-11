@@ -420,16 +420,18 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 	srcVW2 := chgSymbols.GetWeight(gameProp, cd)
 
 	for {
-		if len(posx) == 1 {
-			break
-		}
+		pi := 0
 
-		pi, err := plugin.Random(context.Background(), len(posx))
-		if err != nil {
-			goutils.Error("ChgSymbols.procRandomWithNoTrigger:roll pos",
-				goutils.Err(err))
+		if len(posx) > 1 {
+			pi1, err := plugin.Random(context.Background(), len(posx))
+			if err != nil {
+				goutils.Error("ChgSymbols.procRandomWithNoTrigger:roll pos",
+					goutils.Err(err))
 
-			return nil, err
+				return nil, err
+			}
+
+			pi = pi1
 		}
 
 		x := posx[pi]
@@ -493,6 +495,10 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 			break
 		}
 
+	}
+
+	if curNumber == 0 {
+		return gs, nil
 	}
 
 	// for x, arr := range gs.Arr {
