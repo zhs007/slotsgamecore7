@@ -191,12 +191,14 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 
 		nos := os
 
+		vw2 := genSymbolValsWithSymbol.getWeight(gameProp, &cd.BasicComponentData)
+
 		if genSymbolValsWithSymbol.Config.Type == GSVWSTypeNormal {
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(genSymbolValsWithSymbol.Config.SymbolCodes, s, 0) >= 0 {
 						if nos == nil {
-							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
+							curv, err := vw2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
 									goutils.Err(err))
@@ -213,7 +215,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 								nos = os.CloneEx(gameProp.PoolScene)
 							}
 
-							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
+							curv, err := vw2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
 									goutils.Err(err))
@@ -240,7 +242,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(genSymbolValsWithSymbol.Config.SymbolCodes, s, 0) >= 0 {
 						if nos == nil {
-							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
+							curv, err := vw2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
 									goutils.Err(err))
@@ -257,7 +259,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 								nos = os.CloneEx(gameProp.PoolScene)
 							}
 
-							curv, err := genSymbolValsWithSymbol.Config.WeightVW2.RandVal(plugin)
+							curv, err := vw2.RandVal(plugin)
 							if err != nil {
 								goutils.Error("GenSymbolValsWithSymbol.OnPlayGame:RandVal",
 									goutils.Err(err))
@@ -326,6 +328,17 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnStats2(icd IComponentD
 // NewStats2 -
 func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) NewStats2(parent string) *stats2.Feature {
 	return stats2.NewFeature(parent, []stats2.Option{stats2.OptIntVal})
+}
+
+func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(CCVWeight)
+	if str != "" {
+		vw2, _ := gameProp.Pool.LoadIntWeights(str, true)
+
+		return vw2
+	}
+
+	return genSymbolValsWithSymbol.Config.WeightVW2
 }
 
 func NewGenSymbolValsWithSymbol(name string) IComponent {
