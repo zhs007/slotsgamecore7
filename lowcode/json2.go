@@ -504,3 +504,40 @@ func parseMaskControllers(controller *ast.Node) ([]*Award, map[int][]*Award, err
 
 	return perAwards, mapawards, nil
 }
+
+func parseMapStringAndAllControllers(controller *ast.Node) (map[string][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseMapStringAndAllControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseMapStringAndAllControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	mapawards := make(map[string][]*Award)
+
+	for i, v := range lst {
+		str, a := v.buildWithStringVal()
+		if a != nil {
+			mapawards[str] = append(mapawards[str], a)
+		} else {
+			goutils.Error("parseMapStringAndAllControllers:buildWithStringVal",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return mapawards, nil
+}
