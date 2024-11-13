@@ -92,4 +92,5 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(CheckValTypeName), parseCheckVal)
 	gJsonMgr.RegLoadComponent(strings.ToLower(AdjacentPayTriggerTypeName), parseAdjacentPayTrigger)
 	gJsonMgr.RegLoadComponent(strings.ToLower(WinResultMultiTypeName), parseWinResultMulti)
+	gJsonMgr.RegLoadComponent(strings.ToLower(WeightReels2TypeName), parseWeightReels2)
 }

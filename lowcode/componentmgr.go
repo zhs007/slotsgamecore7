@@ -145,6 +145,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(JackpotTypeName, NewJackpot)
 	mgr.Reg(CheckValTypeName, NewCheckVal)
 	mgr.Reg(AdjacentPayTriggerTypeName, NewAdjacentPayTrigger)
+	mgr.Reg(WeightReels2TypeName, NewWeightReels2)
 
 	return mgr
 }

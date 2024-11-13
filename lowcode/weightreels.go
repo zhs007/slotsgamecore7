@@ -291,12 +291,12 @@ func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 	return cfg
 }
 
-type jsonWeightReels2 struct {
+type jsonWeightReelsT struct {
 	ReelSetWeight string `json:"reelSetWeight"`
 	IsExpandReel  string `json:"isExpandReel"`
 }
 
-func (jwr *jsonWeightReels2) build() *WeightReelsConfig {
+func (jwr *jsonWeightReelsT) build() *WeightReelsConfig {
 	cfg := &WeightReelsConfig{
 		ReelSetsWeight: jwr.ReelSetWeight,
 		IsExpandReel:   jwr.IsExpandReel == "true",
@@ -329,7 +329,7 @@ func parseWeightReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
-		data2 := &jsonWeightReels2{}
+		data2 := &jsonWeightReelsT{}
 
 		err = sonic.Unmarshal(buf, data2)
 		if err != nil {
