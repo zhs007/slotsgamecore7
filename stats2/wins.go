@@ -6,6 +6,7 @@ import (
 
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
+	"gonum.org/v1/gonum/stat"
 )
 
 type StatsWins struct {
@@ -13,6 +14,7 @@ type StatsWins struct {
 	MapWinTimes   map[int]int64    `json:"mapWinTimes"`
 	MapWinTimesEx map[string]int64 `json:"MapWinTimesEx"`
 	MapWinEx      map[string]int64 `json:"MapWinEx"`
+	SD            float64
 }
 
 func (wins *StatsWins) AddWin(win int64) {
@@ -71,6 +73,7 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+0), "win")
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+1), "bet")
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+2), "rtp")
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+3), "SD")
 
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+0), wins.TotalWin)
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+1), totalBet)
@@ -79,6 +82,9 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 	} else {
 		f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+2), 0)
 	}
+
+	sd := wins.calcSD(int(bet))
+	f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+3), sd)
 
 	totalTimes := int64(0)
 	lstwins := []int{}
@@ -182,6 +188,18 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 
 		y++
 	}
+}
+
+func (wins *StatsWins) calcSD(bet int) float64 {
+	lstRets := []float64{}
+	lstWeights := []float64{}
+
+	for win, times := range wins.MapWinTimes {
+		lstRets = append(lstRets, float64(win)/float64(bet))
+		lstWeights = append(lstWeights, float64(times))
+	}
+
+	return stat.StdDev(lstRets, lstWeights)
 }
 
 func NewStatsWins() *StatsWins {
