@@ -295,7 +295,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		goutils.Info("processing...",
 			slog.Int64("total nums", totalnums),
 			slog.Int64("current nums", curnums),
-			slog.Duration("cost time", curtime))
+			slog.String("cost time", curtime.String()))
 	}, true, wincap)
 
 	goutils.Info("finish.",
@@ -350,7 +350,7 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 	goutils.Info("finish.",
 		slog.Int64("total nums", ispinnums),
 		slog.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
-		slog.Duration("cost time", d))
+		slog.String("cost time", d.String()))
 
 	components := game.Pool.mapComponents[int(bet)]
 	components.Stats2.WaitEnding()
