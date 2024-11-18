@@ -12,11 +12,18 @@ type Feature struct {
 	Trigger     *StatsTrigger     `json:"trigger"`     // 普通的trigger，如果在respin或foreach下面，则需要配合它们才能得到正确的统计
 	Wins        *StatsWins        `json:"wins"`        // wins
 	IntVal      *StatsIntVal      `json:"intVal"`      // intVal
+	StrVal      *StatsStrVal      `json:"strVal"`      // strVal
 }
 
 func (f2 *Feature) procCacheStatsIntVal(val int) {
 	if f2.IntVal != nil {
 		f2.IntVal.UseVal(val)
+	}
+}
+
+func (f2 *Feature) procCacheStatsStrVal(val string) {
+	if f2.StrVal != nil {
+		f2.StrVal.UseVal(val)
 	}
 }
 
@@ -79,6 +86,10 @@ func (f2 *Feature) Merge(src *Feature) {
 	if f2.IntVal != nil && src.IntVal != nil {
 		f2.IntVal.Merge(src.IntVal)
 	}
+
+	if f2.StrVal != nil && src.StrVal != nil {
+		f2.StrVal.Merge(src.StrVal)
+	}
 }
 
 func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
@@ -109,6 +120,13 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
 
 		f2.IntVal.SaveSheet(f, sn, s2)
 	}
+
+	if f2.StrVal != nil {
+		sn := fmt.Sprintf("%v - strVal", sheet)
+		f.NewSheet(sn)
+
+		f2.StrVal.SaveSheet(f, sn, s2)
+	}
 }
 
 func NewFeature(parent string, opts Options) *Feature {
@@ -128,6 +146,10 @@ func NewFeature(parent string, opts Options) *Feature {
 
 	if opts.Has(OptIntVal) {
 		f2.IntVal = NewStatsIntVal()
+	}
+
+	if opts.Has(OptStrVal) {
+		f2.StrVal = NewStatsStrVal()
 	}
 
 	return f2
