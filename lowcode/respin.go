@@ -495,7 +495,7 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 
 	s2.ProcStatsRespinTrigger(respin.Name, isRunning, int64(pr.CoinWin), isEnding)
 
-	if isOnStepEnd {
+	if isEnding {
 		cd := icd.(*RespinData)
 
 		s2.ProcStatsIntVal(respin.Name, cd.CurRespinNum)
