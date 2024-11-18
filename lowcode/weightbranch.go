@@ -12,6 +12,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -422,6 +423,20 @@ func (weightBranch *WeightBranch) GetNextLinkComponents() []string {
 	}
 
 	return lst
+}
+
+// OnStats2
+func (weightBranch *WeightBranch) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	weightBranch.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
+
+	cd := icd.(*WeightBranchData)
+
+	s2.ProcStatsStrVal(weightBranch.GetName(), cd.Value)
+}
+
+// NewStats2 -
+func (weightBranch *WeightBranch) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, []stats2.Option{stats2.OptStrVal})
 }
 
 func NewWeightBranch(name string) IComponent {

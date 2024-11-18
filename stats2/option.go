@@ -7,6 +7,7 @@ const (
 	OptSymbolWins  Option = 2
 	OptRootTrigger Option = 3
 	OptIntVal      Option = 4
+	OptStrVal      Option = 5
 )
 
 type Options []Option
