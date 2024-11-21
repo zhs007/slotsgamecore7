@@ -839,42 +839,34 @@ func NewChgSymbols(name string) IComponent {
 //
 // ],
 type jsonChgSymbols struct {
-	Symbols       []string   `json:"symbols"`
-	BlankSymbol   string     `yaml:"blankSymbol" json:"blankSymbol"`
-	Weight        string     `yaml:"weight" json:"weight"`
-	SourceWeight  string     `yaml:"SourceWeight" json:"SourceWeight"`
-	StrType       string     `json:"type"`
-	MaxNumber     int        `json:"maxNumber"`
-	IsAlwaysGen   bool       `json:"isAlwaysGen"`
-	StrTriggers   []string   `json:"trigger"`
-	Height        int        `json:"Height"`
-	WeightOnReels [][]string `json:"weightOnReels"`
+	Symbols       []string `json:"symbols"`
+	BlankSymbol   string   `yaml:"blankSymbol" json:"blankSymbol"`
+	Weight        string   `yaml:"weight" json:"weight"`
+	SourceWeight  string   `yaml:"SourceWeight" json:"SourceWeight"`
+	StrType       string   `json:"type"`
+	MaxNumber     int      `json:"maxNumber"`
+	IsAlwaysGen   bool     `json:"isAlwaysGen"`
+	StrTriggers   []string `json:"trigger"`
+	Height        int      `json:"Height"`
+	WeightOnReels [][]any  `json:"weightOnReels"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 	cfg := &ChgSymbolsConfig{
-		Symbols:      jcfg.Symbols,
-		BlankSymbol:  jcfg.BlankSymbol,
-		Weight:       jcfg.Weight,
-		StrType:      strings.ToLower(jcfg.StrType),
-		MaxNumber:    jcfg.MaxNumber,
-		IsAlwaysGen:  jcfg.IsAlwaysGen,
-		StrTriggers:  jcfg.StrTriggers,
-		SourceWeight: jcfg.SourceWeight,
-		Height:       jcfg.Height,
+		Symbols:          jcfg.Symbols,
+		BlankSymbol:      jcfg.BlankSymbol,
+		Weight:           jcfg.Weight,
+		StrType:          strings.ToLower(jcfg.StrType),
+		MaxNumber:        jcfg.MaxNumber,
+		IsAlwaysGen:      jcfg.IsAlwaysGen,
+		StrTriggers:      jcfg.StrTriggers,
+		SourceWeight:     jcfg.SourceWeight,
+		Height:           jcfg.Height,
+		StrWeightOnReels: make(map[int]string),
 	}
 
 	for _, arr := range jcfg.WeightOnReels {
-		i64, err := goutils.String2Int64(arr[0])
-		if err != nil {
-			goutils.Error("jsonChgSymbols.build:String2Int64",
-				slog.String("str", arr[0]),
-				goutils.Err(err))
-
-			return nil
-		}
-
-		cfg.StrWeightOnReels[int(i64)] = arr[1]
+		cfg.StrWeightOnReels[int(arr[0].(float64))] = arr[1].(string)
 	}
 
 	return cfg
