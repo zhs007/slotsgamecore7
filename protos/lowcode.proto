@@ -355,6 +355,12 @@ message AdjacentPayTriggerData {
     int32 winMulti = 7;
 }
 
+// RandomMoveSymbolsData
+message RandomMoveSymbolsData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
