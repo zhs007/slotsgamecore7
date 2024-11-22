@@ -280,7 +280,7 @@ func parseWinResultModifierEx(gamecfg *BetConfig, cell *ast.Node) (string, error
 		return "", err
 	}
 
-	data := &jsonWinResultModifier{}
+	data := &jsonWinResultModifierEx{}
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {

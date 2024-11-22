@@ -148,6 +148,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WeightReels2TypeName, NewWeightReels2)
 	mgr.Reg(WinResultModifierExTypeName, NewWinResultModifierEx)
 	mgr.Reg(RandomMoveSymbolsTypeName, NewRandomMoveSymbols)
+	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
 
 	return mgr
 }
