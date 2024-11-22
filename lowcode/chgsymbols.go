@@ -24,6 +24,7 @@ const (
 	ChgSymTypeMystery                 ChgSymbolsType = 1
 	ChgSymTypeRandomWithNoTrigger     ChgSymbolsType = 2
 	ChgSymTypeUpgradeSymbolOfCategory ChgSymbolsType = 3
+	ChgSymTypeReels                   ChgSymbolsType = 4
 )
 
 func parseChgSymbolsType(str string) ChgSymbolsType {
@@ -33,6 +34,8 @@ func parseChgSymbolsType(str string) ChgSymbolsType {
 		return ChgSymTypeRandomWithNoTrigger
 	} else if str == "upgradesymbolofcategory" {
 		return ChgSymTypeUpgradeSymbolOfCategory
+	} else if str == "reels" {
+		return ChgSymTypeReels
 	}
 
 	return ChgSymTypeNormal
@@ -79,22 +82,24 @@ func (chgSymbolsData *ChgSymbolsData) ChgConfigIntVal(key string, off int) int {
 // ChgSymbolsConfig - configuration for ChgSymbols
 type ChgSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrType              string                `yaml:"chgSymbolsType" json:"-"`
-	Type                 ChgSymbolsType        `yaml:"-" json:"chgSymbolsType"`
-	Symbols              []string              `yaml:"symbols" json:"-"`
-	SymbolCodes          []int                 `yaml:"-" json:"symbols"`
-	BlankSymbol          string                `yaml:"blankSymbol" json:"-"`
-	BlankSymbolCode      int                   `yaml:"-" json:"blankSymbol"`
-	SourceWeight         string                `yaml:"sourceWeight" json:"sourceWeight"`
-	SourceWeightVW2      *sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	Weight               string                `yaml:"weight" json:"-"`
-	WeightVW2            *sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	MaxNumber            int                   `yaml:"maxNumber" json:"maxNumber"`
-	IsAlwaysGen          bool                  `yaml:"isAlwaysGen" json:"isAlwaysGen"`
-	Controllers          []*Award              `yaml:"controllers" json:"controllers"`
-	JumpToComponent      string                `yaml:"jumpToComponent" json:"jumpToComponent"`
-	StrTriggers          []string              `yaml:"triggers" json:"-"`
-	Height               int                   `yaml:"height" json:"height"`
+	StrType              string                        `yaml:"chgSymbolsType" json:"-"`
+	Type                 ChgSymbolsType                `yaml:"-" json:"chgSymbolsType"`
+	Symbols              []string                      `yaml:"symbols" json:"-"`
+	SymbolCodes          []int                         `yaml:"-" json:"symbols"`
+	BlankSymbol          string                        `yaml:"blankSymbol" json:"-"`
+	BlankSymbolCode      int                           `yaml:"-" json:"blankSymbol"`
+	SourceWeight         string                        `yaml:"sourceWeight" json:"sourceWeight"`
+	SourceWeightVW2      *sgc7game.ValWeights2         `yaml:"-" json:"-"`
+	Weight               string                        `yaml:"weight" json:"-"`
+	WeightVW2            *sgc7game.ValWeights2         `yaml:"-" json:"-"`
+	MaxNumber            int                           `yaml:"maxNumber" json:"maxNumber"`
+	IsAlwaysGen          bool                          `yaml:"isAlwaysGen" json:"isAlwaysGen"`
+	Controllers          []*Award                      `yaml:"controllers" json:"controllers"`
+	JumpToComponent      string                        `yaml:"jumpToComponent" json:"jumpToComponent"`
+	StrTriggers          []string                      `yaml:"triggers" json:"-"`
+	Height               int                           `yaml:"height" json:"height"`
+	StrWeightOnReels     map[int]string                `yaml:"weightOnReels" json:"weightOnReels"`
+	WeightOnReels        map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`
 }
 
 // SetLinkComponent
@@ -174,6 +179,23 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		chgSymbols.Config.SourceWeightVW2 = vw2
 	}
 
+	if chgSymbols.Config.StrWeightOnReels != nil {
+		chgSymbols.Config.WeightOnReels = make(map[int]*sgc7game.ValWeights2)
+
+		for k, v := range chgSymbols.Config.StrWeightOnReels {
+			vw2, err := pool.LoadIntWeights(v, chgSymbols.Config.UseFileMapping)
+			if err != nil {
+				goutils.Error("ChgSymbols.InitEx:LoadIntWeights",
+					slog.String("Weight", v),
+					goutils.Err(err))
+
+				return err
+			}
+
+			chgSymbols.Config.WeightOnReels[k] = vw2
+		}
+	}
+
 	if chgSymbols.Config.Weight != "" {
 		vw2, err := pool.LoadIntWeights(chgSymbols.Config.Weight, chgSymbols.Config.UseFileMapping)
 		if err != nil {
@@ -185,11 +207,6 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 
 		chgSymbols.Config.WeightVW2 = vw2
-	} else {
-		goutils.Error("ChgSymbols.InitEx",
-			goutils.Err(ErrNoWeight))
-
-		return ErrNoWeight
 	}
 
 	for _, award := range chgSymbols.Config.Controllers {
@@ -201,7 +218,7 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (chgSymbols *ChgSymbols) GetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+func (chgSymbols *ChgSymbols) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(CCVWeight)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadIntWeights(str, chgSymbols.Config.UseFileMapping)
@@ -237,6 +254,60 @@ func (chgSymbols *ChgSymbols) GetSymbolCodes(plugin sgc7plugin.IPlugin) ([]int, 
 	return chgSymbols.Config.SymbolCodes, nil
 }
 
+func (chgSymbols *ChgSymbols) procReels(gameProp *GameProperty, cd *BasicComponentData,
+	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, height int) (*sgc7game.GameScene, error) {
+
+	syms, err := chgSymbols.GetSymbolCodes(plugin)
+	if err != nil {
+		goutils.Error("ChgSymbols.procReels:GetSymbolCodes",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	ngs := gs
+	curNumber := 0
+	isNeedBreak := false
+
+	for x, arr := range gs.Arr {
+		for y := len(arr) - 1; y >= len(arr)-height; y-- {
+			s := arr[y]
+
+			if goutils.IndexOfIntSlice(syms, s, 0) >= 0 {
+				cursc, err := chgSymbols.rollSymbolOnReels(gameProp, plugin, cd, x)
+				if err != nil {
+					goutils.Error("ChgSymbols.procReels:rollSymbolOnReels",
+						goutils.Err(err))
+
+					return nil, err
+				}
+
+				if cursc != chgSymbols.Config.BlankSymbolCode {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[x][y] = cursc
+
+					curNumber++
+
+					if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
+						isNeedBreak = true
+
+						break
+					}
+				}
+			}
+		}
+
+		if isNeedBreak {
+			break
+		}
+	}
+
+	return ngs, nil
+}
+
 func (chgSymbols *ChgSymbols) procMystery(gameProp *GameProperty, cd *BasicComponentData,
 	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, height int) (*sgc7game.GameScene, error) {
 
@@ -248,15 +319,14 @@ func (chgSymbols *ChgSymbols) procMystery(gameProp *GameProperty, cd *BasicCompo
 		return nil, err
 	}
 
-	cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
+	cursc, err := chgSymbols.rollSymbol(gameProp, plugin, cd)
 	if err != nil {
-		goutils.Error("ChgSymbols.procMystery:RollSymbol",
+		goutils.Error("ChgSymbols.procMystery:rollSymbol",
 			goutils.Err(err))
 
 		return nil, err
 	}
 
-	// isRealGen := false
 	ngs := gs
 
 	for x, arr := range gs.Arr {
@@ -269,8 +339,6 @@ func (chgSymbols *ChgSymbols) procMystery(gameProp *GameProperty, cd *BasicCompo
 				}
 
 				ngs.Arr[x][y] = cursc
-
-				// isRealGen = true
 			}
 		}
 	}
@@ -290,9 +358,9 @@ func (chgSymbols *ChgSymbols) procUpgradeSymbolOfCategory(gameProp *GameProperty
 		return nil, err
 	}
 
-	cursc, err := chgSymbols.RollUpgradeSymbol(gameProp, plugin, cd, syms[0])
+	cursc, err := chgSymbols.rollUpgradeSymbol(gameProp, plugin, cd, syms[0])
 	if err != nil {
-		goutils.Error("ChgSymbols.procUpgradeSymbolOfCategory:RollSymbol",
+		goutils.Error("ChgSymbols.procUpgradeSymbolOfCategory:rollUpgradeSymbol",
 			goutils.Err(err))
 
 		return nil, err
@@ -302,7 +370,6 @@ func (chgSymbols *ChgSymbols) procUpgradeSymbolOfCategory(gameProp *GameProperty
 		return gs, nil
 	}
 
-	// isRealGen := false
 	ngs := gs
 
 	for x, arr := range gs.Arr {
@@ -315,8 +382,6 @@ func (chgSymbols *ChgSymbols) procUpgradeSymbolOfCategory(gameProp *GameProperty
 				}
 
 				ngs.Arr[x][y] = cursc
-
-				// isRealGen = true
 			}
 		}
 	}
@@ -336,11 +401,6 @@ func (chgSymbols *ChgSymbols) procNormal(gameProp *GameProperty, cd *BasicCompon
 	}
 
 	ngs := gs
-	// if chgSymbols.Config.IsAlwaysGen {
-	// 	ngs = gs.CloneEx(gameProp.PoolScene)
-	// }
-
-	// isRealGen := false
 	curNumber := 0
 	isNeedBreak := false
 
@@ -349,9 +409,9 @@ func (chgSymbols *ChgSymbols) procNormal(gameProp *GameProperty, cd *BasicCompon
 			s := arr[y]
 
 			if goutils.IndexOfIntSlice(syms, s, 0) >= 0 {
-				cursc, err := chgSymbols.RollSymbol(gameProp, plugin, cd)
+				cursc, err := chgSymbols.rollSymbol(gameProp, plugin, cd)
 				if err != nil {
-					goutils.Error("ChgSymbols.procNormal:RollSymbol",
+					goutils.Error("ChgSymbols.procNormal:rollSymbol",
 						goutils.Err(err))
 
 					return nil, err
@@ -365,8 +425,6 @@ func (chgSymbols *ChgSymbols) procNormal(gameProp *GameProperty, cd *BasicCompon
 					ngs.Arr[x][y] = cursc
 
 					curNumber++
-
-					// isRealGen = true
 
 					if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
 						isNeedBreak = true
@@ -417,7 +475,13 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 	curNumber := 0
 	isNeedBreak := false
 
-	srcVW2 := chgSymbols.GetWeight(gameProp, cd)
+	srcVW2 := chgSymbols.getWeight(gameProp, cd)
+	if srcVW2 == nil {
+		goutils.Error("ChgSymbols.procRandomWithNoTrigger:getWeight",
+			goutils.Err(ErrNoWeight))
+
+		return nil, ErrNoWeight
+	}
 
 	for {
 		pi := 0
@@ -501,75 +565,6 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 		return gs, nil
 	}
 
-	// for x, arr := range gs.Arr {
-	// 	for y := len(arr) - 1; y >= len(arr)-height; y-- {
-	// 		s := arr[y]
-
-	// 		if goutils.IndexOfIntSlice(syms, s, 0) >= 0 {
-
-	// 			vw2 := srcVW2.Clone()
-
-	// 			for {
-	// 				curscv, err := vw2.RandVal(plugin)
-	// 				if err != nil {
-	// 					goutils.Error("ChgSymbols.procRandomWithNoTrigger:RollSymbol",
-	// 						goutils.Err(err))
-
-	// 					return nil, err
-	// 				}
-
-	// 				cursc := curscv.Int()
-
-	// 				if cursc != chgSymbols.Config.BlankSymbolCode {
-	// 					if ngs == gs {
-	// 						ngs = gs.CloneEx(gameProp.PoolScene)
-	// 					}
-
-	// 					ngs.Arr[x][y] = cursc
-
-	// 					isTrigger := false
-	// 					for _, trigger := range chgSymbols.Config.StrTriggers {
-	// 						if gameProp.CanTrigger(trigger, ngs, curpr, stake) {
-	// 							isTrigger = true
-
-	// 							break
-	// 						}
-	// 					}
-
-	// 					if isTrigger {
-	// 						if len(vw2.Vals) == 1 {
-
-	// 							ngs.Arr[x][y] = s
-
-	// 							break
-	// 						}
-
-	// 						vw2.RemoveVal(curscv)
-
-	// 						continue
-	// 					}
-
-	// 					curNumber++
-
-	// 					if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
-	// 						isNeedBreak = true
-
-	// 						break
-	// 					}
-	// 				}
-	// 			}
-
-	// 			if isNeedBreak {
-	// 				break
-	// 			}
-	// 		}
-	// 	}
-
-	// 	if isNeedBreak {
-	// 		break
-	// 	}
-	// }
-
 	return ngs, nil
 }
 
@@ -602,6 +597,16 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			ngs1, err := chgSymbols.procMystery(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procMystery",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ngs = ngs1
+		} else if chgSymbols.Config.Type == ChgSymTypeReels {
+			ngs1, err := chgSymbols.procReels(gameProp, &cd.BasicComponentData, plugin, gs, height)
+			if err != nil {
+				goutils.Error("ChgSymbols.OnPlayGame:procReels",
 					goutils.Err(err))
 
 				return "", err
@@ -703,17 +708,19 @@ func (chgSymbols *ChgSymbols) GetBranchWeights() []int {
 	return chgSymbols.Config.WeightVW2.Weights
 }
 
-// RollSymbol -
-func (chgSymbols *ChgSymbols) RollSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData) (int, error) {
-	// if bcd.ForceBranchIndex > 0 && !gIsReleaseMode {
-	// 	vw2 := chgSymbols.GetWeight(gameProp, bcd)
-	// 	return vw2.Vals[bcd.ForceBranchIndex-1].Int(), nil
-	// }
+// rollSymbol -
+func (chgSymbols *ChgSymbols) rollSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData) (int, error) {
+	vw2 := chgSymbols.getWeight(gameProp, bcd)
+	if vw2 == nil {
+		goutils.Error("ChgSymbols.rollSymbol:getWeight",
+			goutils.Err(ErrNoWeight))
 
-	vw2 := chgSymbols.GetWeight(gameProp, bcd)
+		return 0, ErrNoWeight
+	}
+
 	curs, err := vw2.RandVal(plugin)
 	if err != nil {
-		goutils.Error("ChgSymbols.RollSymbol:RandVal",
+		goutils.Error("ChgSymbols.rollSymbol:RandVal",
 			goutils.Err(err))
 
 		return 0, err
@@ -722,9 +729,36 @@ func (chgSymbols *ChgSymbols) RollSymbol(gameProp *GameProperty, plugin sgc7plug
 	return curs.Int(), nil
 }
 
-// RollUpgradeSymbol -
-func (chgSymbols *ChgSymbols) RollUpgradeSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData, s int) (int, error) {
-	vw2 := chgSymbols.GetWeight(gameProp, bcd)
+// rollSymbolOnReels -
+func (chgSymbols *ChgSymbols) rollSymbolOnReels(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData, x int) (int, error) {
+	if chgSymbols.Config.WeightOnReels == nil {
+		vw2, isok := chgSymbols.Config.WeightOnReels[x]
+		if isok {
+			curs, err := vw2.RandVal(plugin)
+			if err != nil {
+				goutils.Error("ChgSymbols.rollSymbolOnReels:RandVal",
+					goutils.Err(err))
+
+				return 0, err
+			}
+
+			return curs.Int(), nil
+		}
+	}
+
+	return chgSymbols.Config.BlankSymbolCode, nil
+}
+
+// rollUpgradeSymbol -
+func (chgSymbols *ChgSymbols) rollUpgradeSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData, s int) (int, error) {
+	vw2 := chgSymbols.getWeight(gameProp, bcd)
+	if vw2 == nil {
+		goutils.Error("ChgSymbols.rollUpgradeSymbol:getWeight",
+			goutils.Err(ErrNoWeight))
+
+		return 0, ErrNoWeight
+	}
+
 	vals := []sgc7game.IVal{}
 	weights := []int{}
 
@@ -741,7 +775,7 @@ func (chgSymbols *ChgSymbols) RollUpgradeSymbol(gameProp *GameProperty, plugin s
 
 	curVW, err := sgc7game.NewValWeights2(vals, weights)
 	if err != nil {
-		goutils.Error("ChgSymbols.RollUpgradeSymbol:NewValWeights2",
+		goutils.Error("ChgSymbols.rollUpgradeSymbol:NewValWeights2",
 			goutils.Err(err))
 
 		return 0, err
@@ -749,7 +783,7 @@ func (chgSymbols *ChgSymbols) RollUpgradeSymbol(gameProp *GameProperty, plugin s
 
 	curs, err := curVW.RandVal(plugin)
 	if err != nil {
-		goutils.Error("ChgSymbols.RollUpgradeSymbol:RandVal",
+		goutils.Error("ChgSymbols.rollUpgradeSymbol:RandVal",
 			goutils.Err(err))
 
 		return 0, err
@@ -780,29 +814,59 @@ func NewChgSymbols(name string) IComponent {
 // "weight": "mweight",
 // "maxNumber": 0,
 // "isAlwaysGen": true,
+// "weightOnReels": [
+//
+//	[
+//		1,
+//		"fg_addwildreel1"
+//	],
+//	[
+//		2,
+//		"fg_addwildreel2"
+//	],
+//	[
+//		3,
+//		"fg_addwildreel3"
+//	],
+//	[
+//		4,
+//		"fg_addwildreel4"
+//	],
+//	[
+//		5,
+//		"fg_addwildreel5"
+//	]
+//
+// ],
 type jsonChgSymbols struct {
-	Symbols      []string `json:"symbols"`
-	BlankSymbol  string   `yaml:"blankSymbol" json:"blankSymbol"`
-	Weight       string   `yaml:"weight" json:"weight"`
-	SourceWeight string   `yaml:"SourceWeight" json:"SourceWeight"`
-	StrType      string   `json:"type"`
-	MaxNumber    int      `json:"maxNumber"`
-	IsAlwaysGen  bool     `json:"isAlwaysGen"`
-	StrTriggers  []string `json:"trigger"`
-	Height       int      `json:"Height"`
+	Symbols       []string `json:"symbols"`
+	BlankSymbol   string   `yaml:"blankSymbol" json:"blankSymbol"`
+	Weight        string   `yaml:"weight" json:"weight"`
+	SourceWeight  string   `yaml:"SourceWeight" json:"SourceWeight"`
+	StrType       string   `json:"type"`
+	MaxNumber     int      `json:"maxNumber"`
+	IsAlwaysGen   bool     `json:"isAlwaysGen"`
+	StrTriggers   []string `json:"trigger"`
+	Height        int      `json:"Height"`
+	WeightOnReels [][]any  `json:"weightOnReels"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 	cfg := &ChgSymbolsConfig{
-		Symbols:      jcfg.Symbols,
-		BlankSymbol:  jcfg.BlankSymbol,
-		Weight:       jcfg.Weight,
-		StrType:      strings.ToLower(jcfg.StrType),
-		MaxNumber:    jcfg.MaxNumber,
-		IsAlwaysGen:  jcfg.IsAlwaysGen,
-		StrTriggers:  jcfg.StrTriggers,
-		SourceWeight: jcfg.SourceWeight,
-		Height:       jcfg.Height,
+		Symbols:          jcfg.Symbols,
+		BlankSymbol:      jcfg.BlankSymbol,
+		Weight:           jcfg.Weight,
+		StrType:          strings.ToLower(jcfg.StrType),
+		MaxNumber:        jcfg.MaxNumber,
+		IsAlwaysGen:      jcfg.IsAlwaysGen,
+		StrTriggers:      jcfg.StrTriggers,
+		SourceWeight:     jcfg.SourceWeight,
+		Height:           jcfg.Height,
+		StrWeightOnReels: make(map[int]string),
+	}
+
+	for _, arr := range jcfg.WeightOnReels {
+		cfg.StrWeightOnReels[int(arr[0].(float64))] = arr[1].(string)
 	}
 
 	return cfg

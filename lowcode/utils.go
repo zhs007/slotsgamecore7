@@ -459,6 +459,68 @@ func HasSymbolsInResult(gs *sgc7game.GameScene, symbols []int, ret *sgc7game.Res
 	return false
 }
 
+func CalcSymbolsInResultEx(gs *sgc7game.GameScene, mapSymbolCodes map[int]int, ret *sgc7game.Result, t WinResultModifierType) int {
+	if t == WRMTypeAddSymbolMulti {
+		mul := 0
+		for i := 0; i < len(ret.Pos)/2; i++ {
+			x := ret.Pos[i*2]
+			y := ret.Pos[i*2+1]
+
+			curmul, isok := mapSymbolCodes[gs.Arr[x][y]]
+			if isok {
+				mul += curmul
+			}
+		}
+
+		if mul == 0 {
+			return 1
+		}
+
+		return mul
+	}
+
+	if t == WRMTypeMulSymbolMulti {
+		mul := 1
+		for i := 0; i < len(ret.Pos)/2; i++ {
+			x := ret.Pos[i*2]
+			y := ret.Pos[i*2+1]
+
+			curmul, isok := mapSymbolCodes[gs.Arr[x][y]]
+			if isok {
+				mul *= curmul
+			}
+		}
+
+		return mul
+	}
+
+	if t == WRMTypeSymbolMultiOnWays {
+		mul := 1
+		for x, _ := range gs.Arr {
+			curmul := 0
+
+			for i := 0; i < len(ret.Pos)/2; i++ {
+				if ret.Pos[i*2] == x {
+					symMul, isok := mapSymbolCodes[gs.Arr[x][ret.Pos[i*2+1]]]
+					if isok {
+						curmul += symMul
+					} else {
+						curmul++
+					}
+				}
+			}
+
+			if curmul > 0 {
+				mul *= curmul
+			}
+		}
+
+		return mul
+	}
+
+	return 1
+}
+
 func CountSymbolsInResult(gs *sgc7game.GameScene, symbols []int, ret *sgc7game.Result) int {
 	num := 0
 

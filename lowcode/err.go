@@ -18,6 +18,9 @@ var (
 	// ErrInvalidComponent - invalid component
 	ErrInvalidComponent = errors.New("invalid component")
 
+	// ErrInvalidComponentConfig - invalid component config
+	ErrInvalidComponentConfig = errors.New("invalid component config")
+
 	// ErrInvalidReels - invalid reels
 	ErrInvalidReels = errors.New("invalid reels")
 

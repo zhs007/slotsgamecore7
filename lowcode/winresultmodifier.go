@@ -107,7 +107,7 @@ type WinResultModifierConfig struct {
 	Type                 WinResultModifierType `yaml:"-" json:"-"`                               // type
 	SourceComponents     []string              `yaml:"sourceComponents" json:"sourceComponents"` // target components
 	WinMulti             int                   `yaml:"winMulti" json:"winMulti"`                 // winMulti，最后的中奖倍数，默认为1
-	TargetSymbols        []string              `yaml:"sourceComponents" json:"targetSymbols"`    // targetSymbols
+	TargetSymbols        []string              `yaml:"targetSymbols" json:"targetSymbols"`       // targetSymbols
 	TargetSymbolCodes    []int                 `yaml:"-" json:"-"`                               // target SymbolCodes
 }
 
@@ -189,7 +189,6 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 	winMulti := winResultModifier.GetWinMulti(&std.BasicComponentData)
 
 	std.WinMulti = winMulti
-	std.Wins = 0
 
 	if winMulti == 1 {
 		nc := winResultModifier.onStepEnd(gameProp, curpr, gp, "")
