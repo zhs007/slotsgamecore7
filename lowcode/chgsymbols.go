@@ -732,7 +732,7 @@ func (chgSymbols *ChgSymbols) rollSymbol(gameProp *GameProperty, plugin sgc7plug
 // rollSymbolOnReels -
 func (chgSymbols *ChgSymbols) rollSymbolOnReels(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData, x int) (int, error) {
 	if chgSymbols.Config.WeightOnReels != nil {
-		vw2, isok := chgSymbols.Config.WeightOnReels[x]
+		vw2, isok := chgSymbols.Config.WeightOnReels[x+1]
 		if isok {
 			curs, err := vw2.RandVal(plugin)
 			if err != nil {
