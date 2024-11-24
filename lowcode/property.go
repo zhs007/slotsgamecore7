@@ -256,7 +256,9 @@ func (gameProp *GameProperty) procEndingRespin() {
 			}
 		}
 
-		if ei >= 0 && ei < len(gameProp.RespinComponents)-1 {
+		if ei < 0 {
+			gameProp.RespinComponents = nil
+		} else if ei >= 0 && ei < len(gameProp.RespinComponents)-1 {
 			gameProp.RespinComponents = gameProp.RespinComponents[:ei+1]
 		}
 	}
