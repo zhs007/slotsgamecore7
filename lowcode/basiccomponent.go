@@ -120,7 +120,7 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	curpr.Scenes = append(curpr.Scenes, sc)
 
-	gameProp.SceneStack.Push(basicComponent.Name, si, sc)
+	gameProp.SceneStack.Push(basicComponent.Name, sc)
 }
 
 // // ReTagScene -
@@ -145,7 +145,7 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 
 	curpr.OtherScenes = append(curpr.OtherScenes, sc)
 
-	gameProp.OtherSceneStack.Push(basicComponent.Name, si, sc)
+	gameProp.OtherSceneStack.Push(basicComponent.Name, sc)
 }
 
 // ClearOtherScene -

@@ -314,7 +314,7 @@ func (randomMoveSymbols *RandomMoveSymbols) procNormal(gameProp *GameProperty, c
 }
 
 func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd *RandomMoveSymbolsData,
-	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
+	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, gsSrc *sgc7game.GameScene) (*sgc7game.GameScene, error) {
 
 	if randomMoveSymbols.Config.ReelsWeightVW2 == nil {
 		goutils.Error("RandomMoveSymbols.procReels",
@@ -412,7 +412,7 @@ func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd
 					ngs = gs.CloneEx(gameProp.PoolScene)
 				}
 
-				ngs.Arr[tx][ty] = ngs.Arr[x][y]
+				ngs.Arr[tx][ty] = gsSrc.Arr[x][y]
 
 				break
 			}
@@ -430,7 +430,8 @@ func (randomMoveSymbols *RandomMoveSymbols) OnPlayGame(gameProp *GameProperty, c
 
 	msd.OnNewStep()
 
-	gs := randomMoveSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
+	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
+	gs2 := gameProp.SceneStack.GetPreTopSceneEx(curpr, prs)
 
 	sc2 := gs
 
@@ -445,7 +446,7 @@ func (randomMoveSymbols *RandomMoveSymbols) OnPlayGame(gameProp *GameProperty, c
 
 		sc2 = ngs
 	} else if randomMoveSymbols.Config.Type == RMSTypeReels {
-		ngs, err := randomMoveSymbols.procReels(gameProp, msd, plugin, gs)
+		ngs, err := randomMoveSymbols.procReels(gameProp, msd, plugin, gs, gs2)
 		if err != nil {
 			goutils.Error("RandomMoveSymbols.OnPlayGame:procReels",
 				goutils.Err(err))
