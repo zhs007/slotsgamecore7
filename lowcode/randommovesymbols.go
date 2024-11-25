@@ -371,7 +371,7 @@ func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd
 				return gs, err
 			}
 
-			tx := ret.Int()
+			tx := ret.Int() - 1
 			yArr := make([]int, 0, gs.Height)
 
 			for ty := 0; ty < gs.Height; ty++ {
