@@ -1,41 +1,38 @@
 package lowcode
 
 import (
+	"slices"
+
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
 type SceneStackData struct {
-	Component  string
-	SceneIndex int
-	Scene      *sgc7game.GameScene
+	Component string
+	Scene     *sgc7game.GameScene
 }
 
 type SceneStack struct {
 	Scenes       []*SceneStackData
 	IsOtherScene bool
-	// CacheScenes []*SceneStackData
 }
 
-// func (stack *SceneStack) Push(scene string, index int) {
-// 	stack.Scenes = append(stack.Scenes, &SceneStackData{
-// 		Component:  scene,
-// 		SceneIndex: index,
-// 	})
-// }
-
-func (stack *SceneStack) Push(scene string, index int, gs *sgc7game.GameScene) {
+func (stack *SceneStack) Push(scene string, gs *sgc7game.GameScene) {
 	ssd := &SceneStackData{
-		Component:  scene,
-		SceneIndex: index,
-		Scene:      gs,
+		Component: scene,
+		Scene:     gs,
 	}
 
 	stack.Scenes = append(stack.Scenes, ssd)
+}
 
-	// if isNeedCache {
-	// 	stack.CacheScenes = append(stack.CacheScenes, ssd)
-	// }
+func (stack *SceneStack) InsertPreScene(scene string, gs *sgc7game.GameScene) {
+	ssd := &SceneStackData{
+		Component: scene,
+		Scene:     gs,
+	}
+
+	stack.Scenes = slices.Insert(stack.Scenes, len(stack.Scenes)-1, ssd)
 }
 
 func (stack *SceneStack) Pop() *SceneStackData {
@@ -61,25 +58,125 @@ func (stack *SceneStack) GetTopScene(curpr *sgc7game.PlayResult, prs []*sgc7game
 				return nil
 			}
 
-			stack.Push("", 0, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			stack.Push("", prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
 			curpr.OtherScenes = append(curpr.OtherScenes, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
 			// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
 
-			return stack.GetTopScene(curpr, prs)
+			return stack.Scenes[len(stack.Scenes)-1]
 		}
 
 		if len(prs[len(prs)-1].Scenes) == 0 {
 			return nil
 		}
 
-		stack.Push("", 0, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		stack.Push("", prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
 		curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
 		// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
 
-		return stack.GetTopScene(curpr, prs)
+		return stack.Scenes[len(stack.Scenes)-1]
 	}
 
 	return stack.Scenes[len(stack.Scenes)-1]
+}
+
+func (stack *SceneStack) GetTopSceneEx(curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) *sgc7game.GameScene {
+	if len(stack.Scenes) == 0 {
+		if len(prs) == 0 {
+			return nil
+		}
+
+		if stack.IsOtherScene {
+			if len(prs[len(prs)-1].OtherScenes) == 0 {
+				return nil
+			}
+
+			stack.Push("", prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			curpr.OtherScenes = append(curpr.OtherScenes, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
+
+			return stack.Scenes[len(stack.Scenes)-1].Scene
+		}
+
+		if len(prs[len(prs)-1].Scenes) == 0 {
+			return nil
+		}
+
+		stack.Push("", prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		// prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1]
+
+		return stack.Scenes[len(stack.Scenes)-1].Scene
+	}
+
+	return stack.Scenes[len(stack.Scenes)-1].Scene
+}
+
+func (stack *SceneStack) GetPreTopScene(curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) *SceneStackData {
+	if len(stack.Scenes) >= 2 {
+		return stack.Scenes[len(stack.Scenes)-2]
+	} else if len(stack.Scenes) == 1 {
+		if len(prs) == 0 {
+			return nil
+		}
+
+		if stack.IsOtherScene {
+			if len(prs[len(prs)-1].OtherScenes) == 0 {
+				return nil
+			}
+
+			stack.InsertPreScene("", prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			// stack.Push("", 0, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			curpr.OtherScenes = append(curpr.OtherScenes, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+
+			return stack.Scenes[len(stack.Scenes)-2]
+		}
+
+		if len(prs[len(prs)-1].Scenes) == 0 {
+			return nil
+		}
+
+		stack.InsertPreScene("", prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		// stack.Push("", 0, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+
+		return stack.Scenes[len(stack.Scenes)-2]
+	}
+
+	return nil
+}
+
+func (stack *SceneStack) GetPreTopSceneEx(curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) *sgc7game.GameScene {
+	if len(stack.Scenes) >= 2 {
+		return stack.Scenes[len(stack.Scenes)-2].Scene
+	} else if len(stack.Scenes) == 1 {
+		if len(prs) == 0 {
+			return nil
+		}
+
+		if stack.IsOtherScene {
+			if len(prs[len(prs)-1].OtherScenes) == 0 {
+				return nil
+			}
+
+			stack.InsertPreScene("", prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			// stack.Push("", 0, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+			curpr.OtherScenes = append(curpr.OtherScenes, prs[len(prs)-1].OtherScenes[len(prs[len(prs)-1].OtherScenes)-1])
+
+			return stack.Scenes[len(stack.Scenes)-2].Scene
+		}
+
+		if len(prs[len(prs)-1].Scenes) == 0 {
+			return nil
+		}
+
+		stack.InsertPreScene("", prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		// stack.Push("", 0, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+		curpr.Scenes = append(curpr.Scenes, prs[len(prs)-1].Scenes[len(prs[len(prs)-1].Scenes)-1])
+
+		return stack.Scenes[len(stack.Scenes)-2].Scene
+	}
+
+	return nil
 }
 
 func (stack *SceneStack) Has(scene string) bool {
@@ -142,16 +239,6 @@ func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *Basic
 
 func (stack *SceneStack) onStepStart(_ *sgc7game.PlayResult) {
 	stack.Scenes = nil
-
-	// for _, v := range stack.CacheScenes {
-	// 	v.SceneIndex = len(pr.Scenes)
-
-	// 	pr.Scenes = append(pr.Scenes, v.Scene)
-
-	// 	stack.Scenes = append(stack.Scenes, v)
-	// }
-
-	// stack.CacheScenes = nil
 }
 
 func NewSceneStack(isOtherScene bool) *SceneStack {
