@@ -270,38 +270,56 @@ func (chgSymbols *ChgSymbols) procReels(gameProp *GameProperty, cd *BasicCompone
 	isNeedBreak := false
 
 	for x, arr := range gs.Arr {
+		arry := make([]int, 0, height)
+
 		for y := len(arr) - 1; y >= len(arr)-height; y-- {
 			s := arr[y]
 
 			if goutils.IndexOfIntSlice(syms, s, 0) >= 0 {
-				cursc, err := chgSymbols.rollSymbolOnReels(gameProp, plugin, cd, x)
-				if err != nil {
-					goutils.Error("ChgSymbols.procReels:rollSymbolOnReels",
-						goutils.Err(err))
-
-					return nil, err
-				}
-
-				if cursc != chgSymbols.Config.BlankSymbolCode {
-					if ngs == gs {
-						ngs = gs.CloneEx(gameProp.PoolScene)
-					}
-
-					ngs.Arr[x][y] = cursc
-
-					curNumber++
-
-					if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
-						isNeedBreak = true
-
-						break
-					}
-				}
+				arry = append(arry, y)
 			}
 		}
 
-		if isNeedBreak {
-			break
+		if len(arry) > 0 {
+			cursc, err := chgSymbols.rollSymbolOnReels(gameProp, plugin, cd, x)
+			if err != nil {
+				goutils.Error("ChgSymbols.procReels:rollSymbolOnReels",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			if cursc != chgSymbols.Config.BlankSymbolCode {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				if len(arry) == 1 {
+					ngs.Arr[x][arry[0]] = cursc
+				} else {
+					arryi, err := plugin.Random(context.Background(), len(arry))
+					if err != nil {
+						goutils.Error("ChgSymbols.procReels:Random",
+							goutils.Err(err))
+
+						return nil, err
+					}
+
+					ngs.Arr[x][arry[arryi]] = cursc
+				}
+
+				curNumber++
+
+				if chgSymbols.Config.MaxNumber > 0 && curNumber >= chgSymbols.Config.MaxNumber {
+					isNeedBreak = true
+
+					break
+				}
+			}
+
+			if isNeedBreak {
+				break
+			}
 		}
 	}
 
