@@ -150,6 +150,7 @@ type RandomMoveSymbolsConfig struct {
 	ReelsWeight              string                `yaml:"reelsWeight" json:"reelsWeight"`
 	ReelsWeightVW2           *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	TargetPositionCollection string                `yaml:"targetPositionCollection" json:"targetPositionCollection"`
+	Controllers              []*Award              `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -233,6 +234,10 @@ func (randomMoveSymbols *RandomMoveSymbols) InitEx(cfg any, pool *GamePropertyPo
 		}
 
 		randomMoveSymbols.Config.ReelsWeightVW2 = vw2
+	}
+
+	for _, award := range randomMoveSymbols.Config.Controllers {
+		award.Init()
 	}
 
 	randomMoveSymbols.onInit(&randomMoveSymbols.Config.BasicComponentConfig)
@@ -428,6 +433,13 @@ func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd
 	return ngs, nil
 }
 
+// OnProcControllers -
+func (randomMoveSymbols *RandomMoveSymbols) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(randomMoveSymbols.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, randomMoveSymbols.Config.Controllers, curpr, gp)
+	}
+}
+
 // playgame
 func (randomMoveSymbols *RandomMoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -470,6 +482,8 @@ func (randomMoveSymbols *RandomMoveSymbols) OnPlayGame(gameProp *GameProperty, c
 	}
 
 	randomMoveSymbols.AddScene(gameProp, curpr, sc2, &msd.BasicComponentData)
+
+	randomMoveSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
 
 	nc := randomMoveSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -530,7 +544,7 @@ func (jcfg *jsonRandomMoveSymbols) build() *RandomMoveSymbolsConfig {
 }
 
 func parseRandomMoveSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseRandomMoveSymbols:getConfigInCell",
 			goutils.Err(err))
@@ -557,6 +571,18 @@ func parseRandomMoveSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) 
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseRandomMoveSymbols:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Controllers = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
