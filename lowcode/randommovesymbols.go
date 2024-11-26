@@ -378,10 +378,12 @@ func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd
 				if x == tx && y == ty {
 					yArr = append(yArr, ty)
 				} else {
-					s := ngs.Arr[tx][ty]
+					if goutils.IndexOfInt2Slice(posSrc, tx, ty, i+1) < 0 {
+						s := ngs.Arr[tx][ty]
 
-					if goutils.IndexOfIntSlice(randomMoveSymbols.Config.TargetSymbolCodes, s, 0) < 0 && goutils.IndexOfIntSlice(randomMoveSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
-						yArr = append(yArr, ty)
+						if goutils.IndexOfIntSlice(randomMoveSymbols.Config.TargetSymbolCodes, s, 0) < 0 && goutils.IndexOfIntSlice(randomMoveSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
+							yArr = append(yArr, ty)
+						}
 					}
 				}
 			}

@@ -748,7 +748,7 @@ func (chgSymbols *ChgSymbols) rollSymbol(gameProp *GameProperty, plugin sgc7plug
 }
 
 // rollSymbolOnReels -
-func (chgSymbols *ChgSymbols) rollSymbolOnReels(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData, x int) (int, error) {
+func (chgSymbols *ChgSymbols) rollSymbolOnReels(_ *GameProperty, plugin sgc7plugin.IPlugin, _ *BasicComponentData, x int) (int, error) {
 	if chgSymbols.Config.WeightOnReels != nil {
 		vw2, isok := chgSymbols.Config.WeightOnReels[x+1]
 		if isok {
