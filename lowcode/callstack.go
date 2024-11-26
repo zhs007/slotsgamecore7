@@ -60,7 +60,7 @@ func (csn *callStackNode) genTag(ic IComponent) string {
 	return fmt.Sprintf("%v/%v", csn.Name, ic.GetName())
 }
 
-func (csn *callStackNode) getComponentData(gameProp *GameProperty, ic IComponent, cs *CallStack) IComponentData {
+func (csn *callStackNode) getComponentData(gameProp *GameProperty, ic IComponent, _ *CallStack) IComponentData {
 	name := ic.GetName()
 	cd, isok := csn.MapComponentData[name]
 	if !isok {
