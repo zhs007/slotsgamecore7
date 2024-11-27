@@ -8,6 +8,7 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"gonum.org/v1/gonum/stat"
 )
 
@@ -169,7 +170,8 @@ func StartRTP(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stake
 					currtp.OnResults(results, gameData)
 
 					if needVariance {
-						currtp.AddReturns(float64(totalReturn / stake.CashBet))
+						rngs := sgc7plugin.GetRngs(plugin)
+						currtp.AddReturns(float64(totalReturn/stake.CashBet), rngs)
 					}
 
 					results = nil //results[:0]
@@ -371,7 +373,8 @@ func StartScaleRTPDown(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int
 					currtp.OnResults(results, gameData)
 
 					if needVariance {
-						rtp.AddReturns(float64(totalReturn / stake.CashBet))
+						rngs := sgc7plugin.GetRngs(plugin)
+						rtp.AddReturns(float64(totalReturn/stake.CashBet), rngs)
 						// rtp.Returns = append(rtp.Returns, float64(totalReturn/stake.CashBet))
 					}
 
