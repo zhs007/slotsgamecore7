@@ -20,6 +20,7 @@ type RTPReturnDataList struct {
 	ReturnWeights []int64
 	MaxReturn     int64
 	MaxReturnNums int64
+	MaxReturnRNGs []int
 	ValRange      []float64
 	TotalReturns  []float64
 	onResults     FuncRDLOnResults
@@ -34,12 +35,13 @@ func NewRTPReturnDataList(tag string, valRange []float64, onResults FuncRDLOnRes
 }
 
 // AddReturns -
-func (rdlst *RTPReturnDataList) AddReturns(fret float64) {
+func (rdlst *RTPReturnDataList) AddReturns(fret float64, rngs []int) {
 	iret := int64(fret * 100)
 
 	if rdlst.MaxReturn < iret {
 		rdlst.MaxReturn = iret
 		rdlst.MaxReturnNums = 1
+		rdlst.MaxReturnRNGs = rngs
 	} else if rdlst.MaxReturn == iret {
 		rdlst.MaxReturnNums++
 	}
@@ -59,10 +61,14 @@ func (rdlst *RTPReturnDataList) AddReturns(fret float64) {
 }
 
 // AddReturnsEx -
-func (rdlst *RTPReturnDataList) addReturnsEx(ret int64, times int64) {
+func (rdlst *RTPReturnDataList) addReturnsEx(ret int64, times int64, rngs []int) {
 	if rdlst.MaxReturn < ret {
 		rdlst.MaxReturn = ret
 		rdlst.MaxReturnNums = times
+
+		if rngs != nil {
+			rdlst.MaxReturnRNGs = rngs
+		}
 	} else if rdlst.MaxReturn == ret {
 		rdlst.MaxReturnNums++
 	}
@@ -85,8 +91,12 @@ func (rdlst *RTPReturnDataList) addReturnsEx(ret int64, times int64) {
 
 // Merge -
 func (rdlst *RTPReturnDataList) Merge(lst *RTPReturnDataList) {
+	if rdlst.MaxReturn < lst.MaxReturn {
+		rdlst.MaxReturnRNGs = lst.MaxReturnRNGs
+	}
+
 	for i, v := range lst.Returns {
-		rdlst.addReturnsEx(v, lst.ReturnWeights[i])
+		rdlst.addReturnsEx(v, lst.ReturnWeights[i], nil)
 	}
 }
 
@@ -95,6 +105,7 @@ func (rdlst *RTPReturnDataList) Clone() *RTPReturnDataList {
 	rdl := &RTPReturnDataList{
 		MaxReturn:     rdlst.MaxReturn,
 		MaxReturnNums: rdlst.MaxReturnNums,
+		MaxReturnRNGs: rdlst.MaxReturnRNGs,
 		ValRange:      rdlst.ValRange,
 		onResults:     rdlst.onResults,
 	}

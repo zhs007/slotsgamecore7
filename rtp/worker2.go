@@ -7,6 +7,7 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"gonum.org/v1/gonum/stat"
 )
 
@@ -142,7 +143,8 @@ func startWorker(game sgc7game.IGame, rtp *RTP, spinnums int64, stake *sgc7game.
 				currtp.OnResults(results, gameData)
 
 				if needVariance {
-					currtp.AddReturns(float64(totalReturn / stake.CashBet))
+					rngs := sgc7plugin.GetRngs(plugin)
+					currtp.AddReturns(float64(totalReturn/stake.CashBet), rngs)
 				}
 
 				results = nil //results[:0]
