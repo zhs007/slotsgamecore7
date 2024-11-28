@@ -255,7 +255,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			totalwins += int64(cpr.CoinWin)
 		}
 
-		gameProp.stats2Cache.ProcStatsOnEnding(totalwins)
+		gameProp.stats2Cache.ProcStatsOnEnding(totalwins, sgc7plugin.GetRngs(plugin))
 
 		components.Stats2.PushCache(gameProp.stats2Cache)
 	}
