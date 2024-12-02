@@ -7,6 +7,7 @@ type Cache struct {
 	Bet       int
 	TotalWin  int64
 	RespinArr []string
+	rngs      []int
 }
 
 func (s2 *Cache) OnStepEnd(respinArr []string) {
@@ -43,8 +44,9 @@ func (s2 *Cache) AddFeature(name string, feature *Feature, isRespin bool) {
 	}
 }
 
-func (s2 *Cache) ProcStatsOnEnding(win int64) {
+func (s2 *Cache) ProcStatsOnEnding(win int64, rngs []int) {
 	s2.TotalWin = win
+	s2.rngs = rngs
 }
 
 func (s2 *Cache) ProcStatsWins(name string, win int64) {

@@ -8,6 +8,7 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
 type Stats struct {
@@ -19,6 +20,7 @@ type Stats struct {
 	BetTimes       int64               `json:"betTimes"`
 	MaxWins        int64               `json:"maxWins"`
 	MaxWinTimes    int64               `json:"maxWinTimes"`
+	MaxWinRNGs     []int               `json:"maxWinRNGs"`
 	BetEndingTimes int64               `json:"-"`
 	Components     []string            `json:"components"`
 	Wins           *StatsWins          `json:"wins"`
@@ -43,6 +45,7 @@ func (s2 *Stats) onCache(cache *Cache) {
 	if cache.TotalWin > s2.MaxWins {
 		s2.MaxWins = cache.TotalWin
 		s2.MaxWinTimes = 1
+		s2.MaxWinRNGs = cache.rngs
 	} else if cache.TotalWin == s2.MaxWins {
 		s2.MaxWinTimes++
 	}
@@ -64,16 +67,6 @@ func (s2 *Stats) SaveExcel(fn string) error {
 	os.WriteFile(fn, buf, 0644)
 
 	return nil
-	// f := excelize.NewFile()
-
-	// for _, cn := range s2.Components {
-	// 	f2, isok := s2.MapStats[cn]
-	// 	if isok {
-	// 		f2.SaveSheet(f, cn, s2)
-	// 	}
-	// }
-
-	// return f.SaveAs(fn)
 }
 
 func (s2 *Stats) saveBasicSheet(f *excelize.File) {
@@ -86,6 +79,7 @@ func (s2 *Stats) saveBasicSheet(f *excelize.File) {
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 3), "rtp")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 4), "max wins")
 	f.SetCellValue(sheet, goutils.Pos2Cell(0, 5), "times of the max wins")
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, 6), "rngs for max win")
 
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 0), s2.BetEndingTimes)
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 1), s2.TotalBet)
@@ -99,6 +93,7 @@ func (s2 *Stats) saveBasicSheet(f *excelize.File) {
 
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 4), s2.MaxWins)
 	f.SetCellValue(sheet, goutils.Pos2Cell(1, 5), s2.MaxWinTimes)
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, 6), sgc7plugin.GenRngsString(s2.MaxWinRNGs))
 }
 
 func (s2 *Stats) saveWins(f *excelize.File) {
@@ -196,6 +191,7 @@ func (s2 *Stats) Merge(src *Stats) {
 	if src.MaxWins > s2.MaxWins {
 		s2.MaxWins = src.MaxWins
 		s2.MaxWinTimes = src.MaxWinTimes
+		s2.MaxWinRNGs = src.MaxWinRNGs
 	} else if src.MaxWins == s2.MaxWins {
 		s2.MaxWinTimes += src.MaxWinTimes
 	}
