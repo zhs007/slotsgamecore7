@@ -173,24 +173,11 @@ func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) 
 	return true
 }
 
-// playgame
-func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
-
-	bcd := cd.(*RemoveSymbolsData)
-	bcd.onNewStep()
-
-	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
+// onBasic
+func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, rscd *RemoveSymbolsData,
+	gs *sgc7game.GameScene, os *sgc7game.GameScene) error {
 	ngs := gs
-
-	bcd.RemovedNum = 0
-
 	totalHeight := 0
-
-	var os *sgc7game.GameScene
-	if removeSymbols.Config.IsNeedProcSymbolVals {
-		os = removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
-	}
 
 	if os != nil {
 		nos := os
@@ -201,67 +188,28 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 				continue
 			}
 
-			ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
+			ccd := gameProp.GetCurComponentDataWithName(cn)
 			if ccd != nil {
 				lst := ccd.GetResults()
 				for _, ri := range lst {
-					if removeSymbols.Config.Type == RSTypeBasic {
-						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-							x := curpr.Results[ri].Pos[pi*2]
-							y := curpr.Results[ri].Pos[pi*2+1]
-							if removeSymbols.canRemove(x, y, ngs) {
-								if ngs == gs {
-									ngs = gs.CloneEx(gameProp.PoolScene)
-									nos = os.CloneEx(gameProp.PoolScene)
-								}
 
-								if !gIsReleaseMode {
-									totalHeight += y
-								}
-
-								ngs.Arr[x][y] = -1
-								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
-
-								bcd.RemovedNum++
+					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+						x := curpr.Results[ri].Pos[pi*2]
+						y := curpr.Results[ri].Pos[pi*2+1]
+						if removeSymbols.canRemove(x, y, ngs) {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+								nos = os.CloneEx(gameProp.PoolScene)
 							}
-						}
-					} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
-						npos := []int{}
 
-						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-							x := curpr.Results[ri].Pos[pi*2]
-							y := curpr.Results[ri].Pos[pi*2+1]
-							if removeSymbols.canRemove(x, y, ngs) {
-								if ngs == gs {
-									ngs = gs.CloneEx(gameProp.PoolScene)
-									nos = os.CloneEx(gameProp.PoolScene)
-								}
-
-								if !gIsReleaseMode {
-									totalHeight += y
-								}
-
-								isNeedRMOtherScene := true
-								if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
-									isNeedRMOtherScene = false
-								} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
-									isNeedRMOtherScene = false
-								}
-
-								if isNeedRMOtherScene {
-									ngs.Arr[x][y] = -1
-									nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
-								} else {
-									npos = append(npos, x, y)
-									// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
-								}
-
-								bcd.RemovedNum++
+							if !gIsReleaseMode {
+								totalHeight += y
 							}
-						}
 
-						for pi := 0; pi < len(npos)/2; pi++ {
-							ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+							ngs.Arr[x][y] = -1
+							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+							rscd.RemovedNum++
 						}
 					}
 				}
@@ -269,12 +217,10 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if ngs == gs {
-			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
+			return ErrComponentDoNothing
 		}
 
-		removeSymbols.AddOtherScene(gameProp, curpr, nos, &bcd.BasicComponentData)
+		removeSymbols.AddOtherScene(gameProp, curpr, nos, &rscd.BasicComponentData)
 	} else {
 		for _, cn := range removeSymbols.Config.TargetComponents {
 			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
@@ -282,81 +228,392 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 				continue
 			}
 
-			ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
+			ccd := gameProp.GetCurComponentDataWithName(cn)
 			if ccd != nil {
 				lst := ccd.GetResults()
 				for _, ri := range lst {
-					if removeSymbols.Config.Type == RSTypeBasic {
-						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-							x := curpr.Results[ri].Pos[pi*2]
-							y := curpr.Results[ri].Pos[pi*2+1]
-							if removeSymbols.canRemove(x, y, ngs) {
-								if ngs == gs {
-									ngs = gs.CloneEx(gameProp.PoolScene)
-								}
 
-								if !gIsReleaseMode {
-									totalHeight += y
-								}
+					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+						x := curpr.Results[ri].Pos[pi*2]
+						y := curpr.Results[ri].Pos[pi*2+1]
+						if removeSymbols.canRemove(x, y, ngs) {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
 
+							if !gIsReleaseMode {
+								totalHeight += y
+							}
+
+							ngs.Arr[x][y] = -1
+
+							rscd.RemovedNum++
+						}
+					}
+
+				}
+			}
+		}
+
+		if ngs == gs {
+			return ErrComponentDoNothing
+		}
+	}
+
+	if !gIsReleaseMode {
+		rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
+	}
+
+	removeSymbols.AddScene(gameProp, curpr, ngs, &rscd.BasicComponentData)
+
+	return nil
+}
+
+// onAdjacentPay
+func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, rscd *RemoveSymbolsData,
+	gs *sgc7game.GameScene, os *sgc7game.GameScene) error {
+	ngs := gs
+	totalHeight := 0
+	npos := []int{}
+
+	if os != nil {
+		nos := os
+
+		for _, cn := range removeSymbols.Config.TargetComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetCurComponentDataWithName(cn)
+			if ccd != nil {
+				lst := ccd.GetResults()
+				for _, ri := range lst {
+
+					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+						x := curpr.Results[ri].Pos[pi*2]
+						y := curpr.Results[ri].Pos[pi*2+1]
+						if removeSymbols.canRemove(x, y, ngs) {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+								nos = os.CloneEx(gameProp.PoolScene)
+							}
+
+							if !gIsReleaseMode {
+								totalHeight += y
+							}
+
+							isNeedRMOtherScene := true
+							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
+								isNeedRMOtherScene = false
+							} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
+								isNeedRMOtherScene = false
+							}
+
+							if isNeedRMOtherScene {
 								ngs.Arr[x][y] = -1
-
-								bcd.RemovedNum++
+								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+							} else {
+								npos = append(npos, x, y)
+								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
 							}
-						}
-					} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
-						npos := []int{}
 
-						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-							x := curpr.Results[ri].Pos[pi*2]
-							y := curpr.Results[ri].Pos[pi*2+1]
-							if removeSymbols.canRemove(x, y, ngs) {
-								if ngs == gs {
-									ngs = gs.CloneEx(gameProp.PoolScene)
-								}
-
-								if !gIsReleaseMode {
-									totalHeight += y
-								}
-
-								isNeedRMOtherScene := true
-								if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
-									isNeedRMOtherScene = false
-								} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
-									isNeedRMOtherScene = false
-								}
-
-								if isNeedRMOtherScene {
-									ngs.Arr[x][y] = -1
-								} else {
-									// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
-									npos = append(npos, x, y)
-								}
-
-								bcd.RemovedNum++
-							}
-						}
-
-						for pi := 0; pi < len(npos)/2; pi++ {
-							ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+							rscd.RemovedNum++
 						}
 					}
 				}
 			}
 		}
 
-		if ngs == gs {
-			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+		for pi := 0; pi < len(npos)/2; pi++ {
+			ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+		}
 
-			return nc, ErrComponentDoNothing
+		if ngs == gs {
+			return ErrComponentDoNothing
+		}
+
+		removeSymbols.AddOtherScene(gameProp, curpr, nos, &rscd.BasicComponentData)
+	} else {
+		for _, cn := range removeSymbols.Config.TargetComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetCurComponentDataWithName(cn)
+			if ccd != nil {
+				lst := ccd.GetResults()
+				for _, ri := range lst {
+
+					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+						x := curpr.Results[ri].Pos[pi*2]
+						y := curpr.Results[ri].Pos[pi*2+1]
+						if removeSymbols.canRemove(x, y, ngs) {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
+
+							if !gIsReleaseMode {
+								totalHeight += y
+							}
+
+							isNeedRMOtherScene := true
+							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
+								isNeedRMOtherScene = false
+							} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
+								isNeedRMOtherScene = false
+							}
+
+							if isNeedRMOtherScene {
+								ngs.Arr[x][y] = -1
+							} else {
+								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+								npos = append(npos, x, y)
+							}
+
+							rscd.RemovedNum++
+						}
+					}
+
+					// for pi := 0; pi < len(npos)/2; pi++ {
+					// 	ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+					// }
+
+				}
+			}
+		}
+
+		for pi := 0; pi < len(npos)/2; pi++ {
+			ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+		}
+
+		if ngs == gs {
+			return ErrComponentDoNothing
 		}
 	}
 
 	if !gIsReleaseMode {
-		bcd.AvgHeight = totalHeight * 100 / bcd.RemovedNum
+		rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
 	}
 
-	removeSymbols.AddScene(gameProp, curpr, ngs, &bcd.BasicComponentData)
+	removeSymbols.AddScene(gameProp, curpr, ngs, &rscd.BasicComponentData)
+
+	return nil
+}
+
+// playgame
+func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+
+	rscd := cd.(*RemoveSymbolsData)
+	rscd.onNewStep()
+
+	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
+	rscd.RemovedNum = 0
+
+	var os *sgc7game.GameScene
+	if removeSymbols.Config.IsNeedProcSymbolVals {
+		os = removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	}
+
+	if removeSymbols.Config.Type == RSTypeBasic {
+		err := removeSymbols.onBasic(gameProp, curpr, gp, rscd, gs, os)
+		if err == ErrComponentDoNothing {
+			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		} else if err != nil {
+			goutils.Error("RemoveSymbols.OnPlayGame:onBasic",
+				goutils.Err(err))
+
+			return "", err
+		}
+	} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+		err := removeSymbols.onAdjacentPay(gameProp, curpr, gp, rscd, gs, os)
+		if err == ErrComponentDoNothing {
+			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		} else if err != nil {
+			goutils.Error("RemoveSymbols.OnPlayGame:onAdjacentPay",
+				goutils.Err(err))
+
+			return "", err
+		}
+	} else {
+		goutils.Error("RemoveSymbols.OnPlayGame:InvalidType",
+			slog.Int("type", int(removeSymbols.Config.Type)),
+			goutils.Err(ErrIvalidComponentConfig))
+
+		return "", ErrIvalidComponentConfig
+	}
+
+	// if os != nil {
+	// 	nos := os
+
+	// 	for _, cn := range removeSymbols.Config.TargetComponents {
+	// 		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+	// 		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+	// 			continue
+	// 		}
+
+	// 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
+	// 		if ccd != nil {
+	// 			lst := ccd.GetResults()
+	// 			for _, ri := range lst {
+	// 				if removeSymbols.Config.Type == RSTypeBasic {
+	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+	// 						x := curpr.Results[ri].Pos[pi*2]
+	// 						y := curpr.Results[ri].Pos[pi*2+1]
+	// 						if removeSymbols.canRemove(x, y, ngs) {
+	// 							if ngs == gs {
+	// 								ngs = gs.CloneEx(gameProp.PoolScene)
+	// 								nos = os.CloneEx(gameProp.PoolScene)
+	// 							}
+
+	// 							if !gIsReleaseMode {
+	// 								totalHeight += y
+	// 							}
+
+	// 							ngs.Arr[x][y] = -1
+	// 							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+	// 							bcd.RemovedNum++
+	// 						}
+	// 					}
+	// 				} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+	// 					npos := []int{}
+
+	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+	// 						x := curpr.Results[ri].Pos[pi*2]
+	// 						y := curpr.Results[ri].Pos[pi*2+1]
+	// 						if removeSymbols.canRemove(x, y, ngs) {
+	// 							if ngs == gs {
+	// 								ngs = gs.CloneEx(gameProp.PoolScene)
+	// 								nos = os.CloneEx(gameProp.PoolScene)
+	// 							}
+
+	// 							if !gIsReleaseMode {
+	// 								totalHeight += y
+	// 							}
+
+	// 							isNeedRMOtherScene := true
+	// 							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
+	// 								isNeedRMOtherScene = false
+	// 							} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
+	// 								isNeedRMOtherScene = false
+	// 							}
+
+	// 							if isNeedRMOtherScene {
+	// 								ngs.Arr[x][y] = -1
+	// 								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+	// 							} else {
+	// 								npos = append(npos, x, y)
+	// 								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+	// 							}
+
+	// 							bcd.RemovedNum++
+	// 						}
+	// 					}
+
+	// 					for pi := 0; pi < len(npos)/2; pi++ {
+	// 						ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	if ngs == gs {
+	// 		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	// 		return nc, ErrComponentDoNothing
+	// 	}
+
+	// 	removeSymbols.AddOtherScene(gameProp, curpr, nos, &bcd.BasicComponentData)
+	// } else {
+	// 	for _, cn := range removeSymbols.Config.TargetComponents {
+	// 		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+	// 		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+	// 			continue
+	// 		}
+
+	// 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
+	// 		if ccd != nil {
+	// 			lst := ccd.GetResults()
+	// 			for _, ri := range lst {
+	// 				if removeSymbols.Config.Type == RSTypeBasic {
+	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+	// 						x := curpr.Results[ri].Pos[pi*2]
+	// 						y := curpr.Results[ri].Pos[pi*2+1]
+	// 						if removeSymbols.canRemove(x, y, ngs) {
+	// 							if ngs == gs {
+	// 								ngs = gs.CloneEx(gameProp.PoolScene)
+	// 							}
+
+	// 							if !gIsReleaseMode {
+	// 								totalHeight += y
+	// 							}
+
+	// 							ngs.Arr[x][y] = -1
+
+	// 							bcd.RemovedNum++
+	// 						}
+	// 					}
+	// 				} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+	// 					npos := []int{}
+
+	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+	// 						x := curpr.Results[ri].Pos[pi*2]
+	// 						y := curpr.Results[ri].Pos[pi*2+1]
+	// 						if removeSymbols.canRemove(x, y, ngs) {
+	// 							if ngs == gs {
+	// 								ngs = gs.CloneEx(gameProp.PoolScene)
+	// 							}
+
+	// 							if !gIsReleaseMode {
+	// 								totalHeight += y
+	// 							}
+
+	// 							isNeedRMOtherScene := true
+	// 							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
+	// 								isNeedRMOtherScene = false
+	// 							} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
+	// 								isNeedRMOtherScene = false
+	// 							}
+
+	// 							if isNeedRMOtherScene {
+	// 								ngs.Arr[x][y] = -1
+	// 							} else {
+	// 								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
+	// 								npos = append(npos, x, y)
+	// 							}
+
+	// 							bcd.RemovedNum++
+	// 						}
+	// 					}
+
+	// 					for pi := 0; pi < len(npos)/2; pi++ {
+	// 						ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	if ngs == gs {
+	// 		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	// 		return nc, ErrComponentDoNothing
+	// 	}
+	// }
+
+	// if !gIsReleaseMode {
+	// 	rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
+	// }
+
+	// removeSymbols.AddScene(gameProp, curpr, ngs, &rscd.BasicComponentData)
 
 	removeSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
 	// if len(removeSymbols.Config.Awards) > 0 {
