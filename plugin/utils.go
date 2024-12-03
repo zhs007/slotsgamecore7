@@ -1,6 +1,12 @@
 package sgc7plugin
 
-import "fmt"
+import (
+	"fmt"
+	"log/slog"
+	"strings"
+
+	"github.com/zhs007/goutils"
+)
 
 func GetRngs(plugin IPlugin) []int {
 	rngs := []int{}
@@ -22,4 +28,26 @@ func GenRngsString(rngs []int) string {
 	}
 
 	return str
+}
+
+func String2Rngs(str string) []int {
+	arr := strings.Split(str, ",")
+	rngs := []int{}
+
+	for _, v := range arr {
+		if v != "" {
+			i64, err := goutils.String2Int64(v)
+			if err != nil {
+				goutils.Error("String2Rngs:String2Int64",
+					slog.String("v", v),
+					goutils.Err(err))
+
+				continue
+			}
+
+			rngs = append(rngs, int(i64))
+		}
+	}
+
+	return rngs
 }
