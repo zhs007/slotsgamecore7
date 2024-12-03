@@ -19,9 +19,9 @@ import (
 
 const LinesTriggerTypeName = "linesTrigger"
 
-const (
-	LTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-)
+// const (
+// 	LTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
+// )
 
 type LinesTriggerData struct {
 	BasicComponentData
@@ -966,7 +966,7 @@ func (linesTrigger *LinesTrigger) NewComponentData() IComponentData {
 }
 
 func (linesTrigger *LinesTrigger) GetWinMulti(basicCD *BasicComponentData) int {
-	winMulti, isok := basicCD.GetConfigIntVal(LTCVWinMulti)
+	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
 		return winMulti
 	}
