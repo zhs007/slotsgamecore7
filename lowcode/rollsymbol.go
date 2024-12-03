@@ -160,6 +160,10 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 		symbols := gameProp.GetComponentSymbols(rollSymbol.Config.SrcSymbolCollection)
 
 		vw = rollSymbol.Config.WeightVW.CloneWithIntArray(symbols)
+
+		if vw == nil {
+			return nil
+		}
 	}
 
 	if vw == nil {
@@ -171,6 +175,10 @@ func (rollSymbol *RollSymbol) getValWeight(gameProp *GameProperty) *sgc7game.Val
 
 		if len(symbols) > 0 {
 			vw = vw.CloneWithoutIntArray(symbols)
+		}
+
+		if vw == nil {
+			return nil
 		}
 	}
 

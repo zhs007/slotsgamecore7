@@ -95,8 +95,8 @@ func (vw *ValWeights2) CloneWithoutIntArray(arr []int) *ValWeights2 {
 	}
 
 	nvw := &ValWeights2{
-		Vals:      make([]IVal, len(vw.Vals)),
-		Weights:   make([]int, len(vw.Weights)),
+		Vals:      make([]IVal, 0, len(vw.Vals)),
+		Weights:   make([]int, 0, len(vw.Weights)),
 		MaxWeight: 0,
 	}
 
@@ -121,8 +121,8 @@ func (vw *ValWeights2) CloneWithIntArray(arr []int) *ValWeights2 {
 	}
 
 	nvw := &ValWeights2{
-		Vals:      make([]IVal, len(vw.Vals)),
-		Weights:   make([]int, len(vw.Weights)),
+		Vals:      make([]IVal, 0, len(vw.Vals)),
+		Weights:   make([]int, 0, len(vw.Weights)),
 		MaxWeight: 0,
 	}
 
@@ -169,8 +169,8 @@ func (vw *ValWeights2) getValidWeightNum() int {
 func (vw *ValWeights2) Normalize() {
 	vnum := vw.getValidWeightNum()
 	if vnum != len(vw.Weights) {
-		vals := make([]IVal, vnum)
-		weights := make([]int, vnum)
+		vals := make([]IVal, 0, vnum)
+		weights := make([]int, 0, vnum)
 
 		vw.MaxWeight = 0
 
