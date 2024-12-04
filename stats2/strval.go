@@ -29,7 +29,7 @@ func (strVal *StatsStrVal) SaveSheet(f *excelize.File, sheet string, s2 *Stats) 
 	strVal.saveSheet(f, sheet, 0, 0, s2)
 }
 
-func (strVal *StatsStrVal) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 *Stats) {
+func (strVal *StatsStrVal) saveSheet(f *excelize.File, sheet string, sx, sy int, _ *Stats) {
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+0, sy+0), "totalTimes")
 
 	f.SetCellValue(sheet, goutils.Pos2Cell(sx+1, sy+0), strVal.TotalUsedTimes)

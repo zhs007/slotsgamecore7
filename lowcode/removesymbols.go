@@ -163,7 +163,7 @@ func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) erro
 func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) bool {
 	curs := gs.Arr[x][y]
 	if curs < 0 {
-		return false
+		return true
 	}
 
 	if len(removeSymbols.Config.IgnoreSymbolCodes) > 0 {

@@ -188,7 +188,7 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 	sx := len(scene.Arr) - 1
 
-	s0 := getSymbol(scene.Arr[sx][ld[sx]])
+	s0 := getSymbol(scene.Arr[sx][ld[len(scene.Arr)-1-sx]])
 	if !isValidSymbol(s0) {
 		return nil
 	}
@@ -196,8 +196,8 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 	nums := 1
 	pos := make([]int, 0, len(ld)*2)
 
-	pos = append(pos, sx, ld[sx])
-	otherMul := getMulti(sx, ld[sx])
+	pos = append(pos, sx, ld[len(scene.Arr)-1-sx])
+	otherMul := getMulti(sx, ld[len(scene.Arr)-1-sx])
 
 	if isWild(s0) {
 		wilds := 1
@@ -205,11 +205,11 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 		wnums := 1
 		wpos := make([]int, 0, len(ld)*2)
 
-		wpos = append(wpos, sx, ld[sx])
-		wotherMul := getMulti(sx, ld[sx])
+		wpos = append(wpos, sx, ld[len(scene.Arr)-1-sx])
+		wotherMul := getMulti(sx, ld[len(scene.Arr)-1-sx])
 
 		for x := 1; x < len(ld); x++ {
-			cs := scene.Arr[sx-x][ld[sx-x]]
+			cs := scene.Arr[sx-x][ld[len(scene.Arr)-1-(sx-x)]]
 
 			if !isValidSymbol(cs) && !isWild(cs) {
 				break
@@ -222,16 +222,16 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 					wnums++
 					nums++
 
-					pos = append(pos, sx-x, ld[sx-x])
-					wpos = append(wpos, sx-x, ld[sx-x])
-					otherMul *= getMulti(sx-x, ld[sx-x])
-					wotherMul *= getMulti(sx-x, ld[sx-x])
+					pos = append(pos, sx-x, ld[len(scene.Arr)-1-(sx-x)])
+					wpos = append(wpos, sx-x, ld[len(scene.Arr)-1-(sx-x)])
+					otherMul *= getMulti(sx-x, ld[len(scene.Arr)-1-(sx-x)])
+					wotherMul *= getMulti(sx-x, ld[len(scene.Arr)-1-(sx-x)])
 				} else {
 					ws = cs
 
 					nums++
-					pos = append(pos, sx-x, ld[sx-x])
-					otherMul *= getMulti(sx-x, ld[sx-x])
+					pos = append(pos, sx-x, ld[len(scene.Arr)-1-(sx-x)])
+					otherMul *= getMulti(sx-x, ld[len(scene.Arr)-1-(sx-x)])
 				}
 			} else {
 				if isWild(cs) {
@@ -241,8 +241,8 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 				if isSameSymbol(cs, ws) {
 					nums++
 
-					pos = append(pos, sx-x, ld[sx-x])
-					otherMul *= getMulti(sx-x, ld[sx-x])
+					pos = append(pos, sx-x, ld[len(scene.Arr)-1-(sx-x)])
+					otherMul *= getMulti(sx-x, ld[len(scene.Arr)-1-(sx-x)])
 				} else {
 					break
 				}
@@ -317,7 +317,7 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 	wilds := 0
 	for x := 1; x < len(ld); x++ {
-		cs := scene.Arr[sx-x][ld[sx-x]]
+		cs := scene.Arr[sx-x][ld[len(scene.Arr)-1-(sx-x)]]
 
 		// if !isValidSymbol(cs) && !isWild(cs) {
 		// 	break
@@ -330,8 +330,8 @@ func CalcLineRL2(scene *GameScene, pt *PayTables, ld []int, bet int,
 
 			nums++
 
-			pos = append(pos, sx-x, ld[sx-x])
-			otherMul *= getMulti(sx-x, ld[sx-x])
+			pos = append(pos, sx-x, ld[len(scene.Arr)-1-(sx-x)])
+			otherMul *= getMulti(sx-x, ld[len(scene.Arr)-1-(sx-x)])
 		} else {
 			break
 		}
