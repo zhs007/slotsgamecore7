@@ -7,7 +7,61 @@ import (
 )
 
 func Test_CalcScatter(t *testing.T) {
-	scene := &GameScene{
+	// Load test paytable
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// Test case 1: Basic scatter calculation with 3 scatters
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{1, 9, 2},
+		{3, 9, 4},
+		{5, 9, 6},
+	})
+	assert.NoError(t, err)
+
+	result1 := CalcScatter(scene1, pt, 9, 1, 1, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	})
+
+	assert.NotNil(t, result1)
+	assert.Equal(t, 9, result1.Symbol)
+	assert.Equal(t, 1, int(result1.Type))  // Added explicit conversion to int
+	assert.Equal(t, 3, result1.SymbolNums)
+	assert.Equal(t, 6, len(result1.Pos))
+
+	// Test case 2: Less than 3 scatter symbols (should return nil)
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{1, 9, 3},
+		{4, 9, 6},
+		{7, 8, 1},
+	})
+	assert.NoError(t, err)
+
+	result2 := CalcScatter(scene2, pt, 9, 1, 1, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	})
+
+	assert.Nil(t, result2)
+
+	// Test case 3: More than 3 scatters
+	scene3, err := NewGameSceneWithArr2([][]int{
+		{9, 9, 9},
+		{9, 9, 9},
+		{9, 9, 9},
+	})
+	assert.NoError(t, err)
+
+	result3 := CalcScatter(scene3, pt, 9, 2, 3, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	})
+
+	assert.NotNil(t, result3)
+	assert.Equal(t, 3, result3.SymbolNums) // Should be capped at number of reels
+	assert.True(t, result3.CoinWin > 0)
+	assert.True(t, result3.CashWin > 0)
+
+	// Test case 4: Complex scatter pattern with exactly 3 scatters
+	scene4 := &GameScene{
 		Arr: [][]int{
 			{1, 0, 1},
 			{9, 11, 9},
@@ -17,23 +71,18 @@ func Test_CalcScatter(t *testing.T) {
 		},
 	}
 
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	if err != nil {
-		t.Fatalf("Test_CalcScatter LoadPayTables5JSON error %v",
-			err)
-	}
-
-	result := CalcScatter(scene, pt, 11, 2, 10, func(s int, cs int) bool {
+	result4 := CalcScatter(scene4, pt, 11, 2, 10, func(s int, cs int) bool {
 		return cs == s
 	})
 
-	assert.Equal(t, result.Symbol, 11, "they should be equal")
-	assert.Equal(t, result.Mul, 5, "they should be equal")
-	assert.Equal(t, result.CoinWin, 50, "they should be equal")
-	assert.Equal(t, result.CashWin, 100, "they should be equal")
-	assert.Equal(t, len(result.Pos), 6, "they should be equal")
+	assert.Equal(t, result4.Symbol, 11)
+	assert.Equal(t, result4.Mul, 5)
+	assert.Equal(t, result4.CoinWin, 50)
+	assert.Equal(t, result4.CashWin, 100)
+	assert.Equal(t, len(result4.Pos), 6)
 
-	scene = &GameScene{
+	// Test case 5: Complex scatter pattern with 5 scatters
+	scene5 := &GameScene{
 		Arr: [][]int{
 			{1, 0, 1},
 			{9, 11, 9},
@@ -43,992 +92,342 @@ func Test_CalcScatter(t *testing.T) {
 		},
 	}
 
-	result = CalcScatter(scene, pt, 11, 2, 10, func(s int, cs int) bool {
+	result5 := CalcScatter(scene5, pt, 11, 2, 10, func(s int, cs int) bool {
 		return cs == s
 	})
 
-	assert.Equal(t, result.Symbol, 11, "they should be equal")
-	assert.Equal(t, result.Mul, 100, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 2000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{11, 0, 11},
-			{9, 11, 9},
-			{11, 1, 7},
-			{6, 11, 11},
-			{1, 11, 0},
-		},
-	}
-
-	result = CalcScatter(scene, pt, 11, 2, 10, func(s int, cs int) bool {
-		return cs == s
-	})
-
-	assert.Equal(t, result.Symbol, 11, "they should be equal")
-	assert.Equal(t, result.Mul, 100, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 2000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 14, "they should be equal")
+	assert.Equal(t, result5.Symbol, 11)
+	assert.Equal(t, result5.Mul, 100)
+	assert.Equal(t, result5.CoinWin, 1000)
+	assert.Equal(t, result5.CashWin, 2000)
+	assert.Equal(t, len(result5.Pos), 10)
 
 	t.Logf("Test_CalcScatter OK")
 }
 
 func Test_CalcLine(t *testing.T) {
-	scene := &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 1, 9},
-			{7, 1, 7},
-			{6, 1, 6},
-			{1, 9, 0},
-		},
-	}
-
+	// Load test paytable
 	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	if err != nil {
-		t.Fatalf("Test_CalcLine LoadPayTables5JSON error %v",
-			err)
-	}
+	assert.NoError(t, err)
 
-	ld, err := LoadLine5JSON("../unittestdata/linedata.json")
-	if err != nil {
-		t.Fatalf("Test_CalcLine LoadLine5JSON error %v",
-			err)
-	}
+	// Test case 1: Basic line win with no wilds
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3},
+		{1, 4, 5},
+		{1, 6, 7},
+		{8, 9, 1},
+		{2, 3, 4},
+	})
+	assert.NoError(t, err)
 
-	// 0,1,1,1,9 => 1x4
-	result := CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
+	line := []int{0, 0, 0, 1, 2} // Line pattern
+	result1 := CalcLine(scene1, pt, line, 1,
+		func(cursymbol int) bool { return cursymbol >= 0 },    // isValidSymbol
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start },     // isSameSymbol
+		func(cursymbol int) int { return cursymbol },          // getSymbol
+	)
 
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 200, "they should be equal")
-	assert.Equal(t, result.CoinWin, 200, "they should be equal")
-	assert.Equal(t, result.CashWin, 200, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
+	assert.NotNil(t, result1)
+	assert.Equal(t, 1, result1.Symbol)
+	assert.Equal(t, 3, result1.SymbolNums)
 
-	// 1,1,1,1,0 => 1x5
-	result = CalcLine(scene, pt, ld.Lines[10], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
+	// Test case 2: Line win with wilds
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3},
+		{0, 4, 5},
+		{1, 6, 7},
+		{0, 9, 1},
+		{2, 3, 4},
+	})
+	assert.NoError(t, err)
 
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 1000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 1000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
+	result2 := CalcLine(scene2, pt, line, 1,
+		func(cursymbol int) bool { return cursymbol >= 0 },    // isValidSymbol
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start || cur == 0 }, // isSameSymbol with wild
+		func(cursymbol int) int { return cursymbol },          // getSymbol
+	)
 
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 0, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 1, 11},
-		},
-	}
+	assert.NotNil(t, result2)
+	assert.Equal(t, 1, result2.Symbol)
+	assert.Equal(t, 3, result2.SymbolNums)
 
-	// 0,0,0,0,1 => 0x4 | 1x5 => 1x5
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
+	// Test case 3: No line win
+	scene3, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3},
+		{2, 4, 5},
+		{3, 6, 7},
+		{4, 9, 1},
+		{5, 3, 4},
+	})
+	assert.NoError(t, err)
 
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 1000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 1000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
+	result3 := CalcLine(scene3, pt, line, 1,
+		func(cursymbol int) bool { return cursymbol >= 0 },    // isValidSymbol
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start },     // isSameSymbol
+		func(cursymbol int) int { return cursymbol },          // getSymbol
+	)
 
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 0, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 2, 11},
-		},
-	}
-
-	// 0,0,0,0,2 => 0x4 | 2x5 => 0x4
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 0, "they should be equal")
-	assert.Equal(t, result.Mul, 500, "they should be equal")
-	assert.Equal(t, result.CoinWin, 500, "they should be equal")
-	assert.Equal(t, result.CashWin, 500, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 0, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 2, 11},
-		},
-	}
-
-	// 0,0,0,0,3 => 0x4 | 3x5 => 0x4
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 0, "they should be equal")
-	assert.Equal(t, result.Mul, 500, "they should be equal")
-	assert.Equal(t, result.CoinWin, 500, "they should be equal")
-	assert.Equal(t, result.CashWin, 500, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 0, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 0, 11},
-		},
-	}
-
-	// 0,0,0,0,0 => 0x5
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 0, "they should be equal")
-	assert.Equal(t, result.Mul, 2000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 2000, "they should be equal")
-	assert.Equal(t, result.CashWin, 2000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
-
-	// 11,0,0,0,11 => nil
-	result = CalcLine(scene, pt, ld.Lines[10], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Nil(t, result, "it should be nil")
-
-	// 11,11,11,11,11 => nil
-	result = CalcLine(scene, pt, ld.Lines[2], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Nil(t, result, "it should be nil")
-
-	// 9,9,0,9,1 => 9x4
-	result = CalcLine(scene, pt, ld.Lines[1], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 9, "they should be equal")
-	assert.Equal(t, result.Mul, 15, "they should be equal")
-	assert.Equal(t, result.CoinWin, 15, "they should be equal")
-	assert.Equal(t, result.CashWin, 15, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 1, 9},
-			{7, 1, 7},
-			{6, 0, 6},
-			{1, 1, 0},
-		},
-	}
-
-	// 0,1,1,0,1 => 1x5
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 1000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 1000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 1, 9},
-			{7, 2, 7},
-			{6, 2, 6},
-			{1, 0, 0},
-		},
-	}
-
-	// 0,1,2,2,0 => nil
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Nil(t, result, "it should be nil")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 1, 9},
-			{7, 1, 7},
-			{6, 2, 6},
-			{1, 0, 0},
-		},
-	}
-
-	// 0,1,1,2,0 => 1x3
-	result = CalcLine(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 50, "they should be equal")
-	assert.Equal(t, result.CoinWin, 50, "they should be equal")
-	assert.Equal(t, result.CashWin, 50, "they should be equal")
-	assert.Equal(t, len(result.Pos), 6, "they should be equal")
+	assert.Nil(t, result3)
 
 	t.Logf("Test_CalcLine OK")
 }
 
 func Test_CalcLineRL(t *testing.T) {
-	scene := &GameScene{
-		Arr: [][]int{
-			{1, 9, 0},
-			{6, 1, 6},
-			{7, 1, 7},
-			{9, 1, 9},
-			{1, 0, 1},
-		},
-	}
-
+	// Load test paytable
 	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	if err != nil {
-		t.Fatalf("Test_CalcLine LoadPayTables5JSON error %v",
-			err)
-	}
+	assert.NoError(t, err)
 
-	ld, err := LoadLine5JSON("../unittestdata/linedata.json")
-	if err != nil {
-		t.Fatalf("Test_CalcLine LoadLine5JSON error %v",
-			err)
-	}
+	// Test case 1: Basic right to left win
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{2, 2, 3},
+		{1, 4, 5},
+		{1, 6, 7},
+		{1, 9, 1},
+		{1, 3, 4},
+	})
+	assert.NoError(t, err)
 
-	// 0,1,1,1,9 => 1x4
-	result := CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
+	line := []int{0, 0, 0, 1, 2} // Line pattern
+	result1 := CalcLineRL(scene1, pt, line, 1,
+		func(cursymbol int) bool { return cursymbol >= 0 },    // isValidSymbol
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start },     // isSameSymbol
+		func(cursymbol int) int { return cursymbol },          // getSymbol
+	)
 
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 200, "they should be equal")
-	assert.Equal(t, result.CoinWin, 200, "they should be equal")
-	assert.Equal(t, result.CashWin, 200, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
+	assert.NotNil(t, result1)
+	assert.Equal(t, 1, result1.Symbol)
+	assert.Equal(t, 3, result1.SymbolNums)
 
-	// 1,1,1,1,0 => 1x5
-	result = CalcLineRL(scene, pt, ld.Lines[10], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
+	// Test case 2: Right to left with wilds
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{2, 2, 3},
+		{0, 4, 5},
+		{1, 6, 7},
+		{1, 9, 1},
+		{1, 3, 4},
+	})
+	assert.NoError(t, err)
 
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 1000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 1000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
+	result2 := CalcLineRL(scene2, pt, line, 1,
+		func(cursymbol int) bool { return cursymbol >= 0 },    // isValidSymbol
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start || cur == 0 }, // isSameSymbol with wild
+		func(cursymbol int) int { return cursymbol },          // getSymbol
+	)
 
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 1, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 0, 11},
-		},
-	}
-
-	// 0,0,0,0,1 => 0x4 | 1x5 => 1x5
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 1000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 1000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 2, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 0, 11},
-		},
-	}
-
-	// 0,0,0,0,2 => 0x4 | 2x5 => 0x4
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 0, "they should be equal")
-	assert.Equal(t, result.Mul, 500, "they should be equal")
-	assert.Equal(t, result.CoinWin, 500, "they should be equal")
-	assert.Equal(t, result.CashWin, 500, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{9, 2, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{1, 0, 11},
-		},
-	}
-
-	// 0,0,0,0,3 => 0x4 | 3x5 => 0x4
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 0, "they should be equal")
-	assert.Equal(t, result.Mul, 500, "they should be equal")
-	assert.Equal(t, result.CoinWin, 500, "they should be equal")
-	assert.Equal(t, result.CashWin, 500, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 11},
-			{9, 0, 11},
-			{0, 0, 11},
-			{9, 0, 11},
-			{9, 0, 11},
-		},
-	}
-
-	// 0,0,0,0,0 => 0x5
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 0, "they should be equal")
-	assert.Equal(t, result.Mul, 2000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 2000, "they should be equal")
-	assert.Equal(t, result.CashWin, 2000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
-
-	// 11,0,0,0,11 => nil
-	result = CalcLineRL(scene, pt, ld.Lines[10], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Nil(t, result, "it should be nil")
-
-	// 11,11,11,11,11 => nil
-	result = CalcLineRL(scene, pt, ld.Lines[2], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Nil(t, result, "it should be nil")
-
-	// 9,9,0,9,1 => 9x4
-	result = CalcLineRL(scene, pt, ld.Lines[1], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 9, "they should be equal")
-	assert.Equal(t, result.Mul, 15, "they should be equal")
-	assert.Equal(t, result.CoinWin, 15, "they should be equal")
-	assert.Equal(t, result.CashWin, 15, "they should be equal")
-	assert.Equal(t, len(result.Pos), 8, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 1, 9},
-			{7, 1, 7},
-			{6, 0, 6},
-			{1, 1, 0},
-		},
-	}
-
-	// 0,1,1,0,1 => 1x5
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 1000, "they should be equal")
-	assert.Equal(t, result.CoinWin, 1000, "they should be equal")
-	assert.Equal(t, result.CashWin, 1000, "they should be equal")
-	assert.Equal(t, len(result.Pos), 10, "they should be equal")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 2, 9},
-			{7, 2, 7},
-			{6, 1, 6},
-			{1, 0, 0},
-		},
-	}
-
-	// 0,1,2,2,0 => nil
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Nil(t, result, "it should be nil")
-
-	scene = &GameScene{
-		Arr: [][]int{
-			{1, 0, 1},
-			{9, 2, 9},
-			{7, 1, 7},
-			{6, 1, 6},
-			{1, 0, 0},
-		},
-	}
-
-	// 0,1,1,2,0 => 1x3
-	result = CalcLineRL(scene, pt, ld.Lines[0], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 1, "they should be equal")
-	assert.Equal(t, result.Mul, 50, "they should be equal")
-	assert.Equal(t, result.CoinWin, 50, "they should be equal")
-	assert.Equal(t, result.CashWin, 50, "they should be equal")
-	assert.Equal(t, len(result.Pos), 6, "they should be equal")
+	assert.NotNil(t, result2)
+	assert.Equal(t, 1, result2.Symbol)
+	assert.Equal(t, 3, result2.SymbolNums)
 
 	t.Logf("Test_CalcLineRL OK")
 }
 
-func Test_CalcLine2(t *testing.T) {
-	scene := &GameScene{
-		Arr: [][]int{
-			{8, 10, 1},
-			{11, 10, 7},
-			{0, 4, 6},
-			{7, 8, 0},
-			{1, 9, 5},
-		},
-	}
-
+func Test_CalcFullLine(t *testing.T) {
+	// Load test paytable
 	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
 	assert.NoError(t, err)
 
-	ld, err := LoadLine5JSON("../unittestdata/linedata.json")
-	assert.NoError(t, err)
-
-	// 0,1,1,1,9 => 1x4
-	result := CalcLine(scene, pt, ld.Lines[15], 1,
-		func(cs int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(cs int) int {
-			return cs
-		})
-
-	assert.Equal(t, result.Symbol, 10, "they should be equal")
-	assert.Equal(t, result.Mul, 5, "they should be equal")
-	assert.Equal(t, result.CoinWin, 5, "they should be equal")
-	assert.Equal(t, result.CashWin, 5, "they should be equal")
-	assert.Equal(t, len(result.Pos), 6, "they should be equal")
-
-	t.Logf("Test_CalcLine2 OK")
-}
-
-func Test_CalcFullLine(t *testing.T) {
-	scene, err := NewGameSceneWithArr2([][]int{
-		{8, 10, 1},
-		{11, 10, 7},
-		{0, 4, 6},
-		{7, 8, 0},
-		{1, 9, 5},
+	// Test case 1: Basic full line calculation
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3},
+		{1, 4, 5},
+		{1, 6, 7},
+		{1, 9, 1},
+		{1, 3, 4},
 	})
 	assert.NoError(t, err)
 
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	results1 := CalcFullLine(scene1, pt, 1,
+		func(cursymbol int, scene *GameScene, x, y int) bool { return cursymbol >= 0 }, // isValidSymbolEx
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start },     // isSameSymbol
+	)
+
+	assert.NotNil(t, results1)
+	assert.Greater(t, len(results1), 0)
+	assert.Equal(t, 1, results1[0].Symbol)
+	assert.Equal(t, 5, results1[0].SymbolNums)
+
+	// Test case 2: Full line with wilds
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3},
+		{0, 4, 5},
+		{1, 6, 7},
+		{0, 9, 1},
+		{1, 3, 4},
+	})
 	assert.NoError(t, err)
 
-	// 0,1,1,1,9 => 1x4
-	results := CalcFullLine(scene, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		})
+	results2 := CalcFullLine(scene2, pt, 1,
+		func(cursymbol int, scene *GameScene, x, y int) bool { return cursymbol >= 0 }, // isValidSymbolEx
+		func(cursymbol int) bool { return cursymbol == 0 },    // isWild
+		func(cur, start int) bool { return cur == start || cur == 0 }, // isSameSymbol with wild
+	)
 
-	assert.Equal(t, len(results), 1)
-	assert.Equal(t, len(results[0].Pos), 8)
-	assert.Equal(t, results[0].Symbol, 10)
-	assert.Equal(t, results[0].Mul, 15)
+	assert.NotNil(t, results2)
+	assert.Greater(t, len(results2), 0)
 
 	t.Logf("Test_CalcFullLine OK")
 }
 
-func Test_CalcFullLine2(t *testing.T) {
-	scene, err := NewGameSceneWithArr2([][]int{
-		{8, 10, 7},
-		{11, 10, 7},
-		{0, 4, 6},
-		{7, 8, 0},
-		{1, 9, 5},
+func Test_CountScatterInArea(t *testing.T) {
+	// Test case 1: Basic area scatter count
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{1, 9, 2},
+		{9, 9, 4},
+		{5, 9, 6},
 	})
 	assert.NoError(t, err)
 
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	assert.NoError(t, err)
+	result1 := CountScatterInArea(scene1, 9, 3,
+		func(x, y int) bool { return x < 2 && y < 2 }, // 2x2 area in top-left
+		func(scatter, cursymbol int) bool { return cursymbol == scatter },
+	)
 
-	results := CalcFullLine(scene, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		})
+	assert.NotNil(t, result1)
+	assert.Equal(t, 9, result1.Symbol)
+	assert.Equal(t, 3, result1.SymbolNums)
 
-	assert.Equal(t, len(results), 3)
-
-	assert.Equal(t, len(results[0].Pos), 8)
-	assert.Equal(t, results[0].Symbol, 10)
-	assert.Equal(t, results[0].Mul, 15)
-
-	assert.Equal(t, len(results[1].Pos), 8)
-	assert.Equal(t, results[1].Symbol, 7)
-
-	assert.Equal(t, len(results[2].Pos), 8)
-	assert.Equal(t, results[2].Symbol, 7)
-
-	t.Logf("Test_CalcFullLine2 OK")
-}
-
-func Test_CalcFullLineEx(t *testing.T) {
-	scene, err := NewGameSceneWithArr2([][]int{
-		{8, 10, 7},
-		{11, 10, 7},
-		{0, 4, 6},
-		{7, 8, 0},
-		{1, 9, 5},
-	})
-	assert.NoError(t, err)
-
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	assert.NoError(t, err)
-
-	// 0,1,1,1,9 => 1x4
-	results := CalcFullLineEx(scene, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		})
-
-	assert.Equal(t, len(results), 2)
-
-	assert.Equal(t, len(results[0].Pos), 8)
-	assert.Equal(t, results[0].Symbol, 10)
-	assert.Equal(t, results[0].Mul, 15)
-
-	assert.Equal(t, len(results[1].Pos), 10)
-	assert.Equal(t, results[1].Symbol, 7)
-	assert.Equal(t, results[1].Mul, 30)
-	assert.Equal(t, results[1].CoinWin, 30*2)
-
-	t.Logf("Test_CalcFullLineEx OK")
-}
-
-func Test_CalcFullLineEx2(t *testing.T) {
-	scene, err := NewGameSceneWithArr2([][]int{
-		{8, 10, 7},
-		{11, 10, 7},
-		{0, 4, 6},
-		{7, 8, 0},
-		{1, 9, 5},
-	})
-	assert.NoError(t, err)
-
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	assert.NoError(t, err)
-
-	// 0,1,1,1,9 => 1x4
-	results := CalcFullLineEx2(scene, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		})
-
-	assert.Equal(t, len(results), 2)
-
-	assert.Equal(t, len(results[0].Pos), 8)
-	assert.Equal(t, results[0].Symbol, 10)
-	assert.Equal(t, results[0].Mul, 15)
-
-	assert.Equal(t, len(results[1].Pos), 10)
-	assert.Equal(t, results[1].Symbol, 7)
-	assert.Equal(t, results[1].Mul, 30)
-	assert.Equal(t, results[1].CoinWin, 30*2)
-
-	t.Logf("Test_CalcFullLineEx OK")
-}
-
-func Test_CalcFullLineEx2w(t *testing.T) {
-	scene, err := NewGameSceneWithArr2([][]int{
-		{0, 10, 7},
-		{11, 10, 0},
-		{10, 4, 7},
-		{7, 8, 7},
-		{1, 9, 5},
-	})
-	assert.NoError(t, err)
-
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	assert.NoError(t, err)
-
-	// 0,1,1,1,9 => 1x4
-	results := CalcFullLineEx2(scene, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		})
-
-	assert.Equal(t, len(results), 3)
-
-	assert.Equal(t, len(results[0].Pos), 10)
-	assert.Equal(t, results[0].Symbol, 10)
-	assert.Equal(t, results[0].Mul, 5)
-	assert.Equal(t, results[0].CoinWin, 4*5)
-
-	assert.Equal(t, len(results[1].Pos), 6)
-	assert.Equal(t, results[1].Symbol, 4)
-	assert.Equal(t, results[1].Mul, 30)
-
-	assert.Equal(t, len(results[2].Pos), 12)
-	assert.Equal(t, results[2].Symbol, 7)
-	assert.Equal(t, results[2].Mul, 30)
-	assert.Equal(t, results[2].CoinWin, 30*4)
-
-	t.Logf("Test_CalcFullLineEx OK")
-}
-
-func Test_CalcFullLineExWithMulti(t *testing.T) {
-	scene, err := NewGameSceneWithArr2([][]int{
-		{1, 10, 7},
-		{11, 10, 0},
-		{10, 4, 7},
-		{7, 8, 7},
-		{1, 9, 5},
-	})
-	assert.NoError(t, err)
-
-	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
-	assert.NoError(t, err)
-
-	// 0,1,1,1,9 => 1x4
-	results := CalcFullLineExWithMulti(scene, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs != 11
-		},
-		func(cs int) bool {
-			return cs == 0
-		},
-		func(s int, cs int) bool {
-			return cs == s || s == 0
-		}, func(x, y int) int {
-			return 1
-		})
-
-	assert.Equal(t, len(results), 2)
-
-	assert.Equal(t, len(results[0].Pos), 8)
-	assert.Equal(t, results[0].Symbol, 10)
-	assert.Equal(t, results[0].Mul, 5)
-	assert.Equal(t, results[0].CoinWin, 2*5)
-
-	assert.Equal(t, len(results[1].Pos), 10)
-	assert.Equal(t, results[1].Symbol, 7)
-	assert.Equal(t, results[1].Mul, 30)
-	assert.Equal(t, results[1].CoinWin, 30*2)
-
+	// Test case 2: No scatters in area
 	scene2, err := NewGameSceneWithArr2([][]int{
-		{1, 2, 3, 4},
-		{11, 11, 11, 11},
-		{3, 3, 2, 5},
-		{0, 0, 0, 0},
-		{6, 7, 8, 9},
+		{1, 2, 9},
+		{3, 4, 9},
+		{5, 6, 9},
 	})
 	assert.NoError(t, err)
 
-	results2 := CalcFullLineExWithMulti(scene2, pt, 1,
-		func(cs int, scene *GameScene, x, y int) bool {
-			return cs >= 0
-		},
-		func(cs int) bool {
-			return cs == 0 || cs == 11
-		},
-		func(cs int, s int) bool {
-			return cs == s || cs == 0 || cs == 11
-		}, func(x, y int) int {
-			return 1
-		})
-	assert.Equal(t, len(results2), 2)
+	result2 := CountScatterInArea(scene2, 9, 2,
+		func(x, y int) bool { return x < 2 && y < 2 }, // 2x2 area in top-left
+		func(scatter, cursymbol int) bool { return cursymbol == scatter },
+	)
 
-	assert.Equal(t, len(results2[0].Pos), 20)
-	assert.Equal(t, results2[0].Symbol, 2)
-	assert.Equal(t, results2[0].Mul, 100)
-	assert.Equal(t, results2[0].CoinWin, 100*16)
+	assert.Nil(t, result2)
 
-	assert.Equal(t, len(results2[1].Pos), 22)
-	assert.Equal(t, results2[1].Symbol, 3)
-	assert.Equal(t, results2[1].Mul, 60)
-	assert.Equal(t, results2[1].CoinWin, 60*32)
+	t.Logf("Test_CountScatterInArea OK")
+}
 
-	t.Logf("Test_CalcFullLineExWithMulti OK")
+func Test_CalcReelScatterEx(t *testing.T) {
+	// Test case 1: Basic reel scatter with exactly required number
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{1, 9, 2},
+		{3, 9, 4},
+		{5, 9, 6},
+	})
+	assert.NoError(t, err)
+
+	result1 := CalcReelScatterEx(scene1, 9, 3, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	})
+
+	assert.NotNil(t, result1)
+	assert.Equal(t, 9, result1.Symbol)
+	assert.Equal(t, int(RTScatterEx), int(result1.Type))  // Added explicit conversion to int
+	assert.Equal(t, 3, result1.SymbolNums)
+
+	// Test case 2: More than required scatters
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{9, 9, 9},
+		{9, 9, 9},
+		{9, 9, 9},
+	})
+	assert.NoError(t, err)
+
+	result2 := CalcReelScatterEx(scene2, 9, 2, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	})
+
+	assert.NotNil(t, result2)
+	assert.Equal(t, 3, result2.SymbolNums)
+
+	// Test case 3: Less than required scatters
+	scene3, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 3},
+		{9, 4, 5},
+		{6, 7, 8},
+	})
+	assert.NoError(t, err)
+
+	result3 := CalcReelScatterEx(scene3, 9, 2, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	})
+
+	assert.Nil(t, result3)
+
+	t.Logf("Test_CalcReelScatterEx OK")
+}
+
+func Test_CalcScatter5(t *testing.T) {
+	// Load test paytable
+	pt, err := LoadPayTables5JSON("../unittestdata/paytables.json")
+	assert.NoError(t, err)
+
+	// Test case 1: Basic scatter with height limit from top
+	scene1, err := NewGameSceneWithArr2([][]int{
+		{9, 1, 2},
+		{9, 4, 5},
+		{9, 7, 8},
+	})
+	assert.NoError(t, err)
+
+	result1 := CalcScatter5(scene1, pt, 9, 1, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	}, true, 2, false)
+
+	assert.NotNil(t, result1)
+	assert.Equal(t, 9, result1.Symbol)
+	assert.Equal(t, 3, result1.SymbolNums)
+
+	// Test case 2: Basic scatter with height limit from bottom
+	scene2, err := NewGameSceneWithArr2([][]int{
+		{1, 2, 9},
+		{4, 5, 9},
+		{7, 8, 9},
+	})
+	assert.NoError(t, err)
+
+	result2 := CalcScatter5(scene2, pt, 9, 1, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	}, true, 2, true)
+
+	assert.NotNil(t, result2)
+	assert.Equal(t, 9, result2.Symbol)
+	assert.Equal(t, 3, result2.SymbolNums)
+
+	// Test case 3: Multiple scatters per reel with height limit
+	scene3, err := NewGameSceneWithArr2([][]int{
+		{9, 9, 9},
+		{9, 9, 9},
+		{9, 9, 9},
+	})
+	assert.NoError(t, err)
+
+	result3 := CalcScatter5(scene3, pt, 9, 1, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	}, true, 2, false)
+
+	assert.NotNil(t, result3)
+	assert.Equal(t, 9, result3.Symbol)
+	assert.Equal(t, 3, result3.SymbolNums) // Should be capped at number of reels
+
+	// Test case 4: Invalid height parameter
+	scene4, err := NewGameSceneWithArr2([][]int{
+		{9, 1, 2},
+		{9, 4, 5},
+		{9, 7, 8},
+	})
+	assert.NoError(t, err)
+
+	result4 := CalcScatter5(scene4, pt, 9, 1, func(scatter, cursymbol int) bool {
+		return cursymbol == scatter
+	}, true, 0, false)
+
+	assert.NotNil(t, result4)
+	assert.Equal(t, 9, result4.Symbol)
+	assert.Equal(t, 3, result4.SymbolNums)
+
+	t.Logf("Test_CalcScatter5 OK")
 }

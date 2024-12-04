@@ -6,6 +6,7 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 	isWild FuncIsWild,
 	isSameSymbol FuncIsSameSymbol,
 	getSymbol FuncGetSymbol) ([]*Result, error) {
+
 	results := []*Result{}
 
 	scene0 := scene.Clone()
