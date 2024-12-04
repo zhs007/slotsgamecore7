@@ -7,7 +7,7 @@ import (
 	"github.com/zhs007/goutils"
 )
 
-// FloatValMapping
+// FloatValMapping - a mapping for float values
 type FloatValMapping[T int, V float32 | float64] struct {
 	MapVals map[T]V `json:"mapVals"`
 }

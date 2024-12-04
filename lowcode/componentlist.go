@@ -12,6 +12,7 @@ type ComponentList struct {
 	MapComponents map[string]IComponent `yaml:"mapComponents" json:"mapComponents"`
 	Stats2        *stats2.Stats         `yaml:"-" json:"-"`
 	statsNodeData *SPCNode              `yaml:"-" json:"-"`
+	RngLib        *RngLib               `yaml:"-" json:"-"`
 }
 
 func (lst *ComponentList) AddComponent(name string, component IComponent) {
@@ -34,6 +35,19 @@ func (lst *ComponentList) onInit(start string) error {
 		lst.statsNodeData = node
 
 		lst.Stats2 = NewStats2(lst)
+
+		if gRngLibConfig != "" {
+			rnglib, err := LoadRngLib(gRngLibConfig)
+			if err != nil {
+				goutils.Error("ComponentList.onInit:LoadRngLib",
+					slog.String("gRngLibConfig", gRngLibConfig),
+					goutils.Err(err))
+
+				return err
+			}
+
+			lst.RngLib = rnglib
+		}
 
 		lst.Stats2.Start()
 	}

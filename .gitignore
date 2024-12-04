@@ -28,3 +28,4 @@ output/*.csv
 __debug_bin*
 .DS_Store
 data/game.json
+data/rnglib.yaml

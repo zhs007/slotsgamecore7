@@ -15,6 +15,7 @@ type Stats struct {
 	MapStats       map[string]*Feature `json:"mapStats"`
 	chanBet        chan int            `json:"-"`
 	chanCache      chan *Cache         `json:"-"`
+	chanRNGs       chan *rngData       `json:"-"`
 	TotalBet       int64               `json:"totalBet"`
 	TotalWins      int64               `json:"totalWins"`
 	BetTimes       int64               `json:"betTimes"`
@@ -24,6 +25,14 @@ type Stats struct {
 	BetEndingTimes int64               `json:"-"`
 	Components     []string            `json:"components"`
 	Wins           *StatsWins          `json:"wins"`
+	MapRNGs        map[string][]int    `json:"rngs"`
+}
+
+func (s2 *Stats) PushRNGs(name string, rngs []int) {
+	s2.chanRNGs <- &rngData{
+		Name: name,
+		RNGs: rngs,
+	}
 }
 
 func (s2 *Stats) PushBet(bet int) {
@@ -103,11 +112,25 @@ func (s2 *Stats) saveWins(f *excelize.File) {
 	s2.Wins.SaveSheet(f, sheet, s2)
 }
 
+func (s2 *Stats) saveRNGs(f *excelize.File) {
+	sheet := "rngs"
+	f.NewSheet(sheet)
+
+	y := 0
+	for k, v := range s2.MapRNGs {
+		f.SetCellValue(sheet, goutils.Pos2Cell(0, y), k)
+		f.SetCellValue(sheet, goutils.Pos2Cell(1, y), sgc7plugin.GenRngsString(v))
+
+		y++
+	}
+}
+
 func (s2 *Stats) ExportExcel() ([]byte, error) {
 	f := excelize.NewFile()
 
 	s2.saveBasicSheet(f)
 	s2.saveWins(f)
+	s2.saveRNGs(f)
 
 	f.DeleteSheet(f.GetSheetName(0))
 
@@ -148,6 +171,17 @@ func (s2 *Stats) Start() {
 			s2.BetEndingTimes++
 		}
 	}()
+
+	go func() {
+		for {
+			rngs := <-s2.chanRNGs
+
+			_, isok := s2.MapRNGs[rngs.Name]
+			if !isok {
+				s2.MapRNGs[rngs.Name] = rngs.RNGs
+			}
+		}
+	}()
 }
 
 func (s2 *Stats) WaitEnding() {
@@ -185,6 +219,13 @@ func (s2 *Stats) Merge(src *Stats) {
 		}
 	}
 
+	for k, v := range src.MapRNGs {
+		_, isok := s2.MapRNGs[k]
+		if !isok {
+			s2.MapRNGs[k] = v
+		}
+	}
+
 	s2.TotalBet += src.TotalBet
 	s2.TotalWins += src.TotalWins
 	s2.BetTimes += src.BetTimes
@@ -210,6 +251,8 @@ func NewStats(components []string) *Stats {
 		MapStats:   make(map[string]*Feature),
 		chanBet:    make(chan int, 1024),
 		chanCache:  make(chan *Cache, 1024),
+		chanRNGs:   make(chan *rngData, 1024),
+		MapRNGs:    make(map[string][]int),
 		Components: components,
 		Wins:       NewStatsWins(),
 	}
