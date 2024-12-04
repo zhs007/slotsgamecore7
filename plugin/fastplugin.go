@@ -34,6 +34,12 @@ func (fp *FastPlugin) Random(ctx context.Context, r int) (int, error) {
 
 		cr := ci % r
 
+		fp.AddRngUsed(&sgc7utils.RngInfo{
+			Bits:  cr,
+			Range: r,
+			Value: cr,
+		})
+
 		return cr, nil
 	}
 
