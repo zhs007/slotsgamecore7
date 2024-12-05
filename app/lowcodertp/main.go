@@ -41,6 +41,7 @@ func main() {
 	gamecfg := os.Getenv("GAMECFG")
 	outputPath := os.Getenv("OUTPUTPATH")
 	strBet := os.Getenv("BET")
+	rnglib := os.Getenv("RNGLIB")
 
 	isAllowStats2 := false
 	strAllowStats2 := os.Getenv("ALLOWSTATS2")
@@ -82,6 +83,10 @@ func main() {
 
 	lowcode.SetReleaseMode()
 	lowcode.SetRTPMode()
+
+	if rnglib != "" {
+		lowcode.SetRngLibConfig(rnglib)
+	}
 
 	// lowcode.SetForceDisableStats()
 	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, 0)

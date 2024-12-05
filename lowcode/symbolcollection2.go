@@ -203,7 +203,7 @@ func (symbolCollection2 *SymbolCollection2) NewComponentData() IComponentData {
 // 	}
 // }
 
-func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, _ sgc7plugin.IPlugin,
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
 
 	ccn := symbolCollection2.Config.ForeachComponent

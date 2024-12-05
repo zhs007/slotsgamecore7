@@ -1,5 +1,17 @@
 package sgc7game
 
+import "github.com/zhs007/goutils"
+
+func isValidAdjacentPayResult(gs *GameScene, ret *Result) bool {
+	for i := 0; i < len(ret.Pos)/2; i++ {
+		if gs.Arr[ret.Pos[i*2]][ret.Pos[i*2+1]] != 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
 // CalcAdjacentPay - AdjacentPay
 func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 	isValidSymbol FuncIsValidSymbol,
@@ -10,19 +22,28 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 	results := []*Result{}
 
 	scene0 := scene.Clone()
+	gsx, err := NewGameScene(scene.Width, scene.Height)
+	if err != nil {
+		goutils.Error("CalcAdjacentPay:NewGameScene",
+			goutils.Err(err))
+
+		return nil, err
+	}
 
 	for x, arr := range scene.Arr {
 		for y := range arr {
 			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
 				crx := calcAdjacentPayWithX(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol, isWild)
 
-				if crx != nil {
+				if crx != nil && isValidAdjacentPayResult(gsx, crx) {
 					results = append(results, crx)
 
 					for i := 0; i < len(crx.Pos)/2; i++ {
 						if !isWild(scene0.Arr[crx.Pos[i*2]][crx.Pos[i*2+1]]) {
 							scene0.Arr[crx.Pos[i*2]][crx.Pos[i*2+1]] = -1
 						}
+
+						gsx.Arr[crx.Pos[i*2]][crx.Pos[i*2+1]] = 0
 					}
 				}
 			}
@@ -30,19 +51,28 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 	}
 
 	scene0 = scene.Clone()
+	gsy, err := NewGameScene(scene.Width, scene.Height)
+	if err != nil {
+		goutils.Error("CalcAdjacentPay:NewGameScene",
+			goutils.Err(err))
+
+		return nil, err
+	}
 
 	for x, arr := range scene.Arr {
 		for y := range arr {
 			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
 				cry := calcAdjacentPayWithY(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol, isWild)
 
-				if cry != nil {
+				if cry != nil && isValidAdjacentPayResult(gsy, cry) {
 					results = append(results, cry)
 
 					for i := 0; i < len(cry.Pos)/2; i++ {
 						if !isWild(scene0.Arr[cry.Pos[i*2]][cry.Pos[i*2+1]]) {
 							scene0.Arr[cry.Pos[i*2]][cry.Pos[i*2+1]] = -1
 						}
+
+						gsy.Arr[cry.Pos[i*2]][cry.Pos[i*2+1]] = 0
 					}
 				}
 			}

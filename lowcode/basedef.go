@@ -289,6 +289,12 @@ func SetAllowFullComponentHistory() {
 	gAllowFullComponentHistory = true
 }
 
+var gRngLibConfig string
+
+func SetRngLibConfig(fn string) {
+	gRngLibConfig = fn
+}
+
 func init() {
 	initCheckWinType()
 }

@@ -255,9 +255,21 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			totalwins += int64(cpr.CoinWin)
 		}
 
-		gameProp.stats2Cache.ProcStatsOnEnding(totalwins, sgc7plugin.GetRngs(plugin))
+		rngs := sgc7plugin.GetRngs(plugin)
+		gameProp.stats2Cache.ProcStatsOnEnding(totalwins, rngs)
 
 		components.Stats2.PushCache(gameProp.stats2Cache)
+
+		if components.RngLib != nil {
+			rets := make([]*sgc7game.PlayResult, 0, len(prs)+1)
+			copy(rets, prs)
+			rets = append(rets, pr)
+
+			rngname := components.RngLib.onResults(rets)
+			if rngname != "" {
+				components.Stats2.PushRNGs(rngname, rngs)
+			}
+		}
 	}
 
 	return pr, nil
