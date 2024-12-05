@@ -123,9 +123,9 @@ func NewGameSceneWithReels(reels *ReelsData, w, h int, arr []int) (*GameScene, e
 
 // Init - init scene
 func (gs *GameScene) Init(w int, h int) error {
-	gs.Arr = nil
+	gs.Arr = make([][]int, w)
 	for x := 0; x < w; x++ {
-		gs.Arr = append(gs.Arr, []int{})
+		gs.Arr[x] = make([]int, 0, h)
 
 		for y := 0; y < h; y++ {
 			gs.Arr[x] = append(gs.Arr[x], -1)
@@ -140,18 +140,18 @@ func (gs *GameScene) Init(w int, h int) error {
 
 // Init2 - init scene v2
 func (gs *GameScene) Init2(w int, h int, v int) error {
-	gs.Arr = nil
+	gs.Arr = make([][]int, w)
 
 	if v == 0 {
 		for x := 0; x < w; x++ {
-			gs.Arr = append(gs.Arr, make([]int, h))
+			gs.Arr[x] = make([]int, h)
 		}
 	} else {
 		for x := 0; x < w; x++ {
-			gs.Arr = append(gs.Arr, make([]int, h))
+			gs.Arr[x] = make([]int, 0, h)
 
 			for y := 0; y < h; y++ {
-				gs.Arr[x][y] = v
+				gs.Arr[x] = append(gs.Arr[x], v)
 			}
 		}
 	}
@@ -164,10 +164,10 @@ func (gs *GameScene) Init2(w int, h int, v int) error {
 
 // InitEx - init scene
 func (gs *GameScene) InitEx(h []int) error {
-	gs.Arr = nil
+	gs.Arr = make([][]int, len(h))
 	gs.Height = 0
 	for x := 0; x < len(h); x++ {
-		gs.Arr = append(gs.Arr, []int{})
+		gs.Arr[x] = make([]int, 0, h[x])
 
 		for y := 0; y < h[x]; y++ {
 			gs.Arr[x] = append(gs.Arr[x], -1)

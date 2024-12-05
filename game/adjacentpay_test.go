@@ -216,6 +216,7 @@ func Test_CalcAdjacentPayEdgeCases(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, resultAllWild)
+	assert.Equal(t, 10, len(resultAllWild))
 
 	// Test scene with alternating symbols and wilds
 	sceneAlternate, err := NewGameSceneWithArr2([][]int{
