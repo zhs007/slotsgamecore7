@@ -72,10 +72,10 @@
             "env": {
                 "GAMECFG": "${workspaceFolder}/data/game.json",
                 "OUTPUTPATH": "${workspaceFolder}/output",
-                "SPINNUMS": "10000",
+                "SPINNUMS": "1000000",
                 "CORE":"1",
                 "ALLOWSTATS2":"true",
-                "BET":"25",
+                "BET":"10",
                 "RNGLIB": "${workspaceFolder}/data/rnglib.yaml"
             }
         },
