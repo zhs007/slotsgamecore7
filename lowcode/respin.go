@@ -40,7 +40,6 @@ func (respinData *RespinData) OnNewGame(gameProp *GameProperty, component ICompo
 	respinData.CurRespinNum = 0
 	respinData.CurAddRespinNum = 0
 	respinData.TotalCoinWin = 0
-	// respinData.TotalCashWin = 0
 	respinData.RetriggerAddRespinNum = 0
 	respinData.LastTriggerNum = 0
 	respinData.CurTriggerNum = 0
@@ -49,8 +48,6 @@ func (respinData *RespinData) OnNewGame(gameProp *GameProperty, component ICompo
 
 // onNewStep -
 func (respinData *RespinData) onNewStep() {
-	// respinData.BasicComponentData.OnNewStep(gameProp, component)
-
 	respinData.CurAddRespinNum = 0
 }
 
@@ -76,12 +73,11 @@ func (respinData *RespinData) Clone() IComponentData {
 // BuildPBComponentData
 func (respinData *RespinData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RespinData{
-		BasicComponentData: respinData.BuildPBBasicComponentData(),
-		LastRespinNum:      int32(respinData.LastRespinNum),
-		CurRespinNum:       int32(respinData.CurRespinNum),
-		CurAddRespinNum:    int32(respinData.CurAddRespinNum),
-		TotalCoinWin:       respinData.TotalCoinWin,
-		// TotalCashWin:          respinData.TotalCashWin,
+		BasicComponentData:    respinData.BuildPBBasicComponentData(),
+		LastRespinNum:         int32(respinData.LastRespinNum),
+		CurRespinNum:          int32(respinData.CurRespinNum),
+		CurAddRespinNum:       int32(respinData.CurAddRespinNum),
+		TotalCoinWin:          respinData.TotalCoinWin,
 		RetriggerAddRespinNum: int32(respinData.RetriggerAddRespinNum),
 		LastTriggerNum:        int32(respinData.LastTriggerNum),
 		CurTriggerNum:         int32(respinData.CurTriggerNum),
@@ -143,11 +139,6 @@ func (respinData *RespinData) SetConfigIntVal(key string, val int) {
 		respinData.BasicComponentData.ChgConfigIntVal(key, val)
 	}
 }
-
-// // AddRetriggerRespinNum -
-// func (respinData *RespinData) AddRetriggerRespinNum(num int) {
-// 	respinData.RetriggerAddRespinNum += num
-// }
 
 // AddTriggerRespinAward -
 func (respinData *RespinData) AddTriggerRespinAward(award *Award) {
@@ -220,10 +211,7 @@ type RespinLevelConfig struct {
 // RespinConfig - configuration for Respin
 type RespinConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	// InitRespinNum        int    `yaml:"initRespinNum" json:"initRespinNum"`
-	MainComponent string `yaml:"mainComponent" json:"mainComponent"`
-	// IsWinBreak           bool                 `yaml:"isWinBreak" json:"isWinBreak"`
-	// Levels []*RespinLevelConfig `yaml:"levels" json:"levels"`
+	MainComponent        string `yaml:"mainComponent" json:"mainComponent"`
 }
 
 // SetLinkComponent
@@ -240,30 +228,13 @@ type Respin struct {
 	Config          *RespinConfig `json:"config"`
 }
 
-// // OnNewGame -
-// func (respin *Respin) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.MapComponentData[respin.Name]
-
-// 	cd.OnNewGame()
-
-// 	return nil
-// }
-
-// OnPlayGame - on playgame
-func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData, _ *GameProperty) bool {
-	if respinData.LastRespinNum <= level.LastRespinNum && respinData.CoinWin < level.MaxCoinWins {
-		return true
-	}
-
-	return false
-}
-
 // // OnPlayGame - on playgame
-// func (respin *Respin) AddRespinTimes(gameProp *GameProperty, num int) {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
+// func (respin *Respin) procLevel(level *RespinLevelConfig, respinData *RespinData, _ *GameProperty) bool {
+// 	if respinData.LastRespinNum <= level.LastRespinNum && respinData.CoinWin < level.MaxCoinWins {
+// 		return true
+// 	}
 
-// 	cd.LastRespinNum += num
-// 	cd.CurAddRespinNum += num
+// 	return false
 // }
 
 // Init -
@@ -305,15 +276,9 @@ func (respin *Respin) InitEx(cfg any, pool *GamePropertyPool) error {
 func (respin *Respin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// respin.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*RespinData)
 
 	cd.onNewStep()
-
-	// if cd.CurRespinNum == 0 && cd.LastRespinNum == 0 && respin.Config.InitRespinNum > 0 {
-	// 	cd.LastRespinNum = respin.Config.InitRespinNum
-	// }
 
 recheck:
 	if cd.LastRespinNum == 0 {
@@ -335,14 +300,6 @@ recheck:
 	}
 
 	nextComponent := respin.Config.MainComponent
-
-	// for _, v := range respin.Config.Levels {
-	// 	if respin.procLevel(v, cd, gameProp) {
-	// 		nextComponent = v.JumpComponent
-
-	// 		break
-	// 	}
-	// }
 
 	if cd.LastRespinNum > 0 {
 		cd.LastRespinNum--
@@ -367,67 +324,6 @@ func (respin *Respin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResul
 
 	return nil
 }
-
-// // OnStats
-// func (respin *Respin) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	if feature != nil && len(lst) > 0 {
-
-// 		if feature.RespinNumStatus != nil ||
-// 			feature.RespinWinStatus != nil {
-// 			pbcd, lastpr := findLastPBComponentData(lst, respin.Name)
-// 			if pbcd != nil {
-// 				respin.onStatsWithPBEnding(feature, pbcd, lastpr)
-// 			}
-// 		}
-
-// 		if feature.RespinStartNumStatus != nil {
-// 			pbcd, firstpr := findFirstPBComponentData(lst, respin.Name)
-// 			if pbcd != nil {
-// 				respin.onStatsWithPBStart(feature, pbcd, firstpr)
-// 			}
-// 		}
-// 	}
-
-// 	return false, 0, 0
-// }
-
-// // onStatsWithPBEnding -
-// func (respin *Respin) onStatsWithPBEnding(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
-// 	if !isok {
-// 		goutils.Error("Respin.onStatsWithPBEnding",
-// 			goutils.Err(ErrIvalidProto))
-
-// 		return ErrIvalidProto
-// 	}
-
-// 	if feature.RespinNumStatus != nil {
-// 		feature.RespinNumStatus.AddStatus(int(pbcd.CurRespinNum))
-// 	}
-
-// 	if feature.RespinWinStatus != nil {
-// 		feature.RespinWinStatus.AddStatus(int(pbcd.TotalCoinWin))
-// 	}
-
-// 	return nil
-// }
-
-// // onStatsWithPBEnding -
-// func (respin *Respin) onStatsWithPBStart(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) error {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.RespinData)
-// 	if !isok {
-// 		goutils.Error("Respin.onStatsWithPBStart",
-// 			goutils.Err(ErrIvalidProto))
-
-// 		return ErrIvalidProto
-// 	}
-
-// 	if feature.RespinStartNumStatus != nil {
-// 		feature.RespinStartNumStatus.AddStatus(int(pbcd.LastRespinNum))
-// 	}
-
-// 	return nil
-// }
 
 // NewComponentData -
 func (respin *Respin) NewComponentData() IComponentData {
@@ -456,7 +352,6 @@ func (respin *Respin) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7gam
 
 	rcd := cd.(*RespinData)
 
-	// rcd.TotalCashWin += curpr.CashWin
 	rcd.TotalCoinWin += int64(curpr.CoinWin)
 
 	if canRemove && rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
@@ -491,6 +386,8 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 
 	if goutils.IndexOfStringSlice(gp.RespinComponents, respin.Name, 0) < 0 {
 		isEnding = true
+	} else if !isRunning {
+		isRunning = true
 	}
 
 	s2.ProcStatsRespinTrigger(respin.Name, isRunning, int64(pr.CoinWin), isEnding)
@@ -500,129 +397,15 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 
 		s2.ProcStatsIntVal(respin.Name, cd.CurRespinNum)
 	}
-
-	// rcd := icd.(*RespinData)
-
-	// if rcd.LastRespinNum == 0 && rcd.LastTriggerNum == 0 {
-	// 	s2.ProcStatsRootTrigger(respin.Name, rcd.TotalCoinWin, true)
-	// } else {
-	// 	s2.ProcStatsRootTrigger(respin.Name, 0, false)
-	// }
 }
 
-// // IsTriggerRespin -
-// func (respin *Respin) IsTriggerRespin() bool {
-// 	rcd := cd.(*RespinData)
-
-// 	return false
-// }
-
-// // SaveRetriggerRespinNum -
-// func (respin *Respin) SaveRetriggerRespinNum(gameProp *GameProperty) {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	cd.RetriggerAddRespinNum = cd.LastRespinNum
-// }
-
-// // Retrigger -
-// func (respin *Respin) Retrigger(gameProp *GameProperty) {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	cd.LastRespinNum += cd.RetriggerAddRespinNum
-// 	cd.CurAddRespinNum += cd.RetriggerAddRespinNum
-
-// 	cd.CurTriggerNum++
-
-// 	if cd.LastTriggerNum > 0 {
-// 		cd.LastTriggerNum--
-// 	}
-// }
-
-// // Trigger -
-// func (respin *Respin) Trigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
-// 	cd := gameProp.GetGlobalComponentData(respin) //gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	n := cd.TriggerRespinNum[cd.CurTriggerNum]
-// 	if n <= 0 {
-// 		n = cd.RetriggerAddRespinNum
-
-// 		cd.TriggerRespinNum[cd.CurTriggerNum] = n
+// func (respin *Respin) getRetriggerRespinNum(basicCD *BasicComponentData) int {
+// 	val, isok := basicCD.GetConfigIntVal(CCVReelSet)
+// 	if isok {
+// 		return val
 // 	}
 
-// 	cd.LastRespinNum += n
-// 	cd.CurAddRespinNum += n
-
-// 	cd.CurTriggerNum++
-
-// 	if cd.LastTriggerNum > 0 {
-// 		cd.LastTriggerNum--
-// 	}
-
-// 	for _, v := range cd.Awards {
-// 		if v.TriggerIndex == cd.CurTriggerNum {
-// 			gameProp.procAward(plugin, v, curpr, gp, true)
-// 		}
-// 	}
-// }
-
-// // AddRetriggerRespinNum -
-// func (respin *Respin) AddRetriggerRespinNum(gameProp *GameProperty, num int) {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	cd.RetriggerAddRespinNum += num
-// }
-
-// // AddTriggerAward -
-// func (respin *Respin) AddTriggerAward(gameProp *GameProperty, award *Award) {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	award.TriggerIndex = cd.CurTriggerNum + cd.LastTriggerNum
-
-// 	cd.Awards = append(cd.Awards, award)
-// }
-
-// // PushTrigger -
-// func (respin *Respin) PushTrigger(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	cd.LastTriggerNum++
-
-// 	cd.TriggerRespinNum = append(cd.TriggerRespinNum, num)
-
-// 	// 第一次trigger时，需要直接
-// 	if cd.LastRespinNum == 0 && cd.CurRespinNum == 0 {
-// 		respin.Trigger(gameProp, plugin, curpr, gp)
-// 	}
-// }
-
-func (respin *Respin) getRetriggerRespinNum(basicCD *BasicComponentData) int {
-	val, isok := basicCD.GetConfigIntVal(CCVReelSet)
-	if isok {
-		return val
-	}
-
-	return 0
-}
-
-// // GetLastRespinNum -
-// func (respin *Respin) GetLastRespinNum(gameProp *GameProperty) int {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	return cd.LastRespinNum
-// }
-
-// // IsEnding -
-// func (respin *Respin) IsEnding(gameProp *GameProperty) bool {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	return cd.LastRespinNum == 0 && cd.LastTriggerNum == 0
-// }
-
-// // IsStarted -
-// func (respin *Respin) IsStarted(gameProp *GameProperty) bool {
-// 	cd := gameProp.MapComponentData[respin.Name].(*RespinData)
-
-// 	return cd.CurRespinNum > 0
+// 	return 0
 // }
 
 // GetAllLinkComponents - get all link components
@@ -641,19 +424,13 @@ func NewRespin(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"isWinBreak": "false"
-//	},
+// "configuration": {
+// },
 type jsonRespin struct {
-	// IsWinBreak string `json:"isWinBreak"`
 }
 
 func (jr *jsonRespin) build() *RespinConfig {
-	cfg := &RespinConfig{
-		// IsWinBreak: jr.IsWinBreak == "true",
-	}
-
-	// cfg.UseSceneV3 = true
+	cfg := &RespinConfig{}
 
 	return cfg
 }
@@ -666,24 +443,6 @@ func parseRespin(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 
 		return "", err
 	}
-
-	// buf, err := cfg.MarshalJSON()
-	// if err != nil {
-	// 	goutils.Error("parseRespin2:MarshalJSON",
-	// 		goutils.Err(err))
-
-	// 	return "", err
-	// }
-
-	// data := &jsonRespin{}
-
-	// err = sonic.Unmarshal(buf, data)
-	// if err != nil {
-	// 	goutils.Error("parseRespin2:Unmarshal",
-	// 		goutils.Err(err))
-
-	// 	return "", err
-	// }
 
 	cfgd := &RespinConfig{}
 
