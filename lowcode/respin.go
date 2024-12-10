@@ -390,7 +390,9 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 		isRunning = true
 	}
 
-	s2.ProcStatsRespinTrigger(respin.Name, isRunning, int64(pr.CoinWin), isEnding)
+	if isRunning {
+		s2.ProcStatsRespinTrigger(respin.Name, isRunning, int64(pr.CoinWin), isEnding)
+	}
 
 	if isEnding {
 		cd := icd.(*RespinData)

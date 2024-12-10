@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/xuri/excelize/v2"
+	"github.com/zhs007/goutils"
 )
 
 type Feature struct {
@@ -47,6 +48,8 @@ func (f2 *Feature) procCacheStatsRespinTrigger(isRunning bool, wins int64, isEnd
 			}
 
 			f2.RootTrigger.RunTimes++
+		} else {
+			goutils.Error("ERR!")
 		}
 
 		if f2.RootTrigger.IsStarted {
