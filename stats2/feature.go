@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/xuri/excelize/v2"
-	"github.com/zhs007/goutils"
 )
 
 type Feature struct {
@@ -38,29 +37,23 @@ func (f2 *Feature) procCacheStatsTrigger() {
 	f2.Trigger.TriggerTimes++
 }
 
-func (f2 *Feature) procCacheStatsRespinTrigger(isRunning bool, wins int64, isEnding bool) {
+func (f2 *Feature) procCacheStatsRespinTrigger(wins int64, isEnding bool) {
 	if f2.RootTrigger != nil {
-		if isRunning {
-			if !f2.RootTrigger.IsStarted {
-				f2.RootTrigger.TriggerTimes++
-				f2.RootTrigger.IsStarted = true
-				f2.RootTrigger.CurWins = 0
-			}
-
-			f2.RootTrigger.RunTimes++
-		} else {
-			goutils.Error("ERR!")
+		if !f2.RootTrigger.IsStarted {
+			f2.RootTrigger.TriggerTimes++
+			f2.RootTrigger.IsStarted = true
 		}
 
-		if f2.RootTrigger.IsStarted {
-			f2.RootTrigger.TotalWins += wins
-			f2.RootTrigger.CurWins += wins
-		}
+		f2.RootTrigger.RunTimes++
+
+		f2.RootTrigger.TotalWins += wins
+		f2.RootTrigger.CurWins += wins
 
 		if isEnding {
 			f2.RootTrigger.IsStarted = false
 
 			f2.RootTrigger.Wins.AddWin(f2.RootTrigger.CurWins)
+			f2.RootTrigger.CurWins = 0
 		}
 	}
 }

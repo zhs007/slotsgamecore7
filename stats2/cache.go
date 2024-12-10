@@ -77,10 +77,10 @@ func (s2 *Cache) ProcStatsStrVal(name string, val string) {
 	}
 }
 
-func (s2 *Cache) ProcStatsRespinTrigger(name string, isRunning bool, wins int64, isEnding bool) {
+func (s2 *Cache) ProcStatsRespinTrigger(name string, wins int64, isEnding bool) {
 	f2, isok := s2.MapStats[name]
 	if isok {
-		f2.procCacheStatsRespinTrigger(isRunning, wins, isEnding)
+		f2.procCacheStatsRespinTrigger(wins, isEnding)
 	}
 }
 
