@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/xuri/excelize/v2"
+	"github.com/zhs007/goutils"
 )
 
 type Feature struct {
@@ -13,6 +14,14 @@ type Feature struct {
 	Wins        *StatsWins        `json:"wins"`        // wins
 	IntVal      *StatsIntVal      `json:"intVal"`      // intVal
 	StrVal      *StatsStrVal      `json:"strVal"`      // strVal
+}
+
+func (f2 *Feature) check() {
+	if f2.RootTrigger != nil {
+		if f2.RootTrigger.CurWins > 0 {
+			goutils.Error("Feature.check:f2.RootTrigger.CurWins")
+		}
+	}
 }
 
 func (f2 *Feature) procCacheStatsIntVal(val int) {

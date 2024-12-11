@@ -10,6 +10,12 @@ type Cache struct {
 	rngs      []int
 }
 
+func (s2 *Cache) check() {
+	for _, v := range s2.MapStats {
+		v.check()
+	}
+}
+
 func (s2 *Cache) OnStepEnd(respinArr []string) {
 	newArr := []string{}
 	for _, v := range s2.RespinArr {
