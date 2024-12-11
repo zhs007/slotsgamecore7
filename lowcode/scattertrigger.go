@@ -231,6 +231,12 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		award.Init()
 	}
 
+	for _, lst := range scatterTrigger.Config.MapAwards {
+		for _, award := range lst {
+			award.Init()
+		}
+	}
+
 	// if scatterTrigger.Config.SymbolAwardsWeights != nil {
 	// 	scatterTrigger.Config.SymbolAwardsWeights.Init()
 	// }
