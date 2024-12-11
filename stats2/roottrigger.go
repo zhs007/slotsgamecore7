@@ -20,6 +20,10 @@ func (trigger *StatsRootTrigger) Merge(src *StatsRootTrigger) {
 	trigger.TotalWins += src.TotalWins
 
 	trigger.Wins.Merge(src.Wins)
+
+	// if trigger.CurWins > 0 || src.CurWins > 0 {
+	// 	goutils.Error("StatsRootTrigger.Merge")
+	// }
 }
 
 func (trigger *StatsRootTrigger) SaveSheet(f *excelize.File, sheet string, parent string, s2 *Stats) {

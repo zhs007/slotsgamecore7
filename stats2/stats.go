@@ -40,6 +40,8 @@ func (s2 *Stats) PushBet(bet int) {
 }
 
 func (s2 *Stats) PushCache(cache *Cache) {
+	// cache.check()
+
 	s2.chanCache <- cache
 }
 

@@ -390,6 +390,10 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 		isRunning = true
 	}
 
+	if pr.IsFinish {
+		isEnding = true
+	}
+
 	if isRunning {
 		s2.ProcStatsRespinTrigger(respin.Name, int64(pr.CoinWin), isEnding)
 	}
