@@ -104,6 +104,7 @@ type jsonControllerData struct {
 	Source          []string `json:"source"`
 	StringVal       string   `json:"stringVal"`
 	OnTriggerRespin string   `json:"onTriggerRespin"`
+	ScatterNum      int      `json:"scatterNum"`
 }
 
 func (jcd *jsonControllerData) build() *Award {
@@ -204,6 +205,10 @@ func (jcd *jsonControllerData) build4Map() (string, *Award) {
 	}
 
 	return jcd.StringVal, jcd.build()
+}
+
+func (jcd *jsonControllerData) build4ScatterNum() (int, *Award) {
+	return jcd.ScatterNum, jcd.build()
 }
 
 func parseControllers(controller *ast.Node) ([]*Award, error) {
@@ -540,4 +545,46 @@ func parseMapStringAndAllControllers(controller *ast.Node) (map[string][]*Award,
 	}
 
 	return mapawards, nil
+}
+
+func parseScatterTriggerControllers(controller *ast.Node) ([]*Award, map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseScatterTriggerControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseScatterTriggerControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	awards := []*Award{}
+	mapAwards := make(map[int][]*Award)
+
+	for i, v := range lst {
+		scatterNum, a := v.build4ScatterNum()
+		if a != nil {
+			if scatterNum <= 0 {
+				awards = append(awards, a)
+			} else {
+				mapAwards[scatterNum] = append(mapAwards[scatterNum], a)
+			}
+		} else {
+			goutils.Error("parseScatterTriggerControllers:build",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return awards, mapAwards, nil
 }
