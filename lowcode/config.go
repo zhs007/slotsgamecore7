@@ -27,12 +27,12 @@ type BetConfig struct {
 	Components     []*ComponentConfig               `yaml:"components"`
 	mapConfig      map[string]IComponentConfig      `yaml:"-"`
 	mapBasicConfig map[string]*BasicComponentConfig `yaml:"-"`
-	ForceEnding    string                           `yaml:"-"`
+	ForceEndings   []string                         `yaml:"-"`
 }
 
-func (betCfg *BetConfig) Reset(start string, end string) {
+func (betCfg *BetConfig) Reset(start string, endings []string) {
 	betCfg.Start = start
-	betCfg.ForceEnding = end
+	betCfg.ForceEndings = endings
 }
 
 // type BetDataConfig struct {
@@ -78,10 +78,10 @@ type Config struct {
 	mapIntMapping     map[string]*sgc7game.ValMapping2 `yaml:"-"`
 }
 
-func (cfg *Config) Reset(bet int, start string, end string) {
+func (cfg *Config) Reset(bet int, start string, endings []string) {
 	betCfg, isok := cfg.MapBetConfigs[bet]
 	if isok {
-		betCfg.Reset(start, end)
+		betCfg.Reset(start, endings)
 	}
 }
 
