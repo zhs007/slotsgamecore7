@@ -496,7 +496,7 @@ func CalcSymbolsInResultEx(gs *sgc7game.GameScene, mapSymbolCodes map[int]int, r
 
 	if t == WRMTypeSymbolMultiOnWays {
 		mul := 1
-		for x, _ := range gs.Arr {
+		for x := range gs.Arr {
 			curmul := 0
 
 			for i := 0; i < len(ret.Pos)/2; i++ {
