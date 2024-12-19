@@ -30,22 +30,22 @@ func (overlaySymbolData *OverlaySymbolData) OnNewGame(gameProp *GameProperty, co
 	overlaySymbolData.CurLevel = overlaySymbol.Config.DefaultLevel
 }
 
-// onNewStep -
-func (overlaySymbolData *OverlaySymbolData) onNewStep(gameProp *GameProperty, component IComponent) {
-	// overlaySymbolData.BasicComponentData.OnNewStep(gameProp, component)
+// // onNewStep -
+// func (overlaySymbolData *OverlaySymbolData) onNewStep(gameProp *GameProperty, component IComponent) {
+// 	// overlaySymbolData.BasicComponentData.OnNewStep(gameProp, component)
 
-	overlaySymbol := component.(*OverlaySymbol)
+// 	overlaySymbol := component.(*OverlaySymbol)
 
-	if overlaySymbol.Config.Collector != "" {
-		collectorData, isok := gameProp.GetCurComponentDataWithName(overlaySymbol.Config.Collector).(*CollectorData)
-		if !isok {
-			goutils.Error("OverlaySymbolData.OnNewStep:GetCurComponentDataWithName",
-				slog.String("collector", overlaySymbol.Config.Collector))
-		} else {
-			overlaySymbolData.CurLevel = collectorData.Val
-		}
-	}
-}
+// 	if overlaySymbol.Config.Collector != "" {
+// 		collectorData, isok := gameProp.GetCurComponentDataWithName(overlaySymbol.Config.Collector).(*CollectorData)
+// 		if !isok {
+// 			goutils.Error("OverlaySymbolData.OnNewStep:GetCurComponentDataWithName",
+// 				slog.String("collector", overlaySymbol.Config.Collector))
+// 		} else {
+// 			overlaySymbolData.CurLevel = collectorData.Val
+// 		}
+// 	}
+// }
 
 // Clone
 func (overlaySymbolData *OverlaySymbolData) Clone() IComponentData {

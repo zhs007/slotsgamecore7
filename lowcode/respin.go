@@ -432,14 +432,14 @@ func NewRespin(name string) IComponent {
 
 // "configuration": {
 // },
-type jsonRespin struct {
-}
+// type jsonRespin struct {
+// }
 
-func (jr *jsonRespin) build() *RespinConfig {
-	cfg := &RespinConfig{}
+// func (jr *jsonRespin) build() *RespinConfig {
+// 	cfg := &RespinConfig{}
 
-	return cfg
-}
+// 	return cfg
+// }
 
 func parseRespin(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	_, label, _, err := getConfigInCell(cell)

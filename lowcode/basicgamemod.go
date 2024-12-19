@@ -69,7 +69,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.SceneStack.onStepStart(pr)
 	gameProp.OtherSceneStack.onStepStart(pr)
 
-	curComponent := components.Components[0]
+	var curComponent IComponent
 
 	if gp.FirstComponent != "" {
 		c, isok := components.MapComponents[gp.FirstComponent]

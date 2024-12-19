@@ -118,16 +118,16 @@ func NewControllerWorker(name string) IComponent {
 
 // "configuration": {
 // }
-type jsonControllerWorker struct {
-}
+// type jsonControllerWorker struct {
+// }
 
-func (jbr *jsonControllerWorker) build() *ControllerWorkerConfig {
-	cfg := &ControllerWorkerConfig{}
+// func (jbr *jsonControllerWorker) build() *ControllerWorkerConfig {
+// 	cfg := &ControllerWorkerConfig{}
 
-	// cfg.UseSceneV3 = true
+// 	// cfg.UseSceneV3 = true
 
-	return cfg
-}
+// 	return cfg
+// }
 
 func parseControllerWorker(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	_, label, ctrls, err := getConfigInCell(cell)
