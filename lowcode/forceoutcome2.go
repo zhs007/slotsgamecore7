@@ -735,7 +735,7 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				[]*cel.Type{cel.IntType, cel.IntType},
 				cel.IntType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
-					if len(params) != 1 {
+					if len(params) != 2 {
 						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithHeight",
 							goutils.Err(ErrInvalidScriptParamsNumber))
 
@@ -772,7 +772,7 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				[]*cel.Type{cel.IntType, cel.IntType},
 				cel.IntType,
 				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
-					if len(params) != 1 {
+					if len(params) != 2 {
 						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithReversalHeight",
 							goutils.Err(ErrInvalidScriptParamsNumber))
 
