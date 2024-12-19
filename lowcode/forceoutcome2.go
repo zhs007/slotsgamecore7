@@ -358,6 +358,46 @@ func (fo2 *ForceOutcome2) countSymbol(symbol int) int {
 	return num
 }
 
+func (fo2 *ForceOutcome2) countSymbolWithReversalHeight(symbol int, height int) int {
+	gs := fo2.getLatestSymbols()
+	if gs == nil {
+		return 0
+	}
+
+	num := 0
+	for _, arr := range gs.Arr {
+		for y, v := range arr {
+			if len(arr)-y <= height {
+				if v == symbol {
+					num++
+				}
+			}
+		}
+	}
+
+	return num
+}
+
+func (fo2 *ForceOutcome2) countSymbolWithHeight(symbol int, height int) int {
+	gs := fo2.getLatestSymbols()
+	if gs == nil {
+		return 0
+	}
+
+	num := 0
+	for _, arr := range gs.Arr {
+		for y, v := range arr {
+			if y < height {
+				if v == symbol {
+					num++
+				}
+			}
+		}
+	}
+
+	return num
+}
+
 func (fo2 *ForceOutcome2) hasSamePosNext(src string, target string) bool {
 	for i, ret := range fo2.results {
 		gp, isok := ret.CurGameModParams.(*GameParams)
@@ -684,6 +724,80 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 					}
 
 					val := fo2.countSymbol(int(symbol))
+
+					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("countSymbolWithHeight",
+			cel.Overload("countSymbolWithHeight_int_int",
+				[]*cel.Type{cel.IntType, cel.IntType},
+				cel.IntType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 1 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithHeight",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					symbol, isok := params[0].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithHeight",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					height, isok := params[1].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithHeight",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					val := fo2.countSymbolWithHeight(int(symbol), int(height))
+
+					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("countSymbolWithReversalHeight",
+			cel.Overload("countSymbolWithReversalHeight_int_int",
+				[]*cel.Type{cel.IntType, cel.IntType},
+				cel.IntType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 1 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithReversalHeight",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					symbol, isok := params[0].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithReversalHeight",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					height, isok := params[1].Value().(int64)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:countSymbolWithReversalHeight",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					val := fo2.countSymbolWithReversalHeight(int(symbol), int(height))
 
 					return types.Int(val)
 				},
