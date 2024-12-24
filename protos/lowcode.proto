@@ -361,6 +361,18 @@ message RandomMoveSymbolsData {
     repeated int32 pos = 2;
 }
 
+// FeatureBarData
+message FeatureBarData {
+    ComponentData basicComponentData = 1;
+    repeated int32 features = 2;
+}
+
+// BombData
+message BombData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

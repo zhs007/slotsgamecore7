@@ -1,7 +1,7 @@
 # zerro "zerrozhao@gmail.com"
 FROM golang:1.21.8
 
-ENV GOPROXY https://goproxy.io
+# ENV GOPROXY https://goproxy.io
 
 WORKDIR /src/app
 

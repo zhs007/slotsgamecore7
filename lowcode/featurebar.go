@@ -10,6 +10,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,9 +30,19 @@ func (featureBarData *FeatureBarData) OnNewGame(gameProp *GameProperty, componen
 	featureBarData.Features = make([]int, 0, featureBarData.cfg.Length)
 }
 
-// // onNewStep -
-// func (featureBarData *FeatureBarData) onNewStep(gameProp *GameProperty, component IComponent) {
-// }
+// BuildPBComponentData
+func (featureBarData *FeatureBarData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.FeatureBarData{
+		BasicComponentData: featureBarData.BuildPBBasicComponentData(),
+		Features:           make([]int32, len(featureBarData.Features)),
+	}
+
+	for i, f := range featureBarData.Features {
+		pbcd.Features[i] = int32(f)
+	}
+
+	return pbcd
+}
 
 // Clone
 func (featureBarData *FeatureBarData) Clone() IComponentData {

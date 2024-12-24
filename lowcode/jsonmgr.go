@@ -97,4 +97,5 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(RandomMoveSymbolsTypeName), parseRandomMoveSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenPositionCollectionTypeName), parseGenPositionCollection)
 	gJsonMgr.RegLoadComponent(strings.ToLower(FeatureBarTypeName), parseFeatureBar)
+	gJsonMgr.RegLoadComponent(strings.ToLower(BombTypeName), parseBomb)
 }

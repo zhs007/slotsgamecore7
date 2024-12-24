@@ -150,6 +150,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RandomMoveSymbolsTypeName, NewRandomMoveSymbols)
 	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
 	mgr.Reg(FeatureBarTypeName, NewFeatureBar)
+	mgr.Reg(BombTypeName, NewBomb)
 
 	return mgr
 }
