@@ -149,6 +149,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WinResultModifierExTypeName, NewWinResultModifierEx)
 	mgr.Reg(RandomMoveSymbolsTypeName, NewRandomMoveSymbols)
 	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
+	mgr.Reg(FeatureBarTypeName, NewFeatureBar)
 
 	return mgr
 }

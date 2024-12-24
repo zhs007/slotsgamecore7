@@ -588,3 +588,50 @@ func parseScatterTriggerControllers(controller *ast.Node) ([]*Award, map[int][]*
 
 	return awards, mapAwards, nil
 }
+
+func parseFeatureBarControllers(controller *ast.Node) (map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseFeatureBarControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseFeatureBarControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	mapawards := make(map[int][]*Award)
+
+	for i, v := range lst {
+		str, a := v.buildWithStringVal()
+		if a != nil {
+			i64, err := goutils.String2Int64(str)
+			if err != nil {
+				goutils.Error("parseFeatureBarControllers:String2Int64",
+					slog.Int("i", i),
+					slog.String("str", str),
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			mapawards[int(i64)] = append(mapawards[int(i64)], a)
+		} else {
+			goutils.Error("parseFeatureBarControllers:buildWithStringVal",
+				slog.Int("i", i),
+				goutils.Err(ErrUnsupportedControllerType))
+
+			return nil, ErrUnsupportedControllerType
+		}
+	}
+
+	return mapawards, nil
+}

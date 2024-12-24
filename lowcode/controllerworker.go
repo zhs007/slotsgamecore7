@@ -43,7 +43,7 @@ func (controllerWorker *ControllerWorker) Init(fn string, pool *GamePropertyPool
 		return err
 	}
 
-	cfg := &ReRollReelConfig{}
+	cfg := &ControllerWorkerConfig{}
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
