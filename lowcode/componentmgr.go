@@ -149,6 +149,9 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WinResultModifierExTypeName, NewWinResultModifierEx)
 	mgr.Reg(RandomMoveSymbolsTypeName, NewRandomMoveSymbols)
 	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
+	mgr.Reg(FeatureBarTypeName, NewFeatureBar)
+	mgr.Reg(BombTypeName, NewBomb)
+	mgr.Reg(SumSymbolValsTypeName, NewSumSymbolVals)
 
 	return mgr
 }
