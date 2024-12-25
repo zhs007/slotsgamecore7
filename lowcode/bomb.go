@@ -354,6 +354,10 @@ func (bomb *Bomb) getSourcePos(ctx context.Context, gameProp *GameProperty, gs *
 		return nil, nil
 	}
 
+	if bomb.Config.SelectSourceNumber <= 0 {
+		return npos, nil
+	}
+
 	if bomb.Config.SelectSourceNumber < len(npos)/2 {
 		retpos := make([]int, bomb.Config.SelectSourceNumber*2)
 
