@@ -151,6 +151,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
 	mgr.Reg(FeatureBarTypeName, NewFeatureBar)
 	mgr.Reg(BombTypeName, NewBomb)
+	mgr.Reg(SumSymbolValsTypeName, NewSumSymbolVals)
 
 	return mgr
 }

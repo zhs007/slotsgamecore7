@@ -13,7 +13,8 @@ COPY ./protos /src/app/
 COPY ./protos/*.proto /src/app/protos/
 COPY ./buildprotos.sh /src/app/
 
-RUN apt-get update \
+RUN apt-get clean \
+    && apt-get update \
     && go get google.golang.org/protobuf/cmd/protoc-gen-go \
     && go install google.golang.org/protobuf/cmd/protoc-gen-go \
     && go get google.golang.org/grpc/cmd/protoc-gen-go-grpc \

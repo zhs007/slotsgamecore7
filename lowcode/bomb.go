@@ -556,7 +556,7 @@ func parseBomb(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		return "", err
 	}
 
-	data := &jsonBurstSymbols{}
+	data := &jsonBomb{}
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
