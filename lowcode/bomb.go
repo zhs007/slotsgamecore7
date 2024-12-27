@@ -516,7 +516,7 @@ func (jcfg *jsonBomb) build() *BombConfig {
 	}
 
 	if len(jcfg.BombData) > 0 {
-		cfg.BombData = make([][]int, len(jcfg.BombData))
+		cfg.BombData = make([][]int, 0, len(jcfg.BombData))
 
 		for _, arr := range jcfg.BombData {
 			narr := make([]int, len(arr))
