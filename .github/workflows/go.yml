@@ -2,7 +2,7 @@ name: Go
 
 on:
   push:
-    branches: [ master, v0.12, v0.13 ]
+    branches: [ master, v0.13 ]
   pull_request:
     branches: [ master ]
 
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.21
+    - name: Set up Go 1.22
       uses: actions/setup-go@v2
       with:
-        go-version: 1.21
+        go-version: 1.22
       id: go
 
     - name: Check out code into the Go module directory
