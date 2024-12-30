@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
@@ -19,8 +20,9 @@ const FeatureBarTypeName = "featureBar"
 
 type FeatureBarData struct {
 	BasicComponentData
-	Features []int
-	cfg      *FeatureBarConfig
+	Features   []int
+	CurFeature int
+	cfg        *FeatureBarConfig
 }
 
 // OnNewGame -
@@ -35,6 +37,7 @@ func (featureBarData *FeatureBarData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.FeatureBarData{
 		BasicComponentData: featureBarData.BuildPBBasicComponentData(),
 		Features:           make([]int32, len(featureBarData.Features)),
+		CurFeature:         int32(featureBarData.CurFeature),
 	}
 
 	for i, f := range featureBarData.Features {
@@ -57,10 +60,11 @@ func (featureBarData *FeatureBarData) Clone() IComponentData {
 // FeatureBarConfig - configuration for FeatureBar
 type FeatureBarConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Length               int                   `yaml:"length" json:"length"`               // bar 的长度
-	StrFeatureWeight     string                `yaml:"featureWeight" json:"featureWeight"` // feature权重
-	FeatureWeight        *sgc7game.ValWeights2 `yaml:"-" json:"-"`                         // feature权重
-	MapAwards            map[int][]*Award      `yaml:"awards" json:"awards"`               // 新的奖励系统
+	Length               int                   `yaml:"length" json:"length"`                   // bar 的长度
+	StrFeatureWeight     string                `yaml:"featureWeight" json:"featureWeight"`     // feature权重
+	FeatureWeight        *sgc7game.ValWeights2 `yaml:"-" json:"-"`                             // feature权重
+	FirstJumpWeight      int                   `yaml:"firstJumpWeight" json:"firstJumpWeight"` // firstJump 权重
+	MapAwards            map[int][]*Award      `yaml:"awards" json:"awards"`                   // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -151,6 +155,50 @@ func (featureBar *FeatureBar) getWeight(gameProp *GameProperty, cd *FeatureBarDa
 	return featureBar.Config.FeatureWeight
 }
 
+// randFirstJump -
+func (featureBar *FeatureBar) randFirstJump(_ *GameProperty, _ *FeatureBarData, plugin sgc7plugin.IPlugin) (bool, error) {
+	if featureBar.Config.FirstJumpWeight <= 0 {
+		return false, nil
+	}
+
+	if featureBar.Config.FirstJumpWeight >= 100 {
+		return true, nil
+	}
+
+	cr, err := plugin.Random(context.Background(), 100)
+	if err != nil {
+		goutils.Error("FeatureBar.randFirstJump:Random",
+			goutils.Err(err))
+
+		return false, err
+	}
+
+	return cr < featureBar.Config.FirstJumpWeight, nil
+}
+
+// procFeature -
+func (featureBar *FeatureBar) procFeature(gameProp *GameProperty, cd *FeatureBarData, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	featureVW *sgc7game.ValWeights2) error {
+
+	cd.CurFeature = cd.Features[0]
+
+	cd.Features = cd.Features[1:]
+
+	feature, err := featureVW.RandVal(plugin)
+	if err != nil {
+		goutils.Error("FeatureBar.procFeature:RandVal",
+			goutils.Err(err))
+
+		return err
+	}
+
+	cd.Features = append(cd.Features, feature.Int())
+
+	featureBar.ProcControllers(gameProp, plugin, curpr, gp, cd.CurFeature, "")
+
+	return nil
+}
+
 // playgame
 func (featureBar *FeatureBar) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -160,6 +208,8 @@ func (featureBar *FeatureBar) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	vw := featureBar.getWeight(gameProp, cd)
 
 	if len(cd.Features) == 0 {
+		cd.CurFeature = -1
+
 		for i := 0; i < featureBar.Config.Length; i++ {
 			feature, err := vw.RandVal(plugin)
 			if err != nil {
@@ -171,22 +221,32 @@ func (featureBar *FeatureBar) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			cd.Features = append(cd.Features, feature.Int())
 		}
-	} else {
-		curFeature := cd.Features[0]
 
-		cd.Features = cd.Features[1:]
-
-		feature, err := vw.RandVal(plugin)
+		isFirstJump, err := featureBar.randFirstJump(gameProp, cd, plugin)
 		if err != nil {
-			goutils.Error("FeatureBar.OnPlayGame:RandVal",
+			goutils.Error("FeatureBar.OnPlayGame:randFirstJump",
 				goutils.Err(err))
 
 			return "", err
 		}
 
-		cd.Features = append(cd.Features, feature.Int())
+		if isFirstJump {
+			err = featureBar.procFeature(gameProp, cd, curpr, gp, plugin, vw)
+			if err != nil {
+				goutils.Error("FeatureBar.OnPlayGame:isFirstJump:procFeature",
+					goutils.Err(err))
 
-		featureBar.ProcControllers(gameProp, plugin, curpr, gp, curFeature, "")
+				return "", err
+			}
+		}
+	} else {
+		err := featureBar.procFeature(gameProp, cd, curpr, gp, plugin, vw)
+		if err != nil {
+			goutils.Error("FeatureBar.OnPlayGame:procFeature",
+				goutils.Err(err))
+
+			return "", err
+		}
 	}
 
 	nc := featureBar.onStepEnd(gameProp, curpr, gp, "")
@@ -212,13 +272,13 @@ func NewFeatureBar(name string) IComponent {
 	}
 }
 
-// "configuration": {
 // "Length": 5,
-// "FeatureWeights": "bgfeature"
-// }
+// "FeatureWeights": "bgfeature",
+// "FirstJumpWeight": 5
 type jsonFeatureBar struct {
-	Length           int    `json:"Length"`         // bar 的长度
-	StrFeatureWeight string `json:"FeatureWeights"` // feature权重
+	Length           int    `json:"Length"`          // bar 的长度
+	StrFeatureWeight string `json:"FeatureWeights"`  // feature权重
+	FirstJumpWeight  int    `json:"FirstJumpWeight"` // firstJump 权重
 }
 
 func (jcfg *jsonFeatureBar) build() *FeatureBarConfig {
