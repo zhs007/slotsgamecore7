@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -212,8 +213,8 @@ func (bomb *Bomb) InitEx(cfg any, pool *GamePropertyPool) error {
 	bomb.Config = cfg.(*BombConfig)
 	bomb.Config.ComponentType = BombTypeName
 
-	bomb.Config.BombSourceType = parseBombSourceType(bomb.Config.StrBombSourceType)
-	bomb.Config.BombTargetType = parseBombTargetType(bomb.Config.StrBombTargetType)
+	bomb.Config.BombSourceType = parseBombSourceType(strings.ToLower(bomb.Config.StrBombSourceType))
+	bomb.Config.BombTargetType = parseBombTargetType(strings.ToLower(bomb.Config.StrBombTargetType))
 
 	for _, s := range bomb.Config.SourceSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
@@ -324,7 +325,7 @@ func (bomb *Bomb) bomb(gameProp *GameProperty, gs *sgc7game.GameScene, x int, y 
 	}
 }
 
-func (bomb *Bomb) getSourcePos(ctx context.Context, gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, bsd *BombData) ([]int, error) {
+func (bomb *Bomb) getSourcePos(ctx context.Context, gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, _ *BombData) ([]int, error) {
 	var npos []int
 
 	if bomb.Config.BombSourceType == BSTypePositionCollection {

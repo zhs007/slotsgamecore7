@@ -204,37 +204,14 @@ func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
 	return false
 }
 
-func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, pos []int, os *sgc7game.GameScene) int {
+func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, os *sgc7game.GameScene) int {
 	sumVal := 0
 
 	pc, isok := gameProp.Components.MapComponents[sumSymbolVals.Config.SourceComponent]
 	if isok {
 		pccd := gameProp.GetComponentData(pc)
+		pos := pccd.GetPos()
 
-		if len(pos) > 0 {
-			for i := 0; i < len(pos)/2; i++ {
-				x := pos[i*2]
-				y := pos[i*2+1]
-				v := os.Arr[x][y]
-
-				if sumSymbolVals.checkVal(v) {
-					pc.AddPos(pccd, x, y)
-
-					sumVal += v
-				}
-			}
-		} else {
-			for x, arr := range os.Arr {
-				for y, v := range arr {
-					if sumSymbolVals.checkVal(v) {
-						pc.AddPos(pccd, x, y)
-
-						sumVal += v
-					}
-				}
-			}
-		}
-	} else {
 		if len(pos) > 0 {
 			for i := 0; i < len(pos)/2; i++ {
 				x := pos[i*2]
@@ -254,6 +231,14 @@ func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, pos []int, os *s
 				}
 			}
 		}
+	} else {
+		for _, arr := range os.Arr {
+			for _, v := range arr {
+				if sumSymbolVals.checkVal(v) {
+					sumVal += v
+				}
+			}
+		}
 	}
 
 	return sumVal
@@ -267,19 +252,7 @@ func (sumSymbolVals *SumSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	os := sumSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
-		pos := make([]int, 0, os.Width*os.Height*2)
-
-		if sumSymbolVals.Config.Type != SSVTypeNone {
-			for x, arr := range os.Arr {
-				for y, v := range arr {
-					if sumSymbolVals.checkVal(v) {
-						pos = append(pos, x, y)
-					}
-				}
-			}
-		}
-
-		val := sumSymbolVals.sum(gameProp, pos, os)
+		val := sumSymbolVals.sum(gameProp, os)
 		cd.Number = val
 	}
 
