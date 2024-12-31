@@ -128,7 +128,6 @@ type SumSymbolValsConfig struct {
 	Value                int               `yaml:"value" json:"value"`
 	Min                  int               `yaml:"min" json:"min"`
 	Max                  int               `yaml:"max" json:"max"`
-	OutputToComponent    string            `yaml:"outputToComponent" json:"outputToComponent"`
 	SourceComponent      string            `yaml:"sourceComponent" json:"sourceComponent"`
 }
 
@@ -208,7 +207,7 @@ func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
 func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, pos []int, os *sgc7game.GameScene) int {
 	sumVal := 0
 
-	pc, isok := gameProp.Components.MapComponents[sumSymbolVals.Config.OutputToComponent]
+	pc, isok := gameProp.Components.MapComponents[sumSymbolVals.Config.SourceComponent]
 	if isok {
 		pccd := gameProp.GetComponentData(pc)
 
@@ -264,27 +263,24 @@ func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, pos []int, os *s
 func (sumSymbolVals *SumSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
+	cd := icd.(*SumSymbolValsData)
+
 	os := sumSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
-		if sumSymbolVals.Config.SourceComponent != "" {
-			pos := gameProp.GetComponentPos(sumSymbolVals.Config.SourceComponent)
-			if len(pos) >= 2 {
+		pos := make([]int, 0, os.Width*os.Height*2)
 
-			}
-		}
-
-		pc, isok := gameProp.Components.MapComponents[sumSymbolVals.Config.OutputToComponent]
-		if isok {
-			pccd := gameProp.GetComponentData(pc)
-
+		if sumSymbolVals.Config.Type != SSVTypeNone {
 			for x, arr := range os.Arr {
 				for y, v := range arr {
 					if sumSymbolVals.checkVal(v) {
-						pc.AddPos(pccd, x, y)
+						pos = append(pos, x, y)
 					}
 				}
 			}
 		}
+
+		val := sumSymbolVals.sum(gameProp, pos, os)
+		cd.Number = val
 	}
 
 	nc := sumSymbolVals.onStepEnd(gameProp, curpr, gp, "")
@@ -308,22 +304,21 @@ func NewSumSymbolVals(name string) IComponent {
 // "outputToComponent": "bg-pos-rmoved",
 // "sourceComponent": "bg-pos-rmoved"
 type jsonSumSymbolVals struct {
-	Type              string `json:"type"`
-	Value             int    `json:"value"`
-	Min               int    `json:"min"`
-	Max               int    `json:"max"`
-	OutputToComponent string `json:"outputToComponent"`
-	SourceComponent   string `json:"sourceComponent"`
+	Type            string `json:"type"`
+	Value           int    `json:"value"`
+	Min             int    `json:"min"`
+	Max             int    `json:"max"`
+	SourceComponent string `json:"sourceComponent"`
 }
 
 func (jcfg *jsonSumSymbolVals) build() *SumSymbolValsConfig {
 	cfg := &SumSymbolValsConfig{
-		StrType:           jcfg.Type,
-		OutputToComponent: jcfg.OutputToComponent,
-		Value:             jcfg.Value,
-		Min:               jcfg.Min,
-		Max:               jcfg.Max,
-		SourceComponent:   jcfg.SourceComponent,
+		StrType: jcfg.Type,
+		// OutputToComponent: jcfg.OutputToComponent,
+		Value:           jcfg.Value,
+		Min:             jcfg.Min,
+		Max:             jcfg.Max,
+		SourceComponent: jcfg.SourceComponent,
 	}
 
 	return cfg
