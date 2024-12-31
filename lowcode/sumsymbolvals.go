@@ -293,6 +293,11 @@ func (sumSymbolVals *SumSymbolVals) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
+// NewComponentData -
+func (sumSymbolVals *SumSymbolVals) NewComponentData() IComponentData {
+	return &SumSymbolValsData{}
+}
+
 func NewSumSymbolVals(name string) IComponent {
 	return &SumSymbolVals{
 		BasicComponent: NewBasicComponent(name, 1),
