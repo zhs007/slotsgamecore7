@@ -288,7 +288,7 @@ func (addSymbols *AddSymbols) onNormal(gameProp *GameProperty, curpr *sgc7game.P
 		for y := len(arr) - 1; y >= len(arr)-height; y-- {
 			s := arr[y]
 
-			if goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
+			if s >= 0 && goutils.IndexOfIntSlice(addSymbols.Config.IgnoreSymbolCodes, s, 0) < 0 {
 				pos = append(pos, x, y)
 			}
 		}
