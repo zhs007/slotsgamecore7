@@ -97,6 +97,7 @@ type RemoveSymbolsConfig struct {
 	IgnoreSymbolCodes    []int             `yaml:"-" json:"-"`                                       // 忽略的symbol
 	IsNeedProcSymbolVals bool              `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int               `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	OutputToComponent    string            `yaml:"outputToComponent" json:"outputToComponent"`       // outputToComponent
 	Awards               []*Award          `yaml:"awards" json:"awards"`                             // 新的奖励系统
 }
 
@@ -179,6 +180,11 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 	ngs := gs
 	totalHeight := 0
 
+	var outputCD IComponentData
+	if removeSymbols.Config.OutputToComponent != "" {
+		outputCD = gameProp.GetCurComponentDataWithName(removeSymbols.Config.OutputToComponent)
+	}
+
 	if os != nil {
 		nos := os
 
@@ -208,6 +214,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 							ngs.Arr[x][y] = -1
 							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+							if outputCD != nil {
+								outputCD.AddPos(x, y)
+							}
 
 							rscd.RemovedNum++
 						}
@@ -247,6 +257,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 							ngs.Arr[x][y] = -1
 
+							if outputCD != nil {
+								outputCD.AddPos(x, y)
+							}
+
 							rscd.RemovedNum++
 						}
 					}
@@ -276,6 +290,11 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 	totalHeight := 0
 	npos := []int{}
 
+	var outputCD IComponentData
+	if removeSymbols.Config.OutputToComponent != "" {
+		outputCD = gameProp.GetCurComponentDataWithName(removeSymbols.Config.OutputToComponent)
+	}
+
 	if os != nil {
 		nos := os
 
@@ -303,6 +322,10 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 								totalHeight += y
 							}
 
+							if outputCD != nil {
+								outputCD.AddPos(x, y)
+							}
+
 							isNeedRMOtherScene := true
 							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
 								isNeedRMOtherScene = false
@@ -315,7 +338,6 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
 							} else {
 								npos = append(npos, x, y)
-								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
 							}
 
 							rscd.RemovedNum++
@@ -358,6 +380,10 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 								totalHeight += y
 							}
 
+							if outputCD != nil {
+								outputCD.AddPos(x, y)
+							}
+
 							isNeedRMOtherScene := true
 							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
 								isNeedRMOtherScene = false
@@ -368,18 +394,12 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 							if isNeedRMOtherScene {
 								ngs.Arr[x][y] = -1
 							} else {
-								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
 								npos = append(npos, x, y)
 							}
 
 							rscd.RemovedNum++
 						}
 					}
-
-					// for pi := 0; pi < len(npos)/2; pi++ {
-					// 	ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
-					// }
-
 				}
 			}
 		}
@@ -449,176 +469,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return "", ErrIvalidComponentConfig
 	}
 
-	// if os != nil {
-	// 	nos := os
-
-	// 	for _, cn := range removeSymbols.Config.TargetComponents {
-	// 		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
-	// 		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
-	// 			continue
-	// 		}
-
-	// 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
-	// 		if ccd != nil {
-	// 			lst := ccd.GetResults()
-	// 			for _, ri := range lst {
-	// 				if removeSymbols.Config.Type == RSTypeBasic {
-	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-	// 						x := curpr.Results[ri].Pos[pi*2]
-	// 						y := curpr.Results[ri].Pos[pi*2+1]
-	// 						if removeSymbols.canRemove(x, y, ngs) {
-	// 							if ngs == gs {
-	// 								ngs = gs.CloneEx(gameProp.PoolScene)
-	// 								nos = os.CloneEx(gameProp.PoolScene)
-	// 							}
-
-	// 							if !gIsReleaseMode {
-	// 								totalHeight += y
-	// 							}
-
-	// 							ngs.Arr[x][y] = -1
-	// 							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
-
-	// 							bcd.RemovedNum++
-	// 						}
-	// 					}
-	// 				} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
-	// 					npos := []int{}
-
-	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-	// 						x := curpr.Results[ri].Pos[pi*2]
-	// 						y := curpr.Results[ri].Pos[pi*2+1]
-	// 						if removeSymbols.canRemove(x, y, ngs) {
-	// 							if ngs == gs {
-	// 								ngs = gs.CloneEx(gameProp.PoolScene)
-	// 								nos = os.CloneEx(gameProp.PoolScene)
-	// 							}
-
-	// 							if !gIsReleaseMode {
-	// 								totalHeight += y
-	// 							}
-
-	// 							isNeedRMOtherScene := true
-	// 							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
-	// 								isNeedRMOtherScene = false
-	// 							} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
-	// 								isNeedRMOtherScene = false
-	// 							}
-
-	// 							if isNeedRMOtherScene {
-	// 								ngs.Arr[x][y] = -1
-	// 								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
-	// 							} else {
-	// 								npos = append(npos, x, y)
-	// 								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
-	// 							}
-
-	// 							bcd.RemovedNum++
-	// 						}
-	// 					}
-
-	// 					for pi := 0; pi < len(npos)/2; pi++ {
-	// 						ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-
-	// 	if ngs == gs {
-	// 		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-	// 		return nc, ErrComponentDoNothing
-	// 	}
-
-	// 	removeSymbols.AddOtherScene(gameProp, curpr, nos, &bcd.BasicComponentData)
-	// } else {
-	// 	for _, cn := range removeSymbols.Config.TargetComponents {
-	// 		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
-	// 		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
-	// 			continue
-	// 		}
-
-	// 		ccd := gameProp.GetCurComponentDataWithName(cn) //gameProp.MapComponentData[cn]
-	// 		if ccd != nil {
-	// 			lst := ccd.GetResults()
-	// 			for _, ri := range lst {
-	// 				if removeSymbols.Config.Type == RSTypeBasic {
-	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-	// 						x := curpr.Results[ri].Pos[pi*2]
-	// 						y := curpr.Results[ri].Pos[pi*2+1]
-	// 						if removeSymbols.canRemove(x, y, ngs) {
-	// 							if ngs == gs {
-	// 								ngs = gs.CloneEx(gameProp.PoolScene)
-	// 							}
-
-	// 							if !gIsReleaseMode {
-	// 								totalHeight += y
-	// 							}
-
-	// 							ngs.Arr[x][y] = -1
-
-	// 							bcd.RemovedNum++
-	// 						}
-	// 					}
-	// 				} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
-	// 					npos := []int{}
-
-	// 					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-	// 						x := curpr.Results[ri].Pos[pi*2]
-	// 						y := curpr.Results[ri].Pos[pi*2+1]
-	// 						if removeSymbols.canRemove(x, y, ngs) {
-	// 							if ngs == gs {
-	// 								ngs = gs.CloneEx(gameProp.PoolScene)
-	// 							}
-
-	// 							if !gIsReleaseMode {
-	// 								totalHeight += y
-	// 							}
-
-	// 							isNeedRMOtherScene := true
-	// 							if len(curpr.Results[ri].Pos)/2 == 3 && pi == 1 {
-	// 								isNeedRMOtherScene = false
-	// 							} else if len(curpr.Results[ri].Pos)/2 == 5 && pi == 2 {
-	// 								isNeedRMOtherScene = false
-	// 							}
-
-	// 							if isNeedRMOtherScene {
-	// 								ngs.Arr[x][y] = -1
-	// 							} else {
-	// 								// ngs.Arr[x][y] = removeSymbols.Config.AddedSymbolCode
-	// 								npos = append(npos, x, y)
-	// 							}
-
-	// 							bcd.RemovedNum++
-	// 						}
-	// 					}
-
-	// 					for pi := 0; pi < len(npos)/2; pi++ {
-	// 						ngs.Arr[npos[pi*2]][npos[pi*2+1]] = removeSymbols.Config.AddedSymbolCode
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-
-	// 	if ngs == gs {
-	// 		nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
-
-	// 		return nc, ErrComponentDoNothing
-	// 	}
-	// }
-
-	// if !gIsReleaseMode {
-	// 	rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
-	// }
-
-	// removeSymbols.AddScene(gameProp, curpr, ngs, &rscd.BasicComponentData)
-
 	removeSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-	// if len(removeSymbols.Config.Awards) > 0 {
-	// 	gameProp.procAwards(plugin, removeSymbols.Config.Awards, curpr, gp)
-	// }
 
 	nc := removeSymbols.onStepEnd(gameProp, curpr, gp, removeSymbols.Config.JumpToComponent)
 
@@ -677,13 +528,15 @@ func NewRemoveSymbols(name string) IComponent {
 // ],
 // "type": "adjacentPay",
 // "addedSymbol": "WL"
+// "outputToComp": "bg-pos-rmoved"
 type jsonRemoveSymbols struct {
-	Type                 string   `json:"type"`                                             // type
-	AddedSymbol          string   `json:"addedSymbol"`                                      // addedSymbol
-	TargetComponents     []string `json:"targetComponents"`                                 // 这些组件的中奖会需要参与remove
-	IgnoreSymbols        []string `json:"ignoreSymbols"`                                    // 忽略的symbol
-	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	Type                 string   `json:"type"`                 // type
+	AddedSymbol          string   `json:"addedSymbol"`          // addedSymbol
+	TargetComponents     []string `json:"targetComponents"`     // 这些组件的中奖会需要参与remove
+	IgnoreSymbols        []string `json:"ignoreSymbols"`        // 忽略的symbol
+	IsNeedProcSymbolVals bool     `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int      `json:"emptySymbolVal"`       // 空的symbolVal是什么
+	OutputToComponent    string   `json:"outputToComp"`         // outputToComp
 }
 
 func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
@@ -694,6 +547,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		AddedSymbol:          jcfg.AddedSymbol,
+		OutputToComponent:    jcfg.OutputToComponent,
 	}
 
 	return cfg
