@@ -37,7 +37,7 @@ func (gameD *GameData) Play(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) 
 
 	stake := sgc7pbutils.BuildStake(req.Stake)
 
-	results, err := lowcode.Spin(gameD.Game, ips, plugin, stake, req.Command, req.ClientParams, req.Cheat)
+	results, err := lowcode.Spin(gameD.Game, ips, plugin, stake, req.Command, req.ClientParams, req.Cheat, true)
 	if err != nil {
 		goutils.Error("GameData.Play:Spin",
 			goutils.Err(err))

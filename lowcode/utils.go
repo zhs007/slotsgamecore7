@@ -174,7 +174,7 @@ func GenDefaultScene(game *Game, bet int) (*sgc7game.GameScene, error) {
 	ips := game.Initialize()
 
 	for {
-		rets, err := procSpin(game, ips, sgc7plugin.NewFastPlugin(), stake, "", "")
+		rets, err := procSpin(game, ips, sgc7plugin.NewFastPlugin(), stake, "", "", false)
 		if err != nil {
 			goutils.Error("GenDefaultScene:procSpin",
 				goutils.Err(err))
@@ -188,7 +188,9 @@ func GenDefaultScene(game *Game, bet int) (*sgc7game.GameScene, error) {
 	}
 }
 
-func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stake *sgc7game.Stake, cmd string, params string) ([]*sgc7game.PlayResult, error) {
+func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stake *sgc7game.Stake, cmd string,
+	params string, isNotAutoSelect bool) ([]*sgc7game.PlayResult, error) {
+
 	results := []*sgc7game.PlayResult{}
 	gameData := game.NewGameData(stake)
 	if gameData == nil {
@@ -223,6 +225,10 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 			break
 		}
 
+		if isNotAutoSelect && pr.IsWait {
+			break
+		}
+
 		// if pr.IsWait {
 		// 	break
 		// }
@@ -252,7 +258,7 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 	return results, nil
 }
 
-func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stake *sgc7game.Stake, cmd string, params string, cheat string) ([]*sgc7game.PlayResult, error) {
+func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stake *sgc7game.Stake, cmd string, params string, cheat string, isNotAutoSelect bool) ([]*sgc7game.PlayResult, error) {
 	fo, err := ProcCheat(plugin, cheat)
 	if err != nil {
 		goutils.Error("Spin:ProcCheat",
@@ -272,7 +278,7 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 	}
 
 	if fo == nil {
-		return procSpin(game, ips, plugin, stake, cmd, params)
+		return procSpin(game, ips, plugin, stake, cmd, params, isNotAutoSelect)
 	}
 
 	for tryi := 0; tryi < gMaxForceOutcomeTimes; tryi++ {
@@ -280,7 +286,7 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 		plugin.ClearCache()
 		plugin.ClearUsedRngs()
 
-		lst, err := procSpin(game, newips, plugin, stake, cmd, params)
+		lst, err := procSpin(game, newips, plugin, stake, cmd, params, isNotAutoSelect)
 		if err != nil {
 			goutils.Error("Spin:procSpin",
 				goutils.Err(err))
