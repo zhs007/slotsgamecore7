@@ -28,12 +28,6 @@ const (
 	ChgSymTypeMysteryOnReels          ChgSymbolsType = 5
 )
 
-type ChgSymbolsMysteryOnReelsWeightData struct {
-	Index     []int
-	StrWeight string
-	Weight    *sgc7game.ValWeights2
-}
-
 func parseChgSymbolsType(str string) ChgSymbolsType {
 	if str == "mystery" {
 		return ChgSymTypeMystery
@@ -48,6 +42,12 @@ func parseChgSymbolsType(str string) ChgSymbolsType {
 	}
 
 	return ChgSymTypeNormal
+}
+
+type ChgSymbolsMysteryOnReelsWeightData struct {
+	Index     []int
+	StrWeight string
+	Weight    *sgc7game.ValWeights2
 }
 
 type ChgSymbolsData struct {
