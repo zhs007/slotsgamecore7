@@ -380,6 +380,12 @@ message SumSymbolValsData {
 	int32 number = 2;
 }
 
+// TreasureChestData
+message TreasureChestData {
+    ComponentData basicComponentData = 1;
+    repeated int32 selected = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

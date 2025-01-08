@@ -43,10 +43,10 @@ func (lst *ComponentList) onInit(start string) error {
 					slog.String("gRngLibConfig", gRngLibConfig),
 					goutils.Err(err))
 
-				return err
+				// return err
+			} else {
+				lst.RngLib = rnglib
 			}
-
-			lst.RngLib = rnglib
 		}
 
 		lst.Stats2.Start()

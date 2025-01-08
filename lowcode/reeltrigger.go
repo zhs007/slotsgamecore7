@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -26,6 +28,7 @@ const (
 	RTTypeColumn       ReelTriggerType = 1 // column
 	RTTypeRowNumber    ReelTriggerType = 2 // row number
 	RTTypeColumnNumber ReelTriggerType = 3 // column number
+	RTTypeFullScreen   ReelTriggerType = 4 // full screen
 )
 
 func parseReelTriggerType(str string) ReelTriggerType {
@@ -33,10 +36,12 @@ func parseReelTriggerType(str string) ReelTriggerType {
 		return RTTypeRow
 	} else if str == "column" {
 		return RTTypeColumn
-	} else if str == "rowNumber" {
+	} else if str == "rownumber" {
 		return RTTypeRowNumber
-	} else if str == "columnNumber" {
+	} else if str == "columnnumber" {
 		return RTTypeColumnNumber
+	} else if str == "fullscreen" {
+		return RTTypeFullScreen
 	}
 
 	return RTTypeRow
@@ -102,8 +107,8 @@ func (reelTriggerData *ReelTriggerData) BuildPBComponentData() proto.Message {
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ReelTriggerConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbol               string              `yaml:"symbol" json:"symbol"`                         // symbol
-	SymbolCode           int                 `yaml:"-" json:"-"`                                   // symbol code
+	Symbols              []string            `yaml:"symbols" json:"symbols"`                       // symbols
+	SymbolCodes          []int               `yaml:"-" json:"-"`                                   // symbol codes
 	StrType              string              `yaml:"type" json:"type"`                             // ReelTriggerType
 	Type                 ReelTriggerType     `yaml:"-" json:"-"`                                   // ReelTriggerType
 	WildSymbols          []string            `yaml:"wildSymbols" json:"wildSymbols"`               // wild etc
@@ -123,12 +128,22 @@ func (cfg *ReelTriggerConfig) SetLinkComponent(link string, componentName string
 			cfg.MapBranchs = make(map[int]*BranchNode)
 		}
 
+		if strings.ToLower(link) == "fullscreen" {
+			cfg.MapBranchs[-1] = &BranchNode{
+				JumpToComponent: componentName,
+			}
+
+			return
+		}
+
 		i64, err := goutils.String2Int64(link)
 		if err != nil {
 			goutils.Error("ReelTrigger.SetLinkComponent",
 				slog.String("link", link),
 				goutils.Err(err),
 			)
+
+			return
 		}
 
 		if cfg.MapBranchs[int(i64)] == nil {
@@ -178,17 +193,17 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 
 	reelTrigger.Config.Type = parseReelTriggerType(reelTrigger.Config.StrType)
 
-	if reelTrigger.Config.Symbol != "" {
-		sc, isok := pool.DefaultPaytables.MapSymbols[reelTrigger.Config.Symbol]
+	for _, v := range reelTrigger.Config.Symbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[v]
 		if !isok {
-			goutils.Error("ReelTrigger.InitEx:Symbol",
-				slog.String("symbol", reelTrigger.Config.Symbol),
+			goutils.Error("ReelTrigger.InitEx:Symbols",
+				slog.String("symbol", v),
 				goutils.Err(ErrIvalidSymbol))
+
+			return ErrIvalidSymbol
 		}
 
-		reelTrigger.Config.SymbolCode = sc
-	} else {
-		reelTrigger.Config.SymbolCode = -1
+		reelTrigger.Config.SymbolCodes = append(reelTrigger.Config.SymbolCodes, sc)
 	}
 
 	for _, s := range reelTrigger.Config.WildSymbols {
@@ -225,6 +240,18 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (reelTrigger *ReelTrigger) isValidSymbolCode(sc int) bool {
+	if slices.Contains(reelTrigger.Config.SymbolCodes, sc) {
+		return true
+	}
+
+	if slices.Contains(reelTrigger.Config.WildSymbolCodes, sc) {
+		return true
+	}
+
+	return false
+}
+
 func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.GameScene) ([]bool, int) {
 	triggerArr := make([]bool, len(rtdata.Masks))
 	triggerNum := 0
@@ -236,7 +263,7 @@ func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.Ga
 				if gs.Arr[x][y] < 0 {
 					num++
 				}
-			} else if gs.Arr[x][y] == reelTrigger.Config.SymbolCode {
+			} else if reelTrigger.isValidSymbolCode(gs.Arr[x][y]) {
 				num++
 			}
 		}
@@ -248,6 +275,33 @@ func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.Ga
 	}
 
 	return triggerArr, triggerNum
+}
+
+func (reelTrigger *ReelTrigger) procFullScreen(_ *GameProperty, _ *sgc7game.PlayResult, _ *GameParams, _ sgc7plugin.IPlugin,
+	rtdata *ReelTriggerData, gs *sgc7game.GameScene) bool {
+
+	triggerNum := 0
+
+	for y := 0; y < gs.Height; y++ {
+		num := 0
+		for x := 0; x < gs.Width; x++ {
+			if reelTrigger.Config.IsCheckEmptySymbol {
+				if gs.Arr[x][y] < 0 {
+					num++
+				}
+			} else if reelTrigger.isValidSymbolCode(gs.Arr[x][y]) {
+				num++
+			}
+		}
+
+		if num >= reelTrigger.Config.MinSymbolNum {
+			triggerNum++
+		}
+	}
+
+	rtdata.NextComponent = ""
+
+	return triggerNum >= reelTrigger.Config.MinSymbolNum
 }
 
 func (reelTrigger *ReelTrigger) procRow(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -314,7 +368,7 @@ func (reelTrigger *ReelTrigger) calcColumn(rtdata *ReelTriggerData, gs *sgc7game
 				if gs.Arr[x][y] < 0 {
 					num++
 				}
-			} else if gs.Arr[x][y] == reelTrigger.Config.SymbolCode {
+			} else if reelTrigger.isValidSymbolCode(gs.Arr[x][y]) {
 				num++
 			}
 		}
@@ -399,6 +453,8 @@ func (reelTrigger *ReelTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		isTrigger = reelTrigger.procColumn(gameProp, curpr, gp, plugin, rtd, gs)
 	} else if reelTrigger.Config.Type == RTTypeColumnNumber {
 		isTrigger = reelTrigger.procColumnNumber(gameProp, curpr, gp, plugin, rtd, gs)
+	} else if reelTrigger.Config.Type == RTTypeFullScreen {
+		isTrigger = reelTrigger.procFullScreen(gameProp, curpr, gp, plugin, rtd, gs)
 	}
 
 	if isTrigger {
@@ -487,11 +543,12 @@ type jsonReelTrigger struct {
 	WildSymbols        []string `json:"wildSymbols"`
 	TargetMask         string   `json:"targetMask"` // 可以把结果传递给一个mask
 	IsCheckEmptySymbol bool     `json:"IsCheckEmptySymbol"`
+	TriggerSymbols     []string `json:"triggerSymbols"`
 }
 
 func (jcfg *jsonReelTrigger) build() *ReelTriggerConfig {
 	cfg := &ReelTriggerConfig{
-		StrType:            jcfg.TriggerType,
+		StrType:            strings.ToLower(jcfg.TriggerType),
 		WildSymbols:        jcfg.WildSymbols,
 		MinSymbolNum:       jcfg.MinSymbolNum,
 		TargetMask:         jcfg.TargetMask,
@@ -500,7 +557,9 @@ func (jcfg *jsonReelTrigger) build() *ReelTriggerConfig {
 	}
 
 	if len(jcfg.Symbols) > 0 {
-		cfg.Symbol = jcfg.Symbols[0]
+		cfg.Symbols = jcfg.Symbols
+	} else {
+		cfg.Symbols = jcfg.TriggerSymbols
 	}
 
 	return cfg

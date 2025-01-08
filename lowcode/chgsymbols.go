@@ -25,6 +25,7 @@ const (
 	ChgSymTypeRandomWithNoTrigger     ChgSymbolsType = 2
 	ChgSymTypeUpgradeSymbolOfCategory ChgSymbolsType = 3
 	ChgSymTypeReels                   ChgSymbolsType = 4
+	ChgSymTypeMysteryOnReels          ChgSymbolsType = 5
 )
 
 func parseChgSymbolsType(str string) ChgSymbolsType {
@@ -36,9 +37,17 @@ func parseChgSymbolsType(str string) ChgSymbolsType {
 		return ChgSymTypeUpgradeSymbolOfCategory
 	} else if str == "reels" {
 		return ChgSymTypeReels
+	} else if str == "mysteryonreels" {
+		return ChgSymTypeMysteryOnReels
 	}
 
 	return ChgSymTypeNormal
+}
+
+type ChgSymbolsMysteryOnReelsWeightData struct {
+	Index     []int
+	StrWeight string
+	Weight    *sgc7game.ValWeights2
 }
 
 type ChgSymbolsData struct {
@@ -82,24 +91,25 @@ func (chgSymbolsData *ChgSymbolsData) ChgConfigIntVal(key string, off int) int {
 // ChgSymbolsConfig - configuration for ChgSymbols
 type ChgSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrType              string                        `yaml:"chgSymbolsType" json:"-"`
-	Type                 ChgSymbolsType                `yaml:"-" json:"chgSymbolsType"`
-	Symbols              []string                      `yaml:"symbols" json:"-"`
-	SymbolCodes          []int                         `yaml:"-" json:"symbols"`
-	BlankSymbol          string                        `yaml:"blankSymbol" json:"-"`
-	BlankSymbolCode      int                           `yaml:"-" json:"blankSymbol"`
-	SourceWeight         string                        `yaml:"sourceWeight" json:"sourceWeight"`
-	SourceWeightVW2      *sgc7game.ValWeights2         `yaml:"-" json:"-"`
-	Weight               string                        `yaml:"weight" json:"-"`
-	WeightVW2            *sgc7game.ValWeights2         `yaml:"-" json:"-"`
-	MaxNumber            int                           `yaml:"maxNumber" json:"maxNumber"`
-	IsAlwaysGen          bool                          `yaml:"isAlwaysGen" json:"isAlwaysGen"`
-	Controllers          []*Award                      `yaml:"controllers" json:"controllers"`
-	JumpToComponent      string                        `yaml:"jumpToComponent" json:"jumpToComponent"`
-	StrTriggers          []string                      `yaml:"triggers" json:"-"`
-	Height               int                           `yaml:"height" json:"height"`
-	StrWeightOnReels     map[int]string                `yaml:"weightOnReels" json:"weightOnReels"`
-	WeightOnReels        map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	StrType              string                                `yaml:"chgSymbolsType" json:"-"`
+	Type                 ChgSymbolsType                        `yaml:"-" json:"chgSymbolsType"`
+	Symbols              []string                              `yaml:"symbols" json:"-"`
+	SymbolCodes          []int                                 `yaml:"-" json:"symbols"`
+	BlankSymbol          string                                `yaml:"blankSymbol" json:"-"`
+	BlankSymbolCode      int                                   `yaml:"-" json:"blankSymbol"`
+	SourceWeight         string                                `yaml:"sourceWeight" json:"sourceWeight"`
+	SourceWeightVW2      *sgc7game.ValWeights2                 `yaml:"-" json:"-"`
+	Weight               string                                `yaml:"weight" json:"-"`
+	WeightVW2            *sgc7game.ValWeights2                 `yaml:"-" json:"-"`
+	MaxNumber            int                                   `yaml:"maxNumber" json:"maxNumber"`
+	IsAlwaysGen          bool                                  `yaml:"isAlwaysGen" json:"isAlwaysGen"`
+	Controllers          []*Award                              `yaml:"controllers" json:"controllers"`
+	JumpToComponent      string                                `yaml:"jumpToComponent" json:"jumpToComponent"`
+	StrTriggers          []string                              `yaml:"triggers" json:"-"`
+	Height               int                                   `yaml:"height" json:"height"`
+	StrWeightOnReels     map[int]string                        `yaml:"weightOnReels" json:"weightOnReels"`
+	WeightOnReels        map[int]*sgc7game.ValWeights2         `yaml:"-" json:"-"`
+	MysteryOnReelsWeight []*ChgSymbolsMysteryOnReelsWeightData `yaml:"mysteryOnReelsWeight" json:"mysteryOnReelsWeight"`
 }
 
 // SetLinkComponent
@@ -207,6 +217,19 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 
 		chgSymbols.Config.WeightVW2 = vw2
+	}
+
+	for _, v := range chgSymbols.Config.MysteryOnReelsWeight {
+		vw2, err := pool.LoadIntWeights(v.StrWeight, chgSymbols.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("ChgSymbols.InitEx:MysteryOnReelsWeight:LoadIntWeights",
+				slog.String("Weight", v.StrWeight),
+				goutils.Err(err))
+
+			return err
+		}
+
+		v.Weight = vw2
 	}
 
 	for _, award := range chgSymbols.Config.Controllers {
@@ -357,6 +380,48 @@ func (chgSymbols *ChgSymbols) procMystery(gameProp *GameProperty, cd *BasicCompo
 				}
 
 				ngs.Arr[x][y] = cursc
+			}
+		}
+	}
+
+	return ngs, nil
+}
+
+func (chgSymbols *ChgSymbols) procMysteryOnReels(gameProp *GameProperty, _ *BasicComponentData,
+	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, height int) (*sgc7game.GameScene, error) {
+
+	syms, err := chgSymbols.GetSymbolCodes(plugin)
+	if err != nil {
+		goutils.Error("ChgSymbols.procMysteryOnReels:GetSymbolCodes",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	ngs := gs
+
+	for _, dat := range chgSymbols.Config.MysteryOnReelsWeight {
+		cursc, err := dat.Weight.RandVal(plugin)
+		if err != nil {
+			goutils.Error("ChgSymbols.procMysteryOnReels:RandVal",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		for x, arr := range gs.Arr {
+			if goutils.IndexOfIntSlice(dat.Index, x, 0) >= 0 {
+				for y := len(arr) - 1; y >= len(arr)-height; y-- {
+					s := arr[y]
+
+					if goutils.IndexOfIntSlice(syms, s, 0) >= 0 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = cursc.Int()
+					}
+				}
 			}
 		}
 	}
@@ -652,6 +717,16 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
+		} else if chgSymbols.Config.Type == ChgSymTypeMysteryOnReels {
+			ngs1, err := chgSymbols.procMysteryOnReels(gameProp, &cd.BasicComponentData, plugin, gs, height)
+			if err != nil {
+				goutils.Error("ChgSymbols.OnPlayGame:procMysteryOnReels",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ngs = ngs1
 		} else {
 			ngs3, err := chgSymbols.procNormal(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
@@ -750,7 +825,7 @@ func (chgSymbols *ChgSymbols) rollSymbol(gameProp *GameProperty, plugin sgc7plug
 // rollSymbolOnReels -
 func (chgSymbols *ChgSymbols) rollSymbolOnReels(_ *GameProperty, plugin sgc7plugin.IPlugin, _ *BasicComponentData, x int) (int, error) {
 	if chgSymbols.Config.WeightOnReels != nil {
-		vw2, isok := chgSymbols.Config.WeightOnReels[x+1]
+		vw2, isok := chgSymbols.Config.WeightOnReels[x]
 		if isok {
 			curs, err := vw2.RandVal(plugin)
 			if err != nil {
@@ -857,16 +932,17 @@ func NewChgSymbols(name string) IComponent {
 //
 // ],
 type jsonChgSymbols struct {
-	Symbols       []string `json:"symbols"`
-	BlankSymbol   string   `yaml:"blankSymbol" json:"blankSymbol"`
-	Weight        string   `yaml:"weight" json:"weight"`
-	SourceWeight  string   `yaml:"SourceWeight" json:"SourceWeight"`
-	StrType       string   `json:"type"`
-	MaxNumber     int      `json:"maxNumber"`
-	IsAlwaysGen   bool     `json:"isAlwaysGen"`
-	StrTriggers   []string `json:"trigger"`
-	Height        int      `json:"Height"`
-	WeightOnReels [][]any  `json:"weightOnReels"`
+	Symbols              []string `json:"symbols"`
+	BlankSymbol          string   `yaml:"blankSymbol" json:"blankSymbol"`
+	Weight               string   `yaml:"weight" json:"weight"`
+	SourceWeight         string   `yaml:"SourceWeight" json:"SourceWeight"`
+	StrType              string   `json:"type"`
+	MaxNumber            int      `json:"maxNumber"`
+	IsAlwaysGen          bool     `json:"isAlwaysGen"`
+	StrTriggers          []string `json:"trigger"`
+	Height               int      `json:"Height"`
+	WeightOnReels        [][]any  `json:"weightOnReels"`
+	MysteryOnReelsWeight [][]any  `json:"mysteryOnReelsWeight"`
 }
 
 func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
@@ -884,7 +960,36 @@ func (jcfg *jsonChgSymbols) build() *ChgSymbolsConfig {
 	}
 
 	for _, arr := range jcfg.WeightOnReels {
-		cfg.StrWeightOnReels[int(arr[0].(float64))] = arr[1].(string)
+		cfg.StrWeightOnReels[int(arr[0].(float64))-1] = arr[1].(string)
+	}
+
+	for i, arr := range jcfg.MysteryOnReelsWeight {
+		ints, isok := arr[0].([]any)
+		if !isok {
+			iv, isok := arr[0].(float64)
+			if isok {
+				dat := &ChgSymbolsMysteryOnReelsWeightData{
+					StrWeight: arr[1].(string),
+					Index:     []int{int(iv) - 1},
+				}
+
+				cfg.MysteryOnReelsWeight = append(cfg.MysteryOnReelsWeight, dat)
+			} else {
+				goutils.Error("jsonChgSymbols:build:MysteryOnReelsWeight",
+					slog.Int("i", i),
+					slog.Any("arr[0]", arr[0]))
+			}
+		} else {
+			dat := &ChgSymbolsMysteryOnReelsWeightData{
+				StrWeight: arr[1].(string),
+			}
+
+			for _, index := range ints {
+				dat.Index = append(dat.Index, int(index.(float64))-1)
+			}
+
+			cfg.MysteryOnReelsWeight = append(cfg.MysteryOnReelsWeight, dat)
+		}
 	}
 
 	return cfg
