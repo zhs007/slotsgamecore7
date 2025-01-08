@@ -52,6 +52,7 @@ type ReelTriggerData struct {
 	NextComponent string
 	Masks         []bool
 	Number        int
+	SymbolCode    int
 }
 
 // OnNewGame -
@@ -73,6 +74,7 @@ func (reelTriggerData *ReelTriggerData) OnNewGame(gameProp *GameProperty, compon
 func (reelTriggerData *ReelTriggerData) onNewStep() {
 	reelTriggerData.UsedResults = nil
 	reelTriggerData.NextComponent = ""
+	reelTriggerData.SymbolCode = -1
 }
 
 // Clone
@@ -233,6 +235,10 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Height {
 			reelTrigger.Config.MinSymbolNum = pool.Config.Height
 		}
+	} else if reelTrigger.Config.Type == RTTypeFullScreen {
+		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Height*pool.Config.Width {
+			reelTrigger.Config.MinSymbolNum = pool.Config.Height * pool.Config.Width
+		}
 	}
 
 	reelTrigger.onInit(&reelTrigger.Config.BasicComponentConfig)
@@ -240,13 +246,28 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (reelTrigger *ReelTrigger) isValidSymbolCode(sc int) bool {
-	if slices.Contains(reelTrigger.Config.SymbolCodes, sc) {
-		return true
-	}
+func (reelTrigger *ReelTrigger) isValidSymbolCode(rtdata *ReelTriggerData, sc int) bool {
+	if rtdata.SymbolCode == -1 {
+		if slices.Contains(reelTrigger.Config.WildSymbolCodes, sc) {
+			return true
+		}
 
-	if slices.Contains(reelTrigger.Config.WildSymbolCodes, sc) {
+		si := slices.Index(reelTrigger.Config.SymbolCodes, sc)
+		if si < 0 {
+			return false
+		}
+
+		rtdata.SymbolCode = reelTrigger.Config.SymbolCodes[si]
+
 		return true
+	} else {
+		if sc == rtdata.SymbolCode {
+			return true
+		}
+
+		if slices.Contains(reelTrigger.Config.WildSymbolCodes, sc) {
+			return true
+		}
 	}
 
 	return false
@@ -263,7 +284,7 @@ func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.Ga
 				if gs.Arr[x][y] < 0 {
 					num++
 				}
-			} else if reelTrigger.isValidSymbolCode(gs.Arr[x][y]) {
+			} else if reelTrigger.isValidSymbolCode(rtdata, gs.Arr[x][y]) {
 				num++
 			}
 		}
@@ -277,31 +298,35 @@ func (reelTrigger *ReelTrigger) calcRow(rtdata *ReelTriggerData, gs *sgc7game.Ga
 	return triggerArr, triggerNum
 }
 
-func (reelTrigger *ReelTrigger) procFullScreen(_ *GameProperty, _ *sgc7game.PlayResult, _ *GameParams, _ sgc7plugin.IPlugin,
+func (reelTrigger *ReelTrigger) procFullScreen(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	rtdata *ReelTriggerData, gs *sgc7game.GameScene) bool {
 
 	triggerNum := 0
 
 	for y := 0; y < gs.Height; y++ {
-		num := 0
 		for x := 0; x < gs.Width; x++ {
 			if reelTrigger.Config.IsCheckEmptySymbol {
 				if gs.Arr[x][y] < 0 {
-					num++
+					triggerNum++
 				}
-			} else if reelTrigger.isValidSymbolCode(gs.Arr[x][y]) {
-				num++
+			} else if reelTrigger.isValidSymbolCode(rtdata, gs.Arr[x][y]) {
+				triggerNum++
 			}
-		}
-
-		if num >= reelTrigger.Config.MinSymbolNum {
-			triggerNum++
 		}
 	}
 
-	rtdata.NextComponent = ""
+	if triggerNum >= reelTrigger.Config.MinSymbolNum {
+		n, isok := reelTrigger.Config.MapBranchs[-1]
+		if isok {
+			gameProp.procAwards(plugin, n.Awards, curpr, gp)
 
-	return triggerNum >= reelTrigger.Config.MinSymbolNum
+			rtdata.NextComponent = n.JumpToComponent
+		}
+
+		return true
+	}
+
+	return false
 }
 
 func (reelTrigger *ReelTrigger) procRow(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -368,7 +393,7 @@ func (reelTrigger *ReelTrigger) calcColumn(rtdata *ReelTriggerData, gs *sgc7game
 				if gs.Arr[x][y] < 0 {
 					num++
 				}
-			} else if reelTrigger.isValidSymbolCode(gs.Arr[x][y]) {
+			} else if reelTrigger.isValidSymbolCode(rtdata, gs.Arr[x][y]) {
 				num++
 			}
 		}
