@@ -159,6 +159,12 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 		return ErrInvalidComponentConfig
 	}
 
+	for _, awards := range treasureChest.Config.MapControllers {
+		for _, award := range awards {
+			award.Init()
+		}
+	}
+
 	treasureChest.onInit(&treasureChest.Config.BasicComponentConfig)
 
 	return nil
@@ -292,7 +298,7 @@ func (jcfg *jsonTreasureChest) build() *TreasureChestConfig {
 }
 
 func parseTreasureChest(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseTreasureChest:getConfigInCell",
 			goutils.Err(err))
@@ -319,6 +325,18 @@ func parseTreasureChest(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		mapAwards, err := parseFeatureBarControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseBasicReels:parseMapControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.MapControllers = mapAwards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
