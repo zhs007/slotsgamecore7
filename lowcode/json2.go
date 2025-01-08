@@ -415,7 +415,9 @@ func parseReelTriggerControllers(controller *ast.Node) (map[int][]*Award, error)
 	for i, v := range lst {
 		str, a := v.buildWithTriggerNum()
 		if a != nil {
-			if strings.HasPrefix(str, "row") {
+			if strings.ToLower(str) == "fullscreen" {
+				mapawards[-1] = append(mapawards[-1], a)
+			} else if strings.HasPrefix(str, "row") {
 				arr := strings.Split(str, "row")
 				if len(arr) == 2 {
 					i64, err := goutils.String2Int64(arr[1])
