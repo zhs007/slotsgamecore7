@@ -1,0 +1,8 @@
+gamemod,tag,symbol,totalbet,totalwin
+,,,5000000,2680844
+
+
+
+totalnums,winnums,Hit Frequency,Variance,StdDev,MaxReturn,MaxReturnNums,MaxCoincidingWin
+1000000,268372,0.268372,4.754950216226226,2.180584833531185,250,2,250
+4,9,1,0,96,

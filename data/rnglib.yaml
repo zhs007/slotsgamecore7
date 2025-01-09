@@ -1,0 +1,5 @@
+rngs:
+  fg: 
+    script: has("fg-start")
+  refg: 
+    script: has("fg-rollsym")

@@ -9,8 +9,8 @@ import (
 
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7stats "github.com/zhs007/slotsgamecore7/stats"
-	"go.uber.org/zap"
 )
 
 type FuncOnRTPResults func(lst []*sgc7game.PlayResult, gameData any)
@@ -37,6 +37,7 @@ type RTP struct {
 	ReturnWeights       []float64
 	MaxReturn           int64
 	MaxReturnNums       int64
+	MaxReturnRNGs       []int
 	MapPlayerPool       map[string]*PlayerPoolData
 	MapHitFrequencyData map[string]*HitFrequencyData
 	MapReturn           map[string]*RTPReturnDataList
@@ -119,6 +120,7 @@ func (rtp *RTP) Add(rtp1 *RTP) {
 	if rtp1.MaxReturn > rtp.MaxReturn {
 		rtp.MaxReturn = rtp1.MaxReturn
 		rtp.MaxReturnNums = rtp1.MaxReturnNums
+		rtp.MaxReturnRNGs = rtp1.MaxReturnRNGs
 	} else if rtp1.MaxReturn == rtp.MaxReturn {
 		rtp.MaxReturnNums += rtp1.MaxReturnNums
 	}
@@ -262,8 +264,8 @@ func (rtp *RTP) AddReturnNode(tag string, valRange []float64, funcOnResults Func
 func (rtp *RTP) Save2CSV(fn string) error {
 	f, err := os.Create(fn)
 	if err != nil {
-		goutils.Error("sgc7rtp.RTP.Save2CSV",
-			zap.Error(err))
+		// goutils.Error("sgc7rtp.RTP.Save2CSV",
+		// 	goutils.Err(err))
 
 		return err
 	}
@@ -417,6 +419,8 @@ func (rtp *RTP) Save2CSV(fn string) error {
 		rtp.BetNums, rtp.WinNums, float64(rtp.WinNums)/float64(rtp.BetNums), rtp.Variance, rtp.StdDev, rtp.MaxReturn, rtp.MaxReturnNums, rtp.MaxCoincidingWin)
 	f.WriteString(str)
 
+	f.WriteString(sgc7plugin.GenRngsString(rtp.MaxReturnRNGs) + "\n")
+
 	f.Sync()
 
 	return nil
@@ -438,8 +442,8 @@ func (rtp *RTP) SaveReturns2CSV(fn string) error {
 
 	f, err := os.Create(fn)
 	if err != nil {
-		goutils.Error("sgc7rtp.RTP.SaveReturns2CSV",
-			zap.Error(err))
+		// goutils.Error("sgc7rtp.RTP.SaveReturns2CSV",
+		// 	goutils.Err(err))
 
 		return err
 	}
@@ -458,10 +462,11 @@ func (rtp *RTP) SaveReturns2CSV(fn string) error {
 }
 
 // AddReturns -
-func (rtp *RTP) AddReturns(ret float64) {
+func (rtp *RTP) AddReturns(ret float64, rngs []int) {
 	if rtp.MaxReturn < int64(ret) {
 		rtp.MaxReturn = int64(ret)
 		rtp.MaxReturnNums = 1
+		rtp.MaxReturnRNGs = rngs
 	} else if rtp.MaxReturn == int64(ret) {
 		rtp.MaxReturnNums++
 	}
