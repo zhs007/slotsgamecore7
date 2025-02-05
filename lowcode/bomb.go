@@ -149,26 +149,26 @@ func (bombData *BombData) newData() {
 
 // BombConfig - configuration for Bomb
 type BombConfig struct {
-	BasicComponentConfig     `yaml:",inline" json:",inline"`
-	BombWidth                int            `json:"bombWidth"`
-	BombHeight               int            `json:"bombHeight"`
-	StrBombSourceType        string         `json:"bombSourceType"`
-	BombSourceType           BombSourceType `json:"-"`
-	SourceSymbols            []string       `json:"sourceSymbols"`
-	SourceSymbolCodes        []int          `json:"-"`
-	BombData                 [][]int        `json:"bombData"`
-	SourcePositionCollection string         `json:"sourcePositionCollection"`
-	SelectSourceNumber       int            `json:"selectSourceNumber"`
-	IgnoreSymbols            []string       `json:"ignoreSymbols"`
-	IgnoreSymbolCodes        []int          `json:"-"`
-	StrBombTargetType        string         `json:"bombTargetType"`
-	BombTargetType           BombTargetType `json:"-"`
-	TargetSymbol             string         `json:"targetSymbol"`
-	TargetSymbolCode         int            `json:"-"`
-	OutputToComponent        string         `json:"outputToComponent"`
-	IgnoreWinResults         []string       `json:"ignoreWinResults"`
-	IgnorePostionCollections []string       `json:"ignorePostionCollections"`
-	Controllers              []*Award       `yaml:"controllers" json:"controllers"` // 新的奖励系统
+	BasicComponentConfig      `yaml:",inline" json:",inline"`
+	BombWidth                 int            `json:"bombWidth"`
+	BombHeight                int            `json:"bombHeight"`
+	StrBombSourceType         string         `json:"bombSourceType"`
+	BombSourceType            BombSourceType `json:"-"`
+	SourceSymbols             []string       `json:"sourceSymbols"`
+	SourceSymbolCodes         []int          `json:"-"`
+	BombData                  [][]int        `json:"bombData"`
+	SourcePositionCollection  string         `json:"sourcePositionCollection"`
+	SelectSourceNumber        int            `json:"selectSourceNumber"`
+	IgnoreSymbols             []string       `json:"ignoreSymbols"`
+	IgnoreSymbolCodes         []int          `json:"-"`
+	StrBombTargetType         string         `json:"bombTargetType"`
+	BombTargetType            BombTargetType `json:"-"`
+	TargetSymbol              string         `json:"targetSymbol"`
+	TargetSymbolCode          int            `json:"-"`
+	OutputToComponent         string         `json:"outputToComponent"`
+	IgnoreWinResults          []string       `json:"ignoreWinResults"`
+	IgnorePositionCollections []string       `json:"ignorePositionCollections"`
+	Controllers               []*Award       `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -272,7 +272,7 @@ func (bomb *Bomb) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlu
 }
 
 func (bomb *Bomb) canBomb(gameProp *GameProperty, x int, y int, curpr *sgc7game.PlayResult, gp *GameParams) bool {
-	for _, v := range bomb.Config.IgnorePostionCollections {
+	for _, v := range bomb.Config.IgnorePositionCollections {
 		pos := gameProp.GetComponentPos(v)
 		if goutils.IndexOfInt2Slice(pos, x, y, 0) >= 0 {
 			return false
@@ -484,19 +484,19 @@ func NewBomb(name string) IComponent {
 //
 // ]
 type jsonBomb struct {
-	BombWidth                int      `json:"bombWidth"`
-	BombHeight               int      `json:"bombHeight"`
-	StrBombSourceType        string   `json:"bombSourceType"`
-	SourceSymbols            []string `json:"sourceSymbols"`
-	BombData                 [][]int  `json:"bombData"`
-	SourcePositionCollection string   `json:"sourcePositionCollection"`
-	SelectSourceNumber       int      `json:"selectSourceNumber"`
-	IgnoreSymbols            []string `json:"ignoreSymbols"`
-	StrBombTargetType        string   `json:"bombTargetType"`
-	TargetSymbol             string   `json:"targetSymbol"`
-	OutputToComponent        string   `json:"outputToComponent"`
-	IgnoreWinResults         []string `json:"ignoreWinResults"`
-	IgnorePostionCollections []string `json:"ignorePostionCollections"`
+	BombWidth                 int      `json:"bombWidth"`
+	BombHeight                int      `json:"bombHeight"`
+	StrBombSourceType         string   `json:"bombSourceType"`
+	SourceSymbols             []string `json:"sourceSymbols"`
+	BombData                  [][]int  `json:"bombData"`
+	SourcePositionCollection  string   `json:"sourcePositionCollection"`
+	SelectSourceNumber        int      `json:"selectSourceNumber"`
+	IgnoreSymbols             []string `json:"ignoreSymbols"`
+	StrBombTargetType         string   `json:"bombTargetType"`
+	TargetSymbol              string   `json:"targetSymbol"`
+	OutputToComponent         string   `json:"outputToComponent"`
+	IgnoreWinResults          []string `json:"ignoreWinResults"`
+	IgnorePositionCollections []string `json:"ignorePositionCollections"`
 }
 
 func (jcfg *jsonBomb) build() *BombConfig {
@@ -536,9 +536,9 @@ func (jcfg *jsonBomb) build() *BombConfig {
 		copy(cfg.IgnoreWinResults, jcfg.IgnoreWinResults)
 	}
 
-	if len(jcfg.IgnorePostionCollections) > 0 {
-		cfg.IgnorePostionCollections = make([]string, len(jcfg.IgnorePostionCollections))
-		copy(cfg.IgnorePostionCollections, jcfg.IgnorePostionCollections)
+	if len(jcfg.IgnorePositionCollections) > 0 {
+		cfg.IgnorePositionCollections = make([]string, len(jcfg.IgnorePositionCollections))
+		copy(cfg.IgnorePositionCollections, jcfg.IgnorePositionCollections)
 	}
 
 	return cfg

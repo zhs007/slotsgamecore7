@@ -33,7 +33,7 @@ func parseAddSymbolsType(str string) AddSymbolsType {
 		return AddSymbolsTypeNoSameReel
 	} else if str == "nosamereelandignore" {
 		return AddSymbolsTypeNoSameReelAndIgnore
-	} else if str == "postioncollection" {
+	} else if str == "positioncollection" {
 		return AddSymbolsTypePositionCollection
 	}
 
@@ -118,21 +118,21 @@ func (addSymbolsData *AddSymbolsData) ChgConfigIntVal(key string, off int) int {
 
 // AddSymbolsConfig - configuration for AddSymbols
 type AddSymbolsConfig struct {
-	BasicComponentConfig  `yaml:",inline" json:",inline"`
-	StrType               string                `yaml:"type" json:"type"`
-	Type                  AddSymbolsType        `yaml:"-" json:"-"`
-	Symbol                string                `yaml:"symbol" json:"symbol"`
-	SymbolCode            int                   `yaml:"-" json:"-"`
-	StrSymbolNumType      string                `yaml:"symbolNumType" json:"symbolNumType"`
-	SymbolNumType         AddSymbolNumType      `yaml:"-" json:"-"`
-	SymbolNum             int                   `yaml:"symbolNum" json:"symbolNum"`
-	SymbolNumWeight       string                `yaml:"symbolNumWeight" json:"symbolNumWeight"`
-	SymbolNumWeightVW     *sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	IgnoreSymbols         []string              `yaml:"ignoreSymbols" json:"ignoreSymbols"`
-	IgnoreSymbolCodes     []int                 `yaml:"-" json:"-"`
-	SymbolNumTrigger      string                `yaml:"symbolNumTrigger" json:"symbolNumTrigger"`
-	Height                int                   `yaml:"height" json:"height"`
-	SrcPostionCollections []string              `yaml:"srcPostionCollections" json:"srcPostionCollections"`
+	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	StrType                string                `yaml:"type" json:"type"`
+	Type                   AddSymbolsType        `yaml:"-" json:"-"`
+	Symbol                 string                `yaml:"symbol" json:"symbol"`
+	SymbolCode             int                   `yaml:"-" json:"-"`
+	StrSymbolNumType       string                `yaml:"symbolNumType" json:"symbolNumType"`
+	SymbolNumType          AddSymbolNumType      `yaml:"-" json:"-"`
+	SymbolNum              int                   `yaml:"symbolNum" json:"symbolNum"`
+	SymbolNumWeight        string                `yaml:"symbolNumWeight" json:"symbolNumWeight"`
+	SymbolNumWeightVW      *sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	IgnoreSymbols          []string              `yaml:"ignoreSymbols" json:"ignoreSymbols"`
+	IgnoreSymbolCodes      []int                 `yaml:"-" json:"-"`
+	SymbolNumTrigger       string                `yaml:"symbolNumTrigger" json:"symbolNumTrigger"`
+	Height                 int                   `yaml:"height" json:"height"`
+	SrcPositionCollections []string              `yaml:"srcPositionCollections" json:"srcPositionCollections"`
 }
 
 // SetLinkComponent
@@ -420,7 +420,7 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 
 func (addSymbols *AddSymbols) onPositionCollection(gameProp *GameProperty, cd *AddSymbolsData, gs *sgc7game.GameScene, height int) (string, error) {
 	ngs := gs
-	for _, v := range addSymbols.Config.SrcPostionCollections {
+	for _, v := range addSymbols.Config.SrcPositionCollections {
 		pc, isok := gameProp.Components.MapComponents[v]
 		if isok {
 			pccd := gameProp.GetComponentData(pc)
@@ -552,28 +552,28 @@ func NewAddSymbols(name string) IComponent {
 //
 // ]
 type jsonAddSymbols struct {
-	Type                  string   `json:"type"`
-	SymbolNumType         string   `json:"symbolNumType"`
-	Symbol                string   `json:"symbol"`
-	SymbolNum             int      `json:"symbolNum"`
-	SymbolNumWeight       string   `json:"symbolNumWeight"`
-	IgnoreSymbols         []string `json:"ignoreSymbols"`
-	SymbolNumTrigger      string   `json:"symbolNumTrigger"`
-	Height                int      `json:"Height"`
-	SrcPostionCollections []string `json:"srcPostionCollections"`
+	Type                   string   `json:"type"`
+	SymbolNumType          string   `json:"symbolNumType"`
+	Symbol                 string   `json:"symbol"`
+	SymbolNum              int      `json:"symbolNum"`
+	SymbolNumWeight        string   `json:"symbolNumWeight"`
+	IgnoreSymbols          []string `json:"ignoreSymbols"`
+	SymbolNumTrigger       string   `json:"symbolNumTrigger"`
+	Height                 int      `json:"Height"`
+	SrcPositionCollections []string `json:"srcPositionCollections"`
 }
 
 func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
 	cfg := &AddSymbolsConfig{
-		StrType:               strings.ToLower(jcfg.Type),
-		Symbol:                jcfg.Symbol,
-		StrSymbolNumType:      jcfg.SymbolNumType,
-		SymbolNum:             jcfg.SymbolNum,
-		SymbolNumWeight:       jcfg.SymbolNumWeight,
-		IgnoreSymbols:         jcfg.IgnoreSymbols,
-		SymbolNumTrigger:      jcfg.SymbolNumTrigger,
-		Height:                jcfg.Height,
-		SrcPostionCollections: jcfg.SrcPostionCollections,
+		StrType:                strings.ToLower(jcfg.Type),
+		Symbol:                 jcfg.Symbol,
+		StrSymbolNumType:       jcfg.SymbolNumType,
+		SymbolNum:              jcfg.SymbolNum,
+		SymbolNumWeight:        jcfg.SymbolNumWeight,
+		IgnoreSymbols:          jcfg.IgnoreSymbols,
+		SymbolNumTrigger:       jcfg.SymbolNumTrigger,
+		Height:                 jcfg.Height,
+		SrcPositionCollections: jcfg.SrcPositionCollections,
 	}
 
 	// cfg.UseSceneV3 = true
