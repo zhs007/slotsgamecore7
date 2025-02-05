@@ -247,7 +247,10 @@ func (moveSymbol2 *MoveSymbols2) procNormal(gameProp *GameProperty, cd *MoveSymb
 			ngs = gs.CloneEx(gameProp.PoolScene)
 		}
 
-		ngs.Arr[tx][ty] = ngs.Arr[x][y]
+		if ngs.IsValidPos(tx, ty) {
+			ngs.Arr[tx][ty] = ngs.Arr[x][y]
+		}
+
 		ngs.Arr[x][y] = gs2.Arr[x][y]
 	}
 
