@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -24,13 +25,16 @@ const (
 	AddSymbolsTypeNormal              AddSymbolsType = 0 // 普通
 	AddSymbolsTypeNoSameReel          AddSymbolsType = 1 // 不能加在同一轴上
 	AddSymbolsTypeNoSameReelAndIgnore AddSymbolsType = 2 // 也不能加在和ignore symbol同一轴上
+	AddSymbolsTypePositionCollection  AddSymbolsType = 3 // 在 positionCollection 的位置上加 symbol
 )
 
 func parseAddSymbolsType(str string) AddSymbolsType {
-	if str == "noSameReel" {
+	if str == "nosamereel" {
 		return AddSymbolsTypeNoSameReel
-	} else if str == "noSameReelAndIgnore" {
+	} else if str == "nosamereelandignore" {
 		return AddSymbolsTypeNoSameReelAndIgnore
+	} else if str == "positioncollection" {
+		return AddSymbolsTypePositionCollection
 	}
 
 	return AddSymbolsTypeNormal
@@ -114,20 +118,21 @@ func (addSymbolsData *AddSymbolsData) ChgConfigIntVal(key string, off int) int {
 
 // AddSymbolsConfig - configuration for AddSymbols
 type AddSymbolsConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrType              string                `yaml:"type" json:"type"`
-	Type                 AddSymbolsType        `yaml:"-" json:"-"`
-	Symbol               string                `yaml:"symbol" json:"symbol"`
-	SymbolCode           int                   `yaml:"-" json:"-"`
-	StrSymbolNumType     string                `yaml:"symbolNumType" json:"symbolNumType"`
-	SymbolNumType        AddSymbolNumType      `yaml:"-" json:"-"`
-	SymbolNum            int                   `yaml:"symbolNum" json:"symbolNum"`
-	SymbolNumWeight      string                `yaml:"symbolNumWeight" json:"symbolNumWeight"`
-	SymbolNumWeightVW    *sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	IgnoreSymbols        []string              `yaml:"ignoreSymbols" json:"ignoreSymbols"`
-	IgnoreSymbolCodes    []int                 `yaml:"-" json:"-"`
-	SymbolNumTrigger     string                `yaml:"symbolNumTrigger" json:"symbolNumTrigger"`
-	Height               int                   `yaml:"height" json:"height"`
+	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	StrType                string                `yaml:"type" json:"type"`
+	Type                   AddSymbolsType        `yaml:"-" json:"-"`
+	Symbol                 string                `yaml:"symbol" json:"symbol"`
+	SymbolCode             int                   `yaml:"-" json:"-"`
+	StrSymbolNumType       string                `yaml:"symbolNumType" json:"symbolNumType"`
+	SymbolNumType          AddSymbolNumType      `yaml:"-" json:"-"`
+	SymbolNum              int                   `yaml:"symbolNum" json:"symbolNum"`
+	SymbolNumWeight        string                `yaml:"symbolNumWeight" json:"symbolNumWeight"`
+	SymbolNumWeightVW      *sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	IgnoreSymbols          []string              `yaml:"ignoreSymbols" json:"ignoreSymbols"`
+	IgnoreSymbolCodes      []int                 `yaml:"-" json:"-"`
+	SymbolNumTrigger       string                `yaml:"symbolNumTrigger" json:"symbolNumTrigger"`
+	Height                 int                   `yaml:"height" json:"height"`
+	SrcPositionCollections []string              `yaml:"srcPositionCollections" json:"srcPositionCollections"`
 }
 
 // SetLinkComponent
@@ -413,6 +418,35 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 	return nc, nil
 }
 
+func (addSymbols *AddSymbols) onPositionCollection(gameProp *GameProperty, cd *AddSymbolsData, gs *sgc7game.GameScene, height int) (string, error) {
+	ngs := gs
+	for _, v := range addSymbols.Config.SrcPositionCollections {
+		pc, isok := gameProp.Components.MapComponents[v]
+		if isok {
+			pccd := gameProp.GetComponentData(pc)
+			pos := pccd.GetPos()
+			if len(pos) > 0 {
+				for i := 0; i < len(pos)/2; i++ {
+					x := pos[i*2]
+					y := pos[i*2+1]
+
+					if IsValidPosWithHeight(x, y, height, gs.Height, true) {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = addSymbols.Config.SymbolCode
+
+						cd.SymbolNum++
+					}
+				}
+			}
+		}
+	}
+
+	return "", nil
+}
+
 // playgame
 func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -426,6 +460,10 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	height := addSymbols.getHeight(&cd.BasicComponentData)
 	if height <= 0 || height > gs.Height {
 		height = gs.Height
+	}
+
+	if addSymbols.Config.Type == AddSymbolsTypePositionCollection {
+		return addSymbols.onPositionCollection(gameProp, cd, gs, height)
 	}
 
 	if addSymbols.Config.SymbolNumType == AddSymbolNumTypeIncUntilTriggered {
@@ -514,26 +552,28 @@ func NewAddSymbols(name string) IComponent {
 //
 // ]
 type jsonAddSymbols struct {
-	Type             string   `json:"type"`
-	SymbolNumType    string   `json:"symbolNumType"`
-	Symbol           string   `json:"symbol"`
-	SymbolNum        int      `json:"symbolNum"`
-	SymbolNumWeight  string   `json:"symbolNumWeight"`
-	IgnoreSymbols    []string `json:"ignoreSymbols"`
-	SymbolNumTrigger string   `json:"symbolNumTrigger"`
-	Height           int      `json:"Height"`
+	Type                   string   `json:"type"`
+	SymbolNumType          string   `json:"symbolNumType"`
+	Symbol                 string   `json:"symbol"`
+	SymbolNum              int      `json:"symbolNum"`
+	SymbolNumWeight        string   `json:"symbolNumWeight"`
+	IgnoreSymbols          []string `json:"ignoreSymbols"`
+	SymbolNumTrigger       string   `json:"symbolNumTrigger"`
+	Height                 int      `json:"Height"`
+	SrcPositionCollections []string `json:"srcPositionCollections"`
 }
 
 func (jcfg *jsonAddSymbols) build() *AddSymbolsConfig {
 	cfg := &AddSymbolsConfig{
-		StrType:          jcfg.Type,
-		Symbol:           jcfg.Symbol,
-		StrSymbolNumType: jcfg.SymbolNumType,
-		SymbolNum:        jcfg.SymbolNum,
-		SymbolNumWeight:  jcfg.SymbolNumWeight,
-		IgnoreSymbols:    jcfg.IgnoreSymbols,
-		SymbolNumTrigger: jcfg.SymbolNumTrigger,
-		Height:           jcfg.Height,
+		StrType:                strings.ToLower(jcfg.Type),
+		Symbol:                 jcfg.Symbol,
+		StrSymbolNumType:       jcfg.SymbolNumType,
+		SymbolNum:              jcfg.SymbolNum,
+		SymbolNumWeight:        jcfg.SymbolNumWeight,
+		IgnoreSymbols:          jcfg.IgnoreSymbols,
+		SymbolNumTrigger:       jcfg.SymbolNumTrigger,
+		Height:                 jcfg.Height,
+		SrcPositionCollections: jcfg.SrcPositionCollections,
 	}
 
 	// cfg.UseSceneV3 = true

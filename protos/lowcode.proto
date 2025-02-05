@@ -386,6 +386,12 @@ message TreasureChestData {
     repeated int32 selected = 2;
 }
 
+// MoveSymbols2Data
+message MoveSymbols2Data {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

@@ -862,3 +862,7 @@ func (gs *GameScene) ToString() string {
 
 	return str
 }
+
+func (gs *GameScene) IsValidPos(x, y int) bool {
+	return x >= 0 && x < gs.Width && y >= 0 && y < gs.Height
+}

@@ -541,3 +541,15 @@ func CountSymbolsInResult(gs *sgc7game.GameScene, symbols []int, ret *sgc7game.R
 
 	return num
 }
+
+func IsValidPosWithHeight(x, y int, curHeight, height int, isReversalHeight bool) bool {
+	if curHeight < height {
+		if isReversalHeight {
+			return y >= 0 && height-y <= curHeight
+		}
+
+		return y >= 0 && y < curHeight
+	}
+
+	return true
+}

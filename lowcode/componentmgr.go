@@ -153,6 +153,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(BombTypeName, NewBomb)
 	mgr.Reg(SumSymbolValsTypeName, NewSumSymbolVals)
 	mgr.Reg(TreasureChestTypeName, NewTreasureChest)
+	mgr.Reg(MoveSymbols2TypeName, NewMoveSymbols2)
 
 	return mgr
 }
