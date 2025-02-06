@@ -94,9 +94,9 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		finfo, _ := os.Stat(fn)
 		linuxFileAttr := finfo.Sys().(*syscall.Stat_t)
 		strBin += fmt.Sprintf("  File:\t%s\n", path.Join("certificationBuildOutput", tsPath, "bins", v))
-		strBin += fmt.Sprintf("Access:\t%s\n", time.Unix(linuxFileAttr.Atim.Sec, 0).Format("2006-01-02_15:04:05"))
-		strBin += fmt.Sprintf("Modify:\t%s\n", time.Unix(linuxFileAttr.Mtim.Sec, 0).Format("2006-01-02_15:04:05"))
-		strBin += fmt.Sprintf(" Birth:\t%s\n", time.Unix(linuxFileAttr.Ctim.Sec, 0).Format("2006-01-02_15:04:05"))
+		strBin += fmt.Sprintf("Access:\t%s\n", time.Unix(linuxFileAttr.Atimespec.Sec, 0).Format("2006-01-02_15:04:05"))
+		strBin += fmt.Sprintf("Modify:\t%s\n", time.Unix(linuxFileAttr.Mtimespec.Sec, 0).Format("2006-01-02_15:04:05"))
+		strBin += fmt.Sprintf(" Birth:\t%s\n", time.Unix(linuxFileAttr.Ctimespec.Sec, 0).Format("2006-01-02_15:04:05"))
 	}
 	os.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildBinData.txt"), []byte(strBin), 0644)
 
@@ -131,7 +131,7 @@ func genSBuild(pathRoot string, binFiles []string, srcFiles []string, gamename s
 		strSrc += fmt.Sprintf("%s\t%s\n", cs, path.Join("certificationBuildOutput", tsPath, gamename, v))
 		finfo, _ := os.Stat(fn)
 		linuxFileAttr := finfo.Sys().(*syscall.Stat_t)
-		strSrc += fmt.Sprintf("%s\t%s\n", time.Unix(linuxFileAttr.Mtim.Sec, 0).Format("2006-01-02_15:04:05"), path.Join("certificationBuildOutput", tsPath, "bins", v))
+		strSrc += fmt.Sprintf("%s\t%s\n", time.Unix(linuxFileAttr.Mtimespec.Sec, 0).Format("2006-01-02_15:04:05"), path.Join("certificationBuildOutput", tsPath, "bins", v))
 	}
 	os.WriteFile(path.Join(gamename, tsPath, gamename, "sBuildSrcData.txt"), []byte(strSrc), 0644)
 
