@@ -418,7 +418,7 @@ func (addSymbols *AddSymbols) onOthers(gameProp *GameProperty, curpr *sgc7game.P
 	return nc, nil
 }
 
-func (addSymbols *AddSymbols) onPositionCollection(gameProp *GameProperty, cd *AddSymbolsData, gs *sgc7game.GameScene, height int) (string, error) {
+func (addSymbols *AddSymbols) onPositionCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd *AddSymbolsData, gs *sgc7game.GameScene, height int) (string, error) {
 	ngs := gs
 	for _, v := range addSymbols.Config.SrcPositionCollections {
 		pc, isok := gameProp.Components.MapComponents[v]
@@ -444,7 +444,13 @@ func (addSymbols *AddSymbols) onPositionCollection(gameProp *GameProperty, cd *A
 		}
 	}
 
-	return "", nil
+	if ngs != gs {
+		addSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+	}
+
+	nc := addSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, nil
 }
 
 // playgame
@@ -463,7 +469,7 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	}
 
 	if addSymbols.Config.Type == AddSymbolsTypePositionCollection {
-		return addSymbols.onPositionCollection(gameProp, cd, gs, height)
+		return addSymbols.onPositionCollection(gameProp, curpr, gp, cd, gs, height)
 	}
 
 	if addSymbols.Config.SymbolNumType == AddSymbolNumTypeIncUntilTriggered {

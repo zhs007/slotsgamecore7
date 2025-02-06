@@ -139,10 +139,6 @@ func (checkSymbolVals *CheckSymbolVals) checkVal(v int) bool {
 func (checkSymbolVals *CheckSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
-	// cd := icd.(*BasicComponentData)
-
 	os := checkSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
 		pc, isok := gameProp.Components.MapComponents[checkSymbolVals.Config.OutputToComponent]
@@ -166,20 +162,8 @@ func (checkSymbolVals *CheckSymbolVals) OnPlayGame(gameProp *GameProperty, curpr
 
 // OnAsciiGame - outpur to asciigame
 func (checkSymbolVals *CheckSymbolVals) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-
-	// cd := icd.(*BasicComponentData)
-
-	// if len(cd.UsedOtherScenes) > 0 {
-	// 	asciigame.OutputOtherScene("The value of the symbols", pr.OtherScenes[cd.UsedOtherScenes[0]])
-	// }
-
 	return nil
 }
-
-// // OnStats
-// func (checkSymbolVals *CheckSymbolVals) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewCheckSymbolVals(name string) IComponent {
 	return &CheckSymbolVals{
