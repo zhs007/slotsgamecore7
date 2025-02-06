@@ -316,12 +316,12 @@ func (moveSymbol2 *MoveSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 
 // NewComponentData -
 func (moveSymbol2 *MoveSymbols2) NewComponentData() IComponentData {
-	return &RandomMoveSymbolsData{}
+	return &MoveSymbols2Data{}
 }
 
 // OnAsciiGame - outpur to asciigame
 func (moveSymbol2 *MoveSymbols2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	msd := icd.(*RandomMoveSymbolsData)
+	msd := icd.(*MoveSymbols2Data)
 
 	asciigame.OutputScene("after moveSymbols2", pr.Scenes[msd.UsedScenes[0]], mapSymbolColor)
 
