@@ -170,6 +170,16 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 	return nil
 }
 
+// OnProcControllers -
+func (treasureChest *TreasureChest) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	controllers, isok := treasureChest.Config.MapControllers[val]
+	if isok {
+		if len(controllers) > 0 {
+			gameProp.procAwards(plugin, controllers, curpr, gp)
+		}
+	}
+}
+
 // playgame
 func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -211,26 +221,15 @@ func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 	}
 
-	// winMulti := jackpot.GetWinMulti(&cd.BasicComponentData)
-	// wins := jackpot.GetWins(&cd.BasicComponentData)
+	treasureChest.ProcControllers(gameProp, plugin, curpr, gp, cd.Output, "")
 
-	// cd.WinMulti = winMulti
+	nextComponent := ""
+	branch, isok := treasureChest.Config.MapBranchs[cd.Output]
+	if isok {
+		nextComponent = branch
+	}
 
-	// cd.Wins = wins * winMulti
-
-	// bet := gameProp.GetBet3(stake, jackpot.Config.BetType)
-
-	// ret := &sgc7game.Result{
-	// 	Symbol:    -1,
-	// 	Type:      sgc7game.RTBonus,
-	// 	LineIndex: -1,
-	// 	CoinWin:   cd.Wins,
-	// 	CashWin:   cd.Wins * bet,
-	// }
-
-	// jackpot.AddResult(curpr, ret, &cd.BasicComponentData)
-
-	nc := treasureChest.onStepEnd(gameProp, curpr, gp, "")
+	nc := treasureChest.onStepEnd(gameProp, curpr, gp, nextComponent)
 
 	return nc, nil
 }
