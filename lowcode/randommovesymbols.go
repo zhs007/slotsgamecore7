@@ -12,6 +12,7 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
@@ -502,6 +503,27 @@ func (moveSymbol *RandomMoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc
 	asciigame.OutputScene("after randomMoveSymbols", pr.Scenes[msd.UsedScenes[0]], mapSymbolColor)
 
 	return nil
+}
+
+// OnStats2
+func (moveSymbol *RandomMoveSymbols) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	moveSymbol.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
+
+	if isOnStepEnd && pr.IsFinish {
+		cd := icd.(*RandomMoveSymbolsData)
+
+		s2.ProcStatsIntVal(moveSymbol.GetName(), len(cd.Pos))
+	}
+}
+
+// NewStats2 -
+func (moveSymbol *RandomMoveSymbols) NewStats2(parent string) *stats2.Feature {
+	return stats2.NewFeature(parent, []stats2.Option{stats2.OptIntVal})
+}
+
+// IsNeedOnStepEndStats2 - 除respin外，如果也有component也需要在stepEnd调用的话，这里需要返回true
+func (moveSymbol *RandomMoveSymbols) IsNeedOnStepEndStats2() bool {
+	return true
 }
 
 func NewRandomMoveSymbols(name string) IComponent {
