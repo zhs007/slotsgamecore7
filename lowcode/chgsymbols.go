@@ -745,9 +745,9 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 				chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-				nc := chgSymbols.onStepEnd(gameProp, curpr, gp, chgSymbols.Config.JumpToComponent)
+				// nc := chgSymbols.onStepEnd(gameProp, curpr, gp, chgSymbols.Config.JumpToComponent)
 
-				return nc, nil
+				// return nc, nil
 			}
 
 			nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
