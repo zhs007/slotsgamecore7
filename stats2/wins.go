@@ -30,13 +30,13 @@ func (wins *StatsWins) genRange(bet int) {
 		if win == 0 {
 			wins.MapWinTimesEx["noWins"] += times
 			wins.MapWinEx["noWins"] = 0
-		}else if win < bet {
+		} else if win < bet {
 			wins.MapWinTimesEx["(0,1)"] += times
 			wins.MapWinEx["(0,1)"] = int64(win) * times
 		} else if win == bet {
 			wins.MapWinTimesEx["=1"] += times
 			wins.MapWinEx["=1"] = int64(win) * times
-		}else {
+		} else {
 			curWins := float64(win) / float64(bet)
 
 			for i := 0; i < len(gWinRange); i++ {
@@ -202,10 +202,10 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), 0)
 		}
 
-		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), 0)
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), wins.MapWinEx[k])
 
 		if totalBet > 0 {
-			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), float64(wins.MapWinEx[k])/float64(totalBet))
 		} else {
 			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
 		}

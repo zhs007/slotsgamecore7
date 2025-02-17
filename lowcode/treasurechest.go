@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -22,11 +23,12 @@ type TreasureChestType int
 
 const (
 	TreasureChestTypeFragmentCollection TreasureChestType = 0
+	TreasureChestTypeSumValue           TreasureChestType = 1
 )
 
 func parseTreasureChestType(str string) TreasureChestType {
-	if str == "fragmentcollection" {
-		return TreasureChestTypeFragmentCollection
+	if str == "sumvalue" {
+		return TreasureChestTypeSumValue
 	}
 
 	return TreasureChestTypeFragmentCollection
@@ -42,11 +44,13 @@ func (treasureChestData *TreasureChestData) OnNewGame(gameProp *GameProperty, co
 	treasureChestData.BasicComponentData.OnNewGame(gameProp, component)
 
 	treasureChestData.Selected = nil
+	treasureChestData.Output = 0
 }
 
 // onNewStep -
 func (treasureChestData *TreasureChestData) onNewStep(gameProp *GameProperty, component IComponent) {
 	treasureChestData.Selected = nil
+	treasureChestData.Output = 0
 }
 
 // Clone
@@ -55,6 +59,8 @@ func (treasureChestData *TreasureChestData) Clone() IComponentData {
 		BasicComponentData: treasureChestData.CloneBasicComponentData(),
 		Selected:           make([]int, len(treasureChestData.Selected)),
 	}
+
+	target.Output = treasureChestData.Output
 
 	copy(target.Selected, treasureChestData.Selected)
 
@@ -68,11 +74,22 @@ func (treasureChestData *TreasureChestData) BuildPBComponentData() proto.Message
 		Selected:           make([]int32, len(treasureChestData.Selected)),
 	}
 
+	pbcd.BasicComponentData.Output = int32(treasureChestData.Output)
+
 	for i, v := range treasureChestData.Selected {
 		pbcd.Selected[i] = int32(v)
 	}
 
 	return pbcd
+}
+
+// GetValEx -
+func (treasureChestData *TreasureChestData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVNumber || key == CVOutputInt {
+		return treasureChestData.Output, true
+	}
+
+	return 0, false
 }
 
 // TreasureChestConfig - configuration for TreasureChest
@@ -83,8 +100,11 @@ type TreasureChestConfig struct {
 	StrWeight            string                `yaml:"weight" json:"weight"` // weight
 	Weight               *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	FragmentNum          int                   `yaml:"fragmentNum" json:"fragmentNum"` // fragmentNum
+	OpenNum              int                   `yaml:"openNum" json:"openNum"`
+	TotalNum             int                   `yaml:"totalNum" json:"totalNum"`
 	MapBranchs           map[int]string        `yaml:"mapBranchs" json:"mapBranchs"`
 	MapControllers       map[int][]*Award      `yaml:"mapControllers" json:"mapControllers"`
+	Controllers          []*Award              `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -140,6 +160,25 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 	treasureChest.Config.Type = parseTreasureChestType(treasureChest.Config.StrType)
 
+	if treasureChest.Config.Type == TreasureChestTypeSumValue {
+		if treasureChest.Config.OpenNum > treasureChest.Config.TotalNum {
+			goutils.Error("TreasureChest.InitEx:TreasureChestTypeSumValue",
+				slog.Int("OpenNum", treasureChest.Config.OpenNum),
+				slog.Int("TotalNum", treasureChest.Config.TotalNum),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return ErrInvalidComponentConfig
+		}
+	} else if treasureChest.Config.Type == TreasureChestTypeFragmentCollection {
+		if treasureChest.Config.FragmentNum <= 0 {
+			goutils.Error("TreasureChest.InitEx:FragmentNum",
+				slog.Int("FragmentNum", treasureChest.Config.FragmentNum),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return ErrInvalidComponentConfig
+		}
+	}
+
 	vw2, err := pool.LoadIntWeights(treasureChest.Config.StrWeight, true)
 	if err != nil {
 		goutils.Error("TreasureChest.InitEx:LoadIntWeights",
@@ -151,18 +190,14 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 	treasureChest.Config.Weight = vw2
 
-	if treasureChest.Config.FragmentNum <= 0 {
-		goutils.Error("TreasureChest.InitEx:FragmentNum",
-			slog.Int("FragmentNum", treasureChest.Config.FragmentNum),
-			goutils.Err(ErrInvalidComponentConfig))
-
-		return ErrInvalidComponentConfig
-	}
-
 	for _, awards := range treasureChest.Config.MapControllers {
 		for _, award := range awards {
 			award.Init()
 		}
+	}
+
+	for _, award := range treasureChest.Config.Controllers {
+		award.Init()
 	}
 
 	treasureChest.onInit(&treasureChest.Config.BasicComponentConfig)
@@ -172,6 +207,12 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 // OnProcControllers -
 func (treasureChest *TreasureChest) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if val == -1 && strVal == "sumValue" {
+		gameProp.procAwards(plugin, treasureChest.Config.Controllers, curpr, gp)
+
+		return
+	}
+
 	controllers, isok := treasureChest.Config.MapControllers[val]
 	if isok {
 		if len(controllers) > 0 {
@@ -180,16 +221,13 @@ func (treasureChest *TreasureChest) ProcControllers(gameProp *GameProperty, plug
 	}
 }
 
-// playgame
-func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	cd := icd.(*TreasureChestData)
-	cd.onNewStep(gameProp, treasureChest)
+// fragmentCollection
+func (treasureChest *TreasureChest) procFragmentCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
 
 	vw2 := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
 	if vw2 == nil {
-		goutils.Error("TreasureChest.OnPlayGame:getWeight",
+		goutils.Error("TreasureChest.procFragmentCollection:getWeight",
 			goutils.Err(ErrInvalidComponentConfig))
 
 		return "", ErrInvalidComponentConfig
@@ -204,7 +242,7 @@ func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sg
 	for {
 		cr, err := vw2.RandVal(plugin)
 		if err != nil {
-			goutils.Error("TreasureChest.OnPlayGame:RandVal",
+			goutils.Error("TreasureChest.procFragmentCollection:RandVal",
 				goutils.Err(err))
 
 			return "", err
@@ -232,6 +270,57 @@ func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sg
 	nc := treasureChest.onStepEnd(gameProp, curpr, gp, nextComponent)
 
 	return nc, nil
+}
+
+// sumValue
+func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
+
+	vw2 := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
+	if vw2 == nil {
+		goutils.Error("TreasureChest.procSumValue:getWeight",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return "", ErrInvalidComponentConfig
+	}
+
+	for i := 0; i < treasureChest.Config.OpenNum; i++ {
+		cr, err := vw2.RandVal(plugin)
+		if err != nil {
+			goutils.Error("TreasureChest.procSumValue:RandVal",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cd.Output += cr.Int()
+	}
+
+	treasureChest.ProcControllers(gameProp, plugin, curpr, gp, -1, "sumValue")
+
+	nc := treasureChest.onStepEnd(gameProp, curpr, gp, "")
+
+	return nc, nil
+}
+
+// playgame
+func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
+
+	cd := icd.(*TreasureChestData)
+	cd.onNewStep(gameProp, treasureChest)
+
+	if treasureChest.Config.Type == TreasureChestTypeFragmentCollection {
+		return treasureChest.procFragmentCollection(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
+	} else if treasureChest.Config.Type == TreasureChestTypeSumValue {
+		return treasureChest.procSumValue(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
+	}
+
+	goutils.Error("TreasureChest.OnPlayGame",
+		slog.Int("type", int(treasureChest.Config.Type)),
+		goutils.Err(ErrInvalidComponentConfig))
+
+	return "", ErrInvalidComponentConfig
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -277,18 +366,24 @@ func NewTreasureChest(name string) IComponent {
 
 // "type": "fragmentCollection",
 // "fragmentNum": 3,
+// "openNum": 9,
+// "totalNum": 9,
 // "weight": "weight_coin"
 type jsonTreasureChest struct {
 	Type        string `json:"type"`
 	FragmentNum int    `json:"fragmentNum"`
+	OpenNum     int    `json:"openNum"`
+	TotalNum    int    `json:"totalNum"`
 	Weight      string `json:"weight"`
 }
 
 func (jcfg *jsonTreasureChest) build() *TreasureChestConfig {
 	cfg := &TreasureChestConfig{
-		StrType:     jcfg.Type,
+		StrType:     strings.ToLower(jcfg.Type),
 		StrWeight:   jcfg.Weight,
 		FragmentNum: jcfg.FragmentNum,
+		OpenNum:     jcfg.OpenNum,
+		TotalNum:    jcfg.TotalNum,
 	}
 
 	// cfg.UseSceneV3 = true
@@ -326,15 +421,16 @@ func parseTreasureChest(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		mapAwards, err := parseFeatureBarControllers(ctrls)
+		awards, mapAwards, err := parseTreasureChestControllers(ctrls)
 		if err != nil {
-			goutils.Error("parseBasicReels:parseMapControllers",
+			goutils.Error("parseBasicReels:parseTreasureChestControllers",
 				goutils.Err(err))
 
 			return "", err
 		}
 
 		cfgd.MapControllers = mapAwards
+		cfgd.Controllers = awards
 	}
 
 	gamecfg.mapConfig[label] = cfgd

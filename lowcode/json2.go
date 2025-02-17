@@ -195,6 +195,14 @@ func (jcd *jsonControllerData) buildWithStringVal() (string, *Award) {
 	return jcd.StringVal, jcd.build()
 }
 
+func (jcd *jsonControllerData) buildWithStringValEx() (string, *Award) {
+	if jcd.StringVal == "" {
+		return "", jcd.build()
+	}
+
+	return jcd.StringVal, jcd.build()
+}
+
 func (jcd *jsonControllerData) build4Map() (string, *Award) {
 	if jcd.StringVal == "" {
 		goutils.Error("jsonControllerData.build4Map",
@@ -636,4 +644,48 @@ func parseFeatureBarControllers(controller *ast.Node) (map[int][]*Award, error) 
 	}
 
 	return mapawards, nil
+}
+
+func parseTreasureChestControllers(controller *ast.Node) ([]*Award, map[int][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseFeatureBarControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseFeatureBarControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	mapawards := make(map[int][]*Award)
+	var awards []*Award
+
+	for i, v := range lst {
+		str, a := v.buildWithStringValEx()
+		if str != "" {
+			i64, err := goutils.String2Int64(str)
+			if err != nil {
+				goutils.Error("parseFeatureBarControllers:String2Int64",
+					slog.Int("i", i),
+					slog.String("str", str),
+					goutils.Err(err))
+
+				return nil, nil, err
+			}
+
+			mapawards[int(i64)] = append(mapawards[int(i64)], a)
+		} else if a != nil {
+			awards = append(awards, a)
+		}
+	}
+
+	return awards, mapawards, nil
 }
