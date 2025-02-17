@@ -212,7 +212,7 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 	}
 
 	y++
-	for i := 0; i < len(gWinRange); i++ {
+	for i := 1; i < len(gWinRange); i++ {
 		var k string
 		if i < len(gWinRange)-1 {
 			k = fmt.Sprintf("[%v,%v)", gWinRange[i], gWinRange[i+1])
