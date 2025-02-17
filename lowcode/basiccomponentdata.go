@@ -22,7 +22,6 @@ type BasicComponentData struct {
 	SrcScenes             []int
 	Output                int
 	StrOutput             string
-	// ForceBranchIndex      int
 }
 
 // Clone
