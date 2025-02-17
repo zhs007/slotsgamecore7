@@ -101,7 +101,7 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) GetValEx(key string, getTy
 		}
 
 		return adjacentPayTriggerData.AvgSymbolValMulti, true
-	} else if key == CVResultNum {
+	} else if key == CVResultNum || key == CVWinResultNum {
 		return len(adjacentPayTriggerData.UsedResults), true
 	}
 

@@ -94,7 +94,7 @@ func (linesTriggerData *LinesTriggerData) GetValEx(key string, getType GetCompon
 		return linesTriggerData.RespinNum, true
 	} else if key == CVWins {
 		return linesTriggerData.Wins, true
-	} else if key == CVResultNum {
+	} else if key == CVResultNum || key == CVWinResultNum {
 		return len(linesTriggerData.UsedResults), true
 	}
 

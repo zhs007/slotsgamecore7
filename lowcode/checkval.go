@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -17,6 +18,21 @@ import (
 )
 
 const CheckValTypeName = "checkVal"
+
+type CheckValType int
+
+const (
+	CheckValTypeString CheckValType = 0
+	CheckValTypeInt    CheckValType = 1
+)
+
+func parseCheckValType(str string) CheckValType {
+	if str == "int" {
+		return CheckValTypeInt
+	}
+
+	return CheckValTypeString
+}
 
 type CheckValData struct {
 	BasicComponentData
@@ -56,10 +72,14 @@ func (checkValData *CheckValData) GetValEx(key string, getType GetComponentValTy
 // CheckValConfig - configuration for CheckVal
 type CheckValConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	SourceVal            []string `yaml:"sourceVal" json:"sourceVal"`
-	TargetVal            []string `yaml:"targetVal" json:"targetVal"`
-	JumpToComponent      string   `yaml:"jumpToComponent" json:"jumpToComponent"`
-	Controllers          []*Award `yaml:"controllers" json:"controllers"` // 新的奖励系统
+	StrType              string       `yaml:"type" json:"type"`
+	Type                 CheckValType `yaml:"-" json:"-"`
+	SourceVal            []string     `yaml:"sourceVal" json:"sourceVal"`
+	ConstIntTarget       int          `yaml:"constIntTarget" json:"constIntTarget"`
+	ConstTarget          string       `yaml:"constTarget" json:"constTarget"`
+	TargetVal            []string     `yaml:"targetVal" json:"targetVal"`
+	JumpToComponent      string       `yaml:"jumpToComponent" json:"jumpToComponent"`
+	Controllers          []*Award     `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -106,6 +126,8 @@ func (checkVal *CheckVal) InitEx(cfg any, pool *GamePropertyPool) error {
 	checkVal.Config = cfg.(*CheckValConfig)
 	checkVal.Config.ComponentType = CheckValTypeName
 
+	checkVal.Config.Type = parseCheckValType(checkVal.Config.StrType)
+
 	for _, ctrl := range checkVal.Config.Controllers {
 		ctrl.Init()
 	}
@@ -128,19 +150,54 @@ func (checkVal *CheckVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 
 	cd := icd.(*CheckValData)
 
-	sv, err := gameProp.GetComponentStrVal2(checkVal.Config.SourceVal[0], checkVal.Config.SourceVal[1])
-	if err != nil {
-		goutils.Error("CheckVal.OnPlayGame:GetComponentStrVal2",
-			slog.Any("sourceVal", checkVal.Config.SourceVal),
-			goutils.Err(err))
+	if checkVal.Config.Type == CheckValTypeString {
+		sv, err := gameProp.GetComponentStrVal2(checkVal.Config.SourceVal[0], checkVal.Config.SourceVal[1])
+		if err != nil {
+			goutils.Error("CheckVal.OnPlayGame:GetComponentStrVal2",
+				slog.Any("sourceVal", checkVal.Config.SourceVal),
+				goutils.Err(err))
 
-		return "", err
+			return "", err
+		}
+
+		nextComponent := ""
+
+		if len(checkVal.Config.TargetVal) >= 2 {
+			tv, err := gameProp.GetComponentStrVal2(checkVal.Config.TargetVal[0], checkVal.Config.TargetVal[1])
+			if err != nil {
+				goutils.Error("CheckVal.OnPlayGame:GetComponentStrVal2",
+					slog.Any("targetVal", checkVal.Config.TargetVal),
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			if sv == tv {
+				cd.IsTrigger = true
+
+				nextComponent = checkVal.Config.JumpToComponent
+
+				checkVal.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+			}
+		} else {
+			if sv == checkVal.Config.ConstTarget {
+				cd.IsTrigger = true
+
+				nextComponent = checkVal.Config.JumpToComponent
+
+				checkVal.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+			}
+		}
+
+		nc := checkVal.onStepEnd(gameProp, curpr, gp, nextComponent)
+
+		return nc, nil
 	}
 
-	tv, err := gameProp.GetComponentStrVal2(checkVal.Config.TargetVal[0], checkVal.Config.TargetVal[1])
+	sv, err := gameProp.GetComponentVal2(checkVal.Config.SourceVal[0], checkVal.Config.SourceVal[1])
 	if err != nil {
-		goutils.Error("CheckVal.OnPlayGame:GetComponentStrVal2",
-			slog.Any("targetVal", checkVal.Config.TargetVal),
+		goutils.Error("CheckVal.OnPlayGame:GetComponentVal2",
+			slog.Any("sourceVal", checkVal.Config.SourceVal),
 			goutils.Err(err))
 
 		return "", err
@@ -148,15 +205,31 @@ func (checkVal *CheckVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.Pla
 
 	nextComponent := ""
 
-	if sv == tv {
-		cd.IsTrigger = true
+	if len(checkVal.Config.TargetVal) >= 2 {
+		tv, err := gameProp.GetComponentVal2(checkVal.Config.TargetVal[0], checkVal.Config.TargetVal[1])
+		if err != nil {
+			goutils.Error("CheckVal.OnPlayGame:GetComponentVal2",
+				slog.Any("targetVal", checkVal.Config.TargetVal),
+				goutils.Err(err))
 
-		nextComponent = checkVal.Config.JumpToComponent
+			return "", err
+		}
 
-		checkVal.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-		// if len(checkVal.Config.Controllers) > 0 {
-		// 	gameProp.procAwards(plugin, checkVal.Config.Controllers, curpr, gp)
-		// }
+		if sv == tv {
+			cd.IsTrigger = true
+
+			nextComponent = checkVal.Config.JumpToComponent
+
+			checkVal.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		}
+	} else {
+		if sv == checkVal.Config.ConstIntTarget {
+			cd.IsTrigger = true
+
+			nextComponent = checkVal.Config.JumpToComponent
+
+			checkVal.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		}
 	}
 
 	nc := checkVal.onStepEnd(gameProp, curpr, gp, nextComponent)
@@ -207,14 +280,20 @@ func NewCheckVal(name string) IComponent {
 //
 // ]
 type jsonCheckVal struct {
-	SourceVal []string `json:"sourceVal"`
-	TargetVal []string `json:"targetVal"`
+	StrType        string   `json:"type"`
+	SourceVal      []string `json:"sourceVal"`
+	ConstIntTarget int      `json:"constIntTarget"`
+	ConstTarget    string   `json:"constTarget"`
+	TargetVal      []string `json:"targetVal"`
 }
 
 func (jcfg *jsonCheckVal) build() *CheckValConfig {
 	cfg := &CheckValConfig{
-		SourceVal: jcfg.SourceVal,
-		TargetVal: jcfg.TargetVal,
+		SourceVal:      jcfg.SourceVal,
+		TargetVal:      jcfg.TargetVal,
+		ConstIntTarget: jcfg.ConstIntTarget,
+		ConstTarget:    jcfg.ConstTarget,
+		StrType:        strings.ToLower(jcfg.StrType),
 	}
 
 	return cfg
