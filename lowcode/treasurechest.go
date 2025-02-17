@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -168,6 +169,14 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 			return ErrInvalidComponentConfig
 		}
+	} else if treasureChest.Config.Type == TreasureChestTypeFragmentCollection {
+		if treasureChest.Config.FragmentNum <= 0 {
+			goutils.Error("TreasureChest.InitEx:FragmentNum",
+				slog.Int("FragmentNum", treasureChest.Config.FragmentNum),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return ErrInvalidComponentConfig
+		}
 	}
 
 	vw2, err := pool.LoadIntWeights(treasureChest.Config.StrWeight, true)
@@ -181,18 +190,14 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 	treasureChest.Config.Weight = vw2
 
-	if treasureChest.Config.FragmentNum <= 0 {
-		goutils.Error("TreasureChest.InitEx:FragmentNum",
-			slog.Int("FragmentNum", treasureChest.Config.FragmentNum),
-			goutils.Err(ErrInvalidComponentConfig))
-
-		return ErrInvalidComponentConfig
-	}
-
 	for _, awards := range treasureChest.Config.MapControllers {
 		for _, award := range awards {
 			award.Init()
 		}
+	}
+
+	for _, award := range treasureChest.Config.Controllers {
+		award.Init()
 	}
 
 	treasureChest.onInit(&treasureChest.Config.BasicComponentConfig)
@@ -374,7 +379,7 @@ type jsonTreasureChest struct {
 
 func (jcfg *jsonTreasureChest) build() *TreasureChestConfig {
 	cfg := &TreasureChestConfig{
-		StrType:     jcfg.Type,
+		StrType:     strings.ToLower(jcfg.Type),
 		StrWeight:   jcfg.Weight,
 		FragmentNum: jcfg.FragmentNum,
 		OpenNum:     jcfg.OpenNum,
