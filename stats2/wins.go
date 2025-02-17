@@ -30,19 +30,25 @@ func (wins *StatsWins) genRange(bet int) {
 		if win == 0 {
 			wins.MapWinTimesEx["noWins"] += times
 			wins.MapWinEx["noWins"] = 0
-		} else {
+		}else if win < bet {
+			wins.MapWinTimesEx["(0,1)"] += times
+			wins.MapWinEx["(0,1)"] = int64(win) * times
+		} else if win == bet {
+			wins.MapWinTimesEx["=1"] += times
+			wins.MapWinEx["=1"] = int64(win) * times
+		}else {
 			curWins := float64(win) / float64(bet)
 
 			for i := 0; i < len(gWinRange); i++ {
-				if curWins > float64(gWinRange[i]) {
-					if i < len(gWinRange)-1 && curWins <= float64(gWinRange[i+1]) {
-						k := fmt.Sprintf("(%v,%v]", gWinRange[i], gWinRange[i+1])
+				if curWins >= float64(gWinRange[i]) {
+					if i < len(gWinRange)-1 && curWins < float64(gWinRange[i+1]) {
+						k := fmt.Sprintf("[%v,%v)", gWinRange[i], gWinRange[i+1])
 						wins.MapWinTimesEx[k] += times
 						wins.MapWinEx[k] += int64(win) * times
 
 						break
 					} else if i == len(gWinRange)-1 {
-						k := fmt.Sprintf(">%v", gWinRange[i])
+						k := fmt.Sprintf(">=%v", gWinRange[i])
 						wins.MapWinTimesEx[k] += times
 						wins.MapWinEx[k] += int64(win) * times
 
@@ -159,13 +165,59 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 		}
 	}
 
+	{
+		y = 7
+		k := "(0,1)"
+
+		v := wins.MapWinTimesEx[k]
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+1, sy+y), k)
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+2, sy+y), v)
+
+		if totalTimes > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), float64(v)/float64(totalTimes))
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), 0)
+		}
+
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), 0)
+
+		if totalBet > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+		}
+	}
+
+	{
+		y = 8
+		k := "=1"
+
+		v := wins.MapWinTimesEx[k]
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+1, sy+y), k)
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+2, sy+y), v)
+
+		if totalTimes > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), float64(v)/float64(totalTimes))
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), 0)
+		}
+
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), 0)
+
+		if totalBet > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+		} else {
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+		}
+	}
+
 	y++
 	for i := 0; i < len(gWinRange); i++ {
 		var k string
 		if i < len(gWinRange)-1 {
-			k = fmt.Sprintf("(%v,%v]", gWinRange[i], gWinRange[i+1])
+			k = fmt.Sprintf("[%v,%v)", gWinRange[i], gWinRange[i+1])
 		} else {
-			k = fmt.Sprintf(">%v", gWinRange[i])
+			k = fmt.Sprintf(">=%v", gWinRange[i])
 		}
 
 		v := wins.MapWinTimesEx[k]
