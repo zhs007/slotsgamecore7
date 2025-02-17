@@ -91,7 +91,7 @@ func (waysTriggerData *WaysTriggerData) GetValEx(key string, getType GetComponen
 		return waysTriggerData.RespinNum, true
 	} else if key == CVWins {
 		return waysTriggerData.Wins, true
-	} else if key == CVResultNum {
+	} else if key == CVResultNum || key == CVWinResultNum {
 		return len(waysTriggerData.UsedResults), true
 	}
 

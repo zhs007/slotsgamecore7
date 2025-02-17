@@ -142,7 +142,7 @@ func (clusterTriggerData *ClusterTriggerData) GetValEx(key string, getType GetCo
 		}
 
 		return clusterTriggerData.AvgSymbolValMulti, true
-	} else if key == CVResultNum {
+	} else if key == CVResultNum || key == CVWinResultNum {
 		return len(clusterTriggerData.UsedResults), true
 	}
 

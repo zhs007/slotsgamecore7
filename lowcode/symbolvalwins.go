@@ -87,7 +87,7 @@ func (symbolValWinsData *SymbolValWinsData) GetValEx(key string, getType GetComp
 		return symbolValWinsData.SymbolNum, true
 	} else if key == SVWDVWins {
 		return symbolValWinsData.Wins, true
-	} else if key == CVResultNum {
+	} else if key == CVResultNum || key == CVWinResultNum {
 		return len(symbolValWinsData.UsedResults), true
 	}
 
