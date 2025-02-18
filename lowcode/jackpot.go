@@ -28,6 +28,7 @@ type JackpotData struct {
 // OnNewGame -
 func (jackpotData *JackpotData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	jackpotData.BasicComponentData.OnNewGame(gameProp, component)
+	jackpotData.UsedResults = nil
 
 	jackpotData.Wins = 0
 
