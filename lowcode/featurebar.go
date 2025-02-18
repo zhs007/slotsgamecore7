@@ -20,9 +20,10 @@ const FeatureBarTypeName = "featureBar"
 
 type FeatureBarData struct {
 	BasicComponentData
-	Features   []int
-	CurFeature int
-	cfg        *FeatureBarConfig
+	Features     []int
+	UsedFeatures []int
+	CurFeature   int
+	cfg          *FeatureBarConfig
 }
 
 // OnNewGame -
@@ -30,6 +31,7 @@ func (featureBarData *FeatureBarData) OnNewGame(gameProp *GameProperty, componen
 	featureBarData.BasicComponentData.OnNewGame(gameProp, component)
 
 	featureBarData.Features = make([]int, 0, featureBarData.cfg.Length)
+	featureBarData.UsedFeatures = nil
 }
 
 // BuildPBComponentData
@@ -37,11 +39,16 @@ func (featureBarData *FeatureBarData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.FeatureBarData{
 		BasicComponentData: featureBarData.BuildPBBasicComponentData(),
 		Features:           make([]int32, len(featureBarData.Features)),
+		UsedFeatures:       make([]int32, len(featureBarData.UsedFeatures)),
 		CurFeature:         int32(featureBarData.CurFeature),
 	}
 
 	for i, f := range featureBarData.Features {
 		pbcd.Features[i] = int32(f)
+	}
+
+	for i, f := range featureBarData.UsedFeatures {
+		pbcd.UsedFeatures[i] = int32(f)
 	}
 
 	return pbcd
@@ -52,7 +59,13 @@ func (featureBarData *FeatureBarData) Clone() IComponentData {
 	target := &FeatureBarData{
 		BasicComponentData: featureBarData.CloneBasicComponentData(),
 		cfg:                featureBarData.cfg,
+		Features:           make([]int, len(featureBarData.Features)),
+		UsedFeatures:       make([]int, len(featureBarData.UsedFeatures)),
+		CurFeature:         featureBarData.CurFeature,
 	}
+
+	copy(target.Features, featureBarData.Features)
+	copy(target.UsedFeatures, featureBarData.UsedFeatures)
 
 	return target
 }
@@ -181,6 +194,7 @@ func (featureBar *FeatureBar) procFeature(gameProp *GameProperty, cd *FeatureBar
 	featureVW *sgc7game.ValWeights2) error {
 
 	cd.CurFeature = cd.Features[0]
+	cd.UsedFeatures = append(cd.UsedFeatures, cd.CurFeature)
 
 	cd.Features = cd.Features[1:]
 
