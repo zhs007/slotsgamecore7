@@ -48,7 +48,7 @@ func (treasureChestData *TreasureChestData) OnNewGame(gameProp *GameProperty, co
 }
 
 // onNewStep -
-func (treasureChestData *TreasureChestData) onNewStep(gameProp *GameProperty, component IComponent) {
+func (treasureChestData *TreasureChestData) onNewStep() {
 	treasureChestData.Selected = nil
 	treasureChestData.Output = 0
 }
@@ -308,7 +308,7 @@ func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sg
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*TreasureChestData)
-	cd.onNewStep(gameProp, treasureChest)
+	cd.onNewStep()
 
 	if treasureChest.Config.Type == TreasureChestTypeFragmentCollection {
 		return treasureChest.procFragmentCollection(gameProp, curpr, gp, plugin, ps, stake, prs, cd)

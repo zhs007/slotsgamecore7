@@ -305,6 +305,7 @@ func (bomb *Bomb) bomb(gameProp *GameProperty, gs *sgc7game.GameScene, x int, y 
 	cy := bomb.Config.BombHeight / 2
 
 	bsd.newData()
+	bsd.AddPos(x, y)
 
 	for sx, arr := range bomb.Config.BombData {
 		for sy, v := range arr {
@@ -312,7 +313,9 @@ func (bomb *Bomb) bomb(gameProp *GameProperty, gs *sgc7game.GameScene, x int, y 
 			ty := y + sy - cy
 			if v != 0 && tx >= 0 && ty >= 0 && tx < gs.Width && ty < gs.Height {
 				if bomb.canBomb(gameProp, tx, ty, curpr, gp) {
-					bsd.AddPos(tx, ty)
+					if tx != x || ty != y {
+						bsd.AddPos(tx, ty)
+					}
 
 					if bomb.Config.BombTargetType == BTTypeRemove {
 						gs.Arr[tx][ty] = -1

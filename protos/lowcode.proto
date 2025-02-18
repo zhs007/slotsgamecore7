@@ -366,6 +366,7 @@ message FeatureBarData {
     ComponentData basicComponentData = 1;
     repeated int32 features = 2;
     int32 curFeature = 3;
+    repeated int32 usedFeatures = 4;
 }
 
 // BombData
