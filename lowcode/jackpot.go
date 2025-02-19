@@ -28,14 +28,13 @@ type JackpotData struct {
 // OnNewGame -
 func (jackpotData *JackpotData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	jackpotData.BasicComponentData.OnNewGame(gameProp, component)
-	jackpotData.UsedResults = nil
 
 	jackpotData.Wins = 0
 
-	piggyBank, isok := component.(*Jackpot)
+	jackpot, isok := component.(*Jackpot)
 	if isok {
-		jackpotData.WinMulti = piggyBank.Config.WinMulti
-		jackpotData.SetConfigIntVal(CCVWinMulti, piggyBank.Config.WinMulti)
+		jackpotData.WinMulti = jackpot.Config.WinMulti
+		jackpotData.SetConfigIntVal(CCVWinMulti, jackpot.Config.WinMulti)
 	} else {
 		jackpotData.WinMulti = 1
 		jackpotData.SetConfigIntVal(CCVWinMulti, 1)
@@ -153,6 +152,7 @@ func (jackpot *Jackpot) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*JackpotData)
+	cd.UsedResults = nil
 
 	winMulti := jackpot.GetWinMulti(&cd.BasicComponentData)
 	wins := jackpot.GetWins(&cd.BasicComponentData)
