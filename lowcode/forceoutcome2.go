@@ -119,6 +119,25 @@ func (fo2 *ForceOutcome2) hasComponent(component string) bool {
 	return false
 }
 
+func (fo2 *ForceOutcome2) hasComponentWith(component0 string, component1 string) bool {
+	has := false
+	for _, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			hasc0 := goutils.IndexOfStringSlice(gp.HistoryComponents, component0, 0) >= 0
+			hasc1 := goutils.IndexOfStringSlice(gp.HistoryComponents, component1, 0) >= 0
+
+			if hasc0 != hasc1 {
+				return false
+			}
+
+			has = hasc0
+		}
+	}
+
+	return has
+}
+
 func (fo2 *ForceOutcome2) getComponentValAt(hasComponent string, component string, val string) int {
 	for i, ret := range fo2.results {
 		gp, isok := ret.CurGameModParams.(*GameParams)
@@ -576,6 +595,45 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				cel.BoolType,
 				cel.UnaryBinding(func(param ref.Val) ref.Val {
 					if fo2.hasComponent(param.Value().(string)) {
+						return types.Bool(true)
+					}
+
+					return types.Bool(false)
+				},
+				),
+			),
+		),
+		cel.Function("hasComponentWith",
+			cel.Overload("hasComponentWith_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.BoolType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 2 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasComponentWith",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Bool(false)
+					}
+
+					component0, isok := params[0].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasComponentWith",
+							slog.Int("i", 0),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					component1, isok := params[1].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasComponentWith",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					if fo2.hasComponentWith(component0, component1) {
 						return types.Bool(true)
 					}
 
