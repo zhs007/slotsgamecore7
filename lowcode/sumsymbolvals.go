@@ -176,6 +176,10 @@ func (sumSymbolVals *SumSymbolVals) InitEx(cfg any, pool *GamePropertyPool) erro
 
 	sumSymbolVals.Config.Type = parseSumSymbolValsType(sumSymbolVals.Config.StrType)
 
+	for _, v := range sumSymbolVals.Config.Awards {
+		v.Init()
+	}
+
 	sumSymbolVals.onInit(&sumSymbolVals.Config.BasicComponentConfig)
 
 	return nil
