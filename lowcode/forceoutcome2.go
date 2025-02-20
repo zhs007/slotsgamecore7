@@ -137,6 +137,62 @@ func (fo2 *ForceOutcome2) getComponentValAt(hasComponent string, component strin
 	return 0
 }
 
+func (fo2 *ForceOutcome2) getMinComponentValAt(hasComponent string, component string, val string) int {
+	minv := 0
+	hasminv := false
+
+	for i, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k := range gp.MapComponentData {
+				if isComponent(k, hasComponent) {
+					v, hasv := fo2.getComponentValEx(i, component, val)
+					if hasv {
+						if !hasminv {
+							minv = v
+							hasminv = true
+						} else {
+							if minv > v {
+								minv = v
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return minv
+}
+
+func (fo2 *ForceOutcome2) getMaxComponentValAt(hasComponent string, component string, val string) int {
+	maxv := 0
+	hasmaxv := false
+
+	for i, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k := range gp.MapComponentData {
+				if isComponent(k, hasComponent) {
+					v, hasv := fo2.getComponentValEx(i, component, val)
+					if hasv {
+						if !hasmaxv {
+							maxv = v
+							hasmaxv = true
+						} else {
+							if maxv < v {
+								maxv = v
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return maxv
+}
+
 func (fo2 *ForceOutcome2) getComponentValEx(iStep int, component string, val string) (int, bool) {
 	if iStep >= 0 && iStep < len(fo2.results) {
 		ret := fo2.results[iStep]
@@ -251,11 +307,7 @@ func (fo2 *ForceOutcome2) getMaxComponentVal(component string, val string) int {
 		}
 	}
 
-	if hasval {
-		return maxval
-	}
-
-	return 0
+	return maxval
 }
 
 func (fo2 *ForceOutcome2) getMinComponentVal(component string, val string) int {
@@ -280,11 +332,7 @@ func (fo2 *ForceOutcome2) getMinComponentVal(component string, val string) int {
 		}
 	}
 
-	if hasval {
-		return minval
-	}
-
-	return 0
+	return minval
 }
 
 func (fo2 *ForceOutcome2) getLatestSymbolVal() *sgc7game.GameScene {
@@ -576,6 +624,98 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 					}
 
 					val := fo2.getComponentValAt(hasComponent, component, componentVal)
+
+					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("getMinValAt",
+			cel.Overload("getMinValAt_string_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.StringType},
+				cel.IntType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 3 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMinValAt",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					hasComponent, isok := params[0].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMinValAt",
+							slog.Int("i", 0),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					component, isok := params[1].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMinValAt",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					componentVal, isok := params[2].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMinValAt",
+							slog.Int("i", 2),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					val := fo2.getMinComponentValAt(hasComponent, component, componentVal)
+
+					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("getMaxValAt",
+			cel.Overload("getMaxValAt_string_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType, cel.StringType},
+				cel.IntType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 3 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMaxValAt",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					hasComponent, isok := params[0].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMaxValAt",
+							slog.Int("i", 0),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					component, isok := params[1].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMaxValAt",
+							slog.Int("i", 1),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					componentVal, isok := params[2].Value().(string)
+					if !isok {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:getMaxValAt",
+							slog.Int("i", 2),
+							goutils.Err(ErrInvalidScriptParamType))
+
+						return types.Int(0)
+					}
+
+					val := fo2.getMaxComponentValAt(hasComponent, component, componentVal)
 
 					return types.Int(val)
 				},
