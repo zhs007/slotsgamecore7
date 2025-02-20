@@ -213,11 +213,25 @@ func (featureBar *FeatureBar) procFeature(gameProp *GameProperty, cd *FeatureBar
 	return nil
 }
 
+func (featureBar *FeatureBar) isClear(basicCD *BasicComponentData) bool {
+	clear, isok := basicCD.GetConfigIntVal(CCVClear)
+	if isok {
+		return clear != 0
+	}
+
+	return false
+}
+
 // playgame
 func (featureBar *FeatureBar) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*FeatureBarData)
+
+	if featureBar.isClear(&cd.BasicComponentData) {
+		cd.Features = nil
+		cd.SetConfigIntVal(CCVClear, 0)
+	}
 
 	vw := featureBar.getWeight(gameProp, cd)
 

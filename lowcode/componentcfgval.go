@@ -25,6 +25,7 @@ const (
 	CCVForceVal                   string = "forceval"                   // 可以修改配置项里的 forceVal
 	CCVForceValNow                string = "forcevalnow"                // 可以修改配置项里的 forceValNow
 	CCVClearForceTriggerOnceCache string = "clearforcetriggeroncecache" // 可以修改配置项里的 clearForceTriggerOnceCache
+	CCVClear                      string = "clear"                      // 可以修改配置项里的 clear
 )
 
 const (
