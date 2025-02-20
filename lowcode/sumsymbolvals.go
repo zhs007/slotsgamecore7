@@ -129,6 +129,7 @@ type SumSymbolValsConfig struct {
 	Min                  int               `yaml:"min" json:"min"`
 	Max                  int               `yaml:"max" json:"max"`
 	SourceComponent      string            `yaml:"sourceComponent" json:"sourceComponent"`
+	Awards               []*Award          `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -178,6 +179,13 @@ func (sumSymbolVals *SumSymbolVals) InitEx(cfg any, pool *GamePropertyPool) erro
 	sumSymbolVals.onInit(&sumSymbolVals.Config.BasicComponentConfig)
 
 	return nil
+}
+
+// OnProcControllers -
+func (sumSymbolVals *SumSymbolVals) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(sumSymbolVals.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, sumSymbolVals.Config.Awards, curpr, gp)
+	}
 }
 
 func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
@@ -249,11 +257,14 @@ func (sumSymbolVals *SumSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*SumSymbolValsData)
+	cd.Number = 0
 
 	os := sumSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
 		val := sumSymbolVals.sum(gameProp, os)
 		cd.Number = val
+
+		sumSymbolVals.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
 	}
 
 	nc := sumSymbolVals.onStepEnd(gameProp, curpr, gp, "")
@@ -303,7 +314,7 @@ func (jcfg *jsonSumSymbolVals) build() *SumSymbolValsConfig {
 }
 
 func parseSumSymbolVals(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseSumSymbolVals:getConfigInCell",
 			goutils.Err(err))
@@ -330,6 +341,18 @@ func parseSumSymbolVals(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseSumSymbolVals:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Awards = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
