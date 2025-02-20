@@ -542,11 +542,11 @@ func parseMapStringAndAllControllers(controller *ast.Node) (map[string][]*Award,
 	mapawards := make(map[string][]*Award)
 
 	for i, v := range lst {
-		str, a := v.buildWithStringVal()
+		str, a := v.buildWithStringValEx()
 		if a != nil {
 			mapawards[str] = append(mapawards[str], a)
 		} else {
-			goutils.Error("parseMapStringAndAllControllers:buildWithStringVal",
+			goutils.Error("parseMapStringAndAllControllers:buildWithStringValEx",
 				slog.Int("i", i),
 				goutils.Err(ErrUnsupportedControllerType))
 
