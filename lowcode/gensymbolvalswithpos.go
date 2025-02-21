@@ -114,17 +114,14 @@ func (genSymbolValsWithPos *GenSymbolValsWithPos) InitEx(cfg any, pool *GameProp
 func (genSymbolValsWithPos *GenSymbolValsWithPos) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
+
+	cd.UsedOtherScenes = nil
 
 	var os *sgc7game.GameScene
 
 	if genSymbolValsWithPos.Config.IsUseSource {
 		os = genSymbolValsWithPos.GetTargetOtherScene3(gameProp, curpr, prs, 0)
-		// if os == nil {
-		// 	os = sgc7game.NewGameScenePoolEx().New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolValsWithPos.Config.DefaultVal)
-		// }
 	}
 
 	nos := os
