@@ -105,6 +105,15 @@ func (reelTriggerData *ReelTriggerData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
+// GetValEx -
+func (reelTriggerData *ReelTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVNumber || key == CVOutputInt {
+		return reelTriggerData.Number, true
+	}
+
+	return 0, false
+}
+
 // ReelTriggerConfig - configuration for ReelTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ReelTriggerConfig struct {
