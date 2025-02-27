@@ -299,7 +299,7 @@ func (waysTrigger *WaysTrigger) getSymbols(gameProp *GameProperty) []int {
 }
 
 // CanTriggerWithScene -
-func (waysTrigger *WaysTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (waysTrigger *WaysTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
 	return waysTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
 }
 

@@ -809,7 +809,8 @@ func (gameProp *GameProperty) GetLastRespinNum(respinComponent string) int {
 func (gameProp *GameProperty) CanTrigger(componentName string, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
 	component, isok := gameProp.Components.MapComponents[componentName]
 	if isok {
-		isTrigger, _ := component.CanTriggerWithScene(gameProp, gs, curpr, stake)
+		icd := gameProp.GetComponentData(component)
+		isTrigger, _ := component.CanTriggerWithScene(gameProp, gs, curpr, stake, icd)
 
 		return isTrigger
 	}

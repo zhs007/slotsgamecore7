@@ -19,10 +19,6 @@ import (
 
 const LinesTriggerTypeName = "linesTrigger"
 
-// const (
-// 	LTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-// )
-
 type LinesTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -40,8 +36,6 @@ func (linesTriggerData *LinesTriggerData) OnNewGame(gameProp *GameProperty, comp
 
 // onNewStep -
 func (linesTriggerData *LinesTriggerData) onNewStep() {
-	// linesTriggerData.BasicComponentData.OnNewStep(gameProp, component)
-
 	linesTriggerData.CashWin = 0
 	linesTriggerData.CoinWin = 0
 
@@ -101,41 +95,28 @@ func (linesTriggerData *LinesTriggerData) GetValEx(key string, getType GetCompon
 	return 0, false
 }
 
-// // SetVal -
-// func (linesTriggerData *LinesTriggerData) SetVal(key string, val int) {
-// 	if key == CVSymbolNum {
-// 		linesTriggerData.SymbolNum = val
-// 	} else if key == CVWildNum {
-// 		linesTriggerData.WildNum = val
-// 	} else if key == CVRespinNum {
-// 		linesTriggerData.RespinNum = val
-// 	} else if key == CVWins {
-// 		linesTriggerData.Wins = val
-// 	}
-// }
-
 // LinesTriggerConfig - configuration for LinesTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type LinesTriggerConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Symbols              []string            `yaml:"symbols" json:"symbols"`                 // like scatter
-	SymbolCodes          []int               `yaml:"-" json:"-"`                             // like scatter
-	Type                 string              `yaml:"type" json:"type"`                       // like scatters
-	TriggerType          SymbolTriggerType   `yaml:"-" json:"-"`                             // SymbolTriggerType
-	BetTypeString        string              `yaml:"betType" json:"betType"`                 // bet or totalBet or noPay
-	BetType              BetType             `yaml:"-" json:"-"`                             // bet or totalBet or noPay
-	OSMulTypeString      string              `yaml:"symbolValsMulti" json:"symbolValsMulti"` // OtherSceneMultiType
-	OSMulType            OtherSceneMultiType `yaml:"-" json:"-"`                             // OtherSceneMultiType
-	MinNum               int                 `yaml:"minNum" json:"minNum"`                   // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols          []string            `yaml:"wildSymbols" json:"wildSymbols"`         // wild etc
-	WildSymbolCodes      []int               `yaml:"-" json:"-"`                             // wild symbolCode
-	StrCheckWinType      string              `yaml:"checkWinType" json:"checkWinType"`       // left2right or right2left or all
-	CheckWinType         CheckWinType        `yaml:"-" json:"-"`                             //
-	WinMulti             int                 `yaml:"winMulti" json:"winMulti"`               // winMulti，最后的中奖倍数，默认为1
-	JumpToComponent      string              `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
-	ForceToNext          bool                `yaml:"forceToNext" json:"forceToNext"`         // 如果触发，默认跳转jump to，这里可以强制走next分支
-	Awards               []*Award            `yaml:"awards" json:"awards"`                   // 新的奖励系统
-	// SymbolAwardsWeights             *AwardsWeights                `yaml:"symbolAwardsWeights" json:"symbolAwardsWeights"`                     // 每个中奖符号随机一组奖励
+	BasicComponentConfig            `yaml:",inline" json:",inline"`
+	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
+	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
+	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
+	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
+	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
+	BetType                         BetType                       `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
+	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`                             // OtherSceneMultiType
+	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                                         // OtherSceneMultiType
+	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
+	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
+	StrCheckWinType                 string                        `yaml:"checkWinType" json:"checkWinType"`                                   // left2right or right2left or all
+	CheckWinType                    CheckWinType                  `yaml:"-" json:"-"`                                                         //
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
+	LineData                        string                        `yaml:"linedata" json:"linedata"`                                           // linedata
+	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
+	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
+	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
@@ -312,8 +293,39 @@ func (linesTrigger *LinesTrigger) getSymbols(gameProp *GameProperty) []int {
 	return linesTrigger.Config.SymbolCodes
 }
 
+func (linesTrigger *LinesTrigger) getLineData(gameProp *GameProperty, cd *LinesTriggerData) (*sgc7game.LineData, error) {
+	ldname := cd.GetConfigVal(CCVLineData)
+	if ldname != "" {
+		v, isok := gameProp.Pool.Config.MapLinedate[ldname]
+		if !isok {
+			goutils.Error("LinesTrigger.getLineData:getLineData",
+				slog.String("val", ldname),
+				goutils.Err(ErrInvalidLineData))
+
+			return nil, ErrInvalidLineData
+		}
+
+		return v, nil
+	}
+
+	if linesTrigger.Config.LineData == "" {
+		return gameProp.CurLineData, nil
+	}
+
+	v, isok := gameProp.Pool.Config.MapLinedate[linesTrigger.Config.LineData]
+	if !isok {
+		goutils.Error("LinesTrigger.getLineData:getLineData",
+			slog.String("val", linesTrigger.Config.LineData),
+			goutils.Err(ErrInvalidLineData))
+
+		return nil, ErrInvalidLineData
+	}
+
+	return v, nil
+}
+
 // canTrigger -
-func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake, cd *LinesTriggerData) (bool, []*sgc7game.Result) {
 	// std := cd.(*LinesTriggerData)
 
 	isTrigger := false
@@ -329,11 +341,19 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 
 	funcCalcMulti := GetSymbolValMultiFunc(linesTrigger.Config.OSMulType)
 
+	ld, err := linesTrigger.getLineData(gameProp, cd)
+	if err != nil {
+		goutils.Error("LinesTrigger.canTrigger",
+			goutils.Err(err))
+
+		return false, nil
+	}
+
 	if linesTrigger.Config.TriggerType == STTypeLines {
 		if linesTrigger.Config.OSMulType == OSMTNone { // no otherscene multi
 			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
-					for i, v := range gameProp.CurLineData.Lines {
+					for i, v := range ld.Lines {
 						ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType), cs,
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -356,7 +376,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					}
 				}
 			} else {
-				for i, v := range gameProp.CurLineData.Lines {
+				for i, v := range ld.Lines {
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
 						ret := sgc7game.CalcLineEx(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
@@ -409,7 +429,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 		} else { // otherscene multi
 			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
-					for i, v := range gameProp.CurLineData.Lines {
+					for i, v := range ld.Lines {
 						ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType), cs,
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -434,7 +454,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					}
 				}
 			} else {
-				for i, v := range gameProp.CurLineData.Lines {
+				for i, v := range ld.Lines {
 					isTriggerFull := false
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
 						ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
@@ -512,7 +532,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 		if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 			// for _, cs := range linesTrigger.Config.SymbolCodes {
 			for _, cs := range linesTrigger.getSymbols(gameProp) {
-				for i, v := range gameProp.CurLineData.Lines {
+				for i, v := range ld.Lines {
 					ret := sgc7game.CountSymbolOnLine(gs, gameProp.CurPaytables, v, 0, cs,
 						func(cursymbol int) bool {
 							return goutils.IndexOfIntSlice(linesTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -537,7 +557,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 				}
 			}
 		} else {
-			for i, v := range gameProp.CurLineData.Lines {
+			for i, v := range ld.Lines {
 				if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
 					ret := sgc7game.CheckLine(gs, v, linesTrigger.Config.MinNum,
 						func(cursymbol int) bool {
@@ -738,7 +758,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	// // 临时应付一下
 	// os = nil
 
-	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake)
+	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake, std)
 
 	if isTrigger {
 		linesTrigger.procWins(gameProp, curpr, std, lst)
@@ -999,8 +1019,10 @@ func (linesTrigger *LinesTrigger) GetNextLinkComponents() []string {
 }
 
 // CanTriggerWithScene -
-func (linesTrigger *LinesTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
-	return linesTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+func (linesTrigger *LinesTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
+	cd := icd.(*LinesTriggerData)
+
+	return linesTrigger.canTrigger(gameProp, gs, nil, curpr, stake, cd)
 }
 
 func NewLinesTrigger(name string) IComponent {

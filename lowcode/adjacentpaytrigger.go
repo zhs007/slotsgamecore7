@@ -367,7 +367,7 @@ func (adjacentPayTrigger *AdjacentPayTrigger) OnPlayGame(gameProp *GameProperty,
 	gs := adjacentPayTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := adjacentPayTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
-	isTrigger, lst := adjacentPayTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake)
+	isTrigger, lst := adjacentPayTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake, cd)
 
 	if isTrigger {
 		adjacentPayTrigger.procWins(gameProp, curpr, std, lst, os)
@@ -459,7 +459,7 @@ func (adjacentPayTrigger *AdjacentPayTrigger) getSymbols(gameProp *GameProperty)
 }
 
 // CanTriggerWithScene -
-func (adjacentPayTrigger *AdjacentPayTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (adjacentPayTrigger *AdjacentPayTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
