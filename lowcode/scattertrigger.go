@@ -307,7 +307,7 @@ func (scatterTrigger *ScatterTrigger) getSymbols(gameProp *GameProperty) []int {
 }
 
 // CanTriggerWithScene -
-func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (scatterTrigger *ScatterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
 	return scatterTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
 }
 

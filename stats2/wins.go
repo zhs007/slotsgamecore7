@@ -179,10 +179,10 @@ func (wins *StatsWins) saveSheet(f *excelize.File, sheet string, sx, sy int, s2 
 			f.SetCellValue(sheet, goutils.Pos2Cell(tx+3, sy+y), 0)
 		}
 
-		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), 0)
+		f.SetCellValue(sheet, goutils.Pos2Cell(tx+4, sy+y), wins.MapWinEx[k])
 
 		if totalBet > 0 {
-			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
+			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), float64(wins.MapWinEx[k])/float64(totalBet))
 		} else {
 			f.SetCellValue(sheet, goutils.Pos2Cell(tx+5, sy+y), 0)
 		}

@@ -446,7 +446,7 @@ func (basicComponent *BasicComponent) GetChildLinkComponents() []string {
 }
 
 // CanTriggerWithScene -
-func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (basicComponent *BasicComponent) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
 	goutils.Error("BasicComponent.CanTriggerWithScene",
 		goutils.Err(ErrInvalidComponent))
 

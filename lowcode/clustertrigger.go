@@ -510,7 +510,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	gs := clusterTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := clusterTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
-	isTrigger, lst := clusterTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake)
+	isTrigger, lst := clusterTrigger.CanTriggerWithScene(gameProp, gs, curpr, stake, cd)
 
 	if isTrigger {
 		clusterTrigger.procWins(gameProp, curpr, std, lst, os, std)
@@ -769,7 +769,7 @@ func (clusterTrigger *ClusterTrigger) getSymbols(gameProp *GameProperty) []int {
 }
 
 // CanTriggerWithScene -
-func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 

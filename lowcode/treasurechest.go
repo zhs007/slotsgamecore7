@@ -284,7 +284,7 @@ func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *
 		return "", ErrInvalidComponentConfig
 	}
 
-	for i := 0; i < treasureChest.Config.OpenNum; i++ {
+	for range treasureChest.Config.OpenNum {
 		cr, err := vw2.RandVal(plugin)
 		if err != nil {
 			goutils.Error("TreasureChest.procSumValue:RandVal",
@@ -294,6 +294,7 @@ func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *
 		}
 
 		cd.Output += cr.Int()
+		cd.Selected = append(cd.Selected, cr.Int())
 	}
 
 	treasureChest.ProcControllers(gameProp, plugin, curpr, gp, -1, "sumValue")
