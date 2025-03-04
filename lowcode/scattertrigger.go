@@ -127,6 +127,7 @@ type ScatterTriggerConfig struct {
 	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
+	OutputToComponent               string                        `yaml:"outputToComponent" json:"outputToComponent"`                         // 将结果给到一个 positionCollection
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinComponent                 string                        `yaml:"respinComponent" json:"respinComponent"`                             // respin component
@@ -278,7 +279,7 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	return nil
 }
 
-// playgame
+// procMask
 func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
 
@@ -292,6 +293,29 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 		}
 
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, scatterTrigger.Config.TargetMask, mask, false)
+	}
+
+	return nil
+}
+
+// procPositionCollection
+func (scatterTrigger *ScatterTrigger) procPositionCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	cd *ScatterTriggerData) error {
+
+	if scatterTrigger.Config.OutputToComponent != "" {
+		pcd := gameProp.GetComponentDataWithName(scatterTrigger.Config.OutputToComponent)
+		if pcd != nil {
+			gameProp.UseComponent(scatterTrigger.Config.OutputToComponent)
+			pc := gameProp.Components.MapComponents[scatterTrigger.Config.OutputToComponent]
+
+			for _, ri := range cd.UsedResults {
+				ret := curpr.Results[ri]
+
+				for i := 0; i < len(ret.Pos)/2; i++ {
+					pc.AddPos(pcd, ret.Pos[i*2], ret.Pos[i*2+1])
+				}
+			}
+		}
 	}
 
 	return nil
@@ -569,24 +593,15 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			return "", err
 		}
 
+		err = scatterTrigger.procPositionCollection(gameProp, curpr, std)
+		if err != nil {
+			goutils.Error("ScatterTrigger.OnPlayGame:procPositionCollection",
+				goutils.Err(err))
+
+			return "", err
+		}
+
 		scatterTrigger.ProcControllers(gameProp, plugin, curpr, gp, lst[0].SymbolNums, "")
-		// if len(scatterTrigger.Config.Awards) > 0 {
-		// 	gameProp.procAwards(plugin, scatterTrigger.Config.Awards, curpr, gp)
-		// }
-
-		// if scatterTrigger.Config.SymbolAwardsWeights != nil {
-		// 	for i := 0; i < lst[0].SymbolNums; i++ {
-		// 		node, err := scatterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
-		// 		if err != nil {
-		// 			goutils.Error("ScatterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-		// 				goutils.Err(err))
-
-		// 			return "", err
-		// 		}
-
-		// 		gameProp.procAwards(plugin, node.Awards, curpr, gp)
-		// 	}
-		// }
 
 		if scatterTrigger.Config.RespinComponent != "" {
 			if gameProp.IsRespin(scatterTrigger.Config.RespinComponent) {
@@ -745,6 +760,7 @@ type jsonScatterTrigger struct {
 	Height                        int        `json:"Height"`
 	MaxHeight                     int        `json:"MaxHeight"`
 	IsReversalHeight              bool       `json:"isReversalHeight"`
+	OutputToComponent             string     `json:"outputToComponent"`
 }
 
 func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
@@ -767,6 +783,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		Height:             jcfg.Height,
 		MaxHeight:          jcfg.MaxHeight,
 		IsReversalHeight:   jcfg.IsReversalHeight,
+		OutputToComponent:  jcfg.OutputToComponent,
 	}
 
 	if jcfg.TriggerRespinType != "none" {
