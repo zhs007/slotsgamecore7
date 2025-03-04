@@ -213,8 +213,19 @@ func (genSymbolVals2 *GenSymbolVals2) getSrcOtherScene(gameProp *GameProperty, c
 	return os, nil
 }
 
+func (genSymbolVals2 *GenSymbolVals2) getNumber(gameProp *GameProperty, basicCD *BasicComponentData) int {
+	number, isok := basicCD.GetConfigIntVal(CCVNumber)
+	if isok {
+		return number
+	}
+
+	return genSymbolVals2.Config.Number
+}
+
 // procNumber
-func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc7game.GameScene, pos []int) (*sgc7game.GameScene, error) {
+func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc7game.GameScene, pos []int, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
+	number := genSymbolVals2.getNumber(gameProp, basicCD)
+
 	// non-clone
 	if os == nil {
 		if len(pos) == 0 {
@@ -230,7 +241,7 @@ func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc
 		h := gameProp.GetVal(GamePropHeight)
 
 		if len(pos) == w*h*2 {
-			return gameProp.PoolScene.New2(w, h, genSymbolVals2.Config.Number), nil
+			return gameProp.PoolScene.New2(w, h, number), nil
 		}
 
 		nos := gameProp.PoolScene.New2(w, h, genSymbolVals2.Config.DefaultVal)
@@ -239,7 +250,7 @@ func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc
 			x := pos[i*2]
 			y := pos[i*2+1]
 
-			nos.Arr[x][y] = genSymbolVals2.Config.Number
+			nos.Arr[x][y] = number
 		}
 
 		return nos, nil
@@ -264,7 +275,7 @@ func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc
 		x := pos[i*2]
 		y := pos[i*2+1]
 
-		nos.Arr[x][y] = genSymbolVals2.Config.Number
+		nos.Arr[x][y] = number
 	}
 
 	return os, nil
@@ -515,7 +526,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 	}
 
 	if genSymbolVals2.Config.GenType == GSV2CTypeNumber {
-		nos, err := genSymbolVals2.procNumber(gameProp, os, pos)
+		nos, err := genSymbolVals2.procNumber(gameProp, os, pos, cd)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procNumber",
 				goutils.Err(err))
