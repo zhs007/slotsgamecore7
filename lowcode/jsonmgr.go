@@ -101,4 +101,5 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(SumSymbolValsTypeName), parseSumSymbolVals)
 	gJsonMgr.RegLoadComponent(strings.ToLower(TreasureChestTypeName), parseTreasureChest)
 	gJsonMgr.RegLoadComponent(strings.ToLower(MoveSymbols2TypeName), parseMoveSymbols2)
+	gJsonMgr.RegLoadComponent(strings.ToLower(GenSymbolVals2TypeName), parseGenSymbolVals2)
 }
