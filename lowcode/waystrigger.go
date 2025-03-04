@@ -135,6 +135,7 @@ type WaysTriggerConfig struct {
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
+	OutputToComponent               string                        `yaml:"outputToComponent" json:"outputToComponent"`                         // 将结果给到一个 positionCollection
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
@@ -284,6 +285,29 @@ func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameP
 		}
 
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, waysTrigger.Config.TargetMask, mask, false)
+	}
+
+	return nil
+}
+
+// procPositionCollection
+func (waysTrigger *WaysTrigger) procPositionCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	cd *WaysTriggerData) error {
+
+	if waysTrigger.Config.OutputToComponent != "" {
+		pcd := gameProp.GetComponentDataWithName(waysTrigger.Config.OutputToComponent)
+		if pcd != nil {
+			gameProp.UseComponent(waysTrigger.Config.OutputToComponent)
+			pc := gameProp.Components.MapComponents[waysTrigger.Config.OutputToComponent]
+
+			for _, ri := range cd.UsedResults {
+				ret := curpr.Results[ri]
+
+				for i := 0; i < len(ret.Pos)/2; i++ {
+					pc.AddPos(pcd, ret.Pos[i*2], ret.Pos[i*2+1])
+				}
+			}
+		}
 	}
 
 	return nil
@@ -484,6 +508,13 @@ func (waysTrigger *WaysTrigger) calcRespinNum(plugin sgc7plugin.IPlugin, ret *sg
 	return 0, nil
 }
 
+// OnProcControllers -
+func (waysTrigger *WaysTrigger) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(waysTrigger.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, waysTrigger.Config.Awards, curpr, gp)
+	}
+}
+
 // playgame
 func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -521,9 +552,15 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			return "", err
 		}
 
-		if len(waysTrigger.Config.Awards) > 0 {
-			gameProp.procAwards(plugin, waysTrigger.Config.Awards, curpr, gp)
+		err = waysTrigger.procPositionCollection(gameProp, curpr, std)
+		if err != nil {
+			goutils.Error("WaysTrigger.OnPlayGame:procPositionCollection",
+				goutils.Err(err))
+
+			return "", err
 		}
+
+		waysTrigger.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
 
 		if waysTrigger.Config.JumpToComponent != "" {
 			if gameProp.IsRespin(waysTrigger.Config.JumpToComponent) {
@@ -665,6 +702,7 @@ type jsonWaysTrigger struct {
 	WildSymbols         []string `json:"wildSymbols"`
 	WinMulti            int      `json:"winMulti"`
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
+	OutputToComponent   string   `json:"outputToComponent"`
 }
 
 func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
@@ -677,6 +715,7 @@ func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
 		WinMulti:           jcfg.WinMulti,
 		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
 		OSMulTypeString:    jcfg.SymbolValsMulti,
+		OutputToComponent:  jcfg.OutputToComponent,
 	}
 
 	return cfg
