@@ -608,6 +608,11 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
 				}
+			} else if valName == CCVClearNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
+				}
 			}
 		})
 		if err != nil {
@@ -635,6 +640,11 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
+				}
+			} else if valName == CCVClearNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
 				}
 			}
 		})
@@ -737,6 +747,11 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
 				}
+			} else if valName == CCVClearNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
+				}
 			}
 		})
 		if err != nil {
@@ -764,6 +779,11 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
+				}
+			} else if valName == CCVClearNow {
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
 				}
 			}
 		})

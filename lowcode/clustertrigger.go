@@ -47,7 +47,7 @@ func (clusterTriggerData *ClusterTriggerData) onNewStep() {
 	clusterTriggerData.WinMulti = 1
 
 	if !gIsReleaseMode {
-		clusterTriggerData.PosComponentData.Clear()
+		clusterTriggerData.PosComponentData.ClearPos()
 	}
 }
 

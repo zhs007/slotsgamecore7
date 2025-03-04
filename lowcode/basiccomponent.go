@@ -496,6 +496,11 @@ func (basicComponent *BasicComponent) GetBranchWeights() []int {
 	return nil
 }
 
+// ClearData -
+func (basicComponent *BasicComponent) ClearData(icd IComponentData, bForceNow bool) {
+
+}
+
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
 		Name:        name,
