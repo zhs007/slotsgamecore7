@@ -575,6 +575,12 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 	}
 
+	if len(pos) <= 0 {
+		nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
 	nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil

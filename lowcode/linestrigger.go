@@ -217,12 +217,6 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		award.Init()
 	}
 
-	// if linesTrigger.Config.SymbolAwardsWeights != nil {
-	// 	linesTrigger.Config.SymbolAwardsWeights.Init()
-	// }
-
-	// linesTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, linesTrigger.Config.SymbolCodes)
-
 	linesTrigger.Config.CheckWinType = ParseCheckWinType(linesTrigger.Config.StrCheckWinType)
 
 	if linesTrigger.Config.RespinNumWeight != "" {

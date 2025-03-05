@@ -178,6 +178,9 @@ var (
 	// ErrInvalidPosition - invalid position
 	ErrInvalidPosition = errors.New("invalid position")
 
+	// ErrInvalidPositionCollection - invalid positionCollection
+	ErrInvalidPositionCollection = errors.New("invalid positionCollection")
+
 	// ErrInvalidCollectorVal - invalid Collector.Val
 	ErrInvalidCollectorVal = errors.New("invalid Collector.Val")
 	// ErrInvalidCollectorLogic - invalid Collector logic
