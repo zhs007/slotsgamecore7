@@ -151,7 +151,7 @@ func (mergePositionCollection *MergePositionCollection) InitEx(cfg any, pool *Ga
 
 // procSymbols -
 func (mergePositionCollection *MergePositionCollection) procSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult,
-	prs []*sgc7game.PlayResult, pc IComponent, pcd IComponentData, cd *MergePositionCollectionData) error {
+	prs []*sgc7game.PlayResult, pos []int, cd *MergePositionCollectionData) ([]int, error) {
 
 	gs := mergePositionCollection.GetTargetScene3(gameProp, curpr, prs, 0)
 	if gs == nil {
@@ -159,34 +159,34 @@ func (mergePositionCollection *MergePositionCollection) procSymbols(gameProp *Ga
 			slog.String("componentName", mergePositionCollection.Name),
 			goutils.Err(ErrInvalidScene))
 
-		return ErrInvalidScene
+		return nil, ErrInvalidScene
 	}
 
 	for x, arr := range gs.Arr {
 		for y, s := range arr {
 			if slices.Contains(mergePositionCollection.Config.SrcSymbolCodes, s) {
 				cd.Pos = append(cd.Pos, x, y)
-				pc.AddPos(pcd, x, y)
+				pos = append(pos, x, y)
 			}
 		}
 	}
 
-	return nil
+	return pos, nil
 }
 
 // procCompnents -
-func (mergePositionCollection *MergePositionCollection) procCompnents(gameProp *GameProperty, pc IComponent, pcd IComponentData,
-	cd *MergePositionCollectionData) error {
+func (mergePositionCollection *MergePositionCollection) procCompnents(gameProp *GameProperty, pos []int,
+	cd *MergePositionCollectionData) ([]int, error) {
 
 	for _, v := range mergePositionCollection.Config.SrcComponents {
 		scd := gameProp.GetComponentDataWithName(v)
-		if pcd == nil {
+		if scd == nil {
 			goutils.Error("MergePositionCollection.procCompnents:GetComponentDataWithName",
 				slog.String("componentName", mergePositionCollection.Name),
 				slog.String("positionCollection", v),
 				goutils.Err(ErrInvalidPositionCollection))
 
-			return ErrInvalidPositionCollection
+			return nil, ErrInvalidPositionCollection
 		}
 
 		pos := scd.GetPos()
@@ -196,11 +196,11 @@ func (mergePositionCollection *MergePositionCollection) procCompnents(gameProp *
 			y := pos[i*2+1]
 
 			cd.Pos = append(cd.Pos, x, y)
-			pc.AddPos(pcd, x, y)
+			pos = append(pos, x, y)
 		}
 	}
 
-	return nil
+	return pos, nil
 }
 
 // playgame
@@ -209,6 +209,40 @@ func (mergePositionCollection *MergePositionCollection) OnPlayGame(gameProp *Gam
 
 	cd := icd.(*MergePositionCollectionData)
 	cd.clear()
+
+	pos := []int{}
+
+	if len(mergePositionCollection.Config.SrcSymbolCodes) > 0 {
+		npos, err := mergePositionCollection.procSymbols(gameProp, curpr, prs, pos, cd)
+		if err != nil {
+			goutils.Error("MergePositionCollection.OnPlayGame:procSymbols",
+				slog.String("componentName", mergePositionCollection.Name),
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		pos = npos
+	}
+
+	if len(mergePositionCollection.Config.SrcComponents) > 0 {
+		npos, err := mergePositionCollection.procCompnents(gameProp, pos, cd)
+		if err != nil {
+			goutils.Error("MergePositionCollection.OnPlayGame:procCompnents",
+				slog.String("componentName", mergePositionCollection.Name),
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		pos = npos
+	}
+
+	if len(cd.Pos) == 0 {
+		nc := mergePositionCollection.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
 
 	pcd := gameProp.GetComponentDataWithName(mergePositionCollection.Config.OutputToComponent)
 	pc, isok := gameProp.Components.MapComponents[mergePositionCollection.Config.OutputToComponent]
@@ -225,32 +259,11 @@ func (mergePositionCollection *MergePositionCollection) OnPlayGame(gameProp *Gam
 		pc.ClearData(pcd, true)
 	}
 
-	if len(mergePositionCollection.Config.SrcSymbolCodes) > 0 {
-		err := mergePositionCollection.procSymbols(gameProp, curpr, prs, pc, pcd, cd)
-		if err != nil {
-			goutils.Error("MergePositionCollection.OnPlayGame:procSymbols",
-				slog.String("componentName", mergePositionCollection.Name),
-				goutils.Err(err))
+	for i := range len(pos) / 2 {
+		x := pos[i*2]
+		y := pos[i*2+1]
 
-			return "", err
-		}
-	}
-
-	if len(mergePositionCollection.Config.SrcComponents) > 0 {
-		err := mergePositionCollection.procCompnents(gameProp, pc, pcd, cd)
-		if err != nil {
-			goutils.Error("MergePositionCollection.OnPlayGame:procCompnents",
-				slog.String("componentName", mergePositionCollection.Name),
-				goutils.Err(err))
-
-			return "", err
-		}
-	}
-
-	if len(cd.Pos) == 0 {
-		nc := mergePositionCollection.onStepEnd(gameProp, curpr, gp, "")
-
-		return nc, ErrComponentDoNothing
+		pc.AddPos(pcd, x, y)
 	}
 
 	nc := mergePositionCollection.onStepEnd(gameProp, curpr, gp, "")
