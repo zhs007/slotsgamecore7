@@ -120,6 +120,7 @@ type LinesTriggerConfig struct {
 	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
+	OutputToComponent               string                        `yaml:"outputToComponent" json:"outputToComponent"`                         // 将结果给到一个 positionCollection
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
@@ -215,12 +216,6 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 	for _, award := range linesTrigger.Config.Awards {
 		award.Init()
 	}
-
-	// if linesTrigger.Config.SymbolAwardsWeights != nil {
-	// 	linesTrigger.Config.SymbolAwardsWeights.Init()
-	// }
-
-	// linesTrigger.Config.ExcludeSymbolCodes = GetExcludeSymbols(pool.DefaultPaytables, linesTrigger.Config.SymbolCodes)
 
 	linesTrigger.Config.CheckWinType = ParseCheckWinType(linesTrigger.Config.StrCheckWinType)
 
@@ -743,11 +738,32 @@ func (linesTrigger *LinesTrigger) ProcControllers(gameProp *GameProperty, plugin
 	}
 }
 
+// procPositionCollection
+func (linesTrigger *LinesTrigger) procPositionCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	cd *LinesTriggerData) error {
+
+	if linesTrigger.Config.OutputToComponent != "" {
+		pcd := gameProp.GetComponentDataWithName(linesTrigger.Config.OutputToComponent)
+		if pcd != nil {
+			gameProp.UseComponent(linesTrigger.Config.OutputToComponent)
+			pc := gameProp.Components.MapComponents[linesTrigger.Config.OutputToComponent]
+
+			for _, ri := range cd.UsedResults {
+				ret := curpr.Results[ri]
+
+				for i := 0; i < len(ret.Pos)/2; i++ {
+					pc.AddPos(pcd, ret.Pos[i*2], ret.Pos[i*2+1])
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // playgame
 func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
-
-	// linesTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := cd.(*LinesTriggerData)
 	std.onNewStep()
@@ -755,31 +771,10 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	gs := linesTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	os := linesTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
-	// // 临时应付一下
-	// os = nil
-
 	isTrigger, lst := linesTrigger.canTrigger(gameProp, gs, os, curpr, stake, std)
 
 	if isTrigger {
 		linesTrigger.procWins(gameProp, curpr, std, lst)
-
-		// if !linesTrigger.Config.NeedDiscardResults {
-		// for _, v := range lst {
-		// 	linesTrigger.AddResult(curpr, v, &std.BasicComponentData)
-
-		// 	std.SymbolNum += v.SymbolNums
-		// 	std.WildNum += v.Wilds
-		// }
-		// } else {
-		// 	for _, v := range lst {
-		// 		std.SymbolNum += v.SymbolNums
-		// 		std.WildNum += v.Wilds
-		// 	}
-		// }
-
-		// if std.CoinWin != std.Wins {
-		// 	goutils.Error("Err!")
-		// }
 
 		respinNum, err := linesTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
@@ -799,28 +794,15 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 			return "", err
 		}
 
-		// if linesTrigger.Config.TagSymbolNum != "" {
-		// 	gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
-		// }
+		err = linesTrigger.procPositionCollection(gameProp, curpr, std)
+		if err != nil {
+			goutils.Error("LinesTrigger.OnPlayGame:procPositionCollection",
+				goutils.Err(err))
+
+			return "", err
+		}
 
 		linesTrigger.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-		// if len(linesTrigger.Config.Awards) > 0 {
-		// 	gameProp.procAwards(plugin, linesTrigger.Config.Awards, curpr, gp)
-		// }
-
-		// if linesTrigger.Config.SymbolAwardsWeights != nil {
-		// 	for i := 0; i < lst[0].SymbolNums; i++ {
-		// 		node, err := linesTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
-		// 		if err != nil {
-		// 			goutils.Error("LinesTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-		// 				goutils.Err(err))
-
-		// 			return "", err
-		// 		}
-
-		// 		gameProp.procAwards(plugin, node.Awards, curpr, gp)
-		// 	}
-		// }
 
 		if linesTrigger.Config.JumpToComponent != "" {
 			if gameProp.IsRespin(linesTrigger.Config.JumpToComponent) {
@@ -845,55 +827,6 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 					lst[0].Value = std.RespinNum
 				}
 			}
-
-			// if symbolTrigger.Config.RespinNumWeightWithScatterNum != nil {
-			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeightWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
-			// 	if err != nil {
-			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			goutils.Err(err))
-
-			// 		return nil
-			// 	}
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = v
-			// } else if len(symbolTrigger.Config.RespinNumWithScatterNum) > 0 {
-			// 	gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.JumpToComponent, true)
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums]
-			// } else if symbolTrigger.Config.RespinNumWeight != "" {
-			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeight, symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
-			// 	if err != nil {
-			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			goutils.Err(err))
-
-			// 		return nil
-			// 	}
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = v
-			// } else if symbolTrigger.Config.RespinNum > 0 {
-			// 	gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNum, symbolTrigger.Config.JumpToComponent, true)
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = symbolTrigger.Config.RespinNum
-			// } else {
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = -1
-			// }
-
-			// if symbolTrigger.Config.ForceToNext {
-			// 	std.NextComponent = symbolTrigger.Config.DefaultNextComponent
-			// } else {
-			// 	rn := gameProp.GetLastRespinNum(symbolTrigger.Config.JumpToComponent)
-			// 	if rn > 0 {
-			// 		gameProp.TriggerRespin(plugin, curpr, gp, 0, symbolTrigger.Config.JumpToComponent, true)
-
-			// 		lst[0].Type = sgc7game.RTFreeGame
-			// 		lst[0].Value = rn
-			// 	}
-			// }
 
 			std.NextComponent = linesTrigger.Config.JumpToComponent
 
@@ -1064,6 +997,7 @@ type jsonLinesTrigger struct {
 	WildSymbols         []string `json:"wildSymbols"`
 	WinMulti            int      `json:"winMulti"`
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
+	OutputToComponent   string   `json:"outputToComponent"`
 }
 
 func (jcfg *jsonLinesTrigger) build() *LinesTriggerConfig {
@@ -1077,6 +1011,7 @@ func (jcfg *jsonLinesTrigger) build() *LinesTriggerConfig {
 		WildSymbols:        jcfg.WildSymbols,
 		WinMulti:           jcfg.WinMulti,
 		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
+		OutputToComponent:  jcfg.OutputToComponent,
 	}
 
 	// cfg.UseSceneV3 = true

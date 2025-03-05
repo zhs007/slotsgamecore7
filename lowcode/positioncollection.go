@@ -173,15 +173,25 @@ func (positionCollection *PositionCollection) InitEx(cfg any, pool *GameProperty
 // 	return nil
 // }
 
+func (positionCollection *PositionCollection) isClear(basicCD *BasicComponentData) bool {
+	clear, isok := basicCD.GetConfigIntVal(CCVClear)
+	if isok {
+		return clear != 0
+	}
+
+	return false
+}
+
 // playgame
 func (positionCollection *PositionCollection) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolCollection2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-	if positionCollection.Config.IsNeedClear {
-		cd := icd.(*PositionCollectionData)
+	cd := icd.(*PositionCollectionData)
 
+	if positionCollection.Config.IsNeedClear || positionCollection.isClear(&cd.BasicComponentData) {
 		cd.clear(positionCollection.Config.InitPositions)
+
+		cd.SetConfigIntVal(CCVClear, 0)
 	}
 
 	nc := positionCollection.onStepEnd(gameProp, curpr, gp, "")
@@ -198,6 +208,14 @@ func (positionCollection *PositionCollection) AddPos(icd IComponentData, x int, 
 	}
 
 	icd.AddPos(x, y)
+}
+
+// ClearData -
+func (positionCollection *PositionCollection) ClearData(icd IComponentData, bForceNow bool) {
+	if bForceNow {
+		cd := icd.(*PositionCollectionData)
+		cd.clear(positionCollection.Config.InitPositions)
+	}
 }
 
 // OnAsciiGame - outpur to asciigame

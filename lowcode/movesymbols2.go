@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -139,12 +140,17 @@ func (moveSymbols2Data *MoveSymbols2Data) newData() {
 
 // MoveSymbols2Config - configuration for MoveSymbols2
 type MoveSymbols2Config struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	Type                 MoveSymbols2Type `yaml:"-" json:"-"`
-	StrType              string           `yaml:"type" json:"type"`
-	SrcSymbols           []string         `yaml:"srcSymbols" json:"srcSymbols"`
-	SrcSymbolCodes       []int            `yaml:"-" json:"-"`
-	Controllers          []*Award         `yaml:"controllers" json:"controllers"`
+	BasicComponentConfig   `yaml:",inline" json:",inline"`
+	Type                   MoveSymbols2Type `yaml:"-" json:"-"`
+	StrType                string           `yaml:"type" json:"type"`
+	SrcSymbols             []string         `yaml:"srcSymbols" json:"srcSymbols"`
+	SrcSymbolCodes         []int            `yaml:"-" json:"-"`
+	SrcPositionCollections []string         `json:"srcPositionCollections"`
+	FillSymbol             string           `json:"fillSymbol"`
+	FillSymbolCode         int              `json:"-"`
+	RemoveSymbol           string           `json:"removeSymbol"`
+	RemoveSymbolCode       int              `json:"-"`
+	Controllers            []*Award         `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -204,6 +210,32 @@ func (moveSymbol2 *MoveSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 		moveSymbol2.Config.SrcSymbolCodes = append(moveSymbol2.Config.SrcSymbolCodes, sc)
 	}
 
+	if len(moveSymbol2.Config.FillSymbol) > 0 {
+		sc, isok := pool.DefaultPaytables.MapSymbols[moveSymbol2.Config.FillSymbol]
+		if !isok {
+			goutils.Error("MoveSymbols2.InitEx:FillSymbol",
+				slog.String("symbol", moveSymbol2.Config.FillSymbol),
+				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		moveSymbol2.Config.FillSymbolCode = sc
+	}
+
+	if len(moveSymbol2.Config.RemoveSymbol) > 0 {
+		sc, isok := pool.DefaultPaytables.MapSymbols[moveSymbol2.Config.RemoveSymbol]
+		if !isok {
+			goutils.Error("MoveSymbols2.InitEx:RemoveSymbol",
+				slog.String("symbol", moveSymbol2.Config.RemoveSymbol),
+				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		moveSymbol2.Config.RemoveSymbolCode = sc
+	}
+
 	for _, award := range moveSymbol2.Config.Controllers {
 		award.Init()
 	}
@@ -213,7 +245,9 @@ func (moveSymbol2 *MoveSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (moveSymbol2 *MoveSymbols2) procNormal(gameProp *GameProperty, cd *MoveSymbols2Data, gs *sgc7game.GameScene, gs2 *sgc7game.GameScene, xoff int, yoff int) (*sgc7game.GameScene, error) {
+// moveSymbols -
+func (moveSymbol2 *MoveSymbols2) moveSymbols(gameProp *GameProperty, cd *MoveSymbols2Data, gs *sgc7game.GameScene,
+	gs2 *sgc7game.GameScene, xoff int, yoff int) (*sgc7game.GameScene, error) {
 
 	posSrc := make([]int, 0, gs.Width*gs.Height*2)
 
@@ -257,6 +291,150 @@ func (moveSymbol2 *MoveSymbols2) procNormal(gameProp *GameProperty, cd *MoveSymb
 	return ngs, nil
 }
 
+// procSymbols -
+func (moveSymbol2 *MoveSymbols2) procSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult,
+	cd *MoveSymbols2Data, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
+
+	gs2 := gameProp.SceneStack.GetPreTopSceneEx(curpr, prs)
+
+	if moveSymbol2.Config.Type == MS2TypeLeft {
+		ngs, err := moveSymbol2.moveSymbols(gameProp, cd, gs, gs2, -1, 0)
+		if err != nil {
+			goutils.Error("MoveSymbols2.procSymbols:moveSymbols",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		return ngs, nil
+	} else if moveSymbol2.Config.Type == MS2TypeRight {
+		ngs, err := moveSymbol2.moveSymbols(gameProp, cd, gs, gs2, 1, 0)
+		if err != nil {
+			goutils.Error("MoveSymbols2.procSymbols:moveSymbols",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		return ngs, nil
+	}
+
+	goutils.Error("MoveSymbols2.procSymbols:procMoveSymbols",
+		goutils.Err(ErrIvalidComponentConfig))
+
+	return nil, ErrIvalidComponentConfig
+}
+
+// movePositionCollection -
+func (moveSymbol2 *MoveSymbols2) movePositionCollection(gameProp *GameProperty, cd *MoveSymbols2Data, gs *sgc7game.GameScene,
+	ngs *sgc7game.GameScene, cname string, xoff int, yoff int) (*sgc7game.GameScene, error) {
+
+	pcd := gameProp.GetComponentDataWithName(cname)
+	pc, isok := gameProp.Components.MapComponents[cname]
+	if isok && pcd != nil {
+		curpos := slices.Clone(pcd.GetPos())
+		if len(curpos) > 0 {
+			for i := range len(curpos) / 2 {
+				x := curpos[i*2]
+				y := curpos[i*2+1]
+
+				cd.newData()
+
+				cd.AddPos(x, y)
+
+				srcSymbol := -99
+
+				if x >= 0 && y >= 0 && x < gs.Width && y < gs.Height {
+					srcSymbol = ngs.Arr[x][y]
+
+					if len(moveSymbol2.Config.RemoveSymbol) > 0 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = moveSymbol2.Config.RemoveSymbolCode
+					}
+				}
+
+				x += xoff
+				y += yoff
+
+				cd.AddPos(x, y)
+
+				if x >= 0 && y >= 0 && x < gs.Width && y < gs.Height {
+					if len(moveSymbol2.Config.FillSymbol) > 0 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = moveSymbol2.Config.FillSymbolCode
+					} else if srcSymbol != -99 {
+						ngs.Arr[x][y] = srcSymbol
+					}
+				}
+
+				curpos[i*2] = x
+				curpos[i*2+1] = y
+			}
+
+			pc.ClearData(pcd, true)
+
+			for i := range curpos {
+				x := curpos[i*2]
+				y := curpos[i*2+1]
+
+				if x >= 0 && y >= 0 && x < gs.Width && y < gs.Height {
+					pc.AddPos(pcd, x, y)
+				}
+			}
+		}
+	}
+
+	return ngs, nil
+}
+
+// procPositionCollections -
+func (moveSymbol2 *MoveSymbols2) procPositionCollections(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	prs []*sgc7game.PlayResult, cd *MoveSymbols2Data, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
+
+	ngs := gs
+
+	if moveSymbol2.Config.Type == MS2TypeLeft {
+		for _, v := range moveSymbol2.Config.SrcPositionCollections {
+			cngs, err := moveSymbol2.movePositionCollection(gameProp, cd, gs, ngs, v, -1, 0)
+			if err != nil {
+				goutils.Error("MoveSymbols2.procPositionCollections:movePositionCollection",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			ngs = cngs
+		}
+
+		return ngs, nil
+	} else if moveSymbol2.Config.Type == MS2TypeRight {
+		for _, v := range moveSymbol2.Config.SrcPositionCollections {
+			cngs, err := moveSymbol2.movePositionCollection(gameProp, cd, gs, ngs, v, 1, 0)
+			if err != nil {
+				goutils.Error("MoveSymbols2.procPositionCollections:movePositionCollection",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			ngs = cngs
+		}
+
+		return ngs, nil
+	}
+
+	goutils.Error("MoveSymbols2.procPositionCollections",
+		goutils.Err(ErrIvalidComponentConfig))
+
+	return nil, ErrIvalidComponentConfig
+}
+
 // OnProcControllers -
 func (moveSymbol2 *MoveSymbols2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	if len(moveSymbol2.Config.Controllers) > 0 {
@@ -273,30 +451,33 @@ func (moveSymbol2 *MoveSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 	msd.OnNewStep()
 
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
-	gs2 := gameProp.SceneStack.GetPreTopSceneEx(curpr, prs)
-
 	sc2 := gs
 
-	if moveSymbol2.Config.Type == MS2TypeLeft {
-		ngs, err := moveSymbol2.procNormal(gameProp, msd, gs, gs2, -1, 0)
+	if len(moveSymbol2.Config.SrcSymbolCodes) > 0 {
+		ngs, err := moveSymbol2.procSymbols(gameProp, curpr, prs, msd, gs)
 		if err != nil {
-			goutils.Error("MoveSymbols2.OnPlayGame:procNormal",
+			goutils.Error("MoveSymbols2.OnPlayGame:procSymbols",
 				goutils.Err(err))
 
 			return "", err
 		}
 
 		sc2 = ngs
-	} else if moveSymbol2.Config.Type == MS2TypeRight {
-		ngs, err := moveSymbol2.procNormal(gameProp, msd, gs, gs2, 1, 0)
+	} else if len(moveSymbol2.Config.SrcPositionCollections) > 0 {
+		ngs, err := moveSymbol2.procPositionCollections(gameProp, curpr, prs, msd, gs)
 		if err != nil {
-			goutils.Error("MoveSymbols2.OnPlayGame:procNormal",
+			goutils.Error("MoveSymbols2.OnPlayGame:procPositionCollections",
 				goutils.Err(err))
 
 			return "", err
 		}
 
 		sc2 = ngs
+	} else {
+		goutils.Error("MoveSymbols2.OnPlayGame",
+			goutils.Err(ErrIvalidComponentConfig))
+
+		return "", ErrIvalidComponentConfig
 	}
 
 	if sc2 == gs {
@@ -335,13 +516,17 @@ func NewMoveSymbols2(name string) IComponent {
 }
 
 // "type": "left",
-// "srcSymbols": [
-// 	"WL"
-// ]
+// "srcPositionCollections": [
+// 	"bg-pos-mw"
+// ],
+// "fillSymbol": "MW"
 
 type jsonMoveSymbols2 struct {
-	StrType    string   `json:"type"`
-	SrcSymbols []string `json:"srcSymbols"`
+	StrType                string   `json:"type"`
+	SrcSymbols             []string `json:"srcSymbols"`
+	SrcPositionCollections []string `json:"srcPositionCollections"`
+	FillSymbol             string   `json:"fillSymbol"`
+	RemoveSymbol           string   `json:"removeSymbol"`
 }
 
 func (jcfg *jsonMoveSymbols2) build() *MoveSymbols2Config {

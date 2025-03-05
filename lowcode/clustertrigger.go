@@ -19,10 +19,6 @@ import (
 
 const ClusterTriggerTypeName = "clusterTrigger"
 
-// const (
-// 	CTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-// )
-
 type ClusterTriggerData struct {
 	BasicComponentData
 	PosComponentData
@@ -51,7 +47,7 @@ func (clusterTriggerData *ClusterTriggerData) onNewStep() {
 	clusterTriggerData.WinMulti = 1
 
 	if !gIsReleaseMode {
-		clusterTriggerData.PosComponentData.Clear()
+		clusterTriggerData.PosComponentData.ClearPos()
 	}
 }
 
@@ -89,43 +85,6 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 	return pbcd
 }
 
-// // LoadPB
-// func (clusterTriggerData *ClusterTriggerData) LoadPB(pb *anypb.Any) error {
-// 	if pb.TypeUrl == "type.googleapis.com/sgc7pb.ClusterTriggerData" {
-// 		var msg sgc7pb.ClusterTriggerData
-
-// 		err := anypb.UnmarshalTo(pb, &msg, proto.UnmarshalOptions{})
-// 		if err != nil {
-// 			goutils.Error("ClusterTriggerData.LoadPB:anypb.UnmarshalTo:ClusterTriggerData",
-// 				goutils.Err(err))
-
-// 			return err
-// 		}
-
-// 		err = clusterTriggerData.LoadPBComponentData(msg.BasicComponentData)
-// 		if err != nil {
-// 			goutils.Error("ClusterTriggerData.LoadPB:LoadPBComponentData",
-// 				goutils.Err(err))
-
-// 			return err
-// 		}
-
-// 		clusterTriggerData.NextComponent = msg.NextComponent
-// 		clusterTriggerData.SymbolNum = int(msg.SymbolNum)
-// 		clusterTriggerData.WildNum = int(msg.WildNum)
-// 		clusterTriggerData.RespinNum = int(msg.RespinNum)
-// 		clusterTriggerData.Wins = int(msg.Wins)
-// 		clusterTriggerData.WinMulti = int(msg.WinMulti)
-
-// 		return nil
-// 	}
-
-// 	goutils.Error("ClusterTriggerData.LoadPB",
-// 		goutils.Err(ErrInvalidPBComponentData))
-
-// 	return ErrInvalidPBComponentData
-// }
-
 // GetValEx -
 func (clusterTriggerData *ClusterTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
@@ -148,19 +107,6 @@ func (clusterTriggerData *ClusterTriggerData) GetValEx(key string, getType GetCo
 
 	return 0, false
 }
-
-// // SetVal -
-// func (clusterTriggerData *ClusterTriggerData) SetVal(key string, val int) {
-// 	if key == CVSymbolNum {
-// 		clusterTriggerData.SymbolNum = val
-// 	} else if key == CVWildNum {
-// 		clusterTriggerData.WildNum = val
-// 	} else if key == CVRespinNum {
-// 		clusterTriggerData.RespinNum = val
-// 	} else if key == CVWins {
-// 		clusterTriggerData.Wins = val
-// 	}
-// }
 
 // GetPos -
 func (clusterTriggerData *ClusterTriggerData) GetPos() []int {
@@ -193,6 +139,7 @@ type ClusterTriggerConfig struct {
 	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
+	OutputToComponent               string                        `yaml:"outputToComponent" json:"outputToComponent"`                         // 将结果给到一个 positionCollection
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinNum                       int                           `yaml:"respinNum" json:"respinNum"`                                         // respin number
 	RespinNumWeight                 string                        `yaml:"respinNumWeight" json:"respinNumWeight"`                             // respin number weight
@@ -500,6 +447,29 @@ func (clusterTrigger *ClusterTrigger) ProcControllers(gameProp *GameProperty, pl
 	}
 }
 
+// procPositionCollection
+func (clusterTrigger *ClusterTrigger) procPositionCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	cd *ClusterTriggerData) error {
+
+	if clusterTrigger.Config.OutputToComponent != "" {
+		pcd := gameProp.GetComponentDataWithName(clusterTrigger.Config.OutputToComponent)
+		if pcd != nil {
+			gameProp.UseComponent(clusterTrigger.Config.OutputToComponent)
+			pc := gameProp.Components.MapComponents[clusterTrigger.Config.OutputToComponent]
+
+			for _, ri := range cd.UsedResults {
+				ret := curpr.Results[ri]
+
+				for i := 0; i < len(ret.Pos)/2; i++ {
+					pc.AddPos(pcd, ret.Pos[i*2], ret.Pos[i*2+1])
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // playgame
 func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -515,13 +485,6 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 	if isTrigger {
 		clusterTrigger.procWins(gameProp, curpr, std, lst, os, std)
 
-		// for _, v := range lst {
-		// 	clusterTrigger.AddResult(curpr, v, &std.BasicComponentData)
-
-		// 	std.SymbolNum += v.SymbolNums
-		// 	std.WildNum += v.Wilds
-		// }
-
 		respinNum, err := clusterTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
 			goutils.Error("ClusterTrigger.OnPlayGame:calcRespinNum",
@@ -532,36 +495,15 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 		std.RespinNum = respinNum
 
-		// err = clusterTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
-		// if err != nil {
-		// 	goutils.Error("ClusterTrigger.OnPlayGame:procMask",
-		// 		goutils.Err(err))
+		err = clusterTrigger.procPositionCollection(gameProp, curpr, std)
+		if err != nil {
+			goutils.Error("ScatterTrigger.OnPlayGame:procPositionCollection",
+				goutils.Err(err))
 
-		// 	return err
-		// }
-
-		// if symbolTrigger.Config.TagSymbolNum != "" {
-		// 	gameProp.TagInt(symbolTrigger.Config.TagSymbolNum, lst[0].SymbolNums)
-		// }
+			return "", err
+		}
 
 		clusterTrigger.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-		// if len(clusterTrigger.Config.Awards) > 0 {
-		// 	gameProp.procAwards(plugin, clusterTrigger.Config.Awards, curpr, gp)
-		// }
-
-		// if clusterTrigger.Config.SymbolAwardsWeights != nil {
-		// 	for i := 0; i < lst[0].SymbolNums; i++ {
-		// 		node, err := clusterTrigger.Config.SymbolAwardsWeights.RandVal(plugin)
-		// 		if err != nil {
-		// 			goutils.Error("ClusterTrigger.OnPlayGame:SymbolAwardsWeights.RandVal",
-		// 				goutils.Err(err))
-
-		// 			return err
-		// 		}
-
-		// 		gameProp.procAwards(plugin, node.Awards, curpr, gp)
-		// 	}
-		// }
 
 		if clusterTrigger.Config.JumpToComponent != "" {
 			if gameProp.IsRespin(clusterTrigger.Config.JumpToComponent) {
@@ -853,6 +795,7 @@ type jsonClusterTrigger struct {
 	WildSymbols         []string `json:"wildSymbols"`
 	WinMulti            int      `json:"winMulti"`
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
+	OutputToComponent   string   `json:"outputToComponent"`
 }
 
 func (jcfg *jsonClusterTrigger) build() *ClusterTriggerConfig {
@@ -865,9 +808,8 @@ func (jcfg *jsonClusterTrigger) build() *ClusterTriggerConfig {
 		WildSymbols:        jcfg.WildSymbols,
 		WinMulti:           jcfg.WinMulti,
 		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
+		OutputToComponent:  jcfg.OutputToComponent,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

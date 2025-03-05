@@ -105,4 +105,10 @@ type IComponent interface {
 	GetBranchNum() int
 	// GetBranchWeights -
 	GetBranchWeights() []int
+
+	//----------------------------
+	// IComponentData
+
+	// ClearData -
+	ClearData(icd IComponentData, bForceNow bool)
 }

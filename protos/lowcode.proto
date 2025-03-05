@@ -393,6 +393,12 @@ message MoveSymbols2Data {
     repeated int32 pos = 2;
 }
 
+// MergePositionCollectionData
+message MergePositionCollectionData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
