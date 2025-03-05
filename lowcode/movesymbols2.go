@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -531,8 +532,11 @@ type jsonMoveSymbols2 struct {
 
 func (jcfg *jsonMoveSymbols2) build() *MoveSymbols2Config {
 	cfg := &MoveSymbols2Config{
-		StrType:    jcfg.StrType,
-		SrcSymbols: jcfg.SrcSymbols,
+		StrType:                strings.ToLower(jcfg.StrType),
+		SrcSymbols:             slices.Clone(jcfg.SrcSymbols),
+		SrcPositionCollections: slices.Clone(jcfg.SrcPositionCollections),
+		FillSymbol:             jcfg.FillSymbol,
+		RemoveSymbol:           jcfg.RemoveSymbol,
 	}
 
 	return cfg
