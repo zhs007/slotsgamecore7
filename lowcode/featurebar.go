@@ -313,6 +313,7 @@ func (jcfg *jsonFeatureBar) build() *FeatureBarConfig {
 	cfg := &FeatureBarConfig{
 		Length:           jcfg.Length,
 		StrFeatureWeight: jcfg.StrFeatureWeight,
+		FirstJumpWeight:  jcfg.FirstJumpWeight,
 	}
 
 	return cfg
