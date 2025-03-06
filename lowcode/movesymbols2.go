@@ -380,7 +380,7 @@ func (moveSymbol2 *MoveSymbols2) movePositionCollection(gameProp *GameProperty, 
 
 			pc.ClearData(pcd, true)
 
-			for i := range curpos {
+			for i := range len(curpos) / 2 {
 				x := curpos[i*2]
 				y := curpos[i*2+1]
 

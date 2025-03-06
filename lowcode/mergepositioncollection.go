@@ -189,11 +189,11 @@ func (mergePositionCollection *MergePositionCollection) procCompnents(gameProp *
 			return nil, ErrInvalidPositionCollection
 		}
 
-		pos := scd.GetPos()
+		srcpos := scd.GetPos()
 
-		for i := range len(pos) / 2 {
-			x := pos[i*2]
-			y := pos[i*2+1]
+		for i := range len(srcpos) / 2 {
+			x := srcpos[i*2]
+			y := srcpos[i*2+1]
 
 			cd.Pos = append(cd.Pos, x, y)
 			pos = append(pos, x, y)
