@@ -467,6 +467,10 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 							}, func(cursymbol int) int {
 								return cursymbol
 							}, func(x, y int) int {
+								if os.Arr[x][y] < 1 {
+									return 1
+								}
+
 								return os.Arr[x][y]
 							})
 						if ret != nil {
@@ -502,6 +506,10 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 							}, func(cursymbol int) int {
 								return cursymbol
 							}, func(x, y int) int {
+								if os.Arr[x][y] < 1 {
+									return 1
+								}
+
 								return os.Arr[x][y]
 							})
 						if ret != nil {
