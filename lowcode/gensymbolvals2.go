@@ -35,10 +35,11 @@ func parseGenSymbolVals2SrcSymbolValsType(strType string) GenSymbolVals2SrcSymbo
 type GenSymbolVals2CoreType int
 
 const (
-	GSV2CTypeNumber GenSymbolVals2CoreType = 0
-	GSV2CTypeWeight GenSymbolVals2CoreType = 1
-	GSV2CTypeAdd    GenSymbolVals2CoreType = 2
-	GSV2CTypeMask   GenSymbolVals2CoreType = 3
+	GSV2CTypeNone   GenSymbolVals2CoreType = 0
+	GSV2CTypeNumber GenSymbolVals2CoreType = 1
+	GSV2CTypeWeight GenSymbolVals2CoreType = 2
+	GSV2CTypeAdd    GenSymbolVals2CoreType = 3
+	GSV2CTypeMask   GenSymbolVals2CoreType = 4
 )
 
 func parseGenSymbolVals2CoreType(strType string) GenSymbolVals2CoreType {
@@ -48,9 +49,11 @@ func parseGenSymbolVals2CoreType(strType string) GenSymbolVals2CoreType {
 		return GSV2CTypeAdd
 	} else if strType == "mask" {
 		return GSV2CTypeMask
+	} else if strType == "number" {
+		return GSV2CTypeNumber
 	}
 
-	return GSV2CTypeNumber
+	return GSV2CTypeNone
 }
 
 // GenSymbolVals2Config - configuration for GenSymbolVals2

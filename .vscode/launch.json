@@ -75,7 +75,7 @@
                 "SPINNUMS": "10000000",
                 "CORE":"1",
                 "ALLOWSTATS2":"true",
-                "BET":"20",
+                "BET":"10",
                 "RNGLIB": "${workspaceFolder}/data/rnglib.yaml"
             }
         },
