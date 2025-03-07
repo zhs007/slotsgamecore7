@@ -549,6 +549,39 @@ func (gameProp *GameProperty) GetComponentVal2(component string, val string) (in
 	return v, nil
 }
 
+func (gameProp *GameProperty) GetComponentStrVal(componentVal string) (string, error) {
+	arr := strings.Split(componentVal, ".")
+	if len(arr) != 2 {
+		goutils.Error("GameProperty.GetComponentVal",
+			slog.String("componentVal", componentVal),
+			goutils.Err(ErrInvalidComponentVal))
+
+		return "", ErrInvalidComponentVal
+	}
+
+	component, isok := gameProp.Components.MapComponents[arr[0]]
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal",
+			slog.String("component", arr[0]),
+			goutils.Err(ErrInvalidComponent))
+
+		return "", ErrInvalidComponent
+	}
+
+	cd := gameProp.callStack.GetComponentData(gameProp, component)
+
+	v, isok := cd.GetStrVal(strings.ToLower(arr[1]))
+	if !isok {
+		goutils.Error("GameProperty.GetComponentVal:GetStrVal",
+			slog.String("componentVal", componentVal),
+			goutils.Err(ErrInvalidComponentVal))
+
+		return "", ErrInvalidComponentVal
+	}
+
+	return v, nil
+}
+
 func (gameProp *GameProperty) GetComponentStrVal2(component string, val string) (string, error) {
 	ic, isok := gameProp.Components.MapComponents[component]
 	if !isok {
@@ -720,7 +753,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	} else if award.Type == AwardSetComponentConfigVal {
-		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.StrParams[1])
+		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.GetStringVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:SetComponentConfigVal",
 				goutils.Err(err))

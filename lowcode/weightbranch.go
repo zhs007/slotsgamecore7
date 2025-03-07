@@ -72,7 +72,6 @@ func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
 func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 	if key == CCVWeight {
 		weightBranchData.WeightVW = nil
-		weightBranchData.WeightVW = nil
 	}
 
 	weightBranchData.BasicComponentData.SetConfigVal(key, val)

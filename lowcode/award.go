@@ -83,20 +83,19 @@ func (cfg *Award) GetVal(gameProp *GameProperty, i int) int {
 	return val
 }
 
-// func (cfg *Award) GetStringVal(gameProp *GameProperty, i int) string {
-// 	val := ""
-// 	if i < len(cfg.StrParams) {
-// 		val = cfg.StrParams[i]
-// 	}
+func (cfg *Award) GetStringVal(gameProp *GameProperty, i int) string {
+	val := ""
 
-// 	if i < len(cfg.ComponentVals) {
-// 		if cfg.ComponentVals[i] != "" {
-// 			val, _ = gameProp.GetComponentVal(cfg.ComponentVals[i])
-// 		}
-// 	}
+	if i < len(cfg.ComponentVals) {
+		if cfg.ComponentVals[i] != "" {
+			val, _ = gameProp.GetComponentStrVal(cfg.ComponentVals[i])
+		}
+	} else if i+1 < len(cfg.StrParams) {
+		val = cfg.StrParams[i+1]
+	}
 
-// 	return val
-// }
+	return val
+}
 
 const (
 	AwardUnknow                   int = 0  // 未知的奖励

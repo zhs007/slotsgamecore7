@@ -689,3 +689,37 @@ func parseTreasureChestControllers(controller *ast.Node) ([]*Award, map[int][]*A
 
 	return awards, mapawards, nil
 }
+
+func parseAllAndStrMapControllers(controller *ast.Node) ([]*Award, map[string][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseAllAndStrMapControllers:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseAllAndStrMapControllers:Unmarshal",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	awards := []*Award{}
+	mapAwards := make(map[string][]*Award)
+
+	for _, v := range lst {
+		str, a := v.buildWithStringValEx()
+		if str == "" {
+			awards = append(awards, a)
+		} else {
+			mapAwards[str] = append(mapAwards[str], a)
+		}
+	}
+
+	return awards, mapAwards, nil
+}
