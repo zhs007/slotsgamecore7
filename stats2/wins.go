@@ -14,7 +14,7 @@ type StatsWins struct {
 	MapWinTimes   map[int]int64    `json:"mapWinTimes"`
 	MapWinTimesEx map[string]int64 `json:"MapWinTimesEx"`
 	MapWinEx      map[string]int64 `json:"MapWinEx"`
-	SD            float64
+	SD            float64          `json:"sd"`
 }
 
 func (wins *StatsWins) AddWin(win int64) {

@@ -53,6 +53,10 @@ func (s2 *Stats) onCache(cache *Cache) {
 		}
 	}
 
+	if gWinCap > 0 && cache.TotalWin > gWinCap {
+		cache.TotalWin = gWinCap
+	}
+
 	if cache.TotalWin > s2.MaxWins {
 		s2.MaxWins = cache.TotalWin
 		s2.MaxWinTimes = 1
