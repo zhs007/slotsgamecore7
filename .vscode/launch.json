@@ -77,7 +77,7 @@
                 "ALLOWSTATS2":"true",
                 "BET":"20",
                 "RNGLIB": "${workspaceFolder}/data/rnglib.yaml",
-                "WINCAP": "10",
+                "WINCAP": "",
             }
         },
         {

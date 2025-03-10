@@ -324,7 +324,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	return nil
 }
 
-func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*stats2.Stats, error) {
+func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel, wincap int64) (*stats2.Stats, error) {
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2WithData(gamecfg, func() sgc7plugin.IPlugin {
@@ -349,7 +349,7 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 		Currency: "EUR",
 	}
 
-	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, 0)
+	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, wincap)
 
 	goutils.Info("finish.",
 		slog.Int64("total nums", ispinnums),
