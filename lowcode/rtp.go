@@ -268,6 +268,10 @@ type RTPConfig struct {
 func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet int64, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel, wincap int64) error {
 	sgc7plugin.IsNoRNGCache = true
 
+	if wincap > 0 {
+		stats2.SetWinCap(int(wincap))
+	}
+
 	game, err := NewGame2(gamecfg, func() sgc7plugin.IPlugin {
 		return sgc7plugin.NewFastPlugin()
 	}, funcNewRNG, funcNewFeatureLevel)

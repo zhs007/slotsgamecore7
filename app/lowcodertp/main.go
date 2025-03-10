@@ -38,6 +38,11 @@ func main() {
 		strspinnums = "10000000"
 	}
 
+	strwincap := os.Getenv("WINCAP")
+	if strwincap == "" {
+		strwincap = "0"
+	}
+
 	gamecfg := os.Getenv("GAMECFG")
 	outputPath := os.Getenv("OUTPUTPATH")
 	strBet := os.Getenv("BET")
@@ -68,6 +73,14 @@ func main() {
 		return
 	}
 
+	wincap, err := strconv.ParseInt(strwincap, 10, 64)
+	if err != nil {
+		goutils.Error("Getenv(WINCAP)",
+			goutils.Err(err))
+
+		return
+	}
+
 	bet := int64(0)
 	if strBet != "" {
 		i64, _ := goutils.String2Int64(strBet)
@@ -89,5 +102,5 @@ func main() {
 	}
 
 	// lowcode.SetForceDisableStats()
-	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, 0)
+	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, wincap)
 }
