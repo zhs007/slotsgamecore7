@@ -173,6 +173,7 @@ func GenDefaultScene(game *Game, bet int) (*sgc7game.GameScene, error) {
 
 	ips := game.Initialize()
 
+	iTimes := 0
 	for {
 		rets, err := procSpin(game, ips, sgc7plugin.NewFastPlugin(), stake, "", "", false)
 		if err != nil {
@@ -184,6 +185,15 @@ func GenDefaultScene(game *Game, bet int) (*sgc7game.GameScene, error) {
 
 		if len(rets) == 1 && rets[0].CoinWin == 0 {
 			return rets[0].Scenes[len(rets[0].Scenes)-1], nil
+		}
+
+		iTimes++
+
+		if iTimes > 10000 {
+			goutils.Error("GenDefaultScene:procSpin",
+				goutils.Err(ErrCanNotGenDefaultScene))
+
+			return nil, ErrCanNotGenDefaultScene
 		}
 	}
 }

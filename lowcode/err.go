@@ -205,4 +205,7 @@ var (
 
 	// ErrNoComponent - no component
 	ErrNoComponent = errors.New("no component")
+
+	// ErrCanNotGenDefaultScene - can not gen default scene
+	ErrCanNotGenDefaultScene = errors.New("can not gen default scene")
 )
