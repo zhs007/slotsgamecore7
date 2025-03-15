@@ -68,6 +68,7 @@ const (
 	CS2TypeMystery        ChgSymbols2Type = 2
 	CS2TypeMysteryOnReels ChgSymbols2Type = 3
 	CS2TypeUpSymbol       ChgSymbols2Type = 4
+	CS2TypeEachPosRandom  ChgSymbols2Type = 5
 )
 
 func parseChgSymbols2Type(str string) ChgSymbols2Type {
@@ -79,6 +80,8 @@ func parseChgSymbols2Type(str string) ChgSymbols2Type {
 		return CS2TypeMysteryOnReels
 	} else if str == "upsymbol" {
 		return CS2TypeUpSymbol
+	} else if str == "eachposrandom" {
+		return CS2TypeEachPosRandom
 	}
 
 	return CS2TypeSymbol
@@ -164,15 +167,14 @@ type ChgSymbols2Config struct {
 	SrcSymbolWeightVW2    *sgc7game.ValWeights2       `yaml:"-" json:"-"`
 	Symbol                string                      `yaml:"symbol" json:"symbol"`
 	SymbolCode            int                         `yaml:"-" json:"-"`
+	MaxNumber             int                         `yaml:"maxNumber" json:"maxNumber"`
+	Controllers           []*Award                    `yaml:"controllers" json:"controllers"`
+	JumpToComponent       string                      `yaml:"jumpToComponent" json:"jumpToComponent"`
 
 	// Symbols              []string                              `yaml:"symbols" json:"-"`
 	// SymbolCodes          []int                                 `yaml:"-" json:"symbols"`
 	// SourceWeight         string                                `yaml:"sourceWeight" json:"sourceWeight"`
 	// SourceWeightVW2      *sgc7game.ValWeights2                 `yaml:"-" json:"-"`
-	// MaxNumber            int                                   `yaml:"maxNumber" json:"maxNumber"`
-	// IsAlwaysGen     bool     `yaml:"isAlwaysGen" json:"isAlwaysGen"`
-	Controllers     []*Award `yaml:"controllers" json:"controllers"`
-	JumpToComponent string   `yaml:"jumpToComponent" json:"jumpToComponent"`
 	// StrTriggers          []string                              `yaml:"triggers" json:"-"`
 	// StrWeightOnReels     map[int]string                        `yaml:"weightOnReels" json:"weightOnReels"`
 	// WeightOnReels        map[int]*sgc7game.ValWeights2         `yaml:"-" json:"-"`
@@ -729,8 +731,8 @@ func (chgSymbols *ChgSymbols2) ProcControllers(gameProp *GameProperty, plugin sg
 }
 
 // getSrcPos
-func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
-	prs []*sgc7game.PlayResult, gs *sgc7game.GameScene) ([]int, error) {
+func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	gs *sgc7game.GameScene) ([]int, error) {
 
 	pos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
 
@@ -805,7 +807,7 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 
 	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	pos, err := chgSymbols.getSrcPos(gameProp, plugin, curpr, prs, gs)
+	pos, err := chgSymbols.getSrcPos(gameProp, plugin, gs)
 	if err != nil {
 		goutils.Error("ChgSymbols2.procPos:getSrcPos",
 			goutils.Err(err))
@@ -828,7 +830,7 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 	}
 
 	if chgSymbols.Config.Type == CS2TypeSymbol {
-		ngs, err := chgSymbols.procSymbolWithPos(gameProp, plugin, curpr, prs, gs, pos, chgSymbols.Config.SymbolCode)
+		ngs, err := chgSymbols.procSymbolWithPos(gameProp, gs, pos, chgSymbols.Config.SymbolCode)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWithPos",
 				goutils.Err(err))
@@ -838,9 +840,19 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	} else if chgSymbols.Config.Type == CS2TypeSymbolWeight {
-		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, plugin, curpr, prs, gs, pos, cd)
+		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWeightWithPos",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+	} else if chgSymbols.Config.Type == CS2TypeEachPosRandom {
+		ngs, err := chgSymbols.procEachPosRandomWithPos(gameProp, plugin, gs, pos, cd)
+		if err != nil {
+			goutils.Error("ChgSymbols2.procPos:procEachPosRandomWithPos",
 				goutils.Err(err))
 
 			return "", err
@@ -855,15 +867,29 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 }
 
 // procSymbolWithPos
-func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
-	prs []*sgc7game.PlayResult, gs *sgc7game.GameScene, pos []int, symbolCode int) (*sgc7game.GameScene, error) {
+func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sgc7game.GameScene, pos []int, symbolCode int) (*sgc7game.GameScene, error) {
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
-	for i := range len(pos) / 2 {
-		x := pos[i*2]
-		y := pos[i*2+1]
+	if chgSymbols2.Config.ExitType == CS2ETypeMaxNumber {
+		curnum := 0
+		for i := range len(pos) / 2 {
+			x := pos[i*2]
+			y := pos[i*2+1]
 
-		ngs.Arr[x][y] = symbolCode
+			ngs.Arr[x][y] = symbolCode
+
+			curnum++
+			if curnum >= chgSymbols2.Config.MaxNumber {
+				break
+			}
+		}
+	} else {
+		for i := range len(pos) / 2 {
+			x := pos[i*2]
+			y := pos[i*2+1]
+
+			ngs.Arr[x][y] = symbolCode
+		}
 	}
 
 	return ngs, nil
@@ -871,7 +897,7 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, plugin
 
 // procSymbolWeightWithPos
 func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
-	curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+	gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
 
 	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
 	curs, err := vw2.RandVal(plugin)
@@ -882,7 +908,72 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, 
 		return nil, err
 	}
 
-	return chgSymbols2.procSymbolWithPos(gameProp, plugin, curpr, prs, gs, pos, curs.Int())
+	return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, curs.Int())
+}
+
+// procEachPosRandomWithPos
+func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+
+	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
+
+	ngs := gs
+
+	if chgSymbols2.Config.ExitType == CS2ETypeMaxNumber {
+		curnum := 0
+		for i := range len(pos) / 2 {
+			x := pos[i*2]
+			y := pos[i*2+1]
+
+			curs, err := vw2.RandVal(plugin)
+			if err != nil {
+				goutils.Error("ChgSymbols2.procEachPosRandomWithPos:RandVal",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			sc := curs.Int()
+
+			if sc != chgSymbols2.Config.BlankSymbolCode {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				ngs.Arr[x][y] = sc
+
+				curnum++
+				if curnum >= chgSymbols2.Config.MaxNumber {
+					break
+				}
+			}
+		}
+	} else {
+		for i := range len(pos) / 2 {
+			x := pos[i*2]
+			y := pos[i*2+1]
+
+			curs, err := vw2.RandVal(plugin)
+			if err != nil {
+				goutils.Error("ChgSymbols2.procEachPosRandomWithPos:RandVal",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			sc := curs.Int()
+
+			if sc != chgSymbols2.Config.BlankSymbolCode {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				ngs.Arr[x][y] = sc
+			}
+		}
+	}
+
+	return ngs, nil
 }
 
 // // procMysteryWithPos
@@ -1172,6 +1263,7 @@ type jsonChgSymbols2 struct {
 	SrcPositionCollection []string `json:"srcPositionCollection"`
 	SrcSymbolWeight       string   `json:"srcSymbolWeight"`
 	Symbol                string   `json:"symbol"`
+	MaxNumber             int      `json:"maxNumber"`
 }
 
 func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
