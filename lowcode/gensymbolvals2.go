@@ -281,7 +281,7 @@ func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc
 		nos.Arr[x][y] = number
 	}
 
-	return os, nil
+	return nos, nil
 }
 
 func (genSymbolVals2 *GenSymbolVals2) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
@@ -369,7 +369,7 @@ func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc
 		nos.Arr[x][y] = cr.Int()
 	}
 
-	return os, nil
+	return nos, nil
 }
 
 // procAdd
@@ -446,7 +446,7 @@ func (genSymbolVals2 *GenSymbolVals2) procAdd(gameProp *GameProperty, os *sgc7ga
 		}
 	}
 
-	return os, nil
+	return nos, nil
 }
 
 // procMask
@@ -503,7 +503,7 @@ func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7g
 		}
 	}
 
-	return os, nil
+	return nos, nil
 }
 
 // playgame
