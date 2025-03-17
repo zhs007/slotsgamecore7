@@ -49,7 +49,7 @@ func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel 
 		goutils.Error("Game.Init2:InitStats",
 			goutils.Err(err))
 
-		return nil
+		return err
 	}
 
 	err = game.BuildGameConfigData()
@@ -57,7 +57,7 @@ func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel 
 		goutils.Error("Game.Init2:BuildGameConfigData",
 			goutils.Err(err))
 
-		return nil
+		return err
 	}
 
 	pool.onInit()
@@ -68,7 +68,7 @@ func (game *Game) Init2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel 
 			goutils.Error("Game.Init2:GenDefaultScene",
 				goutils.Err(err))
 
-			return nil
+			return err
 		}
 
 		cfg.DefaultScene = gs.ToString()

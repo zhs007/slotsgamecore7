@@ -512,6 +512,8 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 	cd := icd.(*BasicComponentData)
 
+	cd.UsedOtherScenes = nil
+
 	pos, err := genSymbolVals2.getSrcPos(gameProp, curpr, prs)
 	if err != nil {
 		goutils.Error("GenSymbolVals2.OnPlayGame:getSrcPos",
