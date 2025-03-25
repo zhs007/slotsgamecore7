@@ -19,6 +19,53 @@ import (
 
 const FeatureBar2TypeName = "featureBar2"
 
+type FeatureBar2PS struct {
+	Features []string `json:"features"` // features
+}
+
+// SetPublicJson
+func (ps *FeatureBar2PS) SetPublicJson(str string) error {
+	err := sonic.UnmarshalString(str, ps)
+	if err != nil {
+		goutils.Error("FeatureBar2PS.SetPublicJson:UnmarshalString",
+			goutils.Err(err))
+
+		return err
+	}
+
+	return nil
+}
+
+// SetPrivateJson
+func (ps *FeatureBar2PS) SetPrivateJson(str string) error {
+	return nil
+}
+
+// GetPublicJson
+func (ps *FeatureBar2PS) GetPublicJson() string {
+	str, err := sonic.MarshalString(ps)
+	if err != nil {
+		goutils.Error("FeatureBar2PS.GetPublicJson:MarshalString",
+			goutils.Err(err))
+
+		return ""
+	}
+
+	return str
+}
+
+// GetPrivateJson
+func (ps *FeatureBar2PS) GetPrivateJson() string {
+	return ""
+}
+
+// Clone
+func (ps *FeatureBar2PS) Clone() IComponentPS {
+	return &FeatureBar2PS{
+		Features: slices.Clone(ps.Features),
+	}
+}
+
 type FeatureBar2Data struct {
 	BasicComponentData
 	Features      []string
@@ -331,6 +378,38 @@ func (featureBar2 *FeatureBar2) NewComponentData() IComponentData {
 	return &FeatureBar2Data{
 		cfg: featureBar2.Config,
 	}
+}
+
+// InitPlayerState -
+func (featureBar2 *FeatureBar2) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	ps *PlayerState, betMethod int, bet int) error {
+
+	if featureBar2.Config.IsPlayerState {
+		bmd := ps.GetBetMethodPub(betMethod)
+		if bet <= 0 {
+			return nil
+		}
+
+		bps := bmd.GetBetPS(bet)
+
+		_, isok := bps.MapComponentData[featureBar2.GetName()]
+		if !isok {
+			cps := &FeatureBar2PS{}
+
+			// vw := featureBar2.Config.FeatureWeight
+
+			// for range featureBar2.Config.Length {
+
+			// }
+
+			bps.MapComponentData[featureBar2.GetName()] = cps
+		}
+	}
+	// ps := gameProp.PlayerState
+
+	// for gameProp.Pool.mapComponents
+
+	return nil
 }
 
 func NewFeatureBar2(name string) IComponent {

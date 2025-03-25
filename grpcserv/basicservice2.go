@@ -42,7 +42,7 @@ func (bs *BasicService2) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *
 			return err
 		}
 
-		ps.SetPrivate(&sgc7game.BasicPlayerPrivateState{})
+		ps.SetPublicJson(pri.Json)
 	}
 
 	return nil

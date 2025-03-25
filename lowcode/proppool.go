@@ -580,18 +580,23 @@ func (pool *GamePropertyPool) GetComponentList(bet int) *ComponentList {
 	return pool.mapComponents[bet]
 }
 
-// func newGamePropertyPool(cfgfn string) (*GamePropertyPool, error) {
-// 	cfg, err := LoadConfig(cfgfn)
-// 	if err != nil {
-// 		goutils.Error("newGamePropertyPool:LoadConfig",
-// 			slog.String("cfgfn", cfgfn),
-// 			goutils.Err(err))
+func (pool *GamePropertyPool) NewPlayerState() (*PlayerState, error) {
+	ps := NewPlayerState()
 
-// 		return nil, err
-// 	}
+	for betMethod, components := range pool.mapComponents {
+		for _, c := range components.Components {
+			err := c.InitPlayerState(pool, nil, nil, ps, betMethod, 0)
+			if err != nil {
+				goutils.Error("GamePropertyPool.NewPlayerState:InitPlayerState",
+					goutils.Err(err))
 
-// 	return newGamePropertyPool2(cfg)
-// }
+				return nil, err
+			}
+		}
+	}
+
+	return ps, nil
+}
 
 func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{

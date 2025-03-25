@@ -90,14 +90,32 @@ func (game *Game) CheckStake(stake *sgc7game.Stake) error {
 
 // NewPlayerState - new playerstate
 func (game *Game) NewPlayerState() sgc7game.IPlayerState {
-	return &sgc7game.BasicPlayerState{}
+	ps, err := game.Pool.NewPlayerState()
+	if err != nil {
+		goutils.Error("Game.NewPlayerState:NewPlayerState",
+			goutils.Err(err))
+
+		return nil
+	}
+
+	// bps := sgc7game.NewBasicPlayerState(BasicGameModName)
+
+	return ps
 }
 
 // Initialize - initialize PlayerState
 func (game *Game) Initialize() sgc7game.IPlayerState {
-	bps := sgc7game.NewBasicPlayerState(BasicGameModName)
+	ps, err := game.Pool.NewPlayerState()
+	if err != nil {
+		goutils.Error("Game.Initialize:NewPlayerState",
+			goutils.Err(err))
 
-	return bps
+		return nil
+	}
+
+	// bps := sgc7game.NewBasicPlayerState(BasicGameModName)
+
+	return ps
 }
 
 // ResetConfig

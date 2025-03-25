@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 
-	data, err := os.ReadFile("../data/game002.json")
+	data, err := os.ReadFile("../data/game.json")
 	if err != nil {
 		goutils.Error("ReadFile",
 			goutils.Err(err))

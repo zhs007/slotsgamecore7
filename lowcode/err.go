@@ -208,4 +208,7 @@ var (
 
 	// ErrCanNotGenDefaultScene - can not gen default scene
 	ErrCanNotGenDefaultScene = errors.New("can not gen default scene")
+
+	// ErrDeprecatedAPI - deprecated API
+	ErrDeprecatedAPI = errors.New("deprecated API")
 )
