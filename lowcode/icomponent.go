@@ -119,4 +119,7 @@ type IComponent interface {
 	// 2 种调用时机，一个是玩家第一次初始化时，这时 bet 为 0，gameProp 和 plugin 为 nil
 	// 另外一个是玩家下注时，这时 bet、gameProp、plugin 都有效
 	InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, ps *PlayerState, betMethod int, bet int) error
+
+	// NewPlayerState - new IComponentPS
+	NewPlayerState() IComponentPS
 }

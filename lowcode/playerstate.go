@@ -7,7 +7,8 @@ import (
 )
 
 type BetPS struct {
-	MapComponentData map[string]IComponentPS `json:"mapComponentData"`
+	MapString        map[string]string       `json:"mapComponentData"`
+	MapComponentData map[string]IComponentPS `json:"-"`
 }
 
 type BetMethodPS struct {
