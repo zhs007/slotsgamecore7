@@ -212,6 +212,8 @@ func procSpin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, 
 
 	defer game.DeleteGameData(gameData)
 
+	game.OnBet(plugin, cmd, params, ips, stake, results, gameData)
+
 	for {
 		if cmd == "" {
 			cmd = "SPIN"

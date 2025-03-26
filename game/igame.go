@@ -33,4 +33,7 @@ type IGame interface {
 
 	// ResetConfig
 	ResetConfig(cfg any)
+
+	// OnBet
+	OnBet(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState, stake *Stake, prs []*PlayResult, gameData any) error
 }

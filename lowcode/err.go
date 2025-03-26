@@ -66,6 +66,9 @@ var (
 	// ErrIvalidGameData - invalid gameData
 	ErrIvalidGameData = errors.New("invalid gameData")
 
+	// ErrIvalidPlayerState - invalid playerState
+	ErrIvalidPlayerState = errors.New("invalid playerState")
+
 	// ErrIvalidSimpleRNG - invalid SimpleRNG
 	ErrIvalidSimpleRNG = errors.New("invalid SimpleRNG")
 

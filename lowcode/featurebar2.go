@@ -396,18 +396,23 @@ func (featureBar2 *FeatureBar2) InitPlayerState(pool *GamePropertyPool, gameProp
 		if !isok {
 			cps := &FeatureBar2PS{}
 
-			// vw := featureBar2.Config.FeatureWeight
+			vw := featureBar2.Config.FeatureWeight
 
-			// for range featureBar2.Config.Length {
+			for range featureBar2.Config.Length {
+				val, err := vw.RandVal(plugin)
+				if err != nil {
+					goutils.Error("FeatureBar2.InitPlayerState:RandVal",
+						goutils.Err(err))
 
-			// }
+					return err
+				}
+
+				cps.Features = append(cps.Features, val.String())
+			}
 
 			bps.MapComponentData[featureBar2.GetName()] = cps
 		}
 	}
-	// ps := gameProp.PlayerState
-
-	// for gameProp.Pool.mapComponents
 
 	return nil
 }

@@ -56,11 +56,27 @@ func (ps *PlayerState) SetPrivate(pri any) error {
 
 // SetPublicJson - set player public state
 func (ps *PlayerState) SetPublicJson(pub string) error {
+	err := sonic.UnmarshalString(pub, &ps.MapBetMothodPub)
+	if err != nil {
+		goutils.Error("PlayerState.SetPublicJson",
+			goutils.Err(err))
+
+		return err
+	}
+
 	return nil
 }
 
 // SetPrivateJson - set player private state
 func (ps *PlayerState) SetPrivateJson(pri string) error {
+	err := sonic.UnmarshalString(pri, &ps.MapBetMothodPri)
+	if err != nil {
+		goutils.Error("PlayerState.SetPrivateJson",
+			goutils.Err(err))
+
+		return err
+	}
+
 	return nil
 }
 

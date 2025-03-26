@@ -583,11 +583,17 @@ func (pool *GamePropertyPool) GetComponentList(bet int) *ComponentList {
 func (pool *GamePropertyPool) NewPlayerState() (*PlayerState, error) {
 	ps := NewPlayerState()
 
+	return ps, nil
+}
+
+func (pool *GamePropertyPool) InitPlayerState() (*PlayerState, error) {
+	ps := NewPlayerState()
+
 	for betMethod, components := range pool.mapComponents {
 		for _, c := range components.Components {
 			err := c.InitPlayerState(pool, nil, nil, ps, betMethod, 0)
 			if err != nil {
-				goutils.Error("GamePropertyPool.NewPlayerState:InitPlayerState",
+				goutils.Error("GamePropertyPool.InitPlayerState:InitPlayerState",
 					goutils.Err(err))
 
 				return nil, err
@@ -596,6 +602,26 @@ func (pool *GamePropertyPool) NewPlayerState() (*PlayerState, error) {
 	}
 
 	return ps, nil
+}
+
+func (pool *GamePropertyPool) InitPlayerStateOnBet(gameProp *GameProperty, plugin sgc7plugin.IPlugin, ps *PlayerState,
+	stake *sgc7game.Stake) error {
+
+	betMethod := stake.CashBet / stake.CoinBet
+	components, isok := pool.mapComponents[int(betMethod)]
+	if isok {
+		for _, c := range components.Components {
+			err := c.InitPlayerState(pool, gameProp, plugin, ps, int(betMethod), int(stake.CoinBet))
+			if err != nil {
+				goutils.Error("GamePropertyPool.InitPlayerStateOnBet:InitPlayerState",
+					goutils.Err(err))
+
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*GamePropertyPool, error) {

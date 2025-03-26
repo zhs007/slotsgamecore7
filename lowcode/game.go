@@ -5,6 +5,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
+	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	sgc7ver "github.com/zhs007/slotsgamecore7/ver"
 )
 
@@ -89,6 +90,8 @@ func (game *Game) CheckStake(stake *sgc7game.Stake) error {
 }
 
 // NewPlayerState - new playerstate
+// NewPlayerState 用于 new 一个空的 playerstate，不需要 initial ，后面会 reset 数据
+// Initialize 用于直接 生成一个 playerstate，并初始化它
 func (game *Game) NewPlayerState() sgc7game.IPlayerState {
 	ps, err := game.Pool.NewPlayerState()
 	if err != nil {
@@ -98,22 +101,18 @@ func (game *Game) NewPlayerState() sgc7game.IPlayerState {
 		return nil
 	}
 
-	// bps := sgc7game.NewBasicPlayerState(BasicGameModName)
-
 	return ps
 }
 
 // Initialize - initialize PlayerState
 func (game *Game) Initialize() sgc7game.IPlayerState {
-	ps, err := game.Pool.NewPlayerState()
+	ps, err := game.Pool.InitPlayerState()
 	if err != nil {
-		goutils.Error("Game.Initialize:NewPlayerState",
+		goutils.Error("Game.Initialize:InitPlayerState",
 			goutils.Err(err))
 
 		return nil
 	}
-
-	// bps := sgc7game.NewBasicPlayerState(BasicGameModName)
 
 	return ps
 }
@@ -224,6 +223,30 @@ func (game *Game) SaveParSheet(f *excelize.File) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+// OnBet
+func (game *Game) OnBet(plugin sgc7plugin.IPlugin, cmd string, param string, ips sgc7game.IPlayerState,
+	stake *sgc7game.Stake, prs []*sgc7game.PlayResult, gameData any) error {
+	gameProp, isok := gameData.(*GameProperty)
+	if !isok {
+		goutils.Error("Game.OnBet:GameProperty",
+			goutils.Err(ErrIvalidGameData))
+
+		return ErrIvalidGameData
+	}
+
+	ps, isok := ips.(*PlayerState)
+	if !isok {
+		goutils.Error("Game.OnBet:PlayerState",
+			goutils.Err(ErrIvalidPlayerState))
+
+		return ErrIvalidPlayerState
+	}
+
+	game.Pool.InitPlayerStateOnBet(gameProp, plugin, ps, stake)
 
 	return nil
 }

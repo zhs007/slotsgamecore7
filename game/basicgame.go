@@ -113,3 +113,10 @@ func (game *BasicGame) NewGameData(stake *Stake) IGameData {
 func (game *BasicGame) DeleteGameData(gamed IGameData) {
 
 }
+
+// OnBet
+func (game *BasicGame) OnBet(plugin sgc7plugin.IPlugin, cmd string, param string, ps IPlayerState,
+	stake *Stake, prs []*PlayResult, gameData any) error {
+
+	return nil
+}
