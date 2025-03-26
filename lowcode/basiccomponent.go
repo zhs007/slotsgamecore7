@@ -277,6 +277,11 @@ func (basicComponent *BasicComponent) InitPlayerState(pool *GamePropertyPool, ga
 	return nil
 }
 
+// NewPlayerState - new IComponentPS
+func (basicComponent *BasicComponent) NewPlayerState() IComponentPS {
+	return nil
+}
+
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
 		Name:        name,

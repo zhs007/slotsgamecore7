@@ -458,25 +458,35 @@ func (featureBar2 *FeatureBar2) InitPlayerState(pool *GamePropertyPool, gameProp
 
 		bps := bmd.GetBetPS(bet)
 
-		_, isok := bps.MapComponentData[featureBar2.GetName()]
+		cname := featureBar2.GetName()
+
+		_, isok := bps.MapComponentData[cname]
 		if !isok {
-			cps := &FeatureBar2PS{}
+			str, isok := bps.MapString[cname]
+			if isok {
+				cps := &FeatureBar2PS{}
+				cps.SetPublicJson(str)
 
-			vw := featureBar2.Config.FeatureWeight
+				bps.MapComponentData[cname] = cps
+			} else {
+				cps := &FeatureBar2PS{}
 
-			for range featureBar2.Config.Length {
-				val, err := vw.RandVal(plugin)
-				if err != nil {
-					goutils.Error("FeatureBar2.InitPlayerState:RandVal",
-						goutils.Err(err))
+				vw := featureBar2.Config.FeatureWeight
 
-					return err
+				for range featureBar2.Config.Length {
+					val, err := vw.RandVal(plugin)
+					if err != nil {
+						goutils.Error("FeatureBar2.InitPlayerState:RandVal",
+							goutils.Err(err))
+
+						return err
+					}
+
+					cps.Features = append(cps.Features, val.String())
 				}
 
-				cps.Features = append(cps.Features, val.String())
+				bps.MapComponentData[featureBar2.GetName()] = cps
 			}
-
-			bps.MapComponentData[featureBar2.GetName()] = cps
 		}
 	}
 
