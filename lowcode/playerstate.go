@@ -27,6 +27,20 @@ func (bmps *BetMethodPS) GetBetPS(bet int) *BetPS {
 	return bps
 }
 
+func (bmps *BetMethodPS) GetBetCPS(bet int, componentName string) IComponentPS {
+	bps, isok := bmps.MapBet[bet]
+	if !isok {
+		return nil
+	}
+
+	cps, isok := bps.MapComponentData[componentName]
+	if !isok {
+		return nil
+	}
+
+	return cps
+}
+
 func (bmps *BetMethodPS) HasBetPS(bet int) bool {
 	_, isok := bmps.MapBet[bet]
 	return isok

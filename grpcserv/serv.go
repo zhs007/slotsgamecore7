@@ -207,6 +207,8 @@ func (serv *Serv) onPlay(req *sgc7pb.RequestPlay) (*sgc7pb.ReplyPlay, error) {
 
 	cmd := req.Command
 
+	serv.game.OnBet(plugin, cmd, req.ClientParams, ips, stake, results, gameData)
+
 	for {
 		if cmd == "" {
 			cmd = "SPIN"
