@@ -66,6 +66,9 @@ var (
 	// ErrIvalidGameData - invalid gameData
 	ErrIvalidGameData = errors.New("invalid gameData")
 
+	// ErrIvalidPlayerState - invalid playerState
+	ErrIvalidPlayerState = errors.New("invalid playerState")
+
 	// ErrIvalidSimpleRNG - invalid SimpleRNG
 	ErrIvalidSimpleRNG = errors.New("invalid SimpleRNG")
 
@@ -208,4 +211,7 @@ var (
 
 	// ErrCanNotGenDefaultScene - can not gen default scene
 	ErrCanNotGenDefaultScene = errors.New("can not gen default scene")
+
+	// ErrDeprecatedAPI - deprecated API
+	ErrDeprecatedAPI = errors.New("deprecated API")
 )

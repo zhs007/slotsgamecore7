@@ -19,6 +19,53 @@ import (
 
 const FeatureBar2TypeName = "featureBar2"
 
+type FeatureBar2PS struct {
+	Features []string `json:"features"` // features
+}
+
+// SetPublicJson
+func (ps *FeatureBar2PS) SetPublicJson(str string) error {
+	err := sonic.UnmarshalString(str, ps)
+	if err != nil {
+		goutils.Error("FeatureBar2PS.SetPublicJson:UnmarshalString",
+			goutils.Err(err))
+
+		return err
+	}
+
+	return nil
+}
+
+// SetPrivateJson
+func (ps *FeatureBar2PS) SetPrivateJson(str string) error {
+	return nil
+}
+
+// GetPublicJson
+func (ps *FeatureBar2PS) GetPublicJson() string {
+	str, err := sonic.MarshalString(ps)
+	if err != nil {
+		goutils.Error("FeatureBar2PS.GetPublicJson:MarshalString",
+			goutils.Err(err))
+
+		return ""
+	}
+
+	return str
+}
+
+// GetPrivateJson
+func (ps *FeatureBar2PS) GetPrivateJson() string {
+	return ""
+}
+
+// Clone
+func (ps *FeatureBar2PS) Clone() IComponentPS {
+	return &FeatureBar2PS{
+		Features: slices.Clone(ps.Features),
+	}
+}
+
 type FeatureBar2Data struct {
 	BasicComponentData
 	Features      []string
@@ -261,9 +308,75 @@ func (featureBar2 *FeatureBar2) isClear(basicCD *BasicComponentData) bool {
 
 // playgame
 func (featureBar2 *FeatureBar2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
+	cmd string, param string, ips sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*FeatureBar2Data)
+
+	if featureBar2.Config.IsPlayerState {
+		ps, isok := ips.(*PlayerState)
+		if !isok {
+			goutils.Error("FeatureBar2.OnPlayGame:PlayerState",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return "", ErrIvalidPlayerState
+		}
+
+		betMethod := stake.CashBet / stake.CoinBet
+		bmd := ps.GetBetMethodPub(int(betMethod))
+		if bmd == nil {
+			goutils.Error("FeatureBar2.OnPlayGame:GetBetMethodPub",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return "", ErrIvalidPlayerState
+		}
+
+		cps := bmd.GetBetCPS(int(stake.CoinBet), featureBar2.GetName())
+		if cps == nil {
+			goutils.Error("FeatureBar2.OnPlayGame:GetBetCPS",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return "", ErrIvalidPlayerState
+		}
+
+		fbps, isok := cps.(*FeatureBar2PS)
+		if !isok {
+			goutils.Error("FeatureBar2.OnPlayGame:FeatureBar2PS",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return "", ErrIvalidPlayerState
+		}
+
+		if len(fbps.Features) != featureBar2.Config.Length {
+			goutils.Error("FeatureBar2.OnPlayGame:FeatureBar2PS.Features",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return "", ErrIvalidPlayerState
+		}
+
+		cd.CurFeature = fbps.Features[0]
+		fbps.Features = fbps.Features[1:]
+
+		vw := featureBar2.getWeight(gameProp, cd)
+
+		feature, err := vw.RandVal(plugin)
+		if err != nil {
+			goutils.Error("FeatureBar2.OnPlayGame:IsPlayerState:RandVal",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		fbps.Features = append(fbps.Features, feature.String())
+
+		cd.UsedFeatures = append(cd.UsedFeatures, cd.CurFeature)
+		cd.Features = slices.Clone(fbps.Features)
+
+		featureBar2.ProcControllers(gameProp, plugin, curpr, gp, -1, cd.CurFeature)
+
+		nc := featureBar2.onStepEnd(gameProp, curpr, gp, featureBar2.Config.MapBranch[cd.CurFeature])
+
+		return nc, nil
+	}
 
 	if featureBar2.isClear(&cd.BasicComponentData) {
 		cd.Features = nil
@@ -331,6 +444,43 @@ func (featureBar2 *FeatureBar2) NewComponentData() IComponentData {
 	return &FeatureBar2Data{
 		cfg: featureBar2.Config,
 	}
+}
+
+// InitPlayerState -
+func (featureBar2 *FeatureBar2) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	ps *PlayerState, betMethod int, bet int) error {
+
+	if featureBar2.Config.IsPlayerState {
+		bmd := ps.GetBetMethodPub(betMethod)
+		if bet <= 0 {
+			return nil
+		}
+
+		bps := bmd.GetBetPS(bet)
+
+		_, isok := bps.MapComponentData[featureBar2.GetName()]
+		if !isok {
+			cps := &FeatureBar2PS{}
+
+			vw := featureBar2.Config.FeatureWeight
+
+			for range featureBar2.Config.Length {
+				val, err := vw.RandVal(plugin)
+				if err != nil {
+					goutils.Error("FeatureBar2.InitPlayerState:RandVal",
+						goutils.Err(err))
+
+					return err
+				}
+
+				cps.Features = append(cps.Features, val.String())
+			}
+
+			bps.MapComponentData[featureBar2.GetName()] = cps
+		}
+	}
+
+	return nil
 }
 
 func NewFeatureBar2(name string) IComponent {

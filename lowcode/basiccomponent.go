@@ -48,22 +48,6 @@ func (basicComponent *BasicComponent) OnPlayGame(gameProp *GameProperty, curpr *
 	return nil
 }
 
-// // OnStats -
-// func (basicComponent *BasicComponent) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // onInit -
-// func (basicComponent *BasicComponent) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-// 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
-
-// 	// for k, v := range basicComponent.Config.InitStrVals {
-// 	// 	gameProp.TagGlobalStr(k, v)
-// 	// }
-
-// 	return nil
-// }
-
 // onInit -
 func (basicComponent *BasicComponent) onInit(cfg *BasicComponentConfig) {
 	basicComponent.Config = cfg
@@ -75,40 +59,8 @@ func (basicComponent *BasicComponent) onStepEnd(_ *GameProperty, _ *sgc7game.Pla
 		nextComponent = basicComponent.Config.DefaultNextComponent
 	}
 
-	// component, isok := gameProp.Components.MapComponents[nextComponent]
-	// if isok && component.IsRespin() {
-	// 	// gameProp.SetStrVal(GamePropRespinComponent, nextComponent)
-	// 	// gameProp.onTriggerRespin(nextComponent)
-
-	// 	// gp.NextStepFirstComponent = nextComponent
-
-	// 	// gameProp.SetStrVal(GamePropNextComponent, "")
-
-	// 	return nextComponent
-	// }
-
-	// gameProp.SetStrVal(GamePropNextComponent, nextComponent)
-
 	return nextComponent
 }
-
-// // OnNewGame -
-// func (basicComponent *BasicComponent) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.GetCurComponentData(basicComponent)
-
-// 	cd.OnNewGame()
-
-// 	return nil
-// }
-
-// // OnNewStep -
-// func (basicComponent *BasicComponent) OnNewStep(gameProp *GameProperty) error {
-// 	cd := gameProp.GetCurComponentData(basicComponent)
-
-// 	cd.OnNewStep()
-
-// 	return nil
-// }
 
 // AddScene -
 func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
@@ -122,18 +74,6 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 
 	gameProp.SceneStack.Push(basicComponent.Name, sc)
 }
-
-// // ReTagScene -
-// func (basicComponent *BasicComponent) ReTagScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
-// 	si int, basicCD *BasicComponentData) {
-
-// 	usi := len(basicCD.UsedScenes)
-// 	basicCD.UsedScenes = append(basicCD.UsedScenes, si)
-
-// 	if usi < len(basicComponent.Config.TagScenes) {
-// 		gameProp.TagScene(curpr, basicComponent.Config.TagScenes[usi], si)
-// 	}
-// }
 
 // AddOtherScene -
 func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
@@ -150,13 +90,6 @@ func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curp
 
 // ClearOtherScene -
 func (basicComponent *BasicComponent) ClearOtherScene(gameProp *GameProperty) {
-	// if basicComponent.Config.UseSceneV2 {
-	// 	if len(basicComponent.Config.OtherScene2Components) > 0 {
-	// 		for _, v := range basicComponent.Config.OtherScene2Components {
-	// 			gameProp.ClearComponentOtherScene(v)
-	// 		}
-	// 	}
-	// }
 }
 
 // AddResult -
@@ -164,86 +97,10 @@ func (basicComponent *BasicComponent) AddResult(curpr *sgc7game.PlayResult, ret 
 	basicCD.CoinWin += ret.CoinWin
 	basicCD.CashWin += int64(ret.CashWin)
 
-	// curpr.CashWin += int64(ret.CashWin)
-	// curpr.CoinWin += ret.CoinWin
-
 	basicCD.UsedResults = append(basicCD.UsedResults, len(curpr.Results))
 
 	curpr.Results = append(curpr.Results, ret)
 }
-
-// // AddRNG -
-// func (basicComponent *BasicComponent) AddRNG(gameProp *GameProperty, rng int, basicCD *BasicComponentData) {
-// 	i := len(basicCD.RNG)
-
-// 	basicCD.RNG = append(basicCD.RNG, rng)
-
-// 	if len(basicComponent.Config.TagRNG) > i {
-// 		gameProp.TagInt(basicComponent.Config.TagRNG[i], rng)
-// 	}
-// }
-
-// // OnStatsWithPB -
-// func (basicComponent *BasicComponent) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.BasicComponentData)
-// 	if !isok {
-// 		goutils.Error("BasicComponent.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
-
-// 		return 0, ErrIvalidProto
-// 	}
-
-// 	return basicComponent.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
-// // OnStatsWithComponent -
-// func (basicComponent *BasicComponent) OnStatsWithPBBasicComponentData(feature *sgc7stats.Feature, pbComponent *sgc7pb.ComponentData, pr *sgc7game.PlayResult) int64 {
-// 	wins := int64(0)
-
-// 	for _, v := range pbComponent.UsedResults {
-// 		ret := pr.Results[v]
-
-// 		feature.Symbols.OnWin(ret)
-
-// 		wins += int64(ret.CashWin)
-// 	}
-
-// 	if pbComponent.TargetScene >= 0 {
-// 		feature.Reels.OnScene(pr.Scenes[pbComponent.TargetScene])
-// 	}
-
-// 	return wins
-// }
-
-// // GetTargetScene -
-// func (basicComponent *BasicComponent) GetTargetScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, targetScene string) *sgc7game.GameScene {
-// 	if targetScene == "" {
-// 		if basicComponent.Config.TargetGlobalScene != "" {
-// 			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
-// 		} else {
-// 			targetScene = basicComponent.Config.TargetScene
-// 		}
-// 	}
-
-// 	gs, si := gameProp.GetScene(curpr, targetScene)
-
-// 	if si >= 0 {
-// 		basicCD.TargetSceneIndex = si
-// 	}
-
-// 	return gs
-// }
-
-// // GetTargetOtherScene -
-// func (basicComponent *BasicComponent) GetTargetOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData) *sgc7game.GameScene {
-// 	gs, si := gameProp.GetOtherScene(curpr, basicComponent.Config.TargetOtherScene)
-
-// 	if si >= 0 {
-// 		basicCD.TargetOtherSceneIndex = si
-// 	}
-
-// 	return gs
-// }
 
 // NewComponentData -
 func (basicComponent *BasicComponent) NewComponentData() IComponentData {
@@ -283,16 +140,6 @@ func (basicComponent *BasicComponent) GetName() string {
 	return basicComponent.Name
 }
 
-// // SetMask -
-// func (basicComponent *BasicComponent) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, mask []bool) error {
-// 	return ErrNotMask
-// }
-
-// // GetMask -
-// func (basicComponent *BasicComponent) GetMask(gameProp *GameProperty) []bool {
-// 	return nil
-// }
-
 // IsRespin -
 func (basicComponent *BasicComponent) IsRespin() bool {
 	return false
@@ -303,55 +150,14 @@ func (basicComponent *BasicComponent) IsForeach() bool {
 	return false
 }
 
-// // IsTriggerRespin -
-// func (basicComponent *BasicComponent) IsTriggerRespin() bool {
-// 	return false
-// }
-
 // IsMask -
 func (basicComponent *BasicComponent) IsMask() bool {
 	return false
 }
 
-// func (basicComponent *BasicComponent) GetTargetScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
-// 	if basicComponent.Config.UseSceneV2 {
-// 		return gameProp.GetComponentScene(component)
-// 	}
-
-// 	if tag == "" {
-// 		if basicComponent.Config.TargetGlobalScene != "" {
-// 			return gameProp.GetGlobalScene(basicComponent.Config.TargetGlobalScene)
-// 		} else {
-// 			tag = basicComponent.Config.TargetScene
-// 		}
-// 	}
-
-// 	gs, si := gameProp.GetScene(curpr, tag)
-
-// 	if si >= 0 {
-// 		basicCD.TargetSceneIndex = si
-// 	}
-
-// 	return gs
-// }
-
 func (basicComponent *BasicComponent) GetTargetScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, si int) *sgc7game.GameScene {
 	return gameProp.SceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
 }
-
-// func (basicComponent *BasicComponent) GetTargetOtherScene2(gameProp *GameProperty, curpr *sgc7game.PlayResult, basicCD *BasicComponentData, component string, tag string) *sgc7game.GameScene {
-// 	if basicComponent.Config.UseSceneV2 {
-// 		return gameProp.GetComponentOtherScene(component)
-// 	}
-
-// 	if tag == "" {
-// 		tag = basicComponent.Config.TargetOtherScene
-// 	}
-
-// 	gs, _ := gameProp.GetOtherScene(curpr, tag)
-
-// 	return gs
-// }
 
 func (basicComponent *BasicComponent) GetTargetOtherScene3(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, si int) *sgc7game.GameScene {
 	return gameProp.OtherSceneStack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
@@ -377,27 +183,6 @@ func (basicComponent *BasicComponent) ProcControllers(gameProp *GameProperty, pl
 
 }
 
-// // OnStats2Trigger
-// func (basicComponent *BasicComponent) OnStats2Trigger(s2 *Stats2) {
-
-// }
-
-// // GetSymbols -
-// func (basicComponent *BasicComponent) GetSymbols(gameProp *GameProperty) []int {
-// 	return nil
-// }
-
-// // AddSymbol -
-// func (basicComponent *BasicComponent) AddSymbol(gameProp *GameProperty, symbol int) {
-
-// }
-
-// // OnEachSymbol - on foreach symbol
-// func (basicComponent *BasicComponent) OnEachSymbol(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState,
-// 	stake *sgc7game.Stake, prs []*sgc7game.PlayResult, symbol int, cd IComponentData) (string, error) {
-// 	return "", nil
-// }
-
 // EachSymbols - foreach symbols
 func (basicComponent *BasicComponent) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake,
 	prs []*sgc7game.PlayResult, cd IComponentData) error {
@@ -408,22 +193,6 @@ func (basicComponent *BasicComponent) EachSymbols(gameProp *GameProperty, curpr 
 func (basicComponent *BasicComponent) AddPos(cd IComponentData, x int, y int) {
 
 }
-
-// // GetComponentData -
-// func (basicComponent *BasicComponent) GetComponentData(gameProp *GameProperty) IComponentData {
-// 	return gameProp.GetCurComponentData(basicComponent)
-
-// 	if basicComponent.dataForeachSymbol != nil {
-// 		return gameProp.MapComponentData[fmt.Sprintf("%v:%v", basicComponent.Name, basicComponent.dataForeachSymbol.Index)]
-// 	}
-
-// 	return gameProp.MapComponentData[basicComponent.Name]
-// }
-
-// // SetForeachSymbolData -
-// func (basicComponent *BasicComponent) SetForeachSymbolData(data *ForeachSymbolData) {
-// 	basicComponent.dataForeachSymbol = data
-// }
 
 // OnGameInited - on game inited
 func (basicComponent *BasicComponent) OnGameInited(components *ComponentList) error {
@@ -499,6 +268,13 @@ func (basicComponent *BasicComponent) GetBranchWeights() []int {
 // ClearData -
 func (basicComponent *BasicComponent) ClearData(icd IComponentData, bForceNow bool) {
 
+}
+
+// InitPlayerState -
+func (basicComponent *BasicComponent) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty,
+	plugin sgc7plugin.IPlugin, ps *PlayerState, betMethod int, bet int) error {
+
+	return nil
 }
 
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
