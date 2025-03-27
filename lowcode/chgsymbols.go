@@ -569,6 +569,10 @@ func (chgSymbols *ChgSymbols) procRandomWithNoTrigger(gameProp *GameProperty, cd
 	for {
 		pi := 0
 
+		if len(posx) == 0 {
+			break
+		}
+
 		if len(posx) > 1 {
 			pi1, err := plugin.Random(context.Background(), len(posx))
 			if err != nil {
