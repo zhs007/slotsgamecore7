@@ -261,9 +261,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 		components.Stats2.PushCache(gameProp.stats2Cache)
 
 		if components.RngLib != nil {
-			rets := make([]*sgc7game.PlayResult, 0, len(prs)+1)
+			rets := make([]*sgc7game.PlayResult, len(prs)+1)
 			copy(rets, prs)
-			rets = append(rets, pr)
+			rets[len(prs)] = pr
 
 			rngname := components.RngLib.onResults(rets)
 			if rngname != "" {
