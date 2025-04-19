@@ -408,6 +408,14 @@ message FeatureBar2Data {
     repeated string cacheFeatures = 5;
 }
 
+// FeaturePickData
+message FeaturePickData {
+    ComponentData basicComponentData = 1;
+    repeated string selected = 2;
+    repeated string unSelected = 3;
+    repeated string curSelected = 4;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
