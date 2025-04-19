@@ -158,6 +158,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(MergePositionCollectionTypeName, NewMergePositionCollection)
 	mgr.Reg(FeatureBar2TypeName, NewFeatureBar2)
 	mgr.Reg(ChgSymbols2TypeName, NewChgSymbols2)
+	mgr.Reg(FeaturePickTypeName, NewFeaturePick)
 
 	return mgr
 }
