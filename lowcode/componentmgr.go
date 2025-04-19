@@ -159,6 +159,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(FeatureBar2TypeName, NewFeatureBar2)
 	mgr.Reg(ChgSymbols2TypeName, NewChgSymbols2)
 	mgr.Reg(FeaturePickTypeName, NewFeaturePick)
+	mgr.Reg(ReelsCollectorTypeName, NewReelsCollector)
 
 	return mgr
 }
