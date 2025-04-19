@@ -160,7 +160,7 @@ func (featurePick *FeaturePick) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	cd.onNewStep()
 
 	if cd.UnSelected == nil && cd.Selected == nil && featurePick.Config.PoolSize > 0 {
-		vw := featurePick.getWeight(gameProp, &cd.BasicComponentData)
+		vw := featurePick.getWeight(gameProp, &cd.BasicComponentData).Clone()
 		cd.UnSelected = make([]string, featurePick.Config.PoolSize)
 
 		for i := range featurePick.Config.PoolSize {
@@ -180,9 +180,15 @@ func (featurePick *FeaturePick) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	pickNum := featurePick.getPickNum(gameProp, &cd.BasicComponentData)
 
 	if pickNum > 0 {
-		cd.CurSelected = make([]string, pickNum)
-		for i := range pickNum {
-			ci, err := plugin.Random(context.Background(), pickNum-i)
+		curPickNum := pickNum
+		if pickNum > len(cd.UnSelected) {
+			curPickNum = len(cd.UnSelected)
+		}
+
+		cd.CurSelected = make([]string, curPickNum)
+
+		for i := range curPickNum {
+			ci, err := plugin.Random(context.Background(), curPickNum-i)
 			if err != nil {
 				goutils.Error("FeaturePick.OnPlayGame:Random",
 					goutils.Err(err))
@@ -194,6 +200,10 @@ func (featurePick *FeaturePick) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			featurePick.ProcControllers(gameProp, plugin, curpr, gp, -1, cd.UnSelected[ci])
 
 			cd.UnSelected = slices.Delete(cd.UnSelected, ci, ci+1)
+		}
+
+		if pickNum > curPickNum {
+
 		}
 
 		nc := featurePick.onStepEnd(gameProp, curpr, gp, "")
