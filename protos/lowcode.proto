@@ -420,6 +420,7 @@ message FeaturePickData {
 message ReelsCollectorData {
     ComponentData basicComponentData = 1;
     repeated int32 Collectors = 2;
+    repeated int32 lastTriggerIndex = 3;
 }
 
 // GameParam

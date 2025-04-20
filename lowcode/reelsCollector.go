@@ -34,7 +34,8 @@ func parseReelsCollectorTriggerType(str string) ReelsCollectorTriggerType {
 }
 
 type ReelsCollectorPS struct {
-	Collectors []int `json:"collectors"` // collectors
+	Collectors       []int `json:"collectors"`       // collectors
+	LastTriggerIndex []int `json:"lastTriggerIndex"` // lastTriggerIndex
 }
 
 // SetPublicJson
@@ -82,7 +83,8 @@ func (ps *ReelsCollectorPS) Clone() IComponentPS {
 
 type ReelsCollectorData struct {
 	BasicComponentData
-	Collectors []int
+	Collectors       []int
+	LastTriggerIndex []int
 }
 
 // OnNewGame -
@@ -97,6 +99,7 @@ func (reelsCollectorData *ReelsCollectorData) BuildPBComponentData() proto.Messa
 	pbcd := &sgc7pb.ReelsCollectorData{
 		BasicComponentData: reelsCollectorData.BuildPBBasicComponentData(),
 		Collectors:         make([]int32, len(reelsCollectorData.Collectors)),
+		LastTriggerIndex:   make([]int32, len(reelsCollectorData.LastTriggerIndex)),
 	}
 
 	for i, v := range reelsCollectorData.Collectors {
@@ -111,6 +114,7 @@ func (reelsCollectorData *ReelsCollectorData) Clone() IComponentData {
 	target := &ReelsCollectorData{
 		BasicComponentData: reelsCollectorData.CloneBasicComponentData(),
 		Collectors:         slices.Clone(reelsCollectorData.Collectors),
+		LastTriggerIndex:   slices.Clone(reelsCollectorData.LastTriggerIndex),
 	}
 
 	return target

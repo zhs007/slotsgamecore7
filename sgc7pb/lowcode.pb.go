@@ -3595,6 +3595,7 @@ type ReelsCollectorData struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
 	Collectors         []int32                `protobuf:"varint,2,rep,packed,name=Collectors,proto3" json:"Collectors,omitempty"`
+	LastTriggerIndex   []int32                `protobuf:"varint,3,rep,packed,name=lastTriggerIndex,proto3" json:"lastTriggerIndex,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -3639,6 +3640,13 @@ func (x *ReelsCollectorData) GetBasicComponentData() *ComponentData {
 func (x *ReelsCollectorData) GetCollectors() []int32 {
 	if x != nil {
 		return x.Collectors
+	}
+	return nil
+}
+
+func (x *ReelsCollectorData) GetLastTriggerIndex() []int32 {
+	if x != nil {
+		return x.LastTriggerIndex
 	}
 	return nil
 }
@@ -4011,12 +4019,13 @@ const file_lowcode_proto_rawDesc = "" +
 	"\n" +
 	"unSelected\x18\x03 \x03(\tR\n" +
 	"unSelected\x12 \n" +
-	"\vcurSelected\x18\x04 \x03(\tR\vcurSelected\"{\n" +
+	"\vcurSelected\x18\x04 \x03(\tR\vcurSelected\"\xa7\x01\n" +
 	"\x12ReelsCollectorData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x1e\n" +
 	"\n" +
 	"Collectors\x18\x02 \x03(\x05R\n" +
-	"Collectors\"\x93\x05\n" +
+	"Collectors\x12*\n" +
+	"\x10lastTriggerIndex\x18\x03 \x03(\x05R\x10lastTriggerIndex\"\x93\x05\n" +
 	"\tGameParam\x12&\n" +
 	"\x0efirstComponent\x18\x01 \x01(\tR\x0efirstComponent\x126\n" +
 	"\x16nextStepFirstComponent\x18\x02 \x01(\tR\x16nextStepFirstComponent\x12J\n" +
