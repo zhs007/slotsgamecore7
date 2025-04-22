@@ -40,6 +40,8 @@ func startWorker(game sgc7game.IGame, rtp *RTP, spinnums int64, stake *sgc7game.
 		// off := 0
 
 		for i := int64(0); i < spinnums; i++ {
+			game.OnBet(plugin, cmd, cmdparam, ps, stake, results, gameData)
+
 			pbsjson := ps.GetPublicJson()
 			ppsjson := ps.GetPrivateJson()
 			iserrturn := false
