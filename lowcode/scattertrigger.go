@@ -104,30 +104,31 @@ func (scatterTriggerData *ScatterTriggerData) GetValEx(key string, getType GetCo
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ScatterTriggerConfig struct {
 	BasicComponentConfig            `yaml:",inline" json:",inline"`
-	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                                             // like scatter
-	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                                         // like scatter
-	Type                            string                        `yaml:"type" json:"type"`                                                   // like scatters
-	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                                         // SymbolTriggerType
-	BetTypeString                   string                        `yaml:"betType" json:"betType"`                                             // bet or totalBet or noPay
-	BetType                         BetType                       `yaml:"-" json:"-"`                                                         // bet or totalBet or noPay
-	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`                             // OtherSceneMultiType
-	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                                         // OtherSceneMultiType
-	MinNum                          int                           `yaml:"minNum" json:"minNum"`                                               // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
-	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`                                     // wild etc
-	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                                         // wild symbolCode
-	PosArea                         []int                         `yaml:"posArea" json:"posArea"`                                             // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
-	CountScatterPayAs               string                        `yaml:"countScatterPayAs" json:"countScatterPayAs"`                         // countscatter时，按什么符号赔付
-	SymbolCodeCountScatterPayAs     int                           `yaml:"-" json:"-"`                                                         // countscatter时，按什么符号赔付
-	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                                           // winMulti，最后的中奖倍数，默认为1
-	Height                          int                           `yaml:"Height" json:"Height"`                                               // Height
-	MaxHeight                       int                           `yaml:"MaxHeight" json:"MaxHeight"`                                         // MaxHeight
-	IsReversalHeight                bool                          `yaml:"isReversalHeight" json:"isReversalHeight"`                           // isReversalHeight
-	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`                             // jump to
-	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"`                       // piggyBank component
-	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`                                     // 如果触发，默认跳转jump to，这里可以强制走next分支
-	Awards                          []*Award                      `yaml:"awards" json:"awards"`                                               // 新的奖励系统
-	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                                       // 如果是scatter这一组判断，可以把结果传递给一个mask
-	OutputToComponent               string                        `yaml:"outputToComponent" json:"outputToComponent"`                         // 将结果给到一个 positionCollection
+	Symbols                         []string                      `yaml:"symbols" json:"symbols"`                       // like scatter
+	SymbolCodes                     []int                         `yaml:"-" json:"-"`                                   // like scatter
+	Type                            string                        `yaml:"type" json:"type"`                             // like scatters
+	TriggerType                     SymbolTriggerType             `yaml:"-" json:"-"`                                   // SymbolTriggerType
+	BetTypeString                   string                        `yaml:"betType" json:"betType"`                       // bet or totalBet or noPay
+	BetType                         BetType                       `yaml:"-" json:"-"`                                   // bet or totalBet or noPay
+	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`       // OtherSceneMultiType
+	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                   // OtherSceneMultiType
+	MinNum                          int                           `yaml:"minNum" json:"minNum"`                         // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`               // wild etc
+	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                   // wild symbolCode
+	PosArea                         []int                         `yaml:"posArea" json:"posArea"`                       // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
+	CountScatterPayAs               string                        `yaml:"countScatterPayAs" json:"countScatterPayAs"`   // countscatter时，按什么符号赔付
+	SymbolCodeCountScatterPayAs     int                           `yaml:"-" json:"-"`                                   // countscatter时，按什么符号赔付
+	WinMulti                        int                           `yaml:"winMulti" json:"winMulti"`                     // winMulti，最后的中奖倍数，默认为1
+	Height                          int                           `yaml:"Height" json:"Height"`                         // Height
+	MaxHeight                       int                           `yaml:"MaxHeight" json:"MaxHeight"`                   // MaxHeight
+	IsReversalHeight                bool                          `yaml:"isReversalHeight" json:"isReversalHeight"`     // isReversalHeight
+	JumpToComponent                 string                        `yaml:"jumpToComponent" json:"jumpToComponent"`       // jump to
+	PiggyBankComponent              string                        `yaml:"piggyBankComponent" json:"piggyBankComponent"` // piggyBank component
+	ForceToNext                     bool                          `yaml:"forceToNext" json:"forceToNext"`               // 如果触发，默认跳转jump to，这里可以强制走next分支
+	Awards                          []*Award                      `yaml:"awards" json:"awards"`                         // 新的奖励系统
+	TargetMask                      string                        `yaml:"targetMask" json:"targetMask"`                 // 如果是scatter这一组判断，可以把结果传递给一个mask
+	OutputToComponent               string                        `yaml:"outputToComponent" json:"outputToComponent"`   // 将结果给到一个 positionCollection
+	ReelsCollector                  string                        `yaml:"reelsCollector" json:"reelsCollector"`
 	IsReverse                       bool                          `yaml:"isReverse" json:"isReverse"`                                         // 如果isReverse，表示判定为否才触发
 	IsAddRespinMode                 bool                          `yaml:"isAddRespinMode" json:"isAddRespinMode"`                             // 是否是增加respinNum模式，默认是增加triggerNum模式
 	RespinComponent                 string                        `yaml:"respinComponent" json:"respinComponent"`                             // respin component
@@ -293,6 +294,35 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 		}
 
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, scatterTrigger.Config.TargetMask, mask, false)
+	}
+
+	return nil
+}
+
+// procReelsCollector
+func (scatterTrigger *ScatterTrigger) procReelsCollector(gs *sgc7game.GameScene, gameProp *GameProperty, ips sgc7game.IPlayerState,
+	ret *sgc7game.Result, stake *sgc7game.Stake) error {
+
+	if scatterTrigger.Config.ReelsCollector != "" {
+		gameProp.UseComponent(scatterTrigger.Config.ReelsCollector)
+
+		reelsData := make([]int, gs.Width)
+
+		for i := 0; i < len(ret.Pos)/2; i++ {
+			reelsData[ret.Pos[i*2]]++
+		}
+
+		betMethod := stake.CashBet / stake.CoinBet
+
+		ps, isok := ips.(*PlayerState)
+		if !isok {
+			goutils.Error("ScatterTrigger.procReelsCollector:PlayerState",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return ErrIvalidPlayerState
+		}
+
+		return gameProp.Pool.ChgReelsCollector(gameProp, scatterTrigger.Config.ReelsCollector, ps, int(betMethod), int(stake.CoinBet), reelsData)
 	}
 
 	return nil
@@ -593,6 +623,14 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 			return "", err
 		}
 
+		err = scatterTrigger.procReelsCollector(gs, gameProp, ps, lst[0], stake)
+		if err != nil {
+			goutils.Error("ScatterTrigger.OnPlayGame:procReelsCollector",
+				goutils.Err(err))
+
+			return "", err
+		}
+
 		err = scatterTrigger.procPositionCollection(gameProp, curpr, std)
 		if err != nil {
 			goutils.Error("ScatterTrigger.OnPlayGame:procPositionCollection",
@@ -723,7 +761,6 @@ func NewScatterTrigger(name string) IComponent {
 	}
 }
 
-//	"configuration": {
 //		"triggerType": "countscatter",
 //		"betType": "bet",
 //		"triggerRespinType": "respinNum",
@@ -737,7 +774,8 @@ func NewScatterTrigger(name string) IComponent {
 //		"genRespinType": "number",
 //		"respinNum": 10,
 //		"putMoneyInPiggyBank": "bg-piggybank"
-//	},
+// 		"reelsCollector": "bg-collect"
+
 type jsonScatterTrigger struct {
 	Symbols                       []string   `json:"symbols"`
 	TriggerType                   string     `json:"triggerType"`
@@ -761,6 +799,7 @@ type jsonScatterTrigger struct {
 	MaxHeight                     int        `json:"MaxHeight"`
 	IsReversalHeight              bool       `json:"isReversalHeight"`
 	OutputToComponent             string     `json:"outputToComponent"`
+	ReelsCollector                string     `json:"reelsCollector"`
 }
 
 func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
@@ -784,6 +823,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		MaxHeight:          jcfg.MaxHeight,
 		IsReversalHeight:   jcfg.IsReversalHeight,
 		OutputToComponent:  jcfg.OutputToComponent,
+		ReelsCollector:     jcfg.ReelsCollector,
 	}
 
 	if jcfg.TriggerRespinType != "none" {

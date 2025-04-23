@@ -282,6 +282,10 @@ func (basicComponent *BasicComponent) NewPlayerState() IComponentPS {
 	return nil
 }
 
+func (basicComponent *BasicComponent) ChgReelsCollector(icd IComponentData, ps *PlayerState, betMethod int, bet int, reelsData []int) {
+
+}
+
 func NewBasicComponent(name string, srcSceneNum int) *BasicComponent {
 	return &BasicComponent{
 		Name:        name,
