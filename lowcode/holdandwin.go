@@ -267,9 +267,18 @@ func (holdAndWin *HoldAndWin) procNormal(gameProp *GameProperty, plugin sgc7plug
 					return nil, nil, err
 				}
 
+				if cv.Int() == holdAndWin.Config.BlankSymbolCode {
+					continue
+				}
+
 				if ngs == gs {
 					ngs = gs.CloneEx(gameProp.PoolScene)
-					nos = os.CloneEx(gameProp.PoolScene)
+
+					if os == nil {
+						nos = gameProp.PoolScene.New2(ngs.Width, ngs.Height, 0)
+					} else {
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
 				}
 
 				ngs.Arr[x][y] = cv.Int()
@@ -316,9 +325,18 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 					return nil, nil, nil, nil, err
 				}
 
+				if cv.Int() == holdAndWin.Config.BlankSymbolCode {
+					continue
+				}
+
 				if ngs == gs {
 					ngs = gs.CloneEx(gameProp.PoolScene)
-					nos = os.CloneEx(gameProp.PoolScene)
+
+					if os == nil {
+						nos = gameProp.PoolScene.New2(ngs.Width, ngs.Height, 0)
+					} else {
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
 				}
 
 				ngs.Arr[x][y] = cv.Int()
@@ -338,7 +356,7 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 		}
 	}
 
-	if nos.Arr[0][nos.Height-1] != 0 && nos.Arr[nos.Width-1][0] != 0 && nos.Arr[nos.Width-1][nos.Height-1] != 0 {
+	if nos != nil && nos.Arr[0][nos.Height-1] != 0 && nos.Arr[nos.Width-1][0] != 0 && nos.Arr[nos.Width-1][nos.Height-1] != 0 {
 		co := nos.Arr[0][0] + nos.Arr[0][nos.Height-1] + nos.Arr[nos.Width-1][0] + nos.Arr[nos.Width-1][nos.Height-1]
 
 		if nos.Height < holdAndWin.Config.MaxHeight {
