@@ -429,6 +429,12 @@ message FlowDownSymbolsData {
     repeated int32 pos = 2;
 }
 
+// HoldAndWinData
+message HoldAndWinData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
