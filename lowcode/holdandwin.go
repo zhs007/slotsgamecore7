@@ -47,6 +47,7 @@ func (holdAndWinData *HoldAndWinData) OnNewGame(gameProp *GameProperty, componen
 // OnNewStep -
 func (holdAndWinData *HoldAndWinData) OnNewStep() {
 	holdAndWinData.UsedScenes = nil
+	holdAndWinData.UsedOtherScenes = nil
 	holdAndWinData.Pos = nil
 }
 
