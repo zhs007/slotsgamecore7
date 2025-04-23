@@ -285,6 +285,10 @@ func (basicComponentData *BasicComponentData) PutInMoney(coins int) {
 
 }
 
+func (basicComponentData *BasicComponentData) ChgReelsCollector(reelsData []int) {
+
+}
+
 // // ForceBranch -
 // func (basicComponentData *BasicComponentData) ForceBranch(branchIndex int) {
 // 	if !gIsReleaseMode {

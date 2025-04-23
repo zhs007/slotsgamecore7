@@ -102,6 +102,11 @@ type IComponentData interface {
 
 	PutInMoney(coins int)
 
+	//----------------------------
+	// ReelsCollector
+
+	ChgReelsCollector(reelsData []int)
+
 	// //----------------------------
 	// // Branch
 

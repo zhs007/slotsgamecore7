@@ -624,6 +624,23 @@ func (pool *GamePropertyPool) InitPlayerStateOnBet(gameProp *GameProperty, plugi
 	return nil
 }
 
+func (pool *GamePropertyPool) ChgReelsCollector(gameProp *GameProperty, name string, ps *PlayerState, betMethod int, bet int, reelsData []int) error {
+	ic, isok := gameProp.Components.MapComponents[name]
+	if !isok {
+		goutils.Error("GamePropertyPool.ChgReelsCollector",
+			slog.String("name", name),
+			goutils.Err(ErrInvalidComponentName))
+
+		return ErrInvalidComponentName
+	}
+
+	icd := gameProp.GetComponentData(ic)
+
+	ic.ChgReelsCollector(icd, ps, betMethod, bet, reelsData)
+
+	return nil
+}
+
 func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
 		MapGamePropPool:     make(map[int]*sync.Pool),

@@ -1,9 +1,11 @@
 package lowcode
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -21,16 +23,25 @@ const ReelsCollectorTypeName = "reelsCollector"
 type ReelsCollectorTriggerType int
 
 const (
-	RCTTypeLeft  ReelsCollectorTriggerType = 0 // left
-	RCTTypeRight ReelsCollectorTriggerType = 1 // right
+	RCTTypeNormal    ReelsCollectorTriggerType = 0 // normal
+	RCTTypeLeft      ReelsCollectorTriggerType = 1 // left
+	RCTTypeRight     ReelsCollectorTriggerType = 2 // right
+	RCTTypeLoopLeft  ReelsCollectorTriggerType = 3 // loopleft
+	RCTTypeLoopRight ReelsCollectorTriggerType = 4 // loopright
 )
 
 func parseReelsCollectorTriggerType(str string) ReelsCollectorTriggerType {
-	if str == "right" {
+	if str == "left" {
 		return RCTTypeRight
+	} else if str == "right" {
+		return RCTTypeRight
+	} else if str == "loopleft" {
+		return RCTTypeLoopLeft
+	} else if str == "loopright" {
+		return RCTTypeLoopRight
 	}
 
-	return RCTTypeLeft
+	return RCTTypeNormal
 }
 
 type ReelsCollectorPS struct {
@@ -85,6 +96,7 @@ type ReelsCollectorData struct {
 	BasicComponentData
 	Collectors       []int
 	LastTriggerIndex []int
+	cfg              *ReelsCollectorConfig
 }
 
 // OnNewGame -
@@ -120,21 +132,43 @@ func (reelsCollectorData *ReelsCollectorData) Clone() IComponentData {
 	return target
 }
 
+// GetValEx -
+func (reelsCollectorData *ReelsCollectorData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVOutputInt {
+		return reelsCollectorData.Output, true
+	}
+
+	return 0, false
+}
+
+func (reelsCollectorData *ReelsCollectorData) ChgReelsCollector(reelsData []int) {
+	for i, v := range reelsData {
+		reelsCollectorData.Collectors[i] += v
+
+		if reelsCollectorData.Collectors[i] > reelsCollectorData.cfg.MaxVal {
+			reelsCollectorData.Collectors[i] = reelsCollectorData.cfg.MaxVal
+		}
+	}
+}
+
 // ReelsCollectorConfig - configuration for ReelsCollector
 type ReelsCollectorConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrTriggerType       string                    `yaml:"triggerType" json:"triggerType"`     // triggerType
-	TriggerType          ReelsCollectorTriggerType `yaml:"-" json:"-"`                         // triggerType
-	MaxVal               int                       `yaml:"maxVal" json:"maxVal"`               // maxVal
-	IsPlayerState        bool                      `yaml:"IsPlayerState" json:"IsPlayerState"` // IsPlayerState
-	OutputMask           string                    `yaml:"outputMask" json:"outputMask"`       // outputMask
-	MapAwards            map[string][]*Award       `yaml:"mapAwards" json:"mapAwards"`         // 新的奖励系统
+	StrTriggerType       string                    `yaml:"triggerType" json:"triggerType"`         // triggerType
+	TriggerType          ReelsCollectorTriggerType `yaml:"-" json:"-"`                             // triggerType
+	MaxVal               int                       `yaml:"maxVal" json:"maxVal"`                   // maxVal
+	IsPlayerState        bool                      `yaml:"IsPlayerState" json:"IsPlayerState"`     // IsPlayerState
+	OutputMask           string                    `yaml:"outputMask" json:"outputMask"`           // outputMask
+	MapAwards            map[string][]*Award       `yaml:"mapAwards" json:"mapAwards"`             // 新的奖励系统
+	JumpToComponent      string                    `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
 }
 
 // SetLinkComponent
 func (cfg *ReelsCollectorConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
+	} else if link == "jump" {
+		cfg.JumpToComponent = componentName
 	}
 }
 
@@ -188,6 +222,10 @@ func (reelsCollector *ReelsCollector) InitEx(cfg any, pool *GamePropertyPool) er
 
 // OnProcControllers -
 func (reelsCollector *ReelsCollector) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if val > 0 {
+		strVal = fmt.Sprintf("%v", val)
+	}
+
 	if len(reelsCollector.Config.MapAwards) > 0 {
 		awards, isok := reelsCollector.Config.MapAwards[strVal]
 		if isok {
@@ -205,6 +243,24 @@ func (reelsCollector *ReelsCollector) procMask(gameProp *GameProperty, curpr *sg
 
 		mask := make([]bool, gameProp.GetVal(GamePropWidth))
 		mask[triggerReelIndex] = true
+
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, reelsCollector.Config.OutputMask, mask, true)
+	}
+
+	return nil
+}
+
+// procMaskEx
+func (reelsCollector *ReelsCollector) procMaskEx(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+	plugin sgc7plugin.IPlugin, triggerReelIndex []int) error {
+
+	if reelsCollector.Config.OutputMask != "" {
+		gameProp.UseComponent(reelsCollector.Config.OutputMask)
+
+		mask := make([]bool, gameProp.GetVal(GamePropWidth))
+		for _, v := range triggerReelIndex {
+			mask[v] = true
+		}
 
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, reelsCollector.Config.OutputMask, mask, true)
 	}
@@ -266,16 +322,58 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 			cbps.Collectors = make([]int, w)
 		}
 
-		if reelsCollector.Config.TriggerType == RCTTypeLeft {
+		// loop
+		if len(cbps.LastTriggerIndex) > 0 {
+			v := cbps.LastTriggerIndex[0]
+			cbps.LastTriggerIndex = slices.Delete(cbps.LastTriggerIndex, 0, 1)
+
+			cd.Output = cbps.Collectors[v]
+
+			cbps.Collectors[v] = 0
+			cd.Collectors = slices.Clone(cbps.Collectors)
+
+			reelsCollector.procMask(gameProp, curpr, gp, plugin, v)
+			reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<loopTrigger>")
+
+			nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
+
+			return nc, nil
+		}
+
+		if reelsCollector.Config.TriggerType == RCTTypeNormal {
+			lst := make([]int, 0, len(cbps.Collectors))
 			for i, v := range cbps.Collectors {
 				if v == reelsCollector.Config.MaxVal {
+					cbps.Collectors[i] = 0
+
+					lst = append(lst, i)
+				}
+			}
+
+			if len(lst) > 0 {
+				cd.Output = reelsCollector.Config.MaxVal
+
+				cd.Collectors = slices.Clone(cbps.Collectors)
+
+				reelsCollector.procMaskEx(gameProp, curpr, gp, plugin, lst)
+				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
+
+				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
+
+				return nc, nil
+			}
+		} else if reelsCollector.Config.TriggerType == RCTTypeLeft {
+			for i, v := range cbps.Collectors {
+				if v == reelsCollector.Config.MaxVal {
+					cd.Output = reelsCollector.Config.MaxVal
+
 					cbps.Collectors[i] = 0
 					cd.Collectors = slices.Clone(cbps.Collectors)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
-					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, i, "")
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
-					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, "")
+					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
 
 					return nc, nil
 				}
@@ -283,13 +381,55 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 		} else if reelsCollector.Config.TriggerType == RCTTypeRight {
 			for i := len(cbps.Collectors) - 1; i >= 0; i-- {
 				if cbps.Collectors[i] == reelsCollector.Config.MaxVal {
+					cd.Output = reelsCollector.Config.MaxVal
+
 					cbps.Collectors[i] = 0
 					cd.Collectors = slices.Clone(cbps.Collectors)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
-					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, i, "")
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
-					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, "")
+					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
+
+					return nc, nil
+				}
+			}
+		} else if reelsCollector.Config.TriggerType == RCTTypeLoopLeft {
+			for i, v := range cbps.Collectors {
+				if v == reelsCollector.Config.MaxVal {
+					cd.Output = reelsCollector.Config.MaxVal
+
+					for t := i + 1; t < len(cbps.Collectors); t++ {
+						cbps.LastTriggerIndex = append(cbps.LastTriggerIndex, t)
+					}
+
+					cbps.Collectors[i] = 0
+					cd.Collectors = slices.Clone(cbps.Collectors)
+
+					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
+
+					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
+
+					return nc, nil
+				}
+			}
+		} else if reelsCollector.Config.TriggerType == RCTTypeLoopRight {
+			for i := len(cbps.Collectors) - 1; i >= 0; i-- {
+				if cbps.Collectors[i] == reelsCollector.Config.MaxVal {
+					cd.Output = reelsCollector.Config.MaxVal
+
+					for t := i - 1; t >= 0; t-- {
+						cbps.LastTriggerIndex = append(cbps.LastTriggerIndex, t)
+					}
+
+					cbps.Collectors[i] = 0
+					cd.Collectors = slices.Clone(cbps.Collectors)
+
+					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
+
+					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
 
 					return nc, nil
 				}
@@ -320,9 +460,9 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				cd.Collectors = slices.Clone(cd.Collectors)
 
 				reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
-				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, i, "")
+				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
-				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, "")
+				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
 
 				return nc, nil
 			}
@@ -334,9 +474,9 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				cd.Collectors = slices.Clone(cd.Collectors)
 
 				reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
-				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, i, "")
+				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
-				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, "")
+				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
 
 				return nc, nil
 			}
@@ -356,22 +496,24 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 }
 
 // OnAsciiGame - outpur to asciigame
-func (featureBar2 *ReelsCollector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult,
+func (reelsCollector *ReelsCollector) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult,
 	mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
 	return nil
 }
 
 // NewComponentData -
-func (featureBar2 *ReelsCollector) NewComponentData() IComponentData {
-	return &ReelsCollectorData{}
+func (reelsCollector *ReelsCollector) NewComponentData() IComponentData {
+	return &ReelsCollectorData{
+		cfg: reelsCollector.Config,
+	}
 }
 
 // InitPlayerState -
-func (featureBar2 *ReelsCollector) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+func (reelsCollector *ReelsCollector) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin,
 	ps *PlayerState, betMethod int, bet int) error {
 
-	if featureBar2.Config.IsPlayerState {
+	if reelsCollector.Config.IsPlayerState {
 		bmd := ps.GetBetMethodPub(betMethod)
 		if bet <= 0 {
 			return nil
@@ -379,7 +521,7 @@ func (featureBar2 *ReelsCollector) InitPlayerState(pool *GamePropertyPool, gameP
 
 		bps := bmd.GetBetPS(bet)
 
-		cname := featureBar2.GetName()
+		cname := reelsCollector.GetName()
 
 		_, isok := bps.MapComponentData[cname]
 		if !isok {
@@ -395,12 +537,54 @@ func (featureBar2 *ReelsCollector) InitPlayerState(pool *GamePropertyPool, gameP
 					Collectors: make([]int, w),
 				}
 
-				bps.MapComponentData[featureBar2.GetName()] = cps
+				bps.MapComponentData[reelsCollector.GetName()] = cps
 			}
 		}
 	}
 
 	return nil
+}
+
+func (reelsCollector *ReelsCollector) ChgReelsCollector(icd IComponentData, ps *PlayerState, betMethod int, bet int, reelsData []int) {
+	cd := icd.(*ReelsCollectorData)
+
+	if reelsCollector.Config.IsPlayerState {
+		bmd := ps.GetBetMethodPub(betMethod)
+		if bet <= 0 {
+			return
+		}
+
+		bps := bmd.GetBetPS(bet)
+
+		cname := reelsCollector.GetName()
+
+		v, isok := bps.MapComponentData[cname]
+		if !isok {
+			goutils.Error("ReelsCollector.ChgReelsCollector:MapComponentData",
+				slog.String("cname", cname),
+				goutils.Err(ErrIvalidPlayerState))
+
+			return
+		}
+
+		cps, isok := v.(*ReelsCollectorPS)
+		if !isok {
+			goutils.Error("ReelsCollector.ChgReelsCollector:ReelsCollectorPS",
+				goutils.Err(ErrIvalidPlayerState))
+
+			return
+		}
+
+		for i, v := range reelsData {
+			cps.Collectors[i] += v
+
+			if cps.Collectors[i] > reelsCollector.Config.MaxVal {
+				cps.Collectors[i] = reelsCollector.Config.MaxVal
+			}
+		}
+
+		cd.Collectors = slices.Clone(cps.Collectors)
+	}
 }
 
 func NewReelsCollector(name string) IComponent {
@@ -422,7 +606,7 @@ type jsonReelsCollector struct {
 
 func (jcfg *jsonReelsCollector) build() *ReelsCollectorConfig {
 	cfg := &ReelsCollectorConfig{
-		StrTriggerType: jcfg.StrTriggerType,
+		StrTriggerType: strings.ToLower(jcfg.StrTriggerType),
 		MaxVal:         jcfg.MaxVal,
 		IsPlayerState:  jcfg.IsPlayerState,
 		OutputMask:     jcfg.OutputMask,

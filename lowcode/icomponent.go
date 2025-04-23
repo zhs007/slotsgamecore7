@@ -122,4 +122,9 @@ type IComponent interface {
 
 	// NewPlayerState - new IComponentPS
 	NewPlayerState() IComponentPS
+
+	//----------------------------
+	// ReelsCollector
+
+	ChgReelsCollector(icd IComponentData, ps *PlayerState, betMethod int, bet int, reelsData []int)
 }
