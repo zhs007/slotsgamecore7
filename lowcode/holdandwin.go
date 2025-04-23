@@ -47,6 +47,7 @@ func (holdAndWinData *HoldAndWinData) OnNewGame(gameProp *GameProperty, componen
 // OnNewStep -
 func (holdAndWinData *HoldAndWinData) OnNewStep() {
 	holdAndWinData.UsedScenes = nil
+	holdAndWinData.UsedOtherScenes = nil
 	holdAndWinData.Pos = nil
 }
 
@@ -435,6 +436,11 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		if sc2 == gs {
 			holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+
+			if nos != nil {
+				holdAndWin.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			}
+
 			nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
 			return nc, ErrComponentDoNothing
@@ -462,6 +468,11 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		if sc2 == gs {
 			holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
+
+			if nos != nil {
+				holdAndWin.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			}
+
 			nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
 			return nc, ErrComponentDoNothing
