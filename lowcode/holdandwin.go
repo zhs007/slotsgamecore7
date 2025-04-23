@@ -434,6 +434,7 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		ogs2 = nos
 
 		if sc2 == gs {
+			holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 			nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
 			return nc, ErrComponentDoNothing
@@ -460,15 +461,21 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		ogs2 = nos
 
 		if sc2 == gs {
+			holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 			nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
 			return nc, ErrComponentDoNothing
 		}
 
 		holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
-		holdAndWin.AddScene(gameProp, curpr, ngs2, &cd.BasicComponentData)
+		if ngs2 != nil {
+			holdAndWin.AddScene(gameProp, curpr, ngs2, &cd.BasicComponentData)
+		}
+
 		holdAndWin.AddOtherScene(gameProp, curpr, ogs2, &cd.BasicComponentData)
-		holdAndWin.AddOtherScene(gameProp, curpr, nos2, &cd.BasicComponentData)
+		if nos2 != nil {
+			holdAndWin.AddOtherScene(gameProp, curpr, nos2, &cd.BasicComponentData)
+		}
 
 		holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
 
