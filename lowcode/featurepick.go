@@ -203,7 +203,9 @@ func (featurePick *FeaturePick) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 
 		if pickNum > curPickNum {
-
+			for i := curPickNum; i < pickNum; i++ {
+				featurePick.ProcControllers(gameProp, plugin, curpr, gp, -1, "<extra>")
+			}
 		}
 
 		nc := featurePick.onStepEnd(gameProp, curpr, gp, "")

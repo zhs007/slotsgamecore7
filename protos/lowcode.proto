@@ -416,6 +416,25 @@ message FeaturePickData {
     repeated string curSelected = 4;
 }
 
+// ReelsCollectorData
+message ReelsCollectorData {
+    ComponentData basicComponentData = 1;
+    repeated int32 collectors = 2;
+    repeated int32 lastTriggerIndex = 3;
+}
+
+// FlowDownSymbolsData
+message FlowDownSymbolsData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
+// HoldAndWinData
+message HoldAndWinData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

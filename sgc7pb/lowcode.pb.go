@@ -3590,6 +3590,173 @@ func (x *FeaturePickData) GetCurSelected() []string {
 	return nil
 }
 
+// ReelsCollectorData
+type ReelsCollectorData struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
+	Collectors         []int32                `protobuf:"varint,2,rep,packed,name=collectors,proto3" json:"collectors,omitempty"`
+	LastTriggerIndex   []int32                `protobuf:"varint,3,rep,packed,name=lastTriggerIndex,proto3" json:"lastTriggerIndex,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ReelsCollectorData) Reset() {
+	*x = ReelsCollectorData{}
+	mi := &file_lowcode_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReelsCollectorData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReelsCollectorData) ProtoMessage() {}
+
+func (x *ReelsCollectorData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReelsCollectorData.ProtoReflect.Descriptor instead.
+func (*ReelsCollectorData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *ReelsCollectorData) GetBasicComponentData() *ComponentData {
+	if x != nil {
+		return x.BasicComponentData
+	}
+	return nil
+}
+
+func (x *ReelsCollectorData) GetCollectors() []int32 {
+	if x != nil {
+		return x.Collectors
+	}
+	return nil
+}
+
+func (x *ReelsCollectorData) GetLastTriggerIndex() []int32 {
+	if x != nil {
+		return x.LastTriggerIndex
+	}
+	return nil
+}
+
+// FlowDownSymbolsData
+type FlowDownSymbolsData struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
+	Pos                []int32                `protobuf:"varint,2,rep,packed,name=pos,proto3" json:"pos,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *FlowDownSymbolsData) Reset() {
+	*x = FlowDownSymbolsData{}
+	mi := &file_lowcode_proto_msgTypes[56]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FlowDownSymbolsData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowDownSymbolsData) ProtoMessage() {}
+
+func (x *FlowDownSymbolsData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[56]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowDownSymbolsData.ProtoReflect.Descriptor instead.
+func (*FlowDownSymbolsData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *FlowDownSymbolsData) GetBasicComponentData() *ComponentData {
+	if x != nil {
+		return x.BasicComponentData
+	}
+	return nil
+}
+
+func (x *FlowDownSymbolsData) GetPos() []int32 {
+	if x != nil {
+		return x.Pos
+	}
+	return nil
+}
+
+// HoldAndWinData
+type HoldAndWinData struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
+	Pos                []int32                `protobuf:"varint,2,rep,packed,name=pos,proto3" json:"pos,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *HoldAndWinData) Reset() {
+	*x = HoldAndWinData{}
+	mi := &file_lowcode_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HoldAndWinData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HoldAndWinData) ProtoMessage() {}
+
+func (x *HoldAndWinData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HoldAndWinData.ProtoReflect.Descriptor instead.
+func (*HoldAndWinData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *HoldAndWinData) GetBasicComponentData() *ComponentData {
+	if x != nil {
+		return x.BasicComponentData
+	}
+	return nil
+}
+
+func (x *HoldAndWinData) GetPos() []int32 {
+	if x != nil {
+		return x.Pos
+	}
+	return nil
+}
+
 // GameParam
 type GameParam struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
@@ -3607,7 +3774,7 @@ type GameParam struct {
 
 func (x *GameParam) Reset() {
 	*x = GameParam{}
-	mi := &file_lowcode_proto_msgTypes[55]
+	mi := &file_lowcode_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3619,7 +3786,7 @@ func (x *GameParam) String() string {
 func (*GameParam) ProtoMessage() {}
 
 func (x *GameParam) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[55]
+	mi := &file_lowcode_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3632,7 +3799,7 @@ func (x *GameParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameParam.ProtoReflect.Descriptor instead.
 func (*GameParam) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{55}
+	return file_lowcode_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *GameParam) GetFirstComponent() string {
@@ -3958,7 +4125,19 @@ const file_lowcode_proto_rawDesc = "" +
 	"\n" +
 	"unSelected\x18\x03 \x03(\tR\n" +
 	"unSelected\x12 \n" +
-	"\vcurSelected\x18\x04 \x03(\tR\vcurSelected\"\x93\x05\n" +
+	"\vcurSelected\x18\x04 \x03(\tR\vcurSelected\"\xa7\x01\n" +
+	"\x12ReelsCollectorData\x12E\n" +
+	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x1e\n" +
+	"\n" +
+	"collectors\x18\x02 \x03(\x05R\n" +
+	"collectors\x12*\n" +
+	"\x10lastTriggerIndex\x18\x03 \x03(\x05R\x10lastTriggerIndex\"n\n" +
+	"\x13FlowDownSymbolsData\x12E\n" +
+	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x10\n" +
+	"\x03pos\x18\x02 \x03(\x05R\x03pos\"i\n" +
+	"\x0eHoldAndWinData\x12E\n" +
+	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x10\n" +
+	"\x03pos\x18\x02 \x03(\x05R\x03pos\"\x93\x05\n" +
 	"\tGameParam\x12&\n" +
 	"\x0efirstComponent\x18\x01 \x01(\tR\x0efirstComponent\x126\n" +
 	"\x16nextStepFirstComponent\x18\x02 \x01(\tR\x16nextStepFirstComponent\x12J\n" +
@@ -3992,7 +4171,7 @@ func file_lowcode_proto_rawDescGZIP() []byte {
 	return file_lowcode_proto_rawDescData
 }
 
-var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 59)
+var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 62)
 var file_lowcode_proto_goTypes = []any{
 	(*ComponentData)(nil),               // 0: sgc7pb.ComponentData
 	(*BasicComponentData)(nil),          // 1: sgc7pb.BasicComponentData
@@ -4049,11 +4228,14 @@ var file_lowcode_proto_goTypes = []any{
 	(*MergePositionCollectionData)(nil), // 52: sgc7pb.MergePositionCollectionData
 	(*FeatureBar2Data)(nil),             // 53: sgc7pb.FeatureBar2Data
 	(*FeaturePickData)(nil),             // 54: sgc7pb.FeaturePickData
-	(*GameParam)(nil),                   // 55: sgc7pb.GameParam
-	nil,                                 // 56: sgc7pb.GameParam.MapComponentsEntry
-	nil,                                 // 57: sgc7pb.GameParam.MapValsEntry
-	nil,                                 // 58: sgc7pb.GameParam.MapStrValsEntry
-	(*anypb.Any)(nil),                   // 59: google.protobuf.Any
+	(*ReelsCollectorData)(nil),          // 55: sgc7pb.ReelsCollectorData
+	(*FlowDownSymbolsData)(nil),         // 56: sgc7pb.FlowDownSymbolsData
+	(*HoldAndWinData)(nil),              // 57: sgc7pb.HoldAndWinData
+	(*GameParam)(nil),                   // 58: sgc7pb.GameParam
+	nil,                                 // 59: sgc7pb.GameParam.MapComponentsEntry
+	nil,                                 // 60: sgc7pb.GameParam.MapValsEntry
+	nil,                                 // 61: sgc7pb.GameParam.MapStrValsEntry
+	(*anypb.Any)(nil),                   // 62: google.protobuf.Any
 }
 var file_lowcode_proto_depIdxs = []int32{
 	0,  // 0: sgc7pb.BasicComponentData.basicComponentData:type_name -> sgc7pb.ComponentData
@@ -4109,15 +4291,18 @@ var file_lowcode_proto_depIdxs = []int32{
 	0,  // 50: sgc7pb.MergePositionCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 51: sgc7pb.FeatureBar2Data.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 52: sgc7pb.FeaturePickData.basicComponentData:type_name -> sgc7pb.ComponentData
-	56, // 53: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
-	57, // 54: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
-	58, // 55: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
-	59, // 56: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
-	57, // [57:57] is the sub-list for method output_type
-	57, // [57:57] is the sub-list for method input_type
-	57, // [57:57] is the sub-list for extension type_name
-	57, // [57:57] is the sub-list for extension extendee
-	0,  // [0:57] is the sub-list for field type_name
+	0,  // 53: sgc7pb.ReelsCollectorData.basicComponentData:type_name -> sgc7pb.ComponentData
+	0,  // 54: sgc7pb.FlowDownSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	0,  // 55: sgc7pb.HoldAndWinData.basicComponentData:type_name -> sgc7pb.ComponentData
+	59, // 56: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
+	60, // 57: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
+	61, // 58: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
+	62, // 59: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
+	60, // [60:60] is the sub-list for method output_type
+	60, // [60:60] is the sub-list for method input_type
+	60, // [60:60] is the sub-list for extension type_name
+	60, // [60:60] is the sub-list for extension extendee
+	0,  // [0:60] is the sub-list for field type_name
 }
 
 func init() { file_lowcode_proto_init() }
@@ -4131,7 +4316,7 @@ func file_lowcode_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lowcode_proto_rawDesc), len(file_lowcode_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   59,
+			NumMessages:   62,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
