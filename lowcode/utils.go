@@ -294,11 +294,11 @@ func Spin(game *Game, ips sgc7game.IPlayerState, plugin sgc7plugin.IPlugin, stak
 	}
 
 	for tryi := 0; tryi < gMaxForceOutcomeTimes; tryi++ {
-		newips := ips.Clone()
+		// newips := ips.Clone()
 		plugin.ClearCache()
 		plugin.ClearUsedRngs()
 
-		lst, err := procSpin(game, newips, plugin, stake, cmd, params, isNotAutoSelect)
+		lst, err := procSpin(game, ips, plugin, stake, cmd, params, isNotAutoSelect)
 		if err != nil {
 			goutils.Error("Spin:procSpin",
 				goutils.Err(err))
