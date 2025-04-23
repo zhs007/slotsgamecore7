@@ -177,7 +177,7 @@ func (moveSymbol2 *MoveSymbols2) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	cfg := &RandomMoveSymbolsConfig{}
+	cfg := &MoveSymbols2Config{}
 
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
@@ -194,7 +194,7 @@ func (moveSymbol2 *MoveSymbols2) Init(fn string, pool *GamePropertyPool) error {
 // InitEx -
 func (moveSymbol2 *MoveSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 	moveSymbol2.Config = cfg.(*MoveSymbols2Config)
-	moveSymbol2.Config.ComponentType = RandomMoveSymbolsTypeName
+	moveSymbol2.Config.ComponentType = MoveSymbols2TypeName
 
 	moveSymbol2.Config.Type = parseMoveSymbols2Type(moveSymbol2.Config.StrType)
 

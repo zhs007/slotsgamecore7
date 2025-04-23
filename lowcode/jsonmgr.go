@@ -107,4 +107,5 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(ChgSymbols2TypeName), parseChgSymbols2)
 	gJsonMgr.RegLoadComponent(strings.ToLower(FeaturePickTypeName), parseFeaturePick)
 	gJsonMgr.RegLoadComponent(strings.ToLower(ReelsCollectorTypeName), parseReelsCollector)
+	gJsonMgr.RegLoadComponent(strings.ToLower(FlowDownSymbolsTypeName), parseFlowDownSymbols)
 }
