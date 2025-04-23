@@ -207,6 +207,12 @@ func (flowDownSymbols *FlowDownSymbols) procFlowToRightOne(x int, gameProp *Game
 
 			return nil
 		}
+
+		if y == gs.Height-1 {
+			gs.Arr[x][y] = flowDownSymbols.Config.FillSymbolCode
+
+			return nil
+		}
 	}
 
 	return nil
