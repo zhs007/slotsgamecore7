@@ -118,6 +118,10 @@ func (reelsCollectorData *ReelsCollectorData) BuildPBComponentData() proto.Messa
 		pbcd.Collectors[i] = int32(v)
 	}
 
+	for i, v := range reelsCollectorData.LastTriggerIndex {
+		pbcd.LastTriggerIndex[i] = int32(v)
+	}
+
 	return pbcd
 }
 
