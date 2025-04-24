@@ -151,6 +151,11 @@ func (reelsCollectorData *ReelsCollectorData) ChgReelsCollector(reelsData []int)
 	}
 }
 
+func (reelsCollectorData *ReelsCollectorData) reset(ps *ReelsCollectorPS) {
+	reelsCollectorData.Collectors = slices.Clone(ps.Collectors)
+	reelsCollectorData.LastTriggerIndex = slices.Clone(ps.LastTriggerIndex)
+}
+
 // ReelsCollectorConfig - configuration for ReelsCollector
 type ReelsCollectorConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -244,7 +249,7 @@ func (reelsCollector *ReelsCollector) procMask(gameProp *GameProperty, curpr *sg
 		mask := make([]bool, gameProp.GetVal(GamePropWidth))
 		mask[triggerReelIndex] = true
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, reelsCollector.Config.OutputMask, mask, true)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, reelsCollector.Config.OutputMask, mask, false)
 	}
 
 	return nil
@@ -262,7 +267,7 @@ func (reelsCollector *ReelsCollector) procMaskEx(gameProp *GameProperty, curpr *
 			mask[v] = true
 		}
 
-		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, reelsCollector.Config.OutputMask, mask, true)
+		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, reelsCollector.Config.OutputMask, mask, false)
 	}
 
 	return nil
@@ -330,7 +335,9 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 			cd.Output = cbps.Collectors[v]
 
 			cbps.Collectors[v] = 0
-			cd.Collectors = slices.Clone(cbps.Collectors)
+
+			cd.reset(cbps)
+			// cd.Collectors = slices.Clone(cbps.Collectors)
 
 			reelsCollector.procMask(gameProp, curpr, gp, plugin, v)
 			reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<loopTrigger>")
@@ -353,7 +360,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 			if len(lst) > 0 {
 				cd.Output = reelsCollector.Config.MaxVal
 
-				cd.Collectors = slices.Clone(cbps.Collectors)
+				// cd.Collectors = slices.Clone(cbps.Collectors)
+				cd.reset(cbps)
 
 				reelsCollector.procMaskEx(gameProp, curpr, gp, plugin, lst)
 				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
@@ -368,7 +376,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					cd.Output = reelsCollector.Config.MaxVal
 
 					cbps.Collectors[i] = 0
-					cd.Collectors = slices.Clone(cbps.Collectors)
+					// cd.Collectors = slices.Clone(cbps.Collectors)
+					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
@@ -384,7 +393,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					cd.Output = reelsCollector.Config.MaxVal
 
 					cbps.Collectors[i] = 0
-					cd.Collectors = slices.Clone(cbps.Collectors)
+					// cd.Collectors = slices.Clone(cbps.Collectors)
+					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
@@ -404,7 +414,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					}
 
 					cbps.Collectors[i] = 0
-					cd.Collectors = slices.Clone(cbps.Collectors)
+					// cd.Collectors = slices.Clone(cbps.Collectors)
+					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
@@ -424,7 +435,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					}
 
 					cbps.Collectors[i] = 0
-					cd.Collectors = slices.Clone(cbps.Collectors)
+					// cd.Collectors = slices.Clone(cbps.Collectors)
+					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
