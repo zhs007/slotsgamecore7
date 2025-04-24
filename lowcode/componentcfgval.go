@@ -52,6 +52,7 @@ const (
 	CVSymbolVal             string = "symbolval"             // symbolVal
 	CVWinResultNum          string = "winresultnum"          // winResultNum
 	CCValueNum              string = "valuenum"              // valueNum
+	CVHeight                string = "height"                // height
 )
 
 const (
