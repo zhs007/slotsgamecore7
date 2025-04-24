@@ -218,6 +218,15 @@ func (flowDownSymbols *FlowDownSymbols) procFlowToRightOne(x int, gameProp *Game
 	return nil
 }
 
+func (flowDownSymbols *FlowDownSymbols) getNumber(cd *FlowDownSymbolsData) int {
+	number, isok := cd.GetConfigIntVal(CCVNumber)
+	if isok {
+		return number
+	}
+
+	return flowDownSymbols.Config.Number
+}
+
 // procFlowToRight -
 func (flowDownSymbols *FlowDownSymbols) procFlowToRight(x int, gameProp *GameProperty, curpr *sgc7game.PlayResult,
 	prs []*sgc7game.PlayResult, cd *FlowDownSymbolsData, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
@@ -228,7 +237,9 @@ func (flowDownSymbols *FlowDownSymbols) procFlowToRight(x int, gameProp *GamePro
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
-	for n := range flowDownSymbols.Config.Number {
+	number := flowDownSymbols.getNumber(cd)
+
+	for n := range number {
 		err := flowDownSymbols.procFlowToRightOne(x, gameProp, curpr, prs, cd, ngs)
 		if err != nil {
 			goutils.Error("FlowDownSymbols.procFlowToRight:procFlowToRightOne",
