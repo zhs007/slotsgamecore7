@@ -365,8 +365,26 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 			ngs2 := gameProp.PoolScene.New(ngs.Width, ngs.Height+1)
 
 			for x, arr := range nos.Arr {
-				copy(nos2.Arr[x], arr)
-				copy(ngs2.Arr[x], ngs.Arr[x])
+				for y, s := range arr {
+					if x == 0 && y == 0 {
+						continue
+					}
+
+					if x == 0 && y == nos.Height-1 {
+						continue
+					}
+
+					if x == nos.Width-1 && y == nos.Height-1 {
+						continue
+					}
+
+					if x == nos.Width-1 && y == 0 {
+						continue
+					}
+
+					nos2.Arr[x][y+1] = s
+					ngs2.Arr[x][y+1] = ngs.Arr[x][y]
+				}
 			}
 
 			nos2.Arr[0][0] = co
@@ -437,8 +455,8 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		if sc2 == gs {
 			holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
-			if nos != nil {
-				holdAndWin.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			if ogs != nil {
+				holdAndWin.AddOtherScene(gameProp, curpr, ogs, &cd.BasicComponentData)
 			}
 
 			nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
@@ -469,8 +487,8 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		if sc2 == gs {
 			holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 
-			if nos != nil {
-				holdAndWin.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			if ogs != nil {
+				holdAndWin.AddOtherScene(gameProp, curpr, ogs, &cd.BasicComponentData)
 			}
 
 			nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
