@@ -36,7 +36,8 @@ func parseHoldAndWinType(str string) HoldAndWinType {
 
 type HoldAndWinData struct {
 	BasicComponentData
-	Pos []int
+	Pos    []int
+	Height int
 }
 
 // OnNewGame -
@@ -95,6 +96,15 @@ func (holdAndWinData *HoldAndWinData) AddPosEx(x int, y int) {
 	if !holdAndWinData.HasPos(x, y) {
 		holdAndWinData.AddPos(x, y)
 	}
+}
+
+// GetValEx -
+func (holdAndWinData *HoldAndWinData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVHeight {
+		return holdAndWinData.Height, true
+	}
+
+	return 0, false
 }
 
 // HoldAndWinConfig - configuration for HoldAndWin
@@ -299,6 +309,8 @@ func (holdAndWin *HoldAndWin) procNormal(gameProp *GameProperty, plugin sgc7plug
 		}
 	}
 
+	cd.Height = ngs.Height
+
 	return ngs, nos, nil
 }
 
@@ -413,8 +425,12 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 		ngs2.Arr[ngs2.Width-1][0] = holdAndWin.Config.BlankSymbolCode
 		ngs2.Arr[ngs2.Width-1][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
 
+		cd.Height = ngs2.Height
+
 		return ngs, nos, ngs2, nos2, nil
 	}
+
+	cd.Height = ngs.Height
 
 	return ngs, nos, nil, nil, nil
 }
