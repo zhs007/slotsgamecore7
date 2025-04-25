@@ -433,7 +433,7 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 			nos2.Arr[nos2.Width-1][0] = 0
 			nos2.Arr[nos2.Width-1][nos2.Height-1] = 0
 
-			ngs2.Arr[0][0] = holdAndWin.Config.BlankSymbolCode
+			ngs2.Arr[0][0] = ngs.Arr[0][0]
 			ngs2.Arr[0][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
 			ngs2.Arr[ngs2.Width-1][0] = holdAndWin.Config.BlankSymbolCode
 			ngs2.Arr[ngs2.Width-1][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
