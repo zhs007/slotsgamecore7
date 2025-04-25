@@ -110,21 +110,22 @@ func (holdAndWinData *HoldAndWinData) GetValEx(key string, getType GetComponentV
 
 // HoldAndWinConfig - configuration for HoldAndWin
 type HoldAndWinConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrType              string                        `yaml:"type" json:"type"`
-	Type                 HoldAndWinType                `yaml:"-" json:"-"`
-	StrWeight            string                        `yaml:"weight" json:"weight"`
-	WeightVW2            *sgc7game.ValWeights2         `yaml:"-" json:"-"`
-	BlankSymbol          string                        `yaml:"blankSymbol" json:"blankSymbol"`
-	BlankSymbolCode      int                           `yaml:"-" json:"-"`
-	IgnoreSymbols        []string                      `yaml:"ignoreSymbols" json:"ignoreSymbols"`
-	IgnoreSymbolCodes    []int                         `yaml:"-" json:"-"`
-	MinHeight            int                           `yaml:"minHeight" json:"minHeight"`
-	MaxHeight            int                           `yaml:"maxHeight" json:"maxHeight"`
-	MapCoinWeight        map[string]string             `yaml:"mapCoinWeight" json:"mapCoinWeight"`
-	MapCoinWeightVW2     map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	JumpToComponent      string                        `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
-	MapAwards            map[string][]*Award           `yaml:"controllers" json:"controllers"`
+	BasicComponentConfig  `yaml:",inline" json:",inline"`
+	StrType               string                        `yaml:"type" json:"type"`
+	Type                  HoldAndWinType                `yaml:"-" json:"-"`
+	StrWeight             string                        `yaml:"weight" json:"weight"`
+	WeightVW2             *sgc7game.ValWeights2         `yaml:"-" json:"-"`
+	BlankSymbol           string                        `yaml:"blankSymbol" json:"blankSymbol"`
+	BlankSymbolCode       int                           `yaml:"-" json:"-"`
+	DefaultCoinSymbolCode int                           `yaml:"-" json:"-"`
+	IgnoreSymbols         []string                      `yaml:"ignoreSymbols" json:"ignoreSymbols"`
+	IgnoreSymbolCodes     []int                         `yaml:"-" json:"-"`
+	MinHeight             int                           `yaml:"minHeight" json:"minHeight"`
+	MaxHeight             int                           `yaml:"maxHeight" json:"maxHeight"`
+	MapCoinWeight         map[string]string             `yaml:"mapCoinWeight" json:"mapCoinWeight"`
+	MapCoinWeightVW2      map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	JumpToComponent       string                        `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
+	MapAwards             map[string][]*Award           `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -212,6 +213,7 @@ func (holdAndWin *HoldAndWin) InitEx(cfg any, pool *GamePropertyPool) error {
 		holdAndWin.Config.WeightVW2 = vw2
 	}
 
+	holdAndWin.Config.DefaultCoinSymbolCode = -1
 	holdAndWin.Config.MapCoinWeightVW2 = make(map[int]*sgc7game.ValWeights2)
 	for k, v := range holdAndWin.Config.MapCoinWeight {
 		sc, isok := pool.DefaultPaytables.MapSymbols[k]
@@ -233,6 +235,10 @@ func (holdAndWin *HoldAndWin) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 
 		holdAndWin.Config.MapCoinWeightVW2[sc] = vw2
+
+		if holdAndWin.Config.DefaultCoinSymbolCode == -1 {
+			holdAndWin.Config.DefaultCoinSymbolCode = sc
+		}
 	}
 
 	for _, awards := range holdAndWin.Config.MapAwards {
@@ -433,7 +439,7 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 			nos2.Arr[nos2.Width-1][0] = 0
 			nos2.Arr[nos2.Width-1][nos2.Height-1] = 0
 
-			ngs2.Arr[0][0] = ngs.Arr[0][0]
+			ngs2.Arr[0][0] = holdAndWin.Config.DefaultCoinSymbolCode
 			ngs2.Arr[0][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
 			ngs2.Arr[ngs2.Width-1][0] = holdAndWin.Config.BlankSymbolCode
 			ngs2.Arr[ngs2.Width-1][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
