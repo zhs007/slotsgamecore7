@@ -3709,6 +3709,7 @@ type HoldAndWinData struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
 	Pos                []int32                `protobuf:"varint,2,rep,packed,name=pos,proto3" json:"pos,omitempty"`
+	Height             int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -3755,6 +3756,13 @@ func (x *HoldAndWinData) GetPos() []int32 {
 		return x.Pos
 	}
 	return nil
+}
+
+func (x *HoldAndWinData) GetHeight() int32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
 }
 
 // GameParam
@@ -4134,10 +4142,11 @@ const file_lowcode_proto_rawDesc = "" +
 	"\x10lastTriggerIndex\x18\x03 \x03(\x05R\x10lastTriggerIndex\"n\n" +
 	"\x13FlowDownSymbolsData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x10\n" +
-	"\x03pos\x18\x02 \x03(\x05R\x03pos\"i\n" +
+	"\x03pos\x18\x02 \x03(\x05R\x03pos\"\x81\x01\n" +
 	"\x0eHoldAndWinData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x10\n" +
-	"\x03pos\x18\x02 \x03(\x05R\x03pos\"\x93\x05\n" +
+	"\x03pos\x18\x02 \x03(\x05R\x03pos\x12\x16\n" +
+	"\x06height\x18\x03 \x01(\x05R\x06height\"\x93\x05\n" +
 	"\tGameParam\x12&\n" +
 	"\x0efirstComponent\x18\x01 \x01(\tR\x0efirstComponent\x126\n" +
 	"\x16nextStepFirstComponent\x18\x02 \x01(\tR\x16nextStepFirstComponent\x12J\n" +

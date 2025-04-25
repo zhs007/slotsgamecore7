@@ -358,10 +358,6 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 
 	for x, arr := range gs.Arr {
 		for y, s := range arr {
-			if x == 0 && y == 0 {
-				continue
-			}
-
 			if goutils.IndexOfIntSlice(holdAndWin.Config.IgnoreSymbolCodes, s, 0) < 0 {
 				cv, err := vw2.RandVal(plugin)
 				if err != nil {
