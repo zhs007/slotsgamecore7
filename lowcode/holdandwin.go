@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"slices"
@@ -123,7 +124,7 @@ type HoldAndWinConfig struct {
 	MapCoinWeight        map[string]string             `yaml:"mapCoinWeight" json:"mapCoinWeight"`
 	MapCoinWeightVW2     map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	JumpToComponent      string                        `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
-	Controllers          []*Award                      `yaml:"controllers" json:"controllers"`
+	MapAwards            map[string][]*Award           `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -234,8 +235,10 @@ func (holdAndWin *HoldAndWin) InitEx(cfg any, pool *GamePropertyPool) error {
 		holdAndWin.Config.MapCoinWeightVW2[sc] = vw2
 	}
 
-	for _, award := range holdAndWin.Config.Controllers {
-		award.Init()
+	for _, awards := range holdAndWin.Config.MapAwards {
+		for _, award := range awards {
+			award.Init()
+		}
 	}
 
 	holdAndWin.onInit(&holdAndWin.Config.BasicComponentConfig)
@@ -314,6 +317,36 @@ func (holdAndWin *HoldAndWin) procNormal(gameProp *GameProperty, plugin sgc7plug
 	return ngs, nos, nil
 }
 
+func (holdAndWin *HoldAndWin) isFull(gs *sgc7game.GameScene) bool {
+	for _, arr := range gs.Arr {
+		for _, s := range arr {
+			_, isok := holdAndWin.Config.MapCoinWeightVW2[s]
+			if !isok {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (holdAndWin *HoldAndWin) isFullCollectorAndHeightLevel(gs *sgc7game.GameScene) bool {
+	for x, arr := range gs.Arr {
+		for y, s := range arr {
+			if x == 0 && y == 0 {
+				continue
+			}
+
+			_, isok := holdAndWin.Config.MapCoinWeightVW2[s]
+			if !isok {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 // procCollectorAndHeightLevel - return gs1, os1, gs2, os2, err
 func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty, plugin sgc7plugin.IPlugin, cd *HoldAndWinData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, *sgc7game.GameScene, *sgc7game.GameScene, error) {
@@ -369,10 +402,10 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 		}
 	}
 
-	if nos != nil && nos.Arr[0][nos.Height-1] != 0 && nos.Arr[nos.Width-1][0] != 0 && nos.Arr[nos.Width-1][nos.Height-1] != 0 {
-		co := nos.Arr[0][0] + nos.Arr[0][nos.Height-1] + nos.Arr[nos.Width-1][0] + nos.Arr[nos.Width-1][nos.Height-1]
+	if nos != nil && nos.Height < holdAndWin.Config.MaxHeight {
+		if nos.Arr[0][nos.Height-1] != 0 && nos.Arr[nos.Width-1][0] != 0 && nos.Arr[nos.Width-1][nos.Height-1] != 0 {
+			co := nos.Arr[0][0] + nos.Arr[0][nos.Height-1] + nos.Arr[nos.Width-1][0] + nos.Arr[nos.Width-1][nos.Height-1]
 
-		if nos.Height < holdAndWin.Config.MaxHeight {
 			nos2 := gameProp.PoolScene.New(nos.Width, nos.Height+1)
 			ngs2 := gameProp.PoolScene.New(ngs.Width, ngs.Height+1)
 
@@ -411,23 +444,6 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 
 			return ngs, nos, ngs2, nos2, nil
 		}
-
-		nos2 := nos.CloneEx(gameProp.PoolScene)
-		ngs2 := ngs.CloneEx(gameProp.PoolScene)
-
-		nos2.Arr[0][0] = co
-		nos2.Arr[0][nos2.Height-1] = 0
-		nos2.Arr[nos2.Width-1][0] = 0
-		nos2.Arr[nos2.Width-1][nos2.Height-1] = 0
-
-		ngs2.Arr[0][0] = holdAndWin.Config.BlankSymbolCode
-		ngs2.Arr[0][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
-		ngs2.Arr[ngs2.Width-1][0] = holdAndWin.Config.BlankSymbolCode
-		ngs2.Arr[ngs2.Width-1][ngs2.Height-1] = holdAndWin.Config.BlankSymbolCode
-
-		cd.Height = ngs2.Height
-
-		return ngs, nos, ngs2, nos2, nil
 	}
 
 	cd.Height = ngs.Height
@@ -437,8 +453,9 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 
 // OnProcControllers -
 func (holdAndWin *HoldAndWin) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	if len(holdAndWin.Config.Controllers) > 0 {
-		gameProp.procAwards(plugin, holdAndWin.Config.Controllers, curpr, gp)
+	awards, isok := holdAndWin.Config.MapAwards[strVal]
+	if isok {
+		gameProp.procAwards(plugin, awards, curpr, gp)
 	}
 }
 
@@ -483,7 +500,11 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 		holdAndWin.AddOtherScene(gameProp, curpr, ogs2, &cd.BasicComponentData)
 
-		holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		if holdAndWin.isFull(sc2) {
+			holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "<full>")
+		} else {
+			holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "<newsymbols>")
+		}
 
 		nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
@@ -512,9 +533,11 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			return nc, ErrComponentDoNothing
 		}
 
+		curgs := sc2
 		holdAndWin.AddScene(gameProp, curpr, sc2, &cd.BasicComponentData)
 		if ngs2 != nil {
 			holdAndWin.AddScene(gameProp, curpr, ngs2, &cd.BasicComponentData)
+			curgs = ngs2
 		}
 
 		holdAndWin.AddOtherScene(gameProp, curpr, ogs2, &cd.BasicComponentData)
@@ -522,7 +545,15 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			holdAndWin.AddOtherScene(gameProp, curpr, nos2, &cd.BasicComponentData)
 		}
 
-		holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+		if ngs2 != nil {
+			holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, fmt.Sprintf("<height=%d>", ngs2.Height))
+		}
+
+		if holdAndWin.isFullCollectorAndHeightLevel(curgs) {
+			holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "<full>")
+		} else {
+			holdAndWin.ProcControllers(gameProp, plugin, curpr, gp, -1, "<newsymbols>")
+		}
 
 		nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
@@ -634,15 +665,15 @@ func parseHoldAndWin(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(ctrls)
+		mapAwards, err := parseMapStringAndAllControllers(ctrls)
 		if err != nil {
-			goutils.Error("parseHoldAndWin:parseControllers",
+			goutils.Error("parseHoldAndWin:parseMapStringAndAllControllers",
 				goutils.Err(err))
 
 			return "", err
 		}
 
-		cfgd.Controllers = awards
+		cfgd.MapAwards = mapAwards
 	}
 
 	gamecfg.mapConfig[label] = cfgd
