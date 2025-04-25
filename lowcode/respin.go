@@ -288,6 +288,13 @@ recheck:
 			goto recheck
 		}
 
+		// 如果完全没触发，不需要走 next 分支
+		if cd.CurRespinNum == 0 {
+			respin.onStepEnd(gameProp, curpr, gp, "")
+
+			return "", ErrComponentDoNothing
+		}
+
 		if respin.Config.DefaultNextComponent == "" {
 			nc := respin.onStepEnd(gameProp, curpr, gp, "")
 
