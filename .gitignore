@@ -29,3 +29,4 @@ __debug_bin*
 .DS_Store
 data/game.json
 data/rnglib.yaml
+data/fg-reel*.xlsx

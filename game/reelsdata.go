@@ -534,3 +534,132 @@ func NewReelsData(num int) *ReelsData {
 
 	return rd
 }
+
+// RemoveSymbolInReels - remove symbol in reels
+func RemoveSymbolInReels(fn string, targetfn string, symbol string) error {
+	// x -> ri
+	mapri := make(map[int]int)
+	maxri := 0
+	isend := []bool{}
+	isfirst := true
+
+	var reels [][]string
+
+	err := LoadExcel(fn, "", func(x int, str string) string {
+		header := strings.ToLower(strings.TrimSpace(str))
+		if header[0] == 'r' {
+			iv, err := goutils.String2Int64(header[1:])
+			if err != nil {
+				goutils.Error("RemoveSymbolInReels:LoadExcel:String2Int64",
+					slog.String("fn", fn),
+					slog.String("header", header),
+					goutils.Err(err))
+
+				return ""
+			}
+
+			if iv <= 0 {
+				goutils.Error("RemoveSymbolInReels:LoadExcel",
+					slog.String("info", "check iv"),
+					slog.String("fn", fn),
+					slog.String("header", header),
+					goutils.Err(ErrInvalidReelsExcelFile))
+
+				return ""
+			}
+
+			mapri[x] = int(iv) - 1
+			if int(iv) > maxri {
+				maxri = int(iv)
+			}
+		}
+
+		return header
+	}, func(x int, y int, header string, data string) error {
+		if isfirst {
+			isfirst = false
+
+			if maxri != len(mapri) {
+				goutils.Error("RemoveSymbolInReels",
+					slog.String("info", "check len"),
+					slog.String("fn", fn),
+					slog.Int("maxri", maxri),
+					slog.Any("mapri", mapri),
+					goutils.Err(ErrInvalidReelsExcelFile))
+
+				return ErrInvalidReelsExcelFile
+			}
+
+			if maxri <= 0 {
+				goutils.Error("RemoveSymbolInReels",
+					slog.String("info", "check empty"),
+					slog.String("fn", fn),
+					slog.Int("maxri", maxri),
+					slog.Any("mapri", mapri),
+					goutils.Err(ErrInvalidReelsExcelFile))
+
+				return ErrInvalidReelsExcelFile
+			}
+
+			reels = make([][]string, maxri)
+
+			for i := range maxri {
+				reels[i] = []string{}
+				isend = append(isend, false)
+			}
+		}
+
+		ri, isok := mapri[x]
+		if isok {
+			data = strings.TrimSpace(data)
+			if len(data) > 0 {
+				reels[ri] = append(reels[ri], data)
+			} else {
+				isend[ri] = true
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		goutils.Error("RemoveSymbolInReels:OpenFile",
+			slog.String("fn", fn),
+			goutils.Err(err))
+
+		return err
+	}
+
+	for x, arr := range reels {
+		narr := []string{}
+		for _, v := range arr {
+			if v != symbol {
+				narr = append(narr, v)
+			}
+		}
+
+		reels[x] = narr
+	}
+
+	f := excelize.NewFile()
+
+	sheet := f.GetSheetName(0)
+
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "line")
+	for i := range reels {
+		f.SetCellStr(sheet, goutils.Pos2Cell(i+1, 0), fmt.Sprintf("R%v", i+1))
+	}
+
+	maxj := 0
+
+	for i, reel := range reels {
+		if maxj < len(reel) {
+			maxj = len(reel)
+		}
+
+		for j, v := range reel {
+			f.SetCellStr(sheet, goutils.Pos2Cell(i+1, j+1), v)
+		}
+	}
+
+	return f.SaveAs(targetfn)
+}

@@ -101,6 +101,20 @@
             "cwd": "${workspaceFolder}/app",
             "env": {
             }
+        },
+        {
+            "name": "rmreelsymbol",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/rmreelsymbol/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/data",
+            "env": {
+                "REELS":"fg-reel2-l5.xlsx",
+                "SYMBOL":"L4",
+                "OUTPUT":"fg-reel2-l4.xlsx",
+            }
         }
     ]
 }
