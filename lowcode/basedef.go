@@ -295,6 +295,12 @@ func SetRngLibConfig(fn string) {
 	gRngLibConfig = fn
 }
 
+var gIsIgnoreGenDefaultScene bool
+
+func SetIgnoreGenDefaultScene() {
+	gIsIgnoreGenDefaultScene = true
+}
+
 func init() {
 	initCheckWinType()
 }
