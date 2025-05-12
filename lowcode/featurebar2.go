@@ -306,6 +306,15 @@ func (featureBar2 *FeatureBar2) isClear(basicCD *BasicComponentData) bool {
 	return false
 }
 
+func (featureBar2 *FeatureBar2) getForceFeature(cd *FeatureBar2Data) string {
+	val := cd.BasicComponentData.GetConfigVal(CCVForceFeature)
+	if val != "" {
+		return val
+	}
+
+	return ""
+}
+
 // playgame
 func (featureBar2 *FeatureBar2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ips sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -353,20 +362,25 @@ func (featureBar2 *FeatureBar2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			return "", ErrIvalidPlayerState
 		}
 
-		cd.CurFeature = fbps.Features[0]
-		fbps.Features = fbps.Features[1:]
+		forceFeature := featureBar2.getForceFeature(cd)
+		if forceFeature != "" {
+			cd.CurFeature = forceFeature
+		} else {
+			cd.CurFeature = fbps.Features[0]
+			fbps.Features = fbps.Features[1:]
 
-		vw := featureBar2.getWeight(gameProp, cd)
+			vw := featureBar2.getWeight(gameProp, cd)
 
-		feature, err := vw.RandVal(plugin)
-		if err != nil {
-			goutils.Error("FeatureBar2.OnPlayGame:IsPlayerState:RandVal",
-				goutils.Err(err))
+			feature, err := vw.RandVal(plugin)
+			if err != nil {
+				goutils.Error("FeatureBar2.OnPlayGame:IsPlayerState:RandVal",
+					goutils.Err(err))
 
-			return "", err
+				return "", err
+			}
+
+			fbps.Features = append(fbps.Features, feature.String())
 		}
-
-		fbps.Features = append(fbps.Features, feature.String())
 
 		cd.UsedFeatures = append(cd.UsedFeatures, cd.CurFeature)
 		cd.Features = slices.Clone(fbps.Features)
