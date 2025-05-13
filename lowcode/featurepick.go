@@ -197,6 +197,7 @@ func (featurePick *FeaturePick) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			}
 
 			cd.CurSelected[i] = cd.UnSelected[ci]
+			featurePick.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 			featurePick.ProcControllers(gameProp, plugin, curpr, gp, -1, cd.UnSelected[ci])
 
 			cd.UnSelected = slices.Delete(cd.UnSelected, ci, ci+1)
@@ -318,9 +319,9 @@ func parseFeaturePick(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		mapAwards, err := parseMapStringAndAllControllers(ctrls)
+		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
-			goutils.Error("parseFeaturePick:parseMapStringAndAllControllers",
+			goutils.Error("parseFeaturePick:parseAllAndStrMapControllers2",
 				goutils.Err(err))
 
 			return "", err
