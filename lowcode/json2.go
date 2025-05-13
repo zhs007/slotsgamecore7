@@ -714,7 +714,7 @@ func parseAllAndStrMapControllers(controller *ast.Node) ([]*Award, map[string][]
 
 	for _, v := range lst {
 		str, a := v.buildWithStringValEx()
-		if str == "" {
+		if str == "" || str == "<any>" {
 			awards = append(awards, a)
 		} else {
 			mapAwards[str] = append(mapAwards[str], a)
@@ -722,4 +722,38 @@ func parseAllAndStrMapControllers(controller *ast.Node) ([]*Award, map[string][]
 	}
 
 	return awards, mapAwards, nil
+}
+
+func parseAllAndStrMapControllers2(controller *ast.Node) (map[string][]*Award, error) {
+	buf, err := controller.MarshalJSON()
+	if err != nil {
+		goutils.Error("parseAllAndStrMapControllers2:MarshalJSON",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	lst := []*jsonControllerData{}
+
+	err = sonic.Unmarshal(buf, &lst)
+	if err != nil {
+		goutils.Error("parseAllAndStrMapControllers2:Unmarshal",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	// awards := []*Award{}
+	mapAwards := make(map[string][]*Award)
+
+	for _, v := range lst {
+		str, a := v.buildWithStringValEx()
+		if str == "" || str == "<any>" {
+			mapAwards["<any>"] = append(mapAwards["<any>"], a)
+		} else {
+			mapAwards[str] = append(mapAwards[str], a)
+		}
+	}
+
+	return mapAwards, nil
 }

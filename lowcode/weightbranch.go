@@ -358,6 +358,7 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	nextComponent := ""
 
+	weightBranch.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 	weightBranch.ProcControllers(gameProp, plugin, curpr, gp, -1, wbd.Value)
 
 	branch, isok := weightBranch.Config.MapBranchs[wbd.Value]

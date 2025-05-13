@@ -667,9 +667,9 @@ func parseHoldAndWin(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		mapAwards, err := parseMapStringAndAllControllers(ctrls)
+		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
-			goutils.Error("parseHoldAndWin:parseMapStringAndAllControllers",
+			goutils.Error("parseHoldAndWin:parseAllAndStrMapControllers2",
 				goutils.Err(err))
 
 			return "", err
