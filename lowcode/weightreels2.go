@@ -158,10 +158,10 @@ func (weightReels2 *WeightReels2) ProcControllers(gameProp *GameProperty, plugin
 		}
 	}
 
-	awards, isok := weightReels2.Config.MapAwards[""]
-	if isok {
-		gameProp.procAwards(plugin, awards, curpr, gp)
-	}
+	// awards, isok := weightReels2.Config.MapAwards[""]
+	// if isok {
+	// 	gameProp.procAwards(plugin, awards, curpr, gp)
+	// }
 }
 
 // playgame
@@ -210,6 +210,7 @@ func (weightReels2 *WeightReels2) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	weightReels2.AddScene(gameProp, curpr, sc, &wrd.BasicComponentData)
 
+	weightReels2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 	weightReels2.ProcControllers(gameProp, plugin, curpr, gp, -1, reelname)
 
 	nc := weightReels2.onStepEnd(gameProp, curpr, gp, "")
@@ -294,9 +295,9 @@ func parseWeightReels2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		mapAwards, err := parseMapStringAndAllControllers(ctrls)
+		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
-			goutils.Error("parseWeightReels2:parseMapStringAndAllControllers",
+			goutils.Error("parseWeightReels2:parseAllAndStrMapControllers2",
 				goutils.Err(err))
 
 			return "", err
