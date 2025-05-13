@@ -452,7 +452,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 				for i, v := range ld.Lines {
 					isTriggerFull := false
 					if linesTrigger.Config.CheckWinType != CheckWinTypeRightLeft {
-						ret := sgc7game.CalcLine2(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
+						ret := sgc7game.CalcLine3(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
@@ -472,7 +472,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 								}
 
 								return os.Arr[x][y]
-							})
+							}, funcCalcMulti)
 						if ret != nil {
 							ret.LineIndex = i
 
@@ -491,7 +491,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 					}
 
 					if !isTriggerFull && linesTrigger.Config.CheckWinType != CheckWinTypeLeftRight {
-						ret := sgc7game.CalcLineRL2(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
+						ret := sgc7game.CalcLineRL3(gs, gameProp.CurPaytables, v, gameProp.GetBet3(stake, linesTrigger.Config.BetType),
 							func(cursymbol int) bool {
 								return goutils.IndexOfIntSlice(lstSym, cursymbol, 0) >= 0
 								// return goutils.IndexOfIntSlice(linesTrigger.Config.ExcludeSymbolCodes, cursymbol, 0) < 0
@@ -511,7 +511,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 								}
 
 								return os.Arr[x][y]
-							})
+							}, funcCalcMulti)
 						if ret != nil {
 							ret.LineIndex = i
 

@@ -56,6 +56,25 @@ func parseGenSymbolVals2CoreType(strType string) GenSymbolVals2CoreType {
 	return GSV2CTypeNone
 }
 
+type GenSymbolVals2Data struct {
+	BasicComponentData
+	cfg *GenSymbolVals2Config
+}
+
+// ChgConfigIntVal -
+func (genSymbolVals2Data *GenSymbolVals2Data) ChgConfigIntVal(key string, off int) int {
+	if key == CCVNumber {
+		_, isok := genSymbolVals2Data.MapConfigIntVals[key]
+		if !isok {
+			genSymbolVals2Data.MapConfigIntVals[key] = genSymbolVals2Data.cfg.Number + off
+
+			return genSymbolVals2Data.MapConfigIntVals[key]
+		}
+	}
+
+	return genSymbolVals2Data.BasicComponentData.ChgConfigIntVal(key, off)
+}
+
 // GenSymbolVals2Config - configuration for GenSymbolVals2
 type GenSymbolVals2Config struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -510,7 +529,7 @@ func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7g
 func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*GenSymbolVals2Data)
 
 	cd.UsedOtherScenes = nil
 
@@ -531,7 +550,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 	}
 
 	if genSymbolVals2.Config.GenType == GSV2CTypeNumber {
-		nos, err := genSymbolVals2.procNumber(gameProp, os, pos, cd)
+		nos, err := genSymbolVals2.procNumber(gameProp, os, pos, &cd.BasicComponentData)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procNumber",
 				goutils.Err(err))
@@ -540,10 +559,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, cd)
+			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 		}
 	} else if genSymbolVals2.Config.GenType == GSV2CTypeWeight {
-		nos, err := genSymbolVals2.procWeight(gameProp, os, pos, plugin, cd)
+		nos, err := genSymbolVals2.procWeight(gameProp, os, pos, plugin, &cd.BasicComponentData)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procWeight",
 				goutils.Err(err))
@@ -552,7 +571,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, cd)
+			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 		}
 	} else if genSymbolVals2.Config.GenType == GSV2CTypeAdd {
 		nos, err := genSymbolVals2.procAdd(gameProp, os, pos)
@@ -564,7 +583,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, cd)
+			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 		}
 	} else if genSymbolVals2.Config.GenType == GSV2CTypeMask {
 		nos, err := genSymbolVals2.procMask(gameProp, os, pos)
@@ -576,7 +595,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, cd)
+			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 		}
 	}
 
@@ -594,13 +613,20 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 // OnAsciiGame - outpur to asciigame
 func (genSymbolVals2 *GenSymbolVals2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*GenSymbolVals2Data)
 
 	if len(cd.UsedOtherScenes) > 0 {
 		asciigame.OutputOtherScene("GenSymbolVals2", pr.OtherScenes[cd.UsedOtherScenes[0]])
 	}
 
 	return nil
+}
+
+// NewComponentData -
+func (genSymbolVals2 *GenSymbolVals2) NewComponentData() IComponentData {
+	return &GenSymbolVals2Data{
+		cfg: genSymbolVals2.Config,
+	}
 }
 
 func NewGenSymbolVals2(name string) IComponent {
