@@ -132,7 +132,6 @@ type FeatureBar2Config struct {
 	IsPlayerState        bool                  `yaml:"IsPlayerState" json:"IsPlayerState"`     // IsPlayerState
 	IsMergeData          bool                  `yaml:"IsMergeData" json:"IsMergeData"`         // IsMergeData
 	MapAwards            map[string][]*Award   `yaml:"mapAwards" json:"mapAwards"`             // 新的奖励系统
-	Awards               []*Award              `yaml:"awards" json:"awards"`                   // 新的奖励系统
 	MapBranch            map[string]string     `yaml:"mapBranch" json:"mapBranch"`             // mapBranch
 }
 
@@ -213,9 +212,9 @@ func (featureBar2 *FeatureBar2) InitEx(cfg any, pool *GamePropertyPool) error {
 		return ErrInvalidComponentConfig
 	}
 
-	for _, award := range featureBar2.Config.Awards {
-		award.Init()
-	}
+	// for _, award := range featureBar2.Config.Awards {
+	// 	award.Init()
+	// }
 
 	for _, awards := range featureBar2.Config.MapAwards {
 		for _, award := range awards {
@@ -230,8 +229,6 @@ func (featureBar2 *FeatureBar2) InitEx(cfg any, pool *GamePropertyPool) error {
 
 // OnProcControllers -
 func (featureBar2 *FeatureBar2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	gameProp.procAwards(plugin, featureBar2.Config.Awards, curpr, gp)
-
 	if len(featureBar2.Config.MapAwards) > 0 {
 		awards, isok := featureBar2.Config.MapAwards[strVal]
 		if isok {
@@ -292,6 +289,7 @@ func (featureBar2 *FeatureBar2) procFeature(gameProp *GameProperty, cd *FeatureB
 
 	cd.Features = append(cd.Features, feature.String())
 
+	featureBar2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 	featureBar2.ProcControllers(gameProp, plugin, curpr, gp, -1, cd.CurFeature)
 
 	return nil
@@ -385,6 +383,7 @@ func (featureBar2 *FeatureBar2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		cd.UsedFeatures = append(cd.UsedFeatures, cd.CurFeature)
 		cd.Features = slices.Clone(fbps.Features)
 
+		featureBar2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 		featureBar2.ProcControllers(gameProp, plugin, curpr, gp, -1, cd.CurFeature)
 
 		nc := featureBar2.onStepEnd(gameProp, curpr, gp, featureBar2.Config.MapBranch[cd.CurFeature])
@@ -568,16 +567,16 @@ func parseFeatureBar2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, mapAwards, err := parseAllAndStrMapControllers(ctrls)
+		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
-			goutils.Error("parseFeatureBar2:parseAllAndStrMapControllers",
+			goutils.Error("parseFeatureBar2:parseAllAndStrMapControllers2",
 				goutils.Err(err))
 
 			return "", err
 		}
 
 		cfgd.MapAwards = mapAwards
-		cfgd.Awards = awards
+		// cfgd.Awards = awards
 	}
 
 	gamecfg.mapConfig[label] = cfgd
