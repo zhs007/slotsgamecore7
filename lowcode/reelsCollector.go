@@ -368,6 +368,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				cd.reset(cbps)
 
 				reelsCollector.procMaskEx(gameProp, curpr, gp, plugin, lst)
+				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
@@ -384,6 +385,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
@@ -401,6 +403,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
@@ -422,6 +425,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
@@ -443,6 +447,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					cd.reset(cbps)
 
 					reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 					reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 					nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
@@ -476,6 +481,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				cd.Collectors = slices.Clone(cd.Collectors)
 
 				reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
@@ -490,6 +496,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				cd.Collectors = slices.Clone(cd.Collectors)
 
 				reelsCollector.procMask(gameProp, curpr, gp, plugin, i)
+				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<any>")
 				reelsCollector.ProcControllers(gameProp, plugin, curpr, gp, reelsCollector.Config.MaxVal, "")
 
 				nc := reelsCollector.onStepEnd(gameProp, curpr, gp, reelsCollector.Config.JumpToComponent)
