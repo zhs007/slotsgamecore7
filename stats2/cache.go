@@ -76,6 +76,13 @@ func (s2 *Cache) ProcStatsIntVal(name string, val int) {
 	}
 }
 
+func (s2 *Cache) ProcStatsIntVal2(name string, val int) {
+	f2, isok := s2.MapStats[name]
+	if isok {
+		f2.procCacheStatsIntVal2(val)
+	}
+}
+
 func (s2 *Cache) ProcStatsStrVal(name string, val string) {
 	f2, isok := s2.MapStats[name]
 	if isok {
