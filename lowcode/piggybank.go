@@ -168,7 +168,11 @@ func (piggyBank *PiggyBank) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 	cd := icd.(*PiggyBankData)
 	var winMulti int
 
-	if piggyBank.Config.Type == PiggyBankTypeSumSymbolVals {
+	isDiableMulti := piggyBank.isDiableMulti(&cd.BasicComponentData)
+
+	if isDiableMulti {
+		winMulti = 1
+	} else if piggyBank.Config.Type == PiggyBankTypeSumSymbolVals {
 		os := piggyBank.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 		if os != nil {
 			winMulti = 0
@@ -280,6 +284,15 @@ func (piggyBank *PiggyBank) GetWinMulti(basicCD *BasicComponentData) int {
 	}
 
 	return piggyBank.Config.WinMulti
+}
+
+func (piggyBank *PiggyBank) isDiableMulti(basicCD *BasicComponentData) bool {
+	isDiableMulti, isok := basicCD.GetConfigIntVal(CCVDisableMulti)
+	if isok {
+		return isDiableMulti != 0
+	}
+
+	return false
 }
 
 // NewStats2 -

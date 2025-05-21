@@ -30,6 +30,7 @@ const (
 	CCVClearNow                   string = "clearnow"                   // 可以修改配置项里的 clearNow
 	CCVPickNum                    string = "picknum"                    // 可以修改配置项里的 pickNum
 	CCVForceFeature               string = "forcefeature"               // 可以修改配置项里的 forceFeature
+	CCVDisableMulti               string = "disablemulti"               // 可以修改配置项里的 disableMulti
 )
 
 const (
