@@ -248,6 +248,13 @@ func (chgSymbols *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 		chgSymbols.Config.BlankSymbolCode = -1
 	}
 
+	symbolCode, isok := pool.DefaultPaytables.MapSymbols[chgSymbols.Config.Symbol]
+	if isok {
+		chgSymbols.Config.SymbolCode = symbolCode
+	} else {
+		chgSymbols.Config.SymbolCode = -1
+	}
+
 	if chgSymbols.Config.SrcSymbolWeight != "" {
 		vw2, err := pool.LoadIntWeights(chgSymbols.Config.SrcSymbolWeight, true)
 		if err != nil {
