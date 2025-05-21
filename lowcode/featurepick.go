@@ -257,11 +257,14 @@ func (featurePick *FeaturePick) OnStats2(icd IComponentData, s2 *stats2.Cache, g
 	for _, v := range cd.CurSelected {
 		s2.ProcStatsStrVal(featurePick.GetName(), v)
 	}
+
+	pickNum := featurePick.getPickNum(gameProp, &cd.BasicComponentData)
+	s2.ProcStatsIntVal(featurePick.GetName(), pickNum)
 }
 
 // NewStats2 -
 func (featurePick *FeaturePick) NewStats2(parent string) *stats2.Feature {
-	return stats2.NewFeature(parent, []stats2.Option{stats2.OptStrVal})
+	return stats2.NewFeature(parent, []stats2.Option{stats2.OptStrVal, stats2.OptIntVal})
 }
 
 func NewFeaturePick(name string) IComponent {

@@ -14,6 +14,7 @@ type Feature struct {
 	Wins        *StatsWins        `json:"wins"`        // wins
 	IntVal      *StatsIntVal      `json:"intVal"`      // intVal
 	StrVal      *StatsStrVal      `json:"strVal"`      // strVal
+	IntVal2     *StatsIntVal      `json:"intVal2"`     // intVal2
 }
 
 func (f2 *Feature) check() {
@@ -27,6 +28,12 @@ func (f2 *Feature) check() {
 func (f2 *Feature) procCacheStatsIntVal(val int) {
 	if f2.IntVal != nil {
 		f2.IntVal.UseVal(val)
+	}
+}
+
+func (f2 *Feature) procCacheStatsIntVal2(val int) {
+	if f2.IntVal2 != nil {
+		f2.IntVal2.UseVal(val)
 	}
 }
 
@@ -95,6 +102,10 @@ func (f2 *Feature) Merge(src *Feature) {
 	if f2.StrVal != nil && src.StrVal != nil {
 		f2.StrVal.Merge(src.StrVal)
 	}
+
+	if f2.IntVal2 != nil && src.IntVal2 != nil {
+		f2.IntVal2.Merge(src.IntVal2)
+	}
 }
 
 func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
@@ -132,6 +143,13 @@ func (f2 *Feature) SaveSheet(f *excelize.File, sheet string, s2 *Stats) {
 
 		f2.StrVal.SaveSheet(f, sn, s2)
 	}
+
+	if f2.IntVal2 != nil {
+		sn := fmt.Sprintf("%v - intVal2", sheet)
+		f.NewSheet(sn)
+
+		f2.IntVal2.SaveSheet(f, sn, s2)
+	}
 }
 
 func NewFeature(parent string, opts Options) *Feature {
@@ -155,6 +173,10 @@ func NewFeature(parent string, opts Options) *Feature {
 
 	if opts.Has(OptStrVal) {
 		f2.StrVal = NewStatsStrVal()
+	}
+
+	if opts.Has(OptIntVal2) {
+		f2.IntVal2 = NewStatsIntVal()
 	}
 
 	return f2

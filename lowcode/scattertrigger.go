@@ -743,7 +743,7 @@ func (scatterTrigger *ScatterTrigger) GetNextLinkComponents() []string {
 
 // NewStats2 -
 func (scatterTrigger *ScatterTrigger) NewStats2(parent string) *stats2.Feature {
-	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins})
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins, stats2.OptIntVal})
 }
 
 // OnStats2
@@ -753,6 +753,8 @@ func (scatterTrigger *ScatterTrigger) OnStats2(icd IComponentData, s2 *stats2.Ca
 	cd := icd.(*ScatterTriggerData)
 
 	s2.ProcStatsWins(scatterTrigger.Name, int64(cd.Wins))
+
+	s2.ProcStatsIntVal(scatterTrigger.Name, cd.SymbolNum)
 }
 
 func NewScatterTrigger(name string) IComponent {

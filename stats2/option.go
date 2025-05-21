@@ -8,6 +8,7 @@ const (
 	OptRootTrigger Option = 3
 	OptIntVal      Option = 4
 	OptStrVal      Option = 5
+	OptIntVal2     Option = 6
 )
 
 type Options []Option

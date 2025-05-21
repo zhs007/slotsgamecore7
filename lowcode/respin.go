@@ -30,6 +30,8 @@ type RespinData struct {
 	CurTriggerNum         int      // 当前已经触发次数
 	Awards                []*Award // 当前已经触发次数
 	TriggerRespinNum      []int    // 配合LastTriggerNum用的respin次数，-1表示用当前的RetriggerAddRespinNum，否则就是具体值
+	isFirst               bool     // 是否第一次进入
+	isRunning             bool     // 是否已经运行了
 }
 
 // OnNewGame -
@@ -44,11 +46,14 @@ func (respinData *RespinData) OnNewGame(gameProp *GameProperty, component ICompo
 	respinData.LastTriggerNum = 0
 	respinData.CurTriggerNum = 0
 	respinData.Awards = nil
+	respinData.isFirst = false
+	respinData.isRunning = false
 }
 
 // onNewStep -
 func (respinData *RespinData) onNewStep() {
 	respinData.CurAddRespinNum = 0
+	respinData.isFirst = false
 }
 
 // Clone
@@ -306,6 +311,12 @@ recheck:
 		return nc, nil
 	}
 
+	if !cd.isRunning {
+		cd.isFirst = true
+	}
+
+	cd.isRunning = true
+
 	nextComponent := respin.Config.MainComponent
 
 	if cd.LastRespinNum > 0 {
@@ -379,13 +390,19 @@ func (respin *Respin) IsRespin() bool {
 
 // NewStats2 -
 func (respin *Respin) NewStats2(parent string) *stats2.Feature {
-	return stats2.NewFeature(parent, stats2.Options{stats2.OptRootTrigger, stats2.OptIntVal})
+	return stats2.NewFeature(parent, stats2.Options{stats2.OptRootTrigger, stats2.OptIntVal, stats2.OptIntVal2})
 }
 
 // OnStats2
 func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
 	isRunning := false
 	isEnding := false
+
+	cd := icd.(*RespinData)
+
+	if cd.isFirst {
+		s2.ProcStatsIntVal2(respin.Name, cd.CurRespinNum+cd.LastRespinNum)
+	}
 
 	if goutils.IndexOfStringSlice(gp.HistoryComponents, respin.Name, 0) >= 0 {
 		isRunning = true
@@ -394,6 +411,7 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 	if goutils.IndexOfStringSlice(gp.RespinComponents, respin.Name, 0) < 0 {
 		isEnding = true
 	} else if !isRunning {
+		// 这里是为了统计完整的 win
 		isRunning = true
 	}
 
@@ -406,8 +424,6 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 	}
 
 	if isEnding {
-		cd := icd.(*RespinData)
-
 		s2.ProcStatsIntVal(respin.Name, cd.CurRespinNum)
 	}
 }
