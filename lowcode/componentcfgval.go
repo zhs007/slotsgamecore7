@@ -28,7 +28,7 @@ const (
 	CCVClear                      string = "clear"                      // 可以修改配置项里的 clear
 	CCVLineData                   string = "linedata"                   // 可以修改配置项里的 linedata
 	CCVClearNow                   string = "clearnow"                   // 可以修改配置项里的 clearNow
-	CCVPickNum                    string = "pickNum"                    // 可以修改配置项里的 pickNum
+	CCVPickNum                    string = "picknum"                    // 可以修改配置项里的 pickNum
 	CCVForceFeature               string = "forcefeature"               // 可以修改配置项里的 forceFeature
 )
 
