@@ -98,13 +98,13 @@ type IComponent interface {
 	OnPlayGameWithSet(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData, set int) (string, error)
 
-	//----------------------------
-	// Branch
+	// //----------------------------
+	// // Branch
 
-	// GetBranchNum -
-	GetBranchNum() int
-	// GetBranchWeights -
-	GetBranchWeights() []int
+	// // GetBranchNum -
+	// GetBranchNum() int
+	// // GetBranchWeights -
+	// GetBranchWeights() []int
 
 	//----------------------------
 	// IComponentData

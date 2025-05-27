@@ -162,6 +162,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ReelsCollectorTypeName, NewReelsCollector)
 	mgr.Reg(FlowDownSymbolsTypeName, NewFlowDownSymbols)
 	mgr.Reg(HoldAndWinTypeName, NewHoldAndWin)
+	mgr.Reg(ChgSymbolsInReelsTypeName, NewChgSymbolsInReels)
 
 	return mgr
 }

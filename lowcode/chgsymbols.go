@@ -795,15 +795,15 @@ func (chgSymbols *ChgSymbols) GetNextLinkComponents() []string {
 	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
 }
 
-// GetBranchNum -
-func (chgSymbols *ChgSymbols) GetBranchNum() int {
-	return len(chgSymbols.Config.WeightVW2.Vals)
-}
+// // GetBranchNum -
+// func (chgSymbols *ChgSymbols) GetBranchNum() int {
+// 	return len(chgSymbols.Config.WeightVW2.Vals)
+// }
 
-// GetBranchWeights -
-func (chgSymbols *ChgSymbols) GetBranchWeights() []int {
-	return chgSymbols.Config.WeightVW2.Weights
-}
+// // GetBranchWeights -
+// func (chgSymbols *ChgSymbols) GetBranchWeights() []int {
+// 	return chgSymbols.Config.WeightVW2.Weights
+// }
 
 // rollSymbol -
 func (chgSymbols *ChgSymbols) rollSymbol(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bcd *BasicComponentData) (int, error) {

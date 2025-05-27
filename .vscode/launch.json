@@ -75,7 +75,7 @@
                 "SPINNUMS": "2000000",
                 "CORE":"8",
                 "ALLOWSTATS2":"true",
-                "BET":"10000",
+                "BET":"10",
                 "RNGLIB": "${workspaceFolder}/data/rnglib.yaml",
                 "WINCAP": "",
             }
@@ -111,9 +111,9 @@
             "args": [],
             "cwd": "${workspaceFolder}/data",
             "env": {
-                "REELS":"fg-reel2-l5.xlsx",
+                "REELS":"fg94-reel1-l5.xlsx",
                 "SYMBOL":"L4",
-                "OUTPUT":"fg-reel2-l4.xlsx",
+                "OUTPUT":"fg94-reel1-l4.xlsx",
             }
         }
     ]
