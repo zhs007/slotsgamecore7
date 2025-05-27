@@ -436,6 +436,18 @@ message HoldAndWinData {
     int32 height = 3;
 }
 
+// ChgSymbols2Data
+message ChgSymbols2Data {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
+// ChgSymbolsInReelsData
+message ChgSymbolsInReelsData {
+    ComponentData basicComponentData = 1;
+    repeated int32 pos = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
