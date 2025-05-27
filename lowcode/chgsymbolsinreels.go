@@ -350,7 +350,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) getSrcPos(gameProp *GameProperty, pl
 
 // playgame
 func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbols2Data) (string, error) {
+	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbolsInReelsData) (string, error) {
 
 	gs := chgSymbolsInReels.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -415,7 +415,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curp
 
 // procEachPosRandomWithPos
 func (chgSymbolsInReels *ChgSymbolsInReels) procEachPosRandomWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
-	gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+	gs *sgc7game.GameScene, pos []int, cd *ChgSymbolsInReelsData) (*sgc7game.GameScene, error) {
 
 	if len(chgSymbolsInReels.Config.MapSymbolWeightVW) == 0 {
 		goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:MapSymbolWeightVW",
@@ -505,7 +505,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procEachPosRandomWithPos(gameProp *G
 func (chgSymbols *ChgSymbolsInReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	cd := icd.(*ChgSymbols2Data)
+	cd := icd.(*ChgSymbolsInReelsData)
 
 	return chgSymbols.procPos(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
 }
@@ -513,7 +513,7 @@ func (chgSymbols *ChgSymbolsInReels) OnPlayGame(gameProp *GameProperty, curpr *s
 // OnAsciiGame - outpur to asciigame
 func (chgSymbols *ChgSymbolsInReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	cd := icd.(*ChgSymbols2Data)
+	cd := icd.(*ChgSymbolsInReelsData)
 
 	if len(cd.UsedScenes) > 0 {
 		asciigame.OutputScene("after ChgSymbolsInReels", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
@@ -607,22 +607,17 @@ func NewChgSymbolsInReels(name string) IComponent {
 //	]
 //
 // ]
-type jsonKV struct {
-	Key   int    `json:"0"` // 使用索引作为字段名
-	Value string `json:"1"`
-}
-
 type jsonChgSymbolsInReels struct {
-	StrSrcType       string   `json:"srcType"`
-	StrSrcSymbolType string   `json:"srcSymbolType"`
-	StrNumberType    string   `json:"numberType"`
-	StrType          string   `json:"type"`
-	IsAlwaysGen      bool     `json:"isAlwaysGen"`
-	Height           int      `json:"Height"`
-	MapSymbol        []jsonKV `json:"mapSymbol"`
-	MapWeight        []jsonKV `json:"mapWeight"`
-	MapSrcSymbols    []jsonKV `json:"mapSrcSymbols"`
-	BlankSymbol      string   `json:"blankSymbol"`
+	StrSrcType       string          `json:"srcType"`
+	StrSrcSymbolType string          `json:"srcSymbolType"`
+	StrNumberType    string          `json:"numberType"`
+	StrType          string          `json:"type"`
+	IsAlwaysGen      bool            `json:"isAlwaysGen"`
+	Height           int             `json:"Height"`
+	MapSymbol        [][]interface{} `json:"mapSymbol"`
+	MapWeight        [][]interface{} `json:"mapWeight"`
+	MapSrcSymbols    [][]interface{} `json:"mapSrcSymbols"`
+	BlankSymbol      string          `json:"blankSymbol"`
 }
 
 func (jcfg *jsonChgSymbolsInReels) build() *ChgSymbolsInReelsConfig {
@@ -638,22 +633,49 @@ func (jcfg *jsonChgSymbolsInReels) build() *ChgSymbolsInReelsConfig {
 
 	if len(jcfg.MapSymbol) > 0 {
 		cfg.MapSymbol = make(map[int]string, len(jcfg.MapSymbol))
-		for _, kv := range jcfg.MapSymbol {
-			cfg.MapSymbol[kv.Key-1] = kv.Value // [1,w] => [0,w)
+
+		for _, arr := range jcfg.MapSymbol {
+			if len(arr) != 2 {
+				goutils.Error("jsonChgSymbolsInReels.build:MapSymbol:arr")
+
+				return nil
+			}
+
+			k := arr[0].(float64)
+			v := arr[1].(string)
+			cfg.MapSymbol[int(k)-1] = v // [1,w] => [0,w)
 		}
 	}
 
 	if len(jcfg.MapWeight) > 0 {
 		cfg.MapSymbolWeight = make(map[int]string, len(jcfg.MapWeight))
-		for _, kv := range jcfg.MapWeight {
-			cfg.MapSymbolWeight[kv.Key-1] = kv.Value // [1,w] => [0,w)
+
+		for _, arr := range jcfg.MapWeight {
+			if len(arr) != 2 {
+				goutils.Error("jsonChgSymbolsInReels.build:MapWeight:arr")
+
+				return nil
+			}
+
+			k := arr[0].(float64)
+			v := arr[1].(string)
+			cfg.MapSymbolWeight[int(k)-1] = v // [1,w] => [0,w)
 		}
 	}
 
 	if len(jcfg.MapSrcSymbols) > 0 {
 		cfg.MapSrcSymbols = make(map[int]string, len(jcfg.MapSrcSymbols))
-		for _, kv := range jcfg.MapWeight {
-			cfg.MapSrcSymbols[kv.Key-1] = kv.Value // [1,w] => [0,w)
+
+		for _, arr := range jcfg.MapSrcSymbols {
+			if len(arr) != 2 {
+				goutils.Error("jsonChgSymbolsInReels.build:MapSrcSymbols:arr")
+
+				return nil
+			}
+
+			k := arr[0].(float64)
+			v := arr[1].(string)
+			cfg.MapSrcSymbols[int(k)-1] = v // [1,w] => [0,w)
 		}
 	}
 
@@ -677,7 +699,7 @@ func parseChgSymbolsInReels(gamecfg *BetConfig, cell *ast.Node) (string, error) 
 		return "", err
 	}
 
-	data := &jsonChgSymbols2{}
+	data := &jsonChgSymbolsInReels{}
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
