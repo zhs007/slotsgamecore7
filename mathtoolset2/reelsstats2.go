@@ -14,6 +14,37 @@ type ReelStats2 struct {
 	TotalSymbolNum int
 }
 
+func (rs2 *ReelStats2) genSymbolsPool() (*SymbolsPool, error) {
+	pool := &SymbolsPool{}
+
+	for k, v := range rs2.MapSymbols {
+		if strings.Contains(k, "_") {
+			arr := strings.Split(k, "_")
+			if len(arr) != 2 {
+				goutils.Error("ReelStats2.genSymbolsPool:Split",
+					slog.Any("arr", arr))
+
+				return nil, ErrUnkonow
+			}
+
+			v1, err := goutils.String2Int64(arr[1])
+			if err != nil {
+				goutils.Error("ReelStats2.genSymbolsPool:Split",
+					slog.Any("arr", arr),
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			pool.PushEx(arr[0], int(v1), v)
+		} else {
+			pool.PushEx(k, 1, v)
+		}
+	}
+
+	return pool, nil
+}
+
 type ReelsStats2 struct {
 	Reels   []*ReelStats2
 	Symbols []string
