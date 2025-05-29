@@ -30,3 +30,4 @@ __debug_bin*
 data/game.json
 data/rnglib.yaml
 data/fg-reel*.xlsx
+unittestdata/*-output.*
