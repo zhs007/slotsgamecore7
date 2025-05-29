@@ -12,6 +12,8 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
@@ -59,6 +61,32 @@ func parseGenSymbolVals2CoreType(strType string) GenSymbolVals2CoreType {
 type GenSymbolVals2Data struct {
 	BasicComponentData
 	cfg *GenSymbolVals2Config
+}
+
+// OnNewGame -
+func (genSymbolVals2Data *GenSymbolVals2Data) OnNewGame(gameProp *GameProperty, component IComponent) {
+	genSymbolVals2Data.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// // OnNewStep -
+// func (genSymbolVals2Data *GenSymbolVals2Data) OnNewStep() {
+// }
+
+// Clone
+func (genSymbolVals2Data *GenSymbolVals2Data) Clone() IComponentData {
+	target := &GenSymbolVals2Data{
+		BasicComponentData: genSymbolVals2Data.CloneBasicComponentData(),
+		cfg:                genSymbolVals2Data.cfg,
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (genSymbolVals2Data *GenSymbolVals2Data) BuildPBComponentData() proto.Message {
+	return &sgc7pb.BasicComponentData{
+		BasicComponentData: genSymbolVals2Data.BuildPBBasicComponentData(),
+	}
 }
 
 // ChgConfigIntVal -
