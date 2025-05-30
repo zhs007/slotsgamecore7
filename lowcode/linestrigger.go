@@ -181,7 +181,7 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		if !isok {
 			goutils.Error("LinesTrigger.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		linesTrigger.Config.SymbolCodes = append(linesTrigger.Config.SymbolCodes, sc)
@@ -192,9 +192,9 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 		if !isok {
 			goutils.Error("LinesTrigger.InitEx:WildSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		linesTrigger.Config.WildSymbolCodes = append(linesTrigger.Config.WildSymbolCodes, sc)
@@ -204,9 +204,9 @@ func (linesTrigger *LinesTrigger) InitEx(cfg any, pool *GamePropertyPool) error 
 	if stt == STTypeUnknow {
 		goutils.Error("LinesTrigger.InitEx:WildSymbols",
 			slog.String("SymbolTriggerType", linesTrigger.Config.Type),
-			goutils.Err(ErrIvalidSymbolTriggerType))
+			goutils.Err(ErrInvalidSymbolTriggerType))
 
-		return ErrIvalidSymbolTriggerType
+		return ErrInvalidSymbolTriggerType
 	}
 
 	linesTrigger.Config.TriggerType = stt

@@ -191,9 +191,9 @@ func (genSymbolVals2 *GenSymbolVals2) InitEx(cfg any, pool *GamePropertyPool) er
 		if !isok {
 			goutils.Error("GenSymbolVals2.InitEx:SrcSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		genSymbolVals2.Config.SrcSymbolCodes = append(genSymbolVals2.Config.SrcSymbolCodes, sc)
@@ -217,9 +217,9 @@ func (genSymbolVals2 *GenSymbolVals2) InitEx(cfg any, pool *GamePropertyPool) er
 			if !isok {
 				goutils.Error("GenSymbolVals2.InitEx:MapSymbolWeights",
 					slog.String("symbol", s),
-					goutils.Err(ErrIvalidSymbol))
+					goutils.Err(ErrInvalidSymbol))
 
-				return ErrIvalidSymbol
+				return ErrInvalidSymbol
 			}
 
 			genSymbolVals2.Config.MapSymbolWeightsVM[sc] = vw2

@@ -163,7 +163,7 @@ func (chgSymbols *ChgSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		if !isok {
 			goutils.Error("ChgSymbols.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		chgSymbols.Config.SymbolCodes = append(chgSymbols.Config.SymbolCodes, sc)

@@ -200,7 +200,7 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		if !isok {
 			goutils.Error("ClusterTrigger.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		clusterTrigger.Config.SymbolCodes = append(clusterTrigger.Config.SymbolCodes, sc)
@@ -211,9 +211,9 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		if !isok {
 			goutils.Error("ClusterTrigger.InitEx:WildSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		clusterTrigger.Config.WildSymbolCodes = append(clusterTrigger.Config.WildSymbolCodes, sc)
@@ -223,9 +223,9 @@ func (clusterTrigger *ClusterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	if stt == STTypeUnknow {
 		goutils.Error("ClusterTrigger.InitEx:ParseSymbolTriggerType",
 			slog.String("SymbolTriggerType", clusterTrigger.Config.Type),
-			goutils.Err(ErrIvalidSymbolTriggerType))
+			goutils.Err(ErrInvalidSymbolTriggerType))
 
-		return ErrIvalidSymbolTriggerType
+		return ErrInvalidSymbolTriggerType
 	}
 
 	clusterTrigger.Config.TriggerType = stt

@@ -70,7 +70,7 @@ func (genPositionCollection *GenPositionCollection) InitEx(cfg any, pool *GamePr
 		if !isok {
 			goutils.Error("GenPositionCollection.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		genPositionCollection.Config.SymbolCodes = append(genPositionCollection.Config.SymbolCodes, sc)

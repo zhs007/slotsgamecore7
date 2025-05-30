@@ -132,9 +132,9 @@ func (mergePositionCollection *MergePositionCollection) InitEx(cfg any, pool *Ga
 		if !isok {
 			goutils.Error("MergePositionCollection.InitEx:SrcSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		mergePositionCollection.Config.SrcSymbolCodes = append(mergePositionCollection.Config.SrcSymbolCodes, sc)

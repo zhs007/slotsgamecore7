@@ -24,9 +24,6 @@ var (
 	// ErrInvalidReels - invalid reels
 	ErrInvalidReels = errors.New("invalid reels")
 
-	// ErrInvalidSymbol - invalid symbol
-	ErrInvalidSymbol = errors.New("invalid symbol")
-
 	// ErrInvalidPaytables - invalid paytables
 	ErrInvalidPaytables = errors.New("invalid paytables")
 
@@ -80,8 +77,8 @@ var (
 	// ErrIvalidTagCurReels - invalid TagCurReels
 	ErrIvalidTagCurReels = errors.New("invalid TagCurReels")
 
-	// ErrIvalidSymbolCollection - invalid SymbolColletion
-	ErrIvalidSymbolCollection = errors.New("invalid SymbolColletion")
+	// ErrInvalidSymbolCollection - invalid SymbolColletion
+	ErrInvalidSymbolCollection = errors.New("invalid SymbolColletion")
 
 	// ErrIvalidCustomNode - invalid custom-node
 	ErrIvalidCustomNode = errors.New("invalid custom-node")
@@ -89,8 +86,8 @@ var (
 	ErrIvalidTriggerLabel = errors.New("invalid trigger label")
 	// ErrIvalidPayTables - invalid paytables
 	ErrIvalidPayTables = errors.New("invalid paytables")
-	// ErrIvalidSymbolInReels - invalid symbol in reels
-	ErrIvalidSymbolInReels = errors.New("invalid symbol in reels")
+	// ErrInvalidSymbolInReels - invalid symbol in reels
+	ErrInvalidSymbolInReels = errors.New("invalid symbol in reels")
 	// ErrNoComponentValues - no componentValues
 	ErrNoComponentValues = errors.New("no componentValues")
 	// ErrUnsupportedComponentType - unsupported componentType
@@ -116,11 +113,11 @@ var (
 	// ErrIvalidProto - invalid proto
 	ErrIvalidProto = errors.New("invalid proto")
 
-	// ErrIvalidSymbol - invalid symbol
-	ErrIvalidSymbol = errors.New("invalid symbol")
+	// ErrInvalidSymbol - invalid symbol
+	ErrInvalidSymbol = errors.New("invalid symbol")
 
-	// ErrIvalidSymbolTriggerType - invalid SymbolTriggerType
-	ErrIvalidSymbolTriggerType = errors.New("invalid SymbolTriggerType")
+	// ErrInvalidSymbolTriggerType - invalid SymbolTriggerType
+	ErrInvalidSymbolTriggerType = errors.New("invalid SymbolTriggerType")
 
 	// ErrNotMask - not mask
 	ErrNotMask = errors.New("not mask")
