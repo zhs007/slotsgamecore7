@@ -168,9 +168,9 @@ func parseSymbolWeights(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.V
 			goutils.Error("parseSymbolWeights:MapSymbols",
 				slog.Int("i", i),
 				slog.String("symbol", v.Val),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return nil, ErrIvalidSymbol
+			return nil, ErrInvalidSymbol
 		}
 
 		vals = append(vals, sgc7game.NewIntValEx(sc))
@@ -208,9 +208,9 @@ func parseSymbolWeights2(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.
 			goutils.Error("parseSymbolWeights2:MapSymbols",
 				slog.Int("i", i),
 				slog.String("symbol", v["val"]),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return nil, ErrIvalidSymbol
+			return nil, ErrInvalidSymbol
 		}
 
 		vals = append(vals, sgc7game.NewIntValEx(sc))

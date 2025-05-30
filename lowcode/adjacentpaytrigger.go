@@ -192,7 +192,7 @@ func (adjacentPayTrigger *AdjacentPayTrigger) InitEx(cfg any, pool *GameProperty
 		if !isok {
 			goutils.Error("AdjacentPayTrigger.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		adjacentPayTrigger.Config.SymbolCodes = append(adjacentPayTrigger.Config.SymbolCodes, sc)
@@ -203,9 +203,9 @@ func (adjacentPayTrigger *AdjacentPayTrigger) InitEx(cfg any, pool *GameProperty
 		if !isok {
 			goutils.Error("AdjacentPayTrigger.InitEx:WildSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		adjacentPayTrigger.Config.WildSymbolCodes = append(adjacentPayTrigger.Config.WildSymbolCodes, sc)
@@ -215,9 +215,9 @@ func (adjacentPayTrigger *AdjacentPayTrigger) InitEx(cfg any, pool *GameProperty
 	if stt == STTypeUnknow {
 		goutils.Error("AdjacentPayTrigger.InitEx:ParseSymbolTriggerType",
 			slog.String("SymbolTriggerType", adjacentPayTrigger.Config.Type),
-			goutils.Err(ErrIvalidSymbolTriggerType))
+			goutils.Err(ErrInvalidSymbolTriggerType))
 
-		return ErrIvalidSymbolTriggerType
+		return ErrInvalidSymbolTriggerType
 	}
 
 	adjacentPayTrigger.Config.TriggerType = stt

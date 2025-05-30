@@ -240,9 +240,9 @@ func (chgSymbolsInReels *ChgSymbolsInReels) InitEx(cfg any, pool *GamePropertyPo
 			if !isok {
 				goutils.Error("ChgSymbolsInReels.InitEx:MapSymbol",
 					slog.String("symbol", v),
-					goutils.Err(ErrIvalidSymbol))
+					goutils.Err(ErrInvalidSymbol))
 
-				return ErrIvalidSymbol
+				return ErrInvalidSymbol
 			}
 
 			chgSymbolsInReels.Config.MapSymbolCode[k] = sc
@@ -272,8 +272,8 @@ func (chgSymbolsInReels *ChgSymbolsInReels) InitEx(cfg any, pool *GamePropertyPo
 			if !isok {
 				goutils.Error("ChgSymbolsInReels.InitEx:MapSrcSymbols",
 					slog.String("symbol", v),
-					goutils.Err(ErrIvalidSymbol))
-				return ErrIvalidSymbol
+					goutils.Err(ErrInvalidSymbol))
+				return ErrInvalidSymbol
 			}
 			chgSymbolsInReels.Config.MapSrcSymbolCodes[k] = symbolCode
 		}

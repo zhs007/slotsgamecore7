@@ -209,9 +209,9 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		if !isok {
 			goutils.Error("ReelTrigger.InitEx:Symbols",
 				slog.String("symbol", v),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		reelTrigger.Config.SymbolCodes = append(reelTrigger.Config.SymbolCodes, sc)
@@ -222,9 +222,9 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		if !isok {
 			goutils.Error("ReelTrigger.InitEx:WildSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		reelTrigger.Config.WildSymbolCodes = append(reelTrigger.Config.WildSymbolCodes, sc)

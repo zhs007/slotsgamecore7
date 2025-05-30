@@ -156,7 +156,7 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 		if !isok {
 			goutils.Error("SymbolValWins.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		symbolValWins.Config.SymbolCodes = append(symbolValWins.Config.SymbolCodes, sc)

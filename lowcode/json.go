@@ -319,9 +319,9 @@ func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData
 				goutils.Error("parseReels:MapSymbols",
 					slog.Int("x", x),
 					slog.Int("y", y),
-					goutils.Err(ErrIvalidSymbolInReels))
+					goutils.Err(ErrInvalidSymbolInReels))
 
-				return nil, ErrIvalidSymbolInReels
+				return nil, ErrInvalidSymbolInReels
 			}
 
 			reeld = append(reeld, sc)
@@ -372,9 +372,9 @@ func parseReel2(dataReels []map[string]string, x int, paytables *sgc7game.PayTab
 			goutils.Error("parseReel2:MapSymbols",
 				slog.Int("x", x),
 				slog.Int("y", y),
-				goutils.Err(ErrIvalidSymbolInReels))
+				goutils.Err(ErrInvalidSymbolInReels))
 
-			return nil, ErrIvalidSymbolInReels
+			return nil, ErrInvalidSymbolInReels
 		}
 
 		arr = append(arr, sc)

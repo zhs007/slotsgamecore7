@@ -192,7 +192,7 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		if !isok {
 			goutils.Error("ScatterTrigger.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		scatterTrigger.Config.SymbolCodes = append(scatterTrigger.Config.SymbolCodes, sc)
@@ -208,9 +208,9 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 		if !isok {
 			goutils.Error("ScatterTrigger.InitEx:WildSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		scatterTrigger.Config.WildSymbolCodes = append(scatterTrigger.Config.WildSymbolCodes, sc)
@@ -220,9 +220,9 @@ func (scatterTrigger *ScatterTrigger) InitEx(cfg any, pool *GamePropertyPool) er
 	if stt == STTypeUnknow {
 		goutils.Error("ScatterTrigger.InitEx:WildSymbols",
 			slog.String("SymbolTriggerType", scatterTrigger.Config.Type),
-			goutils.Err(ErrIvalidSymbolTriggerType))
+			goutils.Err(ErrInvalidSymbolTriggerType))
 
-		return ErrIvalidSymbolTriggerType
+		return ErrInvalidSymbolTriggerType
 	}
 
 	scatterTrigger.Config.TriggerType = stt

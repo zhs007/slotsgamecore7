@@ -89,7 +89,7 @@ func (rebuildSymbols *RebuildSymbols) InitEx(cfg any, pool *GamePropertyPool) er
 		if !isok {
 			goutils.Error("RebuildSymbols.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		rebuildSymbols.Config.SymbolCodes = append(rebuildSymbols.Config.SymbolCodes, sc)

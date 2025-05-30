@@ -149,7 +149,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) InitEx(cfg any, pool *Ga
 		if !isok {
 			goutils.Error("GenSymbolValsWithSymbol.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		genSymbolValsWithSymbol.Config.SymbolCodes = append(genSymbolValsWithSymbol.Config.SymbolCodes, sc)

@@ -196,7 +196,7 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		if !isok {
 			goutils.Error("WaysTrigger.InitEx:Symbol",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 		}
 
 		waysTrigger.Config.SymbolCodes = append(waysTrigger.Config.SymbolCodes, sc)
@@ -207,9 +207,9 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		if !isok {
 			goutils.Error("WaysTrigger.InitEx:WildSymbols",
 				slog.String("symbol", s),
-				goutils.Err(ErrIvalidSymbol))
+				goutils.Err(ErrInvalidSymbol))
 
-			return ErrIvalidSymbol
+			return ErrInvalidSymbol
 		}
 
 		waysTrigger.Config.WildSymbolCodes = append(waysTrigger.Config.WildSymbolCodes, sc)
@@ -219,9 +219,9 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	if stt == STTypeUnknow {
 		goutils.Error("WaysTrigger.InitEx:ParseSymbolTriggerType",
 			slog.String("SymbolTriggerType", waysTrigger.Config.Type),
-			goutils.Err(ErrIvalidSymbolTriggerType))
+			goutils.Err(ErrInvalidSymbolTriggerType))
 
-		return ErrIvalidSymbolTriggerType
+		return ErrInvalidSymbolTriggerType
 	}
 
 	waysTrigger.Config.TriggerType = stt
