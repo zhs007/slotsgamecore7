@@ -37,11 +37,12 @@ func parseGenSymbolVals2SrcSymbolValsType(strType string) GenSymbolVals2SrcSymbo
 type GenSymbolVals2CoreType int
 
 const (
-	GSV2CTypeNone   GenSymbolVals2CoreType = 0
-	GSV2CTypeNumber GenSymbolVals2CoreType = 1
-	GSV2CTypeWeight GenSymbolVals2CoreType = 2
-	GSV2CTypeAdd    GenSymbolVals2CoreType = 3
-	GSV2CTypeMask   GenSymbolVals2CoreType = 4
+	GSV2CTypeNone         GenSymbolVals2CoreType = 0
+	GSV2CTypeNumber       GenSymbolVals2CoreType = 1
+	GSV2CTypeWeight       GenSymbolVals2CoreType = 2
+	GSV2CTypeAdd          GenSymbolVals2CoreType = 3
+	GSV2CTypeMask         GenSymbolVals2CoreType = 4
+	GSV2CTypeSymbolWeight GenSymbolVals2CoreType = 5
 )
 
 func parseGenSymbolVals2CoreType(strType string) GenSymbolVals2CoreType {
@@ -53,6 +54,8 @@ func parseGenSymbolVals2CoreType(strType string) GenSymbolVals2CoreType {
 		return GSV2CTypeMask
 	} else if strType == "number" {
 		return GSV2CTypeNumber
+	} else if strType == "symbolweight" {
+		return GSV2CTypeSymbolWeight
 	}
 
 	return GSV2CTypeNone
@@ -68,9 +71,10 @@ func (genSymbolVals2Data *GenSymbolVals2Data) OnNewGame(gameProp *GameProperty, 
 	genSymbolVals2Data.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// // OnNewStep -
-// func (genSymbolVals2Data *GenSymbolVals2Data) OnNewStep() {
-// }
+// OnNewStep -
+func (genSymbolVals2Data *GenSymbolVals2Data) OnNewStep() {
+	genSymbolVals2Data.UsedOtherScenes = nil
+}
 
 // Clone
 func (genSymbolVals2Data *GenSymbolVals2Data) Clone() IComponentData {
@@ -119,6 +123,8 @@ type GenSymbolVals2Config struct {
 	DefaultVal           int                             `yaml:"defaultVal" json:"defaultVal"`
 	MaxVal               int                             `yaml:"maxVal" json:"maxVal"`
 	IsAlwaysGen          bool                            `yaml:"isAlwaysGen" json:"isAlwaysGen"`
+	MapSymbolWeights     map[string]string               `yaml:"symbolWeights" json:"symbolWeights"`
+	MapSymbolWeightsVM   map[int]*sgc7game.ValWeights2   `yaml:"-" json:"-"`
 	Awards               []*Award                        `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
@@ -186,9 +192,38 @@ func (genSymbolVals2 *GenSymbolVals2) InitEx(cfg any, pool *GamePropertyPool) er
 			goutils.Error("GenSymbolVals2.InitEx:SrcSymbols",
 				slog.String("symbol", s),
 				goutils.Err(ErrIvalidSymbol))
+
+			return ErrIvalidSymbol
 		}
 
 		genSymbolVals2.Config.SrcSymbolCodes = append(genSymbolVals2.Config.SrcSymbolCodes, sc)
+	}
+
+	if len(genSymbolVals2.Config.MapSymbolWeights) > 0 {
+		genSymbolVals2.Config.MapSymbolWeightsVM = make(map[int]*sgc7game.ValWeights2, len(genSymbolVals2.Config.MapSymbolWeights))
+
+		for s, v := range genSymbolVals2.Config.MapSymbolWeights {
+			vw2, err := pool.LoadIntWeights(v, true)
+			if err != nil {
+				goutils.Error("GenSymbolVals2.InitEx:LoadMapSymbolWeights",
+					slog.String("symbol", s),
+					slog.String("value", v),
+					goutils.Err(err))
+
+				return err
+			}
+
+			sc, isok := pool.DefaultPaytables.MapSymbols[s]
+			if !isok {
+				goutils.Error("GenSymbolVals2.InitEx:MapSymbolWeights",
+					slog.String("symbol", s),
+					goutils.Err(ErrIvalidSymbol))
+
+				return ErrIvalidSymbol
+			}
+
+			genSymbolVals2.Config.MapSymbolWeightsVM[sc] = vw2
+		}
 	}
 
 	for _, award := range genSymbolVals2.Config.Awards {
@@ -263,7 +298,7 @@ func (genSymbolVals2 *GenSymbolVals2) getSrcOtherScene(gameProp *GameProperty, c
 	return os, nil
 }
 
-func (genSymbolVals2 *GenSymbolVals2) getNumber(gameProp *GameProperty, basicCD *BasicComponentData) int {
+func (genSymbolVals2 *GenSymbolVals2) getNumber(_ *GameProperty, basicCD *BasicComponentData) int {
 	number, isok := basicCD.GetConfigIntVal(CCVNumber)
 	if isok {
 		return number
@@ -342,6 +377,16 @@ func (genSymbolVals2 *GenSymbolVals2) getWeight(gameProp *GameProperty, basicCD 
 	return genSymbolVals2.Config.WeightVW
 }
 
+func (genSymbolVals2 *GenSymbolVals2) getSymbolWeight(gameProp *GameProperty, basicCD *BasicComponentData, symbolCode int) *sgc7game.ValWeights2 {
+	// str := basicCD.GetConfigVal(CCVWeight)
+	// if str != "" {
+	// 	vw2, _ := gameProp.Pool.LoadIntWeights(str, true)
+
+	// 	return vw2
+	// }
+	return genSymbolVals2.Config.MapSymbolWeightsVM[symbolCode]
+}
+
 // procWeight
 func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc7game.GameScene, pos []int,
 	plugin sgc7plugin.IPlugin, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
@@ -404,6 +449,93 @@ func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc
 	for i := range len(pos) / 2 {
 		x := pos[i*2]
 		y := pos[i*2+1]
+
+		cr, err := vw.RandVal(plugin)
+		if err != nil {
+			goutils.Error("GenSymbolVals2.procWeight:RandVal",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		nos.Arr[x][y] = cr.Int()
+	}
+
+	return nos, nil
+}
+
+// procSymbolWeight
+func (genSymbolVals2 *GenSymbolVals2) procSymbolWeight(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, pos []int,
+	plugin sgc7plugin.IPlugin, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
+
+	// non-clone
+	if os == nil {
+		if len(pos) == 0 {
+			if genSymbolVals2.Config.IsAlwaysGen {
+				return gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight),
+					genSymbolVals2.Config.DefaultVal), nil
+			}
+
+			return nil, nil
+		}
+
+		nos := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight),
+			genSymbolVals2.Config.DefaultVal)
+
+		for i := range len(pos) / 2 {
+			x := pos[i*2]
+			y := pos[i*2+1]
+
+			vw := genSymbolVals2.getSymbolWeight(gameProp, basicCD, gs.Arr[x][y])
+			if vw == nil {
+				goutils.Error("GenSymbolVals2.procWeight:getSymbolWeight",
+					slog.Int("symbolCode", gs.Arr[x][y]),
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return nil, ErrInvalidComponentConfig
+			}
+
+			cr, err := vw.RandVal(plugin)
+			if err != nil {
+				goutils.Error("GenSymbolVals2.procWeight:RandVal",
+					goutils.Err(err))
+
+				return nil, err
+			}
+
+			nos.Arr[x][y] = cr.Int()
+		}
+
+		return nos, nil
+	}
+
+	// clone
+	var nos *sgc7game.GameScene
+
+	if len(pos) == 0 {
+		if !genSymbolVals2.Config.IsAlwaysGen {
+			return os, nil
+		}
+
+		nos = os.CloneEx(gameProp.PoolScene)
+
+		return nos, nil
+	}
+
+	nos = os.CloneEx(gameProp.PoolScene)
+
+	for i := range len(pos) / 2 {
+		x := pos[i*2]
+		y := pos[i*2+1]
+
+		vw := genSymbolVals2.getSymbolWeight(gameProp, basicCD, gs.Arr[x][y])
+		if vw == nil {
+			goutils.Error("GenSymbolVals2.procWeight:getSymbolWeight",
+				slog.Int("symbolCode", gs.Arr[x][y]),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, ErrInvalidComponentConfig
+		}
 
 		cr, err := vw.RandVal(plugin)
 		if err != nil {
@@ -625,6 +757,19 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 		}
+	} else if genSymbolVals2.Config.GenType == GSV2CTypeSymbolWeight {
+		gs := genSymbolVals2.GetTargetScene3(gameProp, curpr, prs, 0)
+		nos, err := genSymbolVals2.procSymbolWeight(gameProp, gs, os, pos, plugin, &cd.BasicComponentData)
+		if err != nil {
+			goutils.Error("GenSymbolVals2.OnPlayGame:procSymbolWeight",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		if nos != os {
+			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		}
 	}
 
 	if len(pos) <= 0 {
@@ -673,16 +818,21 @@ func NewGenSymbolVals2(name string) IComponent {
 //	"rs-pos-wm"
 //
 // ]
+type jsonGSV2SymbolWeight struct {
+	Symbol string `json:"symbol"`
+	Value  string `json:"value"`
+}
 type jsonGenSymbolVals2 struct {
-	StrSrcSymbolValsType string   `json:"srcSymbolValsType"`
-	SrcSymbols           []string `json:"srcSymbols"`
-	SrcComponents        []string `json:"srcComponents"`
-	DefaultVal           int      `json:"defaultVal"`
-	StrGenType           string   `json:"genType"`
-	Number               int      `json:"number"`
-	StrWeight            string   `json:"weight"`
-	MaxVal               int      `json:"maxVal"`
-	IsAlwaysGen          bool     `json:"isAlwaysGen"`
+	StrSrcSymbolValsType string                 `json:"srcSymbolValsType"`
+	SrcSymbols           []string               `json:"srcSymbols"`
+	SrcComponents        []string               `json:"srcComponents"`
+	DefaultVal           int                    `json:"defaultVal"`
+	StrGenType           string                 `json:"genType"`
+	Number               int                    `json:"number"`
+	StrWeight            string                 `json:"weight"`
+	MaxVal               int                    `json:"maxVal"`
+	IsAlwaysGen          bool                   `json:"isAlwaysGen"`
+	SymbolWeights        []jsonGSV2SymbolWeight `json:"symbolWeights"` // for srcSymbols
 }
 
 func (jcfg *jsonGenSymbolVals2) build() *GenSymbolVals2Config {
@@ -696,6 +846,11 @@ func (jcfg *jsonGenSymbolVals2) build() *GenSymbolVals2Config {
 		StrWeight:            jcfg.StrWeight,
 		MaxVal:               jcfg.MaxVal,
 		IsAlwaysGen:          jcfg.IsAlwaysGen,
+	}
+
+	cfg.MapSymbolWeights = make(map[string]string, len(jcfg.SymbolWeights))
+	for _, sw := range jcfg.SymbolWeights {
+		cfg.MapSymbolWeights[sw.Symbol] = sw.Value
 	}
 
 	return cfg
