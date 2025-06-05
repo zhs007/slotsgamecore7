@@ -897,7 +897,7 @@ func (gameProp *GameProperty) IsStartedRespin(componentName string) bool {
 
 func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName string, val string) error {
 	arr := strings.Split(componentConfigValName, ".")
-	if len(arr) != 2 {
+	if len(arr) < 2 {
 		goutils.Error("GameProperty.SetComponentConfigVal",
 			slog.String("componentConfigValName", componentConfigValName),
 			goutils.Err(ErrInvalidComponentVal))
@@ -916,9 +916,16 @@ func (gameProp *GameProperty) SetComponentConfigVal(componentConfigValName strin
 
 	gameProp.UseComponent(arr[0])
 
-	arr[1] = strings.ToLower(arr[1])
+	str := arr[1]
+	if len(arr) > 2 {
+		for i := 2; i < len(arr); i++ {
+			str += "." + arr[i]
+		}
+	}
 
-	cd.SetConfigVal(arr[1], val)
+	str = strings.ToLower(str)
+
+	cd.SetConfigVal(str, val)
 
 	return nil
 }

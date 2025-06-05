@@ -264,6 +264,13 @@ func (holdAndWin *HoldAndWin) getWeight(gameProp *GameProperty, basicCD *BasicCo
 }
 
 func (holdAndWin *HoldAndWin) getCoinWeight(gameProp *GameProperty, basicCD *BasicComponentData, s int) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(CCVMapCoinWeight + "." + strings.ToLower(gameProp.Pool.DefaultPaytables.GetStringFromInt(s)))
+	if str != "" {
+		vw2, _ := gameProp.Pool.LoadIntWeights(str, true)
+
+		return vw2
+	}
+
 	return holdAndWin.Config.MapCoinWeightVW2[s]
 }
 
