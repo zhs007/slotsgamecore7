@@ -14,6 +14,29 @@ type ExRule struct {
 	Symbols []string
 }
 
+// IsFeasible - 判断当前pool和rd是否理论上有解（支持SEP和EXC规则）
+func (rule *ExRule) IsFeasible(pool *SymbolsPool, rd []string) bool {
+	if rule.Code == "SEP" && len(rule.Symbols) > 0 && len(rule.Params) > 0 {
+		sep := rule.Params[0]
+		total := pool.CountAllSymbolNumber()
+		for _, sym := range rule.Symbols {
+			cnt := 0
+			for _, sd := range pool.Pool {
+				if sd.Symbol == sym {
+					cnt += sd.Num
+				}
+			}
+			// 最多能放置的位置数
+			maxPos := (total-1)/(sep+1) + 1
+			if cnt > maxPos {
+				return false
+			}
+		}
+	}
+	// EXC 剪枝先不做，避免误判
+	return true
+}
+
 func (rule *ExRule) procWeight(sd []*SymbolData) {
 	if rule.Code == "EXC" {
 		totalWeight := 0

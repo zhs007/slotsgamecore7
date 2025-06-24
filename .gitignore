@@ -31,3 +31,6 @@ data/game.json
 data/rnglib.yaml
 data/fg-reel*.xlsx
 unittestdata/*-output.*
+unittestdata/genreels.xlsx
+unittestdata/genreelsmainsymbolsdistance.xlsx
+unittestdata/wrss.xlsx

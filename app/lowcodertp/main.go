@@ -46,6 +46,7 @@ func main() {
 	gamecfg := os.Getenv("GAMECFG")
 	outputPath := os.Getenv("OUTPUTPATH")
 	strBet := os.Getenv("BET")
+	strCoin := os.Getenv("COIN")
 	rnglib := os.Getenv("RNGLIB")
 
 	isAllowStats2 := false
@@ -88,6 +89,13 @@ func main() {
 		bet = i64
 	}
 
+	coin := int64(0)
+	if strCoin != "" {
+		i64, _ := goutils.String2Int64(strCoin)
+
+		coin = i64
+	}
+
 	// lowcode.SetJsonMode()
 
 	if isAllowStats2 {
@@ -102,5 +110,5 @@ func main() {
 	}
 
 	// lowcode.SetForceDisableStats()
-	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, wincap)
+	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, coin, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, wincap)
 }
