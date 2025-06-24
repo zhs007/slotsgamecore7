@@ -96,8 +96,6 @@ func main() {
 		coin = i64
 	}
 
-	// lowcode.SetJsonMode()
-
 	if isAllowStats2 {
 		lowcode.SetAllowStatsV2()
 	}
@@ -109,6 +107,5 @@ func main() {
 		lowcode.SetRngLibConfig(rnglib)
 	}
 
-	// lowcode.SetForceDisableStats()
 	lowcode.StartRTP(gamecfg, icore, ispinnums, outputPath, bet, coin, lowcode.NewBasicRNG, lowcode.NewEmptyFeatureLevel, wincap)
 }

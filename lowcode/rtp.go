@@ -64,7 +64,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 
 	stake := &sgc7game.Stake{
 		CoinBet:  coin,
-		CashBet:  bet,
+		CashBet:  bet * coin,
 		Currency: "EUR",
 	}
 
