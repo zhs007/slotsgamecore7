@@ -60,7 +60,7 @@ func (winResultLimiterData *WinResultLimiterData) Clone() IComponentData {
 
 // BuildPBComponentData
 func (winResultLimiterData *WinResultLimiterData) BuildPBComponentData() proto.Message {
-	pbcd := &sgc7pb.WinResultModifierData{
+	pbcd := &sgc7pb.WinResultLimiterData{
 		BasicComponentData: winResultLimiterData.BuildPBBasicComponentData(),
 		Wins:               int32(winResultLimiterData.Wins),
 	}
