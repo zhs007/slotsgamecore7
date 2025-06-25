@@ -381,57 +381,7 @@ func (pool *GamePropertyPool) LoadIntMapping(fn string) *sgc7game.ValMapping2 {
 
 // LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
-	// if gJsonMode {
 	return pool.mapIntValWeights[fn], nil
-	// }
-
-	// pool.lock.RLock()
-	// vw, isok := pool.mapSymbolValWeights[fn]
-	// if isok {
-	// 	pool.lock.RUnlock()
-
-	// 	return vw, nil
-	// }
-	// pool.lock.RUnlock()
-
-	// if pool.Config.mapValWeights != nil {
-	// 	vw := pool.Config.mapValWeights[fn]
-
-	// 	vals := make([]sgc7game.IVal, len(vw.Vals))
-
-	// 	for i, v := range vw.Vals {
-	// 		vals[i] = sgc7game.NewIntValEx(paytables.MapSymbols[v.String()])
-	// 	}
-
-	// 	nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
-	// 	if err != nil {
-	// 		goutils.Error("GamePropertyPool.LoadValWeights:NewValWeights2",
-	// 			goutils.Err(err))
-
-	// 		return nil, err
-	// 	}
-
-	// 	pool.lock.Lock()
-	// 	pool.mapSymbolValWeights[fn] = nvw
-	// 	pool.lock.Unlock()
-
-	// 	return nvw, nil
-	// }
-
-	// vw2, err := sgc7game.LoadValWeights2FromExcelWithSymbols(pool.Config.GetPath(fn, useFileMapping), headerVal, headerWeight, paytables)
-	// if err != nil {
-	// 	goutils.Error("GamePropertyPool.LoadValWeights:LoadValWeights2FromExcel",
-	// 		slog.String("fn", fn),
-	// 		goutils.Err(err))
-
-	// 	return nil, err
-	// }
-
-	// pool.lock.Lock()
-	// pool.mapSymbolValWeights[fn] = vw2
-	// pool.lock.Unlock()
-
-	// return vw2, nil
 }
 
 func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, name string, index int, mask bool) error {

@@ -14,12 +14,12 @@ func genReelDeep(pool *SymbolsPool, rules []*ExRule, rd []string) ([]string, err
 		return nil, ErrUnkonow
 	}
 
-	// 新增全局可行性剪枝，递归前判断所有规则
-	for _, rule := range rules {
-		if !rule.IsFeasible(pool, rd) {
-			return nil, ErrUnkonow
-		}
-	}
+	// // 新增全局可行性剪枝，递归前判断所有规则
+	// for _, rule := range rules {
+	// 	if !rule.IsFeasible(pool, rd) {
+	// 		return nil, ErrUnkonow
+	// 	}
+	// }
 
 retry:
 	nrd := slices.Clone(rd)

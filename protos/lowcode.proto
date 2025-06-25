@@ -448,6 +448,11 @@ message ChgSymbolsInReelsData {
     repeated int32 pos = 2;
 }
 
+// CascadingRegulatorData
+message CascadingRegulatorData {
+    ComponentData basicComponentData = 1;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

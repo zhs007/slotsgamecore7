@@ -56,6 +56,18 @@ func (pt *PayTables) GetStringFromInt(s int) string {
 	return ""
 }
 
+func (pt *PayTables) GetSymbolMinWinNum(s int) int {
+	if cl, isok := pt.MapPay[s]; isok {
+		for i, v := range cl {
+			if v > 0 {
+				return i + 1
+			}
+		}
+	}
+
+	return 0
+}
+
 // LoadPayTables5JSON - load json file
 func LoadPayTables5JSON(fn string) (*PayTables, error) {
 	data, err := os.ReadFile(fn)

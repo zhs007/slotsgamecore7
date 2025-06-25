@@ -109,6 +109,11 @@ func (respinData *RespinData) GetLastRespinNum() int {
 	return respinData.LastRespinNum
 }
 
+// GetCurRespinNum -
+func (respinData *RespinData) GetCurRespinNum() int {
+	return respinData.CurRespinNum
+}
+
 // IsEnding -
 func (respinData *RespinData) IsRespinEnding() bool {
 	return respinData.LastRespinNum == 0 && respinData.LastTriggerNum == 0
