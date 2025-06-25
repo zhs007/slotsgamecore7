@@ -185,6 +185,12 @@ func (winResultLimiter *WinResultLimiter) onMaxOnLine(gameProp *GameProperty, cu
 		}
 	}
 
+	if cd.Wins == 0 {
+		nc := winResultLimiter.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
 	nc := winResultLimiter.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
