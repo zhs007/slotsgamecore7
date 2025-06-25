@@ -453,6 +453,12 @@ message CascadingRegulatorData {
     ComponentData basicComponentData = 1;
 }
 
+// WinResultLimiterData
+message WinResultLimiterData {
+    ComponentData basicComponentData = 1;
+    int32 wins = 2;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;

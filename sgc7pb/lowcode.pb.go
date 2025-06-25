@@ -3916,6 +3916,59 @@ func (x *CascadingRegulatorData) GetBasicComponentData() *ComponentData {
 	return nil
 }
 
+// WinResultLimiterData
+type WinResultLimiterData struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
+	Wins               int32                  `protobuf:"varint,2,opt,name=wins,proto3" json:"wins,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *WinResultLimiterData) Reset() {
+	*x = WinResultLimiterData{}
+	mi := &file_lowcode_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WinResultLimiterData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WinResultLimiterData) ProtoMessage() {}
+
+func (x *WinResultLimiterData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WinResultLimiterData.ProtoReflect.Descriptor instead.
+func (*WinResultLimiterData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *WinResultLimiterData) GetBasicComponentData() *ComponentData {
+	if x != nil {
+		return x.BasicComponentData
+	}
+	return nil
+}
+
+func (x *WinResultLimiterData) GetWins() int32 {
+	if x != nil {
+		return x.Wins
+	}
+	return 0
+}
+
 // GameParam
 type GameParam struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
@@ -3933,7 +3986,7 @@ type GameParam struct {
 
 func (x *GameParam) Reset() {
 	*x = GameParam{}
-	mi := &file_lowcode_proto_msgTypes[61]
+	mi := &file_lowcode_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3945,7 +3998,7 @@ func (x *GameParam) String() string {
 func (*GameParam) ProtoMessage() {}
 
 func (x *GameParam) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[61]
+	mi := &file_lowcode_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3958,7 +4011,7 @@ func (x *GameParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameParam.ProtoReflect.Descriptor instead.
 func (*GameParam) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{61}
+	return file_lowcode_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *GameParam) GetFirstComponent() string {
@@ -4305,7 +4358,10 @@ const file_lowcode_proto_rawDesc = "" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x10\n" +
 	"\x03pos\x18\x02 \x03(\x05R\x03pos\"_\n" +
 	"\x16CascadingRegulatorData\x12E\n" +
-	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\"\x93\x05\n" +
+	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\"q\n" +
+	"\x14WinResultLimiterData\x12E\n" +
+	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x12\n" +
+	"\x04wins\x18\x02 \x01(\x05R\x04wins\"\x93\x05\n" +
 	"\tGameParam\x12&\n" +
 	"\x0efirstComponent\x18\x01 \x01(\tR\x0efirstComponent\x126\n" +
 	"\x16nextStepFirstComponent\x18\x02 \x01(\tR\x16nextStepFirstComponent\x12J\n" +
@@ -4339,7 +4395,7 @@ func file_lowcode_proto_rawDescGZIP() []byte {
 	return file_lowcode_proto_rawDescData
 }
 
-var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 65)
+var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 66)
 var file_lowcode_proto_goTypes = []any{
 	(*ComponentData)(nil),               // 0: sgc7pb.ComponentData
 	(*BasicComponentData)(nil),          // 1: sgc7pb.BasicComponentData
@@ -4402,11 +4458,12 @@ var file_lowcode_proto_goTypes = []any{
 	(*ChgSymbols2Data)(nil),             // 58: sgc7pb.ChgSymbols2Data
 	(*ChgSymbolsInReelsData)(nil),       // 59: sgc7pb.ChgSymbolsInReelsData
 	(*CascadingRegulatorData)(nil),      // 60: sgc7pb.CascadingRegulatorData
-	(*GameParam)(nil),                   // 61: sgc7pb.GameParam
-	nil,                                 // 62: sgc7pb.GameParam.MapComponentsEntry
-	nil,                                 // 63: sgc7pb.GameParam.MapValsEntry
-	nil,                                 // 64: sgc7pb.GameParam.MapStrValsEntry
-	(*anypb.Any)(nil),                   // 65: google.protobuf.Any
+	(*WinResultLimiterData)(nil),        // 61: sgc7pb.WinResultLimiterData
+	(*GameParam)(nil),                   // 62: sgc7pb.GameParam
+	nil,                                 // 63: sgc7pb.GameParam.MapComponentsEntry
+	nil,                                 // 64: sgc7pb.GameParam.MapValsEntry
+	nil,                                 // 65: sgc7pb.GameParam.MapStrValsEntry
+	(*anypb.Any)(nil),                   // 66: google.protobuf.Any
 }
 var file_lowcode_proto_depIdxs = []int32{
 	0,  // 0: sgc7pb.BasicComponentData.basicComponentData:type_name -> sgc7pb.ComponentData
@@ -4468,15 +4525,16 @@ var file_lowcode_proto_depIdxs = []int32{
 	0,  // 56: sgc7pb.ChgSymbols2Data.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 57: sgc7pb.ChgSymbolsInReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
 	0,  // 58: sgc7pb.CascadingRegulatorData.basicComponentData:type_name -> sgc7pb.ComponentData
-	62, // 59: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
-	63, // 60: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
-	64, // 61: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
-	65, // 62: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
-	63, // [63:63] is the sub-list for method output_type
-	63, // [63:63] is the sub-list for method input_type
-	63, // [63:63] is the sub-list for extension type_name
-	63, // [63:63] is the sub-list for extension extendee
-	0,  // [0:63] is the sub-list for field type_name
+	0,  // 59: sgc7pb.WinResultLimiterData.basicComponentData:type_name -> sgc7pb.ComponentData
+	63, // 60: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
+	64, // 61: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
+	65, // 62: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
+	66, // 63: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
+	64, // [64:64] is the sub-list for method output_type
+	64, // [64:64] is the sub-list for method input_type
+	64, // [64:64] is the sub-list for extension type_name
+	64, // [64:64] is the sub-list for extension extendee
+	0,  // [0:64] is the sub-list for field type_name
 }
 
 func init() { file_lowcode_proto_init() }
@@ -4490,7 +4548,7 @@ func file_lowcode_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lowcode_proto_rawDesc), len(file_lowcode_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   65,
+			NumMessages:   66,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
