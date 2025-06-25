@@ -163,6 +163,8 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(FlowDownSymbolsTypeName, NewFlowDownSymbols)
 	mgr.Reg(HoldAndWinTypeName, NewHoldAndWin)
 	mgr.Reg(ChgSymbolsInReelsTypeName, NewChgSymbolsInReels)
+	mgr.Reg(CascadingRegulatorTypeName, NewCascadingRegulator)
+	mgr.Reg(WinResultLimiterTypeName, NewWinResultLimiter)
 
 	return mgr
 }

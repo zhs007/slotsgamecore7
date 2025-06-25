@@ -76,6 +76,8 @@ type IComponentData interface {
 
 	// GetLastRespinNum -
 	GetLastRespinNum() int
+	// GetCurRespinNum -
+	GetCurRespinNum() int
 	// IsRespinEnding -
 	IsRespinEnding() bool
 	// IsRespinStarted -

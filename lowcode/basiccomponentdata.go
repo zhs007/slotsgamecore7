@@ -241,6 +241,11 @@ func (basicComponentData *BasicComponentData) GetLastRespinNum() int {
 	return 0
 }
 
+// GetCurRespinNum -
+func (basicComponentData *BasicComponentData) GetCurRespinNum() int {
+	return 0
+}
+
 // IsRespinEnding -
 func (basicComponentData *BasicComponentData) IsRespinEnding() bool {
 	return false

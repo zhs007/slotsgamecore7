@@ -110,4 +110,6 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(FlowDownSymbolsTypeName), parseFlowDownSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(HoldAndWinTypeName), parseHoldAndWin)
 	gJsonMgr.RegLoadComponent(strings.ToLower(ChgSymbolsInReelsTypeName), parseChgSymbolsInReels)
+	gJsonMgr.RegLoadComponent(strings.ToLower(CascadingRegulatorTypeName), parseCascadingRegulator)
+	gJsonMgr.RegLoadComponent(strings.ToLower(WinResultLimiterTypeName), parseWinResultLimiter)
 }

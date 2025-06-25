@@ -75,6 +75,14 @@ func (vw *ValWeights2) ClearExcludeVal(val IVal) {
 	vw.MaxWeight = 1
 }
 
+func (vw *ValWeights2) ResetMaxWeight() {
+	vw.MaxWeight = 0
+
+	for _, v := range vw.Weights {
+		vw.MaxWeight += v
+	}
+}
+
 func (vw *ValWeights2) Reset(vals []IVal, weights []int) {
 	vw.Vals = make([]IVal, len(vals))
 	vw.Weights = make([]int, len(weights))
@@ -266,6 +274,16 @@ func (vw *ValWeights2) RemoveVal(val IVal) error {
 		goutils.Err(ErrInvalidValWeightsVal))
 
 	return ErrInvalidValWeightsVal
+}
+
+func (vw *ValWeights2) GetIntVals() []int {
+	intVals := make([]int, len(vw.Vals))
+
+	for i, v := range vw.Vals {
+		intVals[i] = v.Int()
+	}
+
+	return intVals
 }
 
 func NewValWeights2Ex() *ValWeights2 {
