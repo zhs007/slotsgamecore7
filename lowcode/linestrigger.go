@@ -851,7 +851,7 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 		return nc, nil
 	} else {
-		err := linesTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
+		err := linesTrigger.procMask(gs, gameProp, curpr, gp, plugin, nil)
 		if err != nil {
 			goutils.Error("LinesTrigger.OnPlayGame:procMask",
 				goutils.Err(err))
