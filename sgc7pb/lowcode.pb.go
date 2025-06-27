@@ -2110,6 +2110,7 @@ type QueueBranchData struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	BasicComponentData *ComponentData         `protobuf:"bytes,1,opt,name=basicComponentData,proto3" json:"basicComponentData,omitempty"`
 	Queue              int32                  `protobuf:"varint,2,opt,name=queue,proto3" json:"queue,omitempty"`
+	TriggerNum         int32                  `protobuf:"varint,3,opt,name=triggerNum,proto3" json:"triggerNum,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -2154,6 +2155,13 @@ func (x *QueueBranchData) GetBasicComponentData() *ComponentData {
 func (x *QueueBranchData) GetQueue() int32 {
 	if x != nil {
 		return x.Queue
+	}
+	return 0
+}
+
+func (x *QueueBranchData) GetTriggerNum() int32 {
+	if x != nil {
+		return x.TriggerNum
 	}
 	return 0
 }
@@ -4234,10 +4242,13 @@ const file_lowcode_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"y\n" +
 	"\x0eRollSymbolData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12 \n" +
-	"\vsymbolCodes\x18\x03 \x03(\x05R\vsymbolCodes\"n\n" +
+	"\vsymbolCodes\x18\x03 \x03(\x05R\vsymbolCodes\"\x8e\x01\n" +
 	"\x0fQueueBranchData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x14\n" +
-	"\x05queue\x18\x02 \x01(\x05R\x05queue\"\x80\x01\n" +
+	"\x05queue\x18\x02 \x01(\x05R\x05queue\x12\x1e\n" +
+	"\n" +
+	"triggerNum\x18\x03 \x01(\x05R\n" +
+	"triggerNum\"\x80\x01\n" +
 	"\x15SymbolCollection2Data\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12 \n" +
 	"\vsymbolCodes\x18\x02 \x03(\x05R\vsymbolCodes\"\xa6\x01\n" +
