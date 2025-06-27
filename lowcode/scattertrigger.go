@@ -289,6 +289,10 @@ func (scatterTrigger *ScatterTrigger) procMask(gs *sgc7game.GameScene, gameProp 
 
 		mask := make([]bool, gs.Width)
 
+		if ret == nil {
+			return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, scatterTrigger.Config.TargetMask, mask, false)
+		}
+
 		for i := 0; i < len(ret.Pos)/2; i++ {
 			mask[ret.Pos[i*2]] = true
 		}
@@ -677,6 +681,14 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 		nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, nil
+	} else {
+		err := scatterTrigger.procMask(gs, gameProp, curpr, gp, plugin, nil)
+		if err != nil {
+			goutils.Error("ScatterTrigger.OnPlayGame:procMask",
+				goutils.Err(err))
+
+			return "", err
+		}
 	}
 
 	nc := scatterTrigger.onStepEnd(gameProp, curpr, gp, "")

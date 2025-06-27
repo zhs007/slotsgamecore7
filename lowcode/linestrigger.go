@@ -265,13 +265,17 @@ func (linesTrigger *LinesTrigger) procMask(gs *sgc7game.GameScene, gameProp *Gam
 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
 
 	if linesTrigger.Config.TargetMask != "" {
+		gameProp.UseComponent(linesTrigger.Config.TargetMask)
+
 		mask := make([]bool, gs.Width)
+
+		if ret == nil {
+			return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, linesTrigger.Config.TargetMask, mask, false)
+		}
 
 		for i := 0; i < len(ret.Pos)/2; i++ {
 			mask[ret.Pos[i*2]] = true
 		}
-
-		gameProp.UseComponent(linesTrigger.Config.TargetMask)
 
 		return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, linesTrigger.Config.TargetMask, mask, false)
 	}
@@ -846,6 +850,14 @@ func (linesTrigger *LinesTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		nc := linesTrigger.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, nil
+	} else {
+		err := linesTrigger.procMask(gs, gameProp, curpr, gp, plugin, lst[0])
+		if err != nil {
+			goutils.Error("LinesTrigger.OnPlayGame:procMask",
+				goutils.Err(err))
+
+			return "", err
+		}
 	}
 
 	nc := linesTrigger.onStepEnd(gameProp, curpr, gp, "")

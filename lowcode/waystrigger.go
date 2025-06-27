@@ -280,6 +280,10 @@ func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameP
 
 		mask := make([]bool, gs.Width)
 
+		if ret == nil {
+			return gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, waysTrigger.Config.TargetMask, mask, false)
+		}
+
 		for i := 0; i < len(ret.Pos)/2; i++ {
 			mask[ret.Pos[i*2]] = true
 		}
@@ -596,6 +600,14 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		nc := waysTrigger.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, nil
+	} else {
+		err := waysTrigger.procMask(gs, gameProp, curpr, gp, plugin, nil)
+		if err != nil {
+			goutils.Error("WaysTrigger.OnPlayGame:procMask",
+				goutils.Err(err))
+
+			return "", err
+		}
 	}
 
 	nc := waysTrigger.onStepEnd(gameProp, curpr, gp, "")
