@@ -17,24 +17,16 @@ import (
 
 const QueueBranchTypeName = "queueBranch"
 
-// const (
-// 	QBDVQueue string = "queue" // 队列数量
-// )
-
 type QueueBranchData struct {
 	BasicComponentData
-	Queue int
+	Queue      int
+	TriggerNum int
 }
 
 // OnNewGame -
 func (queueBranchData *QueueBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	queueBranchData.BasicComponentData.OnNewGame(gameProp, component)
 }
-
-// // OnNewStep -
-// func (queueBranchData *QueueBranchData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	queueBranchData.BasicComponentData.OnNewStep(gameProp, component)
-// }
 
 // SetConfigIntVal -
 func (queueBranchData *QueueBranchData) SetConfigIntVal(key string, val int) {
@@ -59,6 +51,7 @@ func (queueBranchData *QueueBranchData) Clone() IComponentData {
 	target := &QueueBranchData{
 		BasicComponentData: queueBranchData.CloneBasicComponentData(),
 		Queue:              queueBranchData.Queue,
+		TriggerNum:         queueBranchData.TriggerNum,
 	}
 
 	return target
@@ -69,6 +62,7 @@ func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.QueueBranchData{
 		BasicComponentData: queueBranchData.BuildPBBasicComponentData(),
 		Queue:              int32(queueBranchData.Queue),
+		TriggerNum:         int32(queueBranchData.TriggerNum),
 	}
 
 	return pbcd
@@ -78,17 +72,12 @@ func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 func (queueBranchData *QueueBranchData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVValue {
 		return queueBranchData.Queue, true
+	} else if key == CVCurTriggerNum {
+		return queueBranchData.TriggerNum, true
 	}
 
 	return 0, false
 }
-
-// // SetVal -
-// func (queueBranchData *QueueBranchData) SetVal(key string, val int) {
-// 	if key == QBDVQueue {
-// 		queueBranchData.Queue = val
-// 	}
-// }
 
 // QueueBranchConfig - configuration for QueueBranch
 type QueueBranchConfig struct {
@@ -149,12 +138,11 @@ func (queueBranch *QueueBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 func (queueBranch *QueueBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	// queueBranch.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	qbd := cd.(*QueueBranchData)
 
 	if qbd.Queue > 0 {
 		qbd.Queue--
+		qbd.TriggerNum++
 
 		nc := queueBranch.onStepEnd(gameProp, curpr, gp, queueBranch.Config.JumpToComponent)
 
@@ -174,11 +162,6 @@ func (queueBranch *QueueBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 
 	return nil
 }
-
-// // OnStats
-// func (queueBranch *QueueBranch) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // NewComponentData -
 func (queueBranch *QueueBranch) NewComponentData() IComponentData {
@@ -208,8 +191,6 @@ type jsonQueueBranch struct {
 func (jcfg *jsonQueueBranch) build() *QueueBranchConfig {
 	cfg := &QueueBranchConfig{}
 
-	// cfg.UseSceneV3 = true
-
 	return cfg
 }
 
@@ -222,23 +203,7 @@ func parseQueueBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		return "", err
 	}
 
-	// buf, err := cfg.MarshalJSON()
-	// if err != nil {
-	// 	goutils.Error("parseQueueBranch:MarshalJSON",
-	// 		goutils.Err(err))
-
-	// 	return "", err
-	// }
-
 	data := &jsonQueueBranch{}
-
-	// err = sonic.Unmarshal(buf, data)
-	// if err != nil {
-	// 	goutils.Error("parseQueueBranch:Unmarshal",
-	// 		goutils.Err(err))
-
-	// 	return "", err
-	// }
 
 	cfgd := data.build()
 

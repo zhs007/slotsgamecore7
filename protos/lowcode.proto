@@ -250,6 +250,7 @@ message RollSymbolData {
 message QueueBranchData {
     ComponentData basicComponentData = 1;
 	int32 queue = 2;
+    int32 triggerNum = 3;
 }
 
 // SymbolCollection2Data
