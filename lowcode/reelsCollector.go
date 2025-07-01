@@ -560,7 +560,7 @@ func (reelsCollector *ReelsCollector) InitPlayerState(pool *GamePropertyPool, ga
 					Collectors: make([]int, w),
 				}
 
-				bps.MapComponentData[reelsCollector.GetName()] = cps
+				bps.MapComponentData[cname] = cps
 			}
 		}
 	}

@@ -48,7 +48,7 @@ func (bs *BasicService2) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *
 		}
 
 		goutils.Debug("BasicService2.BuildPlayerStateFromPB:Private",
-			slog.String("Json", pub.Json))
+			slog.String("Json", pri.Json))
 
 		ps.SetPrivateJson(pri.Json)
 	}
@@ -58,6 +58,8 @@ func (bs *BasicService2) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *
 
 // BuildPBPlayerState - sgc7game.IPlayerState -> *sgc7pb.PlayerState
 func (bs *BasicService2) BuildPBPlayerState(ps sgc7game.IPlayerState) (*sgc7pb.PlayerState, error) {
+	ps.OnOutput()
+
 	pub := &sgc7pb.BasicPlayerPublicState2{
 		Json: ps.GetPublicJson(),
 	}

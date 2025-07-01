@@ -27,5 +27,8 @@ type IPlayerState interface {
 	// GetCurGameMod - get current game module
 	GetCurGameMod() string
 
+	// OnOutput - on output
+	OnOutput()
+
 	Clone() IPlayerState
 }
