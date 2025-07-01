@@ -93,8 +93,8 @@ func (ps *BasicPlayerState) SetPublicJson(pubjson string) error {
 
 // SetPrivateJson - set player private state
 func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
-	pub := &BasicPlayerPrivateState{}
-	err := sonic.Unmarshal([]byte(prijson), pub)
+	pri := &BasicPlayerPrivateState{}
+	err := sonic.Unmarshal([]byte(prijson), pri)
 	if err != nil {
 		goutils.Warn("BasicPlayerState.SetPrivateJson",
 			goutils.Err(err))
@@ -102,7 +102,7 @@ func (ps *BasicPlayerState) SetPrivateJson(prijson string) error {
 		return err
 	}
 
-	ps.SetPrivate(pub)
+	ps.SetPrivate(pri)
 
 	return nil
 }
@@ -150,4 +150,9 @@ func (ps *BasicPlayerState) Clone() IPlayerState {
 	nps.SetPrivateJson(ps.GetPrivateJson())
 
 	return nps
+}
+
+// OnOutput - on output
+func (ps *BasicPlayerState) OnOutput() {
+
 }

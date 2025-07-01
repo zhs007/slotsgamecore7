@@ -12,6 +12,10 @@ type BetPS struct {
 }
 
 func (bps *BetPS) Rebuild() {
+	if len(bps.MapComponentData) == 0 {
+		return
+	}
+
 	bps.MapString = make(map[string]string)
 
 	for k, v := range bps.MapComponentData {
@@ -145,8 +149,6 @@ func (ps *PlayerState) GetPrivate() any {
 
 // GetPublicJson - set player public state
 func (ps *PlayerState) GetPublicJson() string {
-	ps.Rebuild()
-
 	str, err := sonic.MarshalString(ps.MapBetMothodPub)
 	if err != nil {
 		goutils.Error("PlayerState.GetPublicJson",
@@ -158,8 +160,6 @@ func (ps *PlayerState) GetPublicJson() string {
 
 // GetPrivateJson - set player private state
 func (ps *PlayerState) GetPrivateJson() string {
-	ps.Rebuild()
-
 	str, err := sonic.MarshalString(ps.MapBetMothodPri)
 	if err != nil {
 		goutils.Error("PlayerState.GetPrivateJson",
@@ -208,6 +208,10 @@ func (ps *PlayerState) Rebuild() {
 	for _, v := range ps.MapBetMothodPub {
 		v.Rebuild()
 	}
+}
+
+func (ps *PlayerState) OnOutput() {
+	ps.Rebuild()
 }
 
 func NewPlayerState() *PlayerState {
