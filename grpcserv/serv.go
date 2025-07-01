@@ -83,9 +83,6 @@ func (serv *Serv) GetConfig(ctx context.Context, req *sgc7pb.RequestConfig) (*sg
 
 	res := sgc7pbutils.BuildPBGameConfig(cfg)
 
-	// goutils.Debug("Serv.GetConfig",
-	// 	slog.Any("reply", res))
-
 	return res, nil
 }
 
@@ -122,8 +119,6 @@ func (serv *Serv) Play(req *sgc7pb.RequestPlay, stream sgc7pb.GameLogic_PlayServ
 		return err
 	}
 
-	// goutils.Debug("Serv.Play",
-	// 	slog.Any("reply", res))
 	serv.LogReplyPlay("Serv.Play", res, zapcore.DebugLevel)
 
 	return stream.Send(res)

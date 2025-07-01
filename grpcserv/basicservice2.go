@@ -1,6 +1,8 @@
 package grpcserv
 
 import (
+	"log/slog"
+
 	goutils "github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -30,6 +32,9 @@ func (bs *BasicService2) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *
 			return err
 		}
 
+		goutils.Debug("BasicService2.BuildPlayerStateFromPB:Public",
+			slog.String("Json", pub.Json))
+
 		ps.SetPublicJson(pub.Json)
 	}
 
@@ -42,7 +47,10 @@ func (bs *BasicService2) BuildPlayerStateFromPB(ps sgc7game.IPlayerState, pspb *
 			return err
 		}
 
-		ps.SetPublicJson(pri.Json)
+		goutils.Debug("BasicService2.BuildPlayerStateFromPB:Private",
+			slog.String("Json", pub.Json))
+
+		ps.SetPrivateJson(pri.Json)
 	}
 
 	return nil
