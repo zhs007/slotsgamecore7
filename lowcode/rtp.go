@@ -68,16 +68,17 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 		Currency: "EUR",
 	}
 
-	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration) {
-		goutils.Info("processing...",
-			slog.Int64("total nums", totalnums),
-			slog.Int64("current nums", curnums),
+	d := sgc7rtp.StartRTP3(game, rtp, icore, ispinnums, stake, 100000, func(totalnums int64, curnums int64, curtime time.Duration, curwin int64, curbet int64) {
+
+		goutils.Info(fmt.Sprintf("Iterations: %v\t\t | Total Won: %v\t\t | Total Bet: %v\t\t | Current RTP: %v%%\n", curnums, curwin, curbet, float64(curwin)*100/float64(curbet)),
 			slog.String("cost time", curtime.String()))
+
 	}, true, wincap)
 
 	goutils.Info("finish.",
 		slog.Int64("total nums", ispinnums),
 		slog.Float64("rtp", float64(rtp.TotalWins)/float64(rtp.TotalBet)),
+		slog.Int64("max win", rtp.MaxReturn),
 		slog.Duration("cost time", d))
 
 	curtime := time.Now()
@@ -97,7 +98,7 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 	return nil
 }
 
-func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel, wincap int64) (*stats2.Stats, error) {
+func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ontimer sgc7rtp.FuncOnRTPTimer3, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel, wincap int64) (*stats2.Stats, error) {
 	sgc7plugin.IsNoRNGCache = true
 
 	game, err := NewGame2WithData(gamecfg, func() sgc7plugin.IPlugin {
@@ -122,7 +123,7 @@ func StartRTPWithData(gamecfg []byte, icore int, ispinnums int64, bet int64, ont
 		Currency: "EUR",
 	}
 
-	d := sgc7rtp.StartRTP2(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, wincap)
+	d := sgc7rtp.StartRTP3(game, rtp, icore, ispinnums, stake, int(ispinnums/100), ontimer, true, wincap)
 
 	goutils.Info("finish.",
 		slog.Int64("total nums", ispinnums),
