@@ -179,6 +179,7 @@ func StartRTP3(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stak
 		lastnums--
 	}
 
+	donenum := tasknum
 	curspinnum := int64(0)
 	for {
 		currtp := <-ch
@@ -187,14 +188,17 @@ func StartRTP3(game sgc7game.IGame, rtp *RTP, worknums int, spinnums int64, stak
 
 		rtp.Add(currtp)
 
-		if lastnums <= 0 {
+		donenum--
+		if donenum <= 0 {
 			break
 		}
 
 		ontimer(spinnums, curspinnum, time.Since(t1), rtp.TotalWins, rtp.TotalBet)
 
-		lastnums--
-		startWorker3(game, zerortp, perspinnum, stake, needVariance, limitPayout, ch)
+		if lastnums > 0 {
+			lastnums--
+			startWorker3(game, zerortp, perspinnum, stake, needVariance, limitPayout, ch)
+		}
 	}
 
 	elapsed := time.Since(t1)
