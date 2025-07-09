@@ -84,9 +84,10 @@ type CheckValConfig struct {
 
 // SetLinkComponent
 func (cfg *CheckValConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }

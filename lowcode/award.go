@@ -13,43 +13,44 @@ type Award struct {
 }
 
 func (cfg *Award) getType() int {
-	if cfg.AwardType == "cash" {
+	switch cfg.AwardType {
+	case "cash":
 		return AwardCash
-	} else if cfg.AwardType == "collector" {
+	case "collector":
 		return AwardCollector
-	} else if cfg.AwardType == "respinTimes" {
+	case "respinTimes":
 		return AwardRespinTimes
-	} else if cfg.AwardType == "gameMulti" {
+	case "gameMulti":
 		return AwardGameMulti
-	} else if cfg.AwardType == "stepMulti" {
+	case "stepMulti":
 		return AwardStepMulti
-	} else if cfg.AwardType == "initMask" {
+	case "initMask":
 		return AwardInitMask
-	} else if cfg.AwardType == "triggerRespin" {
+	case "triggerRespin":
 		return AwardTriggerRespin
-	} else if cfg.AwardType == "noLevelUpCollector" {
+	case "noLevelUpCollector":
 		return AwardNoLevelUpCollector
-	} else if cfg.AwardType == "weightGameRNG" {
+	case "weightGameRNG":
 		return AwardWeightGameRNG
-	} else if cfg.AwardType == "pushSymbolCollection" {
+	case "pushSymbolCollection":
 		return AwardPushSymbolCollection
-	} else if cfg.AwardType == "gameCoinMulti" {
+	case "gameCoinMulti":
 		return AwardGameCoinMulti
-	} else if cfg.AwardType == "stepCoinMulti" {
+	case "stepCoinMulti":
 		return AwardStepCoinMulti
-	} else if cfg.AwardType == "retriggerRespin" {
+	case "retriggerRespin":
 		return AwardRetriggerRespin
-	} else if cfg.AwardType == "addRetriggerRespinNum" {
+	case "addRetriggerRespinNum":
 		return AwardAddRetriggerRespinNum
-	} else if cfg.AwardType == "setMaskVal" {
+	case "setMaskVal":
 		return AwardSetMaskVal
-	} else if cfg.AwardType == "triggerRespin2" {
+	case "triggerRespin2":
 		return AwardTriggerRespin2
-	} else if cfg.AwardType == "setComponentConfigVal" {
+	case "setComponentConfigVal":
 		return AwardSetComponentConfigVal
-	} else if cfg.AwardType == "setComponentConfigIntVal" {
+	case "setComponentConfigIntVal":
 		return AwardSetComponentConfigIntVal
-	} else if cfg.AwardType == "chgComponentConfigIntVal" {
+	case "chgComponentConfigIntVal":
 		return AwardChgComponentConfigIntVal
 	}
 

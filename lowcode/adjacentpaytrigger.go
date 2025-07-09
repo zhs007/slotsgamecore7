@@ -87,21 +87,22 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) BuildPBComponentData() pro
 
 // GetValEx -
 func (adjacentPayTriggerData *AdjacentPayTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVSymbolNum {
+	switch key {
+	case CVSymbolNum:
 		return adjacentPayTriggerData.SymbolNum, true
-	} else if key == CVWildNum {
+	case CVWildNum:
 		return adjacentPayTriggerData.WildNum, true
-	} else if key == CVRespinNum {
+	case CVRespinNum:
 		return adjacentPayTriggerData.RespinNum, true
-	} else if key == CVWins {
+	case CVWins:
 		return adjacentPayTriggerData.Wins, true
-	} else if key == CVAvgSymbolValMulti {
+	case CVAvgSymbolValMulti:
 		if adjacentPayTriggerData.AvgSymbolValMulti == 0 {
 			return 100, true
 		}
 
 		return adjacentPayTriggerData.AvgSymbolValMulti, true
-	} else if key == CVResultNum || key == CVWinResultNum {
+	case CVResultNum, CVWinResultNum:
 		return len(adjacentPayTriggerData.UsedResults), true
 	}
 
@@ -143,9 +144,10 @@ type AdjacentPayTriggerConfig struct {
 
 // SetLinkComponent
 func (cfg *AdjacentPayTriggerConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }

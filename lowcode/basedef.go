@@ -37,27 +37,28 @@ const (
 func ParseSymbolTriggerType(str string) SymbolTriggerType {
 	str = strings.ToLower(str)
 
-	if str == "lines" {
+	switch str {
+	case "lines":
 		return STTypeLines
-	} else if str == "ways" {
+	case "ways":
 		return STTypeWays
-	} else if str == "scatters" {
+	case "scatters":
 		return STTypeScatters
-	} else if str == "countscatter" {
+	case "countscatter":
 		return STTypeCountScatter
-	} else if str == "countscatterinarea" {
+	case "countscatterinarea":
 		return STTypeCountScatterInArea
-	} else if str == "checklines" {
+	case "checklines":
 		return STTypeCheckLines
-	} else if str == "checkways" {
+	case "checkways":
 		return STTypeCheckWays
-	} else if str == "cluster" {
+	case "cluster":
 		return STTypeCluster
-	} else if str == "reelscatters" {
+	case "reelscatters":
 		return STTypeReelScatters
-	} else if str == "countscatterreels" {
+	case "countscatterreels":
 		return STTypeCountScatterReels
-	} else if str == "adjacentpay" {
+	case "adjacentpay":
 		return STTypeAdjacentPay
 	}
 
@@ -73,9 +74,10 @@ const (
 )
 
 func ParseBetType(str string) BetType {
-	if str == "bet" {
+	switch str {
+	case "bet":
 		return BTypeBet
-	} else if str == "totalBet" {
+	case "totalBet":
 		return BTypeTotalBet
 	}
 
@@ -93,13 +95,14 @@ const (
 )
 
 func ParseOtherSceneMultiType(str string) OtherSceneMultiType {
-	if str == "add" {
+	switch str {
+	case "add":
 		return OSMTAdd
-	} else if str == "mul" {
+	case "mul":
 		return OSMTMul
-	} else if str == "powof2add" {
+	case "powof2add":
 		return OSMTPowOf2Add
-	} else if str == "powof2mul" {
+	case "powof2mul":
 		return OSMTPowOf2Mul
 	}
 
@@ -107,7 +110,8 @@ func ParseOtherSceneMultiType(str string) OtherSceneMultiType {
 }
 
 func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
-	if t == OSMTAdd {
+	switch t {
+	case OSMTAdd:
 		return func(src int, target int) int {
 			if target > 1 {
 				if src == 1 {
@@ -119,7 +123,7 @@ func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
 
 			return src
 		}
-	} else if t == OSMTMul {
+	case OSMTMul:
 		return func(src int, target int) int {
 			if target > 1 {
 				return src * target
@@ -127,7 +131,7 @@ func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
 
 			return src
 		}
-	} else if t == OSMTPowOf2Add {
+	case OSMTPowOf2Add:
 		return func(src int, target int) int {
 			if target >= 1 {
 				if src == 1 {
@@ -139,7 +143,7 @@ func GetSymbolValMultiFunc(t OtherSceneMultiType) sgc7game.FuncCalcMulti {
 
 			return src
 		}
-	} else if t == OSMTPowOf2Mul {
+	case OSMTPowOf2Mul:
 		return func(src int, target int) int {
 			if target >= 1 {
 				return src * PowInt(2, target)

@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -30,21 +31,22 @@ const (
 )
 
 func parseCheckSymbolValsType(strType string) CheckSymbolValsType {
-	if strType == ">=" {
+	switch strType {
+	case ">=":
 		return CSVTypeGreaterEqu
-	} else if strType == "<=" {
+	case "<=":
 		return CSVTypeLessEqu
-	} else if strType == ">" {
+	case ">":
 		return CSVTypeGreater
-	} else if strType == "<" {
+	case "<":
 		return CSVTypeLess
-	} else if strType == "In [min, max]" {
+	case "in [min, max]":
 		return CSVTypeInAreaLR
-	} else if strType == "In (min, max]" {
+	case "in (min, max]":
 		return CSVTypeInAreaR
-	} else if strType == "In [min, max)" {
+	case "in [min, max)":
 		return CSVTypeInAreaL
-	} else if strType == "In (min, max)" {
+	case "in (min, max)":
 		return CSVTypeInArea
 	}
 
@@ -112,23 +114,24 @@ func (checkSymbolVals *CheckSymbolVals) InitEx(cfg any, pool *GamePropertyPool) 
 }
 
 func (checkSymbolVals *CheckSymbolVals) checkVal(v int) bool {
-	if checkSymbolVals.Config.Type == CSVTypeEqu {
+	switch checkSymbolVals.Config.Type {
+	case CSVTypeEqu:
 		return v == checkSymbolVals.Config.Value
-	} else if checkSymbolVals.Config.Type == CSVTypeGreaterEqu {
+	case CSVTypeGreaterEqu:
 		return v >= checkSymbolVals.Config.Value
-	} else if checkSymbolVals.Config.Type == CSVTypeLessEqu {
+	case CSVTypeLessEqu:
 		return v <= checkSymbolVals.Config.Value
-	} else if checkSymbolVals.Config.Type == CSVTypeGreater {
+	case CSVTypeGreater:
 		return v > checkSymbolVals.Config.Value
-	} else if checkSymbolVals.Config.Type == CSVTypeLess {
+	case CSVTypeLess:
 		return v < checkSymbolVals.Config.Value
-	} else if checkSymbolVals.Config.Type == CSVTypeInAreaLR {
+	case CSVTypeInAreaLR:
 		return v >= checkSymbolVals.Config.Min && v <= checkSymbolVals.Config.Max
-	} else if checkSymbolVals.Config.Type == CSVTypeInAreaR {
+	case CSVTypeInAreaR:
 		return v > checkSymbolVals.Config.Min && v <= checkSymbolVals.Config.Max
-	} else if checkSymbolVals.Config.Type == CSVTypeInAreaL {
+	case CSVTypeInAreaL:
 		return v >= checkSymbolVals.Config.Min && v < checkSymbolVals.Config.Max
-	} else if checkSymbolVals.Config.Type == CSVTypeInArea {
+	case CSVTypeInArea:
 		return v > checkSymbolVals.Config.Min && v < checkSymbolVals.Config.Max
 	}
 
@@ -184,7 +187,7 @@ type jsonCheckSymbolVals struct {
 
 func (jcfg *jsonCheckSymbolVals) build() *CheckSymbolValsConfig {
 	cfg := &CheckSymbolValsConfig{
-		StrType:           jcfg.Type,
+		StrType:           strings.ToLower(jcfg.Type),
 		OutputToComponent: jcfg.OutputToComponent,
 		Value:             jcfg.Value,
 		Min:               jcfg.Min,
