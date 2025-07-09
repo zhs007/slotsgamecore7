@@ -331,7 +331,8 @@ func (bomb *Bomb) bomb(gameProp *GameProperty, gs *sgc7game.GameScene, x int, y 
 func (bomb *Bomb) getSourcePos(ctx context.Context, gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, _ *BombData) ([]int, error) {
 	var npos []int
 
-	if bomb.Config.BombSourceType == BSTypePositionCollection {
+	switch bomb.Config.BombSourceType {
+	case BSTypePositionCollection:
 		npos = make([]int, 0, gs.Width*gs.Height*2)
 
 		pos := gameProp.GetComponentPos(bomb.Config.SourcePositionCollection)
@@ -344,7 +345,7 @@ func (bomb *Bomb) getSourcePos(ctx context.Context, gameProp *GameProperty, gs *
 				}
 			}
 		}
-	} else if bomb.Config.BombSourceType == BSTypeSymbols {
+	case BSTypeSymbols:
 		npos = make([]int, 0, gs.Width*gs.Height*2)
 
 		for x, arr := range gs.Arr {
@@ -354,7 +355,7 @@ func (bomb *Bomb) getSourcePos(ctx context.Context, gameProp *GameProperty, gs *
 				}
 			}
 		}
-	} else {
+	default:
 		return nil, nil
 	}
 

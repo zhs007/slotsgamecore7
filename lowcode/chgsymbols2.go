@@ -33,11 +33,12 @@ func (t ChgSymbols2SourceType) IsReelsMode() bool {
 }
 
 func parseChgSymbols2SourceType(str string) ChgSymbols2SourceType {
-	if str == "reels" {
+	switch str {
+	case "reels":
 		return CS2STypeReels
-	} else if str == "mask" {
+	case "mask":
 		return CS2STypeMask
-	} else if str == "positioncollection" {
+	case "positioncollection":
 		return CS2STypePositionCollection
 	}
 
@@ -53,9 +54,10 @@ const (
 )
 
 func parseChgSymbols2SourceSymbolType(str string) ChgSymbols2SourceSymbolType {
-	if str == "symbols" {
+	switch str {
+	case "symbols":
 		return CS2SSTypeSymbols
-	} else if str == "symbolweight" {
+	case "symbolweight":
 		return CS2SSTypeSymbolWeight
 	}
 
@@ -74,15 +76,16 @@ const (
 )
 
 func parseChgSymbols2Type(str string) ChgSymbols2Type {
-	if str == "symbolweight" {
+	switch str {
+	case "symbolweight":
 		return CS2TypeSymbolWeight
-	} else if str == "mystery" {
+	case "mystery":
 		return CS2TypeMystery
-	} else if str == "mysteryonreels" {
+	case "mysteryonreels":
 		return CS2TypeMysteryOnReels
-	} else if str == "upsymbol" {
+	case "upsymbol":
 		return CS2TypeUpSymbol
-	} else if str == "eachposrandom" {
+	case "eachposrandom":
 		return CS2TypeEachPosRandom
 	}
 
@@ -98,9 +101,10 @@ const (
 )
 
 func parseChgSymbols2ExitType(str string) ChgSymbols2ExitType {
-	if str == "maxnumber" {
+	switch str {
+	case "maxnumber":
 		return CS2ETypeMaxNumber
-	} else if str == "nosamereel" {
+	case "nosamereel":
 		return CS2ETypeNoSameReel
 	}
 
@@ -212,9 +216,10 @@ type ChgSymbols2Config struct {
 
 // SetLinkComponent
 func (cfg *ChgSymbols2Config) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -343,7 +348,8 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 
 	pos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
 
-	if chgSymbols2.Config.SrcType == CS2STypePositionCollection {
+	switch chgSymbols2.Config.SrcType {
+	case CS2STypePositionCollection:
 		for _, pc := range chgSymbols2.Config.SrcPositionCollection {
 			curpos := gameProp.GetComponentPos(pc)
 			if len(curpos) > 0 {
@@ -357,13 +363,13 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 				}
 			}
 		}
-	} else if chgSymbols2.Config.SrcType == CS2STypeAll {
+	case CS2STypeAll:
 		for x := 0; x < gameProp.GetVal(GamePropWidth); x++ {
 			for y := 0; y < gameProp.GetVal(GamePropHeight); y++ {
 				pos = append(pos, x, y)
 			}
 		}
-	} else {
+	default:
 		goutils.Error("ChgSymbols2.getSrcPos:ErrUnsupportedSourceType",
 			slog.String("srcType", chgSymbols2.Config.StrSrcType),
 			goutils.Err(ErrInvalidComponentConfig))
@@ -375,7 +381,8 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 		return nil, nil
 	}
 
-	if chgSymbols2.Config.SrcSymbolType == CS2SSTypeSymbols {
+	switch chgSymbols2.Config.SrcSymbolType {
+	case CS2SSTypeSymbols:
 		npos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
 
 		for i := range len(pos) / 2 {
@@ -388,7 +395,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 		}
 
 		return npos, nil
-	} else if chgSymbols2.Config.SrcSymbolType == CS2SSTypeSymbolWeight {
+	case CS2SSTypeSymbolWeight:
 		curs, err := chgSymbols2.Config.SrcSymbolWeightVW2.RandVal(plugin)
 		if err != nil {
 			goutils.Error("ChgSymbols2.getSrcPos:RandVal",
@@ -414,9 +421,9 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 	return pos, nil
 }
 
-// playgame
+// procPos
 func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbols2Data) (string, error) {
+	_ sgc7game.IPlayerState, _ *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbols2Data) (string, error) {
 
 	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -442,7 +449,8 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 		return nc, ErrComponentDoNothing
 	}
 
-	if chgSymbols.Config.Type == CS2TypeSymbol {
+	switch chgSymbols.Config.Type {
+	case CS2TypeSymbol:
 		ngs, err := chgSymbols.procSymbolWithPos(gameProp, gs, pos, chgSymbols.Config.SymbolCode, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWithPos",
@@ -452,7 +460,7 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 		}
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-	} else if chgSymbols.Config.Type == CS2TypeSymbolWeight {
+	case CS2TypeSymbolWeight:
 		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWeightWithPos",
@@ -462,7 +470,7 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 		}
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-	} else if chgSymbols.Config.Type == CS2TypeEachPosRandom {
+	case CS2TypeEachPosRandom:
 		ngs, err := chgSymbols.procEachPosRandomWithPos(gameProp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procEachPosRandomWithPos",
@@ -473,6 +481,8 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	}
+
+	chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
 
 	nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
 

@@ -29,11 +29,12 @@ const (
 )
 
 func parseAddSymbolsType(str string) AddSymbolsType {
-	if str == "nosamereel" {
+	switch str {
+	case "nosamereel":
 		return AddSymbolsTypeNoSameReel
-	} else if str == "nosamereelandignore" {
+	case "nosamereelandignore":
 		return AddSymbolsTypeNoSameReelAndIgnore
-	} else if str == "positioncollection" {
+	case "positioncollection":
 		return AddSymbolsTypePositionCollection
 	}
 
@@ -49,9 +50,10 @@ const (
 )
 
 func parseAddSymbolNumType(str string) AddSymbolNumType {
-	if str == "weight" {
+	switch str {
+	case "weight":
 		return AddSymbolNumTypeWeight
-	} else if str == "incUntilTriggered" {
+	case "incUntilTriggered":
 		return AddSymbolNumTypeIncUntilTriggered
 	}
 
@@ -480,9 +482,10 @@ func (addSymbols *AddSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	var num int
 
-	if addSymbols.Config.SymbolNumType == AddSymbolNumTypeNumber {
+	switch addSymbols.Config.SymbolNumType {
+	case AddSymbolNumTypeNumber:
 		num = addSymbols.Config.SymbolNum
-	} else if addSymbols.Config.SymbolNumType == AddSymbolNumTypeWeight {
+	case AddSymbolNumTypeWeight:
 		if addSymbols.Config.SymbolNumWeightVW != nil {
 			cv, err := addSymbols.Config.SymbolNumWeightVW.RandVal(plugin)
 			if err != nil {

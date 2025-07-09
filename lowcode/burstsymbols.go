@@ -26,9 +26,10 @@ const (
 )
 
 func parseBurstSymbolsType(str string) BurstSymbolsType {
-	if str == "surround4" {
+	switch str {
+	case "surround4":
 		return BSTypeSurround4
-	} else if str == "surround8" {
+	case "surround8":
 		return BSTypeSurround8
 	}
 
@@ -262,9 +263,10 @@ type BurstSymbolsConfig struct {
 
 // SetLinkComponent
 func (cfg *BurstSymbolsConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }

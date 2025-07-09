@@ -47,11 +47,12 @@ func parseCascadingRegulatorType(strType string) CascadingRegulatorType {
 }
 
 func parseCascadingRegulatorWinType(strType string) CascadingRegulatorWinType {
-	if strType == "ways" {
+	switch strType {
+	case "ways":
 		return CRWTypeWays
-	} else if strType == "scatter" {
+	case "scatter":
 		return CRWTypeScatter
-	} else if strType == "cluster" {
+	case "cluster":
 		return CRWTypeCluster
 	}
 
@@ -177,12 +178,13 @@ func (cascadingRegulator *CascadingRegulator) InitEx(cfg any, pool *GameProperty
 	return nil
 }
 
-func (cascadingRegulator *CascadingRegulator) getMysteryWeight(gameProp *GameProperty, crcd *CascadingRegulatorData) *sgc7game.ValWeights2 {
+func (cascadingRegulator *CascadingRegulator) getMysteryWeight(_ *GameProperty, _ *CascadingRegulatorData) *sgc7game.ValWeights2 {
 	return cascadingRegulator.Config.MysteryWeightVW
 }
 
 // procMysteryOnReels
-func (cascadingRegulator *CascadingRegulator) procMysteryOnReel(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, crcd *CascadingRegulatorData,
+func (cascadingRegulator *CascadingRegulator) procMysteryOnReel(_ *GameProperty, _ *sgc7game.PlayResult, _ *GameParams,
+	plugin sgc7plugin.IPlugin, _ *CascadingRegulatorData,
 	ngs *sgc7game.GameScene, x int, yarr []int, level float32, invalidSyms []int, vw2 *sgc7game.ValWeights2) error {
 
 	if cascadingRegulator.Config.WinType == CRWTypeScatter {

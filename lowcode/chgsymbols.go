@@ -29,15 +29,16 @@ const (
 )
 
 func parseChgSymbolsType(str string) ChgSymbolsType {
-	if str == "mystery" {
+	switch str {
+	case "mystery":
 		return ChgSymTypeMystery
-	} else if str == "randomwithnotrigger" {
+	case "randomwithnotrigger":
 		return ChgSymTypeRandomWithNoTrigger
-	} else if str == "upgradesymbolofcategory" {
+	case "upgradesymbolofcategory":
 		return ChgSymTypeUpgradeSymbolOfCategory
-	} else if str == "reels" {
+	case "reels":
 		return ChgSymTypeReels
-	} else if str == "mysteryonreels" {
+	case "mysteryonreels":
 		return ChgSymTypeMysteryOnReels
 	}
 
@@ -114,9 +115,10 @@ type ChgSymbolsConfig struct {
 
 // SetLinkComponent
 func (cfg *ChgSymbolsConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -680,7 +682,8 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 		ngs := gs
 
-		if chgSymbols.Config.Type == ChgSymTypeMystery {
+		switch chgSymbols.Config.Type {
+		case ChgSymTypeMystery:
 			ngs1, err := chgSymbols.procMystery(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procMystery",
@@ -690,7 +693,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
-		} else if chgSymbols.Config.Type == ChgSymTypeReels {
+		case ChgSymTypeReels:
 			ngs1, err := chgSymbols.procReels(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procReels",
@@ -700,7 +703,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
-		} else if chgSymbols.Config.Type == ChgSymTypeRandomWithNoTrigger {
+		case ChgSymTypeRandomWithNoTrigger:
 			ngs2, err := chgSymbols.procRandomWithNoTrigger(gameProp, &cd.BasicComponentData, plugin, curpr, stake,
 				gs, height)
 			if err != nil {
@@ -711,7 +714,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs2
-		} else if chgSymbols.Config.Type == ChgSymTypeUpgradeSymbolOfCategory {
+		case ChgSymTypeUpgradeSymbolOfCategory:
 			ngs1, err := chgSymbols.procUpgradeSymbolOfCategory(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procUpgradeSymbolOfCategory",
@@ -721,7 +724,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
-		} else if chgSymbols.Config.Type == ChgSymTypeMysteryOnReels {
+		case ChgSymTypeMysteryOnReels:
 			ngs1, err := chgSymbols.procMysteryOnReels(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procMysteryOnReels",
@@ -731,7 +734,7 @@ func (chgSymbols *ChgSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 			}
 
 			ngs = ngs1
-		} else {
+		default:
 			ngs3, err := chgSymbols.procNormal(gameProp, &cd.BasicComponentData, plugin, gs, height)
 			if err != nil {
 				goutils.Error("ChgSymbols.OnPlayGame:procNormal",
