@@ -32,15 +32,16 @@ const (
 )
 
 func parseReelTriggerType(str string) ReelTriggerType {
-	if str == "row" {
+	switch str {
+	case "row":
 		return RTTypeRow
-	} else if str == "column" {
+	case "column":
 		return RTTypeColumn
-	} else if str == "rownumber" {
+	case "rownumber":
 		return RTTypeRowNumber
-	} else if str == "columnnumber" {
+	case "columnnumber":
 		return RTTypeColumnNumber
-	} else if str == "fullscreen" {
+	case "fullscreen":
 		return RTTypeFullScreen
 	}
 
@@ -61,9 +62,10 @@ func (reelTriggerData *ReelTriggerData) OnNewGame(gameProp *GameProperty, compon
 
 	reelTrigger := component.(*ReelTrigger)
 
-	if reelTrigger.Config.Type == RTTypeRow || reelTrigger.Config.Type == RTTypeRowNumber {
+	switch reelTrigger.Config.Type {
+	case RTTypeRow, RTTypeRowNumber:
 		reelTriggerData.Masks = make([]bool, gameProp.GetVal(GamePropHeight))
-	} else if reelTrigger.Config.Type == RTTypeColumn || reelTrigger.Config.Type == RTTypeColumnNumber {
+	case RTTypeColumn, RTTypeColumnNumber:
 		reelTriggerData.Masks = make([]bool, gameProp.GetVal(GamePropWidth))
 	}
 
@@ -236,15 +238,16 @@ func (reelTrigger *ReelTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 	}
 
-	if reelTrigger.Config.Type == RTTypeRow || reelTrigger.Config.Type == RTTypeRowNumber {
+	switch reelTrigger.Config.Type {
+	case RTTypeRow, RTTypeRowNumber:
 		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Width {
 			reelTrigger.Config.MinSymbolNum = pool.Config.Width
 		}
-	} else if reelTrigger.Config.Type == RTTypeColumn || reelTrigger.Config.Type == RTTypeColumnNumber {
+	case RTTypeColumn, RTTypeColumnNumber:
 		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Height {
 			reelTrigger.Config.MinSymbolNum = pool.Config.Height
 		}
-	} else if reelTrigger.Config.Type == RTTypeFullScreen {
+	case RTTypeFullScreen:
 		if reelTrigger.Config.MinSymbolNum <= 0 || reelTrigger.Config.MinSymbolNum > pool.Config.Height*pool.Config.Width {
 			reelTrigger.Config.MinSymbolNum = pool.Config.Height * pool.Config.Width
 		}
@@ -479,15 +482,16 @@ func (reelTrigger *ReelTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	gs := reelTrigger.GetTargetScene3(gameProp, curpr, prs, 0)
 	isTrigger := false
 
-	if reelTrigger.Config.Type == RTTypeRow {
+	switch reelTrigger.Config.Type {
+	case RTTypeRow:
 		isTrigger = reelTrigger.procRow(gameProp, curpr, gp, plugin, rtd, gs)
-	} else if reelTrigger.Config.Type == RTTypeRowNumber {
+	case RTTypeRowNumber:
 		isTrigger = reelTrigger.procRowNumber(gameProp, curpr, gp, plugin, rtd, gs)
-	} else if reelTrigger.Config.Type == RTTypeColumn {
+	case RTTypeColumn:
 		isTrigger = reelTrigger.procColumn(gameProp, curpr, gp, plugin, rtd, gs)
-	} else if reelTrigger.Config.Type == RTTypeColumnNumber {
+	case RTTypeColumnNumber:
 		isTrigger = reelTrigger.procColumnNumber(gameProp, curpr, gp, plugin, rtd, gs)
-	} else if reelTrigger.Config.Type == RTTypeFullScreen {
+	case RTTypeFullScreen:
 		isTrigger = reelTrigger.procFullScreen(gameProp, curpr, gp, plugin, rtd, gs)
 	}
 

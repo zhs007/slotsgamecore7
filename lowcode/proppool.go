@@ -628,13 +628,14 @@ func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLeve
 	mColor := color.New(color.BgGreen, color.FgHiWhite)
 	sColor := color.New(color.BgMagenta, color.FgHiWhite)
 	for k, v := range pool.SymbolsViewer.MapSymbols {
-		if v.Color == "wild" {
+		switch v.Color {
+		case "wild":
 			pool.MapSymbolColor.AddSymbolColor(k, wColor)
-		} else if v.Color == "high" {
+		case "high":
 			pool.MapSymbolColor.AddSymbolColor(k, hColor)
-		} else if v.Color == "medium" {
+		case "medium":
 			pool.MapSymbolColor.AddSymbolColor(k, mColor)
-		} else if v.Color == "scatter" {
+		case "scatter":
 			pool.MapSymbolColor.AddSymbolColor(k, sColor)
 		}
 	}

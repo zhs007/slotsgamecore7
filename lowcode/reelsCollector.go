@@ -31,13 +31,14 @@ const (
 )
 
 func parseReelsCollectorTriggerType(str string) ReelsCollectorTriggerType {
-	if str == "left" {
+	switch str {
+	case "left":
 		return RCTTypeRight
-	} else if str == "right" {
+	case "right":
 		return RCTTypeRight
-	} else if str == "loopleft" {
+	case "loopleft":
 		return RCTTypeLoopLeft
-	} else if str == "loopright" {
+	case "loopright":
 		return RCTTypeLoopRight
 	}
 
@@ -174,9 +175,10 @@ type ReelsCollectorConfig struct {
 
 // SetLinkComponent
 func (cfg *ReelsCollectorConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -351,7 +353,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 			return nc, nil
 		}
 
-		if reelsCollector.Config.TriggerType == RCTTypeNormal {
+		switch reelsCollector.Config.TriggerType {
+		case RCTTypeNormal:
 			lst := make([]int, 0, len(cbps.Collectors))
 			for i, v := range cbps.Collectors {
 				if v == reelsCollector.Config.MaxVal {
@@ -375,7 +378,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 
 				return nc, nil
 			}
-		} else if reelsCollector.Config.TriggerType == RCTTypeLeft {
+		case RCTTypeLeft:
 			for i, v := range cbps.Collectors {
 				if v == reelsCollector.Config.MaxVal {
 					cd.Output = reelsCollector.Config.MaxVal
@@ -393,7 +396,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					return nc, nil
 				}
 			}
-		} else if reelsCollector.Config.TriggerType == RCTTypeRight {
+		case RCTTypeRight:
 			for i := len(cbps.Collectors) - 1; i >= 0; i-- {
 				if cbps.Collectors[i] == reelsCollector.Config.MaxVal {
 					cd.Output = reelsCollector.Config.MaxVal
@@ -411,7 +414,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					return nc, nil
 				}
 			}
-		} else if reelsCollector.Config.TriggerType == RCTTypeLoopLeft {
+		case RCTTypeLoopLeft:
 			for i, v := range cbps.Collectors {
 				if v == reelsCollector.Config.MaxVal {
 					cd.Output = reelsCollector.Config.MaxVal
@@ -433,7 +436,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					return nc, nil
 				}
 			}
-		} else if reelsCollector.Config.TriggerType == RCTTypeLoopRight {
+		case RCTTypeLoopRight:
 			for i := len(cbps.Collectors) - 1; i >= 0; i-- {
 				if cbps.Collectors[i] == reelsCollector.Config.MaxVal {
 					cd.Output = reelsCollector.Config.MaxVal
@@ -455,7 +458,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 					return nc, nil
 				}
 			}
-		} else {
+		default:
 			goutils.Error("ReelsCollector.OnPlayGame:InvalidTriggerType",
 				slog.String("triggerType", reelsCollector.Config.StrTriggerType),
 				goutils.Err(ErrInvalidComponentConfig))
@@ -474,7 +477,8 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 		cd.Collectors = make([]int, w)
 	}
 
-	if reelsCollector.Config.TriggerType == RCTTypeLeft {
+	switch reelsCollector.Config.TriggerType {
+	case RCTTypeLeft:
 		for i, v := range cd.Collectors {
 			if v == reelsCollector.Config.MaxVal {
 				cd.Collectors[i] = 0
@@ -489,7 +493,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				return nc, nil
 			}
 		}
-	} else if reelsCollector.Config.TriggerType == RCTTypeRight {
+	case RCTTypeRight:
 		for i := len(cd.Collectors) - 1; i >= 0; i-- {
 			if cd.Collectors[i] == reelsCollector.Config.MaxVal {
 				cd.Collectors[i] = 0
@@ -504,7 +508,7 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 				return nc, nil
 			}
 		}
-	} else {
+	default:
 		goutils.Error("ReelsCollector.OnPlayGame:InvalidTriggerType",
 			slog.String("triggerType", reelsCollector.Config.StrTriggerType),
 			goutils.Err(ErrInvalidComponentConfig))

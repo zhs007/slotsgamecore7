@@ -74,11 +74,12 @@ func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) addVal(val int) 
 // GetValEx -
 func (genSymbolValsWithSymbolData *GenSymbolValsWithSymbolData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolVal && len(genSymbolValsWithSymbolData.GenVals) > 0 {
-		if getType == GCVTypeMin {
+		switch getType {
+		case GCVTypeMin:
 			return slices.Min(genSymbolValsWithSymbolData.GenVals), true
-		} else if getType == GCVTypeMax {
+		case GCVTypeMax:
 			return slices.Max(genSymbolValsWithSymbolData.GenVals), true
-		} else {
+		default:
 			return genSymbolValsWithSymbolData.GenVals[len(genSymbolValsWithSymbolData.GenVals)-1], true
 		}
 	}
@@ -193,7 +194,8 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 
 		vw2 := genSymbolValsWithSymbol.getWeight(gameProp, &cd.BasicComponentData)
 
-		if genSymbolValsWithSymbol.Config.Type == GSVWSTypeNormal {
+		switch genSymbolValsWithSymbol.Config.Type {
+		case GSVWSTypeNormal:
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(genSymbolValsWithSymbol.Config.SymbolCodes, s, 0) >= 0 {
@@ -237,7 +239,7 @@ func (genSymbolValsWithSymbol *GenSymbolValsWithSymbol) OnPlayGame(gameProp *Gam
 					}
 				}
 			}
-		} else if genSymbolValsWithSymbol.Config.Type == GSVWSTypeNonClear {
+		case GSVWSTypeNonClear:
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(genSymbolValsWithSymbol.Config.SymbolCodes, s, 0) >= 0 {

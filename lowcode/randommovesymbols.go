@@ -454,7 +454,8 @@ func (randomMoveSymbols *RandomMoveSymbols) OnPlayGame(gameProp *GameProperty, c
 
 	sc2 := gs
 
-	if randomMoveSymbols.Config.Type == RMSTypeNormal {
+	switch randomMoveSymbols.Config.Type {
+	case RMSTypeNormal:
 		ngs, err := randomMoveSymbols.procNormal(gameProp, msd, plugin, gs)
 		if err != nil {
 			goutils.Error("RandomMoveSymbols.OnPlayGame:procNormal",
@@ -464,7 +465,7 @@ func (randomMoveSymbols *RandomMoveSymbols) OnPlayGame(gameProp *GameProperty, c
 		}
 
 		sc2 = ngs
-	} else if randomMoveSymbols.Config.Type == RMSTypeReels {
+	case RMSTypeReels:
 		ngs, err := randomMoveSymbols.procReels(gameProp, msd, plugin, gs, gs2)
 		if err != nil {
 			goutils.Error("RandomMoveSymbols.OnPlayGame:procReels",

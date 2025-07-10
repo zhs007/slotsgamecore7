@@ -30,13 +30,14 @@ const (
 )
 
 func parseChgSymbolValsType(strType string) ChgSymbolValsType {
-	if strType == "dec" {
+	switch strType {
+	case "dec":
 		return CSVTypeDec
-	} else if strType == "mul" {
+	case "mul":
 		return CSVTypeMul
-	} else if strType == "add" {
+	case "add":
 		return CSVTypeAdd
-	} else if strType == "set" {
+	case "set":
 		return CSVTypeSet
 	}
 
@@ -54,13 +55,14 @@ const (
 )
 
 func parseChgSymbolValsSourceType(strType string) ChgSymbolValsSourceType {
-	if strType == "positioncollection" {
+	switch strType {
+	case "positioncollection":
 		return CSVSTypePositionCollection
-	} else if strType == "row" {
+	case "row":
 		return CSVSTypeRow
-	} else if strType == "column" {
+	case "column":
 		return CSVSTypeColumn
-	} else if strType == "winResult" {
+	case "winResult":
 		return CSVSTypeWinResult
 	}
 
@@ -76,9 +78,10 @@ const (
 )
 
 func parseChgSymbolValsTargetType(strType string) ChgSymbolValsTargetType {
-	if strType == "weight" {
+	switch strType {
+	case "weight":
 		return CSVTTypeWeight
-	} else if strType == "eachWeight" {
+	case "eachWeight":
 		return CSVTTypeEachWeight
 	}
 
@@ -315,7 +318,8 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 	if os != nil {
 		nos := os
 
-		if chgSymbolVals.Config.SourceType == CSVSTypePositionCollection {
+		switch chgSymbolVals.Config.SourceType {
+		case CSVSTypePositionCollection:
 			pc, isok := gameProp.Components.MapComponents[chgSymbolVals.Config.PositionCollection]
 			if isok {
 				pccd := gameProp.GetComponentData(pc)
@@ -329,7 +333,8 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						return "", nil
 					}
 
-					if chgSymbolVals.Config.Type == CSVTypeInc {
+					switch chgSymbolVals.Config.Type {
+					case CSVTypeInc:
 						for i := 0; i < len(npos)/2; i++ {
 							if nos == os {
 								nos = os.CloneEx(gameProp.PoolScene)
@@ -343,7 +348,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 								}
 							}
 						}
-					} else if chgSymbolVals.Config.Type == CSVTypeDec {
+					case CSVTypeDec:
 						for i := 0; i < len(npos)/2; i++ {
 							if nos.Arr[npos[i*2]][npos[i*2+1]] > chgSymbolVals.Config.MinVal {
 								if nos == os {
@@ -357,7 +362,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 								}
 							}
 						}
-					} else if chgSymbolVals.Config.Type == CSVTypeMul {
+					case CSVTypeMul:
 						for i := 0; i < len(npos)/2; i++ {
 							multi, err := chgSymbolVals.GetTarget(cd, plugin)
 							if err != nil {
@@ -381,7 +386,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 								cd.AddPos(npos[i*2], npos[i*2+1])
 							}
 						}
-					} else if chgSymbolVals.Config.Type == CSVTypeAdd {
+					case CSVTypeAdd:
 						for i := 0; i < len(npos)/2; i++ {
 							off, err := chgSymbolVals.GetTarget(cd, plugin)
 							if err != nil {
@@ -405,7 +410,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 								cd.AddPos(npos[i*2], npos[i*2+1])
 							}
 						}
-					} else if chgSymbolVals.Config.Type == CSVTypeSet {
+					case CSVTypeSet:
 						for i := 0; i < len(npos)/2; i++ {
 							val, err := chgSymbolVals.GetTarget(cd, plugin)
 							if err != nil {
@@ -428,7 +433,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				}
 			}
-		} else if chgSymbolVals.Config.SourceType == CSVSTypeWinResult {
+		case CSVSTypeWinResult:
 			for _, cn := range chgSymbolVals.Config.WinResultComponents {
 				ccd := gameProp.GetComponentDataWithName(cn)
 				// ccd := gameProp.MapComponentData[cn]
@@ -444,7 +449,8 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 							return "", nil
 						}
 
-						if chgSymbolVals.Config.Type == CSVTypeInc {
+						switch chgSymbolVals.Config.Type {
+						case CSVTypeInc:
 							for i := 0; i < len(npos)/2; i++ {
 								if nos.Arr[npos[i*2]][npos[i*2+1]] < chgSymbolVals.Config.MaxVal {
 									if nos == os {
@@ -458,7 +464,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 									}
 								}
 							}
-						} else if chgSymbolVals.Config.Type == CSVTypeDec {
+						case CSVTypeDec:
 							for i := 0; i < len(npos)/2; i++ {
 								if nos.Arr[npos[i*2]][npos[i*2+1]] > chgSymbolVals.Config.MinVal {
 									if nos == os {
@@ -472,7 +478,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 									}
 								}
 							}
-						} else if chgSymbolVals.Config.Type == CSVTypeMul {
+						case CSVTypeMul:
 							for i := 0; i < len(npos)/2; i++ {
 								if nos == os {
 									nos = os.CloneEx(gameProp.PoolScene)
@@ -496,7 +502,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 									cd.AddPos(npos[i*2], npos[i*2+1])
 								}
 							}
-						} else if chgSymbolVals.Config.Type == CSVTypeAdd {
+						case CSVTypeAdd:
 							for i := 0; i < len(npos)/2; i++ {
 								if nos == os {
 									nos = os.CloneEx(gameProp.PoolScene)
@@ -520,7 +526,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 									cd.AddPos(npos[i*2], npos[i*2+1])
 								}
 							}
-						} else if chgSymbolVals.Config.Type == CSVTypeSet {
+						case CSVTypeSet:
 							for i := 0; i < len(npos)/2; i++ {
 								if nos == os {
 									nos = os.CloneEx(gameProp.PoolScene)
@@ -544,8 +550,9 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				}
 			}
-		} else if chgSymbolVals.Config.SourceType == CSVSTypeRow {
-			if chgSymbolVals.Config.Type == CSVTypeInc {
+		case CSVSTypeRow:
+			switch chgSymbolVals.Config.Type {
+			case CSVTypeInc:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -561,7 +568,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeDec {
+			case CSVTypeDec:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -577,7 +584,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeMul {
+			case CSVTypeMul:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -603,7 +610,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				}
 
-			} else if chgSymbolVals.Config.Type == CSVTypeAdd {
+			case CSVTypeAdd:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -629,7 +636,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				}
 
-			} else if chgSymbolVals.Config.Type == CSVTypeSet {
+			case CSVTypeSet:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -653,8 +660,9 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 				}
 
 			}
-		} else if chgSymbolVals.Config.SourceType == CSVSTypeColumn {
-			if chgSymbolVals.Config.Type == CSVTypeInc {
+		case CSVSTypeColumn:
+			switch chgSymbolVals.Config.Type {
+			case CSVTypeInc:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -670,7 +678,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeDec {
+			case CSVTypeDec:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -686,7 +694,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeMul {
+			case CSVTypeMul:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -711,7 +719,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						cd.AddPos(x, y)
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeAdd {
+			case CSVTypeAdd:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -736,7 +744,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						cd.AddPos(x, y)
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeSet {
+			case CSVTypeSet:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -759,8 +767,9 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				}
 			}
-		} else if chgSymbolVals.Config.SourceType == CSVSTypeAll {
-			if chgSymbolVals.Config.Type == CSVTypeInc {
+		case CSVSTypeAll:
+			switch chgSymbolVals.Config.Type {
+			case CSVTypeInc:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -776,7 +785,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeDec {
+			case CSVTypeDec:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -792,7 +801,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeMul {
+			case CSVTypeMul:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -817,7 +826,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeAdd {
+			case CSVTypeAdd:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}
@@ -842,7 +851,7 @@ func (chgSymbolVals *ChgSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 						}
 					}
 				}
-			} else if chgSymbolVals.Config.Type == CSVTypeSet {
+			case CSVTypeSet:
 				if nos == os {
 					nos = os.CloneEx(gameProp.PoolScene)
 				}

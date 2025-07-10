@@ -126,11 +126,12 @@ func (respinData *RespinData) IsRespinStarted() bool {
 
 // ChgConfigIntVal -
 func (respinData *RespinData) ChgConfigIntVal(key string, off int) int {
-	if key == CCVLastRespinNum {
+	switch key {
+	case CCVLastRespinNum:
 		respinData.AddRespinTimes(off)
 
 		return respinData.LastRespinNum
-	} else if key == CCVRetriggerAddRespinNum {
+	case CCVRetriggerAddRespinNum:
 		respinData.RetriggerAddRespinNum += off
 
 		return respinData.RetriggerAddRespinNum
@@ -141,11 +142,12 @@ func (respinData *RespinData) ChgConfigIntVal(key string, off int) int {
 
 // SetConfigIntVal -
 func (respinData *RespinData) SetConfigIntVal(key string, val int) {
-	if key == CCVLastRespinNum {
+	switch key {
+	case CCVLastRespinNum:
 		respinData.ResetRespinTimes(val)
-	} else if key == CCVRetriggerAddRespinNum {
+	case CCVRetriggerAddRespinNum:
 		respinData.RetriggerAddRespinNum = val
-	} else {
+	default:
 		respinData.BasicComponentData.ChgConfigIntVal(key, val)
 	}
 }
@@ -226,9 +228,10 @@ type RespinConfig struct {
 
 // SetLinkComponent
 func (cfg *RespinConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "loop" {
+	case "loop":
 		cfg.MainComponent = componentName
 	}
 }

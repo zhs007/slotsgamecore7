@@ -112,9 +112,10 @@ type PositionCollectionConfig struct {
 
 // SetLinkComponent
 func (cfg *PositionCollectionConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "foreach" {
+	case "foreach":
 		cfg.ForeachComponent = componentName
 	}
 }

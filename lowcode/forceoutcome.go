@@ -10,15 +10,16 @@ import (
 )
 
 func cmpVal(srcVal int, op string, targetVal int) bool {
-	if op == "==" {
+	switch op {
+	case "==":
 		return srcVal == targetVal
-	} else if op == ">=" {
+	case ">=":
 		return srcVal >= targetVal
-	} else if op == "<=" {
+	case "<=":
 		return srcVal <= targetVal
-	} else if op == ">" {
+	case ">":
 		return srcVal > targetVal
-	} else if op == "<" {
+	case "<":
 		return srcVal < targetVal
 	}
 

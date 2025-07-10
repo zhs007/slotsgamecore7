@@ -85,15 +85,16 @@ func (scatterTriggerData *ScatterTriggerData) BuildPBComponentData() proto.Messa
 
 // GetValEx -
 func (scatterTriggerData *ScatterTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVSymbolNum {
+	switch key {
+	case CVSymbolNum:
 		return scatterTriggerData.SymbolNum, true
-	} else if key == CVWildNum {
+	case CVWildNum:
 		return scatterTriggerData.WildNum, true
-	} else if key == CVRespinNum {
+	case CVRespinNum:
 		return scatterTriggerData.RespinNum, true
-	} else if key == CVWins {
+	case CVWins:
 		return scatterTriggerData.Wins, true
-	} else if key == CVResultNum || key == CVWinResultNum {
+	case CVResultNum, CVWinResultNum:
 		return len(scatterTriggerData.UsedResults), true
 	}
 
@@ -143,9 +144,10 @@ type ScatterTriggerConfig struct {
 
 // SetLinkComponent
 func (cfg *ScatterTriggerConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -379,7 +381,8 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 
 	symbols := scatterTrigger.getSymbols(gameProp)
 
-	if scatterTrigger.Config.TriggerType == STTypeScatters {
+	switch scatterTrigger.Config.TriggerType {
+	case STTypeScatters:
 		for _, s := range symbols {
 			ret := sgc7game.CalcScatter5(gs, gameProp.CurPaytables, s, gameProp.GetBet3(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
@@ -392,7 +395,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				lst = append(lst, ret)
 			}
 		}
-	} else if scatterTrigger.Config.TriggerType == STTypeReelScatters {
+	case STTypeReelScatters:
 		for _, s := range symbols {
 			ret := sgc7game.CalcScatter5(gs, gameProp.CurPaytables, s, gameProp.GetBet3(stake, scatterTrigger.Config.BetType),
 				func(scatter int, cursymbol int) bool {
@@ -405,7 +408,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 				lst = append(lst, ret)
 			}
 		}
-	} else if scatterTrigger.Config.TriggerType == STTypeCountScatter {
+	case STTypeCountScatter:
 		ret := sgc7game.CalcScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
 			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 		}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
@@ -423,7 +426,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 
 			lst = append(lst, ret)
 		}
-	} else if scatterTrigger.Config.TriggerType == STTypeCountScatterReels {
+	case STTypeCountScatterReels:
 		ret := sgc7game.CalcReelScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
 			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 		}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
@@ -441,7 +444,7 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 
 			lst = append(lst, ret)
 		}
-	} else if scatterTrigger.Config.TriggerType == STTypeCountScatterInArea {
+	case STTypeCountScatterInArea:
 		ret := sgc7game.CountScatterInArea(gs, symbols[0], scatterTrigger.Config.MinNum,
 			func(x, y int) bool {
 				return IsInPosArea(x, y, scatterTrigger.Config.PosArea)

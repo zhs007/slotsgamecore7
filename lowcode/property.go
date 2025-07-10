@@ -423,7 +423,8 @@ func (gameProp *GameProperty) GetVal(prop int) int {
 }
 
 func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
-	if prop == GamePropCurPaytables {
+	switch prop {
+	case GamePropCurPaytables:
 		v, isok := gameProp.Pool.Config.MapPaytables[val]
 		if !isok {
 			goutils.Error("GameProperty.SetStrVal:GamePropCurPaytables",
@@ -434,7 +435,7 @@ func (gameProp *GameProperty) SetStrVal(prop int, val string) error {
 		}
 
 		gameProp.CurPaytables = v
-	} else if prop == GamePropCurLineData {
+	case GamePropCurLineData:
 		v, isok := gameProp.Pool.Config.MapLinedate[val]
 		if !isok {
 			goutils.Error("GameProperty.SetStrVal:GamePropCurLineData",
@@ -614,7 +615,8 @@ func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Aw
 }
 
 func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
-	if award.Type == AwardSetComponentConfigVal {
+	switch award.Type {
+	case AwardSetComponentConfigVal:
 		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.StrParams[1])
 		if err != nil {
 			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:SetComponentConfigVal",
@@ -622,7 +624,7 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 
 			return
 		}
-	} else if award.Type == AwardSetComponentConfigIntVal {
+	case AwardSetComponentConfigIntVal:
 		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, val int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
@@ -636,12 +638,13 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 
 			return false
 		}, func(componentName string, valName string, val int) {
-			if valName == CCVForceValNow {
+			switch valName {
+			case CCVForceValNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
 				}
-			} else if valName == CCVClearNow {
+			case CCVClearNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
@@ -654,7 +657,7 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 
 			return
 		}
-	} else if award.Type == AwardChgComponentConfigIntVal {
+	case AwardChgComponentConfigIntVal:
 		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, off int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
@@ -669,12 +672,13 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 
 			return false
 		}, func(componentName string, valName string, off int, val int) {
-			if valName == CCVForceValNow {
+			switch valName {
+			case CCVForceValNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
 				}
-			} else if valName == CCVClearNow {
+			case CCVClearNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
@@ -713,7 +717,8 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 		return
 	}
 
-	if award.Type == AwardRespinTimes {
+	switch award.Type {
+	case AwardRespinTimes:
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			cd := gameProp.GetGlobalComponentData(component)
@@ -721,20 +726,20 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			cd.AddRespinTimes(award.Vals[0])
 		}
-	} else if award.Type == AwardTriggerRespin {
+	case AwardTriggerRespin:
 		gameProp.TriggerRespin(plugin, curpr, gp, award.Vals[0], award.StrParams[0], false)
 		// component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		// if isok {
 		// 	cd := gameProp.GetGlobalComponentData(component)
 		// 	cd.TriggerRespin(gameProp, plugin, curpr, gp)
 		// }
-	} else if award.Type == AwardAddRetriggerRespinNum {
+	case AwardAddRetriggerRespinNum:
 		component, isok := gameProp.Components.MapComponents[award.StrParams[0]]
 		if isok {
 			cd := gameProp.GetGlobalComponentData(component)
 			cd.ChgConfigIntVal(CCVRetriggerRespinNum, award.Vals[0])
 		}
-	} else if award.Type == AwardSetMaskVal {
+	case AwardSetMaskVal:
 		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.Pool.SetMaskVal(plugin, gameProp, curpr, gp, award.StrParams[0], award.Vals[0], award.Vals[1] != 0)
 		if err != nil {
@@ -743,7 +748,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return
 		}
-	} else if award.Type == AwardTriggerRespin2 {
+	case AwardTriggerRespin2:
 		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, award.StrParams[0], award.GetVal(gameProp, 0))
 		if err != nil {
@@ -752,7 +757,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return
 		}
-	} else if award.Type == AwardSetComponentConfigVal {
+	case AwardSetComponentConfigVal:
 		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.GetStringVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:SetComponentConfigVal",
@@ -760,7 +765,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return
 		}
-	} else if award.Type == AwardSetComponentConfigIntVal {
+	case AwardSetComponentConfigIntVal:
 		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, val int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
@@ -775,12 +780,13 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return false
 		}, func(componentName string, valName string, val int) {
-			if valName == CCVForceValNow {
+			switch valName {
+			case CCVForceValNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
 				}
-			} else if valName == CCVClearNow {
+			case CCVClearNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
@@ -793,7 +799,7 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return
 		}
-	} else if award.Type == AwardChgComponentConfigIntVal {
+	case AwardChgComponentConfigIntVal:
 		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, off int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, 0)
@@ -808,12 +814,13 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 
 			return false
 		}, func(componentName string, valName string, off int, val int) {
-			if valName == CCVForceValNow {
+			switch valName {
+			case CCVForceValNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ProcControllers(gameProp, plugin, curpr, gp, val, "")
 				}
-			} else if valName == CCVClearNow {
+			case CCVClearNow:
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
@@ -830,9 +837,10 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 }
 
 func (gameProp *GameProperty) GetBet2(stake *sgc7game.Stake, bt BetType) int {
-	if bt == BTypeTotalBet {
+	switch bt {
+	case BTypeTotalBet:
 		return int(stake.CoinBet) * gameProp.Pool.Config.TotalBetInWins[gameProp.GetVal(GamePropCurBetIndex)]
-	} else if bt == BTypeBet {
+	case BTypeBet:
 		return int(stake.CoinBet)
 	}
 

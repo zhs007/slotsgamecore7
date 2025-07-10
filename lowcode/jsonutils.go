@@ -53,7 +53,7 @@ func parseValWeights(n *ast.Node) (*sgc7game.ValWeights2, error) {
 				return nil, err
 			}
 
-			vals = append(vals, sgc7game.NewIntValEx[int](int(i64)))
+			vals = append(vals, sgc7game.NewIntValEx(int(i64)))
 			weights = append(weights, v.Weight)
 		}
 

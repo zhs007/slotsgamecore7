@@ -108,11 +108,12 @@ func (genSymbolVals *GenSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd := icd.(*BasicComponentData)
 
-	if genSymbolVals.Config.Type == GSVTypeBasic {
+	switch genSymbolVals.Config.Type {
+	case GSVTypeBasic:
 		os := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), genSymbolVals.Config.DefaultVal)
 
 		genSymbolVals.AddOtherScene(gameProp, curpr, os, cd)
-	} else if genSymbolVals.Config.Type == GSVTypeWeight {
+	case GSVTypeWeight:
 		os := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight), 0)
 
 		for x, arr := range os.Arr {

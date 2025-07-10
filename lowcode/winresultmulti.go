@@ -66,9 +66,10 @@ func (winResultMultiData *WinResultMultiData) BuildPBComponentData() proto.Messa
 
 // GetValEx -
 func (winResultMultiData *WinResultMultiData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVWins {
+	switch key {
+	case CVWins:
 		return winResultMultiData.Wins, true
-	} else if key == CVWinMulti {
+	case CVWinMulti:
 		return winResultMultiData.WinMulti, true
 	}
 

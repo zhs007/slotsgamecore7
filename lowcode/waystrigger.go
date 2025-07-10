@@ -83,15 +83,16 @@ func (waysTriggerData *WaysTriggerData) BuildPBComponentData() proto.Message {
 
 // GetValEx -
 func (waysTriggerData *WaysTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVSymbolNum {
+	switch key {
+	case CVSymbolNum:
 		return waysTriggerData.SymbolNum, true
-	} else if key == CVWildNum {
+	case CVWildNum:
 		return waysTriggerData.WildNum, true
-	} else if key == CVRespinNum {
+	case CVRespinNum:
 		return waysTriggerData.RespinNum, true
-	} else if key == CVWins {
+	case CVWins:
 		return waysTriggerData.Wins, true
-	} else if key == CVResultNum || key == CVWinResultNum {
+	case CVResultNum, CVWinResultNum:
 		return len(waysTriggerData.UsedResults), true
 	}
 
@@ -147,9 +148,10 @@ type WaysTriggerConfig struct {
 
 // SetLinkComponent
 func (cfg *WaysTriggerConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -337,7 +339,8 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 	lst := []*sgc7game.Result{}
 	symbols := waysTrigger.getSymbols(gameProp)
 
-	if waysTrigger.Config.TriggerType == STTypeWays {
+	switch waysTrigger.Config.TriggerType {
+	case STTypeWays:
 		if os != nil {
 			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
@@ -378,7 +381,7 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		if len(lst) > 0 {
 			isTrigger = true
 		}
-	} else if waysTrigger.Config.TriggerType == STTypeCheckWays {
+	case STTypeCheckWays:
 		currets := sgc7game.CheckWays(gs, waysTrigger.Config.MinNum,
 			func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
 				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0

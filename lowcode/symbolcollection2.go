@@ -90,9 +90,10 @@ type SymbolCollection2Config struct {
 
 // SetLinkComponent
 func (cfg *SymbolCollection2Config) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "foreach" {
+	case "foreach":
 		cfg.ForeachComponent = componentName
 	}
 }

@@ -52,7 +52,8 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			return err
 		}
 
-		if str == "Width" {
+		switch str {
+		case "Width":
 			w, err := v.Get("value").Int64()
 			if err != nil {
 				goutils.Error("loadBasicInfo:Width",
@@ -63,7 +64,7 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			}
 
 			cfg.Width = int(w)
-		} else if str == "Height" {
+		case "Height":
 			h, err := v.Get("value").Int64()
 			if err != nil {
 				goutils.Error("loadBasicInfo:Height",
@@ -74,7 +75,7 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 			}
 
 			cfg.Height = int(h)
-		} else if str == "Scene" {
+		case "Scene":
 			scene, err := v.Get("value").String()
 			if err != nil {
 				goutils.Error("loadBasicInfo:Scene",
@@ -457,7 +458,8 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			return err
 		}
 
-		if t == "Linedata" {
+		switch t {
+		case "Linedata":
 			if v.Get("fileJson") != nil {
 				ld, err := parseLineData(v.Get("fileJson"), cfg.Width)
 				if err != nil {
@@ -487,7 +489,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			if len(cfg.Linedata) == 1 {
 				cfg.DefaultLinedata = name
 			}
-		} else if t == "Reels" {
+		case "Reels":
 			if v.Get("fileJson") != nil {
 				rd, err := parseReels(v.Get("fileJson"), cfg.GetDefaultPaytables())
 				if err != nil {
@@ -513,7 +515,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 				cfg.Reels[name] = name
 				cfg.MapReels[name] = rd
 			}
-		} else if t == "Weights" {
+		case "Weights":
 			vw2, err := parseValWeights(v.Get("fileJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseValWeights",
@@ -524,7 +526,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 			}
 
 			cfg.mapValWeights[name] = vw2
-		} else if t == "ReelSetWeight" {
+		case "ReelSetWeight":
 			if v.Get("fileJson") != nil {
 				vw2, err := parseReelSetWeights(v.Get("fileJson"))
 				if err != nil {
@@ -548,7 +550,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 				cfg.mapReelSetWeights[name] = vw2
 			}
-		} else if t == "SymbolWeight" {
+		case "SymbolWeight":
 			if v.Get("fileJson") != nil {
 				vw2, err := parseSymbolWeights(v.Get("fileJson"), cfg.GetDefaultPaytables())
 				if err != nil {
@@ -572,7 +574,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 				cfg.mapValWeights[name] = vw2
 			}
-		} else if t == "IntValMappingFile" {
+		case "IntValMappingFile":
 			if v.Get("fileJson") != nil {
 				vm2, err := parseIntValMappingFile(v.Get("fileJson"))
 				if err != nil {
@@ -596,7 +598,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 				cfg.mapIntMapping[name] = vm2
 			}
-		} else if t == "StringValWeight" {
+		case "StringValWeight":
 			if v.Get("fileJson") != nil {
 				vm2, err := parseStrWeights(v.Get("fileJson"))
 				if err != nil {
@@ -620,7 +622,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 				cfg.mapStrWeights[name] = vm2
 			}
-		} else if t == "IntValWeight" {
+		case "IntValWeight":
 			if v.Get("fileJson") != nil {
 				vm2, err := parseIntValWeights(v.Get("fileJson"))
 				if err != nil {
@@ -644,7 +646,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 				cfg.mapValWeights[name] = vm2
 			}
-		} else if t == "StringValMappingFile" {
+		case "StringValMappingFile":
 			vm2, err := parseStringValMappingFile2(v.Get("excelJson"))
 			if err != nil {
 				goutils.Error("loadOtherList:parseStringValMappingFile2",
@@ -656,7 +658,7 @@ func loadOtherList(cfg *Config, lstOther *ast.Node) error {
 
 			cfg.mapIntMapping[name] = vm2
 
-		} else {
+		default:
 			goutils.Error("loadOtherList",
 				slog.Int("i", i),
 				slog.String("type", t),
@@ -720,7 +722,8 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 			return err
 		}
 
-		if shape == "custom-node" {
+		switch shape {
+		case "custom-node":
 			componentType, err := cell.Get("label").String()
 			if err != nil {
 				goutils.Error("loadCells:Get:label",
@@ -742,7 +745,7 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 			}
 
 			mapComponentName[id] = componentName
-		} else if shape == "edge" {
+		case "edge":
 			source, err := cell.Get("source").Get("cell").String()
 			if err != nil {
 				goutils.Error("loadCells:edge:source:cell",
@@ -767,17 +770,18 @@ func loadCells(cfg *BetConfig, cells *ast.Node) error {
 				return err
 			}
 
-			if sourcePort == "jump-component-groups-out" {
+			switch sourcePort {
+			case "jump-component-groups-out":
 				ldid.add("jump", source, target)
-			} else if sourcePort == "component-groups-out" {
+			case "component-groups-out":
 				ldid.add("next", source, target)
-			} else if sourcePort == "loop-component-groups-out" {
+			case "loop-component-groups-out":
 				ldid.add("loop", source, target)
-			} else if sourcePort == "foreach-component-groups-out" {
+			case "foreach-component-groups-out":
 				ldid.add("foreach", source, target)
-			} else if sourcePort == "start-out" {
+			case "start-out":
 				lstStartID = append(lstStartID, target)
-			} else {
+			default:
 				arr := strings.Split(sourcePort, "vals-component-groups-out-")
 				if len(arr) == 2 {
 					ldid.add(arr[1], source, target)

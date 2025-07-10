@@ -70,9 +70,10 @@ func (queueBranchData *QueueBranchData) BuildPBComponentData() proto.Message {
 
 // GetValEx -
 func (queueBranchData *QueueBranchData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVValue {
+	switch key {
+	case CVValue:
 		return queueBranchData.Queue, true
-	} else if key == CVCurTriggerNum {
+	case CVCurTriggerNum:
 		return queueBranchData.TriggerNum, true
 	}
 
@@ -87,9 +88,10 @@ type QueueBranchConfig struct {
 
 // SetLinkComponent
 func (cfg *QueueBranchConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
