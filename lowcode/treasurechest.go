@@ -160,7 +160,8 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 	treasureChest.Config.Type = parseTreasureChestType(treasureChest.Config.StrType)
 
-	if treasureChest.Config.Type == TreasureChestTypeSumValue {
+	switch treasureChest.Config.Type {
+	case TreasureChestTypeSumValue:
 		if treasureChest.Config.OpenNum > treasureChest.Config.TotalNum {
 			goutils.Error("TreasureChest.InitEx:TreasureChestTypeSumValue",
 				slog.Int("OpenNum", treasureChest.Config.OpenNum),
@@ -169,7 +170,7 @@ func (treasureChest *TreasureChest) InitEx(cfg any, pool *GamePropertyPool) erro
 
 			return ErrInvalidComponentConfig
 		}
-	} else if treasureChest.Config.Type == TreasureChestTypeFragmentCollection {
+	case TreasureChestTypeFragmentCollection:
 		if treasureChest.Config.FragmentNum <= 0 {
 			goutils.Error("TreasureChest.InitEx:FragmentNum",
 				slog.Int("FragmentNum", treasureChest.Config.FragmentNum),
@@ -223,7 +224,7 @@ func (treasureChest *TreasureChest) ProcControllers(gameProp *GameProperty, plug
 
 // fragmentCollection
 func (treasureChest *TreasureChest) procFragmentCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
+	_ sgc7game.IPlayerState, _ *sgc7game.Stake, _ []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
 
 	vw2 := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
 	if vw2 == nil {
@@ -274,7 +275,7 @@ func (treasureChest *TreasureChest) procFragmentCollection(gameProp *GamePropert
 
 // sumValue
 func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
+	_ sgc7game.IPlayerState, _ *sgc7game.Stake, _ []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
 
 	vw2 := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
 	if vw2 == nil {
@@ -311,9 +312,10 @@ func (treasureChest *TreasureChest) OnPlayGame(gameProp *GameProperty, curpr *sg
 	cd := icd.(*TreasureChestData)
 	cd.onNewStep()
 
-	if treasureChest.Config.Type == TreasureChestTypeFragmentCollection {
+	switch treasureChest.Config.Type {
+	case TreasureChestTypeFragmentCollection:
 		return treasureChest.procFragmentCollection(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
-	} else if treasureChest.Config.Type == TreasureChestTypeSumValue {
+	case TreasureChestTypeSumValue:
 		return treasureChest.procSumValue(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
 	}
 

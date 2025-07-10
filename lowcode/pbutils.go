@@ -13,7 +13,8 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 		return 0, false
 	}
 
-	if pbany.TypeUrl == "type.googleapis.com/sgc7pb.LinesTriggerData" {
+	switch pbany.TypeUrl {
+	case "type.googleapis.com/sgc7pb.LinesTriggerData":
 		var msg sgc7pb.LinesTriggerData
 
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
@@ -24,12 +25,13 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 			return 0, false
 		}
 
-		if val == "wins" {
+		switch val {
+		case "wins":
 			return int(msg.Wins), true
-		} else if val == "symbolNum" {
+		case "symbolNum":
 			return int(msg.SymbolNum), true
 		}
-	} else if pbany.TypeUrl == "type.googleapis.com/sgc7pb.ScatterTriggerData" {
+	case "type.googleapis.com/sgc7pb.ScatterTriggerData":
 		var msg sgc7pb.ScatterTriggerData
 
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
@@ -40,12 +42,13 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 			return 0, false
 		}
 
-		if val == "wins" {
+		switch val {
+		case "wins":
 			return int(msg.Wins), true
-		} else if val == "symbolNum" {
+		case "symbolNum":
 			return int(msg.SymbolNum), true
 		}
-	} else if pbany.TypeUrl == "type.googleapis.com/sgc7pb.WaysTriggerData" {
+	case "type.googleapis.com/sgc7pb.WaysTriggerData":
 		var msg sgc7pb.WaysTriggerData
 
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
@@ -56,12 +59,13 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 			return 0, false
 		}
 
-		if val == "wins" {
+		switch val {
+		case "wins":
 			return int(msg.Wins), true
-		} else if val == "symbolNum" {
+		case "symbolNum":
 			return int(msg.SymbolNum), true
 		}
-	} else if pbany.TypeUrl == "type.googleapis.com/sgc7pb.ClusterTriggerData" {
+	case "type.googleapis.com/sgc7pb.ClusterTriggerData":
 		var msg sgc7pb.ClusterTriggerData
 
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})
@@ -72,12 +76,13 @@ func GetComponentDataVal(pb proto.Message, val string) (int, bool) {
 			return 0, false
 		}
 
-		if val == "wins" {
+		switch val {
+		case "wins":
 			return int(msg.Wins), true
-		} else if val == "symbolNum" {
+		case "symbolNum":
 			return int(msg.SymbolNum), true
 		}
-	} else if pbany.TypeUrl == "type.googleapis.com/sgc7pb.RespinData" {
+	case "type.googleapis.com/sgc7pb.RespinData":
 		var msg sgc7pb.RespinData
 
 		err := anypb.UnmarshalTo(pbany, &msg, proto.UnmarshalOptions{})

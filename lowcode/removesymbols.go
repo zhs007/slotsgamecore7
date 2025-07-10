@@ -103,9 +103,10 @@ type RemoveSymbolsConfig struct {
 
 // SetLinkComponent
 func (cfg *RemoveSymbolsConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -437,7 +438,8 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 		os = removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	}
 
-	if removeSymbols.Config.Type == RSTypeBasic {
+	switch removeSymbols.Config.Type {
+	case RSTypeBasic:
 		err := removeSymbols.onBasic(gameProp, curpr, gp, rscd, gs, os)
 		if err == ErrComponentDoNothing {
 			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
@@ -449,7 +451,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 			return "", err
 		}
-	} else if removeSymbols.Config.Type == RSTypeAdjacentPay {
+	case RSTypeAdjacentPay:
 		err := removeSymbols.onAdjacentPay(gameProp, curpr, gp, rscd, gs, os)
 		if err == ErrComponentDoNothing {
 			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
@@ -461,7 +463,7 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 			return "", err
 		}
-	} else {
+	default:
 		goutils.Error("RemoveSymbols.OnPlayGame:InvalidType",
 			slog.Int("type", int(removeSymbols.Config.Type)),
 			goutils.Err(ErrIvalidComponentConfig))

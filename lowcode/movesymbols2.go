@@ -298,7 +298,8 @@ func (moveSymbol2 *MoveSymbols2) procSymbols(gameProp *GameProperty, curpr *sgc7
 
 	gs2 := gameProp.SceneStack.GetPreTopSceneEx(curpr, prs)
 
-	if moveSymbol2.Config.Type == MS2TypeLeft {
+	switch moveSymbol2.Config.Type {
+	case MS2TypeLeft:
 		ngs, err := moveSymbol2.moveSymbols(gameProp, cd, gs, gs2, -1, 0)
 		if err != nil {
 			goutils.Error("MoveSymbols2.procSymbols:moveSymbols",
@@ -308,7 +309,7 @@ func (moveSymbol2 *MoveSymbols2) procSymbols(gameProp *GameProperty, curpr *sgc7
 		}
 
 		return ngs, nil
-	} else if moveSymbol2.Config.Type == MS2TypeRight {
+	case MS2TypeRight:
 		ngs, err := moveSymbol2.moveSymbols(gameProp, cd, gs, gs2, 1, 0)
 		if err != nil {
 			goutils.Error("MoveSymbols2.procSymbols:moveSymbols",
@@ -395,12 +396,13 @@ func (moveSymbol2 *MoveSymbols2) movePositionCollection(gameProp *GameProperty, 
 }
 
 // procPositionCollections -
-func (moveSymbol2 *MoveSymbols2) procPositionCollections(gameProp *GameProperty, curpr *sgc7game.PlayResult,
-	prs []*sgc7game.PlayResult, cd *MoveSymbols2Data, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
+func (moveSymbol2 *MoveSymbols2) procPositionCollections(gameProp *GameProperty, _ *sgc7game.PlayResult,
+	_ []*sgc7game.PlayResult, cd *MoveSymbols2Data, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
 
 	ngs := gs
 
-	if moveSymbol2.Config.Type == MS2TypeLeft {
+	switch moveSymbol2.Config.Type {
+	case MS2TypeLeft:
 		for _, v := range moveSymbol2.Config.SrcPositionCollections {
 			cngs, err := moveSymbol2.movePositionCollection(gameProp, cd, gs, ngs, v, -1, 0)
 			if err != nil {
@@ -414,7 +416,7 @@ func (moveSymbol2 *MoveSymbols2) procPositionCollections(gameProp *GameProperty,
 		}
 
 		return ngs, nil
-	} else if moveSymbol2.Config.Type == MS2TypeRight {
+	case MS2TypeRight:
 		for _, v := range moveSymbol2.Config.SrcPositionCollections {
 			cngs, err := moveSymbol2.movePositionCollection(gameProp, cd, gs, ngs, v, 1, 0)
 			if err != nil {

@@ -83,11 +83,12 @@ func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message
 
 // GetValEx -
 func (symbolValWinsData *SymbolValWinsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == SVWDVSymbolNum {
+	switch key {
+	case SVWDVSymbolNum:
 		return symbolValWinsData.SymbolNum, true
-	} else if key == SVWDVWins {
+	case SVWDVWins:
 		return symbolValWinsData.Wins, true
-	} else if key == CVResultNum || key == CVWinResultNum {
+	case CVResultNum, CVWinResultNum:
 		return len(symbolValWinsData.UsedResults), true
 	}
 

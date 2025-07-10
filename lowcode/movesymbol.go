@@ -137,15 +137,16 @@ type SelectPosData struct {
 }
 
 func (spd *SelectPosData) Select(gs *sgc7game.GameScene) (bool, int, int) {
-	if spd.Type == SelectWithXY {
+	switch spd.Type {
+	case SelectWithXY:
 		return true, spd.X, spd.Y
-	} else if spd.Type == SelectSymbolR2L {
+	case SelectSymbolR2L:
 		for x := gs.Width - 1; x >= 0; x-- {
 			if gs.Arr[x][spd.Y] == spd.SymbolCode {
 				return true, x, spd.Y
 			}
 		}
-	} else if spd.Type == SelectSymbolL2R {
+	case SelectSymbolL2R:
 		for x := 0; x < gs.Width; x++ {
 			if gs.Arr[x][spd.Y] == spd.SymbolCode {
 				return true, x, spd.Y
@@ -221,7 +222,8 @@ func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode 
 		return
 	}
 
-	if md.MoveType == MoveTypeXY {
+	switch md.MoveType {
+	case MoveTypeXY:
 		md.moveX(gs, sx, tx, sy, symbolCode, msd) // sx,sy -> tx,sy
 
 		if sy != ty {
@@ -231,7 +233,7 @@ func (md *MoveData) Move(gs *sgc7game.GameScene, sx, sy, tx, ty int, symbolCode 
 
 			md.moveY(gs, sy, ty, tx, symbolCode, msd) // tx,sy -> tx,ty
 		}
-	} else if md.MoveType == MoveTypeYX {
+	case MoveTypeYX:
 		md.moveY(gs, sy, ty, sx, symbolCode, msd) // sx,sy -> sx,ty
 
 		if sx != tx {

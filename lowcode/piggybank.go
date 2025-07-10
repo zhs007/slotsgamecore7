@@ -31,11 +31,12 @@ const (
 
 func parsePiggyBankType(str string) PiggyBankType {
 	str = strings.ToLower(strings.ReplaceAll(str, " ", ""))
-	if str == "winmulti=sum(symbolvals)" {
+	switch str {
+	case "winmulti=sum(symbolvals)":
 		return PiggyBankTypeSumSymbolVals
-	} else if str == "winmulti+=sum(symbolvals)" {
+	case "winmulti+=sum(symbolvals)":
 		return PiggyBankTypeAddSumSymbolVals
-	} else if str == "winmulti=sum(emptysymbol(symbolvals))" {
+	case "winmulti=sum(emptysymbol(symbolvals))":
 		return PiggyBankTypeSumEmptyWithSymbolVals
 	}
 
@@ -91,9 +92,10 @@ func (piggyBankData *PiggyBankData) BuildPBComponentData() proto.Message {
 
 // GetValEx -
 func (piggyBankData *PiggyBankData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVWins {
+	switch key {
+	case CVWins:
 		return piggyBankData.Wins, true
-	} else if key == CVWinMulti {
+	case CVWinMulti:
 		return piggyBankData.WinMulti, true
 	}
 

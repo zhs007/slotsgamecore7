@@ -29,13 +29,14 @@ const (
 )
 
 func parseWinResultModifierType(str string) WinResultModifierType {
-	if str == "existSymbol" {
+	switch str {
+	case "existSymbol":
 		return WRMTypeExistSymbol
-	} else if str == "addSymbolMulti" {
+	case "addSymbolMulti":
 		return WRMTypeAddSymbolMulti
-	} else if str == "mulSymbolMulti" {
+	case "mulSymbolMulti":
 		return WRMTypeMulSymbolMulti
-	} else if str == "symbolMultiOnWays" {
+	case "symbolMultiOnWays":
 		return WRMTypeSymbolMultiOnWays
 	}
 

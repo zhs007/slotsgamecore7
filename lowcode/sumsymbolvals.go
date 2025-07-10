@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -33,23 +34,24 @@ const (
 )
 
 func parseSumSymbolValsType(strType string) SumSymbolValsType {
-	if strType == "==" {
+	switch strType {
+	case "==":
 		return SSVTypeEqu
-	} else if strType == ">=" {
+	case ">=":
 		return SSVTypeGreaterEqu
-	} else if strType == "<=" {
+	case "<=":
 		return SSVTypeLessEqu
-	} else if strType == ">" {
+	case ">":
 		return SSVTypeGreater
-	} else if strType == "<" {
+	case "<":
 		return SSVTypeLess
-	} else if strType == "In [min, max]" {
+	case "in [min, max]":
 		return SSVTypeInAreaLR
-	} else if strType == "In (min, max]" {
+	case "in (min, max]":
 		return SSVTypeInAreaR
-	} else if strType == "In [min, max)" {
+	case "in [min, max)":
 		return SSVTypeInAreaL
-	} else if strType == "In (min, max)" {
+	case "in (min, max)":
 		return SSVTypeInArea
 	}
 
@@ -193,23 +195,24 @@ func (sumSymbolVals *SumSymbolVals) ProcControllers(gameProp *GameProperty, plug
 }
 
 func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
-	if sumSymbolVals.Config.Type == SSVTypeEqu {
+	switch sumSymbolVals.Config.Type {
+	case SSVTypeEqu:
 		return v == sumSymbolVals.Config.Value
-	} else if sumSymbolVals.Config.Type == SSVTypeGreaterEqu {
+	case SSVTypeGreaterEqu:
 		return v >= sumSymbolVals.Config.Value
-	} else if sumSymbolVals.Config.Type == SSVTypeLessEqu {
+	case SSVTypeLessEqu:
 		return v <= sumSymbolVals.Config.Value
-	} else if sumSymbolVals.Config.Type == SSVTypeGreater {
+	case SSVTypeGreater:
 		return v > sumSymbolVals.Config.Value
-	} else if sumSymbolVals.Config.Type == SSVTypeLess {
+	case SSVTypeLess:
 		return v < sumSymbolVals.Config.Value
-	} else if sumSymbolVals.Config.Type == SSVTypeInAreaLR {
+	case SSVTypeInAreaLR:
 		return v >= sumSymbolVals.Config.Min && v <= sumSymbolVals.Config.Max
-	} else if sumSymbolVals.Config.Type == SSVTypeInAreaR {
+	case SSVTypeInAreaR:
 		return v > sumSymbolVals.Config.Min && v <= sumSymbolVals.Config.Max
-	} else if sumSymbolVals.Config.Type == SSVTypeInAreaL {
+	case SSVTypeInAreaL:
 		return v >= sumSymbolVals.Config.Min && v < sumSymbolVals.Config.Max
-	} else if sumSymbolVals.Config.Type == SSVTypeInArea {
+	case SSVTypeInArea:
 		return v > sumSymbolVals.Config.Min && v < sumSymbolVals.Config.Max
 	}
 
@@ -306,8 +309,7 @@ type jsonSumSymbolVals struct {
 
 func (jcfg *jsonSumSymbolVals) build() *SumSymbolValsConfig {
 	cfg := &SumSymbolValsConfig{
-		StrType: jcfg.Type,
-		// OutputToComponent: jcfg.OutputToComponent,
+		StrType:         strings.ToLower(jcfg.Type),
 		Value:           jcfg.Value,
 		Min:             jcfg.Min,
 		Max:             jcfg.Max,

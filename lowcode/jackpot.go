@@ -65,9 +65,10 @@ func (jackpotData *JackpotData) BuildPBComponentData() proto.Message {
 
 // GetValEx -
 func (jackpotData *JackpotData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVWins {
+	switch key {
+	case CVWins:
 		return jackpotData.Wins, true
-	} else if key == CVWinMulti {
+	case CVWinMulti:
 		return jackpotData.WinMulti, true
 	}
 

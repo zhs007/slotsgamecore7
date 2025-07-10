@@ -108,14 +108,15 @@ type jsonControllerData struct {
 }
 
 func (jcd *jsonControllerData) build() *Award {
-	if jcd.Type == "addRespinTimes" {
+	switch jcd.Type {
+	case "addRespinTimes":
 		return &Award{
 			AwardType:       "respinTimes",
 			Vals:            []int{jcd.Times},
 			StrParams:       []string{jcd.Target},
 			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
-	} else if jcd.Type == "chgComponentConfigIntVal" {
+	case "chgComponentConfigIntVal":
 		if len(jcd.Source) == 0 {
 			return &Award{
 				AwardType:       "chgComponentConfigIntVal",
@@ -131,7 +132,7 @@ func (jcd *jsonControllerData) build() *Award {
 			ComponentVals:   []string{strings.Join(jcd.Source, ".")},
 			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
-	} else if jcd.Type == "setComponentConfigIntVal" {
+	case "setComponentConfigIntVal":
 		if len(jcd.Source) == 0 {
 			return &Award{
 				AwardType:       "setComponentConfigIntVal",
@@ -147,7 +148,7 @@ func (jcd *jsonControllerData) build() *Award {
 			ComponentVals:   []string{strings.Join(jcd.Source, ".")},
 			OnTriggerRespin: jcd.OnTriggerRespin,
 		}
-	} else if jcd.Type == "setComponentConfigVal" {
+	case "setComponentConfigVal":
 		if len(jcd.Source) == 0 {
 			return &Award{
 				AwardType:       "setComponentConfigVal",
@@ -281,11 +282,12 @@ func parseCollectorControllers(controller *ast.Node) ([]*Award, map[int][]*Award
 	for i, v := range lst {
 		str, a := v.buildWithTriggerNum()
 		if a != nil {
-			if str == "per" {
+			switch str {
+			case "per":
 				awards = append(awards, a)
-			} else if str == "all" {
+			case "all":
 				mapawards[-1] = append(mapawards[-1], a)
-			} else {
+			default:
 				i64, err := goutils.String2Int64(str)
 				if err != nil {
 					goutils.Error("parseControllers:String2Int64",
@@ -494,11 +496,12 @@ func parseMaskControllers(controller *ast.Node) ([]*Award, map[int][]*Award, err
 	for i, v := range lst {
 		str, a := v.buildWithTriggerNum()
 		if a != nil {
-			if str == "per" {
+			switch str {
+			case "per":
 				perAwards = append(perAwards, a)
-			} else if str == "all" {
+			case "all":
 				mapawards[-1] = append(mapawards[-1], a)
-			} else {
+			default:
 				i64, err := goutils.String2Int64(str)
 				if err != nil {
 					goutils.Error("parseMaskControllers:String2Int64",
@@ -520,42 +523,42 @@ func parseMaskControllers(controller *ast.Node) ([]*Award, map[int][]*Award, err
 	return perAwards, mapawards, nil
 }
 
-func parseMapStringAndAllControllers(controller *ast.Node) (map[string][]*Award, error) {
-	buf, err := controller.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseMapStringAndAllControllers:MarshalJSON",
-			goutils.Err(err))
+// func parseMapStringAndAllControllers(controller *ast.Node) (map[string][]*Award, error) {
+// 	buf, err := controller.MarshalJSON()
+// 	if err != nil {
+// 		goutils.Error("parseMapStringAndAllControllers:MarshalJSON",
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	lst := []*jsonControllerData{}
+// 	lst := []*jsonControllerData{}
 
-	err = sonic.Unmarshal(buf, &lst)
-	if err != nil {
-		goutils.Error("parseMapStringAndAllControllers:Unmarshal",
-			goutils.Err(err))
+// 	err = sonic.Unmarshal(buf, &lst)
+// 	if err != nil {
+// 		goutils.Error("parseMapStringAndAllControllers:Unmarshal",
+// 			goutils.Err(err))
 
-		return nil, err
-	}
+// 		return nil, err
+// 	}
 
-	mapawards := make(map[string][]*Award)
+// 	mapawards := make(map[string][]*Award)
 
-	for i, v := range lst {
-		str, a := v.buildWithStringValEx()
-		if a != nil {
-			mapawards[str] = append(mapawards[str], a)
-		} else {
-			goutils.Error("parseMapStringAndAllControllers:buildWithStringValEx",
-				slog.Int("i", i),
-				goutils.Err(ErrUnsupportedControllerType))
+// 	for i, v := range lst {
+// 		str, a := v.buildWithStringValEx()
+// 		if a != nil {
+// 			mapawards[str] = append(mapawards[str], a)
+// 		} else {
+// 			goutils.Error("parseMapStringAndAllControllers:buildWithStringValEx",
+// 				slog.Int("i", i),
+// 				goutils.Err(ErrUnsupportedControllerType))
 
-			return nil, ErrUnsupportedControllerType
-		}
-	}
+// 			return nil, ErrUnsupportedControllerType
+// 		}
+// 	}
 
-	return mapawards, nil
-}
+// 	return mapawards, nil
+// }
 
 func parseScatterTriggerControllers(controller *ast.Node) ([]*Award, map[int][]*Award, error) {
 	buf, err := controller.MarshalJSON()
@@ -690,39 +693,39 @@ func parseTreasureChestControllers(controller *ast.Node) ([]*Award, map[int][]*A
 	return awards, mapawards, nil
 }
 
-func parseAllAndStrMapControllers(controller *ast.Node) ([]*Award, map[string][]*Award, error) {
-	buf, err := controller.MarshalJSON()
-	if err != nil {
-		goutils.Error("parseAllAndStrMapControllers:MarshalJSON",
-			goutils.Err(err))
+// func parseAllAndStrMapControllers(controller *ast.Node) ([]*Award, map[string][]*Award, error) {
+// 	buf, err := controller.MarshalJSON()
+// 	if err != nil {
+// 		goutils.Error("parseAllAndStrMapControllers:MarshalJSON",
+// 			goutils.Err(err))
 
-		return nil, nil, err
-	}
+// 		return nil, nil, err
+// 	}
 
-	lst := []*jsonControllerData{}
+// 	lst := []*jsonControllerData{}
 
-	err = sonic.Unmarshal(buf, &lst)
-	if err != nil {
-		goutils.Error("parseAllAndStrMapControllers:Unmarshal",
-			goutils.Err(err))
+// 	err = sonic.Unmarshal(buf, &lst)
+// 	if err != nil {
+// 		goutils.Error("parseAllAndStrMapControllers:Unmarshal",
+// 			goutils.Err(err))
 
-		return nil, nil, err
-	}
+// 		return nil, nil, err
+// 	}
 
-	awards := []*Award{}
-	mapAwards := make(map[string][]*Award)
+// 	awards := []*Award{}
+// 	mapAwards := make(map[string][]*Award)
 
-	for _, v := range lst {
-		str, a := v.buildWithStringValEx()
-		if str == "" || str == "<any>" {
-			awards = append(awards, a)
-		} else {
-			mapAwards[str] = append(mapAwards[str], a)
-		}
-	}
+// 	for _, v := range lst {
+// 		str, a := v.buildWithStringValEx()
+// 		if str == "" || str == "<any>" {
+// 			awards = append(awards, a)
+// 		} else {
+// 			mapAwards[str] = append(mapAwards[str], a)
+// 		}
+// 	}
 
-	return awards, mapAwards, nil
-}
+// 	return awards, mapAwards, nil
+// }
 
 func parseAllAndStrMapControllers2(controller *ast.Node) (map[string][]*Award, error) {
 	buf, err := controller.MarshalJSON()

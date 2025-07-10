@@ -48,7 +48,8 @@ func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 		return strings.ToLower(strings.TrimSpace(str))
 	}, func(x int, y int, header string, data string) error {
 		data = strings.TrimSpace(data)
-		if header == "code" {
+		switch header {
+		case "code":
 			v, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadSymbolsViewer:LoadExcel:String2Int64",
@@ -60,11 +61,11 @@ func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 			}
 
 			symbols = append(symbols, int(v))
-		} else if header == "symbol" {
+		case "symbol":
 			symbolstr = append(symbolstr, data)
-		} else if header == "output" {
+		case "output":
 			outputs = append(outputs, data)
-		} else if header == "color" {
+		case "color":
 			colors = append(colors, data)
 		}
 

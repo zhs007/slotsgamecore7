@@ -5,13 +5,14 @@ type OtherSceneFeatureConfig struct {
 }
 
 func (cfg *OtherSceneFeatureConfig) GetType() int {
-	if cfg.Type == "gameMulti" {
+	switch cfg.Type {
+	case "gameMulti":
 		return OtherSceneFeatureGameMulti
-	} else if cfg.Type == "gameMultiSum" {
+	case "gameMultiSum":
 		return OtherSceneFeatureGameMultiSum
-	} else if cfg.Type == "stepMulti" {
+	case "stepMulti":
 		return OtherSceneFeatureStepMulti
-	} else if cfg.Type == "stepMultiSum" {
+	case "stepMultiSum":
 		return OtherSceneFeatureStepMultiSum
 	}
 

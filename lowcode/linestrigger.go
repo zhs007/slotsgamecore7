@@ -80,15 +80,16 @@ func (linesTriggerData *LinesTriggerData) BuildPBComponentData() proto.Message {
 
 // GetValEx -
 func (linesTriggerData *LinesTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVSymbolNum {
+	switch key {
+	case CVSymbolNum:
 		return linesTriggerData.SymbolNum, true
-	} else if key == CVWildNum {
+	case CVWildNum:
 		return linesTriggerData.WildNum, true
-	} else if key == CVRespinNum {
+	case CVRespinNum:
 		return linesTriggerData.RespinNum, true
-	} else if key == CVWins {
+	case CVWins:
 		return linesTriggerData.Wins, true
-	} else if key == CVResultNum || key == CVWinResultNum {
+	case CVResultNum, CVWinResultNum:
 		return len(linesTriggerData.UsedResults), true
 	}
 
@@ -132,9 +133,10 @@ type LinesTriggerConfig struct {
 
 // SetLinkComponent
 func (cfg *LinesTriggerConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -348,7 +350,8 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 		return false, nil
 	}
 
-	if linesTrigger.Config.TriggerType == STTypeLines {
+	switch linesTrigger.Config.TriggerType {
+	case STTypeLines:
 		if linesTrigger.Config.OSMulType == OSMTNone { // no otherscene multi
 			if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 				for _, cs := range linesTrigger.getSymbols(gameProp) {
@@ -535,7 +538,7 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 		if len(lst) > 0 {
 			isTrigger = true
 		}
-	} else if linesTrigger.Config.TriggerType == STTypeCheckLines {
+	case STTypeCheckLines:
 		if linesTrigger.Config.CheckWinType == CheckWinTypeCount {
 			// for _, cs := range linesTrigger.Config.SymbolCodes {
 			for _, cs := range linesTrigger.getSymbols(gameProp) {
