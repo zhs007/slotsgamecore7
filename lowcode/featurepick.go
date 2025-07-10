@@ -239,7 +239,7 @@ func (featurePick *FeaturePick) getWeight(gameProp *GameProperty, basicCD *Basic
 	return featurePick.Config.Weight
 }
 
-func (featurePick *FeaturePick) getPickNum(gameProp *GameProperty, basicCD *BasicComponentData) int {
+func (featurePick *FeaturePick) getPickNum(_ *GameProperty, basicCD *BasicComponentData) int {
 	ival, isok := basicCD.GetConfigIntVal(CCVPickNum)
 	if isok {
 		return ival

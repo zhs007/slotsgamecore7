@@ -112,9 +112,10 @@ type FlowDownSymbolsConfig struct {
 
 // SetLinkComponent
 func (cfg *FlowDownSymbolsConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }

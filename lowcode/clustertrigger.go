@@ -87,21 +87,22 @@ func (clusterTriggerData *ClusterTriggerData) BuildPBComponentData() proto.Messa
 
 // GetValEx -
 func (clusterTriggerData *ClusterTriggerData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVSymbolNum {
+	switch key {
+	case CVSymbolNum:
 		return clusterTriggerData.SymbolNum, true
-	} else if key == CVWildNum {
+	case CVWildNum:
 		return clusterTriggerData.WildNum, true
-	} else if key == CVRespinNum {
+	case CVRespinNum:
 		return clusterTriggerData.RespinNum, true
-	} else if key == CVWins {
+	case CVWins:
 		return clusterTriggerData.Wins, true
-	} else if key == CVAvgSymbolValMulti {
+	case CVAvgSymbolValMulti:
 		if clusterTriggerData.AvgSymbolValMulti == 0 {
 			return 100, true
 		}
 
 		return clusterTriggerData.AvgSymbolValMulti, true
-	} else if key == CVResultNum || key == CVWinResultNum {
+	case CVResultNum, CVWinResultNum:
 		return len(clusterTriggerData.UsedResults), true
 	}
 
@@ -151,9 +152,10 @@ type ClusterTriggerConfig struct {
 
 // SetLinkComponent
 func (cfg *ClusterTriggerConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }

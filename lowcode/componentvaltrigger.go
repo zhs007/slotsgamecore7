@@ -25,15 +25,16 @@ const (
 )
 
 func ParseOperateType(str string) OperateType {
-	if str == ">=" {
+	switch str {
+	case ">=":
 		return OTGreaterEqual
-	} else if str == "<=" {
+	case "<=":
 		return OTLessEqual
-	} else if str == ">" {
+	case ">":
 		return OTGreater
-	} else if str == "<" {
+	case "<":
 		return OTLess
-	} else if str == "!=" {
+	case "!=":
 		return OTNotEqual
 	}
 

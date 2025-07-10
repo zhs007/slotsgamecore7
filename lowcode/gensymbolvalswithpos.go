@@ -24,9 +24,10 @@ const (
 )
 
 func parseGenSymbolValsWithPosType(strType string) GenSymbolValsWithPosType {
-	if strType == "mask" {
+	switch strType {
+	case "mask":
 		return GSVWPTypeMask
-	} else if strType == "addWithIntMapping" {
+	case "addWithIntMapping":
 		return GSVWPTypeAddWithIntMapping
 	}
 

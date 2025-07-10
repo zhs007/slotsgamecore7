@@ -27,9 +27,10 @@ const (
 )
 
 func parseChgSymbolsInReelsSourceType(str string) ChgSymbolsInReelsSourceType {
-	if str == "reels" {
+	switch str {
+	case "reels":
 		return CSIRSTypeReels
-	} else if str == "mask" {
+	case "mask":
 		return CSIRSTypeMask
 	}
 
@@ -45,9 +46,10 @@ const (
 )
 
 func parseChgSymbolsInReelsSourceSymbolType(str string) ChgSymbolsInReelsSourceSymbolType {
-	if str == "symbols" {
+	switch str {
+	case "symbols":
 		return CSIRSSTypeSymbols
-	} else if str == "symbolweight" {
+	case "symbolweight":
 		return CSIRSSTypeSymbolWeight
 	}
 
@@ -63,9 +65,10 @@ const (
 )
 
 func parseChgSymbolsInReelsCoreType(str string) ChgSymbolsInReelsCoreType {
-	if str == "symbolweight" {
+	switch str {
+	case "symbolweight":
 		return CSIRCTypeSymbolWeight
-	} else if str == "eachposrandom" {
+	case "eachposrandom":
 		return CSIRCTypeEachPosRandom
 	}
 
@@ -81,9 +84,10 @@ const (
 )
 
 func parseChgSymbolsInReelsNumberType(str string) ChgSymbolsInReelsNumberType {
-	if str == "number" {
+	switch str {
+	case "number":
 		return CSIRNTypeNumber
-	} else if str == "numberweight" {
+	case "numberweight":
 		return CSIRNTypeNumberWeight
 	}
 
@@ -185,9 +189,10 @@ type ChgSymbolsInReelsConfig struct {
 
 // SetLinkComponent
 func (cfg *ChgSymbolsInReelsConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -303,7 +308,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) ProcControllers(gameProp *GameProper
 }
 
 // getSrcPos
-func (chgSymbolsInReels *ChgSymbolsInReels) getSrcPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+func (chgSymbolsInReels *ChgSymbolsInReels) getSrcPos(gameProp *GameProperty, _ sgc7plugin.IPlugin,
 	gs *sgc7game.GameScene) ([]int, error) {
 
 	pos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
@@ -350,7 +355,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) getSrcPos(gameProp *GameProperty, pl
 
 // playgame
 func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbolsInReelsData) (string, error) {
+	_ sgc7game.IPlayerState, _ *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbolsInReelsData) (string, error) {
 
 	gs := chgSymbolsInReels.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -427,13 +432,14 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procEachPosRandomWithPos(gameProp *G
 	ngs := gs
 	maxNumber := chgSymbolsInReels.Config.MaxNumber
 
-	if chgSymbolsInReels.Config.NumberType == CSIRNTypeNumberWeight {
+	switch chgSymbolsInReels.Config.NumberType {
+	case CSIRNTypeNumberWeight:
 		goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:Type",
 			slog.String("NumberType", chgSymbolsInReels.Config.StrNumberType),
 			goutils.Err(ErrInvalidComponentConfig))
 
 		return nil, ErrInvalidComponentConfig
-	} else if chgSymbolsInReels.Config.NumberType == CSIRNTypeNoLimit {
+	case CSIRNTypeNoLimit:
 		maxNumber = 0
 	}
 
