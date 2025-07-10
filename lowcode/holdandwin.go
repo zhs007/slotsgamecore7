@@ -130,9 +130,10 @@ type HoldAndWinConfig struct {
 
 // SetLinkComponent
 func (cfg *HoldAndWinConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
-	} else if link == "jump" {
+	case "jump":
 		cfg.JumpToComponent = componentName
 	}
 }
@@ -482,7 +483,8 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	ogs := gameProp.OtherSceneStack.GetTopSceneEx(curpr, prs)
 	ogs2 := ogs
 
-	if holdAndWin.Config.Type == HAWTypeNormal {
+	switch holdAndWin.Config.Type {
+	case HAWTypeNormal:
 		ngs, nos, err := holdAndWin.procNormal(gameProp, plugin, cd, gs, ogs)
 		if err != nil {
 			goutils.Error("HoldAndWin.OnPlayGame:procNormal",
@@ -518,7 +520,7 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		nc := holdAndWin.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, nil
-	} else if holdAndWin.Config.Type == HAWTypeCollectorAndHeightLevel {
+	case HAWTypeCollectorAndHeightLevel:
 		ngs, nos, ngs2, nos2, err := holdAndWin.procCollectorAndHeightLevel(gameProp, plugin, cd, gs, ogs)
 		if err != nil {
 			goutils.Error("HoldAndWin.OnPlayGame:procCollectorAndHeightLevel",
