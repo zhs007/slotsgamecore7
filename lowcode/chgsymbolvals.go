@@ -263,11 +263,6 @@ func (chgSymbolVals *ChgSymbolVals) rebuildPos(pos []int, plugin sgc7plugin.IPlu
 }
 
 func (chgSymbolVals *ChgSymbolVals) GetNumber(cd *ChgSymbolValsData) int {
-	multi, isok := cd.GetConfigIntVal(CCVMulti)
-	if isok {
-		return multi
-	}
-
 	number, isok := cd.GetConfigIntVal(CCVNumber)
 	if isok {
 		return number

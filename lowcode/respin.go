@@ -436,6 +436,14 @@ func (respin *Respin) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *G
 	}
 }
 
+// ClearData -
+func (respin *Respin) ClearData(icd IComponentData, bForceNow bool) {
+	if bForceNow {
+		cd := icd.(*RespinData)
+		cd.OnNewGame(nil, respin)
+	}
+}
+
 // func (respin *Respin) getRetriggerRespinNum(basicCD *BasicComponentData) int {
 // 	val, isok := basicCD.GetConfigIntVal(CCVReelSet)
 // 	if isok {
