@@ -22,9 +22,11 @@ const FeaturePickTypeName = "featurePick"
 
 type FeaturePickData struct {
 	BasicComponentData
-	Selected    []string
-	UnSelected  []string
-	CurSelected []string
+	Selected     []string
+	UnSelected   []string
+	CurSelected  []string
+	PickNum      int
+	CurPickedNum int
 }
 
 // OnNewGame -
@@ -42,6 +44,8 @@ func (featurePickData *FeaturePickData) onNewStep() {
 
 		featurePickData.CurSelected = nil
 	}
+
+	featurePickData.CurPickedNum = 0
 }
 
 // Clone
@@ -51,6 +55,8 @@ func (featurePickData *FeaturePickData) Clone() IComponentData {
 		Selected:           slices.Clone(featurePickData.Selected),
 		UnSelected:         slices.Clone(featurePickData.UnSelected),
 		CurSelected:        slices.Clone(featurePickData.CurSelected),
+		PickNum:            featurePickData.PickNum,
+		CurPickedNum:       featurePickData.CurPickedNum,
 	}
 
 	return target
@@ -63,9 +69,32 @@ func (featurePickData *FeaturePickData) BuildPBComponentData() proto.Message {
 		Selected:           slices.Clone(featurePickData.Selected),
 		UnSelected:         slices.Clone(featurePickData.UnSelected),
 		CurSelected:        slices.Clone(featurePickData.CurSelected),
+		PickNum:            int32(featurePickData.PickNum),
+		CurPickedNum:       int32(featurePickData.CurPickedNum),
 	}
 
 	return pbcd
+}
+
+// SetConfigIntVal -
+func (featurePickData *FeaturePickData) SetConfigIntVal(key string, val int) {
+	featurePickData.BasicComponentData.SetConfigIntVal(key, val)
+
+	// 特殊处理
+	if key == CCVPickNum {
+		featurePickData.PickNum = val
+	}
+}
+
+// ChgConfigIntVal -
+func (featurePickData *FeaturePickData) ChgConfigIntVal(key string, off int) int {
+	val := featurePickData.BasicComponentData.ChgConfigIntVal(key, off)
+
+	if key == CCVPickNum {
+		featurePickData.PickNum = val
+	}
+
+	return val
 }
 
 // FeaturePickConfig - configuration for FeaturePick
@@ -180,6 +209,8 @@ func (featurePick *FeaturePick) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	pickNum := featurePick.getPickNum(gameProp, &cd.BasicComponentData)
 
 	if pickNum > 0 {
+		cd.CurPickedNum = pickNum
+
 		curPickNum := pickNum
 		if pickNum > len(cd.UnSelected) {
 			curPickNum = len(cd.UnSelected)
