@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -29,11 +30,14 @@ type AdjacentPayTriggerData struct {
 	Wins              int
 	WinMulti          int
 	AvgSymbolValMulti int // 平均的symbolVal倍数，用整数来表达浮点数，100是1倍
+	SymbolCodes       []int
 }
 
 // OnNewGame -
 func (adjacentPayTriggerData *AdjacentPayTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	adjacentPayTriggerData.BasicComponentData.OnNewGame(gameProp, component)
+
+	adjacentPayTriggerData.SymbolCodes = nil
 }
 
 // onNewStep -
@@ -61,6 +65,7 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) Clone() IComponentData {
 		RespinNum:          adjacentPayTriggerData.RespinNum,
 		Wins:               adjacentPayTriggerData.Wins,
 		WinMulti:           adjacentPayTriggerData.WinMulti,
+		SymbolCodes:        slices.Clone(adjacentPayTriggerData.SymbolCodes),
 	}
 
 	if !gIsReleaseMode {
@@ -119,6 +124,20 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) AddPos(x, y int) {
 	adjacentPayTriggerData.PosComponentData.Add(x, y)
 }
 
+func (adjacentPayTriggerData *AdjacentPayTriggerData) SetSymbolCodes(symbolCodes []int) {
+	if len(symbolCodes) == 0 {
+		adjacentPayTriggerData.SymbolCodes = nil
+
+		return
+	}
+
+	adjacentPayTriggerData.SymbolCodes = slices.Clone(symbolCodes)
+}
+
+func (adjacentPayTriggerData *AdjacentPayTriggerData) GetSymbolCodes() []int {
+	return adjacentPayTriggerData.SymbolCodes
+}
+
 // AdjacentPayTriggerConfig - configuration for AdjacentPayTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type AdjacentPayTriggerConfig struct {
@@ -140,6 +159,7 @@ type AdjacentPayTriggerConfig struct {
 	Awards               []*Award            `yaml:"awards" json:"awards"`                         // 新的奖励系统
 	IsReverse            bool                `yaml:"isReverse" json:"isReverse"`                   // 如果isReverse，表示判定为否才触发
 	PiggyBankComponent   string              `yaml:"piggyBankComponent" json:"piggyBankComponent"` // piggyBank component
+	SetWinSymbols        []string            `yaml:"setWinSymbols" json:"setWinSymbols"`
 }
 
 // SetLinkComponent
@@ -352,6 +372,36 @@ func (adjacentPayTrigger *AdjacentPayTrigger) procWins(gameProp *GameProperty, c
 	return std.Wins, nil
 }
 
+func (adjacentPayTrigger *AdjacentPayTrigger) procWinSymbols(gameProp *GameProperty, lst []*sgc7game.Result) {
+	if len(adjacentPayTrigger.Config.SetWinSymbols) > 0 {
+		if len(lst) == 0 {
+			for _, v := range adjacentPayTrigger.Config.SetWinSymbols {
+				curicd := gameProp.GetComponentDataWithName(v)
+				if curicd != nil {
+					curicd.SetSymbolCodes(nil)
+				}
+			}
+
+			return
+		}
+
+		symbolCodes := make([]int, 0, len(lst))
+
+		for _, v := range lst {
+			if !slices.Contains(symbolCodes, v.Symbol) {
+				symbolCodes = append(symbolCodes, v.Symbol)
+			}
+		}
+
+		for _, v := range adjacentPayTrigger.Config.SetWinSymbols {
+			curicd := gameProp.GetComponentDataWithName(v)
+			if curicd != nil {
+				curicd.SetSymbolCodes(symbolCodes)
+			}
+		}
+	}
+}
+
 // OnProcControllers -
 func (adjacentPayTrigger *AdjacentPayTrigger) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	if len(adjacentPayTrigger.Config.Awards) > 0 {
@@ -373,11 +423,9 @@ func (adjacentPayTrigger *AdjacentPayTrigger) OnPlayGame(gameProp *GameProperty,
 
 	if isTrigger {
 		adjacentPayTrigger.procWins(gameProp, curpr, std, lst, os)
+		adjacentPayTrigger.procWinSymbols(gameProp, lst)
 
 		adjacentPayTrigger.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-		// if len(adjacentPayTrigger.Config.Awards) > 0 {
-		// 	gameProp.procAwards(plugin, adjacentPayTrigger.Config.Awards, curpr, gp)
-		// }
 
 		if adjacentPayTrigger.Config.JumpToComponent != "" {
 			std.NextComponent = adjacentPayTrigger.Config.JumpToComponent
@@ -451,13 +499,17 @@ func (adjacentPayTrigger *AdjacentPayTrigger) GetNextLinkComponents() []string {
 	return []string{adjacentPayTrigger.Config.DefaultNextComponent, adjacentPayTrigger.Config.JumpToComponent}
 }
 
-func (adjacentPayTrigger *AdjacentPayTrigger) getSymbols(gameProp *GameProperty) []int {
+func (adjacentPayTrigger *AdjacentPayTrigger) getSymbols(gameProp *GameProperty, cd *AdjacentPayTriggerData) []int {
 	s := gameProp.GetCurCallStackSymbol()
 	if s >= 0 {
 		return []int{s}
 	}
 
-	return adjacentPayTrigger.Config.SymbolCodes
+	if len(cd.SymbolCodes) == 0 {
+		return adjacentPayTrigger.Config.SymbolCodes
+	}
+
+	return cd.SymbolCodes
 }
 
 // CanTriggerWithScene -
@@ -467,7 +519,14 @@ func (adjacentPayTrigger *AdjacentPayTrigger) CanTriggerWithScene(gameProp *Game
 
 	if adjacentPayTrigger.Config.TriggerType == STTypeAdjacentPay {
 
-		symbols := adjacentPayTrigger.getSymbols(gameProp)
+		symbols := adjacentPayTrigger.getSymbols(gameProp, icd.(*AdjacentPayTriggerData))
+		if len(symbols) == 0 {
+			if adjacentPayTrigger.Config.IsReverse {
+				isTrigger = !isTrigger
+			}
+
+			return isTrigger, lst
+		}
 
 		currets, err := sgc7game.CalcAdjacentPay(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, adjacentPayTrigger.Config.BetType),
 			func(cursymbol int) bool {
@@ -540,6 +599,7 @@ type jsonAdjacentPayTrigger struct {
 	WildSymbols         []string `json:"wildSymbols"`
 	WinMulti            int      `json:"winMulti"`
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
+	SetWinSymbols       []string `json:"setWinSymbols"`
 }
 
 func (jcfg *jsonAdjacentPayTrigger) build() *AdjacentPayTriggerConfig {
@@ -552,9 +612,8 @@ func (jcfg *jsonAdjacentPayTrigger) build() *AdjacentPayTriggerConfig {
 		WildSymbols:        jcfg.WildSymbols,
 		WinMulti:           jcfg.WinMulti,
 		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
+		SetWinSymbols:      jcfg.SetWinSymbols,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

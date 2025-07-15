@@ -28,8 +28,7 @@ type IComponent interface {
 		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error)
 	// OnAsciiGame - outpur to asciigame
 	OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error
-	// // OnStats -
-	// OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64)
+
 	// NewComponentData -
 	NewComponentData() IComponentData
 
@@ -97,14 +96,6 @@ type IComponent interface {
 	// OnPlayGameWithSet - on playgame with a set
 	OnPlayGameWithSet(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 		cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData, set int) (string, error)
-
-	// //----------------------------
-	// // Branch
-
-	// // GetBranchNum -
-	// GetBranchNum() int
-	// // GetBranchWeights -
-	// GetBranchWeights() []int
 
 	//----------------------------
 	// IComponentData

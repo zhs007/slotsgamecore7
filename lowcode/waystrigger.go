@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -31,17 +32,18 @@ type WaysTriggerData struct {
 	RespinNum     int
 	Wins          int
 	WinMulti      int
+	SymbolCodes   []int
 }
 
 // OnNewGame -
 func (waysTriggerData *WaysTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	waysTriggerData.BasicComponentData.OnNewGame(gameProp, component)
+
+	waysTriggerData.SymbolCodes = nil
 }
 
 // onNewStep -
 func (waysTriggerData *WaysTriggerData) onNewStep() {
-	// waysTriggerData.BasicComponentData.OnNewStep(gameProp, component)
-
 	waysTriggerData.UsedResults = nil
 
 	waysTriggerData.NextComponent = ""
@@ -61,6 +63,7 @@ func (waysTriggerData *WaysTriggerData) Clone() IComponentData {
 		RespinNum:          waysTriggerData.RespinNum,
 		Wins:               waysTriggerData.Wins,
 		WinMulti:           waysTriggerData.WinMulti,
+		SymbolCodes:        slices.Clone(waysTriggerData.SymbolCodes),
 	}
 
 	return target
@@ -99,18 +102,19 @@ func (waysTriggerData *WaysTriggerData) GetValEx(key string, getType GetComponen
 	return 0, false
 }
 
-// // SetVal -
-// func (waysTriggerData *WaysTriggerData) SetVal(key string, val int) {
-// 	if key == CVSymbolNum {
-// 		waysTriggerData.SymbolNum = val
-// 	} else if key == CVWildNum {
-// 		waysTriggerData.WildNum = val
-// 	} else if key == CVRespinNum {
-// 		waysTriggerData.RespinNum = val
-// 	} else if key == CVWins {
-// 		waysTriggerData.Wins = val
-// 	}
-// }
+func (waysTriggerData *WaysTriggerData) SetSymbolCodes(symbolCodes []int) {
+	if len(symbolCodes) == 0 {
+		waysTriggerData.SymbolCodes = nil
+
+		return
+	}
+
+	waysTriggerData.SymbolCodes = slices.Clone(symbolCodes)
+}
+
+func (waysTriggerData *WaysTriggerData) GetSymbolCodes() []int {
+	return waysTriggerData.SymbolCodes
+}
 
 // WaysTriggerConfig - configuration for WaysTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
@@ -144,6 +148,7 @@ type WaysTriggerConfig struct {
 	RespinNumWithScatterNum         map[int]int                   `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
+	SetWinSymbols                   []string                      `yaml:"setWinSymbols" json:"setWinSymbols"`
 }
 
 // SetLinkComponent
@@ -319,25 +324,36 @@ func (waysTrigger *WaysTrigger) procPositionCollection(gameProp *GameProperty, c
 	return nil
 }
 
-func (waysTrigger *WaysTrigger) getSymbols(gameProp *GameProperty) []int {
+func (waysTrigger *WaysTrigger) getSymbols(gameProp *GameProperty, cd *WaysTriggerData) []int {
 	s := gameProp.GetCurCallStackSymbol()
 	if s >= 0 {
 		return []int{s}
 	}
 
-	return waysTrigger.Config.SymbolCodes
+	if len(cd.SymbolCodes) == 0 {
+		return waysTrigger.Config.SymbolCodes
+	}
+
+	return cd.SymbolCodes
 }
 
 // CanTriggerWithScene -
 func (waysTrigger *WaysTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
-	return waysTrigger.canTrigger(gameProp, gs, nil, curpr, stake)
+	return waysTrigger.canTrigger(gameProp, gs, nil, curpr, stake, icd.(*WaysTriggerData))
 }
 
 // CanTrigger -
-func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake) (bool, []*sgc7game.Result) {
+func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake, cd *WaysTriggerData) (bool, []*sgc7game.Result) {
 	isTrigger := false
 	lst := []*sgc7game.Result{}
-	symbols := waysTrigger.getSymbols(gameProp)
+	symbols := waysTrigger.getSymbols(gameProp, cd)
+	if len(symbols) == 0 {
+		if waysTrigger.Config.IsReverse {
+			isTrigger = !isTrigger
+		}
+
+		return isTrigger, lst
+	}
 
 	switch waysTrigger.Config.TriggerType {
 	case STTypeWays:
@@ -407,6 +423,36 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 	}
 
 	return isTrigger, lst
+}
+
+func (waysTrigger *WaysTrigger) procWinSymbols(gameProp *GameProperty, lst []*sgc7game.Result) {
+	if len(waysTrigger.Config.SetWinSymbols) > 0 {
+		if len(lst) == 0 {
+			for _, v := range waysTrigger.Config.SetWinSymbols {
+				curicd := gameProp.GetComponentDataWithName(v)
+				if curicd != nil {
+					curicd.SetSymbolCodes(nil)
+				}
+			}
+
+			return
+		}
+
+		symbolCodes := make([]int, 0, len(lst))
+
+		for _, v := range lst {
+			if !slices.Contains(symbolCodes, v.Symbol) {
+				symbolCodes = append(symbolCodes, v.Symbol)
+			}
+		}
+
+		for _, v := range waysTrigger.Config.SetWinSymbols {
+			curicd := gameProp.GetComponentDataWithName(v)
+			if curicd != nil {
+				curicd.SetSymbolCodes(symbolCodes)
+			}
+		}
+	}
 }
 
 // procWins
@@ -536,10 +582,11 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		os = waysTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	}
 
-	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake)
+	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake, std)
 
 	if isTrigger {
 		waysTrigger.procWins(gameProp, curpr, std, lst)
+		waysTrigger.procWinSymbols(gameProp, lst)
 
 		respinNum, err := waysTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {

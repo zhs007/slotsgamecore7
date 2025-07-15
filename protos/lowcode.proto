@@ -415,6 +415,8 @@ message FeaturePickData {
     repeated string selected = 2;
     repeated string unSelected = 3;
     repeated string curSelected = 4;
+    int32 pickNum = 5;
+    int32 curPickedNum = 6;
 }
 
 // ReelsCollectorData

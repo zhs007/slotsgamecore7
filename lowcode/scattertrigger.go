@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -27,6 +28,7 @@ type ScatterTriggerData struct {
 	RespinNum     int
 	Wins          int
 	WinMulti      int
+	SymbolCodes   []int
 }
 
 // OnNewGame -
@@ -39,6 +41,8 @@ func (scatterTriggerData *ScatterTriggerData) OnNewGame(gameProp *GameProperty, 
 			scatterTriggerData.SetConfigIntVal(CCVHeight, scatterTrigger.Config.Height)
 		}
 	}
+
+	scatterTriggerData.SymbolCodes = nil
 }
 
 // onNewStep -
@@ -63,6 +67,7 @@ func (scatterTriggerData *ScatterTriggerData) Clone() IComponentData {
 		RespinNum:          scatterTriggerData.RespinNum,
 		Wins:               scatterTriggerData.Wins,
 		WinMulti:           scatterTriggerData.WinMulti,
+		SymbolCodes:        slices.Clone(scatterTriggerData.SymbolCodes),
 	}
 
 	return target
@@ -99,6 +104,20 @@ func (scatterTriggerData *ScatterTriggerData) GetValEx(key string, getType GetCo
 	}
 
 	return 0, false
+}
+
+func (scatterTriggerData *ScatterTriggerData) SetSymbolCodes(symbolCodes []int) {
+	if len(symbolCodes) == 0 {
+		scatterTriggerData.SymbolCodes = nil
+
+		return
+	}
+
+	scatterTriggerData.SymbolCodes = slices.Clone(symbolCodes)
+}
+
+func (scatterTriggerData *ScatterTriggerData) GetSymbolCodes() []int {
+	return scatterTriggerData.SymbolCodes
 }
 
 // ScatterTriggerConfig - configuration for ScatterTrigger
@@ -140,6 +159,7 @@ type ScatterTriggerConfig struct {
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
 	MapAwards                       map[int][]*Award              `yaml:"mapAwards" json:"mapAwards"`                                         // 新的奖励系统
+	SetWinSymbols                   []string                      `yaml:"setWinSymbols" json:"setWinSymbols"`
 }
 
 // SetLinkComponent
@@ -357,13 +377,17 @@ func (scatterTrigger *ScatterTrigger) procPositionCollection(gameProp *GamePrope
 	return nil
 }
 
-func (scatterTrigger *ScatterTrigger) getSymbols(gameProp *GameProperty) []int {
+func (scatterTrigger *ScatterTrigger) getSymbols(gameProp *GameProperty, cd *ScatterTriggerData) []int {
 	s := gameProp.GetCurCallStackSymbol()
 	if s >= 0 {
 		return []int{s}
 	}
 
-	return scatterTrigger.Config.SymbolCodes
+	if len(cd.SymbolCodes) == 0 {
+		return scatterTrigger.Config.SymbolCodes
+	}
+
+	return cd.SymbolCodes
 }
 
 // CanTriggerWithScene -
@@ -379,7 +403,14 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 
-	symbols := scatterTrigger.getSymbols(gameProp)
+	symbols := scatterTrigger.getSymbols(gameProp, std)
+	if len(symbols) == 0 {
+		if scatterTrigger.Config.IsReverse {
+			isTrigger = !isTrigger
+		}
+
+		return isTrigger, lst
+	}
 
 	switch scatterTrigger.Config.TriggerType {
 	case STTypeScatters:
@@ -473,6 +504,36 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 	}
 
 	return isTrigger, lst
+}
+
+func (scatterTrigger *ScatterTrigger) procWinSymbols(gameProp *GameProperty, lst []*sgc7game.Result) {
+	if len(scatterTrigger.Config.SetWinSymbols) > 0 {
+		if len(lst) == 0 {
+			for _, v := range scatterTrigger.Config.SetWinSymbols {
+				curicd := gameProp.GetComponentDataWithName(v)
+				if curicd != nil {
+					curicd.SetSymbolCodes(nil)
+				}
+			}
+
+			return
+		}
+
+		symbolCodes := make([]int, 0, len(lst))
+
+		for _, v := range lst {
+			if !slices.Contains(symbolCodes, v.Symbol) {
+				symbolCodes = append(symbolCodes, v.Symbol)
+			}
+		}
+
+		for _, v := range scatterTrigger.Config.SetWinSymbols {
+			curicd := gameProp.GetComponentDataWithName(v)
+			if curicd != nil {
+				curicd.SetSymbolCodes(symbolCodes)
+			}
+		}
+	}
 }
 
 // procWins
@@ -611,6 +672,7 @@ func (scatterTrigger *ScatterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 	if isTrigger {
 		scatterTrigger.procWins(gameProp, curpr, std, lst)
+		scatterTrigger.procWinSymbols(gameProp, lst)
 
 		respinNum, err := scatterTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
@@ -817,6 +879,7 @@ type jsonScatterTrigger struct {
 	IsReversalHeight              bool       `json:"isReversalHeight"`
 	OutputToComponent             string     `json:"outputToComponent"`
 	ReelsCollector                string     `json:"reelsCollector"`
+	SetWinSymbols                 []string   `json:"setWinSymbols"`
 }
 
 func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
@@ -841,6 +904,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		IsReversalHeight:   jcfg.IsReversalHeight,
 		OutputToComponent:  jcfg.OutputToComponent,
 		ReelsCollector:     jcfg.ReelsCollector,
+		SetWinSymbols:      jcfg.SetWinSymbols,
 	}
 
 	if jcfg.TriggerRespinType != "none" {

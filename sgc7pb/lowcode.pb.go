@@ -3536,6 +3536,8 @@ type FeaturePickData struct {
 	Selected           []string               `protobuf:"bytes,2,rep,name=selected,proto3" json:"selected,omitempty"`
 	UnSelected         []string               `protobuf:"bytes,3,rep,name=unSelected,proto3" json:"unSelected,omitempty"`
 	CurSelected        []string               `protobuf:"bytes,4,rep,name=curSelected,proto3" json:"curSelected,omitempty"`
+	PickNum            int32                  `protobuf:"varint,5,opt,name=pickNum,proto3" json:"pickNum,omitempty"`
+	CurPickedNum       int32                  `protobuf:"varint,6,opt,name=curPickedNum,proto3" json:"curPickedNum,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -3596,6 +3598,20 @@ func (x *FeaturePickData) GetCurSelected() []string {
 		return x.CurSelected
 	}
 	return nil
+}
+
+func (x *FeaturePickData) GetPickNum() int32 {
+	if x != nil {
+		return x.PickNum
+	}
+	return 0
+}
+
+func (x *FeaturePickData) GetCurPickedNum() int32 {
+	if x != nil {
+		return x.CurPickedNum
+	}
+	return 0
 }
 
 // ReelsCollectorData
@@ -4341,14 +4357,16 @@ const file_lowcode_proto_rawDesc = "" +
 	"curFeature\x18\x03 \x01(\tR\n" +
 	"curFeature\x12\"\n" +
 	"\fusedFeatures\x18\x04 \x03(\tR\fusedFeatures\x12$\n" +
-	"\rcacheFeatures\x18\x05 \x03(\tR\rcacheFeatures\"\xb6\x01\n" +
+	"\rcacheFeatures\x18\x05 \x03(\tR\rcacheFeatures\"\xf4\x01\n" +
 	"\x0fFeaturePickData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x1a\n" +
 	"\bselected\x18\x02 \x03(\tR\bselected\x12\x1e\n" +
 	"\n" +
 	"unSelected\x18\x03 \x03(\tR\n" +
 	"unSelected\x12 \n" +
-	"\vcurSelected\x18\x04 \x03(\tR\vcurSelected\"\xa7\x01\n" +
+	"\vcurSelected\x18\x04 \x03(\tR\vcurSelected\x12\x18\n" +
+	"\apickNum\x18\x05 \x01(\x05R\apickNum\x12\"\n" +
+	"\fcurPickedNum\x18\x06 \x01(\x05R\fcurPickedNum\"\xa7\x01\n" +
 	"\x12ReelsCollectorData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\x12\x1e\n" +
 	"\n" +
