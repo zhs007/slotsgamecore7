@@ -65,6 +65,7 @@ func (clusterTriggerData *ClusterTriggerData) Clone() IComponentData {
 		RespinNum:          clusterTriggerData.RespinNum,
 		Wins:               clusterTriggerData.Wins,
 		WinMulti:           clusterTriggerData.WinMulti,
+		SymbolCodes:        slices.Clone(clusterTriggerData.SymbolCodes),
 	}
 
 	if !gIsReleaseMode {

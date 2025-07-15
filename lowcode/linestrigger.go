@@ -62,7 +62,7 @@ func (linesTriggerData *LinesTriggerData) Clone() IComponentData {
 		RespinNum:          linesTriggerData.RespinNum,
 		Wins:               linesTriggerData.Wins,
 		WinMulti:           linesTriggerData.WinMulti,
-		SymbolCodes:        make([]int, len(linesTriggerData.SymbolCodes)),
+		SymbolCodes:        slices.Clone(linesTriggerData.SymbolCodes),
 	}
 
 	return target
@@ -381,6 +381,13 @@ func (linesTrigger *LinesTrigger) canTrigger(gameProp *GameProperty, gs *sgc7gam
 	isTrigger := false
 	lst := []*sgc7game.Result{}
 	lstSym := linesTrigger.getSymbols(gameProp, cd)
+	if len(lstSym) == 0 {
+		if linesTrigger.Config.IsReverse {
+			isTrigger = !isTrigger
+		}
+
+		return isTrigger, lst
+	}
 
 	if linesTrigger.Config.OSMulType != OSMTNone && os == nil {
 		goutils.Error("LinesTrigger.canTrigger",
