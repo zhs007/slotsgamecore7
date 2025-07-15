@@ -22,8 +22,7 @@ type IComponentData interface {
 	OnNewGame(gameProp *GameProperty, component IComponent)
 	// BuildPBComponentData
 	BuildPBComponentData() proto.Message
-	// // LoadPB
-	// LoadPB(pb *anypb.Any) error
+
 	// Clone
 	Clone() IComponentData
 
@@ -109,9 +108,10 @@ type IComponentData interface {
 
 	ChgReelsCollector(reelsData []int)
 
-	// //----------------------------
-	// // Branch
+	//----------------------------
+	// SymbolCodes
 
-	// // ForceBranch -
-	// ForceBranch(branchIndex int)
+	SetSymbolCodes(symbolCodes []int)
+
+	GetSymbolCodes() []int
 }

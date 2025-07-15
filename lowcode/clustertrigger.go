@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -29,11 +30,14 @@ type ClusterTriggerData struct {
 	Wins              int
 	WinMulti          int
 	AvgSymbolValMulti int // 平均的symbolVal倍数，用整数来表达浮点数，100是1倍
+	SymbolCodes       []int
 }
 
 // OnNewGame -
 func (clusterTriggerData *ClusterTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	clusterTriggerData.BasicComponentData.OnNewGame(gameProp, component)
+
+	clusterTriggerData.SymbolCodes = nil
 }
 
 // onNewStep -
@@ -119,6 +123,20 @@ func (clusterTriggerData *ClusterTriggerData) AddPos(x, y int) {
 	clusterTriggerData.PosComponentData.Add(x, y)
 }
 
+func (clusterTriggerData *ClusterTriggerData) SetSymbolCodes(symbolCodes []int) {
+	if len(symbolCodes) == 0 {
+		clusterTriggerData.SymbolCodes = nil
+
+		return
+	}
+
+	clusterTriggerData.SymbolCodes = slices.Clone(symbolCodes)
+}
+
+func (clusterTriggerData *ClusterTriggerData) GetSymbolCodes() []int {
+	return clusterTriggerData.SymbolCodes
+}
+
 // ClusterTriggerConfig - configuration for ClusterTrigger
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type ClusterTriggerConfig struct {
@@ -148,6 +166,7 @@ type ClusterTriggerConfig struct {
 	RespinNumWithScatterNum         map[int]int                   `yaml:"respinNumWithScatterNum" json:"respinNumWithScatterNum"`             // respin number with scatter number
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
+	SetWinSymbols                   []string                      `yaml:"setWinSymbols" json:"setWinSymbols"`
 }
 
 // SetLinkComponent
@@ -283,12 +302,39 @@ func (clusterTrigger *ClusterTrigger) calcSymbolValMulti(ret *sgc7game.Result, o
 		y := ret.Pos[i*2+1]
 
 		mul = funcCalcMulti(mul, os.Arr[x][y])
-		// if os.Arr[x][y] > 1 {
-		// 	mul += os.Arr[x][y]
-		// }
 	}
 
 	return mul
+}
+
+func (clusterTrigger *ClusterTrigger) procWinSymbols(gameProp *GameProperty, lst []*sgc7game.Result) {
+	if len(clusterTrigger.Config.SetWinSymbols) > 0 {
+		if len(lst) == 0 {
+			for _, v := range clusterTrigger.Config.SetWinSymbols {
+				curicd := gameProp.GetComponentDataWithName(v)
+				if curicd != nil {
+					curicd.SetSymbolCodes(nil)
+				}
+			}
+
+			return
+		}
+
+		symbolCodes := make([]int, 0, len(lst))
+
+		for _, v := range lst {
+			if !slices.Contains(symbolCodes, v.Symbol) {
+				symbolCodes = append(symbolCodes, v.Symbol)
+			}
+		}
+
+		for _, v := range clusterTrigger.Config.SetWinSymbols {
+			curicd := gameProp.GetComponentDataWithName(v)
+			if curicd != nil {
+				curicd.SetSymbolCodes(symbolCodes)
+			}
+		}
+	}
 }
 
 // procWins
@@ -486,6 +532,7 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 
 	if isTrigger {
 		clusterTrigger.procWins(gameProp, curpr, std, lst, os, std)
+		clusterTrigger.procWinSymbols(gameProp, lst)
 
 		respinNum, err := clusterTrigger.calcRespinNum(plugin, lst[0])
 		if err != nil {
@@ -531,55 +578,6 @@ func (clusterTrigger *ClusterTrigger) OnPlayGame(gameProp *GameProperty, curpr *
 				}
 			}
 
-			// if symbolTrigger.Config.RespinNumWeightWithScatterNum != nil {
-			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeightWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
-			// 	if err != nil {
-			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			goutils.Err(err))
-
-			// 		return nil
-			// 	}
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = v
-			// } else if len(symbolTrigger.Config.RespinNumWithScatterNum) > 0 {
-			// 	gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums], symbolTrigger.Config.JumpToComponent, true)
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = symbolTrigger.Config.RespinNumWithScatterNum[lst[0].SymbolNums]
-			// } else if symbolTrigger.Config.RespinNumWeight != "" {
-			// 	v, err := gameProp.TriggerRespinWithWeights(curpr, gp, plugin, symbolTrigger.Config.RespinNumWeight, symbolTrigger.Config.UseFileMapping, symbolTrigger.Config.JumpToComponent, true)
-			// 	if err != nil {
-			// 		goutils.Error("BasicWins.ProcTriggerFeature:TriggerRespinWithWeights",
-			// 			goutils.Err(err))
-
-			// 		return nil
-			// 	}
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = v
-			// } else if symbolTrigger.Config.RespinNum > 0 {
-			// 	gameProp.TriggerRespin(plugin, curpr, gp, symbolTrigger.Config.RespinNum, symbolTrigger.Config.JumpToComponent, true)
-
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = symbolTrigger.Config.RespinNum
-			// } else {
-			// 	lst[0].Type = sgc7game.RTFreeGame
-			// 	lst[0].Value = -1
-			// }
-
-			// if symbolTrigger.Config.ForceToNext {
-			// 	std.NextComponent = symbolTrigger.Config.DefaultNextComponent
-			// } else {
-			// 	rn := gameProp.GetLastRespinNum(symbolTrigger.Config.JumpToComponent)
-			// 	if rn > 0 {
-			// 		gameProp.TriggerRespin(plugin, curpr, gp, 0, symbolTrigger.Config.JumpToComponent, true)
-
-			// 		lst[0].Type = sgc7game.RTFreeGame
-			// 		lst[0].Value = rn
-			// 	}
-			// }
-
 			std.NextComponent = clusterTrigger.Config.JumpToComponent
 
 			nc := clusterTrigger.onStepEnd(gameProp, curpr, gp, std.NextComponent)
@@ -612,58 +610,6 @@ func (clusterTrigger *ClusterTrigger) OnAsciiGame(gameProp *GameProperty, pr *sg
 
 	return nil
 }
-
-// // OnStatsWithPB -
-// func (clusterTrigger *ClusterTrigger) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.ClusterTriggerData)
-// 	if !isok {
-// 		goutils.Error("ClusterTrigger.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
-
-// 		return 0, ErrIvalidProto
-// 	}
-
-// 	return clusterTrigger.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
-// // OnStats
-// func (clusterTrigger *ClusterTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	wins := int64(0)
-// 	isTrigger := false
-
-// 	for _, v := range lst {
-// 		gp, isok := v.CurGameModParams.(*GameParams)
-// 		if isok {
-// 			curComponent, isok := gp.MapComponentMsgs[clusterTrigger.Name]
-// 			if isok {
-// 				curwins, err := clusterTrigger.OnStatsWithPB(feature, curComponent, v)
-// 				if err != nil {
-// 					goutils.Error("ClusterTrigger.OnStats",
-// 						goutils.Err(err))
-
-// 					continue
-// 				}
-
-// 				isTrigger = true
-// 				wins += curwins
-// 			}
-// 		}
-// 	}
-
-// 	feature.CurWins.AddWin(int(wins) * 100 / int(stake.CashBet))
-
-// 	if feature.Parent != nil {
-// 		totalwins := int64(0)
-
-// 		for _, v := range lst {
-// 			totalwins += v.CashWin
-// 		}
-
-// 		feature.AllWins.AddWin(int(totalwins) * 100 / int(stake.CashBet))
-// 	}
-
-// 	return isTrigger, stake.CashBet, wins
-// }
 
 // NewComponentData -
 func (clusterTrigger *ClusterTrigger) NewComponentData() IComponentData {
@@ -703,13 +649,17 @@ func (clusterTrigger *ClusterTrigger) GetNextLinkComponents() []string {
 	return []string{clusterTrigger.Config.DefaultNextComponent, clusterTrigger.Config.JumpToComponent}
 }
 
-func (clusterTrigger *ClusterTrigger) getSymbols(gameProp *GameProperty) []int {
+func (clusterTrigger *ClusterTrigger) getSymbols(gameProp *GameProperty, cd *ClusterTriggerData) []int {
 	s := gameProp.GetCurCallStackSymbol()
 	if s >= 0 {
 		return []int{s}
 	}
 
-	return clusterTrigger.Config.SymbolCodes
+	if len(cd.SymbolCodes) == 0 {
+		return clusterTrigger.Config.SymbolCodes
+	}
+
+	return cd.SymbolCodes
 }
 
 // CanTriggerWithScene -
@@ -719,7 +669,14 @@ func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty
 
 	if clusterTrigger.Config.TriggerType == STTypeCluster {
 
-		symbols := clusterTrigger.getSymbols(gameProp)
+		symbols := clusterTrigger.getSymbols(gameProp, icd.(*ClusterTriggerData))
+		if len(symbols) == 0 {
+			if clusterTrigger.Config.IsReverse {
+				isTrigger = !isTrigger
+			}
+
+			return isTrigger, lst
+		}
 
 		currets, err := sgc7game.CalcClusterResult(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, clusterTrigger.Config.BetType),
 			func(cursymbol int) bool {
@@ -741,10 +698,6 @@ func (clusterTrigger *ClusterTrigger) CanTriggerWithScene(gameProp *GameProperty
 
 			return false, nil
 		}
-
-		// for _, v := range currets {
-		// 	gameProp.ProcMulti(v)
-		// }
 
 		lst = append(lst, currets...)
 
@@ -798,6 +751,7 @@ type jsonClusterTrigger struct {
 	WinMulti            int      `json:"winMulti"`
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
 	OutputToComponent   string   `json:"outputToComponent"`
+	SetWinSymbols       []string `json:"setWinSymbols"`
 }
 
 func (jcfg *jsonClusterTrigger) build() *ClusterTriggerConfig {
@@ -811,6 +765,7 @@ func (jcfg *jsonClusterTrigger) build() *ClusterTriggerConfig {
 		WinMulti:           jcfg.WinMulti,
 		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
 		OutputToComponent:  jcfg.OutputToComponent,
+		SetWinSymbols:      jcfg.SetWinSymbols,
 	}
 
 	return cfg

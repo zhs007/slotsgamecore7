@@ -255,16 +255,6 @@ func (basicComponent *BasicComponent) OnPlayGameWithSet(gameProp *GameProperty, 
 	return "", ErrInvalidSetComponent
 }
 
-// // GetBranchNum -
-// func (basicComponent *BasicComponent) GetBranchNum() int {
-// 	return 0
-// }
-
-// // GetBranchWeights -
-// func (basicComponent *BasicComponent) GetBranchWeights() []int {
-// 	return nil
-// }
-
 // ClearData -
 func (basicComponent *BasicComponent) ClearData(icd IComponentData, bForceNow bool) {
 

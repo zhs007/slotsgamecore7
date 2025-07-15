@@ -305,3 +305,11 @@ func (basicComponentData *BasicComponentData) ChgReelsCollector(reelsData []int)
 func (basicComponentData *BasicComponentData) GetStrVal(key string) (string, bool) {
 	return "", false
 }
+
+func (basicComponentData *BasicComponentData) SetSymbolCodes(symbolCodes []int) {
+
+}
+
+func (basicComponentData *BasicComponentData) GetSymbolCodes() []int {
+	return nil
+}
