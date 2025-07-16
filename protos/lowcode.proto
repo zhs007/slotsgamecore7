@@ -462,6 +462,18 @@ message WinResultLimiterData {
     int32 wins = 2;
 }
 
+// SymbolValsSPData
+message SymbolValsSPData {
+    ComponentData basicComponentData = 1;
+    int32 multiSymbolNum = 2;
+	int32 multiCoinSymbolNum = 3;
+	int32 multi = 4;
+	int32 collectSymbolNum = 5;
+	int32 collectCoinSymbolNum = 6;
+	int32 collectCoin = 7;
+    repeated int32 pos = 8;
+}
+
 // GameParam
 message GameParam {
     string firstComponent = 1;
