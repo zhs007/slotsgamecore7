@@ -165,6 +165,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ChgSymbolsInReelsTypeName, NewChgSymbolsInReels)
 	mgr.Reg(CascadingRegulatorTypeName, NewCascadingRegulator)
 	mgr.Reg(WinResultLimiterTypeName, NewWinResultLimiter)
+	mgr.Reg(SymbolValsSPTypeName, NewSymbolValsSP)
 
 	return mgr
 }
