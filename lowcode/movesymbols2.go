@@ -327,9 +327,9 @@ func (moveSymbol2 *MoveSymbols2) procSymbols(gameProp *GameProperty, curpr *sgc7
 	}
 
 	goutils.Error("MoveSymbols2.procSymbols:procMoveSymbols",
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return nil, ErrIvalidComponentConfig
+	return nil, ErrInvalidComponentConfig
 }
 
 // movePositionCollection -
@@ -438,9 +438,9 @@ func (moveSymbol2 *MoveSymbols2) procPositionCollections(gameProp *GameProperty,
 	}
 
 	goutils.Error("MoveSymbols2.procPositionCollections",
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return nil, ErrIvalidComponentConfig
+	return nil, ErrInvalidComponentConfig
 }
 
 // OnProcControllers -
@@ -483,9 +483,9 @@ func (moveSymbol2 *MoveSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 		sc2 = ngs
 	} else {
 		goutils.Error("MoveSymbols2.OnPlayGame",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return "", ErrIvalidComponentConfig
+		return "", ErrInvalidComponentConfig
 	}
 
 	if sc2 == gs {

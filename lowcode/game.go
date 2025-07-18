@@ -233,17 +233,17 @@ func (game *Game) OnBet(plugin sgc7plugin.IPlugin, cmd string, param string, ips
 	gameProp, isok := gameData.(*GameProperty)
 	if !isok {
 		goutils.Error("Game.OnBet:GameProperty",
-			goutils.Err(ErrIvalidGameData))
+			goutils.Err(ErrInvalidGameData))
 
-		return ErrIvalidGameData
+		return ErrInvalidGameData
 	}
 
 	ps, isok := ips.(*PlayerState)
 	if !isok {
 		goutils.Error("Game.OnBet:PlayerState",
-			goutils.Err(ErrIvalidPlayerState))
+			goutils.Err(ErrInvalidPlayerState))
 
-		return ErrIvalidPlayerState
+		return ErrInvalidPlayerState
 	}
 
 	game.Pool.InitPlayerStateOnBet(gameProp, plugin, ps, stake)

@@ -466,9 +466,9 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	default:
 		goutils.Error("RemoveSymbols.OnPlayGame:InvalidType",
 			slog.Int("type", int(removeSymbols.Config.Type)),
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return "", ErrIvalidComponentConfig
+		return "", ErrInvalidComponentConfig
 	}
 
 	removeSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")

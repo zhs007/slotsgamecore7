@@ -578,9 +578,9 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	goutils.Error("HoldAndWin.OnPlayGame:InvalidType",
 		slog.String("type", holdAndWin.Config.StrType),
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return "", ErrIvalidComponentConfig
+	return "", ErrInvalidComponentConfig
 }
 
 // NewComponentData -

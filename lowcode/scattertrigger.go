@@ -343,9 +343,9 @@ func (scatterTrigger *ScatterTrigger) procReelsCollector(gs *sgc7game.GameScene,
 		ps, isok := ips.(*PlayerState)
 		if !isok {
 			goutils.Error("ScatterTrigger.procReelsCollector:PlayerState",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return ErrIvalidPlayerState
+			return ErrInvalidPlayerState
 		}
 
 		return gameProp.Pool.ChgReelsCollector(gameProp, scatterTrigger.Config.ReelsCollector, ps, int(betMethod), int(stake.CoinBet), reelsData)

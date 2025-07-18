@@ -339,9 +339,9 @@ func (flowDownSymbols *FlowDownSymbols) OnPlayGame(gameProp *GameProperty, curpr
 
 	goutils.Error("FlowDownSymbols.OnPlayGame:InvalidType",
 		slog.String("type", flowDownSymbols.Config.StrType),
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return "", ErrIvalidComponentConfig
+	return "", ErrInvalidComponentConfig
 }
 
 // NewComponentData -

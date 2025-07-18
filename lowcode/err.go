@@ -18,12 +18,6 @@ var (
 	// ErrInvalidComponent - invalid component
 	ErrInvalidComponent = errors.New("invalid component")
 
-	// ErrInvalidComponentConfig - invalid component config
-	ErrInvalidComponentConfig = errors.New("invalid component config")
-
-	// ErrInvalidReels - invalid reels
-	ErrInvalidReels = errors.New("invalid reels")
-
 	// ErrInvalidPaytables - invalid paytables
 	ErrInvalidPaytables = errors.New("invalid paytables")
 
@@ -43,49 +37,49 @@ var (
 	// ErrInvalidComponentName - invalid component name
 	ErrInvalidComponentName = errors.New("invalid component name")
 
-	// ErrIvalidCurGameModParams - invalid CurGameModParams
-	ErrIvalidCurGameModParams = errors.New("invalid CurGameModParams")
+	// ErrInvalidCurGameModParams - invalid CurGameModParams
+	ErrInvalidCurGameModParams = errors.New("invalid CurGameModParams")
 
-	// ErrIvalidPlayResultLength - invalid PlayResult Length
-	ErrIvalidPlayResultLength = errors.New("invalid PlayResult Length")
+	// ErrInvalidPlayResultLength - invalid PlayResult Length
+	ErrInvalidPlayResultLength = errors.New("invalid PlayResult Length")
 
-	// ErrIvalidMultiLevelReelsConfig - invalid MultiLevelReels config
-	ErrIvalidMultiLevelReelsConfig = errors.New("invalid MultiLevelReels config")
+	// ErrInvalidMultiLevelReelsConfig - invalid MultiLevelReels config
+	ErrInvalidMultiLevelReelsConfig = errors.New("invalid MultiLevelReels config")
 
-	// ErrIvalidStatsSymbolsInConfig - invalid StatsSymbols in config
-	ErrIvalidStatsSymbolsInConfig = errors.New("invalid StatsSymbols in config")
-	// ErrIvalidStatsComponentInConfig - invalid Stats's component in config
-	ErrIvalidStatsComponentInConfig = errors.New("invalid Stats's component in config")
+	// ErrInvalidStatsSymbolsInConfig - invalid StatsSymbols in config
+	ErrInvalidStatsSymbolsInConfig = errors.New("invalid StatsSymbols in config")
+	// ErrInvalidStatsComponentInConfig - invalid Stats's component in config
+	ErrInvalidStatsComponentInConfig = errors.New("invalid Stats's component in config")
 
-	// ErrIvalidComponentConfig - invalid component config
-	ErrIvalidComponentConfig = errors.New("invalid component config")
+	// ErrInvalidComponentConfig - invalid component config
+	ErrInvalidComponentConfig = errors.New("invalid component config")
 
-	// ErrIvalidGameData - invalid gameData
-	ErrIvalidGameData = errors.New("invalid gameData")
+	// ErrInvalidGameData - invalid gameData
+	ErrInvalidGameData = errors.New("invalid gameData")
 
-	// ErrIvalidPlayerState - invalid playerState
-	ErrIvalidPlayerState = errors.New("invalid playerState")
+	// ErrInvalidPlayerState - invalid playerState
+	ErrInvalidPlayerState = errors.New("invalid playerState")
 
-	// ErrIvalidSimpleRNG - invalid SimpleRNG
-	ErrIvalidSimpleRNG = errors.New("invalid SimpleRNG")
+	// ErrInvalidSimpleRNG - invalid SimpleRNG
+	ErrInvalidSimpleRNG = errors.New("invalid SimpleRNG")
 
-	// ErrIvalidCmd - invalid cmd
-	ErrIvalidCmd = errors.New("invalid cmd")
-	// ErrIvalidCmdParam - invalid cmdparam
-	ErrIvalidCmdParam = errors.New("invalid cmdparam")
+	// ErrInvalidCmd - invalid cmd
+	ErrInvalidCmd = errors.New("invalid cmd")
+	// ErrInvalidCmdParam - invalid cmdparam
+	ErrInvalidCmdParam = errors.New("invalid cmdparam")
 
-	// ErrIvalidTagCurReels - invalid TagCurReels
-	ErrIvalidTagCurReels = errors.New("invalid TagCurReels")
+	// ErrInvalidTagCurReels - invalid TagCurReels
+	ErrInvalidTagCurReels = errors.New("invalid TagCurReels")
 
 	// ErrInvalidSymbolCollection - invalid SymbolColletion
 	ErrInvalidSymbolCollection = errors.New("invalid SymbolColletion")
 
-	// ErrIvalidCustomNode - invalid custom-node
-	ErrIvalidCustomNode = errors.New("invalid custom-node")
-	// ErrIvalidTriggerLabel - invalid trigger label
-	ErrIvalidTriggerLabel = errors.New("invalid trigger label")
-	// ErrIvalidPayTables - invalid paytables
-	ErrIvalidPayTables = errors.New("invalid paytables")
+	// ErrInvalidCustomNode - invalid custom-node
+	ErrInvalidCustomNode = errors.New("invalid custom-node")
+	// ErrInvalidTriggerLabel - invalid trigger label
+	ErrInvalidTriggerLabel = errors.New("invalid trigger label")
+	// ErrInvalidPayTables - invalid paytables
+	ErrInvalidPayTables = errors.New("invalid paytables")
 	// ErrInvalidSymbolInReels - invalid symbol in reels
 	ErrInvalidSymbolInReels = errors.New("invalid symbol in reels")
 	// ErrNoComponentValues - no componentValues
@@ -98,20 +92,20 @@ var (
 	ErrUnsupportedControllerType = errors.New("unsupported ControllerType")
 	// ErrInvalidJsonNode - invalid json node
 	ErrInvalidJsonNode = errors.New("invalid json node")
-	// ErrIvalidReels - invalid reels
-	ErrIvalidReels = errors.New("invalid reels")
+	// ErrInvalidReels - invalid reels
+	ErrInvalidReels = errors.New("invalid reels")
 	// ErrUnsupportedOtherList - unsupported otherList
 	ErrUnsupportedOtherList = errors.New("unsupported otherList")
 
-	// ErrIvalidDefaultScene - invalid default scene
-	ErrIvalidDefaultScene = errors.New("invalid default scene")
-	// ErrIvalidWidth - invalid width
-	ErrIvalidWidth = errors.New("invalid width")
-	// ErrIvalidHeight - invalid height
-	ErrIvalidHeight = errors.New("invalid height")
+	// ErrInvalidDefaultScene - invalid default scene
+	ErrInvalidDefaultScene = errors.New("invalid default scene")
+	// ErrInvalidWidth - invalid width
+	ErrInvalidWidth = errors.New("invalid width")
+	// ErrInvalidHeight - invalid height
+	ErrInvalidHeight = errors.New("invalid height")
 
-	// ErrIvalidProto - invalid proto
-	ErrIvalidProto = errors.New("invalid proto")
+	// ErrInvalidProto - invalid proto
+	ErrInvalidProto = errors.New("invalid proto")
 
 	// ErrInvalidSymbol - invalid symbol
 	ErrInvalidSymbol = errors.New("invalid symbol")

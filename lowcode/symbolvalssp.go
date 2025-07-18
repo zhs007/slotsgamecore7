@@ -490,9 +490,9 @@ func (symbolValsSP *SymbolValsSP) procMulti(gameProp *GameProperty, plugin sgc7p
 
 	goutils.Error("SymbolValsSP.procMulti:InvalidMultiType",
 		slog.String("type", symbolValsSP.Config.StrMultiType),
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return nil, nil, false, ErrIvalidComponentConfig
+	return nil, nil, false, ErrInvalidComponentConfig
 }
 
 // procCollect -
@@ -692,9 +692,9 @@ func (symbolValsSP *SymbolValsSP) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	goutils.Error("SymbolValsSP.OnPlayGame:InvalidType",
 		slog.String("type", symbolValsSP.Config.StrType),
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return "", ErrIvalidComponentConfig
+	return "", ErrInvalidComponentConfig
 }
 
 // NewComponentData -

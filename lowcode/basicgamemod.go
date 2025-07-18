@@ -46,9 +46,9 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp, isok := gameData.(*GameProperty)
 	if !isok {
 		goutils.Error("BasicGameMod.OnPlay",
-			goutils.Err(ErrIvalidGameData))
+			goutils.Err(ErrInvalidGameData))
 
-		return nil, ErrIvalidGameData
+		return nil, ErrInvalidGameData
 	}
 
 	curBetMode := int(stake.CashBet / stake.CoinBet)

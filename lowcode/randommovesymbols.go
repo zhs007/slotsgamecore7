@@ -329,9 +329,9 @@ func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd
 
 	if randomMoveSymbols.Config.ReelsWeightVW2 == nil {
 		goutils.Error("RandomMoveSymbols.procReels",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return gs, ErrIvalidComponentConfig
+		return gs, ErrInvalidComponentConfig
 	}
 
 	var posSrc []int

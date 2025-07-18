@@ -217,9 +217,9 @@ func (overlaySymbol *OverlaySymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 // 	pbcd, isok := pbComponentData.(*sgc7pb.OverlaySymbolData)
 // 	if !isok {
 // 		goutils.Error("OverlaySymbol.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
+// 			goutils.Err(ErrInvalidProto))
 
-// 		return 0, ErrIvalidProto
+// 		return 0, ErrInvalidProto
 // 	}
 
 // 	return overlaySymbol.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

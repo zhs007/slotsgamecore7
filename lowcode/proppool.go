@@ -95,9 +95,9 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 	curComponent, isok := components.MapComponents[cfg.Component]
 // 	if !isok {
 // 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			goutils.Err(ErrIvalidStatsComponentInConfig))
+// 			goutils.Err(ErrInvalidStatsComponentInConfig))
 
-// 		return nil, ErrIvalidStatsComponentInConfig
+// 		return nil, ErrInvalidStatsComponentInConfig
 // 	}
 
 // 	feature := NewStatsFeature(parent, cfg.Name, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
@@ -201,9 +201,9 @@ func (pool *GamePropertyPool) onAddComponentList(betMul int, components *Compone
 // 	curComponent, isok := components.MapComponents[componentName]
 // 	if !isok {
 // 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			goutils.Err(ErrIvalidStatsComponentInConfig))
+// 			goutils.Err(ErrInvalidStatsComponentInConfig))
 
-// 		return nil, ErrIvalidStatsComponentInConfig
+// 		return nil, ErrInvalidStatsComponentInConfig
 // 	}
 
 // 	feature := NewStatsFeature(parent, componentName, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {

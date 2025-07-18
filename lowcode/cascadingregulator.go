@@ -471,9 +471,9 @@ func (cascadingRegulator *CascadingRegulator) OnPlayGame(gameProp *GameProperty,
 	} else {
 		goutils.Error("CascadingRegulator.OnPlayGame:InvalidType",
 			slog.Int("type", int(cascadingRegulator.Config.Type)),
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return "", ErrIvalidComponentConfig
+		return "", ErrInvalidComponentConfig
 	}
 
 	nc := cascadingRegulator.onStepEnd(gameProp, curpr, gp, "")

@@ -29,9 +29,9 @@ func SpinWithSeed(game *Game, ips sgc7game.IPlayerState, seed int, stake *sgc7ga
 	gameProp, isok := gameData.(*GameProperty)
 	if !isok {
 		goutils.Error("SpinWithSeed",
-			goutils.Err(ErrIvalidGameData))
+			goutils.Err(ErrInvalidGameData))
 
-		return nil, ErrIvalidGameData
+		return nil, ErrInvalidGameData
 	}
 
 	cmd := "SPIN"
@@ -94,9 +94,9 @@ func SpinWithSeed(game *Game, ips sgc7game.IPlayerState, seed int, stake *sgc7ga
 		currng, isok := gameProp.rng.(*SimpleRNG)
 		if !isok {
 			goutils.Error("SpinWithSeed",
-				goutils.Err(ErrIvalidSimpleRNG))
+				goutils.Err(ErrInvalidSimpleRNG))
 
-			return nil, ErrIvalidSimpleRNG
+			return nil, ErrInvalidSimpleRNG
 		}
 
 		if !currng.IsNeedIterate() {

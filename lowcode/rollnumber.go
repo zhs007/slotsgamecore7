@@ -148,9 +148,9 @@ func (rollNumber *RollNumber) InitEx(cfg any, pool *GamePropertyPool) error {
 		rollNumber.Config.WeightVW = vw2
 	} else {
 		goutils.Error("RollNumber.InitEx:Weight",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return ErrIvalidComponentConfig
+		return ErrInvalidComponentConfig
 	}
 
 	for _, award := range rollNumber.Config.Awards {

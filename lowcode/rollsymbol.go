@@ -139,9 +139,9 @@ func (rollSymbol *RollSymbol) InitEx(cfg any, pool *GamePropertyPool) error {
 		rollSymbol.Config.WeightVW = vw2
 	} else {
 		goutils.Error("RollSymbol.InitEx:Weight",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return ErrIvalidComponentConfig
+		return ErrInvalidComponentConfig
 	}
 
 	rollSymbol.onInit(&rollSymbol.Config.BasicComponentConfig)

@@ -251,9 +251,9 @@ func (multiWeightAwards *MultiWeightAwards) OnAsciiGame(gameProp *GameProperty, 
 // 	pbcd, isok := pbComponentData.(*sgc7pb.MultiWeightAwardsData)
 // 	if !isok {
 // 		goutils.Error("MultiWeightAwards.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
+// 			goutils.Err(ErrInvalidProto))
 
-// 		return 0, ErrIvalidProto
+// 		return 0, ErrInvalidProto
 // 	}
 
 // 	return multiWeightAwards.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
