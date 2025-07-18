@@ -102,7 +102,7 @@ func (chgSymbolValsData *ChgSymbolValsData) OnNewGame(gameProp *GameProperty, co
 // onNewStep -
 func (chgSymbolValsData *ChgSymbolValsData) onNewStep() {
 	if !gIsReleaseMode {
-		chgSymbolValsData.PosComponentData.ClearPos()
+		chgSymbolValsData.PosComponentData.Clear()
 	}
 }
 

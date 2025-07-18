@@ -236,6 +236,10 @@ func (basicComponentData *BasicComponentData) HasPos(x int, y int) bool {
 func (basicComponentData *BasicComponentData) AddPos(x int, y int) {
 }
 
+// ClearPos -
+func (basicComponentData *BasicComponentData) ClearPos() {
+}
+
 // GetLastRespinNum -
 func (basicComponentData *BasicComponentData) GetLastRespinNum() int {
 	return 0
@@ -293,13 +297,6 @@ func (basicComponentData *BasicComponentData) PutInMoney(coins int) {
 func (basicComponentData *BasicComponentData) ChgReelsCollector(reelsData []int) {
 
 }
-
-// // ForceBranch -
-// func (basicComponentData *BasicComponentData) ForceBranch(branchIndex int) {
-// 	if !gIsReleaseMode {
-// 		basicComponentData.ForceBranchIndex = branchIndex
-// 	}
-// }
 
 // GetStrVal -
 func (basicComponentData *BasicComponentData) GetStrVal(key string) (string, bool) {

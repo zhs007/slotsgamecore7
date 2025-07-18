@@ -182,9 +182,9 @@ func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error 
 		weightBranch.Config.WeightVW = vw2
 	} else {
 		goutils.Error("WeightBranch.InitEx:Weight",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return ErrIvalidComponentConfig
+		return ErrInvalidComponentConfig
 	}
 
 	for _, node := range weightBranch.Config.MapBranchs {

@@ -127,6 +127,11 @@ func (moveSymbols2Data *MoveSymbols2Data) AddPos(x int, y int) {
 	moveSymbols2Data.Pos[len(moveSymbols2Data.Pos)-1] = append(moveSymbols2Data.Pos[len(moveSymbols2Data.Pos)-1], x, y)
 }
 
+// ClearPos -
+func (moveSymbols2Data *MoveSymbols2Data) ClearPos() {
+	moveSymbols2Data.Pos = nil
+}
+
 // AddPosEx -
 func (moveSymbols2Data *MoveSymbols2Data) AddPosEx(x int, y int) {
 	if goutils.IndexOfInt2Slice(moveSymbols2Data.Pos[len(moveSymbols2Data.Pos)-1], x, y, 0) < 0 {
@@ -322,9 +327,9 @@ func (moveSymbol2 *MoveSymbols2) procSymbols(gameProp *GameProperty, curpr *sgc7
 	}
 
 	goutils.Error("MoveSymbols2.procSymbols:procMoveSymbols",
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return nil, ErrIvalidComponentConfig
+	return nil, ErrInvalidComponentConfig
 }
 
 // movePositionCollection -
@@ -433,9 +438,9 @@ func (moveSymbol2 *MoveSymbols2) procPositionCollections(gameProp *GameProperty,
 	}
 
 	goutils.Error("MoveSymbols2.procPositionCollections",
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return nil, ErrIvalidComponentConfig
+	return nil, ErrInvalidComponentConfig
 }
 
 // OnProcControllers -
@@ -478,9 +483,9 @@ func (moveSymbol2 *MoveSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 		sc2 = ngs
 	} else {
 		goutils.Error("MoveSymbols2.OnPlayGame",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return "", ErrIvalidComponentConfig
+		return "", ErrInvalidComponentConfig
 	}
 
 	if sc2 == gs {

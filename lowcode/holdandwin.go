@@ -99,6 +99,11 @@ func (holdAndWinData *HoldAndWinData) AddPosEx(x int, y int) {
 	}
 }
 
+// ClearPos -
+func (holdAndWinData *HoldAndWinData) ClearPos() {
+	holdAndWinData.Pos = nil
+}
+
 // GetValEx -
 func (holdAndWinData *HoldAndWinData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVHeight {
@@ -573,9 +578,9 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	goutils.Error("HoldAndWin.OnPlayGame:InvalidType",
 		slog.String("type", holdAndWin.Config.StrType),
-		goutils.Err(ErrIvalidComponentConfig))
+		goutils.Err(ErrInvalidComponentConfig))
 
-	return "", ErrIvalidComponentConfig
+	return "", ErrInvalidComponentConfig
 }
 
 // NewComponentData -

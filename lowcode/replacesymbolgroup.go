@@ -79,9 +79,9 @@ func (replaceSymbolGroup *ReplaceSymbolGroup) InitEx(cfg any, pool *GameProperty
 		goutils.Error("ReplaceSymbolGroup.InitEx:invalid symbols",
 			slog.Int("src", len(replaceSymbolGroup.Config.SrcSymbolCodes)),
 			slog.Int("target", len(replaceSymbolGroup.Config.TargetSymbolCodes)),
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return ErrIvalidComponentConfig
+		return ErrInvalidComponentConfig
 	}
 
 	replaceSymbolGroup.onInit(&replaceSymbolGroup.Config.BasicComponentConfig)

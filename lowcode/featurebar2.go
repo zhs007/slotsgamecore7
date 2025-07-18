@@ -323,41 +323,41 @@ func (featureBar2 *FeatureBar2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		ps, isok := ips.(*PlayerState)
 		if !isok {
 			goutils.Error("FeatureBar2.OnPlayGame:PlayerState",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		betMethod := stake.CashBet / stake.CoinBet
 		bmd := ps.GetBetMethodPub(int(betMethod))
 		if bmd == nil {
 			goutils.Error("FeatureBar2.OnPlayGame:GetBetMethodPub",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		cps := bmd.GetBetCPS(int(stake.CoinBet), featureBar2.GetName())
 		if cps == nil {
 			goutils.Error("FeatureBar2.OnPlayGame:GetBetCPS",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		fbps, isok := cps.(*FeatureBar2PS)
 		if !isok {
 			goutils.Error("FeatureBar2.OnPlayGame:FeatureBar2PS",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		if len(fbps.Features) != featureBar2.Config.Length {
 			goutils.Error("FeatureBar2.OnPlayGame:FeatureBar2PS.Features",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		forceFeature := featureBar2.getForceFeature(cd)

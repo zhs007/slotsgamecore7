@@ -190,9 +190,9 @@ func (winResultCache *WinResultCache) OnAsciiGame(gameProp *GameProperty, pr *sg
 // 	pbcd, isok := pbComponentData.(*sgc7pb.WinResultCacheData)
 // 	if !isok {
 // 		goutils.Error("WinResultCache.OnStatsWithPB",
-// 			goutils.Err(ErrIvalidProto))
+// 			goutils.Err(ErrInvalidProto))
 
-// 		return 0, ErrIvalidProto
+// 		return 0, ErrInvalidProto
 // 	}
 
 // 	return winResultCache.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil

@@ -319,6 +319,11 @@ func (catchSymbolsData *CatchSymbolsData) AddPos(x int, y int) {
 	catchSymbolsData.SymbolNum++
 }
 
+// ClearPos -
+func (catchSymbolsData *CatchSymbolsData) ClearPos() {
+	catchSymbolsData.Pos = nil
+}
+
 // GetValEx -
 func (catchSymbolsData *CatchSymbolsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVSymbolNum {
@@ -327,13 +332,6 @@ func (catchSymbolsData *CatchSymbolsData) GetValEx(key string, getType GetCompon
 
 	return 0, false
 }
-
-// // AddPosEx -
-// func (catchSymbolsData *CatchSymbolsData) AddPosEx(x int, y int) {
-// 	if goutils.IndexOfInt2Slice(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y, 0) < 0 {
-// 		catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
-// 	}
-// }
 
 // newData -
 func (catchSymbolsData *CatchSymbolsData) newData() {

@@ -127,6 +127,11 @@ func (randomMoveSymbolsData *RandomMoveSymbolsData) AddPos(x int, y int) {
 	randomMoveSymbolsData.Pos[len(randomMoveSymbolsData.Pos)-1] = append(randomMoveSymbolsData.Pos[len(randomMoveSymbolsData.Pos)-1], x, y)
 }
 
+// ClearPos -
+func (randomMoveSymbolsData *RandomMoveSymbolsData) ClearPos() {
+	randomMoveSymbolsData.Pos = nil
+}
+
 // AddPosEx -
 func (randomMoveSymbolsData *RandomMoveSymbolsData) AddPosEx(x int, y int) {
 	if goutils.IndexOfInt2Slice(randomMoveSymbolsData.Pos[len(randomMoveSymbolsData.Pos)-1], x, y, 0) < 0 {
@@ -324,9 +329,9 @@ func (randomMoveSymbols *RandomMoveSymbols) procReels(gameProp *GameProperty, cd
 
 	if randomMoveSymbols.Config.ReelsWeightVW2 == nil {
 		goutils.Error("RandomMoveSymbols.procReels",
-			goutils.Err(ErrIvalidComponentConfig))
+			goutils.Err(ErrInvalidComponentConfig))
 
-		return gs, ErrIvalidComponentConfig
+		return gs, ErrInvalidComponentConfig
 	}
 
 	var posSrc []int

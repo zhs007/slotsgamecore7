@@ -142,6 +142,11 @@ func (bombData *BombData) AddPos(x int, y int) {
 	bombData.Pos[len(bombData.Pos)-1] = append(bombData.Pos[len(bombData.Pos)-1], x, y)
 }
 
+// ClearPos -
+func (bombData *BombData) ClearPos() {
+	bombData.Pos = nil
+}
+
 // newData -
 func (bombData *BombData) newData() {
 	bombData.Pos = append(bombData.Pos, []int{})

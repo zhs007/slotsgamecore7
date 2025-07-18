@@ -107,9 +107,9 @@ func (cfg *Config) BuildStatsSymbolCodes(paytables *sgc7game.PayTables) error {
 		if !isok {
 			goutils.Error("Config.BuildStatsSymbolCodes",
 				slog.String("symbol", v),
-				goutils.Err(ErrIvalidStatsSymbolsInConfig))
+				goutils.Err(ErrInvalidStatsSymbolsInConfig))
 
-			return ErrIvalidStatsSymbolsInConfig
+			return ErrInvalidStatsSymbolsInConfig
 		}
 
 		cfg.StatsSymbolCodes = append(cfg.StatsSymbolCodes, mathtoolset.SymbolType(symbolCode))

@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -102,9 +103,11 @@ type SymbolValWinsConfig struct {
 	BetType              BetType           `yaml:"-" json:"-"`               // bet or totalBet or noPay
 	WinMulti             int               `yaml:"winMulti" json:"winMulti"` // bet or totalBet
 	Symbols              []string          `yaml:"symbols" json:"symbols"`   // like collect
-	SymbolCodes          []int             `json:"-"`                        //
+	SymbolCodes          []int             `yaml:"-" json:"-"`               //
 	StrType              string            `yaml:"type" json:"type"`
 	Type                 SymbolValWinsType `yaml:"-" json:"-"`
+	CoinSymbols          []string          `yaml:"coinSymbols" json:"coinSymbols"` // coin symbols
+	CoinSymbolCodes      []int             `yaml:"-" json:"-"`                     // coin symbols
 }
 
 // SetLinkComponent
@@ -158,9 +161,24 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 			goutils.Error("SymbolValWins.InitEx:Symbol",
 				slog.String("symbol", s),
 				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
 		}
 
 		symbolValWins.Config.SymbolCodes = append(symbolValWins.Config.SymbolCodes, sc)
+	}
+
+	for _, s := range symbolValWins.Config.CoinSymbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("SymbolValWins.InitEx:CoinSymbol",
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		symbolValWins.Config.CoinSymbolCodes = append(symbolValWins.Config.CoinSymbolCodes, sc)
 	}
 
 	symbolValWins.onInit(&symbolValWins.Config.BasicComponentConfig)
@@ -175,22 +193,26 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	svwd := icd.(*SymbolValWinsData)
 	svwd.onNewStep()
 
-	var gs *sgc7game.GameScene
+	gs := symbolValWins.GetTargetScene3(gameProp, curpr, prs, 0)
+	if gs == nil {
+		goutils.Error("SymbolValWins.OnPlayGame:GetTargetScene3",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return "", ErrInvalidComponentConfig
+	}
+
 	os := symbolValWins.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 
 	if os != nil {
 		collectorpos := []int{}
 		mul := 0
 		if symbolValWins.Config.Type == SVWTypeCollector {
-			gs = symbolValWins.GetTargetScene3(gameProp, curpr, prs, 0)
-			if gs != nil {
-				for x, arr := range gs.Arr {
-					for y, s := range arr {
-						if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
-							mul++
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
+						mul++
 
-							collectorpos = append(collectorpos, x, y)
-						}
+						collectorpos = append(collectorpos, x, y)
 					}
 				}
 			}
@@ -201,13 +223,26 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 		totalvals := 0
 		pos := make([]int, 0, len(os.Arr)*len(os.Arr[0])*2)
 
-		for x := 0; x < len(os.Arr); x++ {
-			for y := 0; y < len(os.Arr[x]); y++ {
-				if os.Arr[x][y] > 0 {
-					totalvals += os.Arr[x][y]
-					pos = append(pos, x, y)
+		if len(symbolValWins.Config.CoinSymbolCodes) > 0 {
+			for x := 0; x < len(os.Arr); x++ {
+				for y := 0; y < len(os.Arr[x]); y++ {
+					if slices.Contains(symbolValWins.Config.CoinSymbolCodes, gs.Arr[x][y]) && os.Arr[x][y] > 0 {
+						totalvals += os.Arr[x][y]
+						pos = append(pos, x, y)
 
-					svwd.SymbolNum++
+						svwd.SymbolNum++
+					}
+				}
+			}
+		} else {
+			for x := 0; x < len(os.Arr); x++ {
+				for y := 0; y < len(os.Arr[x]); y++ {
+					if os.Arr[x][y] > 0 {
+						totalvals += os.Arr[x][y]
+						pos = append(pos, x, y)
+
+						svwd.SymbolNum++
+					}
 				}
 			}
 		}
@@ -233,7 +268,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					Mul:        1,
 				}
 
-				if gs != nil {
+				if symbolValWins.Config.Type == SVWTypeCollector {
 					ret.Symbol = gs.Arr[newpos[0]][newpos[1]]
 				}
 
@@ -306,11 +341,20 @@ func NewSymbolValWins(name string) IComponent {
 	}
 }
 
+// "betType": "bet",
+// "winMulti": 1,
+// "type": "normal",
+// "coinSymbols": [
+//
+//	"CA"
+//
+// ]
 type jsonSymbolValWins struct {
-	BetType  string   `json:"betType"`  // bet or totalBet or noPay
-	WinMulti int      `json:"winMulti"` // bet or totalBet
-	Symbols  []string `json:"symbols"`  // like collect
-	Type     string   `yaml:"type" json:"type"`
+	BetType     string   `json:"betType"`  // bet or totalBet or noPay
+	WinMulti    int      `json:"winMulti"` // bet or totalBet
+	Symbols     []string `json:"symbols"`  // like collect
+	Type        string   `yaml:"type" json:"type"`
+	CoinSymbols []string `json:"coinSymbols"` // coin symbols
 }
 
 func (jcfg *jsonSymbolValWins) build() *SymbolValWinsConfig {
@@ -319,6 +363,7 @@ func (jcfg *jsonSymbolValWins) build() *SymbolValWinsConfig {
 		WinMulti:      jcfg.WinMulti,
 		Symbols:       jcfg.Symbols,
 		StrType:       jcfg.Type,
+		CoinSymbols:   jcfg.CoinSymbols,
 	}
 
 	return cfg

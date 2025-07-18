@@ -60,7 +60,7 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 					slog.Int("i", i),
 					goutils.Err(err))
 
-				return ErrIvalidWidth
+				return ErrInvalidWidth
 			}
 
 			cfg.Width = int(w)
@@ -71,7 +71,7 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 					slog.Int("i", i),
 					goutils.Err(err))
 
-				return ErrIvalidHeight
+				return ErrInvalidHeight
 			}
 
 			cfg.Height = int(h)
@@ -82,7 +82,7 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 					slog.Int("i", i),
 					goutils.Err(err))
 
-				// return ErrIvalidDefaultScene
+				// return ErrInvalidDefaultScene
 			} else {
 				cfg.DefaultScene = scene
 			}
@@ -95,9 +95,9 @@ func loadBasicInfo(cfg *Config, buf []byte) error {
 func parsePaytable2(n *ast.Node) (*sgc7game.PayTables, error) {
 	if n == nil {
 		goutils.Error("parsePaytable2",
-			goutils.Err(ErrIvalidPayTables))
+			goutils.Err(ErrInvalidPayTables))
 
-		return nil, ErrIvalidPayTables
+		return nil, ErrInvalidPayTables
 	}
 
 	buf, err := n.MarshalJSON()
@@ -206,9 +206,9 @@ func getLineData2Width(dataLines []map[string]string) int {
 func parseLineData2(n *ast.Node) (*sgc7game.LineData, error) {
 	if n == nil {
 		goutils.Error("parseLineData2",
-			goutils.Err(ErrIvalidReels))
+			goutils.Err(ErrInvalidReels))
 
-		return nil, ErrIvalidReels
+		return nil, ErrInvalidReels
 	}
 
 	buf, err := n.MarshalJSON()
@@ -255,9 +255,9 @@ func parseLineData2(n *ast.Node) (*sgc7game.LineData, error) {
 func parseLineData(n *ast.Node, _ int) (*sgc7game.LineData, error) {
 	if n == nil {
 		goutils.Error("parseLineData",
-			goutils.Err(ErrIvalidReels))
+			goutils.Err(ErrInvalidReels))
 
-		return nil, ErrIvalidReels
+		return nil, ErrInvalidReels
 	}
 
 	buf, err := n.MarshalJSON()
@@ -286,9 +286,9 @@ func parseLineData(n *ast.Node, _ int) (*sgc7game.LineData, error) {
 func parseReels(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
 	if n == nil {
 		goutils.Error("parseReels",
-			goutils.Err(ErrIvalidReels))
+			goutils.Err(ErrInvalidReels))
 
-		return nil, ErrIvalidReels
+		return nil, ErrInvalidReels
 	}
 
 	buf, err := n.MarshalJSON()
@@ -387,9 +387,9 @@ func parseReel2(dataReels []map[string]string, x int, paytables *sgc7game.PayTab
 func parseReels2(n *ast.Node, paytables *sgc7game.PayTables) (*sgc7game.ReelsData, error) {
 	if n == nil {
 		goutils.Error("parseReels2",
-			goutils.Err(ErrIvalidReels))
+			goutils.Err(ErrInvalidReels))
 
-		return nil, ErrIvalidReels
+		return nil, ErrInvalidReels
 	}
 
 	buf, err := n.MarshalJSON()

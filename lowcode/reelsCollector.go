@@ -298,34 +298,34 @@ func (reelsCollector *ReelsCollector) OnPlayGame(gameProp *GameProperty, curpr *
 		ps, isok := ips.(*PlayerState)
 		if !isok {
 			goutils.Error("ReelsCollector.OnPlayGame:PlayerState",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		betMethod := stake.CashBet / stake.CoinBet
 		bmd := ps.GetBetMethodPub(int(betMethod))
 		if bmd == nil {
 			goutils.Error("ReelsCollector.OnPlayGame:GetBetMethodPub",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		cps := bmd.GetBetCPS(int(stake.CoinBet), reelsCollector.GetName())
 		if cps == nil {
 			goutils.Error("ReelsCollector.OnPlayGame:GetBetCPS",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		cbps, isok := cps.(*ReelsCollectorPS)
 		if !isok {
 			goutils.Error("ReelsCollector.OnPlayGame:ReelsCollectorPS",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
-			return "", ErrIvalidPlayerState
+			return "", ErrInvalidPlayerState
 		}
 
 		if len(cbps.Collectors) == 0 {
@@ -589,7 +589,7 @@ func (reelsCollector *ReelsCollector) ChgReelsCollector(icd IComponentData, ps *
 		if !isok {
 			goutils.Error("ReelsCollector.ChgReelsCollector:MapComponentData",
 				slog.String("cname", cname),
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
 			return
 		}
@@ -597,7 +597,7 @@ func (reelsCollector *ReelsCollector) ChgReelsCollector(icd IComponentData, ps *
 		cps, isok := v.(*ReelsCollectorPS)
 		if !isok {
 			goutils.Error("ReelsCollector.ChgReelsCollector:ReelsCollectorPS",
-				goutils.Err(ErrIvalidPlayerState))
+				goutils.Err(ErrInvalidPlayerState))
 
 			return
 		}

@@ -167,6 +167,11 @@ func (chgSymbolsData *ChgSymbols2Data) AddPos(x int, y int) {
 	chgSymbolsData.Pos = append(chgSymbolsData.Pos, x, y)
 }
 
+// ClearPos -
+func (chgSymbolsData *ChgSymbols2Data) ClearPos() {
+	chgSymbolsData.Pos = nil
+}
+
 // AddPosEx -
 func (chgSymbolsData *ChgSymbols2Data) AddPosEx(x int, y int) {
 	if !chgSymbolsData.HasPos(x, y) {

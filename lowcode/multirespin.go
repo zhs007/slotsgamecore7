@@ -54,16 +54,16 @@ func (multiRespin *MultiRespin) parseCmdParam(cmd string, cmdParam string) (*Res
 
 	if !hascmd {
 		goutils.Error("MultiRespin.parseCmdParam",
-			goutils.Err(ErrIvalidCmd))
+			goutils.Err(ErrInvalidCmd))
 
-		return nil, ErrIvalidCmd
+		return nil, ErrInvalidCmd
 	}
 
 	param := &RespinDataCmdParam{}
 	err := sonic.Unmarshal([]byte(cmdParam), param)
 	if err != nil {
 		goutils.Error("MultiRespin.parseCmdParam",
-			goutils.Err(ErrIvalidCmdParam))
+			goutils.Err(ErrInvalidCmdParam))
 
 		return nil, err
 	}
