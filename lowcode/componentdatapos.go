@@ -22,7 +22,7 @@ func (posdata *PosComponentData) Has(target *PosComponentData) bool {
 	return HasSamePos(posdata.Pos, target.Pos)
 }
 
-func (posdata *PosComponentData) ClearPos() {
+func (posdata *PosComponentData) Clear() {
 	posdata.Pos = nil
 }
 

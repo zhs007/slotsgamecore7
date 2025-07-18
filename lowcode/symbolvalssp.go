@@ -126,6 +126,11 @@ func (symbolValsSPData *SymbolValsSPData) AddPos(x int, y int) {
 	symbolValsSPData.Pos = append(symbolValsSPData.Pos, x, y)
 }
 
+// ClearPos -
+func (symbolValsSPData *SymbolValsSPData) ClearPos() {
+	symbolValsSPData.Pos = nil
+}
+
 // AddPosEx -
 func (symbolValsSPData *SymbolValsSPData) AddPosEx(x int, y int) {
 	if !symbolValsSPData.HasPos(x, y) {

@@ -90,6 +90,11 @@ func (genGigaSymbolData *GenGigaSymbolData) AddPos(x int, y int) {
 	genGigaSymbolData.Pos = append(genGigaSymbolData.Pos, x, y)
 }
 
+// ClearPos -
+func (genGigaSymbolData *GenGigaSymbolData) ClearPos() {
+	genGigaSymbolData.Pos = nil
+}
+
 // GenGigaSymbolConfig - configuration for GenGigaSymbol
 type GenGigaSymbolConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`

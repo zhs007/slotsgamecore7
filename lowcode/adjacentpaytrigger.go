@@ -51,7 +51,7 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) onNewStep() {
 	adjacentPayTriggerData.WinMulti = 1
 
 	if !gIsReleaseMode {
-		adjacentPayTriggerData.PosComponentData.ClearPos()
+		adjacentPayTriggerData.PosComponentData.Clear()
 	}
 }
 

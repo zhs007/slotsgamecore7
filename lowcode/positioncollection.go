@@ -99,6 +99,11 @@ func (positionCollectionData *PositionCollectionData) AddPos(x int, y int) {
 	positionCollectionData.Pos = append(positionCollectionData.Pos, x, y)
 }
 
+// ClearPos -
+func (positionCollectionData *PositionCollectionData) ClearPos() {
+	positionCollectionData.Pos = nil
+}
+
 // PositionCollectionConfig - configuration for PositionCollection feature
 type PositionCollectionConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`

@@ -230,12 +230,10 @@ func (burstSymbolsData *BurstSymbolsData) AddPos(x int, y int) {
 	burstSymbolsData.Pos[len(burstSymbolsData.Pos)-1] = append(burstSymbolsData.Pos[len(burstSymbolsData.Pos)-1], x, y)
 }
 
-// // AddPosEx -
-// func (catchSymbolsData *CatchSymbolsData) AddPosEx(x int, y int) {
-// 	if goutils.IndexOfInt2Slice(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y, 0) < 0 {
-// 		catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1] = append(catchSymbolsData.Pos[len(catchSymbolsData.Pos)-1], x, y)
-// 	}
-// }
+// ClearPos -
+func (burstSymbolsData *BurstSymbolsData) ClearPos() {
+	burstSymbolsData.Pos = nil
+}
 
 // newData -
 func (burstSymbolsData *BurstSymbolsData) newData() {

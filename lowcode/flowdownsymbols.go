@@ -88,6 +88,11 @@ func (flowDownSymbolsData *FlowDownSymbolsData) AddPos(x int, y int) {
 	flowDownSymbolsData.Pos = append(flowDownSymbolsData.Pos, x, y)
 }
 
+// ClearPos -
+func (flowDownSymbolsData *FlowDownSymbolsData) ClearPos() {
+	flowDownSymbolsData.Pos = nil
+}
+
 // AddPosEx -
 func (flowDownSymbolsData *FlowDownSymbolsData) AddPosEx(x int, y int) {
 	if !flowDownSymbolsData.HasPos(x, y) {

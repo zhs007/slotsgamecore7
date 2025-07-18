@@ -99,6 +99,11 @@ func (holdAndWinData *HoldAndWinData) AddPosEx(x int, y int) {
 	}
 }
 
+// ClearPos -
+func (holdAndWinData *HoldAndWinData) ClearPos() {
+	holdAndWinData.Pos = nil
+}
+
 // GetValEx -
 func (holdAndWinData *HoldAndWinData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVHeight {

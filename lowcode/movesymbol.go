@@ -116,6 +116,11 @@ func (moveSymbolData *MoveSymbolData) AddPos(x int, y int) {
 	moveSymbolData.Pos[len(moveSymbolData.Pos)-1] = append(moveSymbolData.Pos[len(moveSymbolData.Pos)-1], x, y)
 }
 
+// ClearPos -
+func (moveSymbolData *MoveSymbolData) ClearPos() {
+	moveSymbolData.Pos = nil
+}
+
 // AddPosEx -
 func (moveSymbolData *MoveSymbolData) AddPosEx(x int, y int) {
 	if goutils.IndexOfInt2Slice(moveSymbolData.Pos[len(moveSymbolData.Pos)-1], x, y, 0) < 0 {

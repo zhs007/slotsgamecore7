@@ -73,6 +73,11 @@ func (mergePositionCollectionData *MergePositionCollectionData) AddPos(x int, y 
 	mergePositionCollectionData.Pos = append(mergePositionCollectionData.Pos, x, y)
 }
 
+// ClearPos -
+func (mergePositionCollectionData *MergePositionCollectionData) ClearPos() {
+	mergePositionCollectionData.Pos = nil
+}
+
 // MergePositionCollectionConfig - configuration for MergePositionCollection feature
 type MergePositionCollectionConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`

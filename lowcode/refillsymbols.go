@@ -19,9 +19,10 @@ const RefillSymbolsTypeName = "refillSymbols"
 // RefillSymbolsConfig - configuration for RefillSymbols
 type RefillSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	IsNeedProcSymbolVals bool `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	DefaultSymbolVal     int  `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
+	IsNeedProcSymbolVals bool   `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int    `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	DefaultSymbolVal     int    `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
+	OutputToComponent    string `yaml:"outputToComponent" json:"outputToComponent"`       // 输出到哪个组件
 }
 
 // SetLinkComponent
@@ -84,8 +85,6 @@ func (refillSymbols *RefillSymbols) getSymbol(rd *sgc7game.ReelsData, x int, ind
 func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	// refillSymbols.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	bcd := cd.(*BasicComponentData)
 
 	bcd.UsedScenes = nil
@@ -97,6 +96,20 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	var os *sgc7game.GameScene
 	if refillSymbols.Config.IsNeedProcSymbolVals {
 		os = refillSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	}
+
+	var outputCD IComponentData
+	if refillSymbols.Config.OutputToComponent != "" {
+		outputCD = gameProp.GetComponentDataWithName(refillSymbols.Config.OutputToComponent)
+		if outputCD == nil {
+			goutils.Error("RefillSymbols.OnPlayGame:OutputToComponent",
+				slog.String("outputToComponent", refillSymbols.Config.OutputToComponent),
+				goutils.Err(ErrInvalidComponent))
+
+			return "", ErrInvalidComponent
+		}
+
+		outputCD.ClearPos()
 	}
 
 	if os != nil {
@@ -116,6 +129,10 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 					ngs.Indexes[x]--
 
 					nos.Arr[x][y] = refillSymbols.Config.DefaultSymbolVal
+
+					if outputCD != nil {
+						outputCD.AddPos(x, y)
+					}
 				}
 			}
 		}
@@ -139,6 +156,10 @@ func (refillSymbols *RefillSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 					ngs.Arr[x][y] = refillSymbols.getSymbol(cr, x, ngs.Indexes[x])
 					ngs.Indexes[x]--
+
+					if outputCD != nil {
+						outputCD.AddPos(x, y)
+					}
 				}
 			}
 		}
@@ -168,16 +189,6 @@ func (refillSymbols *RefillSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
-// // OnStats
-// func (refillSymbols *RefillSymbols) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // OnStatsWithPB -
-// func (refillSymbols *RefillSymbols) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	return 0, nil
-// }
-
 // EachUsedResults -
 func (refillSymbols *RefillSymbols) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
 }
@@ -188,11 +199,14 @@ func NewRefillSymbols(name string) IComponent {
 	}
 }
 
-// "configuration": {},
+// "isNeedProcSymbolVals": true,
+// "defaultSymbolVal": 0,
+// "outputToComponent": "bg-pos-collect"
 type jsonRefillSymbols struct {
-	IsNeedProcSymbolVals bool `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	DefaultSymbolVal     int  `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
+	IsNeedProcSymbolVals bool   `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int    `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	DefaultSymbolVal     int    `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
+	OutputToComponent    string `yaml:"outputToComponent" json:"outputToComponent"`       // 输出到哪个组件
 }
 
 func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
@@ -200,9 +214,8 @@ func (jcfg *jsonRefillSymbols) build() *RefillSymbolsConfig {
 		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		DefaultSymbolVal:     jcfg.DefaultSymbolVal,
+		OutputToComponent:    jcfg.OutputToComponent,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

@@ -69,6 +69,8 @@ type IComponentData interface {
 	HasPos(x int, y int) bool
 	// AddPos -
 	AddPos(x int, y int)
+	// ClearPos -
+	ClearPos()
 
 	//----------------------------
 	// Respin
