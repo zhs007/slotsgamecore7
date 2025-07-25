@@ -150,18 +150,12 @@ func (weightReels2 *WeightReels2) GetReelSetWeight(gameProp *GameProperty, basic
 
 // OnProcControllers -
 func (weightReels2 *WeightReels2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-
 	if strVal != "" {
 		awards, isok := weightReels2.Config.MapAwards[strVal]
 		if isok {
 			gameProp.procAwards(plugin, awards, curpr, gp)
 		}
 	}
-
-	// awards, isok := weightReels2.Config.MapAwards[""]
-	// if isok {
-	// 	gameProp.procAwards(plugin, awards, curpr, gp)
-	// }
 }
 
 // playgame
