@@ -44,6 +44,21 @@ func parseSymbolValsSPMultiType(str string) SymbolValsSPMultiType {
 	return SVSPMultiTypeNormal
 }
 
+type SymbolValsSPCollectType int
+
+const (
+	SVSPCollectTypeNormal   SymbolValsSPCollectType = 0 // normal
+	SVSPCollectTypeSequence SymbolValsSPCollectType = 1 // sequence
+)
+
+func parseSymbolValsSPCollectType(str string) SymbolValsSPCollectType {
+	if str == "sequence" {
+		return SVSPCollectTypeSequence
+	}
+
+	return SVSPCollectTypeNormal
+}
+
 type SymbolValsSPData struct {
 	BasicComponentData
 	Pos                  []int // 位置
@@ -148,25 +163,27 @@ func (symbolValsSPData *SymbolValsSPData) newLine() {
 // SymbolValsSPConfig - configuration for SymbolValsSP
 type SymbolValsSPConfig struct {
 	BasicComponentConfig    `yaml:",inline" json:",inline"`
-	StrType                 string                `yaml:"type" json:"type"`
-	Type                    SymbolValsSPType      `yaml:"-" json:"-"`
-	CoinSymbols             []string              `yaml:"coinSymbols" json:"coinSymbols"`
-	CoinSymbolCodes         []int                 `yaml:"-" json:"-"`
-	MultiSymbols            []string              `yaml:"multiSymbols" json:"multiSymbols"`
-	MultiSymbolCodes        []int                 `yaml:"-" json:"-"`
-	StrMultiType            string                `yaml:"multiType" json:"multiType"`
-	MultiType               SymbolValsSPMultiType `yaml:"-" json:"-"`
-	MultiTargetSymbol       string                `yaml:"multiTargetSymbol" json:"multiTargetSymbol"`
-	MultiTargetSymbolCode   int                   `yaml:"-" json:"-"`
-	CollectSymbols          []string              `yaml:"collectSymbols" json:"collectSymbols"`
-	CollectSymbolCodes      []int                 `yaml:"-" json:"-"`
-	CollectTargetSymbol     string                `yaml:"collectTargetSymbol" json:"collectTargetSymbol"`
-	CollectTargetSymbolCode int                   `yaml:"-" json:"-"`
-	CollectCoinSymbol       string                `yaml:"collectCoinSymbol" json:"collectCoinSymbol"`
-	CollectCoinSymbolCode   int                   `yaml:"-" json:"-"`
-	CollectMultiSymbol      string                `yaml:"collectMultiSymbol" json:"collectMultiSymbol"`
-	CollectMultiSymbolCode  int                   `yaml:"-" json:"-"`
-	MapAwards               map[string][]*Award   `yaml:"controllers" json:"controllers"`
+	StrType                 string                  `yaml:"type" json:"type"`
+	Type                    SymbolValsSPType        `yaml:"-" json:"-"`
+	CoinSymbols             []string                `yaml:"coinSymbols" json:"coinSymbols"`
+	CoinSymbolCodes         []int                   `yaml:"-" json:"-"`
+	MultiSymbols            []string                `yaml:"multiSymbols" json:"multiSymbols"`
+	MultiSymbolCodes        []int                   `yaml:"-" json:"-"`
+	StrMultiType            string                  `yaml:"multiType" json:"multiType"`
+	MultiType               SymbolValsSPMultiType   `yaml:"-" json:"-"`
+	MultiTargetSymbol       string                  `yaml:"multiTargetSymbol" json:"multiTargetSymbol"`
+	MultiTargetSymbolCode   int                     `yaml:"-" json:"-"`
+	CollectSymbols          []string                `yaml:"collectSymbols" json:"collectSymbols"`
+	CollectSymbolCodes      []int                   `yaml:"-" json:"-"`
+	CollectTargetSymbol     string                  `yaml:"collectTargetSymbol" json:"collectTargetSymbol"`
+	CollectTargetSymbolCode int                     `yaml:"-" json:"-"`
+	CollectCoinSymbol       string                  `yaml:"collectCoinSymbol" json:"collectCoinSymbol"`
+	CollectCoinSymbolCode   int                     `yaml:"-" json:"-"`
+	CollectMultiSymbol      string                  `yaml:"collectMultiSymbol" json:"collectMultiSymbol"`
+	CollectMultiSymbolCode  int                     `yaml:"-" json:"-"`
+	StrCollectType          string                  `yaml:"collectType" json:"collectType"`
+	CollectType             SymbolValsSPCollectType `yaml:"-" json:"-"`
+	MapAwards               map[string][]*Award     `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -274,6 +291,9 @@ func (symbolValsSP *SymbolValsSP) InitEx(cfg any, pool *GamePropertyPool) error 
 			}
 			symbolValsSP.Config.CollectSymbolCodes = append(symbolValsSP.Config.CollectSymbolCodes, sc)
 		}
+
+		symbolValsSP.Config.CollectType = parseSymbolValsSPCollectType(symbolValsSP.Config.StrCollectType)
+
 		if symbolValsSP.Config.CollectTargetSymbol != "" {
 			sc, isok := pool.DefaultPaytables.MapSymbols[symbolValsSP.Config.CollectTargetSymbol]
 			if !isok {
@@ -285,6 +305,7 @@ func (symbolValsSP *SymbolValsSP) InitEx(cfg any, pool *GamePropertyPool) error 
 			}
 			symbolValsSP.Config.CollectTargetSymbolCode = sc
 		}
+
 		if symbolValsSP.Config.CollectCoinSymbol != "" {
 			sc, isok := pool.DefaultPaytables.MapSymbols[symbolValsSP.Config.CollectCoinSymbol]
 			if !isok {
@@ -296,6 +317,7 @@ func (symbolValsSP *SymbolValsSP) InitEx(cfg any, pool *GamePropertyPool) error 
 			}
 			symbolValsSP.Config.CollectCoinSymbolCode = sc
 		}
+
 		if symbolValsSP.Config.CollectMultiSymbol != "" {
 			sc, isok := pool.DefaultPaytables.MapSymbols[symbolValsSP.Config.CollectMultiSymbol]
 			if !isok {
@@ -321,7 +343,7 @@ func (symbolValsSP *SymbolValsSP) InitEx(cfg any, pool *GamePropertyPool) error 
 }
 
 // procMultiNormal -
-func (symbolValsSP *SymbolValsSP) procMultiNormal(gameProp *GameProperty, plugin sgc7plugin.IPlugin, cd *SymbolValsSPData,
+func (symbolValsSP *SymbolValsSP) procMultiNormal(gameProp *GameProperty, _ sgc7plugin.IPlugin, cd *SymbolValsSPData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, bool, error) {
 
 	isTriggerMulti := false
@@ -397,7 +419,7 @@ func (symbolValsSP *SymbolValsSP) procMultiNormal(gameProp *GameProperty, plugin
 }
 
 // procMultiRoundXY -
-func (symbolValsSP *SymbolValsSP) procMultiRoundXY(gameProp *GameProperty, plugin sgc7plugin.IPlugin, cd *SymbolValsSPData,
+func (symbolValsSP *SymbolValsSP) procMultiRoundXY(gameProp *GameProperty, _ sgc7plugin.IPlugin, cd *SymbolValsSPData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene, cx, cy int, multi int, isNewOS bool) (*sgc7game.GameScene, error) {
 
 	cd.MultiSymbolNum++
@@ -495,8 +517,8 @@ func (symbolValsSP *SymbolValsSP) procMulti(gameProp *GameProperty, plugin sgc7p
 	return nil, nil, false, ErrInvalidComponentConfig
 }
 
-// procCollect -
-func (symbolValsSP *SymbolValsSP) procCollect(gameProp *GameProperty, plugin sgc7plugin.IPlugin, cd *SymbolValsSPData,
+// procCollectNormal -
+func (symbolValsSP *SymbolValsSP) procCollectNormal(gameProp *GameProperty, _ sgc7plugin.IPlugin, cd *SymbolValsSPData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, bool, error) {
 
 	isTriggerCollect := false
@@ -596,6 +618,123 @@ func (symbolValsSP *SymbolValsSP) procCollect(gameProp *GameProperty, plugin sgc
 	}
 
 	return ngs, nos, isTriggerCollect, nil
+}
+
+// procCollectSequence -
+func (symbolValsSP *SymbolValsSP) procCollectSequence(gameProp *GameProperty, _ sgc7plugin.IPlugin, cd *SymbolValsSPData,
+	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, bool, error) {
+
+	isTriggerCollect := false
+
+	ngs := gs
+	nos := os
+
+	totalcoin := 0
+	coinpos := make([]int, 0, gs.Width*gs.Height*2)
+	collectpos := make([]int, 0, gs.Width*gs.Height*2)
+	mulpos := make([]int, 0, gs.Width*gs.Height*2)
+
+	for x, arr := range gs.Arr {
+		for y, s := range arr {
+			if slices.Contains(symbolValsSP.Config.CoinSymbolCodes, s) {
+				if os.Arr[x][y] > 0 {
+					totalcoin += os.Arr[x][y]
+
+					cd.CollectCoinSymbolNum++
+
+					coinpos = append(coinpos, x, y)
+				}
+			} else if slices.Contains(symbolValsSP.Config.CollectSymbolCodes, s) {
+				cd.CollectSymbolNum++
+
+				collectpos = append(collectpos, x, y)
+			} else if slices.Contains(symbolValsSP.Config.MultiSymbolCodes, s) {
+				mulpos = append(mulpos, x, y)
+			}
+		}
+	}
+
+	if len(collectpos) > 0 {
+		isTriggerCollect = true
+		cd.newLine()
+
+		x := collectpos[0]
+		y := collectpos[1]
+
+		if nos == os {
+			nos = os.CloneEx(gameProp.PoolScene)
+		}
+
+		nos.Arr[x][y] = totalcoin
+
+		cd.CollectCoin += totalcoin
+
+		cd.AddPos(x, y)
+
+		if symbolValsSP.Config.CollectTargetSymbolCode > 0 {
+			if ngs == gs {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
+
+			ngs.Arr[x][y] = symbolValsSP.Config.CollectTargetSymbolCode
+		}
+
+		if symbolValsSP.Config.CollectCoinSymbolCode > 0 {
+			if ngs == gs {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
+
+			for i := 0; i < len(coinpos); i += 2 {
+				x := coinpos[i]
+				y := coinpos[i+1]
+
+				cd.AddPos(x, y)
+
+				ngs.Arr[x][y] = symbolValsSP.Config.CollectCoinSymbolCode
+			}
+		} else {
+			for i := 0; i < len(coinpos); i += 2 {
+				x := coinpos[i]
+				y := coinpos[i+1]
+
+				cd.AddPos(x, y)
+			}
+		}
+
+		if symbolValsSP.Config.CollectMultiSymbolCode > 0 {
+			if ngs == gs {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
+
+			for i := 0; i < len(mulpos); i += 2 {
+				x := mulpos[i]
+				y := mulpos[i+1]
+
+				cd.AddPos(x, y)
+
+				ngs.Arr[x][y] = symbolValsSP.Config.CollectMultiSymbolCode
+			}
+		}
+	}
+
+	return ngs, nos, isTriggerCollect, nil
+}
+
+// procCollect -
+func (symbolValsSP *SymbolValsSP) procCollect(gameProp *GameProperty, _ sgc7plugin.IPlugin, cd *SymbolValsSPData,
+	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, bool, error) {
+	switch symbolValsSP.Config.CollectType {
+	case SVSPCollectTypeNormal:
+		return symbolValsSP.procCollectNormal(gameProp, nil, cd, gs, os)
+	case SVSPCollectTypeSequence:
+		return symbolValsSP.procCollectSequence(gameProp, nil, cd, gs, os)
+	}
+
+	goutils.Error("SymbolValsSP.procCollect:InvalidCollectType",
+		slog.String("type", symbolValsSP.Config.StrCollectType),
+		goutils.Err(ErrInvalidComponentConfig))
+
+	return nil, nil, false, ErrInvalidComponentConfig
 }
 
 // procNormal -
@@ -732,6 +871,7 @@ func NewSymbolValsSP(name string) IComponent {
 // "collectTargetSymbol": "CA",
 // "collectCoinSymbol": "BN",
 // "collectMulSymbol": "BN"
+// "collectType": "sequence"
 
 type jsonSymbolValsSP struct {
 	StrType             string   `json:"type"`
@@ -743,6 +883,7 @@ type jsonSymbolValsSP struct {
 	CollectTargetSymbol string   `json:"collectTargetSymbol"`
 	CollectCoinSymbol   string   `json:"collectCoinSymbol"`
 	CollectMulSymbol    string   `json:"collectMulSymbol"`
+	CollectType         string   `json:"collectType"`
 }
 
 func (jcfg *jsonSymbolValsSP) build() *SymbolValsSPConfig {
@@ -756,6 +897,7 @@ func (jcfg *jsonSymbolValsSP) build() *SymbolValsSPConfig {
 		CollectTargetSymbol: jcfg.CollectTargetSymbol,
 		CollectCoinSymbol:   jcfg.CollectCoinSymbol,
 		CollectMultiSymbol:  jcfg.CollectMulSymbol,
+		StrCollectType:      strings.ToLower(jcfg.CollectType),
 	}
 
 	return cfg

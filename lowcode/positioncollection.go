@@ -54,11 +54,6 @@ func (positionCollectionData *PositionCollectionData) clear(pos []int) {
 	positionCollectionData.Pos = append(positionCollectionData.Pos, pos...)
 }
 
-// // OnNewStep -
-// func (positionCollectionData *PositionCollectionData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	positionCollectionData.BasicComponentData.OnNewStep(gameProp, component)
-// }
-
 // Clone
 func (positionCollectionData *PositionCollectionData) Clone() IComponentData {
 	target := &PositionCollectionData{
@@ -168,17 +163,6 @@ func (positionCollection *PositionCollection) InitEx(cfg any, pool *GameProperty
 	return nil
 }
 
-// // OnNewGame -
-// func (symbolCollection2 *SymbolCollection2) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
-
-// 	cd.OnNewGame()
-
-// 	cd.SymbolCodes = append(cd.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
-
-// 	return nil
-// }
-
 func (positionCollection *PositionCollection) isClear(basicCD *BasicComponentData) bool {
 	clear, isok := basicCD.GetConfigIntVal(CCVClear)
 	if isok {
@@ -236,11 +220,6 @@ func (positionCollection *PositionCollection) OnAsciiGame(gameProp *GameProperty
 
 	return nil
 }
-
-// // OnStats
-// func (positionCollection *PositionCollection) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // NewComponentData -
 func (positionCollection *PositionCollection) NewComponentData() IComponentData {
