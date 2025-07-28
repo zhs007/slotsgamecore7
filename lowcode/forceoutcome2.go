@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"log/slog"
+	"slices"
 	"strings"
 
 	"github.com/google/cel-go/cel"
@@ -13,9 +14,10 @@ import (
 
 // ForceOutcome2 - 通过 results 来分析数据，所以只能做为临时变量用
 type ForceOutcome2 struct {
-	cel     *cel.Env
-	results []*sgc7game.PlayResult
-	program cel.Program
+	cel       *cel.Env
+	results   []*sgc7game.PlayResult
+	program   cel.Program
+	payTables *sgc7game.PayTables
 }
 
 func (fo2 *ForceOutcome2) SetScript(code string) error {
@@ -477,6 +479,68 @@ func (fo2 *ForceOutcome2) hasSamePosNext(src string, target string) bool {
 							if HasSamePos(v.GetPos(), tcd.GetPos()) {
 								return true
 							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func (fo2 *ForceOutcome2) hasSymbolsWinning(src string, symbols []string) bool {
+	if len(symbols) == 0 {
+		goutils.Error("ForceOutcome2.hasSymbolsWinning:empty symbols",
+			goutils.Err(ErrInvalidForceOutcome2Code))
+
+		return false
+	}
+
+	symbolCodes := make([]int, 0, len(symbols))
+	for _, v := range symbols {
+		symbolcode, isok := fo2.payTables.MapSymbols[v]
+		if !isok {
+			goutils.Error("ForceOutcome2.hasSymbolsWinning:payTables",
+				slog.String("symbol", v),
+				goutils.Err(ErrInvalidSymbol))
+
+			return false
+		}
+
+		symbolCodes = append(symbolCodes, symbolcode)
+	}
+
+	if src == "" {
+		for _, ret := range fo2.results {
+			for _, win := range ret.Results {
+				if slices.Contains(symbolCodes, win.Symbol) {
+					return true
+				}
+			}
+		}
+
+		return false
+	}
+
+	for _, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k, v := range gp.MapComponentData {
+				if isComponent(k, src) {
+					lst := v.GetResults()
+					for _, retIndex := range lst {
+						if retIndex < 0 || retIndex >= len(ret.Results) {
+							goutils.Error("ForceOutcome2.hasSymbolsWinning:invalid retIndex",
+								slog.Int("retIndex", retIndex),
+								goutils.Err(ErrInvalidForceOutcome2Code))
+
+							continue
+						}
+
+						if slices.Contains(symbolCodes, ret.Results[retIndex].Symbol) {
+							// 找到一个就可以了
+							return true
 						}
 					}
 				}
@@ -1002,6 +1066,28 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 				),
 			),
 		),
+		cel.Function("hasSymbolsWinning",
+			cel.Overload("hasSymbolsWinning_string_list",
+				[]*cel.Type{cel.StringType, cel.ListType(cel.StringType)},
+				cel.BoolType,
+				cel.FunctionBinding(func(params ...ref.Val) ref.Val {
+					if len(params) != 2 {
+						goutils.Error("ForceOutcome2.newScriptBasicFuncs:hasSymbolsWinning",
+							goutils.Err(ErrInvalidScriptParamsNumber))
+
+						return types.Int(0)
+					}
+
+					component := params[0].Value().(string)
+					arr := getStringSlice(params[1])
+
+					val := fo2.hasSymbolsWinning(component, arr)
+
+					return types.Bool(val)
+				},
+				),
+			),
+		),
 	}
 }
 
@@ -1031,4 +1117,22 @@ func NewForceOutcome2(code string) (*ForceOutcome2, error) {
 	}
 
 	return fo2, nil
+}
+
+func getStringSlice(val ref.Val) []string {
+	lst, isok := val.Value().([]ref.Val)
+
+	if isok {
+		arr := []string{}
+
+		for _, v := range lst {
+			v1 := v.Value().(string)
+
+			arr = append(arr, v1)
+		}
+
+		return arr
+	}
+
+	return nil
 }
