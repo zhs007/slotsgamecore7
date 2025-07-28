@@ -20,6 +20,10 @@ type ForceOutcome2 struct {
 	payTables *sgc7game.PayTables
 }
 
+func (fo2 *ForceOutcome2) SetPayTables(payTables *sgc7game.PayTables) {
+	fo2.payTables = payTables
+}
+
 func (fo2 *ForceOutcome2) SetScript(code string) error {
 	code = strings.Replace(code, "has(", "hasComponent(", -1)
 	ast, issues := fo2.cel.Compile(code)
