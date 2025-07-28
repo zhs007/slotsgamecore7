@@ -156,7 +156,6 @@ func ProcCheat(plugin sgc7plugin.IPlugin, cheat string) (*ForceOutcome2, error) 
 		} else {
 			if gAllowForceOutcome {
 				return NewForceOutcome2(cheat)
-				// return ParseForceOutcome(cheat), nil
 			}
 		}
 	}
