@@ -87,9 +87,20 @@ func (collectorData *Collector2Data) SetConfigIntVal(key string, val int) {
 	if key == CCVValueNum {
 		collectorData.Val = val
 	} else {
-		collectorData.BasicComponentData.ChgConfigIntVal(key, val)
+		collectorData.BasicComponentData.SetConfigIntVal(key, val)
 	}
 }
+
+// // ChgConfigIntVal -
+// func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
+// 	if key == CCVPickNum {
+// 		collectorData.Val += off
+// 	} else {
+// 		return collectorData.BasicComponentData.ChgConfigIntVal(key, off)
+// 	}
+
+// 	return collectorData.Val
+// }
 
 func (collectorData *Collector2Data) GetOutput() int {
 	return collectorData.Val
@@ -276,9 +287,83 @@ func (collector *Collector2) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *Game
 }
 
 func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+	cmd string, param string, ips sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 	ccd := cd.(*Collector2Data)
 	ccd.onNewStep()
+
+	if collector.Config.IsPlayerState {
+		ps, isok := ips.(*PlayerState)
+		if !isok {
+			goutils.Error("Collector2.OnPlayGame:PlayerState",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		betMethod := stake.CashBet / stake.CoinBet
+		bmd := ps.GetBetMethodPub(int(betMethod))
+		if bmd == nil {
+			goutils.Error("Collector2.OnPlayGame:GetBetMethodPub",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		bet := stake.CoinBet
+		if collector.Config.IsIgnoreBet {
+			bet = -1
+		}
+
+		cps := bmd.GetBetCPS(int(bet), collector.GetName())
+		if cps == nil {
+			goutils.Error("Collector2.OnPlayGame:GetBetCPS",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		cbps, isok := cps.(*Collector2PS)
+		if !isok {
+			goutils.Error("Collector2.OnPlayGame:Collector2PS",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		if collector.Config.IsForceTriggerController {
+			for ci := ccd.Val; ci >= 0; ci-- {
+				strCurVal := fmt.Sprintf("%d", ci)
+				_, isok := collector.Config.MapAwards[strCurVal]
+				if isok {
+					collector.ProcControllers(gameProp, plugin, curpr, gp, ci, strCurVal)
+
+					break
+				}
+			}
+		}
+
+		ccd.Val = cbps.Value
+
+		off, isok := ccd.GetConfigIntVal(CCVValueNum)
+		if isok {
+			err := collector.add(plugin, off, ccd, gameProp, curpr, gp, false)
+			if err != nil {
+				goutils.Error("Collector2.OnPlayGame:add:off",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ccd.ClearConfigIntVal(CCVValueNum)
+		}
+
+		cbps.Value = ccd.Val
+
+		nc := collector.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
+	}
+
 	off, isok := ccd.GetConfigIntVal(CCVValueNum)
 	if isok {
 		err := collector.add(plugin, off, ccd, gameProp, curpr, gp, false)
@@ -289,7 +374,9 @@ func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.
 		}
 		ccd.ClearConfigIntVal(CCVValueNum)
 	}
+
 	nc := collector.onStepEnd(gameProp, curpr, gp, "")
+
 	return nc, nil
 }
 
