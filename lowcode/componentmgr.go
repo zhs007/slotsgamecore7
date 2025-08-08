@@ -121,6 +121,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(QueueBranchTypeName, NewQueueBranch)
 	mgr.Reg(SymbolCollection2TypeName, NewSymbolCollection2)
 	mgr.Reg(ReplaceReelWithMaskTypeName, NewReplaceReelWithMask)
+	mgr.Reg(SymbolExplanderTypeName, NewSymbolExplander)
 	mgr.Reg(PiggyBankTypeName, NewPiggyBank)
 	mgr.Reg(AddSymbolsTypeName, NewAddSymbols)
 	mgr.Reg(IntValMappingTypeName, NewIntValMapping)

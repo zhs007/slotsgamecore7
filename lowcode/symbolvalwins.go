@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -22,13 +23,17 @@ const SymbolValWinsTypeName = "symbolValWins"
 type SymbolValWinsType int
 
 const (
-	SVWTypeNormal    SymbolValWinsType = 0
-	SVWTypeCollector SymbolValWinsType = 1
+	SVWTypeNormal        SymbolValWinsType = 0
+	SVWTypeCollector     SymbolValWinsType = 1
+	SVWTypeReelCollector SymbolValWinsType = 2
 )
 
 func parseSymbolValWinsType(strType string) SymbolValWinsType {
-	if strType == "collector" {
+	switch strType {
+	case "collector":
 		return SVWTypeCollector
+	case "reelcollector":
+		return SVWTypeReelCollector
 	}
 
 	return SVWTypeNormal
@@ -206,7 +211,8 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 	if os != nil {
 		collectorpos := []int{}
 		mul := 0
-		if symbolValWins.Config.Type == SVWTypeCollector {
+		switch symbolValWins.Config.Type {
+		case SVWTypeCollector:
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
 					if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
@@ -216,7 +222,19 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					}
 				}
 			}
-		} else {
+		case SVWTypeReelCollector:
+			for x, arr := range gs.Arr {
+				for y, s := range arr {
+					if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
+						mul++
+
+						collectorpos = append(collectorpos, x, y)
+
+						break
+					}
+				}
+			}
+		default:
 			mul = 1
 		}
 
@@ -362,7 +380,7 @@ func (jcfg *jsonSymbolValWins) build() *SymbolValWinsConfig {
 		BetTypeString: jcfg.BetType,
 		WinMulti:      jcfg.WinMulti,
 		Symbols:       jcfg.Symbols,
-		StrType:       jcfg.Type,
+		StrType:       strings.ToLower(jcfg.Type),
 		CoinSymbols:   jcfg.CoinSymbols,
 	}
 

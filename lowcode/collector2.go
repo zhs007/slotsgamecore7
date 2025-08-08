@@ -20,6 +20,53 @@ import (
 
 const Collector2TypeName = "collector2"
 
+type Collector2PS struct {
+	Value int `json:"value"` // value
+}
+
+// SetPublicJson
+func (ps *Collector2PS) SetPublicJson(str string) error {
+	err := sonic.UnmarshalString(str, ps)
+	if err != nil {
+		goutils.Error("Collector2PS.SetPublicJson:UnmarshalString",
+			goutils.Err(err))
+
+		return err
+	}
+
+	return nil
+}
+
+// SetPrivateJson
+func (ps *Collector2PS) SetPrivateJson(str string) error {
+	return nil
+}
+
+// GetPublicJson
+func (ps *Collector2PS) GetPublicJson() string {
+	str, err := sonic.MarshalString(ps)
+	if err != nil {
+		goutils.Error("Collector2PS.GetPublicJson:MarshalString",
+			goutils.Err(err))
+
+		return ""
+	}
+
+	return str
+}
+
+// GetPrivateJson
+func (ps *Collector2PS) GetPrivateJson() string {
+	return ""
+}
+
+// Clone
+func (ps *Collector2PS) Clone() IComponentPS {
+	return &Collector2PS{
+		Value: ps.Value,
+	}
+}
+
 type Collector2Data struct {
 	BasicComponentData
 	Val          int // 当前总值, Current total value
@@ -40,9 +87,20 @@ func (collectorData *Collector2Data) SetConfigIntVal(key string, val int) {
 	if key == CCVValueNum {
 		collectorData.Val = val
 	} else {
-		collectorData.BasicComponentData.ChgConfigIntVal(key, val)
+		collectorData.BasicComponentData.SetConfigIntVal(key, val)
 	}
 }
+
+// // ChgConfigIntVal -
+// func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
+// 	if key == CCVPickNum {
+// 		collectorData.Val += off
+// 	} else {
+// 		return collectorData.BasicComponentData.ChgConfigIntVal(key, off)
+// 	}
+
+// 	return collectorData.Val
+// }
 
 func (collectorData *Collector2Data) GetOutput() int {
 	return collectorData.Val
@@ -72,12 +130,13 @@ func (collectorData *Collector2Data) BuildPBComponentData() proto.Message {
 }
 
 type Collector2Config struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	MaxVal               int                 `yaml:"maxVal" json:"maxVal"`
-	IsCycle              bool                `yaml:"isCycle" json:"isCycle"`
-	IsPlayerState        bool                `yaml:"isPlayerState" json:"isPlayerState"`
-	IsIgnoreBet          bool                `yaml:"isIgnoreBet" json:"isIgnoreBet"`
-	MapAwards            map[string][]*Award `yaml:"controllers" json:"controllers"`
+	BasicComponentConfig     `yaml:",inline" json:",inline"`
+	MaxVal                   int                 `yaml:"maxVal" json:"maxVal"`
+	IsCycle                  bool                `yaml:"isCycle" json:"isCycle"`
+	IsPlayerState            bool                `yaml:"isPlayerState" json:"isPlayerState"`
+	IsIgnoreBet              bool                `yaml:"isIgnoreBet" json:"isIgnoreBet"`
+	IsForceTriggerController bool                `yaml:"isForceTriggerController" json:"isForceTriggerController"`
+	MapAwards                map[string][]*Award `yaml:"controllers" json:"controllers"`
 }
 
 func (cfg *Collector2Config) SetLinkComponent(link string, componentName string) {
@@ -228,9 +287,83 @@ func (collector *Collector2) onLevelUp(plugin sgc7plugin.IPlugin, gameProp *Game
 }
 
 func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+	cmd string, param string, ips sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 	ccd := cd.(*Collector2Data)
 	ccd.onNewStep()
+
+	if collector.Config.IsPlayerState {
+		ps, isok := ips.(*PlayerState)
+		if !isok {
+			goutils.Error("Collector2.OnPlayGame:PlayerState",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		betMethod := stake.CashBet / stake.CoinBet
+		bmd := ps.GetBetMethodPub(int(betMethod))
+		if bmd == nil {
+			goutils.Error("Collector2.OnPlayGame:GetBetMethodPub",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		bet := stake.CoinBet
+		if collector.Config.IsIgnoreBet {
+			bet = -1
+		}
+
+		cps := bmd.GetBetCPS(int(bet), collector.GetName())
+		if cps == nil {
+			goutils.Error("Collector2.OnPlayGame:GetBetCPS",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		cbps, isok := cps.(*Collector2PS)
+		if !isok {
+			goutils.Error("Collector2.OnPlayGame:Collector2PS",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return "", ErrInvalidPlayerState
+		}
+
+		if collector.Config.IsForceTriggerController {
+			for ci := ccd.Val; ci >= 0; ci-- {
+				strCurVal := fmt.Sprintf("%d", ci)
+				_, isok := collector.Config.MapAwards[strCurVal]
+				if isok {
+					collector.ProcControllers(gameProp, plugin, curpr, gp, ci, strCurVal)
+
+					break
+				}
+			}
+		}
+
+		ccd.Val = cbps.Value
+
+		off, isok := ccd.GetConfigIntVal(CCVValueNum)
+		if isok {
+			err := collector.add(plugin, off, ccd, gameProp, curpr, gp, false)
+			if err != nil {
+				goutils.Error("Collector2.OnPlayGame:add:off",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			ccd.ClearConfigIntVal(CCVValueNum)
+		}
+
+		cbps.Value = ccd.Val
+
+		nc := collector.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
+	}
+
 	off, isok := ccd.GetConfigIntVal(CCVValueNum)
 	if isok {
 		err := collector.add(plugin, off, ccd, gameProp, curpr, gp, false)
@@ -241,7 +374,9 @@ func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.
 		}
 		ccd.ClearConfigIntVal(CCVValueNum)
 	}
+
 	nc := collector.onStepEnd(gameProp, curpr, gp, "")
+
 	return nc, nil
 }
 
@@ -278,6 +413,46 @@ func (collector *Collector2) IsNeedOnStepEndStats2() bool {
 	return true
 }
 
+// InitPlayerState -
+func (collector *Collector2) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	ps *PlayerState, betMethod int, bet int) error {
+
+	if collector.Config.IsPlayerState {
+		bmd := ps.GetBetMethodPub(betMethod)
+		if bet <= 0 {
+			return nil
+		}
+
+		// 如果忽略下注，这时只处理 bet 为 -1 的情况
+		if collector.Config.IsIgnoreBet {
+			bet = -1
+		}
+
+		bps := bmd.GetBetPS(bet)
+
+		cname := collector.GetName()
+
+		_, isok := bps.MapComponentData[cname]
+		if !isok {
+			str, isok := bps.MapString[cname]
+			if isok {
+				cps := &Collector2PS{}
+				cps.SetPublicJson(str)
+
+				bps.MapComponentData[cname] = cps
+			} else {
+				cps := &Collector2PS{
+					Value: 0,
+				}
+
+				bps.MapComponentData[cname] = cps
+			}
+		}
+	}
+
+	return nil
+}
+
 func NewCollector2(name string) IComponent {
 	collector := &Collector2{
 		BasicComponent: NewBasicComponent(name, 1),
@@ -287,22 +462,25 @@ func NewCollector2(name string) IComponent {
 
 // "maxVal": 20,
 // "isCycle": false,
-// "IsPlayerState": true,
-// "IsIgnoreBet": true
+// "isPlayerState": true,
+// "isIgnoreBet": true,
+// "isForceTriggerController": true
 
 type jsonCollector2 struct {
-	MaxVal        int  `json:"maxVal"`
-	IsCycle       bool `json:"isCycle"`
-	IsPlayerState bool `json:"IsPlayerState"`
-	IsIgnoreBet   bool `json:"IsIgnoreBet"`
+	MaxVal                   int  `json:"maxVal"`
+	IsCycle                  bool `json:"isCycle"`
+	IsPlayerState            bool `json:"isPlayerState"`
+	IsIgnoreBet              bool `json:"isIgnoreBet"`
+	IsForceTriggerController bool `json:"isForceTriggerController"`
 }
 
 func (jcfg *jsonCollector2) build() *Collector2Config {
 	cfg := &Collector2Config{
-		MaxVal:        jcfg.MaxVal,
-		IsCycle:       jcfg.IsCycle,
-		IsPlayerState: jcfg.IsPlayerState,
-		IsIgnoreBet:   jcfg.IsIgnoreBet,
+		MaxVal:                   jcfg.MaxVal,
+		IsCycle:                  jcfg.IsCycle,
+		IsPlayerState:            jcfg.IsPlayerState,
+		IsIgnoreBet:              jcfg.IsIgnoreBet,
+		IsForceTriggerController: jcfg.IsForceTriggerController,
 	}
 	return cfg
 }
