@@ -66,7 +66,7 @@ func main() {
 
 	ret3, err := client.PlayGame(context.Background(), "moonwalk", ret2.PlayerState, "", &sgc7pb.Stake{
 		CoinBet:  1,
-		CashBet:  20,
+		CashBet:  10,
 		Currency: "EUR",
 	}, "", "")
 	if err != nil {
@@ -81,7 +81,7 @@ func main() {
 
 	ret4, err := client.PlayGame(context.Background(), "moonwalk", ret3.Play.PlayerState, "", &sgc7pb.Stake{
 		CoinBet:  2,
-		CashBet:  40,
+		CashBet:  20,
 		Currency: "EUR",
 	}, "", "")
 	if err != nil {
@@ -96,7 +96,7 @@ func main() {
 
 	ret5, err := client.PlayGame(context.Background(), "moonwalk", ret4.Play.PlayerState, "", &sgc7pb.Stake{
 		CoinBet:  3,
-		CashBet:  60,
+		CashBet:  30,
 		Currency: "EUR",
 	}, "", "")
 	if err != nil {
@@ -104,6 +104,23 @@ func main() {
 			goutils.Err(err))
 
 		return
+	}
+
+	ps := ret5.Play.PlayerState
+	for range 100000 {
+		curret, err := client.PlayGame(context.Background(), "moonwalk", ps, "", &sgc7pb.Stake{
+			CoinBet:  3,
+			CashBet:  30,
+			Currency: "EUR",
+		}, "", "")
+		if err != nil {
+			goutils.Error("PlayGame error",
+				goutils.Err(err))
+
+			return
+		}
+
+		ps = curret.Play.PlayerState
 	}
 
 	goutils.Info("PlayGame",

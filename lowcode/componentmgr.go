@@ -168,6 +168,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WinResultLimiterTypeName, NewWinResultLimiter)
 	mgr.Reg(SymbolValsSPTypeName, NewSymbolValsSP)
 	mgr.Reg(Collector2TypeName, NewCollector2)
+	mgr.Reg(DropDownSymbols2TypeName, NewDropDownSymbols2)
 
 	return mgr
 }

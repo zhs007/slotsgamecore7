@@ -492,20 +492,25 @@ func parseCollector2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 			goutils.Err(err))
 		return "", err
 	}
+
 	buf, err := cfg.MarshalJSON()
 	if err != nil {
 		goutils.Error("parseCollector2:MarshalJSON",
 			goutils.Err(err))
 		return "", err
 	}
+
 	data := &jsonCollector2{}
+
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
 		goutils.Error("parseCollector2:Unmarshal",
 			goutils.Err(err))
 		return "", err
 	}
+
 	cfgd := data.build()
+
 	if ctrls != nil {
 		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
@@ -517,12 +522,16 @@ func parseCollector2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 
 		cfgd.MapAwards = mapAwards
 	}
+
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
+
 	ccfg := &ComponentConfig{
 		Name: label,
 		Type: Collector2TypeName,
 	}
+
 	gamecfg.Components = append(gamecfg.Components, ccfg)
+
 	return label, nil
 }
