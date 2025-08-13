@@ -96,9 +96,6 @@ func (mgr *GameMgr) InitializeGamePlayer(gameCode string) (*sgc7pb.PlayerState, 
 	if !isok || gameD == nil || gameD.Game == nil || gameD.Service == nil {
 		goutils.Error("GameMgr.InitializeGamePlayer",
 			slog.String("gameCode", gameCode),
-			slog.Bool("gameD", gameD != nil),
-			slog.Bool("gameD.Game", gameD.Game != nil),
-			slog.Bool("gameD.Service", gameD.Service != nil),
 			slog.Int("game number", len(mgr.MapGames)),
 			goutils.Err(ErrInvalidGameCode))
 
