@@ -649,6 +649,11 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
 				}
+			case CCVValueNumNow:
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.OnUpdateDataWithPlayerState(gameProp.Pool, gameProp, plugin, curpr, gp, gp.ps, int(gp.stake.CashBet/gp.stake.CoinBet), int(gp.stake.CoinBet), gameProp.GetComponentDataWithName(componentName))
+				}
 			}
 		})
 		if err != nil {
@@ -682,6 +687,11 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
+				}
+			case CCVValueNumNow:
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.OnUpdateDataWithPlayerState(gameProp.Pool, gameProp, plugin, curpr, gp, gp.ps, int(gp.stake.CashBet/gp.stake.CoinBet), int(gp.stake.CoinBet), gameProp.GetComponentDataWithName(componentName))
 				}
 			}
 		})
@@ -791,6 +801,11 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
 				}
+			case CCVValueNumNow:
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.OnUpdateDataWithPlayerState(gameProp.Pool, gameProp, plugin, curpr, gp, gp.ps, int(gp.stake.CashBet/gp.stake.CoinBet), int(gp.stake.CoinBet), gameProp.GetComponentDataWithName(componentName))
+				}
 			}
 		})
 		if err != nil {
@@ -824,6 +839,11 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 				component := gameProp.Components.MapComponents[componentName]
 				if component != nil {
 					component.ClearData(gameProp.GetComponentDataWithName(componentName), true)
+				}
+			case CCVValueNumNow:
+				component := gameProp.Components.MapComponents[componentName]
+				if component != nil {
+					component.OnUpdateDataWithPlayerState(gameProp.Pool, gameProp, plugin, curpr, gp, gp.ps, int(gp.stake.CashBet/gp.stake.CoinBet), int(gp.stake.CoinBet), gameProp.GetComponentDataWithName(componentName))
 				}
 			}
 		})

@@ -464,7 +464,9 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 			return "", err
 		}
 
-		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		if ngs != gs {
+			chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		}
 	case CS2TypeSymbolWeight:
 		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, plugin, gs, pos, cd)
 		if err != nil {
@@ -540,7 +542,13 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, 
 		return nil, err
 	}
 
-	return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, curs.Int(), cd)
+	sc := curs.Int()
+
+	if sc != chgSymbols2.Config.BlankSymbolCode {
+		return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, sc, cd)
+	}
+
+	return gs, nil
 }
 
 // procEachPosRandomWithPos

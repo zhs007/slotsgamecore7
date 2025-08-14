@@ -114,6 +114,9 @@ type IComponent interface {
 	// NewPlayerState - new IComponentPS
 	NewPlayerState() IComponentPS
 
+	// OnUpdateDataWithPlayerState -
+	OnUpdateDataWithPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, ps *PlayerState, betMethod int, bet int, cd IComponentData)
+
 	//----------------------------
 	// ReelsCollector
 
