@@ -194,33 +194,38 @@ func (game *Game) SaveParSheet(f *excelize.File) error {
 		}
 	}
 
-	for vn, vw := range game.Pool.mapSymbolValWeights {
-		err = SaveSymbolWeights(f, vn, game.Cfg.PayTables, vw)
-		if err != nil {
-			goutils.Error("Game.SaveParSheet:SaveSymbolWeights",
-				goutils.Err(err))
+	for key, val := range game.Pool.mapUsedWeights {
+		switch val {
+		case "symbol":
+			vw := game.Pool.mapIntValWeights[key]
 
-			return err
-		}
-	}
+			err = SaveSymbolWeights(f, key, game.Pool.DefaultPaytables, vw)
+			if err != nil {
+				goutils.Error("Game.SaveParSheet:SaveSymbolWeights",
+					goutils.Err(err))
 
-	for vn, vw := range game.Pool.mapIntValWeights {
-		err = SaveIntWeights(f, vn, vw)
-		if err != nil {
-			goutils.Error("Game.SaveParSheet:SaveIntWeights",
-				goutils.Err(err))
+				return err
+			}
+		case "int":
+			vw := game.Pool.mapIntValWeights[key]
 
-			return err
-		}
-	}
+			err = SaveIntWeights(f, key, vw)
+			if err != nil {
+				goutils.Error("Game.SaveParSheet:SaveIntWeights",
+					goutils.Err(err))
 
-	for vn, vw := range game.Pool.mapStrValWeights {
-		err = SaveStrWeights(f, vn, vw)
-		if err != nil {
-			goutils.Error("Game.SaveParSheet:SaveStrWeights",
-				goutils.Err(err))
+				return err
+			}
+		case "str":
+			vw := game.Pool.mapStrValWeights[key]
 
-			return err
+			err = SaveStrWeights(f, key, vw)
+			if err != nil {
+				goutils.Error("Game.SaveParSheet:SaveStrWeights",
+					goutils.Err(err))
+
+				return err
+			}
 		}
 	}
 
