@@ -163,6 +163,8 @@ type GameParams struct {
 	LastScene        *sgc7game.GameScene       `json:"-"`
 	LastOtherScene   *sgc7game.GameScene       `json:"-"`
 	MapComponentData map[string]IComponentData `json:"-"`
+	stake            *sgc7game.Stake           `json:"-"`
+	ps               *PlayerState              `json:"-"`
 }
 
 func (gp *GameParams) AddComponentData(name string, cd IComponentData) error {
@@ -201,9 +203,11 @@ func (gp *GameParams) SetGameProp(gameProp *GameProperty) error {
 	return nil
 }
 
-func NewGameParam() *GameParams {
+func NewGameParam(stake *sgc7game.Stake, ps *PlayerState) *GameParams {
 	return &GameParams{
 		MapComponentData: make(map[string]IComponentData),
+		stake:            stake,
+		ps:               ps,
 	}
 }
 

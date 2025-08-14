@@ -272,6 +272,11 @@ func (basicComponent *BasicComponent) NewPlayerState() IComponentPS {
 	return nil
 }
 
+// OnUpdateDataWithPlayerState -
+func (basicComponent *BasicComponent) OnUpdateDataWithPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, ps *PlayerState, betMethod int, bet int, cd IComponentData) {
+
+}
+
 func (basicComponent *BasicComponent) ChgReelsCollector(icd IComponentData, ps *PlayerState, betMethod int, bet int, reelsData []int) {
 
 }

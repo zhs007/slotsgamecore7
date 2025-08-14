@@ -110,6 +110,7 @@ func (collectorData *Collector2Data) GetValEx(key string, getType GetComponentVa
 	if key == CVValue || key == CCValueNum {
 		return collectorData.Val, true
 	}
+
 	return 0, false
 }
 
@@ -451,6 +452,63 @@ func (collector *Collector2) InitPlayerState(pool *GamePropertyPool, gameProp *G
 	}
 
 	return nil
+}
+
+// OnUpdateDataWithPlayerState -
+func (collector *Collector2) OnUpdateDataWithPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, ps *PlayerState, betMethod int, bet int, cd IComponentData) {
+	if collector.Config.IsPlayerState {
+		bmd := ps.GetBetMethodPub(betMethod)
+		if bet <= 0 {
+			return
+		}
+
+		// 如果忽略下注，这时只处理 bet 为 -1 的情况
+		if collector.Config.IsIgnoreBet {
+			bet = -1
+		}
+
+		bps := bmd.GetBetPS(bet)
+
+		cname := collector.GetName()
+
+		ips, isok := bps.MapComponentData[cname]
+		if !isok {
+			goutils.Error("Collector2.OnUpdateDataWithPlayerState:MapComponentData",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return
+		}
+
+		cps, isok := ips.(*Collector2PS)
+		if !isok {
+			goutils.Error("Collector2.OnUpdateDataWithPlayerState:Collector2PS",
+				goutils.Err(ErrInvalidPlayerState))
+
+			return
+		}
+
+		cd2, isok := cd.(*Collector2Data)
+		if !isok {
+			goutils.Error("Collector2.OnUpdateDataWithPlayerState:Collector2Data",
+				goutils.Err(ErrInvalidComponentData))
+
+			return
+		}
+
+		off, isok := cd2.GetConfigIntVal(CCVValueNumNow)
+		if isok {
+			err := collector.add(plugin, off, cd2, gameProp, curpr, gp, false)
+			if err != nil {
+				goutils.Error("Collector2.OnPlayGame:add:off",
+					goutils.Err(err))
+				return
+			}
+
+			cd2.ClearConfigIntVal(CCVValueNumNow)
+
+			cps.Value = cd2.Val
+		}
+	}
 }
 
 func NewCollector2(name string) IComponent {

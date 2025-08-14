@@ -18,8 +18,8 @@ type BasicGameMod struct {
 }
 
 // OnPlay - on play
-func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult) (*sgc7game.PlayResult, *GameParams) {
-	gp := NewGameParam()
+func (bgm *BasicGameMod) newPlayResult(prs []*sgc7game.PlayResult, stake *sgc7game.Stake, ps *PlayerState) (*sgc7game.PlayResult, *GameParams) {
+	gp := NewGameParam(stake, ps)
 	gp.MapComponents = make(map[string]*anypb.Any)
 
 	pr := &sgc7game.PlayResult{
@@ -64,7 +64,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 	bgm.OnNewStep(gameProp, stake)
 
-	pr, gp := bgm.newPlayResult(prs)
+	pr, gp := bgm.newPlayResult(prs, stake, ps.(*PlayerState))
 
 	gameProp.SceneStack.onStepStart(pr)
 	gameProp.OtherSceneStack.onStepStart(pr)
