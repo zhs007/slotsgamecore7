@@ -15,11 +15,6 @@ type ComponentConfig struct {
 	Config string `yaml:"config"`
 }
 
-// type GameModConfig struct {
-// 	Type       string             `yaml:"type"`
-// 	Components []*ComponentConfig `yaml:"components"`
-// }
-
 type BetConfig struct {
 	Bet            int                              `yaml:"bet"`
 	TotalBetInWins int                              `yaml:"totalBetInWins"`
@@ -34,20 +29,6 @@ func (betCfg *BetConfig) Reset(start string, endings []string) {
 	betCfg.Start = start
 	betCfg.ForceEndings = endings
 }
-
-// type BetDataConfig struct {
-// 	mapConfig        map[string]any                   `yaml:"-"`
-// 	mapBasicConfig   map[string]*BasicComponentConfig `yaml:"-"`
-// 	mapIntValWeights map[string]*sgc7game.ValWeights2 `yaml:"-"`
-// }
-
-// func newBetDataConfig() *BetDataConfig {
-// 	return &BetDataConfig{
-// 		mapConfig:        make(map[string]any),
-// 		mapBasicConfig:   make(map[string]*BasicComponentConfig),
-// 		mapIntValWeights: make(map[string]*sgc7game.ValWeights2),
-// 	}
-// }
 
 type Config struct {
 	Name              string                           `yaml:"name"`
@@ -145,109 +126,3 @@ func (cfg *Config) GetDefaultLineData() *sgc7game.LineData {
 
 	return nil
 }
-
-// func LoadConfig(fn string) (*Config, error) {
-// 	data, err := os.ReadFile(fn)
-// 	if err != nil {
-// 		goutils.Error("LoadConfig:ReadFile",
-// 			slog.String("fn", fn),
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	cfg := &Config{}
-// 	err = yaml.Unmarshal(data, cfg)
-// 	if err != nil {
-// 		goutils.Error("LoadConfig:Unmarshal",
-// 			slog.String("fn", fn),
-// 			goutils.Err(err))
-
-// 		return nil, err
-// 	}
-
-// 	if len(cfg.Linedata) > 0 {
-// 		cfg.MapLinedate = make(map[string]*sgc7game.LineData)
-
-// 		for k, v := range cfg.Linedata {
-// 			ld, err := sgc7game.LoadLineDataFromExcel(cfg.GetPath(v, false))
-// 			if err != nil {
-// 				goutils.Error("LoadConfig:LoadLineDataFromExcel",
-// 					slog.String("key", k),
-// 					slog.String("linedatafn", v),
-// 					slog.String("fn", fn),
-// 					goutils.Err(err))
-
-// 				return nil, err
-// 			}
-
-// 			cfg.MapLinedate[k] = ld
-// 		}
-// 	}
-
-// 	cfg.MapPaytables = make(map[string]*sgc7game.PayTables)
-
-// 	for k, v := range cfg.Paytables {
-// 		pt, err := sgc7game.LoadPaytablesFromExcel(cfg.GetPath(v, false))
-// 		if err != nil {
-// 			goutils.Error("LoadConfig:LoadPaytablesFromExcel",
-// 				slog.String("key", k),
-// 				slog.String("paytablesfn", v),
-// 				slog.String("fn", fn),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-
-// 		cfg.MapPaytables[k] = pt
-// 	}
-
-// 	pt, isok := cfg.MapPaytables["main"]
-// 	if !isok {
-// 		if err != nil {
-// 			goutils.Error("LoadConfig",
-// 				slog.String("fn", fn),
-// 				goutils.Err(ErrMustHaveMainPaytables))
-
-// 			return nil, ErrMustHaveMainPaytables
-// 		}
-// 	}
-
-// 	if len(cfg.Reels) > 0 {
-// 		cfg.MapReels = make(map[string]*sgc7game.ReelsData)
-
-// 		// if cfg.IsIntReel {
-// 		// 	for k, v := range cfg.Reels {
-// 		// 		rd, err := sgc7game.LoadReelsFromExcel(cfg.GetPath(v, false))
-// 		// 		if err != nil {
-// 		// 			goutils.Error("LoadConfig:LoadReelsFromExcel",
-// 		// 				slog.String("key", k),
-// 		// 				slog.String("paytablesfn", v),
-// 		// 				slog.String("fn", fn),
-// 		// 				goutils.Err(err))
-
-// 		// 			return nil, err
-// 		// 		}
-
-// 		// 		cfg.MapReels[k] = rd
-// 		// 	}
-// 		// } else {
-// 		for k, v := range cfg.Reels {
-// 			rd, err := sgc7game.LoadReelsFromExcel2(cfg.GetPath(v, false), pt)
-// 			if err != nil {
-// 				goutils.Error("LoadConfig:LoadReelsFromExcel2",
-// 					slog.String("key", k),
-// 					slog.String("paytablesfn", v),
-// 					slog.String("fn", fn),
-// 					goutils.Err(err))
-
-// 				return nil, err
-// 			}
-
-// 			cfg.MapReels[k] = rd
-// 		}
-// 		// }
-// 	}
-
-// 	return cfg, nil
-// }

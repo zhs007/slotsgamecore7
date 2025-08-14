@@ -13,18 +13,18 @@ import (
 )
 
 type GamePropertyPool struct {
-	MapGamePropPool     map[int]*sync.Pool
-	Config              *Config
-	DefaultPaytables    *sgc7game.PayTables
-	DefaultLineData     *sgc7game.LineData
-	SymbolsViewer       *SymbolsViewer
-	MapSymbolColor      *asciigame.SymbolColorMap
-	mapComponents       map[int]*ComponentList
-	mapStrValWeights    map[string]*sgc7game.ValWeights2
-	mapIntValWeights    map[string]*sgc7game.ValWeights2
-	mapSymbolValWeights map[string]*sgc7game.ValWeights2
-	newRNG              FuncNewRNG
-	newFeatureLevel     FuncNewFeatureLevel
+	MapGamePropPool  map[int]*sync.Pool
+	Config           *Config
+	DefaultPaytables *sgc7game.PayTables
+	DefaultLineData  *sgc7game.LineData
+	SymbolsViewer    *SymbolsViewer
+	MapSymbolColor   *asciigame.SymbolColorMap
+	mapComponents    map[int]*ComponentList
+	mapStrValWeights map[string]*sgc7game.ValWeights2
+	mapIntValWeights map[string]*sgc7game.ValWeights2
+	newRNG           FuncNewRNG
+	newFeatureLevel  FuncNewFeatureLevel
+	mapUsedWeights   map[string]string // 用于标记哪些权重被使用过
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -50,168 +50,15 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		gameProp.SetVal(GamePropCurLineNum, len(gameProp.CurLineData.Lines))
 	}
 
-	// mapc, isok := pool.mapComponents[betMul]
-	// if !isok {
-	// 	goutils.Error("GamePropertyPool.newGameProp:mapComponents",
-	// 		slog.Int("betMul", betMul),
-	// 		goutils.Err(ErrInvalidBet))
-
-	// 	return nil
-	// }
-
-	// for k, v := range mapc.MapComponents {
-	// 	gameProp.MapComponentData[k] = v.NewComponentData()
-	// }
-
 	gameProp.SetVal(GamePropWidth, pool.Config.Width)
 	gameProp.SetVal(GamePropHeight, pool.Config.Height)
 
 	return gameProp
 }
 
-// func (pool *GamePropertyPool) NewGameProp(betMul int) (*GameProperty, error) {
-// 	gameProp := pool.newGameProp()
-
-// 	gameProp.SetVal(GamePropWidth, pool.Config.Width)
-// 	gameProp.SetVal(GamePropHeight, pool.Config.Height)
-
-// 	return gameProp, nil
-// }
-
 func (pool *GamePropertyPool) onAddComponentList(betMul int, components *ComponentList) {
 	pool.mapComponents[betMul] = components
 }
-
-// func (pool *GamePropertyPool) NewStatsWithConfig(betMul int, parent *sgc7stats.Feature, cfg *StatsConfig) (*sgc7stats.Feature, error) {
-// 	components, isok := pool.mapComponents[betMul]
-// 	if !isok {
-// 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			slog.Int("bet", betMul),
-// 			goutils.Err(ErrInvalidBet))
-
-// 		return nil, ErrInvalidBet
-// 	}
-
-// 	curComponent, isok := components.MapComponents[cfg.Component]
-// 	if !isok {
-// 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			goutils.Err(ErrInvalidStatsComponentInConfig))
-
-// 		return nil, ErrInvalidStatsComponentInConfig
-// 	}
-
-// 	feature := NewStatsFeature(parent, cfg.Name, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 		if cfg.IsNeedForceStats {
-// 			return true, s.CashBet, calcTotalCashWins(lst)
-// 		}
-
-// 		return curComponent.OnStats(f, s, lst)
-// 	}, pool.Config.Width, pool.Config.StatsSymbolCodes, StatusTypeUnknow, "")
-
-// 	for _, v := range cfg.Children {
-// 		_, err := pool.NewStatsWithConfig(betMul, feature, v)
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:NewStatsWithConfig",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	for k, v := range cfg.RespinEndingStatus {
-// 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinEnding, k)
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	for k, v := range cfg.RespinStartStatus {
-// 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStart, k)
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	for k, v := range cfg.RespinStartStatusEx {
-// 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStartEx, k)
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	for _, v := range cfg.RespinNumStatus {
-// 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinNum, "")
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	for _, v := range cfg.RespinWinStatus {
-// 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinWin, "")
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	for _, v := range cfg.RespinStartNumStatus {
-// 		_, err := pool.newStatusStats(betMul, feature, v, StatusTypeRespinStartNum, "")
-// 		if err != nil {
-// 			goutils.Error("GameProperty.NewStatsWithConfig:newStatusStats",
-// 				slog.Any("v", v),
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-// 	}
-
-// 	return feature, nil
-// }
-
-// func (pool *GamePropertyPool) newStatusStats(betMul int, parent *sgc7stats.Feature, componentName string, statusType int, respinName string) (*sgc7stats.Feature, error) {
-// 	components, isok := pool.mapComponents[betMul]
-// 	if !isok {
-// 		goutils.Error("GameProperty.newStatusStats",
-// 			slog.Int("bet", betMul),
-// 			goutils.Err(ErrInvalidBet))
-
-// 		return nil, ErrInvalidBet
-// 	}
-
-// 	curComponent, isok := components.MapComponents[componentName]
-// 	if !isok {
-// 		goutils.Error("GameProperty.NewStatsWithConfig",
-// 			goutils.Err(ErrInvalidStatsComponentInConfig))
-
-// 		return nil, ErrInvalidStatsComponentInConfig
-// 	}
-
-// 	feature := NewStatsFeature(parent, componentName, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 		return curComponent.OnStats(f, s, lst)
-// 	}, pool.Config.Width, pool.Config.StatsSymbolCodes, statusType, respinName)
-
-// 	return feature, nil
-// }
 
 func (pool *GamePropertyPool) loadAllWeights() {
 	for v, vw2 := range pool.Config.mapValWeights {
@@ -242,136 +89,21 @@ func (pool *GamePropertyPool) InitStats(betMul int) error {
 		return err
 	}
 
-	// if !gIsForceDisableStats && pool.Config.Stats != nil {
-	// 	statsTotal := sgc7stats.NewFeature("total", sgc7stats.FeatureBasic, func(f *sgc7stats.Feature, s *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-	// 		totalWin := int64(0)
-
-	// 		for _, v := range lst {
-	// 			totalWin += v.CashWin
-	// 		}
-
-	// 		return true, s.CashBet, totalWin
-	// 	}, nil)
-
-	// 	_, err := pool.NewStatsWithConfig(betMul, statsTotal, pool.Config.Stats)
-	// 	if err != nil {
-	// 		goutils.Error("GameProperty.InitStats:BuildStatsSymbolCodes",
-	// 			goutils.Err(err))
-
-	// 		return err
-	// 	}
-
-	// 	pool.Stats = NewStats(statsTotal, pool)
-	// 	pool.Stats.Bet = betMul
-
-	// 	go pool.Stats.StartWorker()
-	// }
-
 	return nil
 }
 
 // LoadStrWeights - load xlsx file
 func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
-	// if gJsonMode {
+	pool.mapUsedWeights[fn] = "str" // 标记这个权重被使用过
+
 	return pool.mapStrValWeights[fn], nil
-	// }
-
-	// pool.lock.RLock()
-	// vw, isok := pool.mapStrValWeights[fn]
-	// if isok {
-	// 	pool.lock.RUnlock()
-
-	// 	return vw, nil
-	// }
-	// pool.lock.RUnlock()
-
-	// if pool.Config.mapValWeights != nil {
-	// 	nvw := pool.Config.mapValWeights[fn]
-
-	// 	pool.lock.Lock()
-	// 	pool.mapStrValWeights[fn] = nvw
-	// 	pool.lock.Unlock()
-
-	// 	return nvw, nil
-	// }
-
-	// vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewStrVal)
-	// if err != nil {
-	// 	goutils.Error("GamePropertyPool.LoadStrWeights:LoadValWeights2FromExcel",
-	// 		slog.String("fn", fn),
-	// 		goutils.Err(err))
-
-	// 	return nil, err
-	// }
-
-	// pool.lock.Lock()
-	// pool.mapStrValWeights[fn] = vw2
-	// pool.lock.Unlock()
-
-	// return vw2, nil
 }
 
 // LoadIntWeights - load xlsx file
 func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
-	// if gJsonMode {
+	pool.mapUsedWeights[fn] = "int" // 标记这个权重被使用过
+
 	return pool.mapIntValWeights[fn], nil
-	// }
-
-	// pool.lock.RLock()
-	// vw, isok := pool.mapIntValWeights[fn]
-	// if isok {
-	// 	pool.lock.RUnlock()
-
-	// 	return vw, nil
-	// }
-	// pool.lock.RUnlock()
-
-	// if pool.Config.mapValWeights != nil {
-	// 	vw := pool.Config.mapValWeights[fn]
-
-	// 	vals := make([]sgc7game.IVal, len(vw.Vals))
-
-	// 	for _, v := range vw.Vals {
-	// 		i64, err := goutils.String2Int64(v.String())
-	// 		if err != nil {
-	// 			goutils.Error("GamePropertyPool.LoadIntWeights:String2Int64",
-	// 				goutils.Err(err))
-
-	// 			return nil, err
-	// 		}
-
-	// 		vals = append(vals, sgc7game.NewIntValEx[int](int(i64)))
-	// 	}
-
-	// 	nvw, err := sgc7game.NewValWeights2(vals, vw.Weights)
-	// 	if err != nil {
-	// 		goutils.Error("GamePropertyPool.LoadIntWeights:NewValWeights2",
-	// 			goutils.Err(err))
-
-	// 		return nil, err
-	// 	}
-
-	// 	pool.lock.Lock()
-	// 	pool.mapIntValWeights[fn] = nvw
-	// 	pool.lock.Unlock()
-
-	// 	return nvw, nil
-	// }
-
-	// vw2, err := sgc7game.LoadValWeights2FromExcel(pool.Config.GetPath(fn, useFileMapping), "val", "weight", sgc7game.NewIntVal[int])
-	// if err != nil {
-	// 	goutils.Error("GamePropertyPool.LoadIntWeights:LoadValWeights2FromExcel",
-	// 		slog.String("fn", fn),
-	// 		goutils.Err(err))
-
-	// 	return nil, err
-	// }
-
-	// pool.lock.Lock()
-	// pool.mapIntValWeights[fn] = vw2
-	// pool.lock.Unlock()
-
-	// return vw2, nil
 }
 
 // LoadSymbolWeights - load xlsx file
@@ -381,6 +113,8 @@ func (pool *GamePropertyPool) LoadIntMapping(fn string) *sgc7game.ValMapping2 {
 
 // LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
+	pool.mapUsedWeights[fn] = "symbol" // 标记这个权重被使用过
+
 	return pool.mapIntValWeights[fn], nil
 }
 
@@ -395,14 +129,6 @@ func (pool *GamePropertyPool) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *Ga
 	}
 
 	cd := gameProp.GetComponentData(ic)
-	// im, isok := ic.(IMask)
-	// if !isok {
-	// 	goutils.Error("GamePropertyPool.SetMaskVal",
-	// 		slog.String("name", name),
-	// 		goutils.Err(ErrNotMask))
-
-	// 	return ErrNotMask
-	// }
 
 	if cd != nil {
 		ic.SetMaskVal(plugin, gameProp, curpr, gp, cd, index, mask)
@@ -428,14 +154,6 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 	}
 
 	cd := gameProp.GetComponentData(ic)
-	// im, isok := ic.(IMask)
-	// if !isok {
-	// 	goutils.Error("GamePropertyPool.SetMaskVal",
-	// 		slog.String("name", name),
-	// 		goutils.Err(ErrNotMask))
-
-	// 	return ErrNotMask
-	// }
 
 	if cd != nil {
 		if isOnlyTrue {
@@ -452,23 +170,6 @@ func (pool *GamePropertyPool) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameP
 		goutils.Err(ErrInvalidComponent))
 
 	return ErrInvalidComponent
-
-	// im, isok := ic.(IMask)
-	// if !isok {
-	// 	goutils.Error("GamePropertyPool.SetMask",
-	// 		slog.String("name", name),
-	// 		goutils.Err(ErrNotMask))
-
-	// 	return ErrNotMask
-	// }
-
-	// if isOnlyTrue {
-	// 	im.SetMaskOnlyTrue(plugin, gameProp, curpr, gp, mask)
-	// } else {
-	// 	im.SetMask(plugin, gameProp, curpr, gp, mask)
-	// }
-
-	// return nil
 }
 
 func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bool, error) {
@@ -489,17 +190,6 @@ func (pool *GamePropertyPool) GetMask(name string, gameProp *GameProperty) ([]bo
 	goutils.Error("GamePropertyPool.GetMask",
 		slog.String("name", name),
 		goutils.Err(ErrInvalidComponent))
-
-	// im, isok := ic.(IMask)
-	// if !isok {
-	// 	goutils.Error("GamePropertyPool.GetMask",
-	// 		slog.String("name", name),
-	// 		goutils.Err(ErrNotMask))
-
-	// 	return nil, ErrNotMask
-	// }
-
-	// mask := im.GetMask(gameProp)
 
 	return nil, ErrInvalidComponent
 }
@@ -593,16 +283,16 @@ func (pool *GamePropertyPool) ChgReelsCollector(gameProp *GameProperty, name str
 
 func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLevel FuncNewFeatureLevel) (*GamePropertyPool, error) {
 	pool := &GamePropertyPool{
-		MapGamePropPool:     make(map[int]*sync.Pool),
-		Config:              cfg,
-		DefaultPaytables:    cfg.GetDefaultPaytables(),
-		DefaultLineData:     cfg.GetDefaultLineData(),
-		mapComponents:       make(map[int]*ComponentList),
-		mapStrValWeights:    make(map[string]*sgc7game.ValWeights2),
-		mapIntValWeights:    make(map[string]*sgc7game.ValWeights2),
-		mapSymbolValWeights: make(map[string]*sgc7game.ValWeights2),
-		newRNG:              funcNewRNG,
-		newFeatureLevel:     funcNewFeatureLevel,
+		MapGamePropPool:  make(map[int]*sync.Pool),
+		Config:           cfg,
+		DefaultPaytables: cfg.GetDefaultPaytables(),
+		DefaultLineData:  cfg.GetDefaultLineData(),
+		mapComponents:    make(map[int]*ComponentList),
+		mapStrValWeights: make(map[string]*sgc7game.ValWeights2),
+		mapIntValWeights: make(map[string]*sgc7game.ValWeights2),
+		newRNG:           funcNewRNG,
+		newFeatureLevel:  funcNewFeatureLevel,
+		mapUsedWeights:   make(map[string]string), // 用于标记哪些权重被使用过
 	}
 
 	if cfg.SymbolsViewer == "" {
