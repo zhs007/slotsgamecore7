@@ -332,7 +332,7 @@ func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.
 		}
 
 		if collector.Config.IsForceTriggerController {
-			for ci := ccd.Val; ci >= 0; ci-- {
+			for ci := cbps.Value; ci >= 0; ci-- {
 				strCurVal := fmt.Sprintf("%d", ci)
 				_, isok := collector.Config.MapAwards[strCurVal]
 				if isok {
