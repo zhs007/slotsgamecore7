@@ -32,35 +32,6 @@ func (mgr *ComponentMgr) NewComponent(cfgComponent *ComponentConfig) IComponent 
 	return nil
 }
 
-// // LoadPB
-// func (mgr *ComponentMgr) LoadPB(pb *anypb.Any) (IComponentData, error) {
-// 	funcCD, isok := mgr.MapComponentData[pb.TypeUrl]
-// 	if isok {
-// 		icd := funcCD()
-// 		if icd == nil {
-// 			goutils.Error("ComponentMgr.LoadPB",
-// 				goutils.Err(ErrInvalidFuncNewComponentData))
-
-// 			return nil, ErrInvalidFuncNewComponentData
-// 		}
-
-// 		err := icd.LoadPB(pb)
-// 		if icd == nil {
-// 			goutils.Error("ComponentMgr.LoadPB:LoadPB",
-// 				goutils.Err(err))
-
-// 			return nil, err
-// 		}
-
-// 		return icd, nil
-// 	}
-
-// 	goutils.Error("ComponentMgr.LoadPB",
-// 		goutils.Err(ErrInvalidAnypbTypeURL))
-
-// 	return nil, ErrInvalidAnypbTypeURL
-// }
-
 func NewComponentMgr() *ComponentMgr {
 	mgr := &ComponentMgr{
 		MapComponent:     make(map[string]FuncNewComponent),
@@ -68,31 +39,20 @@ func NewComponentMgr() *ComponentMgr {
 	}
 
 	mgr.Reg(BasicReelsTypeName, NewBasicReels)
-	// mgr.Reg(MysteryTypeName, NewMystery)
-	// mgr.Reg(BasicWinsTypeName, NewBasicWins)
-	// mgr.Reg(LightningTypeName, NewLightning)
-	// mgr.Reg(MultiLevelReelsTypeName, NewMultiLevelReels)
 	mgr.Reg(CollectorTypeName, NewCollector)
-	// mgr.Reg(MultiLevelMysteryTypeName, NewMultiLevelMystery)
-	// mgr.Reg(BookOfTypeName, NewBookOf)
 	mgr.Reg(SymbolMultiTypeName, NewSymbolMulti)
 	mgr.Reg(SymbolValTypeName, NewSymbolVal)
 	mgr.Reg(SymbolValWinsTypeName, NewSymbolValWins)
 	mgr.Reg(SymbolVal2TypeName, NewSymbolVal2)
 	mgr.Reg(OverlaySymbolTypeName, NewOverlaySymbol)
-	// mgr.Reg(ReelSetMysteryTypeName, NewReelSetMystery)
 	mgr.Reg(WeightTriggerTypeName, NewWeightTrigger)
 	mgr.Reg(ChgSymbolTypeName, NewChgSymbol)
 	mgr.Reg(RespinTypeName, NewRespin)
 	mgr.Reg(MultiRespinTypeName, NewMultiRespin)
 	mgr.Reg(ReplaceSymbolTypeName, NewReplaceSymbol)
 	mgr.Reg(MaskTypeName, NewMask)
-	// mgr.Reg(MultiLevelReplaceReelTypeName, NewMultiLevelReplaceReel)
 	mgr.Reg(FixSymbolsTypeName, NewFixSymbols)
-	// mgr.Reg(SymbolCollectionTypeName, NewSymbolCollection)
 	mgr.Reg(WeightChgSymbolTypeName, NewWeightChgSymbol)
-	// mgr.Reg(BookOf2TypeName, NewBookOf2)
-	// mgr.Reg(SymbolTriggerTypeName, NewSymbolTrigger)
 	mgr.Reg(ReplaceReelTypeName, NewReplaceReel)
 	mgr.Reg(MoveSymbolTypeName, NewMoveSymbol)
 	mgr.Reg(MoveReelTypeName, NewMoveReel)
@@ -100,7 +60,6 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(ReRollReelTypeName, NewReRollReel)
 	mgr.Reg(MultiWeightAwardsTypeName, NewMultiWeightAwards)
 	mgr.Reg(MaskBranchTypeName, NewMaskBranch)
-	// mgr.Reg(Respin2TypeName, NewRespin2)
 	mgr.Reg(WeightTrigger2TypeName, NewWeightTrigger2)
 	mgr.Reg(SymbolModifierTypeName, NewSymbolModifier)
 	mgr.Reg(ComponentTriggerTypeName, NewComponentTrigger)
@@ -169,6 +128,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(SymbolValsSPTypeName, NewSymbolValsSP)
 	mgr.Reg(Collector2TypeName, NewCollector2)
 	mgr.Reg(DropDownSymbols2TypeName, NewDropDownSymbols2)
+	mgr.Reg(HoldAndRespinReelsTypeName, NewHoldAndRespinReels)
 
 	return mgr
 }
