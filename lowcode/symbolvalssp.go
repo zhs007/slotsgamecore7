@@ -25,7 +25,7 @@ const (
 	SVSPTypeNormal SymbolValsSPType = 0 // normal
 )
 
-func parseSymbolValsSPType(str string) SymbolValsSPType {
+func parseSymbolValsSPType(_ string) SymbolValsSPType {
 	return SVSPTypeNormal
 }
 
