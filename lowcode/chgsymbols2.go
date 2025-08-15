@@ -235,7 +235,7 @@ type ChgSymbols2 struct {
 }
 
 // Init -
-func (chgSymbols *ChgSymbols2) Init(fn string, pool *GamePropertyPool) error {
+func (chgSymbols2 *ChgSymbols2) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("ChgSymbols2.Init:ReadFile",
@@ -256,20 +256,20 @@ func (chgSymbols *ChgSymbols2) Init(fn string, pool *GamePropertyPool) error {
 		return err
 	}
 
-	return chgSymbols.InitEx(cfg, pool)
+	return chgSymbols2.InitEx(cfg, pool)
 }
 
 // InitEx -
-func (chgSymbols *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
-	chgSymbols.Config = cfg.(*ChgSymbols2Config)
-	chgSymbols.Config.ComponentType = ChgSymbols2TypeName
+func (chgSymbols2 *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
+	chgSymbols2.Config = cfg.(*ChgSymbols2Config)
+	chgSymbols2.Config.ComponentType = ChgSymbols2TypeName
 
-	chgSymbols.Config.SrcType = parseChgSymbols2SourceType(chgSymbols.Config.StrSrcType)
-	chgSymbols.Config.SrcSymbolType = parseChgSymbols2SourceSymbolType(chgSymbols.Config.StrSrcSymbolType)
-	chgSymbols.Config.Type = parseChgSymbols2Type(chgSymbols.Config.StrType)
-	chgSymbols.Config.ExitType = parseChgSymbols2ExitType(chgSymbols.Config.StrExitType)
+	chgSymbols2.Config.SrcType = parseChgSymbols2SourceType(chgSymbols2.Config.StrSrcType)
+	chgSymbols2.Config.SrcSymbolType = parseChgSymbols2SourceSymbolType(chgSymbols2.Config.StrSrcSymbolType)
+	chgSymbols2.Config.Type = parseChgSymbols2Type(chgSymbols2.Config.StrType)
+	chgSymbols2.Config.ExitType = parseChgSymbols2ExitType(chgSymbols2.Config.StrExitType)
 
-	for _, s := range chgSymbols.Config.SrcSymbols {
+	for _, s := range chgSymbols2.Config.SrcSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("ChgSymbols2.InitEx:Symbol",
@@ -277,74 +277,80 @@ func (chgSymbols *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 				goutils.Err(ErrInvalidSymbol))
 		}
 
-		chgSymbols.Config.SrcSymbolCodes = append(chgSymbols.Config.SrcSymbolCodes, sc)
+		chgSymbols2.Config.SrcSymbolCodes = append(chgSymbols2.Config.SrcSymbolCodes, sc)
 	}
 
-	blankSymbolCode, isok := pool.DefaultPaytables.MapSymbols[chgSymbols.Config.BlankSymbol]
+	blankSymbolCode, isok := pool.DefaultPaytables.MapSymbols[chgSymbols2.Config.BlankSymbol]
 	if isok {
-		chgSymbols.Config.BlankSymbolCode = blankSymbolCode
+		chgSymbols2.Config.BlankSymbolCode = blankSymbolCode
 	} else {
-		chgSymbols.Config.BlankSymbolCode = -1
+		chgSymbols2.Config.BlankSymbolCode = -1
 	}
 
-	symbolCode, isok := pool.DefaultPaytables.MapSymbols[chgSymbols.Config.Symbol]
+	symbolCode, isok := pool.DefaultPaytables.MapSymbols[chgSymbols2.Config.Symbol]
 	if isok {
-		chgSymbols.Config.SymbolCode = symbolCode
+		chgSymbols2.Config.SymbolCode = symbolCode
 	} else {
-		chgSymbols.Config.SymbolCode = -1
+		chgSymbols2.Config.SymbolCode = -1
 	}
 
-	if chgSymbols.Config.SrcSymbolWeight != "" {
-		vw2, err := pool.LoadIntWeights(chgSymbols.Config.SrcSymbolWeight, true)
+	if chgSymbols2.Config.SrcSymbolWeight != "" {
+		vw2, err := pool.LoadIntWeights(chgSymbols2.Config.SrcSymbolWeight, true)
 		if err != nil {
 			goutils.Error("ChgSymbols2.InitEx:LoadIntWeights",
-				slog.String("SourceWeight", chgSymbols.Config.SrcSymbolWeight),
+				slog.String("SourceWeight", chgSymbols2.Config.SrcSymbolWeight),
 				goutils.Err(err))
 
 			return err
 		}
 
-		chgSymbols.Config.SrcSymbolWeightVW2 = vw2
+		chgSymbols2.Config.SrcSymbolWeightVW2 = vw2
 	}
 
-	if chgSymbols.Config.Weight != "" {
-		vw2, err := pool.LoadIntWeights(chgSymbols.Config.Weight, chgSymbols.Config.UseFileMapping)
+	if chgSymbols2.Config.Weight != "" {
+		vw2, err := pool.LoadIntWeights(chgSymbols2.Config.Weight, chgSymbols2.Config.UseFileMapping)
 		if err != nil {
 			goutils.Error("ChgSymbols2.InitEx:LoadIntWeights",
-				slog.String("Weight", chgSymbols.Config.Weight),
+				slog.String("Weight", chgSymbols2.Config.Weight),
 				goutils.Err(err))
 
 			return err
 		}
 
-		chgSymbols.Config.WeightVW2 = vw2
+		chgSymbols2.Config.WeightVW2 = vw2
 	}
 
-	for _, ctrls := range chgSymbols.Config.MapControllers {
+	for _, ctrls := range chgSymbols2.Config.MapControllers {
 		for _, ctrl := range ctrls {
 			ctrl.Init()
 		}
 	}
 
-	chgSymbols.onInit(&chgSymbols.Config.BasicComponentConfig)
+	chgSymbols2.onInit(&chgSymbols2.Config.BasicComponentConfig)
 
 	return nil
 }
 
-func (chgSymbols *ChgSymbols2) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+func (chgSymbols2 *ChgSymbols2) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(CCVWeight)
 	if str != "" {
-		vw2, _ := gameProp.Pool.LoadIntWeights(str, true)
+		vw2, err := gameProp.Pool.LoadIntWeights(str, true)
+		if err != nil {
+			goutils.Error("ChgSymbols2.getWeight:LoadIntWeights",
+				goutils.Err(err))
+
+			return nil
+		}
 
 		return vw2
 	}
 
-	return chgSymbols.Config.WeightVW2
+	return chgSymbols2.Config.WeightVW2
 }
 
 // OnProcControllers -
-func (chgSymbols *ChgSymbols2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	ctrls, isok := chgSymbols.Config.MapControllers[strVal]
+func (chgSymbols2 *ChgSymbols2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	ctrls, isok := chgSymbols2.Config.MapControllers[strVal]
 	if isok {
 		gameProp.procAwards(plugin, ctrls, curpr, gp)
 	}
@@ -430,12 +436,12 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 }
 
 // procPos
-func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	_ sgc7game.IPlayerState, _ *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbols2Data) (string, error) {
 
-	gs := chgSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
+	gs := chgSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	pos, err := chgSymbols.getSrcPos(gameProp, plugin, gs)
+	pos, err := chgSymbols2.getSrcPos(gameProp, plugin, gs)
 	if err != nil {
 		goutils.Error("ChgSymbols2.procPos:getSrcPos",
 			goutils.Err(err))
@@ -444,23 +450,23 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 	}
 
 	if len(pos) == 0 {
-		if chgSymbols.Config.IsAlwaysGen {
+		if chgSymbols2.Config.IsAlwaysGen {
 			if gs != nil {
 				ngs := gs.CloneEx(gameProp.PoolScene)
 
-				chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+				chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 			}
 		}
 
-		nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, ErrComponentDoNothing
 	}
 
-	switch chgSymbols.Config.Type {
+	switch chgSymbols2.Config.Type {
 	case CS2TypeSymbol:
-		symbolCode := chgSymbols.Config.SymbolCode
-		ngs, err := chgSymbols.procSymbolWithPos(gameProp, gs, pos, symbolCode, cd)
+		symbolCode := chgSymbols2.Config.SymbolCode
+		ngs, err := chgSymbols2.procSymbolWithPos(gameProp, gs, pos, symbolCode, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWithPos",
 				goutils.Err(err))
@@ -469,13 +475,13 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 		}
 
 		if ngs != gs {
-			chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+			chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-			chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1,
+			chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
 				gameProp.Pool.DefaultPaytables.GetStringFromInt(symbolCode))
 		}
 	case CS2TypeSymbolWeight:
-		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
+		ngs, err := chgSymbols2.procSymbolWeightWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWeightWithPos",
 				goutils.Err(err))
@@ -483,9 +489,9 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 			return "", err
 		}
 
-		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	case CS2TypeEachPosRandom:
-		ngs, err := chgSymbols.procEachPosRandomWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
+		ngs, err := chgSymbols2.procEachPosRandomWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procEachPosRandomWithPos",
 				goutils.Err(err))
@@ -493,12 +499,12 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 			return "", err
 		}
 
-		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	}
 
-	chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
+	chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
 
-	nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
 }
@@ -638,18 +644,18 @@ func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty,
 }
 
 // playgame
-func (chgSymbols *ChgSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (chgSymbols2 *ChgSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*ChgSymbols2Data)
 
 	cd.OnNewStep()
 
-	return chgSymbols.procPos(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
+	return chgSymbols2.procPos(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
 }
 
 // OnAsciiGame - outpur to asciigame
-func (chgSymbols *ChgSymbols2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+func (chgSymbols2 *ChgSymbols2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
 	cd := icd.(*ChgSymbols2Data)
 
@@ -661,19 +667,19 @@ func (chgSymbols *ChgSymbols2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.
 }
 
 // GetAllLinkComponents - get all link components
-func (chgSymbols *ChgSymbols2) GetAllLinkComponents() []string {
-	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
+func (chgSymbols2 *ChgSymbols2) GetAllLinkComponents() []string {
+	return []string{chgSymbols2.Config.DefaultNextComponent, chgSymbols2.Config.JumpToComponent}
 }
 
 // GetNextLinkComponents - get next link components
-func (chgSymbols *ChgSymbols2) GetNextLinkComponents() []string {
-	return []string{chgSymbols.Config.DefaultNextComponent, chgSymbols.Config.JumpToComponent}
+func (chgSymbols2 *ChgSymbols2) GetNextLinkComponents() []string {
+	return []string{chgSymbols2.Config.DefaultNextComponent, chgSymbols2.Config.JumpToComponent}
 }
 
 // NewComponentData -
-func (chgSymbols *ChgSymbols2) NewComponentData() IComponentData {
+func (chgSymbols2 *ChgSymbols2) NewComponentData() IComponentData {
 	return &ChgSymbols2Data{
-		cfg: chgSymbols.Config,
+		cfg: chgSymbols2.Config,
 	}
 }
 
@@ -763,7 +769,7 @@ func parseChgSymbols2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	if ctrls != nil {
 		mapControllers, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
-			goutils.Error("parseHoldAndRespinReels:parseAllAndStrMapControllers2",
+			goutils.Error("parseChgSymbols2:parseAllAndStrMapControllers2",
 				goutils.Err(err))
 
 			return "", err
