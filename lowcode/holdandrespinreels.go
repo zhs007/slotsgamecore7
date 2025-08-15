@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -21,20 +22,22 @@ const HoldAndRespinReelsTypeName = "holdAndRespinReels"
 type HoldAndRespinReelsType int
 
 const (
-	HARRTypeKeepReels   HoldAndRespinReelsType = 0 // keep reels
-	HARRTypeResetReels  HoldAndRespinReelsType = 1 // reset reels
-	HARRTypeRerollReels HoldAndRespinReelsType = 2 // reroll reels
+	HARTypeKeepReels   HoldAndRespinReelsType = 0 // keep reels
+	HARTypeResetReels  HoldAndRespinReelsType = 1 // reset reels
+	HARTypeRerollReels HoldAndRespinReelsType = 2 // reroll reels
 )
 
-func parseHoldAndRespinReelType(str string) HoldAndRespinReelsType {
+func parseHoldAndRespinReelsType(str string) HoldAndRespinReelsType {
+	str = strings.ToLower(str)
+
 	switch str {
 	case "resetreels":
-		return HARRTypeResetReels
+		return HARTypeResetReels
 	case "rerollreels":
-		return HARRTypeRerollReels
+		return HARTypeRerollReels
 	}
 
-	return HARRTypeKeepReels
+	return HARTypeKeepReels
 }
 
 type HoldAndRespinReelsData struct {
@@ -72,7 +75,10 @@ func (harData *HoldAndRespinReelsData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData returns a protobuf message representing this component's data.
+// Note: we intentionally reuse sgc7pb.WeightReelsData to carry BasicComponentData and ReelSetIndex
+// to avoid adding a new proto message for this small payload. If semantic separation is
+// required in the future, introduce a dedicated proto message for HoldAndRespinReelsData.
 func (harData *HoldAndRespinReelsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightReelsData{
 		BasicComponentData: harData.BuildPBBasicComponentData(),
@@ -82,7 +88,7 @@ func (harData *HoldAndRespinReelsData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// BasicReelsConfig - configuration for HoldAndRespinReels
+// HoldAndRespinReelsConfig - configuration for HoldAndRespinReels
 type HoldAndRespinReelsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string                 `yaml:"type" json:"type"`
@@ -91,7 +97,7 @@ type HoldAndRespinReelsConfig struct {
 	ReelSetsWeightVW     *sgc7game.ValWeights2  `json:"-"`
 	HoldReels            []bool                 `yaml:"holdReels" json:"holdReels"`
 	ReelSet              string                 `yaml:"reelSet" json:"reelSet"`
-	MapAwards            map[string][]*Award    `yaml:"controllers" json:"controllers"` // 新的奖励系统
+	MapControllers       map[string][]*Award    `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -133,10 +139,17 @@ func (har *HoldAndRespinReels) Init(fn string, pool *GamePropertyPool) error {
 
 // InitEx -
 func (har *HoldAndRespinReels) InitEx(cfg any, pool *GamePropertyPool) error {
-	har.Config = cfg.(*HoldAndRespinReelsConfig)
+	cfgd, ok := cfg.(*HoldAndRespinReelsConfig)
+	if !ok {
+		goutils.Error("HoldAndRespinReels.InitEx:InvalidConfigType",
+			slog.String("got", fmt.Sprintf("%T", cfg)))
+
+		return ErrInvalidComponent
+	}
+	har.Config = cfgd
 	har.Config.ComponentType = HoldAndRespinReelsTypeName
 
-	har.Config.Type = parseHoldAndRespinReelType(har.Config.StrType)
+	har.Config.Type = parseHoldAndRespinReelsType(har.Config.StrType)
 
 	if har.Config.ReelSetsWeight != "" {
 		vw2, err := pool.LoadStrWeights(har.Config.ReelSetsWeight, har.Config.UseFileMapping)
@@ -151,9 +164,9 @@ func (har *HoldAndRespinReels) InitEx(cfg any, pool *GamePropertyPool) error {
 		har.Config.ReelSetsWeightVW = vw2
 	}
 
-	for _, awards := range har.Config.MapAwards {
-		for _, award := range awards {
-			award.Init()
+	for _, ctrls := range har.Config.MapControllers {
+		for _, ctrl := range ctrls {
+			ctrl.Init()
 		}
 	}
 
@@ -165,7 +178,14 @@ func (har *HoldAndRespinReels) InitEx(cfg any, pool *GamePropertyPool) error {
 func (har *HoldAndRespinReels) getReelSetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(CCVReelSetWeight)
 	if str != "" {
-		vw2, _ := gameProp.Pool.LoadStrWeights(str, har.Config.UseFileMapping)
+		vw2, err := gameProp.Pool.LoadStrWeights(str, har.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("HoldAndRespinReels.getReelSetWeight:LoadStrWeights",
+				slog.String("str", str),
+				goutils.Err(err))
+
+			return nil
+		}
 
 		return vw2
 	}
@@ -185,9 +205,9 @@ func (har *HoldAndRespinReels) getReelSet(basicCD *BasicComponentData) string {
 // OnProcControllers -
 func (har *HoldAndRespinReels) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	if strVal != "" {
-		awards, isok := har.Config.MapAwards[strVal]
+		ctrls, isok := har.Config.MapControllers[strVal]
 		if isok {
-			gameProp.procAwards(plugin, awards, curpr, gp)
+			gameProp.procAwards(plugin, ctrls, curpr, gp)
 		}
 	}
 }
@@ -196,15 +216,27 @@ func (har *HoldAndRespinReels) ProcControllers(gameProp *GameProperty, plugin sg
 func (har *HoldAndRespinReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	hrd := icd.(*HoldAndRespinReelsData)
+	hrd, ok := icd.(*HoldAndRespinReelsData)
+	if !ok {
+		goutils.Error("HoldAndRespinReels.OnPlayGame:InvalidComponentData",
+			slog.String("type", fmt.Sprintf("%T", icd)))
+
+		return "", ErrInvalidComponent
+	}
 
 	hrd.onNewStep()
 
 	reelname := ""
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
+	if gs == nil {
+		goutils.Error("HoldAndRespinReels.OnPlayGame:GetTopSceneEx",
+			goutils.Err(ErrInvalidScene))
+
+		return "", ErrInvalidScene
+	}
 
 	switch har.Config.Type {
-	case HARRTypeKeepReels:
+	case HARTypeKeepReels:
 		reelname = gs.ReelName
 
 		rd, isok := gameProp.Pool.Config.MapReels[reelname]
@@ -222,7 +254,7 @@ func (har *HoldAndRespinReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7gam
 		sc.RandMaskReelsWithReelData(gameProp.CurReels, plugin, har.Config.HoldReels, true)
 
 		har.AddScene(gameProp, curpr, sc, &hrd.BasicComponentData)
-	case HARRTypeResetReels:
+	case HARTypeResetReels:
 		reelname = har.getReelSet(&hrd.BasicComponentData)
 
 		rd, isok := gameProp.Pool.Config.MapReels[reelname]
@@ -241,7 +273,7 @@ func (har *HoldAndRespinReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7gam
 		sc.ReelName = reelname
 
 		har.AddScene(gameProp, curpr, sc, &hrd.BasicComponentData)
-	case HARRTypeRerollReels:
+	case HARTypeRerollReels:
 		vw2 := har.getReelSetWeight(gameProp, &hrd.BasicComponentData)
 		if vw2 != nil {
 			val, si, err := vw2.RandValEx(plugin)
@@ -284,9 +316,15 @@ func (har *HoldAndRespinReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7gam
 	return nc, nil
 }
 
-// OnAsciiGame - outpur to asciigame
+// OnAsciiGame - output to asciigame
 func (har *HoldAndRespinReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	hrd := icd.(*HoldAndRespinReelsData)
+	hrd, ok := icd.(*HoldAndRespinReelsData)
+	if !ok {
+		goutils.Error("HoldAndRespinReels.OnAsciiGame:InvalidComponentData",
+			slog.String("type", fmt.Sprintf("%T", icd)))
+
+		return ErrInvalidComponent
+	}
 
 	if len(hrd.UsedScenes) > 0 {
 		asciigame.OutputScene("hold and respin symbols", pr.Scenes[hrd.UsedScenes[0]], mapSymbolColor)
@@ -376,7 +414,7 @@ func parseHoldAndRespinReels(gamecfg *BetConfig, cell *ast.Node) (string, error)
 	cfgd := data.build()
 
 	if ctrls != nil {
-		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
+		mapControllers, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
 			goutils.Error("parseHoldAndRespinReels:parseAllAndStrMapControllers2",
 				goutils.Err(err))
@@ -384,7 +422,7 @@ func parseHoldAndRespinReels(gamecfg *BetConfig, cell *ast.Node) (string, error)
 			return "", err
 		}
 
-		cfgd.MapAwards = mapAwards
+		cfgd.MapControllers = mapControllers
 	}
 
 	gamecfg.mapConfig[label] = cfgd
