@@ -204,11 +204,9 @@ func (har *HoldAndRespinReels) getReelSet(basicCD *BasicComponentData) string {
 
 // OnProcControllers -
 func (har *HoldAndRespinReels) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	if strVal != "" {
-		ctrls, isok := har.Config.MapControllers[strVal]
-		if isok {
-			gameProp.procAwards(plugin, ctrls, curpr, gp)
-		}
+	ctrls, isok := har.Config.MapControllers[strVal]
+	if isok {
+		gameProp.procAwards(plugin, ctrls, curpr, gp)
 	}
 }
 

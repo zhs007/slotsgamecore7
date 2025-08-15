@@ -215,7 +215,7 @@ type ChgSymbols2Config struct {
 	Symbol                string                      `yaml:"symbol" json:"symbol"`
 	SymbolCode            int                         `yaml:"-" json:"-"`
 	MaxNumber             int                         `yaml:"maxNumber" json:"maxNumber"`
-	Controllers           []*Award                    `yaml:"controllers" json:"controllers"`
+	MapControllers        map[string][]*Award         `yaml:"controllers" json:"controllers"`
 	JumpToComponent       string                      `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
 
@@ -320,8 +320,10 @@ func (chgSymbols *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 		chgSymbols.Config.WeightVW2 = vw2
 	}
 
-	for _, award := range chgSymbols.Config.Controllers {
-		award.Init()
+	for _, ctrls := range chgSymbols.Config.MapControllers {
+		for _, ctrl := range ctrls {
+			ctrl.Init()
+		}
 	}
 
 	chgSymbols.onInit(&chgSymbols.Config.BasicComponentConfig)
@@ -342,8 +344,9 @@ func (chgSymbols *ChgSymbols2) getWeight(gameProp *GameProperty, basicCD *BasicC
 
 // OnProcControllers -
 func (chgSymbols *ChgSymbols2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	if len(chgSymbols.Config.Controllers) > 0 {
-		gameProp.procAwards(plugin, chgSymbols.Config.Controllers, curpr, gp)
+	ctrls, isok := chgSymbols.Config.MapControllers[strVal]
+	if isok {
+		gameProp.procAwards(plugin, ctrls, curpr, gp)
 	}
 }
 
@@ -456,7 +459,8 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 
 	switch chgSymbols.Config.Type {
 	case CS2TypeSymbol:
-		ngs, err := chgSymbols.procSymbolWithPos(gameProp, gs, pos, chgSymbols.Config.SymbolCode, cd)
+		symbolCode := chgSymbols.Config.SymbolCode
+		ngs, err := chgSymbols.procSymbolWithPos(gameProp, gs, pos, symbolCode, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWithPos",
 				goutils.Err(err))
@@ -466,9 +470,12 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 
 		if ngs != gs {
 			chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+			chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1,
+				gameProp.Pool.DefaultPaytables.GetStringFromInt(symbolCode))
 		}
 	case CS2TypeSymbolWeight:
-		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, plugin, gs, pos, cd)
+		ngs, err := chgSymbols.procSymbolWeightWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWeightWithPos",
 				goutils.Err(err))
@@ -478,7 +485,7 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	case CS2TypeEachPosRandom:
-		ngs, err := chgSymbols.procEachPosRandomWithPos(gameProp, plugin, gs, pos, cd)
+		ngs, err := chgSymbols.procEachPosRandomWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procEachPosRandomWithPos",
 				goutils.Err(err))
@@ -489,7 +496,7 @@ func (chgSymbols *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.P
 		chgSymbols.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 	}
 
-	chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+	chgSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
 
 	nc := chgSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -530,8 +537,8 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 }
 
 // procSymbolWeightWithPos
-func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
-	gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
 
 	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
 	curs, err := vw2.RandVal(plugin)
@@ -545,6 +552,9 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, 
 	sc := curs.Int()
 
 	if sc != chgSymbols2.Config.BlankSymbolCode {
+		chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
+			gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
+
 		return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, sc, cd)
 	}
 
@@ -552,8 +562,8 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, 
 }
 
 // procEachPosRandomWithPos
-func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
-	gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
 
 	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
 
@@ -585,6 +595,10 @@ func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty,
 				cd.AddPos(x, y)
 
 				curnum++
+
+				chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
+					gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
+
 				if curnum >= chgSymbols2.Config.MaxNumber {
 					break
 				}
@@ -613,6 +627,9 @@ func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty,
 				ngs.Arr[x][y] = sc
 
 				cd.AddPos(x, y)
+
+				chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
+					gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
 			}
 		}
 	}
@@ -744,15 +761,15 @@ func parseChgSymbols2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd := data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(ctrls)
+		mapControllers, err := parseAllAndStrMapControllers2(ctrls)
 		if err != nil {
-			goutils.Error("parseClusterTrigger:parseControllers",
+			goutils.Error("parseHoldAndRespinReels:parseAllAndStrMapControllers2",
 				goutils.Err(err))
 
 			return "", err
 		}
 
-		cfgd.Controllers = awards
+		cfgd.MapControllers = mapControllers
 	}
 
 	gamecfg.mapConfig[label] = cfgd
