@@ -41,7 +41,7 @@ type SymbolExplander struct {
 }
 
 // Init -
-func (symbolExplander *SymbolExplander) Init(fn string, pool *GamePropertyPool) error {
+func (se *SymbolExplander) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolExplander.Init:ReadFile",
@@ -62,15 +62,15 @@ func (symbolExplander *SymbolExplander) Init(fn string, pool *GamePropertyPool) 
 		return err
 	}
 
-	return symbolExplander.InitEx(cfg, pool)
+	return se.InitEx(cfg, pool)
 }
 
 // InitEx -
-func (symbolExplander *SymbolExplander) InitEx(cfg any, pool *GamePropertyPool) error {
-	symbolExplander.Config = cfg.(*SymbolExplanderConfig)
-	symbolExplander.Config.ComponentType = SymbolExplanderTypeName
+func (se *SymbolExplander) InitEx(cfg any, pool *GamePropertyPool) error {
+	se.Config = cfg.(*SymbolExplanderConfig)
+	se.Config.ComponentType = SymbolExplanderTypeName
 
-	for _, s := range symbolExplander.Config.Symbols {
+	for _, s := range se.Config.Symbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("SymbolExplander.InitEx:Symbols.Symbol",
@@ -80,43 +80,43 @@ func (symbolExplander *SymbolExplander) InitEx(cfg any, pool *GamePropertyPool) 
 			return ErrInvalidSymbol
 		}
 
-		symbolExplander.Config.SymbolCodes = append(symbolExplander.Config.SymbolCodes, sc)
+		se.Config.SymbolCodes = append(se.Config.SymbolCodes, sc)
 	}
 
-	for _, award := range symbolExplander.Config.MapAwards {
+	for _, award := range se.Config.MapAwards {
 		for _, a := range award {
 			a.Init()
 		}
 	}
 
-	symbolExplander.onInit(&symbolExplander.Config.BasicComponentConfig)
+	se.onInit(&se.Config.BasicComponentConfig)
 
 	return nil
 }
 
 // OnProcControllers -
-func (symbolExplander *SymbolExplander) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	awards, isok := symbolExplander.Config.MapAwards[strVal]
+func (se *SymbolExplander) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, pr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	awards, isok := se.Config.MapAwards[strVal]
 	if isok {
-		gameProp.procAwards(plugin, awards, curpr, gp)
+		gameProp.procAwards(plugin, awards, pr, gp)
 	}
 }
 
 // playgame
-func (symbolExplander *SymbolExplander) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (se *SymbolExplander) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*BasicComponentData)
 
 	cd.UsedScenes = nil
-	lstSymbolCores := make([]int, 0, len(symbolExplander.Config.SymbolCodes))
+	lstSymbolCores := make([]int, 0, len(se.Config.SymbolCodes))
 
-	gs := symbolExplander.GetTargetScene3(gameProp, curpr, prs, 0)
+	gs := se.GetTargetScene3(gameProp, pr, prs, 0)
 	ngs := gs
 
 	for x, arr := range gs.Arr {
 		for _, s := range arr {
-			if goutils.IndexOfIntSlice(symbolExplander.Config.SymbolCodes, s, 0) >= 0 {
+			if goutils.IndexOfIntSlice(se.Config.SymbolCodes, s, 0) >= 0 {
 				if !slices.Contains(lstSymbolCores, s) {
 					lstSymbolCores = append(lstSymbolCores, s)
 				}
@@ -133,28 +133,28 @@ func (symbolExplander *SymbolExplander) OnPlayGame(gameProp *GameProperty, curpr
 	}
 
 	if len(lstSymbolCores) > 0 {
-		symbolExplander.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
+		se.ProcControllers(gameProp, plugin, pr, gp, 0, "<trigger>")
 
 		for _, sc := range lstSymbolCores {
-			symbolExplander.ProcControllers(gameProp, plugin, curpr, gp, 0, gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
+			se.ProcControllers(gameProp, plugin, pr, gp, 0, gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
 		}
 	}
 
 	if ngs == gs {
-		nc := symbolExplander.onStepEnd(gameProp, curpr, gp, "")
+		nc := se.onStepEnd(gameProp, pr, gp, "")
 
 		return nc, ErrComponentDoNothing
 	}
 
-	symbolExplander.AddScene(gameProp, curpr, ngs, cd)
+	se.AddScene(gameProp, pr, ngs, cd)
 
-	nc := symbolExplander.onStepEnd(gameProp, curpr, gp, symbolExplander.Config.JumpToComponent)
+	nc := se.onStepEnd(gameProp, pr, gp, se.Config.JumpToComponent)
 
 	return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolExplander *SymbolExplander) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+func (se *SymbolExplander) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	cd := icd.(*BasicComponentData)
 
 	if len(cd.UsedScenes) > 0 {

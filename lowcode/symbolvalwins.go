@@ -23,20 +23,20 @@ const SymbolValWinsTypeName = "symbolValWins"
 type SymbolValWinsType int
 
 const (
-	SVWTypeNormal        SymbolValWinsType = 0
-	SVWTypeCollector     SymbolValWinsType = 1
-	SVWTypeReelCollector SymbolValWinsType = 2
+	svwTypeNormal        SymbolValWinsType = 0
+	svwTypeCollector     SymbolValWinsType = 1
+	svwTypeReelCollector SymbolValWinsType = 2
 )
 
 func parseSymbolValWinsType(strType string) SymbolValWinsType {
 	switch strType {
 	case "collector":
-		return SVWTypeCollector
+		return svwTypeCollector
 	case "reelcollector":
-		return SVWTypeReelCollector
+		return svwTypeReelCollector
 	}
 
-	return SVWTypeNormal
+	return svwTypeNormal
 }
 
 const (
@@ -128,7 +128,7 @@ type SymbolValWins struct {
 }
 
 // Init -
-func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) error {
+func (svw *SymbolValWins) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("SymbolValWins.Init:ReadFile",
@@ -149,18 +149,19 @@ func (symbolValWins *SymbolValWins) Init(fn string, pool *GamePropertyPool) erro
 		return err
 	}
 
-	return symbolValWins.InitEx(cfg, pool)
+	return svw.InitEx(cfg, pool)
 }
 
 // InitEx -
-func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) error {
-	symbolValWins.Config = cfg.(*SymbolValWinsConfig)
-	symbolValWins.Config.ComponentType = SymbolValWinsTypeName
 
-	symbolValWins.Config.BetType = ParseBetType(symbolValWins.Config.BetTypeString)
-	symbolValWins.Config.Type = parseSymbolValWinsType(symbolValWins.Config.StrType)
+func (svw *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) error {
+	svw.Config = cfg.(*SymbolValWinsConfig)
+	svw.Config.ComponentType = SymbolValWinsTypeName
 
-	for _, s := range symbolValWins.Config.Symbols {
+	svw.Config.BetType = ParseBetType(svw.Config.BetTypeString)
+	svw.Config.Type = parseSymbolValWinsType(svw.Config.StrType)
+
+	for _, s := range svw.Config.Symbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("SymbolValWins.InitEx:Symbol",
@@ -170,10 +171,10 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 			return ErrInvalidSymbol
 		}
 
-		symbolValWins.Config.SymbolCodes = append(symbolValWins.Config.SymbolCodes, sc)
+		svw.Config.SymbolCodes = append(svw.Config.SymbolCodes, sc)
 	}
 
-	for _, s := range symbolValWins.Config.CoinSymbols {
+	for _, s := range svw.Config.CoinSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
 			goutils.Error("SymbolValWins.InitEx:CoinSymbol",
@@ -183,22 +184,22 @@ func (symbolValWins *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) erro
 			return ErrInvalidSymbol
 		}
 
-		symbolValWins.Config.CoinSymbolCodes = append(symbolValWins.Config.CoinSymbolCodes, sc)
+		svw.Config.CoinSymbolCodes = append(svw.Config.CoinSymbolCodes, sc)
 	}
 
-	symbolValWins.onInit(&symbolValWins.Config.BasicComponentConfig)
+	svw.onInit(&svw.Config.BasicComponentConfig)
 
 	return nil
 }
 
 // playgame
-func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	svwd := icd.(*SymbolValWinsData)
 	svwd.onNewStep()
 
-	gs := symbolValWins.GetTargetScene3(gameProp, curpr, prs, 0)
+	gs := svw.GetTargetScene3(gameProp, pr, prs, 0)
 	if gs == nil {
 		goutils.Error("SymbolValWins.OnPlayGame:GetTargetScene3",
 			goutils.Err(ErrInvalidComponentConfig))
@@ -206,26 +207,26 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return "", ErrInvalidComponentConfig
 	}
 
-	os := symbolValWins.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	os := svw.GetTargetOtherScene3(gameProp, pr, prs, 0)
 
 	if os != nil {
 		collectorpos := []int{}
 		mul := 0
-		switch symbolValWins.Config.Type {
-		case SVWTypeCollector:
+		switch svw.Config.Type {
+		case svwTypeCollector:
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
-					if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
+					if goutils.IndexOfIntSlice(svw.Config.SymbolCodes, s, 0) >= 0 {
 						mul++
 
 						collectorpos = append(collectorpos, x, y)
 					}
 				}
 			}
-		case SVWTypeReelCollector:
+		case svwTypeReelCollector:
 			for x, arr := range gs.Arr {
 				for y, s := range arr {
-					if goutils.IndexOfIntSlice(symbolValWins.Config.SymbolCodes, s, 0) >= 0 {
+					if goutils.IndexOfIntSlice(svw.Config.SymbolCodes, s, 0) >= 0 {
 						mul++
 
 						collectorpos = append(collectorpos, x, y)
@@ -241,10 +242,10 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 		totalvals := 0
 		pos := make([]int, 0, len(os.Arr)*len(os.Arr[0])*2)
 
-		if len(symbolValWins.Config.CoinSymbolCodes) > 0 {
+		if len(svw.Config.CoinSymbolCodes) > 0 {
 			for x := 0; x < len(os.Arr); x++ {
 				for y := 0; y < len(os.Arr[x]); y++ {
-					if slices.Contains(symbolValWins.Config.CoinSymbolCodes, gs.Arr[x][y]) && os.Arr[x][y] > 0 {
+					if slices.Contains(svw.Config.CoinSymbolCodes, gs.Arr[x][y]) && os.Arr[x][y] > 0 {
 						totalvals += os.Arr[x][y]
 						pos = append(pos, x, y)
 
@@ -266,14 +267,13 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 		}
 
 		if totalvals > 0 && mul > 0 {
-			bet := gameProp.GetBet3(stake, symbolValWins.Config.BetType)
-			othermul := symbolValWins.GetWinMulti(&svwd.BasicComponentData)
+			bet := gameProp.GetBet3(stake, svw.Config.BetType)
+			othermul := svw.GetWinMulti(&svwd.BasicComponentData)
 
 			for i := 0; i < mul; i++ {
 				newpos := make([]int, 0, len(pos)+2)
 
-				if symbolValWins.Config.Type == SVWTypeCollector ||
-					symbolValWins.Config.Type == SVWTypeReelCollector {
+				if svw.isCollectorType() {
 
 					newpos = append(newpos, collectorpos[i*2], collectorpos[i*2+1])
 				}
@@ -288,8 +288,7 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					Mul:        1,
 				}
 
-				if symbolValWins.Config.Type == SVWTypeCollector ||
-					symbolValWins.Config.Type == SVWTypeReelCollector {
+				if svw.isCollectorType() {
 
 					ret.Symbol = gs.Arr[newpos[0]][newpos[1]]
 				}
@@ -300,22 +299,22 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 				svwd.Wins += ret.CoinWin
 
-				symbolValWins.AddResult(curpr, ret, &svwd.BasicComponentData)
+				svw.AddResult(pr, ret, &svwd.BasicComponentData)
 			}
 
-			nc := symbolValWins.onStepEnd(gameProp, curpr, gp, "")
+			nc := svw.onStepEnd(gameProp, pr, gp, "")
 
 			return nc, nil
 		}
 	}
 
-	nc := symbolValWins.onStepEnd(gameProp, curpr, gp, "")
+	nc := svw.onStepEnd(gameProp, pr, gp, "")
 
 	return nc, ErrComponentDoNothing
 }
 
 // OnAsciiGame - outpur to asciigame
-func (symbolValWins *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+func (svw *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	cd := icd.(*SymbolValWinsData)
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
@@ -326,35 +325,40 @@ func (symbolValWins *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 }
 
 // NewComponentData -
-func (symbolValWins *SymbolValWins) NewComponentData() IComponentData {
+func (svw *SymbolValWins) NewComponentData() IComponentData {
 	return &SymbolValWinsData{}
 }
 
 // NewStats2 -
-func (symbolValWins *SymbolValWins) NewStats2(parent string) *stats2.Feature {
+func (svw *SymbolValWins) NewStats2(parent string) *stats2.Feature {
 	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins, stats2.OptIntVal})
 }
 
 // OnStats2
-func (symbolValWins *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
-	symbolValWins.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
+func (svw *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+	svw.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
 	svwd := icd.(*SymbolValWinsData)
 
-	s2.ProcStatsWins(symbolValWins.Name, int64(svwd.Wins))
+	s2.ProcStatsWins(svw.Name, int64(svwd.Wins))
 
-	multi := symbolValWins.GetWinMulti(&svwd.BasicComponentData)
+	multi := svw.GetWinMulti(&svwd.BasicComponentData)
 
-	s2.ProcStatsIntVal(symbolValWins.GetName(), multi)
+	s2.ProcStatsIntVal(svw.GetName(), multi)
 }
 
-func (symbolValWins *SymbolValWins) GetWinMulti(basicCD *BasicComponentData) int {
+func (svw *SymbolValWins) GetWinMulti(basicCD *BasicComponentData) int {
 	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
 		return winMulti
 	}
 
-	return symbolValWins.Config.WinMulti
+	return svw.Config.WinMulti
+}
+
+// isCollectorType reports whether the config type is a collector variant
+func (svw *SymbolValWins) isCollectorType() bool {
+	return svw.Config.Type == svwTypeCollector || svw.Config.Type == svwTypeReelCollector
 }
 
 func NewSymbolValWins(name string) IComponent {
