@@ -223,11 +223,6 @@ func (weightReels2 *WeightReels2) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 	return nil
 }
 
-// // OnStats
-// func (weightReels *WeightReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 // NewComponentData -
 func (weightReels2 *WeightReels2) NewComponentData() IComponentData {
 	return &WeightReels2Data{}

@@ -15,10 +15,6 @@ import (
 
 const BasicReelsTypeName = "basicReels"
 
-// const (
-// 	BRCVReelSet string = "reelSet" // 可以修改配置项里的ReelSet
-// )
-
 // BasicReelsConfig - configuration for BasicReels
 type BasicReelsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -69,19 +65,6 @@ func (basicReels *BasicReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	basicReels.Config = cfg.(*BasicReelsConfig)
 	basicReels.Config.ComponentType = BasicReelsTypeName
 
-	// if basicReels.Config.ReelSetsWeight != "" {
-	// 	vw2, err := pool.LoadStrWeights(basicReels.Config.ReelSetsWeight, basicReels.Config.UseFileMapping)
-	// 	if err != nil {
-	// 		goutils.Error("BasicReels.Init:LoadValWeights",
-	// 			slog.String("ReelSetsWeight", basicReels.Config.ReelSetsWeight),
-	// 			goutils.Err(err))
-
-	// 		return err
-	// 	}
-
-	// 	basicReels.ReelSetWeights = vw2
-	// }
-
 	for _, award := range basicReels.Config.Awards {
 		award.Init()
 	}
@@ -111,40 +94,10 @@ func (basicReels *BasicReels) ProcControllers(gameProp *GameProperty, plugin sgc
 func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	// basicReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	bcd := cd.(*BasicComponentData)
 
 	bcd.UsedScenes = nil
 
-	// bcd.OnNewStep()
-
-	// reelname := ""
-	// if basicReels.ReelSetWeights != nil {
-	// 	val, _, err := basicReels.ReelSetWeights.RandValEx(plugin)
-	// 	if err != nil {
-	// 		goutils.Error("BasicReels.OnPlayGame:ReelSetWeights.RandVal",
-	// 			goutils.Err(err))
-
-	// 		return "", err
-	// 	}
-
-	// 	// basicReels.AddRNG(gameProp, si, bcd)
-
-	// 	curreels := val.String()
-	// 	gameProp.TagStr(TagCurReels, curreels)
-
-	// 	rd, isok := gameProp.Pool.Config.MapReels[curreels]
-	// 	if !isok {
-	// 		goutils.Error("BasicReels.OnPlayGame:MapReels",
-	// 			goutils.Err(ErrInvalidReels))
-
-	// 		return "", ErrInvalidReels
-	// 	}
-
-	// 	gameProp.CurReels = rd
-	// 	reelname = curreels
-	// } else {
 	reelname := basicReels.getReelSet(bcd)
 	rd, isok := gameProp.Pool.Config.MapReels[reelname]
 	if !isok {
@@ -157,18 +110,9 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	gameProp.TagStr(TagCurReels, reelname)
 
 	gameProp.CurReels = rd
-	// reelname = basicReels.Config.ReelSet
-	// }
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	sc.ReelName = reelname
-	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
-	// if err != nil {
-	// 	goutils.Error("BasicReels.OnPlayGame:NewGameScene",
-	// 		goutils.Err(err))
-
-	// 	return err
-	// }
 
 	if basicReels.Config.IsExpandReel {
 		sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)
@@ -179,9 +123,6 @@ func (basicReels *BasicReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 	basicReels.AddScene(gameProp, curpr, sc, bcd)
 
 	basicReels.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-	// if len(basicReels.Config.Awards) > 0 {
-	// 	gameProp.procAwards(plugin, basicReels.Config.Awards, curpr, gp)
-	// }
 
 	nc := basicReels.onStepEnd(gameProp, curpr, gp, "")
 
@@ -198,11 +139,6 @@ func (basicReels *BasicReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 
 	return nil
 }
-
-// // OnStats
-// func (basicReels *BasicReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewBasicReels(name string) IComponent {
 	basicReels := &BasicReels{
@@ -227,8 +163,6 @@ func (jbr *jsonBasicReels) build() *BasicReelsConfig {
 		IsExpandReel: jbr.IsExpandReel,
 	}
 
-	// cfg.UseSceneV3 = true
-
 	return cfg
 }
 
@@ -242,8 +176,6 @@ func (jbr *jsonBasicReels2) build() *BasicReelsConfig {
 		ReelSet:      jbr.ReelSet,
 		IsExpandReel: jbr.IsExpandReel == "true",
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
