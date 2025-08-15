@@ -148,7 +148,7 @@ func (symbolExplander *SymbolExplander) OnPlayGame(gameProp *GameProperty, curpr
 
 	symbolExplander.AddScene(gameProp, curpr, ngs, cd)
 
-	nc := symbolExplander.onStepEnd(gameProp, curpr, gp, "")
+	nc := symbolExplander.onStepEnd(gameProp, curpr, gp, symbolExplander.Config.JumpToComponent)
 
 	return nc, nil
 }

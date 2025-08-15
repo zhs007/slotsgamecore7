@@ -272,7 +272,9 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 			for i := 0; i < mul; i++ {
 				newpos := make([]int, 0, len(pos)+2)
 
-				if symbolValWins.Config.Type == SVWTypeCollector {
+				if symbolValWins.Config.Type == SVWTypeCollector ||
+					symbolValWins.Config.Type == SVWTypeReelCollector {
+
 					newpos = append(newpos, collectorpos[i*2], collectorpos[i*2+1])
 				}
 
@@ -286,7 +288,9 @@ func (symbolValWins *SymbolValWins) OnPlayGame(gameProp *GameProperty, curpr *sg
 					Mul:        1,
 				}
 
-				if symbolValWins.Config.Type == SVWTypeCollector {
+				if symbolValWins.Config.Type == SVWTypeCollector ||
+					symbolValWins.Config.Type == SVWTypeReelCollector {
+
 					ret.Symbol = gs.Arr[newpos[0]][newpos[1]]
 				}
 
