@@ -173,7 +173,13 @@ func (collector *Collector2) Init(fn string, pool *GamePropertyPool) error {
 }
 
 func (collector *Collector2) InitEx(cfg any, pool *GamePropertyPool) error {
-	collector.Config = cfg.(*Collector2Config)
+	cfg2, isok := cfg.(*Collector2Config)
+	if !isok {
+		goutils.Error("Collector2.InitEx:cfg type",
+			goutils.Err(ErrInvalidComponentConfig))
+		return ErrInvalidComponentConfig
+	}
+	collector.Config = cfg2
 	collector.Config.ComponentType = Collector2TypeName
 
 	if collector.Config.MapAwards != nil {
@@ -332,7 +338,7 @@ func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.
 		}
 
 		if collector.Config.IsForceTriggerController {
-			for ci := ccd.Val; ci >= 0; ci-- {
+			for ci := cbps.Value; ci >= 0; ci-- {
 				strCurVal := fmt.Sprintf("%d", ci)
 				_, isok := collector.Config.MapAwards[strCurVal]
 				if isok {
@@ -382,9 +388,15 @@ func (collector *Collector2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.
 }
 
 func (collector *Collector2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
-	ccd := cd.(*Collector2Data)
+	ccd, isok := cd.(*Collector2Data)
+	if !isok {
+		goutils.Error("Collector2.OnAsciiGame:Collector2Data",
+			goutils.Err(ErrInvalidComponentData))
+		return ErrInvalidComponentData
+	}
+
 	if ccd.NewCollector <= 0 {
-		fmt.Printf("%v dose not collect new value, the collector value is %v\n", collector.Name, ccd.Val)
+		fmt.Printf("%v does not collect new value, the collector value is %v\n", collector.Name, ccd.Val)
 	} else {
 		fmt.Printf("%v collect %v. the collector value is %v\n", collector.Name, ccd.NewCollector, ccd.Val)
 	}
