@@ -2,6 +2,9 @@ package sgc7game
 
 import "github.com/zhs007/goutils"
 
+// isValidAdjacentPayResult - 这个接口只用于内部调用，为了避免重复判断中奖的，所以传入的 gamescene 是一个特殊用途的 scene，不能乱用
+// gs 只有 2 种值，0 和 -1， 0 表示已经处理过中奖了，-1 表示没有处理过
+// 考虑到 A W W W B，这样的局面，是 2 个中奖（分别是 A W W W 和 W W W B），所以只要有一个位置是新的就算有效中奖
 func isValidAdjacentPayResult(gs *GameScene, ret *Result) bool {
 	for i := 0; i < len(ret.Pos)/2; i++ {
 		if gs.Arr[ret.Pos[i*2]][ret.Pos[i*2+1]] != 0 {
@@ -22,6 +25,7 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 	results := []*Result{}
 
 	scene0 := scene.Clone()
+	// gsx 是一个默认全 -1 的 scene
 	gsx, err := NewGameScene(scene.Width, scene.Height)
 	if err != nil {
 		goutils.Error("CalcAdjacentPay:NewGameScene",
@@ -30,19 +34,29 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 		return nil, err
 	}
 
+	isprocx := false
+
+	// 先判断 x 方向，注意，scene 是 arr[x][y]，所以 x 其实是竖向的
 	for x, arr := range scene.Arr {
 		for y := range arr {
 			if scene0.Arr[x][y] >= 0 && isValidSymbol(scene0.Arr[x][y]) {
 				crx := calcAdjacentPayWithX(scene0, x, y, getSymbol(scene0.Arr[x][y]), pt, bet, isSameSymbol, isWild)
 
+				// 这里的 crx 是一个特殊的结果，不能直接用来计算结果
+				// 其实这里只是需要保证不重复判断即可
+				// 考虑到 wild，所以只要有一个位置是新的就算有效中奖
 				if crx != nil && isValidAdjacentPayResult(gsx, crx) {
 					results = append(results, crx)
 
 					for i := 0; i < len(crx.Pos)/2; i++ {
+						// 这里也是为了不重复判断，把除了 wild 以外的设置为空
 						if !isWild(scene0.Arr[crx.Pos[i*2]][crx.Pos[i*2+1]]) {
 							scene0.Arr[crx.Pos[i*2]][crx.Pos[i*2+1]] = -1
+
+							isprocx = true
 						}
 
+						// 这里将 gsx 设置为 0，就是不能重复判断
 						gsx.Arr[crx.Pos[i*2]][crx.Pos[i*2+1]] = 0
 					}
 				}
@@ -50,7 +64,11 @@ func CalcAdjacentPay(scene *GameScene, pt *PayTables, bet int,
 		}
 	}
 
-	scene0 = scene.Clone()
+	if isprocx {
+		// 当清空 scene0 的一部分以后才需要重新 clone，否则可以节省一个 clone
+		scene0 = scene.Clone()
+	}
+
 	gsy, err := NewGameScene(scene.Width, scene.Height)
 	if err != nil {
 		goutils.Error("CalcAdjacentPay:NewGameScene",
