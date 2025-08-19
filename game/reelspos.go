@@ -30,7 +30,7 @@ func (reelspos *ReelsPosData) AddPos(x, y int) {
 }
 
 func (reelspos *ReelsPosData) RandReel(ctx context.Context, plugin sgc7plugin.IPlugin, x int) (int, error) {
-	if x < 0 || x > len(reelspos.ReelsPos) {
+	if x < 0 || x >= len(reelspos.ReelsPos) {
 		goutils.Error("ReelsPosData.RandReel",
 			slog.Int("x", x),
 			goutils.Err(ErrInvalidSceneX))
