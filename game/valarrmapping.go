@@ -28,7 +28,9 @@ func (vm *ValArrMapping[T, V]) Clone() *ValArrMapping[T, V] {
 	}
 
 	for k, v := range vm.MapVals {
-		nvm.MapVals[k] = v
+		newSlice := make([]V, len(v))
+		copy(newSlice, v)
+		nvm.MapVals[k] = newSlice
 	}
 
 	return nvm
