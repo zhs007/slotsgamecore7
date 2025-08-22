@@ -43,7 +43,6 @@ func newGameScenePool() *gameScenePool {
 }
 
 type GameScenePoolEx struct {
-	// Lock     sync.Mutex
 	MapPools map[int]map[int]*gameScenePool
 }
 
@@ -72,9 +71,6 @@ func (pool *GameScenePoolEx) new2(w, h int, v int) *GameScene {
 }
 
 func (pool *GameScenePoolEx) Put(scene *GameScene) {
-	// pool.Lock.Lock()
-	// defer pool.Lock.Unlock()
-
 	pool.MapPools[scene.Width][scene.Height].put(scene)
 }
 
@@ -87,9 +83,6 @@ func (pool *GameScenePoolEx) Reset() {
 }
 
 func (pool *GameScenePoolEx) New(w, h int) *GameScene {
-	// pool.Lock.Lock()
-	// defer pool.Lock.Unlock()
-
 	mps, isok := pool.MapPools[w]
 	if !isok {
 		mps = make(map[int]*gameScenePool)
@@ -117,9 +110,6 @@ func (pool *GameScenePoolEx) New(w, h int) *GameScene {
 }
 
 func (pool *GameScenePoolEx) New2(w, h int, v int) *GameScene {
-	// pool.Lock.Lock()
-	// defer pool.Lock.Unlock()
-
 	mps, isok := pool.MapPools[w]
 	if !isok {
 		mps = make(map[int]*gameScenePool)

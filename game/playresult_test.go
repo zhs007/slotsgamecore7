@@ -21,7 +21,7 @@ func Test_NextGameModParams(t *testing.T) {
 
 	buf, err := PlayResult2JSON(pr)
 	assert.NoError(t, err)
-	t.Logf(string(buf))
+	t.Logf("%s", string(buf))
 
 	pr2 := &PlayResult{
 		CurGameModParams: &TestParams{},
