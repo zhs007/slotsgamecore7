@@ -115,19 +115,25 @@ func (se *SymbolExplander) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayR
 	ngs := gs
 
 	for x, arr := range gs.Arr {
+		sc := -1
 		for _, s := range arr {
 			if goutils.IndexOfIntSlice(se.Config.SymbolCodes, s, 0) >= 0 {
 				if !slices.Contains(lstSymbolCores, s) {
 					lstSymbolCores = append(lstSymbolCores, s)
 				}
 
-				if ngs == gs {
-					ngs = gs.CloneEx(gameProp.PoolScene)
-				}
+				sc = s
+				break
+			}
+		}
 
-				for ty := range ngs.Height {
-					ngs.Arr[x][ty] = s
-				}
+		if sc != -1 {
+			if ngs == gs {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
+
+			for ty := range ngs.Height {
+				ngs.Arr[x][ty] = sc
 			}
 		}
 	}
