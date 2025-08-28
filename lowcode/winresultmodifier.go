@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"math"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -26,18 +27,24 @@ const (
 	WRMTypeAddSymbolMulti    WinResultModifierType = 1
 	WRMTypeMulSymbolMulti    WinResultModifierType = 2
 	WRMTypeSymbolMultiOnWays WinResultModifierType = 3
+	WRMTypeDivisor           WinResultModifierType = 4
+	WRMTypeMultiply          WinResultModifierType = 5
 )
 
 func parseWinResultModifierType(str string) WinResultModifierType {
 	switch str {
-	case "existSymbol":
+	case "existsymbol":
 		return WRMTypeExistSymbol
-	case "addSymbolMulti":
+	case "addsymbolmulti":
 		return WRMTypeAddSymbolMulti
-	case "mulSymbolMulti":
+	case "mulsymbolmulti":
 		return WRMTypeMulSymbolMulti
-	case "symbolMultiOnWays":
+	case "symbolmultionways":
 		return WRMTypeSymbolMultiOnWays
+	case "divisor":
+		return WRMTypeDivisor
+	case "multiply":
+		return WRMTypeMultiply
 	}
 
 	return WRMTypeExistSymbol
@@ -56,8 +63,6 @@ func (winResultModifierData *WinResultModifierData) OnNewGame(gameProp *GameProp
 
 // onNewStep -
 func (winResultModifierData *WinResultModifierData) onNewStep() {
-	// winResultMultiData.BasicComponentData.OnNewStep(gameProp, component)
-
 	winResultModifierData.Wins = 0
 	winResultModifierData.WinMulti = 1
 }
@@ -93,13 +98,6 @@ func (winResultModifierData *WinResultModifierData) GetValEx(key string, getType
 	return 0, false
 }
 
-// // SetVal -
-// func (winResultModifierData *WinResultModifierData) SetVal(key string, val int) {
-// 	if key == CVWins {
-// 		winResultModifierData.Wins = val
-// 	}
-// }
-
 // WinResultModifierConfig - configuration for WinResultModifier
 // 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type WinResultModifierConfig struct {
@@ -108,6 +106,7 @@ type WinResultModifierConfig struct {
 	Type                 WinResultModifierType `yaml:"-" json:"-"`                               // type
 	SourceComponents     []string              `yaml:"sourceComponents" json:"sourceComponents"` // target components
 	WinMulti             int                   `yaml:"winMulti" json:"winMulti"`                 // winMulti，最后的中奖倍数，默认为1
+	WinDivisor           int                   `yaml:"winDivisor" json:"winDivisor"`             // winDivisor
 	TargetSymbols        []string              `yaml:"targetSymbols" json:"targetSymbols"`       // targetSymbols
 	TargetSymbolCodes    []int                 `yaml:"-" json:"-"`                               // target SymbolCodes
 }
@@ -160,6 +159,10 @@ func (winResultModifier *WinResultModifier) InitEx(cfg any, pool *GamePropertyPo
 		winResultModifier.Config.WinMulti = 1
 	}
 
+	if winResultModifier.Config.WinDivisor <= 0 {
+		winResultModifier.Config.WinDivisor = 1
+	}
+
 	for _, s := range winResultModifier.Config.TargetSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
@@ -181,8 +184,6 @@ func (winResultModifier *WinResultModifier) InitEx(cfg any, pool *GamePropertyPo
 // playgame
 func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	std := icd.(*WinResultModifierData)
 	std.onNewStep()
@@ -230,7 +231,6 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 			}
 
 			ccd := gameProp.GetComponentDataWithName(cn)
-			// ccd := gameProp.MapComponentData[cn]
 			lst := ccd.GetResults()
 			for _, ri := range lst {
 				num := CountSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri])
@@ -307,6 +307,54 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 				isproced = true
 			}
 		}
+	} else if winResultModifier.Config.Type == WRMTypeDivisor {
+		for _, cn := range winResultModifier.Config.SourceComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetComponentDataWithName(cn)
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				div := winResultModifier.Config.WinDivisor
+
+				if div <= 0 {
+					div = 1
+				}
+
+				curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin / div
+				curpr.Results[ri].CashWin = curpr.Results[ri].CashWin / div
+
+				std.Wins += curpr.Results[ri].CoinWin
+
+				isproced = true
+			}
+		}
+	} else if winResultModifier.Config.Type == WRMTypeMultiply {
+		for _, cn := range winResultModifier.Config.SourceComponents {
+			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+				continue
+			}
+
+			ccd := gameProp.GetComponentDataWithName(cn)
+			lst := ccd.GetResults()
+			for _, ri := range lst {
+				mul := winResultModifier.Config.WinMulti
+
+				if mul <= 0 {
+					mul = 1
+				}
+
+				curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin * mul
+				curpr.Results[ri].CashWin = curpr.Results[ri].CashWin * mul
+
+				std.Wins += curpr.Results[ri].CoinWin
+
+				isproced = true
+			}
+		}
 	}
 
 	if !isproced {
@@ -329,24 +377,6 @@ func (winResultModifier *WinResultModifier) OnAsciiGame(gameProp *GameProperty, 
 
 	return nil
 }
-
-// // OnStatsWithPB -
-// func (winResultMulti *WinResultMulti) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.WinResultMultiData)
-// 	if !isok {
-// 		goutils.Error("WinResultMulti.OnStatsWithPB",
-// 			goutils.Err(ErrInvalidProto))
-
-// 		return 0, ErrInvalidProto
-// 	}
-
-// 	return winResultMulti.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
-// // OnStats
-// func (winResultMulti *WinResultMulti) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // NewComponentData -
 func (winResultModifier *WinResultModifier) NewComponentData() IComponentData {
@@ -376,30 +406,31 @@ func NewWinResultModifier(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"winMulti": 2,
-//		"type": "existSymbol",
-//		"sourceComponent": [
-//			"fg-payfg"
-//		],
-//		"targetSymbols": ["RW2"]
-//	},
+// "type": "divide",
+// "winMulti": 1,
+// "targetSymbols": [],
+// "winDivisor": 10,
+// "sourceComponent": [
+//
+//	"bg-pay"
+//
+// ]
 type jsonWinResultModifier struct {
 	Type             string   `json:"type"`            // type
 	SourceComponents []string `json:"sourceComponent"` // source components
 	WinMulti         int      `json:"winMulti"`        // winMulti
 	TargetSymbols    []string `json:"targetSymbols"`   // targetSymbols
+	WinDivisor       int      `json:"winDivisor"`      // winDivisor
 }
 
 func (jwt *jsonWinResultModifier) build() *WinResultModifierConfig {
 	cfg := &WinResultModifierConfig{
-		StrType:          jwt.Type,
+		StrType:          strings.ToLower(jwt.Type),
 		SourceComponents: jwt.SourceComponents,
 		WinMulti:         jwt.WinMulti,
 		TargetSymbols:    jwt.TargetSymbols,
+		WinDivisor:       jwt.WinDivisor,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
