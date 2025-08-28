@@ -451,6 +451,10 @@ func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc
 		x := pos[i*2]
 		y := pos[i*2+1]
 
+		if nos.Arr[x][y] != genSymbolVals2.Config.DefaultVal {
+			continue
+		}
+
 		cr, err := vw.RandVal(plugin)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.procWeight:RandVal",
