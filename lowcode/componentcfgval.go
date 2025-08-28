@@ -33,6 +33,7 @@ const (
 	CCVDisableMulti               string = "disablemulti"               // 可以修改配置项里的 disableMulti
 	CCVMapCoinWeight              string = "mapcoinweight"              // 可以修改配置项里的 mapCoinWeight
 	CCVValueNumNow                string = "valuenumnow"                // 可以修改配置项里的 valueNumNow
+	CCVOpenNum                    string = "opennum"                    // 可以修改配置项里的 opennum
 )
 
 const (

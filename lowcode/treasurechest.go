@@ -285,7 +285,9 @@ func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *
 		return "", ErrInvalidComponentConfig
 	}
 
-	for range treasureChest.Config.OpenNum {
+	openNum := treasureChest.getSymbolNum(gameProp, &cd.BasicComponentData)
+
+	for range openNum {
 		cr, err := vw2.RandVal(plugin)
 		if err != nil {
 			goutils.Error("TreasureChest.procSumValue:RandVal",
@@ -303,6 +305,15 @@ func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *
 	nc := treasureChest.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
+}
+
+func (treasureChest *TreasureChest) getSymbolNum(gameProp *GameProperty, basicCD *BasicComponentData) int {
+	v, isok := basicCD.GetConfigIntVal(CCVOpenNum)
+	if isok {
+		return v
+	}
+
+	return treasureChest.Config.OpenNum
 }
 
 // playgame

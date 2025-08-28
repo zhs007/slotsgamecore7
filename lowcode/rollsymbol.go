@@ -32,11 +32,6 @@ func (rollSymbolData *RollSymbolData) OnNewGame(gameProp *GameProperty, componen
 	rollSymbolData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// // OnNewStep -
-// func (rollSymbolData *RollSymbolData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	rollSymbolData.BasicComponentData.OnNewStep(gameProp, component)
-// }
-
 // Clone
 func (rollSymbolData *RollSymbolData) Clone() IComponentData {
 	target := &RollSymbolData{
@@ -67,10 +62,6 @@ func (rollSymbolData *RollSymbolData) BuildPBComponentData() proto.Message {
 func (rollSymbolData *RollSymbolData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	return 0, false
 }
-
-// // SetVal -
-// func (rollSymbolData *RollSymbolData) SetVal(key string, val int) {
-// }
 
 // RollSymbolConfig - configuration for RollSymbol
 type RollSymbolConfig struct {

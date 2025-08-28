@@ -182,11 +182,6 @@ func (symbolVal2 *SymbolVal2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	return nil
 }
 
-// // OnStats
-// func (symbolVal2 *SymbolVal2) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 func NewSymbolVal2(name string) IComponent {
 	return &SymbolVal2{
 		BasicComponent: NewBasicComponent(name, 1),
