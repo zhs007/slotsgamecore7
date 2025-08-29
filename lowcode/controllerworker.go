@@ -82,12 +82,7 @@ func (controllerWorker *ControllerWorker) ProcControllers(gameProp *GameProperty
 func (controllerWorker *ControllerWorker) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// reRollReel.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	controllerWorker.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
-	// if len(controllerWorker.Config.Awards) > 0 {
-	// 	gameProp.procAwards(plugin, controllerWorker.Config.Awards, curpr, gp)
-	// }
 
 	nc := controllerWorker.onStepEnd(gameProp, curpr, gp, "")
 
@@ -96,38 +91,15 @@ func (controllerWorker *ControllerWorker) OnPlayGame(gameProp *GameProperty, cur
 
 // OnAsciiGame - outpur to asciigame
 func (controllerWorker *ControllerWorker) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	// cd := icd.(*BasicComponentData)
-
-	// if len(cd.UsedScenes) > 0 {
-	// 	asciigame.OutputScene("after reRollReel", pr.Scenes[cd.UsedScenes[0]], mapSymbolColor)
-	// }
 
 	return nil
 }
-
-// // OnStats
-// func (reRollReel *ReRollReel) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewControllerWorker(name string) IComponent {
 	return &ControllerWorker{
 		BasicComponent: NewBasicComponent(name, 1),
 	}
 }
-
-// "configuration": {
-// }
-// type jsonControllerWorker struct {
-// }
-
-// func (jbr *jsonControllerWorker) build() *ControllerWorkerConfig {
-// 	cfg := &ControllerWorkerConfig{}
-
-// 	// cfg.UseSceneV3 = true
-
-// 	return cfg
-// }
 
 func parseControllerWorker(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	_, label, ctrls, err := getConfigInCell(cell)
@@ -138,25 +110,6 @@ func parseControllerWorker(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 		return "", err
 	}
 
-	// buf, err := cfg.MarshalJSON()
-	// if err != nil {
-	// 	goutils.Error("parseControllerWorker:MarshalJSON",
-	// 		goutils.Err(err))
-
-	// 	return "", err
-	// }
-
-	// data := &jsonControllerWorker{}
-
-	// err = sonic.Unmarshal(buf, data)
-	// if err != nil {
-	// 	goutils.Error("parseControllerWorker:Unmarshal",
-	// 		goutils.Err(err))
-
-	// 	return "", err
-	// }
-
-	// cfgd := data.build()
 	cfgd := &ControllerWorkerConfig{}
 
 	if ctrls != nil {
