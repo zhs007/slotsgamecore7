@@ -97,26 +97,6 @@ func (sumSymbolValsData *SumSymbolValsData) GetValEx(key string, getType GetComp
 	return 0, false
 }
 
-// // SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
-// func (sumSymbolValsData *SumSymbolValsData) SetConfigIntVal(key string, val int) {
-// 	if key == CCVForceValNow {
-// 		sumSymbolValsData.Number = val
-// 	} else {
-// 		sumSymbolValsData.BasicComponentData.SetConfigIntVal(key, val)
-// 	}
-// }
-
-// // ChgConfigIntVal -
-// func (sumSymbolValsData *SumSymbolValsData) ChgConfigIntVal(key string, off int) int {
-// 	if key == CCVForceValNow {
-// 		sumSymbolValsData.Number += off
-
-// 		return sumSymbolValsData.Number
-// 	}
-
-// 	return sumSymbolValsData.BasicComponentData.ChgConfigIntVal(key, off)
-// }
-
 // GetOutput -
 func (rollNumberData *SumSymbolValsData) GetOutput() int {
 	return rollNumberData.Number
