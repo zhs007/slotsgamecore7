@@ -58,11 +58,11 @@ type GenMaskConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string      `yaml:"type" json:"type"`
 	Type                 GenMaskType `yaml:"-" json:"-"`
-	MaskLen              int         `yaml:"type" json:"maskLen"`
-	OutputMask           string      `yaml:"type" json:"outputMask"`
-	SrcMask              []string    `yaml:"type" json:"srcMask"`
-	WeightValue          int         `yaml:"type" json:"weightValue"`
-	InitMask             []bool      `yaml:"type" json:"initMask"`
+	MaskLen              int         `yaml:"maskLen" json:"maskLen"`
+	OutputMask           string      `yaml:"outputMask" json:"outputMask"`
+	SrcMask              []string    `yaml:"srcMask" json:"srcMask"`
+	WeightValue          int         `yaml:"weightValue" json:"weightValue"`
+	InitMask             []bool      `yaml:"initMask" json:"initMask"`
 	Controllers          []*Award    `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
@@ -209,6 +209,14 @@ func (gm *GenMask) getFirstMask(gameProp *GameProperty, basicCD *BasicComponentD
 
 			return nil
 		}
+		if len(maskVal) != gm.Config.MaskLen {
+			goutils.Error("GenMask.getFirstMask:MaskLen",
+				slog.Int("got", len(maskVal)),
+				slog.Int("want", gm.Config.MaskLen),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil
+		}
 
 		return maskVal
 	}
@@ -226,14 +234,32 @@ func (gm *GenMask) getAllMask(gameProp *GameProperty, _ *BasicComponentData) [][
 	masks := make([][]bool, 0, size)
 
 	if len(gm.Config.InitMask) > 0 {
+		if len(gm.Config.InitMask) != gm.Config.MaskLen {
+			goutils.Error("GenMask.getAllMask:InitMaskLen",
+				slog.Int("got", len(gm.Config.InitMask)),
+				slog.Int("want", gm.Config.MaskLen),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil
+		}
 		masks = append(masks, gm.Config.InitMask)
 	}
 
-	if len(gm.Config.SrcMask) > 0 {
-		maskVal, err := gameProp.GetMask(gm.Config.SrcMask[0])
+	for _, name := range gm.Config.SrcMask {
+		maskVal, err := gameProp.GetMask(name)
 		if err != nil {
-			goutils.Error("GenMask.getFirstMask:GetMask",
+			goutils.Error("GenMask.getAllMask:GetMask",
+				slog.String("name", name),
 				goutils.Err(err))
+
+			return nil
+		}
+		if len(maskVal) != gm.Config.MaskLen {
+			goutils.Error("GenMask.getAllMask:MaskLen",
+				slog.String("name", name),
+				slog.Int("got", len(maskVal)),
+				slog.Int("want", gm.Config.MaskLen),
+				goutils.Err(ErrInvalidComponentConfig))
 
 			return nil
 		}
@@ -313,6 +339,13 @@ func (gm *GenMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult
 
 			gameProp.Pool.SetMask(plugin, gameProp, curpr, gp, gm.Config.OutputMask, nmask, false)
 		} else {
+			if len(mask) != gm.Config.MaskLen {
+				goutils.Error("GenMask.OnPlayGame:MaskLen",
+					slog.Int("got", len(mask)),
+					slog.Int("want", gm.Config.MaskLen),
+					goutils.Err(ErrInvalidComponentConfig))
+				return "", ErrInvalidComponentConfig
+			}
 			nmask := make([]bool, gm.Config.MaskLen)
 			for i := 0; i < gm.Config.MaskLen; i++ {
 				if mask[i] {
@@ -343,6 +376,9 @@ func (gm *GenMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult
 	case GMTypeAnd:
 		nmask := make([]bool, gm.Config.MaskLen)
 		masks := gm.getAllMask(gameProp, cd)
+		if masks == nil {
+			return "", ErrInvalidComponentConfig
+		}
 
 		for i, curmask := range masks {
 			if i == 0 {
@@ -360,6 +396,9 @@ func (gm *GenMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult
 	case GMTypeOr:
 		nmask := make([]bool, gm.Config.MaskLen)
 		masks := gm.getAllMask(gameProp, cd)
+		if masks == nil {
+			return "", ErrInvalidComponentConfig
+		}
 
 		for i, curmask := range masks {
 			if i == 0 {
@@ -377,6 +416,9 @@ func (gm *GenMask) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult
 	case GMTypeXor:
 		nmask := make([]bool, gm.Config.MaskLen)
 		masks := gm.getAllMask(gameProp, cd)
+		if masks == nil {
+			return "", ErrInvalidComponentConfig
+		}
 
 		for i, curmask := range masks {
 			if i == 0 {
@@ -417,7 +459,7 @@ func NewGenMask(name string) IComponent {
 // "maskLen": 6,
 // "outputMask": "bg-mask-vs",
 // "srcMask": [],
-// "weightValue": 500000,
+// "weightValue": 5000,
 // "initMask": [
 //
 //	0,
