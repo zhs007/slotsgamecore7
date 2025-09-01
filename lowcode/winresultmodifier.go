@@ -3,7 +3,6 @@ package lowcode
 import (
 	"fmt"
 	"log/slog"
-	"math"
 	"os"
 	"strings"
 
@@ -22,12 +21,23 @@ const WinResultModifierTypeName = "winResultModifier"
 
 type WinResultModifierType int
 
+func (wrmt WinResultModifierType) isNeedMultiply() bool {
+	return wrmt != WRMTypeDivide
+}
+
+func (wrmt WinResultModifierType) isNeedGameScene() bool {
+	return wrmt == WRMTypeExistSymbol ||
+		wrmt == WRMTypeAddSymbolMulti ||
+		wrmt == WRMTypeMulSymbolMulti ||
+		wrmt == WRMTypeSymbolMultiOnWays
+}
+
 const (
 	WRMTypeExistSymbol       WinResultModifierType = 0
 	WRMTypeAddSymbolMulti    WinResultModifierType = 1
 	WRMTypeMulSymbolMulti    WinResultModifierType = 2
 	WRMTypeSymbolMultiOnWays WinResultModifierType = 3
-	WRMTypeDivisor           WinResultModifierType = 4
+	WRMTypeDivide            WinResultModifierType = 4
 	WRMTypeMultiply          WinResultModifierType = 5
 )
 
@@ -41,8 +51,8 @@ func parseWinResultModifierType(str string) WinResultModifierType {
 		return WRMTypeMulSymbolMulti
 	case "symbolmultionways":
 		return WRMTypeSymbolMultiOnWays
-	case "divisor":
-		return WRMTypeDivisor
+	case "divide":
+		return WRMTypeDivide
 	case "multiply":
 		return WRMTypeMultiply
 	}
@@ -136,6 +146,7 @@ func (winResultModifier *WinResultModifier) Init(fn string, pool *GamePropertyPo
 
 	cfg := &WinResultModifierConfig{}
 
+	// yaml只会自动生成，不需要考虑字符串大小写问题
 	err = yaml.Unmarshal(data, cfg)
 	if err != nil {
 		goutils.Error("WinResultModifier.Init:Unmarshal",
@@ -192,13 +203,19 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 
 	std.WinMulti = winMulti
 
-	if winMulti == 1 {
+	if winMulti == 1 && winResultModifier.Config.Type.isNeedMultiply() {
 		nc := winResultModifier.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, ErrComponentDoNothing
 	}
 
 	gs := winResultModifier.GetTargetScene3(gameProp, curpr, prs, 0)
+	if gs == nil && winResultModifier.Config.Type.isNeedGameScene() {
+		nc := winResultModifier.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
 	isproced := false
 
 	if winResultModifier.Config.Type == WRMTypeExistSymbol {
@@ -209,7 +226,6 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 			}
 
 			ccd := gameProp.GetComponentDataWithName(cn)
-			// ccd := gameProp.MapComponentData[cn]
 			lst := ccd.GetResults()
 			for _, ri := range lst {
 				if HasSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri]) {
@@ -253,12 +269,11 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 			}
 
 			ccd := gameProp.GetComponentDataWithName(cn)
-			// ccd := gameProp.MapComponentData[cn]
 			lst := ccd.GetResults()
 			for _, ri := range lst {
 				num := CountSymbolsInResult(gs, winResultModifier.Config.TargetSymbolCodes, curpr.Results[ri])
 				if num > 0 {
-					m := int(math.Pow(float64(winMulti), float64(num)))
+					m := intPow(winMulti, num)
 					curpr.Results[ri].CashWin *= m
 					curpr.Results[ri].CoinWin *= m
 					curpr.Results[ri].OtherMul *= m
@@ -299,15 +314,23 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 					}
 				}
 
+				if curpr.Results[ri].Mul <= 0 {
+					goutils.Error("WinResultModifier.OnPlayGame:curpr.Results[ri].Mul <= 0",
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return "", ErrInvalidComponentConfig
+				}
+
 				curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin / curpr.Results[ri].Mul * mul
 				curpr.Results[ri].CashWin = curpr.Results[ri].CashWin / curpr.Results[ri].Mul * mul
+				curpr.Results[ri].OtherMul *= mul
 
 				std.Wins += curpr.Results[ri].CoinWin
 
 				isproced = true
 			}
 		}
-	} else if winResultModifier.Config.Type == WRMTypeDivisor {
+	} else if winResultModifier.Config.Type == WRMTypeDivide {
 		for _, cn := range winResultModifier.Config.SourceComponents {
 			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
 			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
@@ -341,7 +364,7 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 			ccd := gameProp.GetComponentDataWithName(cn)
 			lst := ccd.GetResults()
 			for _, ri := range lst {
-				mul := winResultModifier.Config.WinMulti
+				mul := winMulti
 
 				if mul <= 0 {
 					mul = 1
@@ -349,6 +372,7 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 
 				curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin * mul
 				curpr.Results[ri].CashWin = curpr.Results[ri].CashWin * mul
+				curpr.Results[ri].OtherMul *= mul
 
 				std.Wins += curpr.Results[ri].CoinWin
 

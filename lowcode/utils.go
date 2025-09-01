@@ -10,105 +10,26 @@ import (
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 )
 
-// // findLastPBComponentData
-// func findLastPBComponentData(lst []*sgc7game.PlayResult, componentName string) (proto.Message, *sgc7game.PlayResult) {
-// 	for i := len(lst) - 1; i >= 0; i-- {
-// 		pr := lst[i]
+func intPow(base int, exp int) int {
+	if exp < 0 {
+		// 负指数在整数域下无精确表示，保守返回 0（可根据项目约定改为 panic 或返回 error）
+		return 0
+	}
+	if exp == 0 {
+		return 1
+	}
 
-// 		gp := pr.CurGameModParams.(*GameParams)
-// 		if gp != nil {
-// 			pbcd := gp.MapComponentMsgs[componentName]
-// 			if pbcd != nil {
-// 				return pbcd, pr
-// 			}
-// 		}
-// 	}
-
-// 	return nil, nil
-// }
-
-// // findLastPBComponentDataEx
-// func findLastPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) (proto.Message, *sgc7game.PlayResult) {
-// 	for i := len(lst) - 1; i >= 0; i-- {
-// 		pr := lst[i]
-
-// 		gp := pr.CurGameModParams.(*GameParams)
-// 		if gp != nil {
-// 			pbRespin := gp.MapComponentMsgs[respinComponentName]
-// 			pbcd := gp.MapComponentMsgs[componentName]
-// 			if pbRespin != nil && pbcd != nil {
-// 				return pbcd, pr
-// 			}
-// 		}
-// 	}
-
-// 	return nil, nil
-// }
-
-// // findFirstPBComponentData
-// func findFirstPBComponentData(lst []*sgc7game.PlayResult, componentName string) (proto.Message, *sgc7game.PlayResult) {
-// 	for _, pr := range lst {
-// 		gp := pr.CurGameModParams.(*GameParams)
-// 		if gp != nil {
-// 			pbcd := gp.MapComponentMsgs[componentName]
-// 			if pbcd != nil {
-// 				return pbcd, pr
-// 			}
-// 		}
-// 	}
-
-// 	return nil, nil
-// }
-
-// // findFirstPBComponentDataEx
-// func findFirstPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) (proto.Message, *sgc7game.PlayResult) {
-// 	for _, pr := range lst {
-// 		gp := pr.CurGameModParams.(*GameParams)
-// 		if gp != nil {
-// 			pbRespin := gp.MapComponentMsgs[respinComponentName]
-// 			pbcd := gp.MapComponentMsgs[componentName]
-// 			if pbRespin != nil && pbcd != nil {
-// 				return pbcd, pr
-// 			}
-// 		}
-// 	}
-
-// 	return nil, nil
-// }
-
-// // findAllPBComponentDataEx
-// func findAllPBComponentDataEx(lst []*sgc7game.PlayResult, respinComponentName string, componentName string) ([]proto.Message, []*sgc7game.PlayResult) {
-// 	pbs := []proto.Message{}
-// 	prs := []*sgc7game.PlayResult{}
-
-// 	for _, pr := range lst {
-// 		gp := pr.CurGameModParams.(*GameParams)
-// 		if gp != nil {
-// 			pbRespin := gp.MapComponentMsgs[respinComponentName]
-// 			pbcd := gp.MapComponentMsgs[componentName]
-// 			if pbRespin != nil && pbcd != nil {
-// 				pbs = append(pbs, pbcd)
-// 				prs = append(prs, pr)
-// 			}
-// 		}
-// 	}
-
-// 	if len(pbs) == 0 {
-// 		return nil, nil
-// 	}
-
-// 	return pbs, prs
-// }
-
-// func calcTotalCashWins(lst []*sgc7game.PlayResult) int64 {
-// 	wins := int64(0)
-
-// 	for _, v := range lst {
-// 		wins += v.CashWin
-// 	}
-
-// 	return wins
-// }
+	result := 1
+	b := base
+	for exp > 0 {
+		if exp&1 == 1 {
+			result *= b
+		}
+		b *= b
+		exp >>= 1
+	}
+	return result
+}
 
 func isSameBoolSlice(src []bool, dest []bool) bool {
 	if len(src) == len(dest) {
