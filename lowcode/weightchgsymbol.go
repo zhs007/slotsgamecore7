@@ -11,6 +11,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 已弃用，待清理
+
 const WeightChgSymbolTypeName = "weightChgSymbol"
 
 // WeightChgSymbolConfig - configuration for WeightChgSymbol feature

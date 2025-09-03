@@ -363,10 +363,6 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	branch, isok := weightBranch.Config.MapBranchs[wbd.Value]
 	if isok {
-		// if len(branch.Awards) > 0 {
-		// 	gameProp.procAwards(plugin, branch.Awards, curpr, gp)
-		// }
-
 		nextComponent = branch.JumpToComponent
 	}
 

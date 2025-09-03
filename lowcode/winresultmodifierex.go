@@ -16,28 +16,44 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// WinResultModifierExTypeName is the component type name used in configuration
+// and registration for the WinResultModifierEx component.
 const WinResultModifierExTypeName = "winResultModifierEx"
 
+// WinResultModifierExData holds runtime state for a WinResultModifierEx component.
+//
+// It embeds BasicComponentData and tracks accumulated wins and the applied
+// win multiplier for the current step.
 type WinResultModifierExData struct {
 	BasicComponentData
 	Wins     int
 	WinMulti int
 }
 
-// OnNewGame -
+// OnNewGame initializes per-game state for WinResultModifierExData.
+//
+// OnNewGame forwards to BasicComponentData.OnNewGame and performs any
+// WinResultModifierEx-specific initialization required at the start of a new game.
 func (winResultModifierDataEx *WinResultModifierExData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	winResultModifierDataEx.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// onNewStep -
+// onNewStep resets step-specific fields on WinResultModifierExData.
+//
+// onNewStep resets accumulated wins and the step multiplier to their default
+// values. This is an internal helper used at the beginning of each step.
 func (winResultModifierDataEx *WinResultModifierExData) onNewStep() {
 	winResultModifierDataEx.Wins = 0
 	winResultModifierDataEx.WinMulti = 1
 }
 
-// Clone
+// Clone creates a deep copy of WinResultModifierExData and returns it as
+// the IComponentData interface.
+//
+// Clone is used when component data must be duplicated (for example, when
+// creating snapshots or copying state between game contexts).
 func (winResultModifierDataEx *WinResultModifierExData) Clone() IComponentData {
-	target := &WinResultModifierData{
+	target := &WinResultModifierExData{
 		BasicComponentData: winResultModifierDataEx.CloneBasicComponentData(),
 		Wins:               winResultModifierDataEx.Wins,
 		WinMulti:           winResultModifierDataEx.WinMulti,
@@ -46,7 +62,11 @@ func (winResultModifierDataEx *WinResultModifierExData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData converts the component data into its protobuf
+// representation used for telemetry or RPC.
+//
+// BuildPBComponentData returns a proto.Message representing the current
+// WinResultModifierExData.
 func (winResultModifierDataEx *WinResultModifierExData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WinResultModifierData{
 		BasicComponentData: winResultModifierDataEx.BuildPBBasicComponentData(),
@@ -57,7 +77,11 @@ func (winResultModifierDataEx *WinResultModifierExData) BuildPBComponentData() p
 	return pbcd
 }
 
-// GetValEx -
+// GetValEx retrieves a named integer value from the component data.
+//
+// For WinResultModifierExData the supported key is "CVWins" which returns the
+// accumulated wins. The function returns the value and a boolean indicating
+// whether the key was found.
 func (winResultModifierDataEx *WinResultModifierExData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return winResultModifierDataEx.Wins, true
@@ -67,6 +91,11 @@ func (winResultModifierDataEx *WinResultModifierExData) GetValEx(key string, get
 }
 
 // WinResultModifierExConfig - configuration for WinResultModifierEx
+//
+// WinResultModifierExConfig describes how a WinResultModifierEx component is
+// configured via YAML/JSON. It includes the component base config, the
+// type string, source components that will be inspected, and a mapping from
+// target symbol names to multiplier values.
 type WinResultModifierExConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string                `yaml:"type" json:"type"`                         // type
@@ -77,18 +106,29 @@ type WinResultModifierExConfig struct {
 }
 
 // SetLinkComponent
+// SetLinkComponent sets link-based connections for the component.
+//
+// The function supports the "next" link which sets the default next
+// component name. This mirrors the behavior used by other components and is
+// called by the builder when wiring components together.
 func (cfg *WinResultModifierExConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
 	}
 }
 
+// WinResultModifierEx is a component that modifies win results based on
+// configured symbol mappings and multiplier logic.
+//
+// It embeds BasicComponent and holds a typed configuration pointer.
 type WinResultModifierEx struct {
 	*BasicComponent `json:"-"`
 	Config          *WinResultModifierExConfig `json:"config"`
 }
 
-// Init -
+// Init loads YAML configuration from the given filename and initializes the
+// component. It is a convenience wrapper around InitEx that reads the file
+// content and unmarshals it into the component config structure.
 func (winResultModifierEx *WinResultModifierEx) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
@@ -113,14 +153,17 @@ func (winResultModifierEx *WinResultModifierEx) Init(fn string, pool *GameProper
 	return winResultModifierEx.InitEx(cfg, pool)
 }
 
-// InitEx -
+// InitEx initializes the component from an already-unmarshaled configuration
+// object (typically *WinResultModifierExConfig). It validates configuration
+// values and resolves symbol codes from the paytable pool.
 func (winResultModifierEx *WinResultModifierEx) InitEx(cfg any, pool *GamePropertyPool) error {
 	winResultModifierEx.Config = cfg.(*WinResultModifierExConfig)
 	winResultModifierEx.Config.ComponentType = WinResultModifierExTypeName
 
 	winResultModifierEx.Config.Type = parseWinResultModifierType(winResultModifierEx.Config.StrType)
-	if winResultModifierEx.Config.Type == WRMTypeExistSymbol {
-		goutils.Error("WinResultModifierEx.InitEx:WRMTypeExistSymbol",
+	if !winResultModifierEx.Config.Type.isValidInWinResultModifierEx() {
+
+		goutils.Error("WinResultModifierEx.InitEx:isValidInWinResultModifierEx",
 			goutils.Err(ErrInvalidComponentConfig))
 
 		return ErrInvalidComponentConfig
@@ -146,11 +189,25 @@ func (winResultModifierEx *WinResultModifierEx) InitEx(cfg any, pool *GameProper
 	return nil
 }
 
-// playgame
+// OnPlayGame applies the configured win-modification logic to the current
+// PlayResult. It inspects results produced by configured source components
+// and adjusts CoinWin, CashWin and OtherMul according to the mapping and
+// modifier type.
+//
+// OnPlayGame returns the name of the next component (or empty) and an error
+// indicating whether any modification was applied. If no modification took
+// place it returns ErrComponentDoNothing.
 func (winResultModifierEx *WinResultModifierEx) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	std := icd.(*WinResultModifierExData)
+	std, ok := icd.(*WinResultModifierExData)
+	if !ok {
+		goutils.Error("WinResultModifierEx.OnPlayGame:invalid icd type",
+			goutils.Err(ErrInvalidComponentData))
+
+		return "", ErrInvalidComponentData
+	}
+
 	std.onNewStep()
 
 	gs := winResultModifierEx.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -170,6 +227,14 @@ func (winResultModifierEx *WinResultModifierEx) OnPlayGame(gameProp *GamePropert
 
 			if mul > 1 {
 				if winResultModifierEx.Config.Type == WRMTypeSymbolMultiOnWays {
+					// protect against division by zero
+					if curpr.Results[ri].Mul <= 0 {
+						goutils.Error("WinResultModifierEx.OnPlayGame:curpr.Results[ri].Mul <= 0",
+							goutils.Err(ErrInvalidComponentConfig))
+
+						return "", ErrInvalidComponentConfig
+					}
+
 					curpr.Results[ri].OtherMul = mul
 
 					curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin / curpr.Results[ri].Mul * mul
@@ -199,21 +264,33 @@ func (winResultModifierEx *WinResultModifierEx) OnPlayGame(gameProp *GamePropert
 	return nc, nil
 }
 
-// OnAsciiGame - outpur to asciigame
+// OnAsciiGame outputs component debug information to the asciigame system.
+//
+// OnAsciiGame is intended for human-readable debugging of component behavior
+// and prints the current multiplier and accumulated wins.
 func (winResultModifierEx *WinResultModifierEx) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 
-	std := icd.(*WinResultModifierExData)
+	std, ok := icd.(*WinResultModifierExData)
+	if !ok {
+		goutils.Error("WinResultModifierEx.OnAsciiGame:invalid icd type",
+			goutils.Err(ErrInvalidComponentData))
+
+		return ErrInvalidComponentData
+	}
 
 	fmt.Printf("WinResultModifierEx x %v, ending wins = %v \n", std.WinMulti, std.Wins)
 
 	return nil
 }
 
-// NewComponentData -
+// NewComponentData creates a fresh instance of WinResultModifierExData used
+// to track per-game and per-step state for this component.
 func (winResultModifierEx *WinResultModifierEx) NewComponentData() IComponentData {
 	return &WinResultModifierExData{}
 }
 
+// NewWinResultModifierEx creates a new WinResultModifierEx instance with the
+// provided name and default priority.
 func NewWinResultModifierEx(name string) IComponent {
 	return &WinResultModifierEx{
 		BasicComponent: NewBasicComponent(name, 1),
@@ -242,6 +319,19 @@ func NewWinResultModifierEx(name string) IComponent {
 //	"bg-wins"
 //
 // ]
+// jsonWinResultModifierEx is an intermediate structure for parsing compact
+// JSON configuration when the component is defined inline in a script or
+// when using the ast-based parser. It mirrors the minimal fields expected in
+// JSON source form and is converted to a WinResultModifierExConfig by
+// build().
+//
+// The JSON shape is expected as:
+//
+//	{
+//	  "type": "addSymbolMulti",
+//	  "sourceComponent": [ ... ],
+//	  "mapTargetSymbols": [ ["SYM", 2], ["SYM2", 3] ]
+//	}
 type jsonWinResultModifierEx struct {
 	Type             string   `json:"type"`             // type
 	SourceComponents []string `json:"sourceComponent"`  // source components
@@ -256,13 +346,45 @@ func (jcfg *jsonWinResultModifierEx) build() *WinResultModifierExConfig {
 	}
 
 	for _, arr := range jcfg.MapTargetSymbols {
-		cfg.MapTargetSymbols[arr[0].(string)] = int(arr[1].(float64))
+		if len(arr) < 2 {
+			continue
+		}
+
+		// key should be string
+		key, ok := arr[0].(string)
+		if !ok {
+			continue
+		}
+
+		// value can be float64 (default for numbers in sonic.Unmarshal) or int
+		switch v := arr[1].(type) {
+		case float64:
+			cfg.MapTargetSymbols[key] = int(v)
+		case int:
+			cfg.MapTargetSymbols[key] = v
+		case int64:
+			cfg.MapTargetSymbols[key] = int(v)
+		default:
+			// try to handle numeric-like strings
+			if s, ok := arr[1].(string); ok {
+				// best-effort parse
+				var vi int
+				_, err := fmt.Sscanf(s, "%d", &vi)
+				if err == nil {
+					cfg.MapTargetSymbols[key] = vi
+				}
+			}
+		}
 	}
 
 	return cfg
 }
 
 func parseWinResultModifierEx(gamecfg *BetConfig, cell *ast.Node) (string, error) {
+	// parseWinResultModifierEx parses an AST cell produced by the low-code
+	// parser and registers a WinResultModifierEx component into the
+	// provided BetConfig. It extracts the inline JSON-like config, maps it
+	// into the typed config, and appends a ComponentConfig entry.
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseWinResultModifierEx:getConfigInCell",

@@ -14,6 +14,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 已弃用，待清理
+
 const WeightAwardsTypeName = "weightAwards"
 
 type WeightAwardsData struct {
@@ -27,11 +29,6 @@ func (weightAwardsData *WeightAwardsData) OnNewGame(gameProp *GameProperty, comp
 
 	weightAwardsData.GotIndex = nil
 }
-
-// // OnNewStep -
-// func (weightAwardsData *WeightAwardsData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	weightAwardsData.BasicComponentData.OnNewStep(gameProp, component)
-// }
 
 // Clone
 func (weightAwardsData *WeightAwardsData) Clone() IComponentData {
@@ -153,8 +150,6 @@ func (weightAwards *WeightAwards) buildMask(plugin sgc7plugin.IPlugin, gameProp 
 func (weightAwards *WeightAwards) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// weightAwards.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	mwad := icd.(*WeightAwardsData)
 
 	mwad.GotIndex = nil
@@ -234,45 +229,10 @@ func (weightAwards *WeightAwards) OnAsciiGame(gameProp *GameProperty, pr *sgc7ga
 	return nil
 }
 
-// // OnStats
-// func (weightAwards *WeightAwards) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
-// // OnStatsWithPB -
-// func (multiWeightAwards *MultiWeightAwards) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.MultiWeightAwardsData)
-// 	if !isok {
-// 		goutils.Error("MultiWeightAwards.OnStatsWithPB",
-// 			goutils.Err(ErrInvalidProto))
-
-// 		return 0, ErrInvalidProto
-// 	}
-
-// 	return multiWeightAwards.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
 // NewComponentData -
 func (weightAwards *WeightAwards) NewComponentData() IComponentData {
 	return &WeightAwardsData{}
 }
-
-// // EachUsedResults -
-// func (multiWeightAwards *MultiWeightAwards) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
-// 	pbcd := &sgc7pb.SymbolCollectionData{}
-
-// 	err := pbComponentData.UnmarshalTo(pbcd)
-// 	if err != nil {
-// 		goutils.Error("MultiWeightAwards.EachUsedResults:UnmarshalTo",
-// 			goutils.Err(err))
-
-// 		return
-// 	}
-
-// 	for _, v := range pbcd.BasicComponentData.UsedResults {
-// 		oneach(pr.Results[v])
-// 	}
-// }
 
 func NewWeightAwards(name string) IComponent {
 	return &WeightAwards{

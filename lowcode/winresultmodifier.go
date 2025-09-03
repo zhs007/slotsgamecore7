@@ -32,6 +32,12 @@ func (wrmt WinResultModifierType) isNeedGameScene() bool {
 		wrmt == WRMTypeSymbolMultiOnWays
 }
 
+func (wrmt WinResultModifierType) isValidInWinResultModifierEx() bool {
+	return wrmt == WRMTypeAddSymbolMulti ||
+		wrmt == WRMTypeMulSymbolMulti ||
+		wrmt == WRMTypeSymbolMultiOnWays
+}
+
 const (
 	WRMTypeExistSymbol       WinResultModifierType = 0
 	WRMTypeAddSymbolMulti    WinResultModifierType = 1
@@ -323,7 +329,9 @@ func (winResultModifier *WinResultModifier) OnPlayGame(gameProp *GameProperty, c
 
 				curpr.Results[ri].CoinWin = curpr.Results[ri].CoinWin / curpr.Results[ri].Mul * mul
 				curpr.Results[ri].CashWin = curpr.Results[ri].CashWin / curpr.Results[ri].Mul * mul
-				curpr.Results[ri].OtherMul *= mul
+
+				// 这个地方不确定能修改OtherMul，先注释掉，待查
+				// curpr.Results[ri].OtherMul *= mul
 
 				std.Wins += curpr.Results[ri].CoinWin
 
