@@ -15,6 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 兼容老项目，已弃用
+
 const WeightReelsTypeName = "weightReels"
 
 type WeightReelsData struct {
@@ -56,7 +58,6 @@ func (weightReelsData *WeightReelsData) Clone() IComponentData {
 func (weightReelsData *WeightReelsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightReelsData{
 		BasicComponentData: weightReelsData.BuildPBBasicComponentData(),
-		ReelSetIndex:       int32(weightReelsData.ReelSetIndex),
 	}
 
 	return pbcd
@@ -135,7 +136,7 @@ func (weightReels *WeightReels) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (weightReels *WeightReels) GetReelSetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+func (weightReels *WeightReels) getReelSetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(CCVReelSetWeight)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadStrWeights(str, weightReels.Config.UseFileMapping)
@@ -145,15 +146,6 @@ func (weightReels *WeightReels) GetReelSetWeight(gameProp *GameProperty, basicCD
 
 	return weightReels.Config.ReelSetsWeightVW
 }
-
-// func (weightReels *WeightReels) GetReelSet(basicCD *BasicComponentData) string {
-// 	str := basicCD.GetConfigVal(BRCVReelSet)
-// 	if str != "" {
-// 		return str
-// 	}
-
-// 	return weightReels.Config.ReelSetsWeightVW.Vals[]
-// }
 
 // OnProcControllers -
 func (weightReels *WeightReels) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
@@ -166,14 +158,12 @@ func (weightReels *WeightReels) ProcControllers(gameProp *GameProperty, plugin s
 func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// weightReels.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	wrd := icd.(*WeightReelsData)
 
 	wrd.onNewStep()
 
 	reelname := ""
-	vw2 := weightReels.GetReelSetWeight(gameProp, &wrd.BasicComponentData)
+	vw2 := weightReels.getReelSetWeight(gameProp, &wrd.BasicComponentData)
 	if vw2 != nil {
 		val, si, err := vw2.RandValEx(plugin)
 		if err != nil {
@@ -185,10 +175,7 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 		wrd.ReelSetIndex = si
 
-		// weightReels.AddRNG(gameProp, si, &wrd.BasicComponentData)
-
 		curreels := val.String()
-		// gameProp.TagStr(TagCurReels, curreels)
 
 		rd, isok := gameProp.Pool.Config.MapReels[curreels]
 		if !isok {
@@ -201,31 +188,9 @@ func (weightReels *WeightReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		gameProp.CurReels = rd
 		reelname = curreels
 	}
-	// else {
-	// 	reelname = weightReels.GetReelSet(cd)
-	// 	rd, isok := gameProp.Pool.Config.MapReels[reelname]
-	// 	if !isok {
-	// 		goutils.Error("BasicReels.OnPlayGame:MapReels",
-	// 			goutils.Err(ErrInvalidReels))
-
-	// 		return ErrInvalidReels
-	// 	}
-
-	// 	gameProp.TagStr(TagCurReels, reelname)
-
-	// 	gameProp.CurReels = rd
-	// 	// reelname = basicReels.Config.ReelSet
-	// }
 
 	sc := gameProp.PoolScene.New(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
 	sc.ReelName = reelname
-	// sc, err := sgc7game.NewGameScene(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight))
-	// if err != nil {
-	// 	goutils.Error("BasicReels.OnPlayGame:NewGameScene",
-	// 		goutils.Err(err))
-
-	// 	return err
-	// }
 
 	if weightReels.Config.IsExpandReel {
 		sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)
@@ -252,11 +217,6 @@ func (weightReels *WeightReels) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 
 	return nil
 }
-
-// // OnStats
-// func (weightReels *WeightReels) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // NewComponentData -
 func (weightReels *WeightReels) NewComponentData() IComponentData {
@@ -286,8 +246,6 @@ func (jwr *jsonWeightReels) build() *WeightReelsConfig {
 		IsExpandReel:   jwr.IsExpandReel,
 	}
 
-	// cfg.UseSceneV3 = true
-
 	return cfg
 }
 
@@ -301,8 +259,6 @@ func (jwr *jsonWeightReelsT) build() *WeightReelsConfig {
 		ReelSetsWeight: jwr.ReelSetWeight,
 		IsExpandReel:   jwr.IsExpandReel == "true",
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

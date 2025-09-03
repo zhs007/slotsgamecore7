@@ -11,6 +11,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 已弃用
+
 const WeightTriggerTypeName = "weightTrigger"
 
 // WeightTriggerConfig - configuration for WeightTrigger
@@ -80,10 +82,6 @@ func (weightTrigger *WeightTrigger) InitEx(cfg any, pool *GamePropertyPool) erro
 func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// weightTrigger.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
-	// cd := gameProp.MapComponentData[weightTrigger.Name].(*BasicComponentData)
-
 	rv, err := weightTrigger.WeightSet.RandVal(plugin)
 	if err != nil {
 		goutils.Error("WeightTrigger.OnPlayGame:RandVal",
@@ -98,10 +96,6 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 		if weightTrigger.Config.RespinNums[setIndex] > 0 {
 			gameProp.TriggerRespin(plugin, curpr, gp, weightTrigger.Config.RespinNums[setIndex], weightTrigger.Config.NextComponents[setIndex], weightTrigger.Config.IsUseTriggerRespin2)
 		}
-		// 	weightTrigger.onStepEnd(gameProp, curpr, gp, "")
-		// } else {
-		// 	weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
-		// }
 	}
 
 	nc := weightTrigger.onStepEnd(gameProp, curpr, gp, weightTrigger.Config.NextComponents[setIndex])
@@ -113,11 +107,6 @@ func (weightTrigger *WeightTrigger) OnPlayGame(gameProp *GameProperty, curpr *sg
 func (weightTrigger *WeightTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
 }
-
-// // OnStats
-// func (weightTrigger *WeightTrigger) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewWeightTrigger(name string) IComponent {
 	return &WeightTrigger{

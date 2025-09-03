@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -137,10 +138,17 @@ func (weightReels2 *WeightReels2) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
-func (weightReels2 *WeightReels2) GetReelSetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+func (weightReels2 *WeightReels2) getReelSetWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(CCVReelSetWeight)
 	if str != "" {
-		vw2, _ := gameProp.Pool.LoadStrWeights(str, weightReels2.Config.UseFileMapping)
+		vw2, err := gameProp.Pool.LoadStrWeights(str, weightReels2.Config.UseFileMapping)
+		if err != nil {
+			goutils.Error("WeightReels2.getReelSetWeight:LoadStrWeights",
+				slog.String("ReelSetWeight", str),
+				goutils.Err(err))
+
+			return nil
+		}
 
 		return vw2
 	}
@@ -162,12 +170,19 @@ func (weightReels2 *WeightReels2) ProcControllers(gameProp *GameProperty, plugin
 func (weightReels2 *WeightReels2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	wrd := icd.(*WeightReels2Data)
+	wrd, ok := icd.(*WeightReels2Data)
+	if !ok {
+		goutils.Error("WeightReels2.OnPlayGame:invalid component data",
+			slog.String("type", fmt.Sprintf("%T", icd)),
+			goutils.Err(ErrInvalidComponentData))
+
+		return "", ErrInvalidComponentData
+	}
 
 	wrd.onNewStep()
 
 	reelname := ""
-	vw2 := weightReels2.GetReelSetWeight(gameProp, &wrd.BasicComponentData)
+	vw2 := weightReels2.getReelSetWeight(gameProp, &wrd.BasicComponentData)
 	if vw2 != nil {
 		val, si, err := vw2.RandValEx(plugin)
 		if err != nil {

@@ -16,7 +16,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// 发现这个组件没用了，先标记一下
+// 已弃用
+
 const WinResultCacheTypeName = "winResultCache"
 
 type WinResultCacheData struct {
@@ -30,14 +31,6 @@ type WinResultCacheData struct {
 func (winResultCacheData *WinResultCacheData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	winResultCacheData.BasicComponentData.OnNewGame(gameProp, component)
 }
-
-// // OnNewStep -
-// func (winResultCacheData *WinResultCacheData) OnNewStep(gameProp *GameProperty, component IComponent) {
-// 	winResultCacheData.BasicComponentData.OnNewStep(gameProp, component)
-
-// 	winResultCacheData.Wins = 0
-// 	winResultCacheData.WinMulti = 1
-// }
 
 // Clone
 func (winResultCacheData *WinResultCacheData) Clone() IComponentData {
@@ -71,13 +64,6 @@ func (winResultCacheData *WinResultCacheData) GetValEx(key string, getType GetCo
 
 	return 0, false
 }
-
-// // SetVal -
-// func (winResultCacheData *WinResultCacheData) SetVal(key string, val int) {
-// 	if key == CVWins {
-// 		winResultCacheData.Wins = val
-// 	}
-// }
 
 // WinResultCacheConfig - configuration for WinResultCache
 type WinResultCacheConfig struct {
@@ -140,36 +126,6 @@ func (winResultCache *WinResultCache) InitEx(cfg any, pool *GamePropertyPool) er
 func (winResultCache *WinResultCache) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
-	// cd := icd.(*WinResultCacheData)
-
-	// cd.OnNewStep(gameProp, piggyBank)
-
-	// winMulti := piggyBank.GetWinMulti(&cd.BasicComponentData)
-
-	// cd.WinMulti = winMulti
-	// sm, isok := cd.GetConfigIntVal(CCVSavedMoney)
-	// if !isok {
-	// 	nc := piggyBank.onStepEnd(gameProp, curpr, gp, "")
-
-	// 	return nc, ErrComponentDoNothing
-	// }
-
-	// cd.Wins = sm * winMulti
-
-	// bet := gameProp.GetBet2(stake, BTypeBet)
-
-	// ret := &sgc7game.Result{
-	// 	Symbol:    -1,
-	// 	Type:      sgc7game.RTSymbolVal,
-	// 	LineIndex: -1,
-	// 	CoinWin:   cd.Wins,
-	// 	CashWin:   cd.Wins * bet,
-	// }
-
-	// piggyBank.AddResult(curpr, ret, &cd.BasicComponentData)
-
 	nc := winResultCache.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
@@ -185,37 +141,10 @@ func (winResultCache *WinResultCache) OnAsciiGame(gameProp *GameProperty, pr *sg
 	return nil
 }
 
-// // OnStatsWithPB -
-// func (winResultCache *WinResultCache) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.WinResultCacheData)
-// 	if !isok {
-// 		goutils.Error("WinResultCache.OnStatsWithPB",
-// 			goutils.Err(ErrInvalidProto))
-
-// 		return 0, ErrInvalidProto
-// 	}
-
-// 	return winResultCache.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
-// // OnStats
-// func (winResultCache *WinResultCache) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 // NewComponentData -
 func (winResultCache *WinResultCache) NewComponentData() IComponentData {
 	return &WinResultCacheData{}
 }
-
-// func (winResultCache *WinResultCache) getWinMulti(basicCD *BasicComponentData) int {
-// 	winMulti, isok := basicCD.GetConfigIntVal(WTCVWinMulti)
-// 	if isok {
-// 		return winMulti
-// 	}
-
-// 	return winResultCache.Config.WinMulti
-// }
 
 func NewWinResultCache(name string) IComponent {
 	return &WinResultCache{
@@ -231,8 +160,6 @@ func (jwt *jsonWinResultCache) build() *WinResultCacheConfig {
 	cfg := &WinResultCacheConfig{
 		WinMulti: jwt.WinMulti,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }

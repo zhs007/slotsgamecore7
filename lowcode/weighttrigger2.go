@@ -11,11 +11,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const WeightTrigger2TypeName = "weightTrigger2"
+// 已弃用
 
-// const (
-// 	WT2CVTriggerWeight string = "triggerWeight" // 可以修改配置项里的triggerWeight
-// )
+const WeightTrigger2TypeName = "weightTrigger2"
 
 // WeightTrigger2Config - configuration for WeightTrigger2
 type WeightTrigger2Config struct {
@@ -93,8 +91,6 @@ func (weightTrigger2 *WeightTrigger2) getTriggerWeight(gameProp *GameProperty, b
 func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// weightTrigger2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
 
 	vw := weightTrigger2.getTriggerWeight(gameProp, cd)
@@ -122,11 +118,6 @@ func (weightTrigger2 *WeightTrigger2) OnPlayGame(gameProp *GameProperty, curpr *
 func (weightTrigger2 *WeightTrigger2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
 }
-
-// // OnStats
-// func (weightTrigger2 *WeightTrigger2) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewWeightTrigger2(name string) IComponent {
 	return &WeightTrigger2{
