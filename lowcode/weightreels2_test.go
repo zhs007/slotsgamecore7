@@ -108,7 +108,6 @@ func TestWeightReels2_GetReelSetWeightAndOnPlayGame(t *testing.T) {
 	gameProp.OtherSceneStack = NewSceneStack(true)
 	pool.Config = cfg
 	pool.MapSymbolColor = nil
-	pool.mapStrValWeights = pool.mapStrValWeights
 
 	// component and basicCD
 	comp := NewWeightReels2("wr2").(*WeightReels2)

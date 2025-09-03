@@ -196,7 +196,7 @@ func (gm *GenMask) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (gm *GenMask) getFirstMask(gameProp *GameProperty, basicCD *BasicComponentData) []bool {
+func (gm *GenMask) getFirstMask(gameProp *GameProperty, _ *BasicComponentData) []bool {
 	if len(gm.Config.InitMask) > 0 {
 		return gm.Config.InitMask
 	}

@@ -13,10 +13,6 @@ import (
 
 const WeightChgSymbolTypeName = "weightChgSymbol"
 
-// const (
-// 	WCSCVMapChgWeight string = "mapChgWeight" // 可以修改配置项里的mapChgWeight，这里因为是个map，所以要当成 mapChgWeight:S 这样传递
-// )
-
 // WeightChgSymbolConfig - configuration for WeightChgSymbol feature
 type WeightChgSymbolConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
@@ -96,8 +92,6 @@ func (weightChgSymbol *WeightChgSymbol) getChgWeight(gameProp *GameProperty, bas
 func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// weightChgSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
 
 	gs := weightChgSymbol.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -107,7 +101,6 @@ func (weightChgSymbol *WeightChgSymbol) OnPlayGame(gameProp *GameProperty, curpr
 	for x, arr := range cgs.Arr {
 		for y, s := range arr {
 			vw := weightChgSymbol.getChgWeight(gameProp, cd, s)
-			// vw, isok := weightChgSymbol.Config.MapChgWeightVW[s]
 			if vw != nil {
 				cr, err := vw.RandVal(plugin)
 				if err != nil {
@@ -140,11 +133,6 @@ func (weightChgSymbol *WeightChgSymbol) OnAsciiGame(gameProp *GameProperty, pr *
 
 	return nil
 }
-
-// // OnStats
-// func (weightChgSymbol *WeightChgSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewWeightChgSymbol(name string) IComponent {
 	return &WeightChgSymbol{

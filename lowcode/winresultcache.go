@@ -16,7 +16,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// 已弃用
+// 已弃用，待清理
 
 const WinResultCacheTypeName = "winResultCache"
 

@@ -402,7 +402,7 @@ func TestInitErrorPaths(t *testing.T) {
 	}
 }
 
-func setupGameForPlay(t *testing.T) (*GameProperty, *GameParams, *sgc7game.PlayResult) {
+func setupGameForPlay(_ *testing.T) (*GameProperty, *GameParams, *sgc7game.PlayResult) {
 	// minimal gameProp
 	gp := &GameProperty{}
 	gp.Pool = makePoolWithPaytables()

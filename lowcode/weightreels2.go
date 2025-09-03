@@ -57,7 +57,6 @@ func (weightReels2Data *WeightReels2Data) Clone() IComponentData {
 func (weightReels2Data *WeightReels2Data) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightReelsData{
 		BasicComponentData: weightReels2Data.BuildPBBasicComponentData(),
-		ReelSetIndex:       int32(weightReels2Data.ReelSetIndex),
 	}
 
 	return pbcd

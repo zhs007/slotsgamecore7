@@ -67,7 +67,6 @@ func (winResultModifierDataEx *WinResultModifierExData) GetValEx(key string, get
 }
 
 // WinResultModifierExConfig - configuration for WinResultModifierEx
-// 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type WinResultModifierExConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string                `yaml:"type" json:"type"`                         // type

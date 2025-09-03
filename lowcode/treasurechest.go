@@ -307,7 +307,7 @@ func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *
 	return nc, nil
 }
 
-func (treasureChest *TreasureChest) getSymbolNum(gameProp *GameProperty, basicCD *BasicComponentData) int {
+func (treasureChest *TreasureChest) getSymbolNum(_ *GameProperty, basicCD *BasicComponentData) int {
 	v, isok := basicCD.GetConfigIntVal(CCVOpenNum)
 	if isok {
 		return v
