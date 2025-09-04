@@ -12,9 +12,9 @@ import (
 
 func intPow(base int, exp int) int {
 	if exp < 0 {
-		// 负指数在整数域下无精确表示，保守返回 0（可根据项目约定改为 panic 或返回 error）
-		return 0
+		return 1
 	}
+
 	if exp == 0 {
 		return 1
 	}
@@ -253,35 +253,6 @@ func InsSliceNonRep(arr []string, src []string) []string {
 	return arr
 }
 
-func PowInt(v int, n int) int {
-	if n < 0 {
-		return 1
-	}
-
-	if n == 0 {
-		return 1
-	}
-
-	if n == 1 {
-		return v
-	}
-
-	if n == 2 {
-		return v * v
-	}
-
-	if n == 3 {
-		return v * v * v
-	}
-
-	t := v * v * v
-	for i := 3; i < n; i++ {
-		t *= v
-	}
-
-	return t
-}
-
 func CmpVal(src int, op string, target int) bool {
 	if op == "==" {
 		return src == target
@@ -352,9 +323,9 @@ func IsInitialArr(arr []int) bool {
 }
 
 // GenInitialArr - return [0,1,2...]
-func GenInitialArr(len int) []int {
+func GenInitialArr(l int) []int {
 	arr := []int{}
-	for i := 0; i < len; i++ {
+	for i := 0; i < l; i++ {
 		arr = append(arr, i)
 	}
 

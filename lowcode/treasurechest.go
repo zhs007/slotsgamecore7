@@ -400,8 +400,6 @@ func (jcfg *jsonTreasureChest) build() *TreasureChestConfig {
 		TotalNum:    jcfg.TotalNum,
 	}
 
-	// cfg.UseSceneV3 = true
-
 	return cfg
 }
 

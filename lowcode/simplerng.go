@@ -50,11 +50,11 @@ func (rng *SimpleRNG) GetCurRNG(curBetMode int, gameProp *GameProperty, curCompo
 }
 
 func (rng *SimpleRNG) IsNeedIterate() bool {
-	return len(rng.weights) > 0
+	return false //len(rng.weights) > 0
 }
 
 func (rng *SimpleRNG) IsIterateEnding() bool {
-	return rng.curIndex < len(rng.weights)
+	return true //rng.curIndex < len(rng.weights)
 }
 
 // OnChoiceBranch -
