@@ -226,9 +226,16 @@ func (treasureChest *TreasureChest) ProcControllers(gameProp *GameProperty, plug
 func (treasureChest *TreasureChest) procFragmentCollection(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	_ sgc7game.IPlayerState, _ *sgc7game.Stake, _ []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
 
-	vw2 := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
-	if vw2 == nil {
+	vw2, err := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
+	if err != nil {
 		goutils.Error("TreasureChest.procFragmentCollection:getWeight",
+			goutils.Err(err))
+
+		return "", err
+	}
+
+	if len(vw2.Vals) == 0 {
+		goutils.Error("TreasureChest.procFragmentCollection:empty weights",
 			goutils.Err(ErrInvalidComponentConfig))
 
 		return "", ErrInvalidComponentConfig
@@ -277,12 +284,12 @@ func (treasureChest *TreasureChest) procFragmentCollection(gameProp *GamePropert
 func (treasureChest *TreasureChest) procSumValue(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	_ sgc7game.IPlayerState, _ *sgc7game.Stake, _ []*sgc7game.PlayResult, cd *TreasureChestData) (string, error) {
 
-	vw2 := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
-	if vw2 == nil {
+	vw2, err := treasureChest.getWeight(gameProp, &cd.BasicComponentData)
+	if err != nil {
 		goutils.Error("TreasureChest.procSumValue:getWeight",
-			goutils.Err(ErrInvalidComponentConfig))
+			goutils.Err(err))
 
-		return "", ErrInvalidComponentConfig
+		return "", err
 	}
 
 	openNum := treasureChest.getSymbolNum(gameProp, &cd.BasicComponentData)
@@ -347,15 +354,21 @@ func (treasureChest *TreasureChest) NewComponentData() IComponentData {
 	return &TreasureChestData{}
 }
 
-func (treasureChest *TreasureChest) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+func (treasureChest *TreasureChest) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) (*sgc7game.ValWeights2, error) {
 	str := basicCD.GetConfigVal(CCVWeight)
 	if str != "" {
-		vw2, _ := gameProp.Pool.LoadIntWeights(str, true)
+		vw2, err := gameProp.Pool.LoadIntWeights(str, true)
+		if err != nil {
+			goutils.Error("TreasureChest.getWeight:LoadIntWeights",
+				goutils.Err(err))
 
-		return vw2
+			return nil, err
+		}
+
+		return vw2, nil
 	}
 
-	return treasureChest.Config.Weight
+	return treasureChest.Config.Weight, nil
 }
 
 // OnStats2
@@ -435,7 +448,7 @@ func parseTreasureChest(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	if ctrls != nil {
 		awards, mapAwards, err := parseTreasureChestControllers(ctrls)
 		if err != nil {
-			goutils.Error("parseBasicReels:parseTreasureChestControllers",
+			goutils.Error("parseTreasureChest:parseTreasureChestControllers",
 				goutils.Err(err))
 
 			return "", err
