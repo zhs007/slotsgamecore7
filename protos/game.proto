@@ -83,6 +83,8 @@ message Stake {
     int32 coinBet = 1;
     int32 cashBet = 2;
     string currency = 3;
+    int64 coinBet64 = 4;
+    int64 cashBet64 = 5;
 }
 
 // RequestPlay - play input parameters for the game
