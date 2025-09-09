@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -26,29 +27,33 @@ const (
 )
 
 func parseWinResultLimiterType(str string) WinResultLimiterType {
-	if str == "maxonline" {
+	s := strings.TrimSpace(strings.ToLower(str))
+	if s == "maxonline" {
 		return WRLTypeMaxOnLine
 	}
 
+	// default to max on line if unknown (backwards compatible)
 	return WRLTypeMaxOnLine
 }
 
+// WinResultLimiterData holds runtime data for the WinResultLimiter component.
+// It embeds BasicComponentData and tracks the total wins calculated by the limiter.
 type WinResultLimiterData struct {
 	BasicComponentData
 	Wins int
 }
 
-// OnNewGame -
+// OnNewGame calls BasicComponentData.OnNewGame to initialize component data at the start of a new game.
 func (winResultLimiterData *WinResultLimiterData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	winResultLimiterData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// onNewStep -
+// onNewStep resets the per-step counters for the component data.
 func (winResultLimiterData *WinResultLimiterData) onNewStep() {
 	winResultLimiterData.Wins = 0
 }
 
-// Clone
+// Clone creates a deep copy of the component data and returns the clone.
 func (winResultLimiterData *WinResultLimiterData) Clone() IComponentData {
 	target := &WinResultLimiterData{
 		BasicComponentData: winResultLimiterData.CloneBasicComponentData(),
@@ -58,7 +63,7 @@ func (winResultLimiterData *WinResultLimiterData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData builds a protobuf message representing the component data.
 func (winResultLimiterData *WinResultLimiterData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WinResultLimiterData{
 		BasicComponentData: winResultLimiterData.BuildPBBasicComponentData(),
@@ -68,7 +73,8 @@ func (winResultLimiterData *WinResultLimiterData) BuildPBComponentData() proto.M
 	return pbcd
 }
 
-// GetValEx -
+// GetValEx returns named values exposed by this component data.
+// Supported keys: CVWins -> returns the accumulated wins for the limiter.
 func (winResultLimiterData *WinResultLimiterData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVWins {
 		return winResultLimiterData.Wins, true
@@ -77,7 +83,8 @@ func (winResultLimiterData *WinResultLimiterData) GetValEx(key string, getType G
 	return 0, false
 }
 
-// WinResultLimiterConfig - configuration for WinResultLimiter
+// WinResultLimiterConfig is the configuration for the WinResultLimiter component.
+// It is parsed from YAML/JSON and controls limiter behavior.
 type WinResultLimiterConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string               `yaml:"type" json:"type"`                   // type
@@ -85,20 +92,23 @@ type WinResultLimiterConfig struct {
 	SrcComponents        []string             `yaml:"srcComponents" json:"srcComponents"` // srcComponents
 }
 
-// SetLinkComponent
+// SetLinkComponent sets a link between components such as the "next" component.
+// If link is "next", the DefaultNextComponent field is updated.
 func (cfg *WinResultLimiterConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
 	}
 }
 
+// WinResultLimiter is a component that limits win results according to configured rules.
 type WinResultLimiter struct {
 	*BasicComponent `json:"-"`
 	Config          *WinResultLimiterConfig `json:"config"`
 }
 
-// Init -
-func (winResultModifier *WinResultLimiter) Init(fn string, pool *GamePropertyPool) error {
+// Init loads a YAML configuration file and initializes the component.
+// Init reads the file from fn and unmarshals it into a WinResultLimiterConfig before calling InitEx.
+func (w *WinResultLimiter) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
 		goutils.Error("WinResultLimiter.Init:ReadFile",
@@ -119,13 +129,23 @@ func (winResultModifier *WinResultLimiter) Init(fn string, pool *GamePropertyPoo
 		return err
 	}
 
-	return winResultModifier.InitEx(cfg, pool)
+	return w.InitEx(cfg, pool)
 }
 
-// InitEx -
+// InitEx initializes the component from a parsed configuration object.
+// InitEx validates the cfg type and sets internal fields required for operation.
 func (winResultLimiter *WinResultLimiter) InitEx(cfg any, pool *GamePropertyPool) error {
-	winResultLimiter.Config = cfg.(*WinResultLimiterConfig)
-	winResultLimiter.Config.ComponentType = WinResultModifierTypeName
+	c, ok := cfg.(*WinResultLimiterConfig)
+	if !ok {
+		goutils.Error("WinResultLimiter.InitEx:InvalidCfg",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	winResultLimiter.Config = c
+	// set correct component type for limiter
+	winResultLimiter.Config.ComponentType = WinResultLimiterTypeName
 
 	winResultLimiter.Config.Type = parseWinResultLimiterType(winResultLimiter.Config.StrType)
 
@@ -134,20 +154,38 @@ func (winResultLimiter *WinResultLimiter) InitEx(cfg any, pool *GamePropertyPool
 	return nil
 }
 
-// playgame
+// onMaxOnLine enforces the max-on-line rule: for each line, only the highest win remains.
+// Other wins on the same line are zeroed out and the kept win is accumulated into cd.Wins.
 func (winResultLimiter *WinResultLimiter) onMaxOnLine(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd *WinResultLimiterData) (string, error) {
 
 	mapLinesWin := make(map[int][]int)
 
 	for _, cn := range winResultLimiter.Config.SrcComponents {
-		// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+		// If previous components haven't executed, their data may not be cleaned up,
+		// so skip this source component.
 		if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
 			continue
 		}
 
 		ccd := gameProp.GetComponentDataWithName(cn)
+		if ccd == nil {
+			goutils.Error("WinResultLimiter.onMaxOnLine:MissingComponentData",
+				slog.String("component", cn),
+				goutils.Err(ErrInvalidComponentData))
+
+			continue
+		}
+
 		lst := ccd.GetResults()
 		for _, ri := range lst {
+			if ri < 0 || ri >= len(curpr.Results) {
+				goutils.Error("WinResultLimiter.onMaxOnLine:ResultIndexOutOfRange",
+					slog.Int("ri", ri),
+					slog.Int("results_len", len(curpr.Results)))
+
+				continue
+			}
+
 			curline := curpr.Results[ri].LineIndex
 			mapLinesWin[curline] = append(mapLinesWin[curline], ri)
 		}
@@ -196,7 +234,8 @@ func (winResultLimiter *WinResultLimiter) onMaxOnLine(gameProp *GameProperty, cu
 	return nc, nil
 }
 
-// playgame
+// OnPlayGame is the runtime entry used during play to apply limiter logic to a PlayResult.
+// OnPlayGame dispatches to the configured limiter behavior for the current step.
 func (winResultLimiter *WinResultLimiter) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
@@ -214,16 +253,18 @@ func (winResultLimiter *WinResultLimiter) OnPlayGame(gameProp *GameProperty, cur
 	return "", ErrInvalidComponentConfig
 }
 
-// OnAsciiGame - outpur to asciigame
+// OnAsciiGame outputs component information for ASCII game mode.
+// OnAsciiGame prints the ending wins to stdout for legacy ASCII output.
 func (winResultModifier *WinResultLimiter) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	std := icd.(*WinResultLimiterData)
 
+	// This uses fmt.Printf because it's a special ASCII game mode that expects stdout output.
 	fmt.Printf("WinResultLimiter, ending wins = %v \n", std.Wins)
 
 	return nil
 }
 
-// NewComponentData -
+// NewComponentData creates and returns a fresh WinResultLimiterData instance.
 func (winResultModifier *WinResultLimiter) NewComponentData() IComponentData {
 	return &WinResultLimiterData{}
 }

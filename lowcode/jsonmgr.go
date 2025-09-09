@@ -72,7 +72,6 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(WeightBranchTypeName), parseWeightBranch)
 	gJsonMgr.RegLoadComponent(strings.ToLower(ClusterTriggerTypeName), parseClusterTrigger)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenGigaSymbolTypeName), parseGenGigaSymbol)
-	gJsonMgr.RegLoadComponent(strings.ToLower(WinResultCacheTypeName), parseWinResultCache)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenSymbolValsWithPosTypeName), parseGenSymbolValsWithPos)
 	gJsonMgr.RegLoadComponent(strings.ToLower(CheckSymbolValsTypeName), parseCheckSymbolVals)
 	gJsonMgr.RegLoadComponent(strings.ToLower(PositionCollectionTypeName), parsePositionCollection)

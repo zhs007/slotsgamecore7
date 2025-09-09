@@ -19,22 +19,27 @@ import (
 
 const WeightBranchTypeName = "weightBranch"
 
+// WeightBranchData represents runtime state for a WeightBranch component.
+// It embeds BasicComponentData and stores the currently selected branch value,
+// an optional per-instance ValWeights2 (WeightVW) and a list of branches
+// to ignore when ForceTriggerOnce is configured.
 type WeightBranchData struct {
 	BasicComponentData
-	Value         string
-	WeightVW      *sgc7game.ValWeights2
-	IgnoreBranchs []string
+	Value          string
+	WeightVW       *sgc7game.ValWeights2
+	IgnoreBranches []string
 }
 
-// OnNewGame -
+// OnNewGame resets per-game state for the component data.
+// It is called when a new game/play begins so cached per-data state is cleared.
 func (weightBranchData *WeightBranchData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	weightBranchData.BasicComponentData.OnNewGame(gameProp, component)
 
 	weightBranchData.WeightVW = nil
-	weightBranchData.IgnoreBranchs = nil
+	weightBranchData.IgnoreBranches = nil
 }
 
-// Clone
+// Clone returns a copy of the WeightBranchData suitable for per-play storage.
 func (weightBranchData *WeightBranchData) Clone() IComponentData {
 	target := &WeightBranchData{
 		BasicComponentData: weightBranchData.CloneBasicComponentData(),
@@ -44,7 +49,7 @@ func (weightBranchData *WeightBranchData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData builds the protobuf representation of this component data.
 func (weightBranchData *WeightBranchData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.WeightBranchData{
 		BasicComponentData: weightBranchData.BuildPBBasicComponentData(),
@@ -54,12 +59,14 @@ func (weightBranchData *WeightBranchData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetValEx -
+// GetValEx returns an integer configuration or runtime value by key.
+// Currently not used by WeightBranch and returns (0,false).
 func (weightBranchData *WeightBranchData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	return 0, false
 }
 
-// GetStrVal -
+// GetStrVal returns a string configuration or runtime value by key.
+// Supports CSVValue which maps to the currently selected branch Value.
 func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
 	if key == CSVValue {
 		return weightBranchData.Value, true
@@ -68,7 +75,8 @@ func (weightBranchData *WeightBranchData) GetStrVal(key string) (string, bool) {
 	return "", false
 }
 
-// SetConfigVal -
+// SetConfigVal applies a string configuration change to the component data.
+// When the weight configuration is changed it clears any cached per-data WeightVW.
 func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 	if key == CCVWeight {
 		weightBranchData.WeightVW = nil
@@ -77,20 +85,22 @@ func (weightBranchData *WeightBranchData) SetConfigVal(key string, val string) {
 	weightBranchData.BasicComponentData.SetConfigVal(key, val)
 }
 
-// SetConfigIntVal - CCVValueNum的set和chg逻辑不太一样，等于的时候不会触发任何的 controllers
+// SetConfigIntVal applies an integer configuration change to the component data.
+// Special handling: when CCVClearForceTriggerOnceCache is set it clears per-data caches.
 func (weightBranchData *WeightBranchData) SetConfigIntVal(key string, val int) {
 	if key == CCVClearForceTriggerOnceCache {
 		weightBranchData.WeightVW = nil
-		weightBranchData.IgnoreBranchs = nil
+		weightBranchData.IgnoreBranches = nil
 	} else {
 		weightBranchData.BasicComponentData.SetConfigIntVal(key, val)
 	}
 }
 
-// ChgConfigIntVal -
+// ChgConfigIntVal changes an integer config by offset and returns the new value.
+// When CCVClearForceTriggerOnceCache is changed it clears per-data ignore list.
 func (weightBranchData *WeightBranchData) ChgConfigIntVal(key string, off int) int {
 	if key == CCVClearForceTriggerOnceCache {
-		weightBranchData.IgnoreBranchs = nil
+		weightBranchData.IgnoreBranches = nil
 
 		return 0
 	}
@@ -98,13 +108,16 @@ func (weightBranchData *WeightBranchData) ChgConfigIntVal(key string, off int) i
 	return weightBranchData.BasicComponentData.ChgConfigIntVal(key, off)
 }
 
-// BranchNode -
+// BranchNode defines configuration for a single branch value.
+// It contains optional Awards to trigger and the component name to jump to.
 type BranchNode struct {
 	Awards          []*Award `yaml:"awards" json:"awards"` // 新的奖励系统
 	JumpToComponent string   `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
 
-// WeightBranchConfig - configuration for WeightBranch
+// WeightBranchConfig is the configuration for a WeightBranch component.
+// It specifies the weight table name, optional forced branch, mapping of branches
+// to target components and other behavior such as ForceTriggerOnce.
 type WeightBranchConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	ForceBranch          string                 `yaml:"forceBranch" json:"forceBranch"`
@@ -116,6 +129,9 @@ type WeightBranchConfig struct {
 }
 
 // SetLinkComponent
+// SetLinkComponent links a branch key (or "next") to a component name.
+// Use "next" to set the default next component; otherwise the link is treated
+// as a branch value and stored in MapBranchs.
 func (cfg *WeightBranchConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
@@ -139,7 +155,11 @@ type WeightBranch struct {
 	Config          *WeightBranchConfig `json:"config"`
 }
 
-// Init -
+// WeightBranch is a component that chooses a branch based on configured weights.
+// It supports forced branches, player selection, and one-time force triggers.
+
+// Init initializes the WeightBranch from a YAML file specified by fn.
+// It loads the configuration and delegates to InitEx.
 func (weightBranch *WeightBranch) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
@@ -164,7 +184,8 @@ func (weightBranch *WeightBranch) Init(fn string, pool *GamePropertyPool) error 
 	return weightBranch.InitEx(cfg, pool)
 }
 
-// InitEx -
+// InitEx initializes the WeightBranch from an already-parsed configuration object.
+// It validates the configuration and loads the referenced weight table into Config.WeightVW.
 func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error {
 	weightBranch.Config = cfg.(*WeightBranchConfig)
 	weightBranch.Config.ComponentType = WeightBranchTypeName
@@ -198,7 +219,7 @@ func (weightBranch *WeightBranch) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
-func (weightBranch *WeightBranch) getForceBrach(wbd *WeightBranchData) string {
+func (weightBranch *WeightBranch) getForceBranch(wbd *WeightBranchData) string {
 	val := wbd.BasicComponentData.GetConfigVal(CCVForceBranch)
 	if val != "" {
 		return val
@@ -232,7 +253,7 @@ func (weightBranch *WeightBranch) getWeight(gameProp *GameProperty, wbd *WeightB
 func (weightBranch *WeightBranch) onBranch(branch string, wbd *WeightBranchData, vw2 *sgc7game.ValWeights2) error {
 	if len(weightBranch.Config.ForceTriggerOnce) > 0 {
 		if goutils.IndexOfStringSlice(weightBranch.Config.ForceTriggerOnce, branch, 0) >= 0 {
-			if goutils.IndexOfStringSlice(wbd.IgnoreBranchs, branch, 0) >= 0 {
+			if goutils.IndexOfStringSlice(wbd.IgnoreBranches, branch, 0) >= 0 {
 				goutils.Error("WeightBranch.onBranch",
 					slog.String("branch", branch),
 					goutils.Err(ErrInvalidBranch))
@@ -240,7 +261,7 @@ func (weightBranch *WeightBranch) onBranch(branch string, wbd *WeightBranchData,
 				return ErrInvalidBranch
 			}
 
-			wbd.IgnoreBranchs = append(wbd.IgnoreBranchs, branch)
+			wbd.IgnoreBranches = append(wbd.IgnoreBranches, branch)
 
 			if wbd.WeightVW != nil {
 				nvw2, err := wbd.WeightVW.CloneExcludeVal(sgc7game.NewStrValEx(branch))
@@ -256,7 +277,7 @@ func (weightBranch *WeightBranch) onBranch(branch string, wbd *WeightBranchData,
 			} else {
 				nvw2 := vw2.Clone()
 
-				for _, v := range wbd.IgnoreBranchs {
+				for _, v := range wbd.IgnoreBranches {
 					err := nvw2.RemoveVal(sgc7game.NewStrValEx(v))
 					if err != nil {
 						goutils.Error("WeightBranch.RemoveVal",
@@ -275,17 +296,31 @@ func (weightBranch *WeightBranch) onBranch(branch string, wbd *WeightBranchData,
 	return nil
 }
 
-// playgame
+// OnPlayGame processes a play through this component.
+// It selects a branch based on configuration, player selection, or forced branch,
+// executes controllers and determines the next component to jump to.
 func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	wbd := icd.(*WeightBranchData)
+	wbd, ok := icd.(*WeightBranchData)
+	if !ok {
+		goutils.Error("WeightBranch.OnPlayGame:invalid icd",
+			goutils.Err(ErrInvalidComponentData))
+
+		return "", ErrInvalidComponentData
+	}
 
 	curBetMode := int(stake.CashBet / stake.CoinBet)
 
-	forceBranch := weightBranch.getForceBrach(wbd)
+	forceBranch := weightBranch.getForceBranch(wbd)
 	if forceBranch == "" {
 		vw2 := weightBranch.getWeight(gameProp, wbd)
+		if vw2 == nil {
+			goutils.Error("WeightBranch.OnPlayGame:missing weight",
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return "", ErrInvalidComponentConfig
+		}
 
 		if weightBranch.Config.IsNeedPlayerSelect {
 			if cmd == DefaultCmd {
@@ -363,10 +398,6 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	branch, isok := weightBranch.Config.MapBranchs[wbd.Value]
 	if isok {
-		// if len(branch.Awards) > 0 {
-		// 	gameProp.procAwards(plugin, branch.Awards, curpr, gp)
-		// }
-
 		nextComponent = branch.JumpToComponent
 	}
 
@@ -375,7 +406,7 @@ func (weightBranch *WeightBranch) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 	return nc, nil
 }
 
-// OnProcControllers -
+// ProcControllers executes branch-linked controller awards for the given string value.
 func (weightBranch *WeightBranch) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	branch, isok := weightBranch.Config.MapBranchs[strVal]
 	if isok {
@@ -385,21 +416,31 @@ func (weightBranch *WeightBranch) ProcControllers(gameProp *GameProperty, plugin
 	}
 }
 
-// OnAsciiGame - outpur to asciigame
+// OnAsciiGame renders debugging/ascii output for this component.
+// It returns an error when icd is not the expected type.
 func (weightBranch *WeightBranch) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	wbd := icd.(*WeightBranchData)
+	wbd, ok := icd.(*WeightBranchData)
+	if !ok {
+		goutils.Error("WeightBranch.OnAsciiGame:invalid icd",
+			goutils.Err(ErrInvalidComponentData))
 
-	fmt.Printf("weightBranch %v, got %v\n", weightBranch.GetName(), wbd.Value)
+		return ErrInvalidComponentData
+	}
+
+	fmt.Printf("weightBranch: name=%s, value=%s\n",
+		weightBranch.GetName(),
+		wbd.Value)
 
 	return nil
 }
 
-// NewComponentData -
+// NewComponentData creates a new empty WeightBranchData for runtime use.
 func (weightBranch *WeightBranch) NewComponentData() IComponentData {
 	return &WeightBranchData{}
 }
 
-// GetAllLinkComponents - get all link components
+// GetAllLinkComponents returns all branch keys configured for this component.
+// The returned slice is not guaranteed to be in any particular order.
 func (weightBranch *WeightBranch) GetAllLinkComponents() []string {
 	lst := []string{}
 
@@ -412,7 +453,8 @@ func (weightBranch *WeightBranch) GetAllLinkComponents() []string {
 	return lst
 }
 
-// GetNextLinkComponents - get next link components
+// GetNextLinkComponents returns all next component names referenced by branches.
+// Results may include empty strings for branches without a configured jump.
 func (weightBranch *WeightBranch) GetNextLinkComponents() []string {
 	lst := []string{}
 
@@ -425,16 +467,22 @@ func (weightBranch *WeightBranch) GetNextLinkComponents() []string {
 	return lst
 }
 
-// OnStats2
+// OnStats2 collects runtime stats for this component into the provided cache.
 func (weightBranch *WeightBranch) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
 	weightBranch.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
-	cd := icd.(*WeightBranchData)
+	cd, ok := icd.(*WeightBranchData)
+	if !ok {
+		goutils.Error("WeightBranch.OnStats2:invalid icd",
+			goutils.Err(ErrInvalidComponentData))
+
+		return
+	}
 
 	s2.ProcStatsStrVal(weightBranch.GetName(), cd.Value)
 }
 
-// NewStats2 -
+// NewStats2 returns a new stats feature describing this component's statistics.
 func (weightBranch *WeightBranch) NewStats2(parent string) *stats2.Feature {
 	return stats2.NewFeature(parent, []stats2.Option{stats2.OptStrVal})
 }
@@ -445,11 +493,15 @@ func NewWeightBranch(name string) IComponent {
 	}
 }
 
+// NewWeightBranch constructs a new WeightBranch component with the given name.
+
 // "configuration": {
 // "weight": "greenweight"
 // "forceBranch": "continue"
 // isNeedPlayerSelect
 // }
+// jsonWeightBranch is a lightweight struct used when parsing compact JSON
+// configuration for a WeightBranch from the lowcode format.
 type jsonWeightBranch struct {
 	Weight             string   `json:"weight"`
 	ForceBranch        string   `json:"forceBranch"`
@@ -457,6 +509,7 @@ type jsonWeightBranch struct {
 	IsNeedPlayerSelect bool     `json:"isNeedPlayerSelect"`
 }
 
+// build converts the parsed jsonWeightBranch into a full WeightBranchConfig.
 func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 	cfg := &WeightBranchConfig{
 		Weight:             jwr.Weight,
@@ -469,6 +522,9 @@ func (jwr *jsonWeightBranch) build() *WeightBranchConfig {
 	return cfg
 }
 
+// parseWeightBranch parses a weightBranch configuration from the AST node used
+// by the lowcode parser and registers the component configuration into gamecfg.
+// It returns the generated component label on success.
 func parseWeightBranch(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {

@@ -128,9 +128,24 @@ func BuildPBGameConfig(cfg *sgc7game.Config) *sgc7pb.GameConfig {
 
 // BuildStake - PlayerState => sgc7game.IPlayerState
 func BuildStake(stake *sgc7pb.Stake) *sgc7game.Stake {
+	var cashBet int64
+	var coinBet int64
+
+	if stake.CashBet64 > 0 {
+		cashBet = stake.CashBet64
+	} else {
+		cashBet = int64(stake.CashBet)
+	}
+
+	if stake.CoinBet64 > 0 {
+		coinBet = stake.CoinBet64
+	} else {
+		coinBet = int64(stake.CoinBet)
+	}
+
 	return &sgc7game.Stake{
-		CoinBet:  int64(stake.CoinBet),
-		CashBet:  int64(stake.CashBet),
+		CoinBet:  coinBet,
+		CashBet:  cashBet,
 		Currency: stake.Currency,
 	}
 }

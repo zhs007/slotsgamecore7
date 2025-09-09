@@ -17,6 +17,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 兼容老项目，已弃用
+
 const WinResultMultiTypeName = "winResultMulti"
 
 const (
@@ -36,8 +38,6 @@ func (winResultMultiData *WinResultMultiData) OnNewGame(gameProp *GameProperty, 
 
 // onNewStep -
 func (winResultMultiData *WinResultMultiData) onNewStep() {
-	// winResultMultiData.BasicComponentData.OnNewStep(gameProp, component)
-
 	winResultMultiData.Wins = 0
 	winResultMultiData.WinMulti = 1
 }
@@ -76,15 +76,7 @@ func (winResultMultiData *WinResultMultiData) GetValEx(key string, getType GetCo
 	return 0, false
 }
 
-// // SetVal -
-// func (winResultMultiData *WinResultMultiData) SetVal(key string, val int) {
-// 	if key == CVWins {
-// 		winResultMultiData.Wins = val
-// 	}
-// }
-
 // WinResultMultiConfig - configuration for WinResultMulti
-// 需要特别注意，当判断scatter时，symbols里的符号会当作同一个符号来处理
 type WinResultMultiConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	TargetComponents     []string `yaml:"targetComponents" json:"targetComponents"` // target components
@@ -146,8 +138,6 @@ func (winResultMulti *WinResultMulti) InitEx(cfg any, pool *GamePropertyPool) er
 func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	std := icd.(*WinResultMultiData)
 	std.onNewStep()
 
@@ -169,7 +159,6 @@ func (winResultMulti *WinResultMulti) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		ccd := gameProp.GetComponentDataWithName(cn)
-		// ccd := gameProp.MapComponentData[cn]
 		lst := ccd.GetResults()
 		for _, ri := range lst {
 			curpr.Results[ri].CashWin *= winMulti
@@ -194,24 +183,6 @@ func (winResultMulti *WinResultMulti) OnAsciiGame(gameProp *GameProperty, pr *sg
 
 	return nil
 }
-
-// // OnStatsWithPB -
-// func (winResultMulti *WinResultMulti) OnStatsWithPB(feature *sgc7stats.Feature, pbComponentData proto.Message, pr *sgc7game.PlayResult) (int64, error) {
-// 	pbcd, isok := pbComponentData.(*sgc7pb.WinResultMultiData)
-// 	if !isok {
-// 		goutils.Error("WinResultMulti.OnStatsWithPB",
-// 			goutils.Err(ErrInvalidProto))
-
-// 		return 0, ErrInvalidProto
-// 	}
-
-// 	return winResultMulti.OnStatsWithPBBasicComponentData(feature, pbcd.BasicComponentData, pr), nil
-// }
-
-// // OnStats
-// func (winResultMulti *WinResultMulti) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 // OnStats2
 func (winResultMulti *WinResultMulti) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
@@ -287,8 +258,6 @@ func (jwt *jsonWinResultMulti) build() *WinResultMultiConfig {
 		TargetComponents: jwt.TargetComponents,
 		WinMulti:         jwt.WinMulti,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
