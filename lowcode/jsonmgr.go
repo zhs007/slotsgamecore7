@@ -65,7 +65,7 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(RollSymbolTypeName), parseRollSymbol)
 	gJsonMgr.RegLoadComponent(strings.ToLower(MaskTypeName), parseMask)
 	gJsonMgr.RegLoadComponent(strings.ToLower(ReplaceReelWithMaskTypeName), parseReplaceReelWithMask)
-	gJsonMgr.RegLoadComponent(strings.ToLower(SymbolExplanderTypeName), parseSymbolExplander)
+	gJsonMgr.RegLoadComponent(strings.ToLower(SymbolExpanderTypeName), parseSymbolExpander)
 	gJsonMgr.RegLoadComponent(strings.ToLower(PiggyBankTypeName), parsePiggyBank)
 	gJsonMgr.RegLoadComponent(strings.ToLower(AddSymbolsTypeName), parseAddSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(IntValMappingTypeName), parseIntValMapping)
