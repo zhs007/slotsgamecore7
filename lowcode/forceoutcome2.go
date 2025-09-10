@@ -289,6 +289,24 @@ func (fo2 *ForceOutcome2) getComponentVal(component string, val string) int {
 	return 0
 }
 
+func (fo2 *ForceOutcome2) getComponentStrVal(component string, val string) string {
+	for _, ret := range fo2.results {
+		gp, isok := ret.CurGameModParams.(*GameParams)
+		if isok {
+			for k, v := range gp.MapComponentData {
+				if isComponent(k, component) {
+					curval, isok2 := v.GetStrVal(strings.ToLower(val))
+					if isok2 {
+						return curval
+					}
+				}
+			}
+		}
+	}
+
+	return ""
+}
+
 func (fo2 *ForceOutcome2) getComponentValAtEnding(component string, val string) (int, bool) {
 	retVal := 0
 	hasVal := false
@@ -571,6 +589,18 @@ func (fo2 *ForceOutcome2) newScriptBasicFuncs() []cel.EnvOption {
 					val := fo2.getComponentVal(param0.Value().(string), param1.Value().(string))
 
 					return types.Int(val)
+				},
+				),
+			),
+		),
+		cel.Function("getStrVal",
+			cel.Overload("getStrVal_string_string",
+				[]*cel.Type{cel.StringType, cel.StringType},
+				cel.StringType,
+				cel.BinaryBinding(func(param0 ref.Val, param1 ref.Val) ref.Val {
+					val := fo2.getComponentStrVal(param0.Value().(string), param1.Value().(string))
+
+					return types.String(val)
 				},
 				),
 			),
