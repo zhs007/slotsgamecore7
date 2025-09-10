@@ -18,8 +18,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// HoldAndWinTypeName is the registered component type name used by the component manager
+// and JSON loader for HoldAndWin components.
 const HoldAndWinTypeName = "holdAndWin"
 
+// HoldAndWinType enumerates supported variants of hold-and-win mechanics.
+// Use parseHoldAndWinType to convert a textual type into this enum.
 type HoldAndWinType int
 
 const (
@@ -27,6 +31,8 @@ const (
 	HAWTypeCollectorAndHeightLevel HoldAndWinType = 1 // Collector And Height Level
 )
 
+// parseHoldAndWinType converts a configuration string into a HoldAndWinType.
+// Unknown values return HAWTypeNormal.
 func parseHoldAndWinType(str string) HoldAndWinType {
 	if str == "collectorandheightlevel" {
 		return HAWTypeCollectorAndHeightLevel
@@ -35,25 +41,27 @@ func parseHoldAndWinType(str string) HoldAndWinType {
 	return HAWTypeNormal
 }
 
+// HoldAndWinData holds per-player/per-session runtime state for the component.
+// It embeds BasicComponentData for common state and tracks positions and current height.
 type HoldAndWinData struct {
 	BasicComponentData
 	Pos    []int
 	Height int
 }
 
-// OnNewGame -
+// OnNewGame is called when a new game session starts and delegates to BasicComponentData.
 func (holdAndWinData *HoldAndWinData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	holdAndWinData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// OnNewStep -
+// OnNewStep resets step-scoped fields before processing a new play step.
 func (holdAndWinData *HoldAndWinData) OnNewStep() {
 	holdAndWinData.UsedScenes = nil
 	holdAndWinData.UsedOtherScenes = nil
 	holdAndWinData.Pos = nil
 }
 
-// Clone
+// Clone creates and returns a deep copy of the HoldAndWinData.
 func (holdAndWinData *HoldAndWinData) Clone() IComponentData {
 	target := &HoldAndWinData{
 		BasicComponentData: holdAndWinData.CloneBasicComponentData(),
@@ -63,7 +71,7 @@ func (holdAndWinData *HoldAndWinData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData converts component data into its protobuf representation.
 func (holdAndWinData *HoldAndWinData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.HoldAndWinData{
 		BasicComponentData: holdAndWinData.BuildPBBasicComponentData(),
@@ -77,34 +85,34 @@ func (holdAndWinData *HoldAndWinData) BuildPBComponentData() proto.Message {
 	return pbcd
 }
 
-// GetPos -
+// GetPos returns a copy of the interleaved positions slice [x0,y0,x1,y1,...].
 func (holdAndWinData *HoldAndWinData) GetPos() []int {
 	return holdAndWinData.Pos
 }
 
-// HasPos -
+// HasPos reports whether the given (x,y) coordinate has been recorded.
 func (holdAndWinData *HoldAndWinData) HasPos(x int, y int) bool {
 	return goutils.IndexOfInt2Slice(holdAndWinData.Pos, x, y, 0) >= 0
 }
 
-// AddPos -
+// AddPos appends the provided coordinate to the internal positions list.
 func (holdAndWinData *HoldAndWinData) AddPos(x int, y int) {
 	holdAndWinData.Pos = append(holdAndWinData.Pos, x, y)
 }
 
-// AddPosEx -
+// AddPosEx adds the coordinate only if it is not already present.
 func (holdAndWinData *HoldAndWinData) AddPosEx(x int, y int) {
 	if !holdAndWinData.HasPos(x, y) {
 		holdAndWinData.AddPos(x, y)
 	}
 }
 
-// ClearPos -
+// ClearPos removes all recorded positions.
 func (holdAndWinData *HoldAndWinData) ClearPos() {
 	holdAndWinData.Pos = nil
 }
 
-// GetValEx -
+// GetValEx returns extended component values by key. Supported keys include CVHeight.
 func (holdAndWinData *HoldAndWinData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVHeight {
 		return holdAndWinData.Height, true
@@ -120,6 +128,8 @@ type HoldAndWinConfig struct {
 	Type                  HoldAndWinType                `yaml:"-" json:"-"`
 	StrWeight             string                        `yaml:"weight" json:"weight"`
 	WeightVW2             *sgc7game.ValWeights2         `yaml:"-" json:"-"`
+	StrSPWeight           string                        `yaml:"spWeight" json:"spWeight"`
+	SPWeightVW2           *sgc7game.ValWeights2         `yaml:"-" json:"-"`
 	BlankSymbol           string                        `yaml:"blankSymbol" json:"blankSymbol"`
 	BlankSymbolCode       int                           `yaml:"-" json:"-"`
 	DefaultCoinSymbolCode int                           `yaml:"-" json:"-"`
@@ -133,7 +143,8 @@ type HoldAndWinConfig struct {
 	MapAwards             map[string][]*Award           `yaml:"controllers" json:"controllers"`
 }
 
-// SetLinkComponent
+// SetLinkComponent configures a link from this component to another component by name.
+// Supported link keys are "next" and "jump".
 func (cfg *HoldAndWinConfig) SetLinkComponent(link string, componentName string) {
 	switch link {
 	case "next":
@@ -219,6 +230,19 @@ func (holdAndWin *HoldAndWin) InitEx(cfg any, pool *GamePropertyPool) error {
 		holdAndWin.Config.WeightVW2 = vw2
 	}
 
+	if holdAndWin.Config.StrSPWeight != "" {
+		vw2, err := pool.LoadIntWeights(holdAndWin.Config.StrSPWeight, true)
+		if err != nil {
+			goutils.Error("HoldAndWin.InitEx:LoadIntWeights",
+				slog.String("Weight", holdAndWin.Config.StrSPWeight),
+				goutils.Err(err))
+
+			return err
+		}
+
+		holdAndWin.Config.SPWeightVW2 = vw2
+	}
+
 	holdAndWin.Config.DefaultCoinSymbolCode = -1
 	holdAndWin.Config.MapCoinWeightVW2 = make(map[int]*sgc7game.ValWeights2)
 	for k, v := range holdAndWin.Config.MapCoinWeight {
@@ -269,18 +293,38 @@ func (holdAndWin *HoldAndWin) getWeight(gameProp *GameProperty, basicCD *BasicCo
 	return holdAndWin.Config.WeightVW2
 }
 
-func (holdAndWin *HoldAndWin) getCoinWeight(gameProp *GameProperty, basicCD *BasicComponentData, s int) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(CCVMapCoinWeight + "." + strings.ToLower(gameProp.Pool.DefaultPaytables.GetStringFromInt(s)))
+func (holdAndWin *HoldAndWin) getSPWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(CCVSPWeight)
 	if str != "" {
 		vw2, _ := gameProp.Pool.LoadIntWeights(str, true)
 
 		return vw2
 	}
 
-	return holdAndWin.Config.MapCoinWeightVW2[s]
+	return holdAndWin.Config.SPWeightVW2
 }
 
-// procNormal -
+func (holdAndWin *HoldAndWin) getCoinWeight(gameProp *GameProperty, basicCD *BasicComponentData, s int) (*sgc7game.ValWeights2, error) {
+	str := basicCD.GetConfigVal(CCVMapCoinWeight + "." + strings.ToLower(gameProp.Pool.DefaultPaytables.GetStringFromInt(s)))
+	if str != "" {
+		vw2, err := gameProp.Pool.LoadIntWeights(str, true)
+		if err != nil {
+			return nil, err
+		}
+
+		return vw2, nil
+	}
+
+	vw2, ok := holdAndWin.Config.MapCoinWeightVW2[s]
+	if !ok || vw2 == nil {
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return vw2, nil
+}
+
+// procNormal - fills new symbols into empty positions according to weight config.
+// Returns possibly cloned game scene (ngs) and other scene (nos) when modifications occur.
 func (holdAndWin *HoldAndWin) procNormal(gameProp *GameProperty, plugin sgc7plugin.IPlugin, cd *HoldAndWinData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
 
@@ -317,7 +361,14 @@ func (holdAndWin *HoldAndWin) procNormal(gameProp *GameProperty, plugin sgc7plug
 				ngs.Arr[x][y] = cv.Int()
 				cd.AddPosEx(x, y)
 
-				cvw2 := holdAndWin.getCoinWeight(gameProp, &cd.BasicComponentData, ngs.Arr[x][y])
+				cvw2, err := holdAndWin.getCoinWeight(gameProp, &cd.BasicComponentData, ngs.Arr[x][y])
+				if err != nil {
+					goutils.Error("HoldAndWin.procNormal:getCoinWeight",
+						goutils.Err(err))
+
+					return nil, nil, err
+				}
+
 				coin, err := cvw2.RandVal(plugin)
 				if err != nil {
 					goutils.Error("HoldAndWin.procNormal:getCoinWeight:RandVal",
@@ -366,19 +417,41 @@ func (holdAndWin *HoldAndWin) isFullCollectorAndHeightLevel(gs *sgc7game.GameSce
 	return true
 }
 
-// procCollectorAndHeightLevel - return gs1, os1, gs2, os2, err
+func (holdAndWin *HoldAndWin) isSPPos(x int, y int, w int, h int) bool {
+	return (x == 0 || x == w-1) && (y == 0 || y == h-1)
+}
+
+// procCollectorAndHeightLevel - collector variant that may expand height when corner coins accumulate.
+// Returns (ngs, nos, ngs2, nos2, err). ngs/ngs2 are the new game scenes (ngs2 when expanded height).
 func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty, plugin sgc7plugin.IPlugin, cd *HoldAndWinData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) (*sgc7game.GameScene, *sgc7game.GameScene, *sgc7game.GameScene, *sgc7game.GameScene, error) {
 
 	ngs := gs
 	nos := os
 
+	// basic validation to avoid unexpected zero dimensions
+	if gs == nil || gs.Width <= 0 || gs.Height <= 0 {
+		goutils.Error("HoldAndWin.procCollectorAndHeightLevel:InvalidScene",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, nil, nil, nil, ErrInvalidComponentConfig
+	}
+
 	vw2 := holdAndWin.getWeight(gameProp, &cd.BasicComponentData)
+	spvw2 := holdAndWin.getSPWeight(gameProp, &cd.BasicComponentData)
+	if spvw2 == nil {
+		spvw2 = vw2
+	}
 
 	for x, arr := range gs.Arr {
 		for y, s := range arr {
 			if goutils.IndexOfIntSlice(holdAndWin.Config.IgnoreSymbolCodes, s, 0) < 0 {
-				cv, err := vw2.RandVal(plugin)
+				curvw2 := vw2
+				if holdAndWin.isSPPos(x, y, gs.Width, gs.Height) {
+					curvw2 = spvw2
+				}
+
+				cv, err := curvw2.RandVal(plugin)
 				if err != nil {
 					goutils.Error("HoldAndWin.procNormal:RandVal",
 						goutils.Err(err))
@@ -403,7 +476,14 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 				ngs.Arr[x][y] = cv.Int()
 				cd.AddPosEx(x, y)
 
-				cvw2 := holdAndWin.getCoinWeight(gameProp, &cd.BasicComponentData, ngs.Arr[x][y])
+				cvw2, err := holdAndWin.getCoinWeight(gameProp, &cd.BasicComponentData, ngs.Arr[x][y])
+				if err != nil {
+					goutils.Error("HoldAndWin.procNormal:getCoinWeight",
+						goutils.Err(err))
+
+					return nil, nil, nil, nil, err
+				}
+
 				coin, err := cvw2.RandVal(plugin)
 				if err != nil {
 					goutils.Error("HoldAndWin.procNormal:getCoinWeight:RandVal",
@@ -418,7 +498,7 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 	}
 
 	if nos != nil && nos.Height < holdAndWin.Config.MaxHeight {
-		if nos.Arr[0][nos.Height-1] != 0 && nos.Arr[nos.Width-1][0] != 0 && nos.Arr[nos.Width-1][nos.Height-1] != 0 {
+		if nos.Arr[0][nos.Height-1] != 0 && nos.Arr[nos.Width-1][0] != 0 && nos.Arr[nos.Width-1][nos.Height-1] != 0 && nos.Arr[0][0] != 0 {
 			co := nos.Arr[0][0] + nos.Arr[0][nos.Height-1] + nos.Arr[nos.Width-1][0] + nos.Arr[nos.Width-1][nos.Height-1]
 
 			nos2 := gameProp.PoolScene.New(nos.Width, nos.Height+1)
@@ -584,19 +664,24 @@ func (holdAndWin *HoldAndWin) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 }
 
 // NewComponentData -
-func (flowDownSymbols *HoldAndWin) NewComponentData() IComponentData {
+func (holdAndWin *HoldAndWin) NewComponentData() IComponentData {
 	return &HoldAndWinData{}
 }
 
 // OnAsciiGame - outpur to asciigame
-func (flowDownSymbols *HoldAndWin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
+func (holdAndWin *HoldAndWin) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	msd := icd.(*HoldAndWinData)
+
+	if len(msd.UsedScenes) == 0 {
+		return fmt.Errorf("HoldAndWin.OnAsciiGame: no used scenes")
+	}
 
 	asciigame.OutputScene("after HoldAndWin", pr.Scenes[msd.UsedScenes[0]], mapSymbolColor)
 
 	return nil
 }
 
+// NewHoldAndWin creates a new HoldAndWin component instance with the provided name.
 func NewHoldAndWin(name string) IComponent {
 	return &HoldAndWin{
 		BasicComponent: NewBasicComponent(name, 1),
@@ -618,6 +703,8 @@ func NewHoldAndWin(name string) IComponent {
 // 	"COIN"
 // ]
 
+// jsonHoldAndWinCoinWeight represents a single entry of the mapCoinWeight JSON array
+// mapping a symbol name to a named weight table.
 type jsonHoldAndWinCoinWeight struct {
 	Symbol string `json:"symbol"`
 	Value  string `json:"value"`
@@ -626,6 +713,7 @@ type jsonHoldAndWinCoinWeight struct {
 type jsonHoldAndWin struct {
 	StrType       string                      `json:"type"`
 	StrWeight     string                      `json:"weight"`
+	StrSPWeight   string                      `json:"spWeight"`
 	BlankSymbol   string                      `json:"blankSymbol"`
 	IgnoreSymbols []string                    `json:"ignoreSymbols"`
 	MinHeight     int                         `json:"minHeight"`
@@ -633,10 +721,13 @@ type jsonHoldAndWin struct {
 	MapCoinWeight []*jsonHoldAndWinCoinWeight `json:"mapCoinWeight"`
 }
 
+// build converts a jsonHoldAndWin into a HoldAndWinConfig suitable for InitEx.
+// It normalizes string fields and constructs the MapCoinWeight map.
 func (jcfg *jsonHoldAndWin) build() *HoldAndWinConfig {
 	cfg := &HoldAndWinConfig{
 		StrType:       strings.ToLower(jcfg.StrType),
 		StrWeight:     jcfg.StrWeight,
+		StrSPWeight:   jcfg.StrSPWeight,
 		BlankSymbol:   jcfg.BlankSymbol,
 		IgnoreSymbols: slices.Clone(jcfg.IgnoreSymbols),
 		MinHeight:     jcfg.MinHeight,
