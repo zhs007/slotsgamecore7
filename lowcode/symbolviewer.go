@@ -8,6 +8,10 @@ import (
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
 
+// DefaultSymbolColor is the default color used when a symbol color is not provided.
+const DefaultSymbolColor = "low"
+
+// SymbolViewerData holds presentation data for a symbol.
 type SymbolViewerData struct {
 	Code   int
 	Symbol string
@@ -15,58 +19,92 @@ type SymbolViewerData struct {
 	Color  string
 }
 
-type SymbolsViewer struct {
+// SymbolViewer is a helper for mapping symbol code -> presentation data.
+//
+// Note: an alias "SymbolsViewer" is provided below for backwards compatibility
+// with code that references the old exported name.
+type SymbolViewer struct {
 	MapSymbols map[int]*SymbolViewerData
 }
 
+// SymbolsViewer is an alias for SymbolViewer to keep compatibility with
+// existing callers that expect the older name.
+type SymbolsViewer = SymbolViewer
+
+// NewSymbolViewerFromPaytables builds a SymbolViewer from game PayTables.
+// It uses the symbol string as the default Output and assigns a default color
+// when none is provided.
 func NewSymbolViewerFromPaytables(paytables *sgc7game.PayTables) *SymbolsViewer {
-	symViewer := &SymbolsViewer{
+	viewer := &SymbolViewer{
 		MapSymbols: make(map[int]*SymbolViewerData),
 	}
 
-	for key, sym := range paytables.MapSymbols {
+	for symStr, code := range paytables.MapSymbols {
 		svd := &SymbolViewerData{
-			Code:   sym,
-			Symbol: key,
-			Output: key,
-			Color:  "low",
+			Code:   code,
+			Symbol: symStr,
+			Output: symStr,
+			Color:  DefaultSymbolColor,
 		}
 
-		symViewer.MapSymbols[sym] = svd
+		viewer.MapSymbols[code] = svd
 	}
 
-	return symViewer
+	return (*SymbolsViewer)(viewer)
 }
 
+// LoadSymbolsViewer loads a symbols viewer from an Excel file. Required column:
+//   - code (int)
+// Optional columns:
+//   - symbol, output, color
+// The header matching is case-insensitive and trimmed.
 func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
-	symbols := []int{}
-	symbolstr := []string{}
-	outputs := []string{}
-	colors := []string{}
+	type tmpRow struct {
+		code   *int
+		symbol string
+		output string
+		color  string
+		row    int
+	}
 
+	rows := map[int]*tmpRow{}
+
+	// transform: normalize cells (header matching is lowercased)
 	err := sgc7game.LoadExcel(fn, "", func(x int, str string) string {
 		return strings.ToLower(strings.TrimSpace(str))
 	}, func(x int, y int, header string, data string) error {
 		data = strings.TrimSpace(data)
+		r := rows[y]
+		if r == nil {
+			r = &tmpRow{row: y}
+			rows[y] = r
+		}
+
 		switch header {
 		case "code":
+			if data == "" {
+				// empty code cell => treat as missing code for this row
+				return nil
+			}
+
 			v, err := goutils.String2Int64(data)
 			if err != nil {
 				goutils.Error("LoadSymbolsViewer:LoadExcel:String2Int64",
 					slog.String("header", header),
 					slog.String("data", data),
+					slog.Int("row", y),
 					goutils.Err(err))
 
 				return err
 			}
-
-			symbols = append(symbols, int(v))
+			iv := int(v)
+			r.code = &iv
 		case "symbol":
-			symbolstr = append(symbolstr, data)
+			r.symbol = data
 		case "output":
-			outputs = append(outputs, data)
+			r.output = data
 		case "color":
-			colors = append(colors, data)
+			r.color = data
 		}
 
 		return nil
@@ -79,20 +117,39 @@ func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 		return nil, err
 	}
 
-	sv := &SymbolsViewer{
+	sv := &SymbolViewer{
 		MapSymbols: make(map[int]*SymbolViewerData),
 	}
 
-	for i, v := range symbols {
-		svd := &SymbolViewerData{
-			Code:   v,
-			Symbol: symbolstr[i],
-			Output: outputs[i],
-			Color:  colors[i],
+	for _, r := range rows {
+		if r.code == nil {
+			// skip rows without a code, but warn with row info
+			goutils.Warn("LoadSymbolsViewer: missing code, skipping row",
+				slog.Int("row", r.row))
+			continue
 		}
 
-		sv.MapSymbols[v] = svd
+		code := *r.code
+
+		// if duplicate code, warn and overwrite with last-seen
+		if _, ok := sv.MapSymbols[code]; ok {
+			goutils.Warn("LoadSymbolsViewer: duplicate code, overwriting",
+				slog.Int("code", code),
+				slog.Int("row", r.row))
+		}
+
+		color := r.color
+		if color == "" {
+			color = DefaultSymbolColor
+		}
+
+		sv.MapSymbols[code] = &SymbolViewerData{
+			Code:   code,
+			Symbol: r.symbol,
+			Output: r.output,
+			Color:  color,
+		}
 	}
 
-	return sv, nil
+	return (*SymbolsViewer)(sv), nil
 }
