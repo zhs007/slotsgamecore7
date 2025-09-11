@@ -505,6 +505,8 @@ func (holdAndWin *HoldAndWin) procCollectorAndHeightLevel(gameProp *GameProperty
 			ngs2 := gameProp.PoolScene.New(ngs.Width, ngs.Height+1)
 
 			for x, arr := range nos.Arr {
+				ngs2.Arr[x][0] = holdAndWin.Config.BlankSymbolCode
+				
 				for y, s := range arr {
 					if x == 0 && y == 0 {
 						continue
