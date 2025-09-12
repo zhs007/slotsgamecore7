@@ -18,8 +18,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// SymbolValWinsTypeName is the component type name used in configuration
+// and registration for the SymbolValWins component.
 const SymbolValWinsTypeName = "symbolValWins"
 
+// SymbolValWinsType enumerates the variant types for SymbolValWins behavior.
+// It controls how collector symbols are interpreted when computing wins.
 type SymbolValWinsType int
 
 const (
@@ -28,6 +32,8 @@ const (
 	svwTypeReelCollector SymbolValWinsType = 2
 )
 
+// parseSymbolValWinsType converts a textual type (from configuration)
+// into the corresponding SymbolValWinsType enum value.
 func parseSymbolValWinsType(strType string) SymbolValWinsType {
 	switch strType {
 	case "collector":
@@ -44,25 +50,34 @@ const (
 	SVWDVSymbolNum string = "symbolNum" // 符号数量
 )
 
+// SymbolValWinsData stores runtime state for a SymbolValWins component.
+// It extends BasicComponentData and records the number of collected symbols
+// and the total coin wins produced by the component during a step/session.
 type SymbolValWinsData struct {
 	BasicComponentData
+	// SymbolNum is the count of symbol positions that contributed value
 	SymbolNum int
+	// Wins is the total coin value accumulated by this component
 	Wins      int
 }
 
-// OnNewGame -
+// OnNewGame is called when a new game session starts.
+// It forwards to BasicComponentData.OnNewGame to initialize base fields.
 func (symbolValWinsData *SymbolValWinsData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	symbolValWinsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// onNewStep -
+// onNewStep resets the per-step fields of SymbolValWinsData. This is
+// invoked when a new step (spin/round) begins so previous results don't
+// leak into the new computation.
 func (symbolValWinsData *SymbolValWinsData) onNewStep() {
 	symbolValWinsData.UsedResults = nil
 	symbolValWinsData.SymbolNum = 0
 	symbolValWinsData.Wins = 0
 }
 
-// Clone
+// Clone produces a deep-ish copy of the component data. It clones the
+// embedded BasicComponentData and copies primitive fields.
 func (symbolValWinsData *SymbolValWinsData) Clone() IComponentData {
 	target := &SymbolValWinsData{
 		BasicComponentData: symbolValWinsData.CloneBasicComponentData(),
@@ -73,21 +88,26 @@ func (symbolValWinsData *SymbolValWinsData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData serializes runtime data into the protobuf message
+// used for debugging or telemetry. The returned message is of type
+// sgc7pb.SymbolValWinsData and includes base component data as well as
+// SymbolNum and Wins.
 func (symbolValWinsData *SymbolValWinsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.SymbolValWinsData{
 		BasicComponentData: symbolValWinsData.BuildPBBasicComponentData(),
 	}
 
-	if !gIsReleaseMode {
-		pbcd.SymbolNum = int32(symbolValWinsData.SymbolNum)
-		pbcd.Wins = int32(symbolValWinsData.Wins)
-	}
+	pbcd.SymbolNum = int32(symbolValWinsData.SymbolNum)
+	pbcd.Wins = int32(symbolValWinsData.Wins)
 
 	return pbcd
 }
 
-// GetValEx -
+// GetValEx returns extra integer values from the component data by key.
+// Supported keys:
+//   - SVWDVSymbolNum -> number of contributing symbols
+//   - SVWDVWins -> total coin wins produced
+//   - CVResultNum, CVWinResultNum -> number of used results
 func (symbolValWinsData *SymbolValWinsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	switch key {
 	case SVWDVSymbolNum:
@@ -101,7 +121,9 @@ func (symbolValWinsData *SymbolValWinsData) GetValEx(key string, getType GetComp
 	return 0, false
 }
 
-// SymbolValWinsConfig - configuration for SymbolValWins
+// SymbolValWinsConfig describes the YAML/JSON configuration for a
+// SymbolValWins component. It embeds BasicComponentConfig and adds
+// fields to select symbol sets, coin symbols and behavior type.
 type SymbolValWinsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	BetTypeString        string            `yaml:"betType" json:"betType"`   // bet or totalBet or noPay
@@ -127,7 +149,12 @@ type SymbolValWins struct {
 	Config          *SymbolValWinsConfig `json:"config"`
 }
 
-// Init -
+// SymbolValWins is a component that creates coin-value results based on an
+// "other scene" (value map) and optionally collector symbols on the
+// primary scene. It supports normal, collector and reelcollector modes.
+
+// Init reads YAML config from file and initializes the component.
+// It unmarshals into SymbolValWinsConfig and delegates to InitEx.
 func (svw *SymbolValWins) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
@@ -152,8 +179,9 @@ func (svw *SymbolValWins) Init(fn string, pool *GamePropertyPool) error {
 	return svw.InitEx(cfg, pool)
 }
 
-// InitEx -
-
+// InitEx initializes the component from an already-parsed config object.
+// It resolves symbol names to codes using the provided GamePropertyPool
+// and performs basic validation.
 func (svw *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) error {
 	svw.Config = cfg.(*SymbolValWinsConfig)
 	svw.Config.ComponentType = SymbolValWinsTypeName
@@ -192,11 +220,27 @@ func (svw *SymbolValWins) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-// playgame
+// OnPlayGame executes the component logic for a single play step.
+// Behavior summary:
+//   - locate the target scene (gs) and other scene (os)
+//   - depending on Type (normal/collector/reelcollector) determine multiplier
+//     and collector positions
+//   - scan the other scene for coin values (optionally filtered by coin symbols)
+//   - if any values found, create RTCoins results (one per multiplier) with
+//     appropriate Pos, CoinWin and CashWin and add them to PlayResult
+// It returns the next component name and an error (ErrComponentDoNothing
+// if nothing was produced).
 func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	svwd := icd.(*SymbolValWinsData)
+	svwd, ok := icd.(*SymbolValWinsData)
+	if !ok || svwd == nil {
+		goutils.Error("SymbolValWins.OnPlayGame:SymbolValWinsData",
+			goutils.Err(ErrInvalidComponentData))
+
+		return "", ErrInvalidComponentData
+	}
+
 	svwd.onNewStep()
 
 	gs := svw.GetTargetScene3(gameProp, pr, prs, 0)
@@ -210,8 +254,11 @@ func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 	os := svw.GetTargetOtherScene3(gameProp, pr, prs, 0)
 
 	if os != nil {
-		collectorpos := []int{}
-		mul := 0
+	// collectorpos stores pairs of (x,y) coordinates for collector symbols.
+	// mul is the number of collectors (effectively how many separate
+	// RTCoins results we will produce when collectors are present).
+	collectorpos := []int{}
+	mul := 0
 		switch svw.Config.Type {
 		case svwTypeCollector:
 			for x, arr := range gs.Arr {
@@ -239,14 +286,19 @@ func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 			mul = 1
 		}
 
-		totalvals := 0
-		pos := make([]int, 0, len(os.Arr)*len(os.Arr[0])*2)
+	// totalvals accumulates the sum of coin values from the other scene.
+	// pos collects the positions (x,y) that contribute; stored as a flat
+	// slice [x0,y0,x1,y1,...]. Preallocate using os.Width/os.Height
+	// which are provided by the scene for convenience.
+	totalvals := 0
+
+	pos := make([]int, 0, os.Width*os.Height*2)
 
 		if len(svw.Config.CoinSymbolCodes) > 0 {
-			for x := 0; x < len(os.Arr); x++ {
-				for y := 0; y < len(os.Arr[x]); y++ {
-					if slices.Contains(svw.Config.CoinSymbolCodes, gs.Arr[x][y]) && os.Arr[x][y] > 0 {
-						totalvals += os.Arr[x][y]
+			for x, arr := range os.Arr {
+				for y, v := range arr {
+					if v > 0 && slices.Contains(svw.Config.CoinSymbolCodes, gs.Arr[x][y]) {
+						totalvals += v
 						pos = append(pos, x, y)
 
 						svwd.SymbolNum++
@@ -254,10 +306,10 @@ func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 				}
 			}
 		} else {
-			for x := 0; x < len(os.Arr); x++ {
-				for y := 0; y < len(os.Arr[x]); y++ {
-					if os.Arr[x][y] > 0 {
-						totalvals += os.Arr[x][y]
+			for x, arr := range os.Arr {
+				for y, v := range arr {
+					if v > 0 {
+						totalvals += v
 						pos = append(pos, x, y)
 
 						svwd.SymbolNum++
@@ -266,20 +318,26 @@ func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 			}
 		}
 
-		if totalvals > 0 && mul > 0 {
+	// If we found any coin values and we have at least one multiplier
+	// (normal mode sets mul=1), construct Result entries and append
+	// them to the PlayResult.
+	if totalvals > 0 && mul > 0 {
 			bet := gameProp.GetBet3(stake, svw.Config.BetType)
 			othermul := svw.GetWinMulti(&svwd.BasicComponentData)
 
 			for i := 0; i < mul; i++ {
+				// build a new position list for this result. For collector
+				// variants, the collector coordinate precedes the coin pos list.
 				newpos := make([]int, 0, len(pos)+2)
 
 				if svw.isCollectorType() {
-
 					newpos = append(newpos, collectorpos[i*2], collectorpos[i*2+1])
 				}
 
 				newpos = append(newpos, pos...)
 
+				// Construct the result object describing coin wins. SymbolNums
+				// is the count of contributing coin positions.
 				ret := &sgc7game.Result{
 					Type:       sgc7game.RTCoins,
 					LineIndex:  -1,
@@ -289,7 +347,8 @@ func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 				}
 
 				if svw.isCollectorType() {
-
+					// For collector results, set the symbol to the collector's
+					// symbol code so consumers can render it.
 					ret.Symbol = gs.Arr[newpos[0]][newpos[1]]
 				}
 
@@ -315,7 +374,13 @@ func (svw *SymbolValWins) OnPlayGame(gameProp *GameProperty, pr *sgc7game.PlayRe
 
 // OnAsciiGame - outpur to asciigame
 func (svw *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	cd := icd.(*SymbolValWinsData)
+	cd, ok := icd.(*SymbolValWinsData)
+	if !ok || cd == nil {
+		goutils.Error("SymbolValWins.OnAsciiGame:SymbolValWinsData",
+			goutils.Err(ErrInvalidComponentData))
+
+		return ErrInvalidComponentData
+	}
 
 	asciigame.OutputResults("wins", pr, func(i int, ret *sgc7game.Result) bool {
 		return goutils.IndexOfIntSlice(cd.UsedResults, i, 0) >= 0
@@ -325,11 +390,16 @@ func (svw *SymbolValWins) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayR
 }
 
 // NewComponentData -
+// NewComponentData creates a fresh SymbolValWinsData instance for use by
+// the runtime when a new player/session/component instance is created.
 func (svw *SymbolValWins) NewComponentData() IComponentData {
 	return &SymbolValWinsData{}
 }
 
 // NewStats2 -
+// NewStats2 builds a stats2.Feature that describes which metrics this
+// component will emit. It returns a feature that reports wins and an
+// integer value (used for win multipliers).
 func (svw *SymbolValWins) NewStats2(parent string) *stats2.Feature {
 	return stats2.NewFeature(parent, stats2.Options{stats2.OptWins, stats2.OptIntVal})
 }
@@ -338,7 +408,13 @@ func (svw *SymbolValWins) NewStats2(parent string) *stats2.Feature {
 func (svw *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
 	svw.BasicComponent.OnStats2(icd, s2, gameProp, gp, pr, isOnStepEnd)
 
-	svwd := icd.(*SymbolValWinsData)
+	svwd, ok := icd.(*SymbolValWinsData)
+	if !ok || svwd == nil {
+		goutils.Error("SymbolValWins.OnStats2:SymbolValWinsData",
+			goutils.Err(ErrInvalidComponentData))
+
+		return
+	}
 
 	s2.ProcStatsWins(svw.Name, int64(svwd.Wins))
 
@@ -347,6 +423,9 @@ func (svw *SymbolValWins) OnStats2(icd IComponentData, s2 *stats2.Cache, gamePro
 	s2.ProcStatsIntVal(svw.GetName(), multi)
 }
 
+// GetWinMulti returns the effective multiplier to apply to coin values.
+// It first consults runtime overrides in BasicComponentData, and falls
+// back to the configured WinMulti.
 func (svw *SymbolValWins) GetWinMulti(basicCD *BasicComponentData) int {
 	winMulti, isok := basicCD.GetConfigIntVal(CCVWinMulti)
 	if isok {
@@ -395,6 +474,14 @@ func (jcfg *jsonSymbolValWins) build() *SymbolValWinsConfig {
 	return cfg
 }
 
+// jsonSymbolValWins is an intermediate structure used to parse JSON/YAML
+// configuration embedded in spreadsheets or design tools. The build
+// method converts it into the internal SymbolValWinsConfig.
+
+
+// parseSymbolValWins parses a configuration cell (AST node) from a design
+// spreadsheet into a SymbolValWinsConfig and registers it with the
+// provided BetConfig. It returns the component label/name or an error.
 func parseSymbolValWins(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfg, label, _, err := getConfigInCell(cell)
 	if err != nil {

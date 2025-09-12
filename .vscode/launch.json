@@ -111,9 +111,9 @@
             "args": [],
             "cwd": "${workspaceFolder}/data",
             "env": {
-                "REELS":"fg94-reel1-l5.xlsx",
+                "REELS":"fg-reel3-l5.xlsx",
                 "SYMBOL":"L4",
-                "OUTPUT":"fg94-reel1-l4.xlsx",
+                "OUTPUT":"fg-reel3-l4.xlsx",
             }
         }
     ]
