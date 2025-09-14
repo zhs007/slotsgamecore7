@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -86,19 +87,20 @@ func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message
 
 // RemoveSymbolsConfig - configuration for RemoveSymbols
 type RemoveSymbolsConfig struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	StrType              string            `yaml:"type" json:"type"`
-	Type                 RemoveSymbolsType `yaml:"-" json:"-"`
-	AddedSymbol          string            `yaml:"addedSymbol" json:"addedSymbol"`
-	AddedSymbolCode      int               `yaml:"-" json:"-"`
-	JumpToComponent      string            `yaml:"jumpToComponent" json:"jumpToComponent"`           // jump to
-	TargetComponents     []string          `yaml:"targetComponents" json:"targetComponents"`         // 这些组件的中奖会需要参与remove
-	IgnoreSymbols        []string          `yaml:"ignoreSymbols" json:"ignoreSymbols"`               // 忽略的symbol
-	IgnoreSymbolCodes    []int             `yaml:"-" json:"-"`                                       // 忽略的symbol
-	IsNeedProcSymbolVals bool              `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int               `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	OutputToComponent    string            `yaml:"outputToComponent" json:"outputToComponent"`       // outputToComponent
-	Awards               []*Award          `yaml:"awards" json:"awards"`                             // 新的奖励系统
+	BasicComponentConfig     `yaml:",inline" json:",inline"`
+	StrType                  string            `yaml:"type" json:"type"`
+	Type                     RemoveSymbolsType `yaml:"-" json:"-"`
+	AddedSymbol              string            `yaml:"addedSymbol" json:"addedSymbol"`
+	AddedSymbolCode          int               `yaml:"-" json:"-"`
+	JumpToComponent          string            `yaml:"jumpToComponent" json:"jumpToComponent"`                   // jump to
+	TargetComponents         []string          `yaml:"targetComponents" json:"targetComponents"`                 // 这些组件的中奖会需要参与remove
+	SourcePositionCollection []string          `yaml:"sourcePositionCollection" json:"sourcePositionCollection"` // 源位置集合
+	IgnoreSymbols            []string          `yaml:"ignoreSymbols" json:"ignoreSymbols"`                       // 忽略的symbol
+	IgnoreSymbolCodes        []int             `yaml:"-" json:"-"`                                               // 忽略的symbol
+	IsNeedProcSymbolVals     bool              `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"`         // 是否需要同时处理symbolVals
+	EmptySymbolVal           int               `yaml:"emptySymbolVal" json:"emptySymbolVal"`                     // 空的symbolVal是什么
+	OutputToComponent        string            `yaml:"outputToComponent" json:"outputToComponent"`               // outputToComponent
+	Awards                   []*Award          `yaml:"awards" json:"awards"`                                     // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -189,39 +191,69 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 	if os != nil {
 		nos := os
 
-		for _, cn := range removeSymbols.Config.TargetComponents {
-			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
-			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
-				continue
-			}
+		if len(removeSymbols.Config.TargetComponents) > 0 {
+			for _, cn := range removeSymbols.Config.TargetComponents {
+				// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+				if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+					continue
+				}
 
-			ccd := gameProp.GetCurComponentDataWithName(cn)
-			if ccd != nil {
-				lst := ccd.GetResults()
-				for _, ri := range lst {
+				ccd := gameProp.GetCurComponentDataWithName(cn)
+				if ccd != nil {
+					lst := ccd.GetResults()
+					for _, ri := range lst {
 
-					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-						x := curpr.Results[ri].Pos[pi*2]
-						y := curpr.Results[ri].Pos[pi*2+1]
-						if removeSymbols.canRemove(x, y, ngs) {
-							if ngs == gs {
-								ngs = gs.CloneEx(gameProp.PoolScene)
-								nos = os.CloneEx(gameProp.PoolScene)
+						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+							x := curpr.Results[ri].Pos[pi*2]
+							y := curpr.Results[ri].Pos[pi*2+1]
+							if removeSymbols.canRemove(x, y, ngs) {
+								if ngs == gs {
+									ngs = gs.CloneEx(gameProp.PoolScene)
+									nos = os.CloneEx(gameProp.PoolScene)
+								}
+
+								if !gIsReleaseMode {
+									totalHeight += y
+								}
+
+								ngs.Arr[x][y] = -1
+								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+								if outputCD != nil {
+									outputCD.AddPos(x, y)
+								}
+
+								rscd.RemovedNum++
 							}
-
-							if !gIsReleaseMode {
-								totalHeight += y
-							}
-
-							ngs.Arr[x][y] = -1
-							nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
-
-							if outputCD != nil {
-								outputCD.AddPos(x, y)
-							}
-
-							rscd.RemovedNum++
 						}
+					}
+				}
+			}
+		} else if len(removeSymbols.Config.SourcePositionCollection) > 0 {
+			for _, cn := range removeSymbols.Config.SourcePositionCollection {
+
+				curpos := gameProp.GetComponentPos(cn)
+				for pi := 0; pi < len(curpos)/2; pi++ {
+					x := curpos[pi*2]
+					y := curpos[pi*2+1]
+					if removeSymbols.canRemove(x, y, ngs) {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+							nos = os.CloneEx(gameProp.PoolScene)
+						}
+
+						if !gIsReleaseMode {
+							totalHeight += y
+						}
+
+						ngs.Arr[x][y] = -1
+						nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+						if outputCD != nil {
+							outputCD.AddPos(x, y)
+						}
+
+						rscd.RemovedNum++
 					}
 				}
 			}
@@ -233,39 +265,67 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 		removeSymbols.AddOtherScene(gameProp, curpr, nos, &rscd.BasicComponentData)
 	} else {
-		for _, cn := range removeSymbols.Config.TargetComponents {
-			// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
-			if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
-				continue
-			}
+		if len(removeSymbols.Config.TargetComponents) > 0 {
+			for _, cn := range removeSymbols.Config.TargetComponents {
+				// 如果前面没有执行过，就可能没有清理数据，所以这里需要跳过
+				if goutils.IndexOfStringSlice(gp.HistoryComponents, cn, 0) < 0 {
+					continue
+				}
 
-			ccd := gameProp.GetCurComponentDataWithName(cn)
-			if ccd != nil {
-				lst := ccd.GetResults()
-				for _, ri := range lst {
+				ccd := gameProp.GetCurComponentDataWithName(cn)
+				if ccd != nil {
+					lst := ccd.GetResults()
+					for _, ri := range lst {
 
-					for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
-						x := curpr.Results[ri].Pos[pi*2]
-						y := curpr.Results[ri].Pos[pi*2+1]
-						if removeSymbols.canRemove(x, y, ngs) {
-							if ngs == gs {
-								ngs = gs.CloneEx(gameProp.PoolScene)
+						for pi := 0; pi < len(curpr.Results[ri].Pos)/2; pi++ {
+							x := curpr.Results[ri].Pos[pi*2]
+							y := curpr.Results[ri].Pos[pi*2+1]
+							if removeSymbols.canRemove(x, y, ngs) {
+								if ngs == gs {
+									ngs = gs.CloneEx(gameProp.PoolScene)
+								}
+
+								if !gIsReleaseMode {
+									totalHeight += y
+								}
+
+								ngs.Arr[x][y] = -1
+
+								if outputCD != nil {
+									outputCD.AddPos(x, y)
+								}
+
+								rscd.RemovedNum++
 							}
-
-							if !gIsReleaseMode {
-								totalHeight += y
-							}
-
-							ngs.Arr[x][y] = -1
-
-							if outputCD != nil {
-								outputCD.AddPos(x, y)
-							}
-
-							rscd.RemovedNum++
 						}
-					}
 
+					}
+				}
+			}
+		} else if len(removeSymbols.Config.SourcePositionCollection) > 0 {
+			for _, cn := range removeSymbols.Config.SourcePositionCollection {
+				curpos := gameProp.GetComponentPos(cn)
+
+				for pi := 0; pi < len(curpos)/2; pi++ {
+					x := curpos[pi*2]
+					y := curpos[pi*2+1]
+					if removeSymbols.canRemove(x, y, ngs) {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						if !gIsReleaseMode {
+							totalHeight += y
+						}
+
+						ngs.Arr[x][y] = -1
+
+						if outputCD != nil {
+							outputCD.AddPos(x, y)
+						}
+
+						rscd.RemovedNum++
+					}
 				}
 			}
 		}
@@ -530,26 +590,33 @@ func NewRemoveSymbols(name string) IComponent {
 // ],
 // "type": "adjacentPay",
 // "addedSymbol": "WL"
-// "outputToComp": "bg-pos-rmoved"
+// "outputToComp": "bg-pos-rmoved",
+// "sourcePositionCollection": [
+//
+//	"bg-scatterzone"
+//
+// ]
 type jsonRemoveSymbols struct {
-	Type                 string   `json:"type"`                 // type
-	AddedSymbol          string   `json:"addedSymbol"`          // addedSymbol
-	TargetComponents     []string `json:"targetComponents"`     // 这些组件的中奖会需要参与remove
-	IgnoreSymbols        []string `json:"ignoreSymbols"`        // 忽略的symbol
-	IsNeedProcSymbolVals bool     `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int      `json:"emptySymbolVal"`       // 空的symbolVal是什么
-	OutputToComponent    string   `json:"outputToComp"`         // outputToComp
+	Type                     string   `json:"type"`                     // type
+	AddedSymbol              string   `json:"addedSymbol"`              // addedSymbol
+	TargetComponents         []string `json:"targetComponents"`         // 这些组件的中奖会需要参与remove
+	IgnoreSymbols            []string `json:"ignoreSymbols"`            // 忽略的symbol
+	IsNeedProcSymbolVals     bool     `json:"isNeedProcSymbolVals"`     // 是否需要同时处理symbolVals
+	EmptySymbolVal           int      `json:"emptySymbolVal"`           // 空的symbolVal是什么
+	OutputToComponent        string   `json:"outputToComp"`             // outputToComp
+	SourcePositionCollection []string `json:"sourcePositionCollection"` // 源位置集合
 }
 
 func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	cfg := &RemoveSymbolsConfig{
-		StrType:              jcfg.Type,
-		TargetComponents:     jcfg.TargetComponents,
-		IgnoreSymbols:        jcfg.IgnoreSymbols,
-		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
-		EmptySymbolVal:       jcfg.EmptySymbolVal,
-		AddedSymbol:          jcfg.AddedSymbol,
-		OutputToComponent:    jcfg.OutputToComponent,
+		StrType:                  jcfg.Type,
+		TargetComponents:         slices.Clone(jcfg.TargetComponents),
+		IgnoreSymbols:            slices.Clone(jcfg.IgnoreSymbols),
+		IsNeedProcSymbolVals:     jcfg.IsNeedProcSymbolVals,
+		EmptySymbolVal:           jcfg.EmptySymbolVal,
+		AddedSymbol:              jcfg.AddedSymbol,
+		OutputToComponent:        jcfg.OutputToComponent,
+		SourcePositionCollection: slices.Clone(jcfg.SourcePositionCollection),
 	}
 
 	return cfg
