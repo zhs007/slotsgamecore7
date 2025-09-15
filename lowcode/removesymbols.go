@@ -60,9 +60,8 @@ func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 	removeSymbolsData.UsedScenes = nil
 	removeSymbolsData.UsedOtherScenes = nil
 
-	if gIsReleaseMode {
-		removeSymbolsData.AvgHeight = 0
-	}
+	// Always initialize AvgHeight to avoid carrying old values between steps
+	removeSymbolsData.AvgHeight = 0
 }
 
 // Clone
@@ -145,7 +144,15 @@ func (removeSymbols *RemoveSymbols) Init(fn string, pool *GamePropertyPool) erro
 
 // InitEx -
 func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
-	removeSymbols.Config = cfg.(*RemoveSymbolsConfig)
+	rcfg, ok := cfg.(*RemoveSymbolsConfig)
+	if !ok || rcfg == nil {
+		goutils.Error("RemoveSymbols.InitEx:InvalidConfig",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	removeSymbols.Config = rcfg
 	removeSymbols.Config.ComponentType = RemoveSymbolsTypeName
 
 	removeSymbols.Config.AddedSymbolCode = pool.DefaultPaytables.MapSymbols[removeSymbols.Config.AddedSymbol]
@@ -165,7 +172,15 @@ func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) erro
 }
 
 func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) bool {
+	// Guard against out-of-range indices to avoid panic. Caller generally should
+	// ensure x,y are valid, but be defensive here.
+	if x < 0 || y < 0 || x >= gs.Width || y >= gs.Height {
+		return false
+	}
+
 	curs := gs.Arr[x][y]
+
+	// If curs < 0 we treat it as removable (matches previous behavior).
 	if curs < 0 {
 		return true
 	}
@@ -336,7 +351,11 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 	}
 
 	if !gIsReleaseMode {
-		rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
+		if rscd.RemovedNum > 0 {
+			rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
+		} else {
+			rscd.AvgHeight = 0
+		}
 	}
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &rscd.BasicComponentData)
@@ -475,7 +494,11 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 	}
 
 	if !gIsReleaseMode {
-		rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
+		if rscd.RemovedNum > 0 {
+			rscd.AvgHeight = totalHeight * 100 / rscd.RemovedNum
+		} else {
+			rscd.AvgHeight = 0
+		}
 	}
 
 	removeSymbols.AddScene(gameProp, curpr, ngs, &rscd.BasicComponentData)
@@ -486,8 +509,13 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 // playgame
 func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+	rscd, ok := cd.(*RemoveSymbolsData)
+	if !ok || rscd == nil {
+		goutils.Error("RemoveSymbols.OnPlayGame:InvalidComponentData",
+			goutils.Err(ErrInvalidComponentConfig))
 
-	rscd := cd.(*RemoveSymbolsData)
+		return "", ErrInvalidComponentConfig
+	}
 	rscd.onNewStep()
 
 	gs := removeSymbols.GetTargetScene3(gameProp, curpr, prs, 0)
