@@ -1,3 +1,7 @@
+// Package lowcode contains configurable, pluggable "components" that modify
+// game scenes and play results at runtime. Components are defined by YAML/JSON
+// configurations and operate on GameScene objects to implement mechanics such as
+// removing symbols, adding symbols, collecting positions, etc.
 package lowcode
 
 import (
@@ -17,8 +21,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// RemoveSymbolsTypeName is the component type name used in configuration files
+// to identify the removeSymbols component.
 const RemoveSymbolsTypeName = "removeSymbols"
 
+// RemoveSymbolsType enumerates different removal behaviors supported by the
+// removeSymbols component.
 type RemoveSymbolsType int
 
 const (
@@ -26,6 +34,9 @@ const (
 	RSTypeAdjacentPay RemoveSymbolsType = 1
 )
 
+// parseRemoveSymbolsType parses a string representation of the component
+// subtype and returns the corresponding RemoveSymbolsType. Unknown types
+// default to RSTypeBasic.
 func parseRemoveSymbolsType(strType string) RemoveSymbolsType {
 	if strType == "adjacentPay" {
 		return RSTypeAdjacentPay
@@ -34,13 +45,19 @@ func parseRemoveSymbolsType(strType string) RemoveSymbolsType {
 	return RSTypeBasic
 }
 
+// RemoveSymbolsData holds runtime data for a removeSymbols component.
+// It embeds BasicComponentData and tracks how many symbols were removed in
+// the current step and the average height of removed symbols (AvgHeight).
+// AvgHeight is stored as an int fixed-point value where 100 represents 1.0.
 type RemoveSymbolsData struct {
 	BasicComponentData
 	RemovedNum int
-	AvgHeight  int // 平均移除图标的高度，用int表示浮点数，因此100表示1
+	AvgHeight  int // average removed symbol height; fixed-point: 100==1.0
 }
 
-// GetValEx -
+// GetValEx returns the integer value associated with the provided key for
+// this component data. It supports "CVAvgHeight" to expose the calculated
+// average remove height.
 func (removeSymbolsData *RemoveSymbolsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVAvgHeight {
 		return removeSymbolsData.AvgHeight, true
@@ -49,12 +66,14 @@ func (removeSymbolsData *RemoveSymbolsData) GetValEx(key string, getType GetComp
 	return 0, false
 }
 
-// OnNewGame -
+// OnNewGame is called when a new game starts and allows the component data
+// to initialize or reset any per-game state.
 func (removeSymbolsData *RemoveSymbolsData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	removeSymbolsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// onNewStep -
+// onNewStep resets per-step transient state. It should be called at the
+// beginning of each component execution step.
 func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 	removeSymbolsData.RemovedNum = 0
 	removeSymbolsData.UsedScenes = nil
@@ -64,7 +83,8 @@ func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 	removeSymbolsData.AvgHeight = 0
 }
 
-// Clone
+// Clone creates a shallow copy of RemoveSymbolsData suitable for storing as
+// independent component data on cloned branches.
 func (removeSymbolsData *RemoveSymbolsData) Clone() IComponentData {
 	target := &RemoveSymbolsData{
 		BasicComponentData: removeSymbolsData.CloneBasicComponentData(),
@@ -74,7 +94,8 @@ func (removeSymbolsData *RemoveSymbolsData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData builds the protobuf representation of this component
+// data for serialization or transport.
 func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RemoveSymbolsData{
 		BasicComponentData: removeSymbolsData.BuildPBBasicComponentData(),
@@ -84,7 +105,9 @@ func (removeSymbolsData *RemoveSymbolsData) BuildPBComponentData() proto.Message
 	return pbcd
 }
 
-// RemoveSymbolsConfig - configuration for RemoveSymbols
+// RemoveSymbolsConfig is the YAML/JSON configuration for a removeSymbols
+// component. It defines targets, ignored symbols, output wiring and
+// additional behavior flags.
 type RemoveSymbolsConfig struct {
 	BasicComponentConfig     `yaml:",inline" json:",inline"`
 	StrType                  string            `yaml:"type" json:"type"`
@@ -102,7 +125,8 @@ type RemoveSymbolsConfig struct {
 	Awards                   []*Award          `yaml:"awards" json:"awards"`                                     // 新的奖励系统
 }
 
-// SetLinkComponent
+// SetLinkComponent sets a named downstream component link. Supported link
+// values are "next" (default next component) and "jump" (jump target).
 func (cfg *RemoveSymbolsConfig) SetLinkComponent(link string, componentName string) {
 	switch link {
 	case "next":
@@ -112,12 +136,17 @@ func (cfg *RemoveSymbolsConfig) SetLinkComponent(link string, componentName stri
 	}
 }
 
+// RemoveSymbols implements the removeSymbols component behavior. It holds a
+// reference to its configuration and a BasicComponent instance for common
+// component behavior.
 type RemoveSymbols struct {
 	*BasicComponent `json:"-"`
 	Config          *RemoveSymbolsConfig `json:"config"`
 }
 
-// Init -
+// Init reads a YAML file from disk and initializes the component configuration
+// using InitEx. It is a convenience wrapper used when configurations are
+// stored in files.
 func (removeSymbols *RemoveSymbols) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
@@ -142,7 +171,9 @@ func (removeSymbols *RemoveSymbols) Init(fn string, pool *GamePropertyPool) erro
 	return removeSymbols.InitEx(cfg, pool)
 }
 
-// InitEx -
+// InitEx initializes the component from a parsed configuration object. It
+// performs symbol code resolution using the provided GamePropertyPool and
+// prepares awards and other derived config fields.
 func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 	rcfg, ok := cfg.(*RemoveSymbolsConfig)
 	if !ok || rcfg == nil {
@@ -171,6 +202,10 @@ func (removeSymbols *RemoveSymbols) InitEx(cfg any, pool *GamePropertyPool) erro
 	return nil
 }
 
+// canRemove checks whether the symbol at position (x,y) in the provided
+// GameScene is eligible for removal according to this component's
+// configuration. The function is defensive and will return false if the
+// coordinates are out-of-range.
 func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) bool {
 	// Guard against out-of-range indices to avoid panic. Caller generally should
 	// ensure x,y are valid, but be defensive here.
@@ -192,7 +227,10 @@ func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) 
 	return true
 }
 
-// onBasic
+// onBasic implements the default remove behavior. It removes positions
+// collected from either configured target components or explicit source
+// position collections. If an "other scene" (os) is provided, it will be
+// updated accordingly (e.g. empty value mapping).
 func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, rscd *RemoveSymbolsData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) error {
 	ngs := gs
@@ -363,7 +401,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 	return nil
 }
 
-// onAdjacentPay
+// onAdjacentPay implements an adjacency-aware removal used for "adjacentPay"
+// style components. It retains the middle symbol of certain adjacent groups
+// (e.g. for 3-in-a-row or 5-in-a-row) and replaces them with an added symbol
+// after processing.
 func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, rscd *RemoveSymbolsData,
 	gs *sgc7game.GameScene, os *sgc7game.GameScene) error {
 	ngs := gs
@@ -506,7 +547,10 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 	return nil
 }
 
-// playgame
+// OnPlayGame is the component entry point executed for a play step. It applies
+// the configured removal behavior (basic or adjacentPay) to the target
+// GameScene(s), processes controllers/awards and returns the next component
+// to execute (or an ErrComponentDoNothing error when no change occurred).
 func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 	rscd, ok := cd.(*RemoveSymbolsData)
@@ -566,14 +610,18 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 	return nc, nil
 }
 
-// OnProcControllers -
+// ProcControllers executes configured award controllers after removal is
+// performed. It's called by OnPlayGame after the scene changes are applied.
 func (removeSymbols *RemoveSymbols) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	if len(removeSymbols.Config.Awards) > 0 {
 		gameProp.procAwards(plugin, removeSymbols.Config.Awards, curpr, gp)
 	}
 }
 
-// OnAsciiGame - outpur to asciigame
+// OnAsciiGame outputs a textual representation of the primary scene affected
+// by this component to aid debugging and development. It expects a
+// *RemoveSymbolsData as component data and will safely no-op if UsedScenes is
+// empty.
 func (removeSymbols *RemoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
 	bcd := cd.(*RemoveSymbolsData)
 
@@ -584,12 +632,14 @@ func (removeSymbols *RemoveSymbols) OnAsciiGame(gameProp *GameProperty, pr *sgc7
 	return nil
 }
 
-// NewComponentData -
+// NewComponentData returns a new, zeroed RemoveSymbolsData instance. The
+// runtime will call this to allocate per-play component data.
 func (removeSymbols *RemoveSymbols) NewComponentData() IComponentData {
 	return &RemoveSymbolsData{}
 }
 
-// EachUsedResults -
+// EachUsedResults is required by the component interface but not used by
+// removeSymbols; it is intentionally a no-op here.
 func (removeSymbols *RemoveSymbols) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
 }
 
@@ -603,6 +653,7 @@ func (removeSymbols *RemoveSymbols) GetNextLinkComponents() []string {
 	return []string{removeSymbols.Config.DefaultNextComponent, removeSymbols.Config.JumpToComponent}
 }
 
+// NewRemoveSymbols constructs a RemoveSymbols component with the given name.
 func NewRemoveSymbols(name string) IComponent {
 	return &RemoveSymbols{
 		BasicComponent: NewBasicComponent(name, 1),
@@ -624,17 +675,23 @@ func NewRemoveSymbols(name string) IComponent {
 //	"bg-scatterzone"
 //
 // ]
+// jsonRemoveSymbols is the lightweight JSON/YAML mapping used when parsing an
+// inline removeSymbols configuration from AST nodes. It is converted to the
+// full RemoveSymbolsConfig via build().
 type jsonRemoveSymbols struct {
 	Type                     string   `json:"type"`                     // type
 	AddedSymbol              string   `json:"addedSymbol"`              // addedSymbol
-	TargetComponents         []string `json:"targetComponents"`         // 这些组件的中奖会需要参与remove
-	IgnoreSymbols            []string `json:"ignoreSymbols"`            // 忽略的symbol
-	IsNeedProcSymbolVals     bool     `json:"isNeedProcSymbolVals"`     // 是否需要同时处理symbolVals
-	EmptySymbolVal           int      `json:"emptySymbolVal"`           // 空的symbolVal是什么
-	OutputToComponent        string   `json:"outputToComp"`             // outputToComp
-	SourcePositionCollection []string `json:"sourcePositionCollection"` // 源位置集合
+	TargetComponents         []string `json:"targetComponents"`         // target components whose results cause removal
+	IgnoreSymbols            []string `json:"ignoreSymbols"`            // symbols to ignore when removing
+	IsNeedProcSymbolVals     bool     `json:"isNeedProcSymbolVals"`     // whether to process other scene symbol values
+	EmptySymbolVal           int      `json:"emptySymbolVal"`           // value to set in other scene for emptied slots
+	OutputToComponent        string   `json:"outputToComp"`             // optional component to output removed positions to
+	SourcePositionCollection []string `json:"sourcePositionCollection"` // alternative explicit list of positions to remove
 }
 
+// build converts the jsonRemoveSymbols helper into a full
+// RemoveSymbolsConfig instance; slices are cloned to avoid sharing memory
+// between parsed AST structures and the resulting config.
 func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 	cfg := &RemoveSymbolsConfig{
 		StrType:                  jcfg.Type,
