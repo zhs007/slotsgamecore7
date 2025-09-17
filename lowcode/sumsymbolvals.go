@@ -16,8 +16,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// SumSymbolValsTypeName is the component type name used to register
+// and identify SumSymbolVals components in configuration and component mgr.
 const SumSymbolValsTypeName = "sumSymbolVals"
 
+// SumSymbolValsType represents the comparison type used when deciding
+// whether a symbol value should be counted in the sum. It covers
+// equality, inequality and range membership forms.
 type SumSymbolValsType int
 
 const (
@@ -33,6 +38,10 @@ const (
 	SSVTypeInArea     SumSymbolValsType = 9 // In (min, max)
 )
 
+// parseSumSymbolValsType parses a textual representation of the comparison
+// type and returns the corresponding SumSymbolValsType. The input is expected
+// to be one of the supported literal forms, e.g. "==", ">=", "in [min, max]".
+// If the input is not recognized, SSVTypeNone is returned.
 func parseSumSymbolValsType(strType string) SumSymbolValsType {
 	switch strType {
 	case "==":
@@ -58,17 +67,22 @@ func parseSumSymbolValsType(strType string) SumSymbolValsType {
 	return SSVTypeNone
 }
 
+// SumSymbolValsData holds runtime data for a SumSymbolVals component.
+// It embeds BasicComponentData and stores the computed Number (the sum).
 type SumSymbolValsData struct {
 	BasicComponentData
 	Number int
 }
 
-// OnNewGame -
+// OnNewGame implements the IComponentData lifecycle hook. It forwards
+// to BasicComponentData.OnNewGame to initialize embedded fields.
 func (sumSymbolValsData *SumSymbolValsData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	sumSymbolValsData.BasicComponentData.OnNewGame(gameProp, component)
 }
 
-// Clone
+// Clone creates a deep copy of SumSymbolValsData for use in new play
+// result contexts. This is required by the component framework to keep
+// component data isolated between plays.
 func (sumSymbolValsData *SumSymbolValsData) Clone() IComponentData {
 	target := &SumSymbolValsData{
 		BasicComponentData: sumSymbolValsData.CloneBasicComponentData(),
@@ -78,7 +92,8 @@ func (sumSymbolValsData *SumSymbolValsData) Clone() IComponentData {
 	return target
 }
 
-// BuildPBComponentData
+// BuildPBComponentData converts the component data into its protobuf
+// representation for serialization across the system.
 func (sumSymbolValsData *SumSymbolValsData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.SumSymbolValsData{
 		BasicComponentData: sumSymbolValsData.BuildPBBasicComponentData(),
@@ -88,7 +103,9 @@ func (sumSymbolValsData *SumSymbolValsData) BuildPBComponentData() proto.Message
 	return pbcd
 }
 
-// GetValEx -
+// GetValEx returns named integer outputs exposed by this component's data.
+// Supported keys are CVNumber and CVOutputInt, both returning the computed
+// Number (sum) value. The boolean indicates whether the key was handled.
 func (sumSymbolValsData *SumSymbolValsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
 	if key == CVNumber || key == CVOutputInt {
 		return sumSymbolValsData.Number, true
@@ -97,12 +114,15 @@ func (sumSymbolValsData *SumSymbolValsData) GetValEx(key string, getType GetComp
 	return 0, false
 }
 
-// GetOutput -
+// GetOutput returns the numeric output value for ascii or other renderers.
 func (rollNumberData *SumSymbolValsData) GetOutput() int {
 	return rollNumberData.Number
 }
 
-// SumSymbolValsConfig - configuration for SumSymbolVals
+// SumSymbolValsConfig is the YAML/JSON configuration structure for
+// a SumSymbolVals component. It includes the comparison type (StrType),
+// numeric parameters (Value, Min, Max), the source component name to
+// read positions from, and optional awards to trigger when evaluated.
 type SumSymbolValsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	StrType              string            `yaml:"type" json:"type"`
@@ -114,19 +134,24 @@ type SumSymbolValsConfig struct {
 	Awards               []*Award          `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
-// SetLinkComponent
+// SetLinkComponent implements BasicComponentConfig's link wiring helper.
+// Currently SumSymbolVals supports linking the "next" component which
+// sets DefaultNextComponent used by the framework.
 func (cfg *SumSymbolValsConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
 	}
 }
 
+// SumSymbolVals is a component that sums symbol values from a scene
+// according to a configured predicate. The result is stored in
+// SumSymbolValsData.Number and can be used by downstream components.
 type SumSymbolVals struct {
 	*BasicComponent `json:"-"`
 	Config          *SumSymbolValsConfig `json:"config"`
 }
 
-// Init -
+// Init loads configuration from a YAML file and delegates to InitEx.
 func (sumSymbolVals *SumSymbolVals) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
@@ -151,10 +176,18 @@ func (sumSymbolVals *SumSymbolVals) Init(fn string, pool *GamePropertyPool) erro
 	return sumSymbolVals.InitEx(cfg, pool)
 }
 
-// InitEx -
+// InitEx initializes the component from an already-unmarshaled config
+// object. This method performs type assertion and sets up internal
+// fields such as parsed Type and initializes any Awards.
 func (sumSymbolVals *SumSymbolVals) InitEx(cfg any, pool *GamePropertyPool) error {
-	sumSymbolVals.Config = cfg.(*SumSymbolValsConfig)
-	sumSymbolVals.Config.ComponentType = CheckSymbolValsTypeName
+	cd, ok := cfg.(*SumSymbolValsConfig)
+    	if !ok {
+    		goutils.Error("SumSymbolVals.InitEx:invalid cfg type",
+    			slog.Any("cfg", cfg))
+    		return ErrInvalidComponentConfig
+    	}
+	sumSymbolVals.Config = cd
+	sumSymbolVals.Config.ComponentType = SumSymbolValsTypeName
 
 	sumSymbolVals.Config.Type = parseSumSymbolValsType(sumSymbolVals.Config.StrType)
 
@@ -167,13 +200,18 @@ func (sumSymbolVals *SumSymbolVals) InitEx(cfg any, pool *GamePropertyPool) erro
 	return nil
 }
 
-// OnProcControllers -
+// ProcControllers triggers any configured awards/controllers after the
+// component has evaluated. It delegates to gameProp.procAwards if awards
+// are present in configuration.
 func (sumSymbolVals *SumSymbolVals) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	if len(sumSymbolVals.Config.Awards) > 0 {
 		gameProp.procAwards(plugin, sumSymbolVals.Config.Awards, curpr, gp)
 	}
 }
 
+// checkVal evaluates whether a single symbol value v satisfies the
+// configured predicate (Type/Value/Min/Max). It returns true when v
+// should be included in the sum.
 func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
 	switch sumSymbolVals.Config.Type {
 	case SSVTypeEqu:
@@ -195,6 +233,9 @@ func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
 	case SSVTypeInArea:
 		return v > sumSymbolVals.Config.Min && v < sumSymbolVals.Config.Max
 	}
+	// unknown type
+	goutils.Debug("SumSymbolVals.checkVal: unknown type",
+		slog.Int("type", int(sumSymbolVals.Config.Type)))
 
 	return false
 }
@@ -202,11 +243,15 @@ func (sumSymbolVals *SumSymbolVals) checkVal(v int) bool {
 func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, os *sgc7game.GameScene) int {
 	sumVal := 0
 
+	// If a source component is configured, use its positions; otherwise
+	// iterate the whole scene.
 	pc, isok := gameProp.Components.MapComponents[sumSymbolVals.Config.SourceComponent]
 	if isok {
 		pccd := gameProp.GetComponentData(pc)
 		pos := pccd.GetPos()
 
+		// pos is expected to be an even-length slice of coordinates [x0,y0,x1,y1,...].
+		// If pos is non-empty we iterate pairs; otherwise we fallback to full scan.
 		if len(pos) > 0 {
 			for i := 0; i < len(pos)/2; i++ {
 				x := pos[i*2]
@@ -243,7 +288,12 @@ func (sumSymbolVals *SumSymbolVals) sum(gameProp *GameProperty, os *sgc7game.Gam
 func (sumSymbolVals *SumSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	cd := icd.(*SumSymbolValsData)
+	cd, ok := icd.(*SumSymbolValsData)
+	if !ok {
+		goutils.Error("SumSymbolVals.OnPlayGame: invalid component data type",
+			slog.Any("icd", icd))
+		return "", ErrInvalidComponentData
+	}
 	cd.Number = 0
 
 	os := sumSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)

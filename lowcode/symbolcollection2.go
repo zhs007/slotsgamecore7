@@ -37,12 +37,6 @@ func (symbolCollection2Data *SymbolCollection2Data) OnNewGame(gameProp *GameProp
 	symbolCollection2Data.SymbolCodes = append(symbolCollection2Data.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
 }
 
-// // OnNewStep -
-// func (symbolCollection2Data *SymbolCollection2Data) onNewStep() {
-// 	// symbolCollection2Data.BasicComponentData.OnNewStep(gameProp, component)
-// 	// symbolCollection2Data
-// }
-
 // Clone
 func (symbolCollection2Data *SymbolCollection2Data) Clone() IComponentData {
 	target := &SymbolCollection2Data{
@@ -143,22 +137,9 @@ func (symbolCollection2 *SymbolCollection2) InitEx(cfg any, pool *GamePropertyPo
 	return nil
 }
 
-// // OnNewGame -
-// func (symbolCollection2 *SymbolCollection2) OnNewGame(gameProp *GameProperty) error {
-// 	cd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
-
-// 	cd.OnNewGame()
-
-// 	cd.SymbolCodes = append(cd.SymbolCodes, symbolCollection2.Config.InitSymbolCodes...)
-
-// 	return nil
-// }
-
 // playgame
 func (symbolCollection2 *SymbolCollection2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// symbolCollection2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	nc := symbolCollection2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -178,31 +159,10 @@ func (symbolCollection2 *SymbolCollection2) OnAsciiGame(gameProp *GameProperty, 
 	return nil
 }
 
-// // OnStats
-// func (symbolCollection2 *SymbolCollection2) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 // NewComponentData -
 func (symbolCollection2 *SymbolCollection2) NewComponentData() IComponentData {
 	return &SymbolCollection2Data{}
 }
-
-// // GetSymbols -
-// func (symbolCollection2 *SymbolCollection2) GetSymbols(gameProp *GameProperty) []int {
-// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
-
-// 	return scd.SymbolCodes
-// }
-
-// // AddSymbol -
-// func (symbolCollection2 *SymbolCollection2) AddSymbol(gameProp *GameProperty, symbolCode int) {
-// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
-
-// 	if symbolCollection2.Config.MaxSymbolNum <= 0 || len(scd.SymbolCodes) < symbolCollection2.Config.MaxSymbolNum {
-// 		scd.SymbolCodes = append(scd.SymbolCodes, symbolCode)
-// 	}
-// }
 
 func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, _ sgc7plugin.IPlugin,
 	ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult) error {
@@ -232,14 +192,6 @@ func (symbolCollection2 *SymbolCollection2) runInEach(gameProp *GameProperty, cu
 		}
 
 		if !isComponentDoNothing {
-			// if gAllowStats2 {
-			// 	if !gameProp.stats2Cache.HasFeature(curComponent.GetName()) {
-			// 		gameProp.stats2Cache.AddFeature(curComponent.GetName(), curComponent.NewStats2(gameProp.Components.statsNodeData.GetParent(curComponent.GetName())))
-			// 	}
-
-			// 	curComponent.OnStats2(ccd, gameProp.stats2Cache)
-			// }
-
 			gameProp.OnCallEnd(curComponent, ccd, gp, curpr)
 		}
 
@@ -289,40 +241,6 @@ func (symbolCollection2 *SymbolCollection2) EachSymbols(gameProp *GameProperty, 
 			}
 		}
 	}
-	// 	curComponentName := symbolCollection2.Config.ForeachComponent
-	// 	scd := gameProp.MapComponentData[symbolCollection2.Name].(*SymbolCollection2Data)
-
-	// 	for i, curs := range scd.SymbolCodes {
-	// 		for _, cc := range symbolCollection2.Config.Children {
-
-	// 		}
-
-	// 		componentNum := 0
-	// 		for {
-	// 			next, err := gameProp.ProcEachSymbol(curComponentName, curpr, gp, plugin, ps, stake, prs, i, curs)
-	// 			if err != nil {
-	// 				if err == ErrComponentDoNothing {
-	// 					if next == "" {
-	// 						break
-	// 					}
-	// 				} else {
-	// 					goutils.Error("SymbolCollection2.EachSymbols:ProcEachSymbol",
-	// 						goutils.Err(err))
-
-	// 					return err
-	// 				}
-	// 			}
-
-	// 			curComponentName = next
-
-	// 			componentNum++
-
-	// 			if componentNum > MaxComponentNumInStep {
-	// 				break
-	// 			}
-	// 		}
-	// 	}
-	// }
 
 	return nil
 }
@@ -376,8 +294,6 @@ type jsonSymbolCollection2 struct {
 
 func (jr *jsonSymbolCollection2) build() *SymbolCollection2Config {
 	cfg := &SymbolCollection2Config{}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
