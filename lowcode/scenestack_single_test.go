@@ -59,7 +59,7 @@ func TestSceneStackCoverage(t *testing.T) {
     st.TruncateTo(0)
     st.Push("a", gs1)
     st.Push("b", gs2)
-    st.PopEx(1)
+    st.TruncateTo(1)
 
     // GetTargetScene3 match
     gp := &GameProperty{SceneStack: NewSceneStack(false), OtherSceneStack: NewSceneStack(true)}

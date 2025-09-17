@@ -237,7 +237,7 @@ func TestPopExWrapper(t *testing.T) {
     st.Push("b", s2)
 
     // PopEx should truncate to given num
-    st.PopEx(1)
+    st.TruncateTo(1)
     if len(st.Scenes) != 1 || st.Scenes[0].Component != "a" {
         t.Fatalf("PopEx did not truncate as expected: %#v", st.Scenes)
     }
@@ -338,7 +338,7 @@ func TestCoverScenestackAllPaths(t *testing.T) {
     // PopEx wrapper
     st.Push("a", s1)
     st.Push("b", s2)
-    st.PopEx(1)
+    st.TruncateTo(1)
     if len(st.Scenes) != 1 || st.Scenes[0].Component != "a" {
         t.Fatalf("PopEx failed")
     }
