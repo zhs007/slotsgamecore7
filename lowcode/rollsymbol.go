@@ -18,10 +18,6 @@ import (
 
 const RollSymbolTypeName = "rollSymbol"
 
-const (
-	RSDVSymbol string = "symbol" // roll a symbol
-)
-
 type RollSymbolData struct {
 	BasicComponentData
 	SymbolCodes []int
@@ -48,7 +44,6 @@ func (rollSymbolData *RollSymbolData) Clone() IComponentData {
 func (rollSymbolData *RollSymbolData) BuildPBComponentData() proto.Message {
 	pbcd := &sgc7pb.RollSymbolData{
 		BasicComponentData: rollSymbolData.BuildPBBasicComponentData(),
-		// SymbolCode:         int32(rollSymbolData.SymbolCode),
 	}
 
 	for _, v := range rollSymbolData.SymbolCodes {
@@ -200,8 +195,6 @@ func (rollSymbol *RollSymbol) getSymbolNum(gameProp *GameProperty, basicCD *Basi
 func (rollSymbol *RollSymbol) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// rollSymbol.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	rsd := icd.(*RollSymbolData)
 
 	rsd.SymbolCodes = nil
@@ -256,11 +249,6 @@ func (rollSymbol *RollSymbol) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.P
 	return nil
 }
 
-// // OnStats
-// func (rollSymbol *RollSymbol) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
-
 // NewComponentData -
 func (rollSymbol *RollSymbol) NewComponentData() IComponentData {
 	return &RollSymbolData{}
@@ -297,8 +285,6 @@ func (jcfg *jsonRollSymbol) build() *RollSymbolConfig {
 		IgnoreSymbolCollection: jcfg.IgnoreSymbolCollection,
 		TargetSymbolCollection: jcfg.TargetSymbolCollection,
 	}
-
-	// cfg.UseSceneV3 = true
 
 	return cfg
 }
