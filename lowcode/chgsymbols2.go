@@ -479,6 +479,10 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 
 			chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
 				gameProp.Pool.DefaultPaytables.GetStringFromInt(symbolCode))
+		} else {
+			nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case CS2TypeSymbolWeight:
 		ngs, err := chgSymbols2.procSymbolWeightWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
@@ -489,7 +493,13 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 			return "", err
 		}
 
-		chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		if ngs != gs {
+			chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		} else {
+			nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
 	case CS2TypeEachPosRandom:
 		ngs, err := chgSymbols2.procEachPosRandomWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
 		if err != nil {
@@ -499,7 +509,13 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 			return "", err
 		}
 
-		chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		if ngs != gs {
+			chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+		} else {
+			nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
 	}
 
 	chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
