@@ -236,6 +236,13 @@ func (genSymbolVals2 *GenSymbolVals2) InitEx(cfg any, pool *GamePropertyPool) er
 	return nil
 }
 
+// OnProcControllers -
+func (genSymbolVals2 *GenSymbolVals2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(genSymbolVals2.Config.Awards) > 0 {
+		gameProp.procAwards(plugin, genSymbolVals2.Config.Awards, curpr, gp)
+	}
+}
+
 // getSrcPos
 func (genSymbolVals2 *GenSymbolVals2) getSrcPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) ([]int, error) {
 	if len(genSymbolVals2.Config.SrcComponents) > 0 {
@@ -309,7 +316,9 @@ func (genSymbolVals2 *GenSymbolVals2) getNumber(_ *GameProperty, basicCD *BasicC
 }
 
 // procNumber
-func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc7game.GameScene, pos []int, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
+func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
+	gp *GameParams, pos []int, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
+
 	number := genSymbolVals2.getNumber(gameProp, basicCD)
 
 	// non-clone
@@ -339,6 +348,8 @@ func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc
 			nos.Arr[x][y] = number
 		}
 
+		genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
+
 		return nos, nil
 	}
 
@@ -363,6 +374,8 @@ func (genSymbolVals2 *GenSymbolVals2) procNumber(gameProp *GameProperty, os *sgc
 
 		nos.Arr[x][y] = number
 	}
+
+	genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
 
 	return nos, nil
 }
@@ -390,7 +403,7 @@ func (genSymbolVals2 *GenSymbolVals2) getSymbolWeight(_ *GameProperty, _ *BasicC
 
 // procWeight
 func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc7game.GameScene, pos []int,
-	plugin sgc7plugin.IPlugin, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
+	plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
 
 	vw := genSymbolVals2.getWeight(gameProp, basicCD)
 	if vw == nil {
@@ -429,6 +442,8 @@ func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc
 			nos.Arr[x][y] = cr.Int()
 		}
 
+		genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
+
 		return nos, nil
 	}
 
@@ -466,12 +481,14 @@ func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc
 		nos.Arr[x][y] = cr.Int()
 	}
 
+	genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
+
 	return nos, nil
 }
 
 // procSymbolWeight
 func (genSymbolVals2 *GenSymbolVals2) procSymbolWeight(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, pos []int,
-	plugin sgc7plugin.IPlugin, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
+	plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, basicCD *BasicComponentData) (*sgc7game.GameScene, error) {
 
 	// non-clone
 	if os == nil {
@@ -510,6 +527,8 @@ func (genSymbolVals2 *GenSymbolVals2) procSymbolWeight(gameProp *GameProperty, g
 
 			nos.Arr[x][y] = cr.Int()
 		}
+
+		genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
 
 		return nos, nil
 	}
@@ -553,11 +572,14 @@ func (genSymbolVals2 *GenSymbolVals2) procSymbolWeight(gameProp *GameProperty, g
 		nos.Arr[x][y] = cr.Int()
 	}
 
+	genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
+
 	return nos, nil
 }
 
 // procAdd
-func (genSymbolVals2 *GenSymbolVals2) procAdd(gameProp *GameProperty, os *sgc7game.GameScene, pos []int) (*sgc7game.GameScene, error) {
+func (genSymbolVals2 *GenSymbolVals2) procAdd(gameProp *GameProperty, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
+	gp *GameParams, pos []int) (*sgc7game.GameScene, error) {
 	// non-clone
 	if os == nil {
 		if len(pos) == 0 {
@@ -592,6 +614,8 @@ func (genSymbolVals2 *GenSymbolVals2) procAdd(gameProp *GameProperty, os *sgc7ga
 				nos.Arr[x][y]++
 			}
 		}
+
+		genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
 
 		return nos, nil
 	}
@@ -630,11 +654,14 @@ func (genSymbolVals2 *GenSymbolVals2) procAdd(gameProp *GameProperty, os *sgc7ga
 		}
 	}
 
+	genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
+
 	return nos, nil
 }
 
 // procMask
-func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7game.GameScene, pos []int) (*sgc7game.GameScene, error) {
+func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
+	gp *GameParams, pos []int) (*sgc7game.GameScene, error) {
 	// non-clone
 	if os == nil {
 		if len(pos) == 0 {
@@ -659,6 +686,8 @@ func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7g
 				nos.Arr[x][y] = 1
 			}
 		}
+
+		genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
 
 		return nos, nil
 	}
@@ -686,6 +715,8 @@ func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7g
 			nos.Arr[x][y] = 1
 		}
 	}
+
+	genSymbolVals2.ProcControllers(gameProp, plugin, curpr, gp, 0, "")
 
 	return nos, nil
 }
@@ -716,7 +747,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 	switch genSymbolVals2.Config.GenType {
 	case GSV2CTypeNumber:
-		nos, err := genSymbolVals2.procNumber(gameProp, os, pos, &cd.BasicComponentData)
+		nos, err := genSymbolVals2.procNumber(gameProp, os, plugin, curpr, gp, pos, &cd.BasicComponentData)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procNumber",
 				goutils.Err(err))
@@ -726,9 +757,13 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeWeight:
-		nos, err := genSymbolVals2.procWeight(gameProp, os, pos, plugin, &cd.BasicComponentData)
+		nos, err := genSymbolVals2.procWeight(gameProp, os, pos, plugin, curpr, gp, &cd.BasicComponentData)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procWeight",
 				goutils.Err(err))
@@ -738,9 +773,13 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeAdd:
-		nos, err := genSymbolVals2.procAdd(gameProp, os, pos)
+		nos, err := genSymbolVals2.procAdd(gameProp, os, plugin, curpr, gp, pos)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procAdd",
 				goutils.Err(err))
@@ -750,9 +789,13 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeMask:
-		nos, err := genSymbolVals2.procMask(gameProp, os, pos)
+		nos, err := genSymbolVals2.procMask(gameProp, os, plugin, curpr, gp, pos)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procMask",
 				goutils.Err(err))
@@ -762,10 +805,14 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeSymbolWeight:
 		gs := genSymbolVals2.GetTargetScene3(gameProp, curpr, prs, 0)
-		nos, err := genSymbolVals2.procSymbolWeight(gameProp, gs, os, pos, plugin, &cd.BasicComponentData)
+		nos, err := genSymbolVals2.procSymbolWeight(gameProp, gs, os, pos, plugin, curpr, gp, &cd.BasicComponentData)
 		if err != nil {
 			goutils.Error("GenSymbolVals2.OnPlayGame:procSymbolWeight",
 				goutils.Err(err))
@@ -775,6 +822,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	}
 
