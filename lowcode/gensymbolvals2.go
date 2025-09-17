@@ -726,6 +726,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeWeight:
 		nos, err := genSymbolVals2.procWeight(gameProp, os, pos, plugin, &cd.BasicComponentData)
@@ -738,6 +742,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeAdd:
 		nos, err := genSymbolVals2.procAdd(gameProp, os, pos)
@@ -750,6 +758,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeMask:
 		nos, err := genSymbolVals2.procMask(gameProp, os, pos)
@@ -762,6 +774,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	case GSV2CTypeSymbolWeight:
 		gs := genSymbolVals2.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -775,6 +791,10 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 
 		if nos != os {
 			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		} else {
+			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
 		}
 	}
 
