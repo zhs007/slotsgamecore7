@@ -289,8 +289,8 @@ func (cs *CallStack) StartEachSymbols(gameProp *GameProperty, component ICompone
 
 func (cs *CallStack) onEachSymbolsEnd(gameProp *GameProperty, component IComponent, symbolCode int, i int) error {
 	if len(cs.nodes) > 1 && cs.nodes[len(cs.nodes)-1].IsSame(component, symbolCode, i) {
-		gameProp.SceneStack.PopEx(cs.nodes[len(cs.nodes)-1].cacheSceneIndex)
-		gameProp.OtherSceneStack.PopEx(cs.nodes[len(cs.nodes)-1].cacheOtherSceneIndex)
+		gameProp.SceneStack.TruncateTo(cs.nodes[len(cs.nodes)-1].cacheSceneIndex)
+		gameProp.OtherSceneStack.TruncateTo(cs.nodes[len(cs.nodes)-1].cacheOtherSceneIndex)
 
 		cs.nodes = cs.nodes[:len(cs.nodes)-1]
 

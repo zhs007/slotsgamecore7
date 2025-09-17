@@ -40,6 +40,8 @@ func (stack *SceneStack) Push(scene string, gs *sgc7game.GameScene) {
 	stack.Scenes = append(stack.Scenes, ssd)
 }
 
+//go:noinline
+
 // InsertPreScene inserts a SceneStackData just before the current top of
 // the stack. If the stack has N elements, the new element will be placed
 // at index N-1 (i.e., immediately below the top). Note: calling this when
@@ -55,6 +57,8 @@ func (stack *SceneStack) InsertPreScene(scene string, gs *sgc7game.GameScene) {
 	// the original implementation.
 	stack.Scenes = slices.Insert(stack.Scenes, len(stack.Scenes)-1, ssd)
 }
+
+//go:noinline
 
 // Pop removes and returns the top SceneStackData. Returns nil if the
 // stack is empty.
@@ -252,6 +256,8 @@ func (stack *SceneStack) PopTo(scene string) {
 	}
 }
 
+//go:noinline
+
 // TruncateTo reduces the stack to at most 'num' entries. If num <= 0 the
 // stack is cleared. If num >= current length, no-op.
 func (stack *SceneStack) TruncateTo(num int) {
@@ -306,6 +312,8 @@ func (stack *SceneStack) GetTargetScene3(gameProp *GameProperty, basicCfg *Basic
 func (stack *SceneStack) onStepStart(_ *sgc7game.PlayResult) {
 	stack.Scenes = nil
 }
+
+//go:noinline
 
 // NewSceneStack constructs a SceneStack. Pass isOtherScene=true to create
 // a stack that operates on OtherScenes (used for auxiliary scene types).
