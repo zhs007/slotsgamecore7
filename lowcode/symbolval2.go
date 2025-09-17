@@ -11,6 +11,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 已弃用
+
 const SymbolVal2TypeName = "symbolVal2"
 
 // SymbolVal2Config - configuration for SymbolVal2 feature
@@ -104,21 +106,12 @@ func (symbolVal2 *SymbolVal2) InitEx(cfg any, pool *GamePropertyPool) error {
 func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolVal2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
 
 	gs := symbolVal2.GetTargetScene3(gameProp, curpr, prs, 0)
 
 	if gs.HasSymbol(symbolVal2.SymbolCode) {
 		os := gameProp.PoolScene.New(gs.Width, gs.Height)
-		// os, err := sgc7game.NewGameScene(gs.Width, gs.Height)
-		// if err != nil {
-		// 	goutils.Error("SymbolVal2.OnPlayGame:NewGameScene",
-		// 		goutils.Err(err))
-
-		// 	return err
-		// }
 
 		setIndex := -1
 		if symbolVal2.Config.RNGSet != "" {
@@ -157,10 +150,6 @@ func (symbolVal2 *SymbolVal2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 		}
 
 		symbolVal2.AddOtherScene(gameProp, curpr, os, cd)
-
-		// if symbolVal2.OtherSceneFeature != nil {
-		// 	gameProp.procOtherSceneFeature(symbolVal2.OtherSceneFeature, curpr, os)
-		// }
 	} else {
 		symbolVal2.ClearOtherScene(gameProp)
 	}

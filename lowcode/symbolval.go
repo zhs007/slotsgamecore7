@@ -11,11 +11,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const SymbolValTypeName = "symbolVal"
+// 已弃用
 
-// const (
-// 	SVCVWeightVal string = "weightVal" // 可以修改配置项里的 weightVal
-// )
+const SymbolValTypeName = "symbolVal"
 
 // SymbolValConfig - configuration for SymbolMulti feature
 type SymbolValConfig struct {
@@ -104,8 +102,6 @@ func (symbolVal *SymbolVal) GetWeightVal(gameProp *GameProperty, basicCD *BasicC
 func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolVal.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
 
 	gs := symbolVal.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -136,10 +132,6 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			}
 
 			symbolVal.AddOtherScene(gameProp, curpr, os, cd)
-
-			// if symbolVal.OtherSceneFeature != nil {
-			// 	gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
-			// }
 		} else {
 			os := os1.CloneEx(gameProp.PoolScene)
 
@@ -166,10 +158,6 @@ func (symbolVal *SymbolVal) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.P
 			}
 
 			symbolVal.AddOtherScene(gameProp, curpr, os, cd)
-
-			// if symbolVal.OtherSceneFeature != nil {
-			// 	gameProp.procOtherSceneFeature(symbolVal.OtherSceneFeature, curpr, os)
-			// }
 		}
 	} else {
 		symbolVal.ClearOtherScene(gameProp)
@@ -191,11 +179,6 @@ func (symbolVal *SymbolVal) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pla
 
 	return nil
 }
-
-// // OnStats
-// func (symbolVal *SymbolVal) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewSymbolVal(name string) IComponent {
 	return &SymbolVal{

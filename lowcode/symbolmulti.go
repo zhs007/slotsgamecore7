@@ -11,6 +11,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// 已弃用
+
 const SymbolMultiTypeName = "symbolMulti"
 
 // SymbolMultiConfig - configuration for SymbolMulti feature
@@ -113,8 +115,6 @@ func (symbolMulti *SymbolMulti) InitEx(cfg any, pool *GamePropertyPool) error {
 func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// symbolMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
-
 	cd := icd.(*BasicComponentData)
 
 	gs := symbolMulti.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -159,10 +159,6 @@ func (symbolMulti *SymbolMulti) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 
 		symbolMulti.AddOtherScene(gameProp, curpr, os, cd)
-
-		// if symbolMulti.OtherSceneFeature != nil {
-		// 	gameProp.procOtherSceneFeature(symbolMulti.OtherSceneFeature, curpr, os)
-		// }
 	} else {
 		symbolMulti.ClearOtherScene(gameProp)
 	}
@@ -183,11 +179,6 @@ func (symbolMulti *SymbolMulti) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 
 	return nil
 }
-
-// // OnStats
-// func (symbolMulti *SymbolMulti) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
 
 func NewSymbolMulti(name string) IComponent {
 	return &SymbolMulti{
