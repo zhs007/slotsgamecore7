@@ -237,8 +237,8 @@ func (wd *WinningDistribution) saveTimes(f *excelize.File) {
 	y := 1
 
 	for _, v := range wd.TimesWins {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), v.Win)
-		f.SetCellInt(sheet, goutils.Pos2Cell(1, y), int(v.Times))
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, y), v.Win)
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, y), int(v.Times))
 
 		y++
 	}
@@ -264,7 +264,7 @@ func (wd *WinningDistribution) savePercent(f *excelize.File, scale float64) {
 	y := 1
 
 	for _, v := range wd.PercentWins {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), v.Win)
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, y), v.Win)
 		f.SetCellFloat(sheet, goutils.Pos2Cell(1, y), v.Percent*scale, 5, 64)
 
 		y++

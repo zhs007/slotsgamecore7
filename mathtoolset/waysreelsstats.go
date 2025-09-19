@@ -224,14 +224,14 @@ func (wrss *WaysReelsStats) SaveExcel(fn string) error {
 	y := 1
 
 	for _, k := range wrss.Keys {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), k)
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, y), k)
 
 		for i, reel := range wrss.Reels {
 			statsSymbol, isok := reel.MapSymbols[k]
 			if isok {
-				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), statsSymbol.Num)
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), statsSymbol.Num)
 			} else {
-				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), 0)
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), 0)
 			}
 		}
 
@@ -239,7 +239,7 @@ func (wrss *WaysReelsStats) SaveExcel(fn string) error {
 	}
 
 	for i, rs := range wrss.Reels {
-		f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
+	f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
 	}
 
 	return f.SaveAs(fn)

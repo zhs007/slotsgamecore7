@@ -82,7 +82,7 @@ func NewExcelFile(reels [][]string) *excelize.File {
 	}
 
 	for i := 0; i < maxj; i++ {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, i+1), i)
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, i+1), i)
 	}
 
 	return f

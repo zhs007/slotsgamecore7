@@ -7,7 +7,9 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
-	_ "github.com/mkevac/debugcharts"
+	// debugcharts imported previously for a runtime debug UI; remove it to
+	// avoid pulling older gopsutil v2 as an indirect dependency. Developers
+	// can re-enable it locally if needed.
 
 	"github.com/zhs007/goutils"
 	"github.com/zhs007/slotsgamecore7/lowcode"

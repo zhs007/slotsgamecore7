@@ -567,14 +567,14 @@ func (rss *ReelsStats) SaveExcel(fn string) error {
 	y := 1
 
 	for _, s := range rss.Symbols {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), int(s))
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, y), int(s))
 
 		for i, reel := range rss.Reels {
 			statsSymbol, isok := reel.MapSymbols[s]
 			if isok {
-				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), statsSymbol.Num)
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), statsSymbol.Num)
 			} else {
-				f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), 0)
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), 0)
 			}
 		}
 
@@ -582,7 +582,7 @@ func (rss *ReelsStats) SaveExcel(fn string) error {
 	}
 
 	for i, rs := range rss.Reels {
-		f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
+		f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
 	}
 
 	return f.SaveAs(fn)

@@ -40,11 +40,11 @@ func SavePaytable(f *excelize.File, sheet string, pt *sgc7game.PayTables) error 
 	for code := 0; code <= maxCode; code++ {
 		arr, isok := pt.MapPay[code]
 		if isok {
-			f.SetCellInt(sheet, goutils.Pos2Cell(0, code+1), code)
+			f.SetCellValue(sheet, goutils.Pos2Cell(0, code+1), code)
 			f.SetCellStr(sheet, goutils.Pos2Cell(1, code+1), pt.GetStringFromInt(code))
 
 			for i := 0; i < num; i++ {
-				f.SetCellInt(sheet, goutils.Pos2Cell(2+i, code+1), arr[i])
+				f.SetCellValue(sheet, goutils.Pos2Cell(2+i, code+1), arr[i])
 			}
 		}
 	}
@@ -78,7 +78,7 @@ func SaveReels(f *excelize.File, sheet string, pt *sgc7game.PayTables, reels *sg
 	}
 
 	for y := 0; y < maxline; y++ {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y+1), y)
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, y+1), y)
 
 		for i := 0; i < num; i++ {
 			if y < len(reels.Reels[i]) {
@@ -110,10 +110,10 @@ func SaveLineData(f *excelize.File, sheet string, ld *sgc7game.LineData) error {
 	}
 
 	for y := 0; y < maxline; y++ {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y+1), y+1)
+		f.SetCellValue(sheet, goutils.Pos2Cell(0, y+1), y+1)
 
 		for i := 0; i < num; i++ {
-			f.SetCellInt(sheet, goutils.Pos2Cell(i+1, y+1), ld.Lines[y][i])
+			f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y+1), ld.Lines[y][i])
 		}
 	}
 
@@ -144,9 +144,9 @@ func SaveSymbolWeights(f *excelize.File, sheet string, pt *sgc7game.PayTables, v
 	for c := 0; c <= maxCode; c++ {
 		cv := sgc7game.NewIntValEx(c)
 		w := vw.GetWeight(cv)
-		if w > 0 {
+			if w > 0 {
 			f.SetCellStr(sheet, goutils.Pos2Cell(0, y), pt.GetStringFromInt(c))
-			f.SetCellInt(sheet, goutils.Pos2Cell(1, y), w)
+			f.SetCellValue(sheet, goutils.Pos2Cell(1, y), w)
 		}
 	}
 
@@ -179,9 +179,9 @@ func SaveIntWeights(f *excelize.File, sheet string, vw *sgc7game.ValWeights2) er
 	for i := 0; i < len(vals); i++ {
 		cv := sgc7game.NewIntValEx(vals[i])
 		w := vw.GetWeight(cv)
-		if w > 0 {
-			f.SetCellInt(sheet, goutils.Pos2Cell(0, i+1), vals[i])
-			f.SetCellInt(sheet, goutils.Pos2Cell(1, i+1), w)
+			if w > 0 {
+			f.SetCellValue(sheet, goutils.Pos2Cell(0, i+1), vals[i])
+			f.SetCellValue(sheet, goutils.Pos2Cell(1, i+1), w)
 		}
 	}
 
@@ -204,7 +204,7 @@ func SaveStrWeights(f *excelize.File, sheet string, vw *sgc7game.ValWeights2) er
 	for i := 0; i < len(vw.Vals); i++ {
 		if vw.Weights[i] > 0 {
 			f.SetCellStr(sheet, goutils.Pos2Cell(0, i+1), vw.Vals[i].String())
-			f.SetCellInt(sheet, goutils.Pos2Cell(1, i+1), vw.Weights[i])
+			f.SetCellValue(sheet, goutils.Pos2Cell(1, i+1), vw.Weights[i])
 		}
 	}
 
