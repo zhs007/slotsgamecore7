@@ -2,6 +2,7 @@ package lowcode
 
 import (
 	"log/slog"
+	"sort"
 	"strings"
 
 	"github.com/zhs007/goutils"
@@ -121,7 +122,17 @@ func LoadSymbolsViewer(fn string) (*SymbolsViewer, error) {
 		MapSymbols: make(map[int]*SymbolViewerData),
 	}
 
-	for _, r := range rows {
+	// iterate rows in ascending row order so the last-seen row in the file
+	// deterministically overwrites earlier duplicates. Iterating a map
+	// directly is randomized by Go and can lead to flaky behavior in tests.
+	keys := make([]int, 0, len(rows))
+	for k := range rows {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	for _, k := range keys {
+		r := rows[k]
 		if r.code == nil {
 			// skip rows without a code, but warn with row info
 			goutils.Warn("LoadSymbolsViewer: missing code, skipping row",

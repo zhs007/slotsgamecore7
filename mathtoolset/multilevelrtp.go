@@ -149,8 +149,8 @@ func (rtpdata *MultiLevelRTPData) SaveResults(fn string) error {
 	si := 1
 
 	for _, v := range rtpdata.Nodes {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, si), v.SpinNum)
-		f.SetCellInt(sheet, goutils.Pos2Cell(1, si), v.EndingLevel)
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, si), v.SpinNum)
+	f.SetCellValue(sheet, goutils.Pos2Cell(1, si), v.EndingLevel)
 		f.SetCellFloat(sheet, goutils.Pos2Cell(2, si), v.Percent, 5, 64)
 		f.SetCellFloat(sheet, goutils.Pos2Cell(3, si), v.RTP, 5, 64)
 		f.SetCellFloat(sheet, goutils.Pos2Cell(4, si), v.TotalRTP, 5, 64)

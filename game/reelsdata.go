@@ -140,12 +140,12 @@ func (rd *ReelsData) SaveExcel(fn string) error {
 		}
 
 		for j, v := range reel {
-			f.SetCellInt(sheet, goutils.Pos2Cell(i+1, j+1), v)
+			f.SetCellValue(sheet, goutils.Pos2Cell(i+1, j+1), v)
 		}
 	}
 
 	for i := 0; i < maxj; i++ {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, i+1), i)
+		f.SetCellValue(sheet, goutils.Pos2Cell(0, i+1), i)
 	}
 
 	return f.SaveAs(fn)
@@ -174,7 +174,7 @@ func (rd *ReelsData) SaveExcelEx(fn string, paytables *PayTables) error {
 	}
 
 	for i := 0; i < maxj; i++ {
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, i+1), i)
+		f.SetCellValue(sheet, goutils.Pos2Cell(0, i+1), i)
 	}
 
 	return f.SaveAs(fn)

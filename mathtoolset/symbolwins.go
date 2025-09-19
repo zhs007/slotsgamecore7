@@ -194,7 +194,7 @@ func (ssws *SymbolsWinsStats) SaveExcelSheet(f *excelize.File, fm SymbolsWinsFil
 	for _, s := range ssws.Symbols {
 		sws := ssws.GetSymbolWinsStats(s)
 
-		f.SetCellInt(sheet, goutils.Pos2Cell(0, y), int(s))
+	f.SetCellValue(sheet, goutils.Pos2Cell(0, y), int(s))
 		f.SetCellValue(sheet, goutils.Pos2Cell(1, y), sws.Total)
 
 		rtp := 0.0
