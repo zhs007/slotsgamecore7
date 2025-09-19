@@ -1,8 +1,8 @@
 module github.com/zhs007/slotsgamecore7
 
-go 1.22.7
+go 1.24
 
-toolchain go1.22.10
+toolchain go1.24
 
 require (
 	devt.de/krotik/common v1.5.1
