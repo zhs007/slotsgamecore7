@@ -269,6 +269,14 @@ func (chgSymbols2 *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 	chgSymbols2.Config.Type = parseChgSymbols2Type(chgSymbols2.Config.StrType)
 	chgSymbols2.Config.ExitType = parseChgSymbols2ExitType(chgSymbols2.Config.StrExitType)
 
+	if chgSymbols2.Config.ExitType == CS2ETypeMaxNumber && chgSymbols2.Config.MaxNumber <= 0 {
+		goutils.Error("ChgSymbols2.InitEx:MaxNumber",
+			slog.Int("maxNumber", chgSymbols2.Config.MaxNumber),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
 	for _, s := range chgSymbols2.Config.SrcSymbols {
 		sc, isok := pool.DefaultPaytables.MapSymbols[s]
 		if !isok {
@@ -748,6 +756,7 @@ func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
 		SrcPositionCollection: slices.Clone(jcfg.SrcPositionCollection),
 		SrcSymbolWeight:       jcfg.SrcSymbolWeight,
 		Symbol:                jcfg.Symbol,
+		MaxNumber:             jcfg.MaxNumber,
 	}
 
 	return cfg
