@@ -55,6 +55,7 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(MoveSymbolTypeName), parseMoveSymbol)
 	gJsonMgr.RegLoadComponent(strings.ToLower(RespinTypeName), parseRespin)
 	gJsonMgr.RegLoadComponent(strings.ToLower(SymbolCollection2TypeName), parseSymbolCollection2)
+	gJsonMgr.RegLoadComponent(strings.ToLower("symbolCollection"), parseSymbolCollection2)
 	gJsonMgr.RegLoadComponent(strings.ToLower(RemoveSymbolsTypeName), parseRemoveSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(DropDownSymbolsTypeName), parseDropDownSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(RefillSymbolsTypeName), parseRefillSymbols)
