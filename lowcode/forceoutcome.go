@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"strings"
 
-	any1 "github.com/golang/protobuf/ptypes/any"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
@@ -58,7 +58,7 @@ func hasComponentInHistory(lst []string, component string) bool {
 	return false
 }
 
-func checkComponentVal(mapComponent map[string]*any1.Any, component string, val string, op string, targetVal int) bool {
+func checkComponentVal(mapComponent map[string]*anypb.Any, component string, val string, op string, targetVal int) bool {
 	for k, v := range mapComponent {
 		if isComponent(k, component) {
 			curval, isok2 := GetComponentDataVal(v, val)

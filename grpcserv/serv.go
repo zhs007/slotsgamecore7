@@ -40,8 +40,8 @@ func NewServ(service IService, game sgc7game.IGame, bindaddr string, version str
 
 	if useOpenTelemetry {
 		grpcServ = grpc.NewServer(
-			grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-			grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+			// otelgrpc v0.63.0 uses stats handlers rather than interceptors
+			grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		)
 	} else {
 		grpcServ = grpc.NewServer()

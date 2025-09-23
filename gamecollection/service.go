@@ -1,7 +1,6 @@
 package gamecollection
 
 import (
-	"github.com/golang/protobuf/ptypes/any"
 	"github.com/zhs007/slotsgamecore7/grpcserv"
 	"github.com/zhs007/slotsgamecore7/lowcode"
 	sgc7pb "github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -13,8 +12,8 @@ type Service struct {
 	*grpcserv.BasicService2
 }
 
-// BuildPBGameModParam - interface{} -> *any.Any
-func (sv *Service) BuildPBGameModParam(gp interface{}) (*any.Any, error) {
+// BuildPBGameModParam - interface{} -> *anypb.Any
+func (sv *Service) BuildPBGameModParam(gp interface{}) (*anypb.Any, error) {
 	mygp, isok := gp.(*lowcode.GameParams)
 	if !isok {
 		return nil, ErrInvalidGameParams
@@ -23,8 +22,8 @@ func (sv *Service) BuildPBGameModParam(gp interface{}) (*any.Any, error) {
 	return anypb.New(&mygp.GameParam)
 }
 
-// BuildPBGameModParamFromAny - interface{} -> *any.Any
-func (sv *Service) BuildPBGameModParamFromAny(msg *any.Any) (interface{}, error) {
+// BuildPBGameModParamFromAny - *anypb.Any -> interface{}
+func (sv *Service) BuildPBGameModParamFromAny(msg *anypb.Any) (interface{}, error) {
 	mygp := &sgc7pb.GameParam{}
 
 	err := msg.UnmarshalTo(mygp)

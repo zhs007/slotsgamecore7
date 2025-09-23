@@ -40,8 +40,8 @@ func NewServ(bindaddr string, version string, useOpenTelemetry bool, funcNewRNG 
 		grpcServ = grpc.NewServer(
 			grpc.MaxRecvMsgSize(1024*1024*10),
 			grpc.MaxSendMsgSize(1024*1024*10),
-			grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
-			grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+			// otelgrpc v0.63.0 uses stats handlers rather than interceptors
+			grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		)
 	} else {
 		grpcServ = grpc.NewServer()
