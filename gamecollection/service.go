@@ -22,7 +22,7 @@ func (sv *Service) BuildPBGameModParam(gp interface{}) (*anypb.Any, error) {
 	return anypb.New(&mygp.GameParam)
 }
 
-// BuildPBGameModParamFromAny - interface{} -> *anypb.Any
+// BuildPBGameModParamFromAny - *anypb.Any -> interface{}
 func (sv *Service) BuildPBGameModParamFromAny(msg *anypb.Any) (interface{}, error) {
 	mygp := &sgc7pb.GameParam{}
 

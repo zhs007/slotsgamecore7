@@ -3,6 +3,8 @@ package opentelemetry
 import (
 	"context"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/zhs007/goutils"
 	"go.opentelemetry.io/otel"
@@ -14,6 +16,50 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 )
 
+// chooseSampler selects a sampler based on environment variables with sane defaults.
+// Priority:
+// 1) OTEL_TRACES_SAMPLER = always_on|always_off|traceidratio (with OTEL_TRACES_SAMPLER_ARG)
+// 2) SGC7_TRACE_SAMPLE_RATIO (0..1) -> ParentBased(TraceIDRatioBased(r))
+// 3) If ENV/APP_ENV/GO_ENV indicates prod/production -> ParentBased(TraceIDRatioBased(0.1))
+// 4) Default -> AlwaysSample (developer-friendly)
+func chooseSampler() sdktrace.Sampler {
+	if v := strings.ToLower(strings.TrimSpace(os.Getenv("OTEL_TRACES_SAMPLER"))); v != "" {
+		switch v {
+		case "always_on":
+			return sdktrace.AlwaysSample()
+		case "always_off":
+			return sdktrace.NeverSample()
+		case "traceidratio":
+			if arg := os.Getenv("OTEL_TRACES_SAMPLER_ARG"); arg != "" {
+				if r, err := strconv.ParseFloat(arg, 64); err == nil && r >= 0 && r <= 1 {
+					return sdktrace.ParentBased(sdktrace.TraceIDRatioBased(r))
+				}
+			}
+			// default ratio when traceidratio is selected without arg
+			return sdktrace.ParentBased(sdktrace.TraceIDRatioBased(0.1))
+		}
+	}
+
+	if arg := os.Getenv("SGC7_TRACE_SAMPLE_RATIO"); arg != "" {
+		if r, err := strconv.ParseFloat(arg, 64); err == nil && r >= 0 && r <= 1 {
+			return sdktrace.ParentBased(sdktrace.TraceIDRatioBased(r))
+		}
+	}
+
+	env := strings.ToLower(strings.TrimSpace(os.Getenv("ENV")))
+	if env == "" {
+		env = strings.ToLower(strings.TrimSpace(os.Getenv("APP_ENV")))
+	}
+	if env == "" {
+		env = strings.ToLower(strings.TrimSpace(os.Getenv("GO_ENV")))
+	}
+	if env == "prod" || env == "production" {
+		return sdktrace.ParentBased(sdktrace.TraceIDRatioBased(0.1))
+	}
+
+	return sdktrace.AlwaysSample()
+}
+
 // ConfigureOTLP sets up tracing using the OTLP exporter (recommended). It honors standard OTEL_* env vars.
 func ConfigureOTLP(ctx context.Context, appname string) (func(), error) {
 	// Use default environment-based configuration for endpoint, headers, etc.
@@ -24,7 +70,7 @@ func ConfigureOTLP(ctx context.Context, appname string) (func(), error) {
 	}
 
 	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithSampler(chooseSampler()),
 		sdktrace.WithBatcher(exp),
 		sdktrace.WithResource(resource.NewSchemaless(semconv.ServiceNameKey.String(appname))),
 	)
@@ -52,7 +98,7 @@ func ConfigureJaeger(ctx context.Context, appname string) (func(), error) {
 	}
 
 	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithSampler(chooseSampler()),
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resource.NewSchemaless(semconv.ServiceNameKey.String(appname))),
 	)
