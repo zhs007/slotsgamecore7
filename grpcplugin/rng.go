@@ -48,10 +48,10 @@ func (client *RngClient) GetRngs(ctx context.Context, nums int) ([]uint32, error
 		var err error
 
 		if client.useOpenTelemetry {
-			conn, err = grpc.Dial(client.servAddr,
-				grpc.WithTransportCredentials(insecure.NewCredentials()),
-				grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-				grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+				conn, err = grpc.Dial(client.servAddr,
+					grpc.WithTransportCredentials(insecure.NewCredentials()),
+					// otelgrpc v0.63.0 removed Interceptors; use stats handlers instead
+					grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
 			if err != nil {
 				goutils.Error("RngClient.GetRngs:grpc.Dial",
 					slog.String("server address", client.servAddr),

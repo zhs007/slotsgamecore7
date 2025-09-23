@@ -40,10 +40,10 @@ func (client *Client) reset() {
 
 func (client *Client) onRequest(_ context.Context) error {
 	if client.conn == nil || client.client == nil {
-		conn, err := grpc.Dial(client.servAddr,
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-			grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-			grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
+	    conn, err := grpc.Dial(client.servAddr,
+		    grpc.WithTransportCredentials(insecure.NewCredentials()),
+		    // otelgrpc v0.63.0 uses stats handlers instead of interceptors
+		    grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
 		if err != nil {
 			goutils.Error("Client.onRequest:grpc.Dial",
 				slog.String("server address", client.servAddr),
