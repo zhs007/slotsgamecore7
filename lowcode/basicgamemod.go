@@ -199,7 +199,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 			// 这里可能会由于respin循环回滚导致异常,循环回滚是为了处理前端渲染的问题,待查
 			// 后续可以考虑去掉循环回滚
-			if gameProp.callStack.IsInCurCallStack(nc) {
+			if !gameProp.IsRespin(nc) && gameProp.callStack.IsInCurCallStack(nc) {
 				goutils.Error("BasicGameMod.OnPlay:procRespinBeforeStepEnding:IsInCurCallStack",
 					goutils.Err(ErrInvalidComponentConfig))
 
