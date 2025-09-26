@@ -209,13 +209,34 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			nextComponentName = nc
 		}
 
-		if gameProp.IsRespin(nextComponentName) && !gameProp.IsEndingRespin(nextComponentName) {
-			gameProp.onTriggerRespin(nextComponentName)
-			gp.NextStepFirstComponent = nextComponentName
+		if gameProp.IsRespin(nextComponentName) {
+			if !gameProp.IsEndingRespin(nextComponentName) {
+				gameProp.onTriggerRespin(nextComponentName)
+				gp.NextStepFirstComponent = nextComponentName
 
-			pr.IsFinish = false
+				pr.IsFinish = false
 
-			break
+				break
+			} else {
+				cr, isok := gameProp.Components.MapComponents[nextComponentName]
+				if isok {
+					cd := gameProp.GetGlobalComponentData(cr)
+					nc, err := cr.ProcRespinOnStepEnd(gameProp, pr, gp, cd, true)
+					if err != nil {
+						goutils.Error("BasicGameMod.OnPlay:IsRespin:ProcRespinOnStepEnd",
+							slog.String("respin", nextComponentName),
+							goutils.Err(err))
+
+						return nil, err
+					}
+
+					if nc == "" {
+						break
+					}
+
+					nextComponentName = nc
+				}
+			}
 		}
 
 		c, isok := components.MapComponents[nextComponentName]
