@@ -203,7 +203,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 				goutils.Error("BasicGameMod.OnPlay:procRespinBeforeStepEnding:IsInCurCallStack",
 					goutils.Err(ErrInvalidComponentConfig))
 
-				return nil, ErrInvalidComponentConfig
+				break
 			}
 
 			nextComponentName = nc
