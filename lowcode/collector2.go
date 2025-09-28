@@ -512,6 +512,15 @@ func (collector *Collector2) OnUpdateDataWithPlayerState(pool *GamePropertyPool,
 		// CCVValueNumNow 在这里非常特殊,理论上,这里(playerstate时)什么都不用做,只需要缓存数据即可
 		val, isok := cd2.GetConfigIntVal(CCVValueNumNow)
 		if isok {
+			if val < 0 {
+				val = 0
+			}
+
+			if val > collector.Config.MaxVal && collector.Config.MaxVal > 0 {
+				val = collector.Config.MaxVal
+			}
+
+			// 这里不触发onLevelUp,因为数据是从playerstate里同步过来的,实时写回去时只要把值设置正确就行了
 			cd2.Val = val
 
 			cd2.ClearConfigIntVal(CCVValueNumNow)
