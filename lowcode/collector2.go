@@ -91,16 +91,18 @@ func (collectorData *Collector2Data) SetConfigIntVal(key string, val int) {
 	}
 }
 
-// // ChgConfigIntVal -
-// func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
-// 	if key == CCVPickNum {
-// 		collectorData.Val += off
-// 	} else {
-// 		return collectorData.BasicComponentData.ChgConfigIntVal(key, off)
-// 	}
+// ChgConfigIntVal -
+func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
+	if key == CCVValueNumNow {
+		val := collectorData.Val + off
 
-// 	return collectorData.Val
-// }
+		collectorData.BasicComponentData.SetConfigIntVal(key, val)
+
+		return val
+	} else {
+		return collectorData.BasicComponentData.ChgConfigIntVal(key, off)
+	}
+}
 
 func (collectorData *Collector2Data) GetOutput() int {
 	return collectorData.Val
@@ -507,18 +509,14 @@ func (collector *Collector2) OnUpdateDataWithPlayerState(pool *GamePropertyPool,
 			return
 		}
 
-		off, isok := cd2.GetConfigIntVal(CCVValueNumNow)
+		// CCVValueNumNow 在这里非常特殊,理论上,这里(playerstate时)什么都不用做,只需要缓存数据即可
+		val, isok := cd2.GetConfigIntVal(CCVValueNumNow)
 		if isok {
-			err := collector.add(plugin, off, cd2, gameProp, curpr, gp, false)
-			if err != nil {
-				goutils.Error("Collector2.OnPlayGame:add:off",
-					goutils.Err(err))
-				return
-			}
+			cd2.Val = val
 
 			cd2.ClearConfigIntVal(CCVValueNumNow)
 
-			cps.Value = cd2.Val
+			cps.Value = val
 		}
 	}
 }
