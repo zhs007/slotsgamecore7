@@ -309,12 +309,6 @@ func SetIgnoreGenDefaultScene() {
 	gIsIgnoreGenDefaultScene = true
 }
 
-var gSaveParSheet = false
-
-func SetSaveParSheet() {
-	gSaveParSheet = true
-}
-
 func init() {
 	initCheckWinType()
 }

@@ -124,7 +124,7 @@ func TestWeightBranchData_And_Init(t *testing.T) {
 	defer os.Remove(tmpf)
 
 	vw := prepareVW2("w1v")
-	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw}}
 
 	comp2 := NewWeightBranch("wbinit").(*WeightBranch)
 	err := comp2.Init(tmpf, pool)
@@ -168,7 +168,7 @@ func TestOnBranch_SuccessPaths(t *testing.T) {
 
 func TestOnPlayGame_ForceBranch(t *testing.T) {
 	vw := prepareVW2("fb")
-	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw}}
 
 	gameProp := &GameProperty{Pool: pool}
 	gameProp.PoolScene = sgc7game.NewGameScenePoolEx()
@@ -390,7 +390,7 @@ func TestSetLinkComponent_UpdateExisting(t *testing.T) {
 
 func TestInitEx_WithAwardsCallsInit(t *testing.T) {
 	vw := prepareVW2("w1v")
-	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw}}
 
 	comp := NewWeightBranch("initaw").(*WeightBranch)
 	cfg := &WeightBranchConfig{Weight: "w1", MapBranchs: map[string]*BranchNode{"a": {Awards: []*Award{{AwardType: "respinTimes"}}}}}
@@ -409,7 +409,7 @@ func TestWeightBranch_OnPlayGame_RandAndForceOnce(t *testing.T) {
 	// prepare ValWeights2
 	vw2 := prepareVW2("b1")
 
-	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw2}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw2}}
 
 	gameProp := &GameProperty{Pool: pool}
 	gameProp.PoolScene = sgc7game.NewGameScenePoolEx()

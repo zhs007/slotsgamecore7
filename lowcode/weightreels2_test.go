@@ -183,7 +183,7 @@ func TestWeightReels2_InitExAndJSONBuild(t *testing.T) {
 	vw2, err := sgc7game.NewValWeights2([]sgc7game.IVal{sv}, []int{1})
 	assert.NoError(t, err)
 
-	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw2}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw2}}
 
 	// prepare WeightReels2 and call InitEx with ReelSetsWeight set
 	comp := NewWeightReels2("wrx").(*WeightReels2)
@@ -222,7 +222,7 @@ func TestWeightReels2Data_OnNewGameAndInit(t *testing.T) {
 	vw2, err := sgc7game.NewValWeights2([]sgc7game.IVal{sv}, []int{1})
 	assert.NoError(t, err)
 
-	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw2}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapStrValWeights: map[string]*sgc7game.ValWeights2{"w1": vw2}}
 
 	wc := NewWeightReels2("wx").(*WeightReels2)
 	err = wc.Init(tmpf, pool)
