@@ -24,7 +24,6 @@ type GamePropertyPool struct {
 	mapIntValWeights map[string]*sgc7game.ValWeights2
 	newRNG           FuncNewRNG
 	newFeatureLevel  FuncNewFeatureLevel
-	mapUsedWeights   map[string]string // 用于标记哪些权重被使用过
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -94,19 +93,11 @@ func (pool *GamePropertyPool) InitStats(betMul int) error {
 
 // LoadStrWeights - load xlsx file
 func (pool *GamePropertyPool) LoadStrWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
-	if gSaveParSheet {
-		pool.mapUsedWeights[fn] = "str" // 标记这个权重被使用过
-	}
-
 	return pool.mapStrValWeights[fn], nil
 }
 
 // LoadIntWeights - load xlsx file
 func (pool *GamePropertyPool) LoadIntWeights(fn string, useFileMapping bool) (*sgc7game.ValWeights2, error) {
-	if gSaveParSheet {
-		pool.mapUsedWeights[fn] = "int" // 标记这个权重被使用过
-	}
-
 	return pool.mapIntValWeights[fn], nil
 }
 
@@ -117,10 +108,6 @@ func (pool *GamePropertyPool) LoadIntMapping(fn string) *sgc7game.ValMapping2 {
 
 // LoadSymbolWeights - load xlsx file
 func (pool *GamePropertyPool) LoadSymbolWeights(fn string, headerVal string, headerWeight string, paytables *sgc7game.PayTables, useFileMapping bool) (*sgc7game.ValWeights2, error) {
-	if gSaveParSheet {
-		pool.mapUsedWeights[fn] = "symbol" // 标记这个权重被使用过
-	}
-
 	return pool.mapIntValWeights[fn], nil
 }
 
@@ -298,7 +285,6 @@ func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLeve
 		mapIntValWeights: make(map[string]*sgc7game.ValWeights2),
 		newRNG:           funcNewRNG,
 		newFeatureLevel:  funcNewFeatureLevel,
-		mapUsedWeights:   make(map[string]string), // 用于标记哪些权重被使用过
 	}
 
 	if cfg.SymbolsViewer == "" {

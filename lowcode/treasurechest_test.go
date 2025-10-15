@@ -85,7 +85,7 @@ func TestInitExValidationAndWeightLoading(t *testing.T) {
 	vw, err := sgc7game.NewValWeights2([]sgc7game.IVal{iv}, []int{1})
 	assert.NoError(t, err)
 
-	pool := &GamePropertyPool{mapIntValWeights: map[string]*sgc7game.ValWeights2{"w": vw}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapIntValWeights: map[string]*sgc7game.ValWeights2{"w": vw}}
 
 	// FragmentCollection with invalid FragmentNum
 	comp := NewTreasureChest("tc1").(*TreasureChest)
@@ -271,7 +271,7 @@ func TestInitExWithControllers(t *testing.T) {
 	iv := sgc7game.NewIntValEx[int](1)
 	vw, _ := sgc7game.NewValWeights2([]sgc7game.IVal{iv}, []int{1})
 
-	pool := &GamePropertyPool{mapIntValWeights: map[string]*sgc7game.ValWeights2{"w": vw}, mapUsedWeights: make(map[string]string)}
+	pool := &GamePropertyPool{mapIntValWeights: map[string]*sgc7game.ValWeights2{"w": vw}}
 
 	comp := NewTreasureChest("tc_initc").(*TreasureChest)
 	cfg := &TreasureChestConfig{
