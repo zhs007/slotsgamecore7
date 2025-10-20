@@ -26,6 +26,7 @@ const (
 	CS2STypeReels              ChgSymbols2SourceType = 1
 	CS2STypeMask               ChgSymbols2SourceType = 2
 	CS2STypePositionCollection ChgSymbols2SourceType = 3
+	CS2STypeRowMask            ChgSymbols2SourceType = 4
 )
 
 func (t ChgSymbols2SourceType) IsReelsMode() bool {
@@ -40,6 +41,8 @@ func parseChgSymbols2SourceType(str string) ChgSymbols2SourceType {
 		return CS2STypeMask
 	case "positioncollection":
 		return CS2STypePositionCollection
+	case "rowmask":
+		return CS2STypeRowMask
 	}
 
 	return CS2STypeAll
@@ -199,6 +202,8 @@ type ChgSymbols2Config struct {
 	SrcSymbolType         ChgSymbols2SourceSymbolType `yaml:"-" json:"-"`
 	StrType               string                      `yaml:"type" json:"type"`
 	Type                  ChgSymbols2Type             `yaml:"-" json:"-"`
+	SrcRowMask            string                      `yaml:"srcRowMask" json:"srcRowMask"`
+	SrcMask               string                      `yaml:"srcMask" json:"srcMask"`
 	StrExitType           string                      `yaml:"exitType" json:"exitType"`
 	ExitType              ChgSymbols2ExitType         `yaml:"-" json:"-"`
 	IsAlwaysGen           bool                        `yaml:"isAlwaysGen" json:"isAlwaysGen"`
@@ -389,6 +394,44 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 		for x := 0; x < gameProp.GetVal(GamePropWidth); x++ {
 			for y := 0; y < gameProp.GetVal(GamePropHeight); y++ {
 				pos = append(pos, x, y)
+			}
+		}
+	case CS2STypeRowMask:
+		imaskd := gameProp.GetComponentDataWithName(chgSymbols2.Config.SrcRowMask)
+		if imaskd != nil {
+			arr := imaskd.GetMask()
+			if len(arr) != gs.Height {
+				goutils.Error("ChgSymbols2.getSrcPos:RowMask:len(arr)!=gs.Height",
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return nil, ErrInvalidComponentConfig
+			}
+
+			for y := 0; y < gs.Height; y++ {
+				if arr[y] {
+					for x := 0; x < gs.Width; x++ {
+						pos = append(pos, x, y)
+					}
+				}
+			}
+		}
+	case CS2STypeMask:
+		imaskd := gameProp.GetComponentDataWithName(chgSymbols2.Config.SrcMask)
+		if imaskd != nil {
+			arr := imaskd.GetMask()
+			if len(arr) != gs.Width {
+				goutils.Error("ChgSymbols2.getSrcPos:Mask:len(arr)!=gs.Width",
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return nil, ErrInvalidComponentConfig
+			}
+
+			for x := 0; x < gs.Width; x++ {
+				if arr[x] {
+					for y := 0; y < gs.Height; y++ {
+						pos = append(pos, x, y)
+					}
+				}
 			}
 		}
 	default:
@@ -726,6 +769,7 @@ func NewChgSymbols2(name string) IComponent {
 // ],
 // "weight": "fgtoco",
 // "blankSymbol": "BN"
+// "srcRowMask": "mask-left"
 type jsonChgSymbols2 struct {
 	StrSrcType            string   `json:"srcType"`
 	StrSrcSymbolType      string   `json:"srcSymbolType"`
@@ -740,6 +784,8 @@ type jsonChgSymbols2 struct {
 	SrcSymbolWeight       string   `json:"srcSymbolWeight"`
 	Symbol                string   `json:"symbol"`
 	MaxNumber             int      `json:"maxNumber"`
+	SrcRowMask            string   `json:"srcRowMask"`
+	SrcMask               string   `json:"srcMask"`
 }
 
 func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
@@ -748,6 +794,8 @@ func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
 		StrSrcSymbolType:      strings.ToLower(jcfg.StrSrcSymbolType),
 		StrType:               strings.ToLower(jcfg.StrType),
 		StrExitType:           strings.ToLower(jcfg.StrExitType),
+		SrcMask:               jcfg.SrcMask,
+		SrcRowMask:            jcfg.SrcRowMask,
 		IsAlwaysGen:           jcfg.IsAlwaysGen,
 		Height:                jcfg.Height,
 		Weight:                jcfg.Weight,
