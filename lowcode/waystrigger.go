@@ -20,10 +20,6 @@ import (
 
 const WaysTriggerTypeName = "waysTrigger"
 
-// const (
-// 	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-// )
-
 type WaysTriggerData struct {
 	BasicComponentData
 	NextComponent string
@@ -149,6 +145,7 @@ type WaysTriggerConfig struct {
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
 	SetWinSymbols                   []string                      `yaml:"setWinSymbols" json:"setWinSymbols"`
+	RowMask                         string                        `yaml:"rowMask" json:"rowMask"`
 }
 
 // SetLinkComponent
@@ -355,12 +352,73 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		return isTrigger, lst
 	}
 
-	switch waysTrigger.Config.TriggerType {
-	case STTypeWays:
-		if os != nil {
-			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+	if waysTrigger.Config.RowMask != "" {
+		maskCompData := gameProp.GetComponentDataWithName(waysTrigger.Config.RowMask)
+		if maskCompData == nil {
+			goutils.Error("WaysTrigger.canTrigger:GetComponentDataWithName",
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return false, nil
+		}
+
+		validMask := maskCompData.GetMask()
+
+		switch waysTrigger.Config.TriggerType {
+		case STTypeWays:
+			if os != nil {
+				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+						if !validMask[y] {
+							return false
+						}
+
+						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(x, y int) int {
+						return os.Arr[x][y]
+					})
+
+				lst = append(lst, currets...)
+			} else {
+				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+						if !validMask[y] {
+							return false
+						}
+
+						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(x, y int) int {
+						return 1
+					})
+
+				lst = append(lst, currets...)
+			}
+
+			if len(lst) > 0 {
+				isTrigger = true
+			}
+		case STTypeCheckWays:
+			currets := sgc7game.CheckWays(gs, waysTrigger.Config.MinNum,
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-					// return true
+					if !validMask[y] {
+						return false
+					}
+
 					return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 				}, func(cursymbol int) bool {
 					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
@@ -370,13 +428,58 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 					}
 
 					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, func(x, y int) int {
-					return os.Arr[x][y]
 				})
 
 			lst = append(lst, currets...)
-		} else {
-			currets := sgc7game.CalcFullLineExWithMulti(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+
+			if len(lst) > 0 {
+				isTrigger = true
+			}
+		}
+	} else {
+		switch waysTrigger.Config.TriggerType {
+		case STTypeWays:
+			if os != nil {
+				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(x, y int) int {
+						return os.Arr[x][y]
+					})
+
+				lst = append(lst, currets...)
+			} else {
+				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+					}, func(cursymbol int) bool {
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(cursymbol int, startsymbol int) bool {
+						if cursymbol == startsymbol {
+							return true
+						}
+
+						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+					}, func(x, y int) int {
+						return 1
+					})
+
+				lst = append(lst, currets...)
+			}
+
+			if len(lst) > 0 {
+				isTrigger = true
+			}
+		case STTypeCheckWays:
+			currets := sgc7game.CheckWays(gs, waysTrigger.Config.MinNum,
 				func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
 					return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 				}, func(cursymbol int) bool {
@@ -387,34 +490,13 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 					}
 
 					return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-				}, func(x, y int) int {
-					return 1
 				})
 
 			lst = append(lst, currets...)
-		}
 
-		if len(lst) > 0 {
-			isTrigger = true
-		}
-	case STTypeCheckWays:
-		currets := sgc7game.CheckWays(gs, waysTrigger.Config.MinNum,
-			func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
-			}, func(cursymbol int) bool {
-				return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			}, func(cursymbol int, startsymbol int) bool {
-				if cursymbol == startsymbol {
-					return true
-				}
-
-				return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-			})
-
-		lst = append(lst, currets...)
-
-		if len(lst) > 0 {
-			isTrigger = true
+			if len(lst) > 0 {
+				isTrigger = true
+			}
 		}
 	}
 
@@ -754,6 +836,9 @@ func NewWaysTrigger(name string) IComponent {
 //		"wildSymbols": [
 //			"WL"
 //		]
+//
+// "rowMask": "mask-height4"
+//
 //	},
 type jsonWaysTrigger struct {
 	Symbols             []string `json:"symbols"`
@@ -765,6 +850,7 @@ type jsonWaysTrigger struct {
 	WinMulti            int      `json:"winMulti"`
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
 	OutputToComponent   string   `json:"outputToComponent"`
+	RowMask             string   `json:"rowMask"`
 }
 
 func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
@@ -778,6 +864,7 @@ func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
 		PiggyBankComponent: jcfg.PutMoneyInPiggyBank,
 		OSMulTypeString:    jcfg.SymbolValsMulti,
 		OutputToComponent:  jcfg.OutputToComponent,
+		RowMask:            jcfg.RowMask,
 	}
 
 	return cfg

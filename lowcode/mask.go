@@ -31,9 +31,21 @@ type MaskData struct {
 func (maskData *MaskData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	maskData.BasicComponentData.OnNewGame(gameProp, component)
 
-	maskData.Vals = make([]bool, maskData.Num)
-	maskData.NewVals = make([]bool, maskData.Num)
-	maskData.NewChged = 0
+	componentMask, isok := component.(*Mask)
+	if !isok {
+		goutils.Error("MaskData.OnNewGame:component.(*Mask)",
+			slog.String("component", component.GetName()))
+	}
+
+	if len(componentMask.Config.InitMask) > 0 {
+		copy(maskData.Vals, componentMask.Config.InitMask)
+		copy(maskData.NewVals, componentMask.Config.InitMask)
+		maskData.NewChged = 0
+	} else {
+		maskData.Vals = make([]bool, maskData.Num)
+		maskData.NewVals = make([]bool, maskData.Num)
+		maskData.NewChged = 0
+	}
 }
 
 // onNewStep -
@@ -119,6 +131,7 @@ type MaskConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
 	Num                  int              `yaml:"num" json:"num"`
 	IgnoreFalse          bool             `yaml:"ignoreFalse" json:"ignoreFalse"`
+	InitMask             []bool           `yaml:"initMask" json:"initMask"`
 	PerMaskAwards        []*Award         `yaml:"perMaskAwards" json:"perMaskAwards"`
 	MapSPMaskAwards      map[int][]*Award `yaml:"mapSPMaskAwards" json:"mapSPMaskAwards"` // -1表示全满的奖励
 }
@@ -164,6 +177,20 @@ func (mask *Mask) Init(fn string, pool *GamePropertyPool) error {
 func (mask *Mask) InitEx(cfg any, pool *GamePropertyPool) error {
 	mask.Config = cfg.(*MaskConfig)
 	mask.Config.ComponentType = MaskTypeName
+
+	if mask.Config.Num <= 0 {
+		goutils.Error("Mask.InitEx:Num <= 0",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	if len(mask.Config.InitMask) > 0 && len(mask.Config.InitMask) != mask.Config.Num {
+		goutils.Error("Mask.InitEx:len(mask.Config.InitMask) != mask.Config.Num",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
 
 	if mask.Config.PerMaskAwards != nil {
 		for _, v := range mask.Config.PerMaskAwards {
@@ -325,19 +352,39 @@ func NewMask(name string) IComponent {
 
 //	"configuration": {
 //		"length": 5
+//
+// "initMask": [
+//
+//	0,
+//	1,
+//	1,
+//	1,
+//	1,
+//	1
+//
+// ]
+//
 //	},
 type jsonMask struct {
-	Length      int  `json:"length"`
-	IgnoreFalse bool `json:"ignoreFalse"`
+	Length      int   `json:"length"`
+	IgnoreFalse bool  `json:"ignoreFalse"`
+	InitMask    []int `json:"initMask"`
 }
 
 func (jcfg *jsonMask) build() *MaskConfig {
 	cfg := &MaskConfig{
 		Num:         jcfg.Length,
 		IgnoreFalse: jcfg.IgnoreFalse,
+		InitMask:    make([]bool, len(jcfg.InitMask)),
 	}
 
-	// cfg.UseSceneV3 = true
+	for i, v := range jcfg.InitMask {
+		if v != 0 {
+			cfg.InitMask[i] = true
+		} else {
+			cfg.InitMask[i] = false
+		}
+	}
 
 	return cfg
 }
