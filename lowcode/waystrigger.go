@@ -20,10 +20,6 @@ import (
 
 const WaysTriggerTypeName = "waysTrigger"
 
-// const (
-// 	WTCVWinMulti string = "winMulti" // 可以修改配置项里的winMulti
-// )
-
 type WaysTriggerData struct {
 	BasicComponentData
 	NextComponent string
