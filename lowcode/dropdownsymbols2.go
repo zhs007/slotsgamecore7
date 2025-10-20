@@ -234,6 +234,91 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(ngs *sgc7game.Game
 	// 滚动时先 x 从 1 开始扫(从下往上)，看能不能向左滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动; 如果一个图标滚动了,上面的图标也都应该一起动;滚动马上执行,这样后面的图标才有位置动
 	// 再 x 从 0 开始扫，前面已经滚动过的轴跳过，看能不能向右滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动
 	// 就这个顺序迭代
+	for x := 1; x < ngs.Width; x++ {
+		arr := ngs.Arr[x]
+		for y := len(arr) - 2; y >= 0; y-- {
+			if arr[y] == -1 {
+				break
+			}
+
+			if x%2 == 1 {
+				if ngs.Arr[x-1][y] == -1 {
+					ngs.Arr[x-1][y] = arr[y]
+
+					arr[y] = -1
+
+					for ty := y - 1; ty >= 0; ty-- {
+						if arr[ty] == -1 {
+							break
+						}
+
+						ngs.Arr[x-1][ty] = arr[ty]
+
+						arr[ty] = -1
+					}
+				}
+			} else {
+				if ngs.Arr[x-1][y+1] == -1 {
+					ngs.Arr[x-1][y+1] = arr[y]
+
+					arr[y] = -1
+
+					for ty := y - 1; ty >= 0; ty-- {
+						if arr[ty] == -1 {
+							break
+						}
+
+						ngs.Arr[x-1][ty+1] = arr[ty]
+
+						arr[ty] = -1
+					}
+				}
+			}
+		}
+	}
+
+	for x := ngs.Width - 2; x >= 0; x-- {
+		arr := ngs.Arr[x]
+		for y := len(arr) - 2; y >= 0; y-- {
+			if arr[y] == -1 {
+				break
+			}
+
+			if x%2 == 1 {
+				if ngs.Arr[x+1][y] == -1 {
+					ngs.Arr[x+1][y] = arr[y]
+
+					arr[y] = -1
+
+					for ty := y - 1; ty >= 0; ty-- {
+						if arr[ty] == -1 {
+							break
+						}
+
+						ngs.Arr[x+1][ty] = arr[ty]
+
+						arr[ty] = -1
+					}
+				}
+			} else {
+				if ngs.Arr[x+1][y+1] == -1 {
+					ngs.Arr[x+1][y+1] = arr[y]
+
+					arr[y] = -1
+
+					for ty := y - 1; ty >= 0; ty-- {
+						if arr[ty] == -1 {
+							break
+						}
+
+						ngs.Arr[x+1][ty+1] = arr[ty]
+
+						arr[ty] = -1
+					}
+				}
+			}
+		}
+	}
 
 	return nil
 }
