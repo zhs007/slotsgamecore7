@@ -41,6 +41,7 @@ type DropDownSymbols2Config struct {
 	EmptySymbolVal       int                  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 	StrType              string               `yaml:"type" json:"type"`                                 // 类型
 	Type                 DropDownSymbols2Type `yaml:"-" json:"-"`                                       // 类型
+	RowMask              string               `yaml:"rowMask" json:"rowMask"`                           // rowMask
 	MapAwards            map[string][]*Award  `yaml:"controllers" json:"controllers"`
 }
 
@@ -204,7 +205,186 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggeredWithOS(ngs *sgc7gam
 	return nil
 }
 
-func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(ngs *sgc7game.GameScene) error {
+func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProperty, ngs *sgc7game.GameScene) error {
+
+	if dropDownSymbols.Config.RowMask != "" {
+		imaskd := gameProp.GetComponentDataWithName(dropDownSymbols.Config.RowMask)
+		if imaskd == nil {
+			goutils.Error("DropDownSymbols2.getSrcPos:RowMask:imaskd==nil",
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return ErrInvalidComponentConfig
+		}
+
+		maskarr := imaskd.GetMask()
+
+		// 先正常下落，再处理滚动
+		for x, arr := range ngs.Arr {
+			for y := len(arr) - 1; y >= 0; {
+				if !maskarr[y] {
+					y--
+
+					continue
+				}
+
+				if arr[y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						if arr[y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
+							arr[y] = arr[y1]
+							arr[y1] = -1
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		for {
+			canExit := true
+
+			for x := 1; x < ngs.Width; x++ {
+				arr := ngs.Arr[x]
+				for y := len(arr) - 2; y >= 0; y-- {
+					if arr[y] == -1 {
+						break
+					}
+
+					if !maskarr[y] {
+						continue
+					}
+
+					if x%2 == 1 {
+						if ngs.Arr[x-1][y] == -1 {
+							canExit = false
+
+							ngs.Arr[x-1][y] = arr[y]
+
+							arr[y] = -1
+
+							for ty := y - 1; ty >= 0; ty-- {
+								if arr[ty] == -1 {
+									break
+								}
+
+								ngs.Arr[x-1][ty] = arr[ty]
+
+								arr[ty] = -1
+							}
+						}
+					} else {
+						if ngs.Arr[x-1][y+1] == -1 {
+							canExit = false
+
+							ngs.Arr[x-1][y+1] = arr[y]
+
+							arr[y] = -1
+
+							for ty := y - 1; ty >= 0; ty-- {
+								if arr[ty] == -1 {
+									break
+								}
+
+								ngs.Arr[x-1][ty+1] = arr[ty]
+
+								arr[ty] = -1
+							}
+						}
+					}
+				}
+			}
+
+			for x := ngs.Width - 2; x >= 0; x-- {
+				arr := ngs.Arr[x]
+				for y := len(arr) - 2; y >= 0; y-- {
+					if arr[y] == -1 {
+						break
+					}
+
+					if !maskarr[y] {
+						continue
+					}
+
+					if x%2 == 1 {
+						if ngs.Arr[x+1][y] == -1 {
+							canExit = false
+
+							ngs.Arr[x+1][y] = arr[y]
+
+							arr[y] = -1
+
+							for ty := y - 1; ty >= 0; ty-- {
+								if arr[ty] == -1 {
+									break
+								}
+
+								ngs.Arr[x+1][ty] = arr[ty]
+
+								arr[ty] = -1
+							}
+						}
+					} else {
+						if ngs.Arr[x+1][y+1] == -1 {
+							canExit = false
+
+							ngs.Arr[x+1][y+1] = arr[y]
+
+							arr[y] = -1
+
+							for ty := y - 1; ty >= 0; ty-- {
+								if arr[ty] == -1 {
+									break
+								}
+
+								ngs.Arr[x+1][ty+1] = arr[ty]
+
+								arr[ty] = -1
+							}
+						}
+					}
+				}
+			}
+
+			if canExit {
+				break
+			}
+		}
+
+		for x, arr := range ngs.Arr {
+			for y := len(arr) - 1; y >= 0; {
+				if arr[y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						if arr[y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
+							arr[y] = arr[y1]
+							arr[y1] = -1
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		return nil
+	}
 
 	// 先正常下落，再处理滚动
 	for x, arr := range ngs.Arr {
@@ -234,89 +414,105 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(ngs *sgc7game.Game
 	// 滚动时先 x 从 1 开始扫(从下往上)，看能不能向左滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动; 如果一个图标滚动了,上面的图标也都应该一起动;滚动马上执行,这样后面的图标才有位置动
 	// 再 x 从 0 开始扫，前面已经滚动过的轴跳过，看能不能向右滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动
 	// 就这个顺序迭代
-	for x := 1; x < ngs.Width; x++ {
-		arr := ngs.Arr[x]
-		for y := len(arr) - 2; y >= 0; y-- {
-			if arr[y] == -1 {
-				break
-			}
+	for {
+		canExit := true
 
-			if x%2 == 1 {
-				if ngs.Arr[x-1][y] == -1 {
-					ngs.Arr[x-1][y] = arr[y]
-
-					arr[y] = -1
-
-					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
-							break
-						}
-
-						ngs.Arr[x-1][ty] = arr[ty]
-
-						arr[ty] = -1
-					}
+		for x := 1; x < ngs.Width; x++ {
+			arr := ngs.Arr[x]
+			for y := len(arr) - 2; y >= 0; y-- {
+				if arr[y] == -1 {
+					break
 				}
-			} else {
-				if ngs.Arr[x-1][y+1] == -1 {
-					ngs.Arr[x-1][y+1] = arr[y]
 
-					arr[y] = -1
+				if x%2 == 1 {
+					if ngs.Arr[x-1][y] == -1 {
+						canExit = false
 
-					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
-							break
+						ngs.Arr[x-1][y] = arr[y]
+
+						arr[y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if arr[ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x-1][ty] = arr[ty]
+
+							arr[ty] = -1
 						}
+					}
+				} else {
+					if ngs.Arr[x-1][y+1] == -1 {
+						canExit = false
 
-						ngs.Arr[x-1][ty+1] = arr[ty]
+						ngs.Arr[x-1][y+1] = arr[y]
 
-						arr[ty] = -1
+						arr[y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if arr[ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x-1][ty+1] = arr[ty]
+
+							arr[ty] = -1
+						}
 					}
 				}
 			}
 		}
-	}
 
-	for x := ngs.Width - 2; x >= 0; x-- {
-		arr := ngs.Arr[x]
-		for y := len(arr) - 2; y >= 0; y-- {
-			if arr[y] == -1 {
-				break
-			}
+		for x := ngs.Width - 2; x >= 0; x-- {
+			arr := ngs.Arr[x]
+			for y := len(arr) - 2; y >= 0; y-- {
+				if arr[y] == -1 {
+					break
+				}
 
-			if x%2 == 1 {
-				if ngs.Arr[x+1][y] == -1 {
-					ngs.Arr[x+1][y] = arr[y]
+				if x%2 == 1 {
+					if ngs.Arr[x+1][y] == -1 {
+						canExit = false
 
-					arr[y] = -1
+						ngs.Arr[x+1][y] = arr[y]
 
-					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
-							break
+						arr[y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if arr[ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x+1][ty] = arr[ty]
+
+							arr[ty] = -1
 						}
+					}
+				} else {
+					if ngs.Arr[x+1][y+1] == -1 {
+						canExit = false
 
-						ngs.Arr[x+1][ty] = arr[ty]
+						ngs.Arr[x+1][y+1] = arr[y]
 
-						arr[ty] = -1
+						arr[y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if arr[ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x+1][ty+1] = arr[ty]
+
+							arr[ty] = -1
+						}
 					}
 				}
-			} else {
-				if ngs.Arr[x+1][y+1] == -1 {
-					ngs.Arr[x+1][y+1] = arr[y]
-
-					arr[y] = -1
-
-					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
-							break
-						}
-
-						ngs.Arr[x+1][ty+1] = arr[ty]
-
-						arr[ty] = -1
-					}
-				}
 			}
+		}
+
+		if canExit {
+			break
 		}
 	}
 
@@ -387,7 +583,7 @@ func (dropDownSymbols *DropDownSymbols2) OnPlayGame(gameProp *GameProperty, curp
 				return "", err
 			}
 		case DDS2TypeHexGridStaggered:
-			err := dropDownSymbols.procHexGridStaggered(ngs)
+			err := dropDownSymbols.procHexGridStaggered(gameProp, ngs)
 			if err != nil {
 				goutils.Error("DropDownSymbols2.OnPlayGame:procHexGridStaggered",
 					goutils.Err(err))
@@ -429,13 +625,13 @@ func NewDropDownSymbols2(name string) IComponent {
 
 // "isNeedProcSymbolVals": false,
 // "type": "hexGridStaggered"
-
-// "configuration": {},
+// "rowMask": "mask-height4"
 type jsonDropDownSymbols2 struct {
-	HoldSymbols          []string `json:"holdSymbols"`                                      // 不需要下落的symbol
-	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	Type                 string   `yaml:"type" json:"type"`                                 // 类型
+	HoldSymbols          []string `json:"holdSymbols"`          // 不需要下落的symbol
+	IsNeedProcSymbolVals bool     `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int      `json:"emptySymbolVal"`       // 空的symbolVal是什么
+	Type                 string   `json:"type"`                 // 类型
+	RowMask              string   `json:"rowMask"`              // rowMask
 }
 
 func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
@@ -444,6 +640,7 @@ func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
 		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		StrType:              strings.ToLower(jcfg.Type),
+		RowMask:              jcfg.RowMask,
 	}
 
 	return cfg
