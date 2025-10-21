@@ -41,6 +41,7 @@ type DropDownSymbols2Config struct {
 	EmptySymbolVal       int                  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
 	StrType              string               `yaml:"type" json:"type"`                                 // 类型
 	Type                 DropDownSymbols2Type `yaml:"-" json:"-"`                                       // 类型
+	RowMask              string               `yaml:"rowMask" json:"rowMask"`                           // rowMask
 	MapAwards            map[string][]*Award  `yaml:"controllers" json:"controllers"`
 }
 
@@ -143,16 +144,22 @@ func (dropDownSymbols *DropDownSymbols2) procNormalWithOS(ngs *sgc7game.GameScen
 	return nil
 }
 
-func (dropDownSymbols *DropDownSymbols2) procNormal(ngs *sgc7game.GameScene) error {
+func (dropDownSymbols *DropDownSymbols2) procNormal(gameProp *GameProperty, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
 
-	for x, arr := range ngs.Arr {
-		for y := len(arr) - 1; y >= 0; {
-			if arr[y] == -1 {
+	ngs := gs
+
+	for x := range ngs.Arr {
+		for y := len(ngs.Arr[x]) - 1; y >= 0; {
+			if ngs.Arr[x][y] == -1 {
 				hass := false
 				for y1 := y - 1; y1 >= 0; y1-- {
-					if arr[y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
-						arr[y] = arr[y1]
-						arr[y1] = -1
+					if ngs.Arr[x][y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = ngs.Arr[x][y1]
+						ngs.Arr[x][y1] = -1
 
 						hass = true
 						y--
@@ -169,7 +176,7 @@ func (dropDownSymbols *DropDownSymbols2) procNormal(ngs *sgc7game.GameScene) err
 		}
 	}
 
-	return nil
+	return ngs, nil
 }
 
 func (dropDownSymbols *DropDownSymbols2) procHexGridStaggeredWithOS(ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
@@ -204,17 +211,223 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggeredWithOS(ngs *sgc7gam
 	return nil
 }
 
-func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(ngs *sgc7game.GameScene) error {
+func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProperty, gs *sgc7game.GameScene) (bool, *sgc7game.GameScene, error) {
+
+	ngs := gs
+
+	// 有 rowMask 时很复杂,最后的下落不能算trigger,应该算refill
+	if dropDownSymbols.Config.RowMask != "" {
+		imaskd := gameProp.GetComponentDataWithName(dropDownSymbols.Config.RowMask)
+		if imaskd == nil {
+			goutils.Error("DropDownSymbols2.getSrcPos:RowMask:imaskd==nil",
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return false, nil, ErrInvalidComponentConfig
+		}
+
+		maskarr := imaskd.GetMask()
+
+		// 先正常下落，再处理滚动
+		for x := range ngs.Arr {
+			for y := len(ngs.Arr[x]) - 1; y >= 0; {
+				if !maskarr[y] {
+					y--
+
+					continue
+				}
+
+				if ngs.Arr[x][y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						if ngs.Arr[x][y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
+
+							ngs.Arr[x][y] = ngs.Arr[x][y1]
+							ngs.Arr[x][y1] = -1
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		isRoll := false
+
+		for x := 1; x < ngs.Width; x++ {
+			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					break
+				}
+
+				if !maskarr[y] {
+					continue
+				}
+
+				if x%2 == 1 {
+					if ngs.Arr[x-1][y] == -1 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						isRoll = true
+
+						ngs.Arr[x-1][y] = ngs.Arr[x][y]
+
+						ngs.Arr[x][y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if ngs.Arr[x][ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x-1][ty] = ngs.Arr[x][ty]
+
+							ngs.Arr[x][ty] = -1
+						}
+					}
+				} else {
+					if ngs.Arr[x-1][y+1] == -1 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						isRoll = true
+
+						ngs.Arr[x-1][y+1] = ngs.Arr[x][y]
+
+						ngs.Arr[x][y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if ngs.Arr[x][ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x-1][ty+1] = ngs.Arr[x][ty]
+
+							ngs.Arr[x][ty] = -1
+						}
+					}
+				}
+			}
+		}
+
+		for x := ngs.Width - 2; x >= 0; x-- {
+			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					break
+				}
+
+				if !maskarr[y] {
+					continue
+				}
+
+				if x%2 == 1 {
+					if ngs.Arr[x+1][y] == -1 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						isRoll = true
+
+						ngs.Arr[x+1][y] = ngs.Arr[x][y]
+
+						ngs.Arr[x][y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if ngs.Arr[x][ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x+1][ty] = ngs.Arr[x][ty]
+
+							ngs.Arr[x][ty] = -1
+						}
+					}
+				} else {
+					if ngs.Arr[x+1][y+1] == -1 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						isRoll = true
+
+						ngs.Arr[x+1][y+1] = ngs.Arr[x][y]
+
+						ngs.Arr[x][y] = -1
+
+						for ty := y - 1; ty >= 0; ty-- {
+							if ngs.Arr[x][ty] == -1 {
+								break
+							}
+
+							ngs.Arr[x+1][ty+1] = ngs.Arr[x][ty]
+
+							ngs.Arr[x][ty] = -1
+						}
+					}
+				}
+			}
+		}
+
+		if isRoll {
+			return true, ngs, nil
+		}
+
+		for x := range ngs.Arr {
+			for y := len(ngs.Arr[x]) - 1; y >= 0; {
+				if ngs.Arr[x][y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						if ngs.Arr[x][y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
+
+							ngs.Arr[x][y] = ngs.Arr[x][y1]
+							ngs.Arr[x][y1] = -1
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		return false, ngs, nil
+	}
 
 	// 先正常下落，再处理滚动
-	for x, arr := range ngs.Arr {
-		for y := len(arr) - 1; y >= 0; {
-			if arr[y] == -1 {
+	for x := range ngs.Arr {
+		for y := len(ngs.Arr[x]) - 1; y >= 0; {
+			if ngs.Arr[x][y] == -1 {
 				hass := false
 				for y1 := y - 1; y1 >= 0; y1-- {
-					if arr[y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
-						arr[y] = arr[y1]
-						arr[y1] = -1
+					if ngs.Arr[x][y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
+						if ngs == gs {
+							ngs = gs.CloneEx(gameProp.PoolScene)
+						}
+
+						ngs.Arr[x][y] = ngs.Arr[x][y1]
+						ngs.Arr[x][y1] = -1
 
 						hass = true
 						y--
@@ -234,43 +447,56 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(ngs *sgc7game.Game
 	// 滚动时先 x 从 1 开始扫(从下往上)，看能不能向左滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动; 如果一个图标滚动了,上面的图标也都应该一起动;滚动马上执行,这样后面的图标才有位置动
 	// 再 x 从 0 开始扫，前面已经滚动过的轴跳过，看能不能向右滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动
 	// 就这个顺序迭代
+	isRoll := false
+
 	for x := 1; x < ngs.Width; x++ {
-		arr := ngs.Arr[x]
-		for y := len(arr) - 2; y >= 0; y-- {
-			if arr[y] == -1 {
+		for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+			if ngs.Arr[x][y] == -1 {
 				break
 			}
 
 			if x%2 == 1 {
 				if ngs.Arr[x-1][y] == -1 {
-					ngs.Arr[x-1][y] = arr[y]
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
 
-					arr[y] = -1
+					isRoll = true
+
+					ngs.Arr[x-1][y] = ngs.Arr[x][y]
+
+					ngs.Arr[x][y] = -1
 
 					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
+						if ngs.Arr[x][ty] == -1 {
 							break
 						}
 
-						ngs.Arr[x-1][ty] = arr[ty]
+						ngs.Arr[x-1][ty] = ngs.Arr[x][ty]
 
-						arr[ty] = -1
+						ngs.Arr[x][ty] = -1
 					}
 				}
 			} else {
 				if ngs.Arr[x-1][y+1] == -1 {
-					ngs.Arr[x-1][y+1] = arr[y]
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
 
-					arr[y] = -1
+					isRoll = true
+
+					ngs.Arr[x-1][y+1] = ngs.Arr[x][y]
+
+					ngs.Arr[x][y] = -1
 
 					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
+						if ngs.Arr[x][ty] == -1 {
 							break
 						}
 
-						ngs.Arr[x-1][ty+1] = arr[ty]
+						ngs.Arr[x-1][ty+1] = ngs.Arr[x][ty]
 
-						arr[ty] = -1
+						ngs.Arr[x][ty] = -1
 					}
 				}
 			}
@@ -278,49 +504,60 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(ngs *sgc7game.Game
 	}
 
 	for x := ngs.Width - 2; x >= 0; x-- {
-		arr := ngs.Arr[x]
-		for y := len(arr) - 2; y >= 0; y-- {
-			if arr[y] == -1 {
+		for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+			if ngs.Arr[x][y] == -1 {
 				break
 			}
 
 			if x%2 == 1 {
 				if ngs.Arr[x+1][y] == -1 {
-					ngs.Arr[x+1][y] = arr[y]
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
 
-					arr[y] = -1
+					isRoll = true
+
+					ngs.Arr[x+1][y] = ngs.Arr[x][y]
+
+					ngs.Arr[x][y] = -1
 
 					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
+						if ngs.Arr[x][ty] == -1 {
 							break
 						}
 
-						ngs.Arr[x+1][ty] = arr[ty]
+						ngs.Arr[x+1][ty] = ngs.Arr[x][ty]
 
-						arr[ty] = -1
+						ngs.Arr[x][ty] = -1
 					}
 				}
 			} else {
 				if ngs.Arr[x+1][y+1] == -1 {
-					ngs.Arr[x+1][y+1] = arr[y]
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
 
-					arr[y] = -1
+					isRoll = true
+
+					ngs.Arr[x+1][y+1] = ngs.Arr[x][y]
+
+					ngs.Arr[x][y] = -1
 
 					for ty := y - 1; ty >= 0; ty-- {
-						if arr[ty] == -1 {
+						if ngs.Arr[x][ty] == -1 {
 							break
 						}
 
-						ngs.Arr[x+1][ty+1] = arr[ty]
+						ngs.Arr[x+1][ty+1] = ngs.Arr[x][ty]
 
-						arr[ty] = -1
+						ngs.Arr[x][ty] = -1
 					}
 				}
 			}
 		}
 	}
 
-	return nil
+	return isRoll, ngs, nil
 }
 
 // playgame
@@ -346,14 +583,13 @@ func (dropDownSymbols *DropDownSymbols2) OnPlayGame(gameProp *GameProperty, curp
 		return nc, ErrComponentDoNothing
 	}
 
-	ngs := gs.CloneEx(gameProp.PoolScene)
-
 	var os *sgc7game.GameScene
 	if dropDownSymbols.Config.IsNeedProcSymbolVals {
 		os = dropDownSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	}
 
 	if os != nil {
+		ngs := gs.CloneEx(gameProp.PoolScene)
 		nos := os.CloneEx(gameProp.PoolScene)
 
 		switch dropDownSymbols.Config.Type {
@@ -376,30 +612,52 @@ func (dropDownSymbols *DropDownSymbols2) OnPlayGame(gameProp *GameProperty, curp
 		}
 
 		dropDownSymbols.AddOtherScene(gameProp, curpr, nos, bcd)
+
+		dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
+
+		dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 	} else {
 		switch dropDownSymbols.Config.Type {
 		case DDS2TypeNormal:
-			err := dropDownSymbols.procNormal(ngs)
+			ngs, err := dropDownSymbols.procNormal(gameProp, gs)
 			if err != nil {
 				goutils.Error("DropDownSymbols2.OnPlayGame:procNormal",
 					goutils.Err(err))
 
 				return "", err
 			}
+
+			if ngs != gs {
+				dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
+
+				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
+
+				return dropDownSymbols.onStepEnd(gameProp, curpr, gp, ""), nil
+			}
 		case DDS2TypeHexGridStaggered:
-			err := dropDownSymbols.procHexGridStaggered(ngs)
+			istrigger, ngs, err := dropDownSymbols.procHexGridStaggered(gameProp, gs)
 			if err != nil {
 				goutils.Error("DropDownSymbols2.OnPlayGame:procHexGridStaggered",
 					goutils.Err(err))
 
 				return "", err
 			}
+
+			if ngs != gs {
+				dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
+
+				if istrigger {
+					dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
+				}
+
+				return dropDownSymbols.onStepEnd(gameProp, curpr, gp, ""), nil
+			}
 		}
+
+		nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
 	}
-
-	dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
-
-	dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 
 	nc := dropDownSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -429,13 +687,13 @@ func NewDropDownSymbols2(name string) IComponent {
 
 // "isNeedProcSymbolVals": false,
 // "type": "hexGridStaggered"
-
-// "configuration": {},
+// "rowMask": "mask-height4"
 type jsonDropDownSymbols2 struct {
-	HoldSymbols          []string `json:"holdSymbols"`                                      // 不需要下落的symbol
-	IsNeedProcSymbolVals bool     `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int      `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	Type                 string   `yaml:"type" json:"type"`                                 // 类型
+	HoldSymbols          []string `json:"holdSymbols"`          // 不需要下落的symbol
+	IsNeedProcSymbolVals bool     `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal       int      `json:"emptySymbolVal"`       // 空的symbolVal是什么
+	Type                 string   `json:"type"`                 // 类型
+	RowMask              string   `json:"rowMask"`              // rowMask
 }
 
 func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
@@ -444,6 +702,7 @@ func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
 		IsNeedProcSymbolVals: jcfg.IsNeedProcSymbolVals,
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		StrType:              strings.ToLower(jcfg.Type),
+		RowMask:              jcfg.RowMask,
 	}
 
 	return cfg
