@@ -239,7 +239,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 				if ngs.Arr[x][y] == -1 {
 					hass := false
 					for y1 := y - 1; y1 >= 0; y1-- {
-						if !maskarr[y] {
+						if !maskarr[y1] {
 							continue
 						}
 
@@ -264,6 +264,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 					y--
 				}
 			}
+		}
+
+		if ngs != gs {
+			return true, ngs, nil
 		}
 
 		isRoll := false
@@ -291,7 +295,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
-							if !maskarr[y] {
+							if !maskarr[ty] {
 								continue
 							}
 
@@ -317,7 +321,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
-							if !maskarr[y] {
+							if !maskarr[ty] {
 								continue
 							}
 
@@ -357,7 +361,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
-							if !maskarr[y] {
+							if !maskarr[ty] {
 								continue
 							}
 
@@ -383,7 +387,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
-							if !maskarr[y] {
+							if !maskarr[ty] {
 								continue
 							}
 

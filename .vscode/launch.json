@@ -115,6 +115,20 @@
                 "SYMBOL":"L4",
                 "OUTPUT":"fg86-reel3-l4.xlsx",
             }
+        },
+        {
+            "name": "checkgame",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/checkgame/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}/data",
+            "env": {
+                "GAMECFG":"game.json",
+                "BET":"10",
+                "CHEAT":"122, 102, 87, 24, 153, 142, 0, 13, 13, 1, 12, 21, 23, 0, 23, 2, 18, 22, 18, 15, 22, 0, 5, 12, 16",
+            }
         }
     ]
 }
