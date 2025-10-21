@@ -239,6 +239,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 				if ngs.Arr[x][y] == -1 {
 					hass := false
 					for y1 := y - 1; y1 >= 0; y1-- {
+						if !maskarr[y] {
+							continue
+						}
+
 						if ngs.Arr[x][y1] != -1 && goutils.IndexOfIntSlice(dropDownSymbols.Config.HoldSymbolCodes, ngs.Arr[x][y1], 0) < 0 {
 							if ngs == gs {
 								ngs = gs.CloneEx(gameProp.PoolScene)
@@ -287,6 +291,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
+							if !maskarr[y] {
+								continue
+							}
+
 							if ngs.Arr[x][ty] == -1 {
 								break
 							}
@@ -309,6 +317,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
+							if !maskarr[y] {
+								continue
+							}
+
 							if ngs.Arr[x][ty] == -1 {
 								break
 							}
@@ -345,6 +357,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
+							if !maskarr[y] {
+								continue
+							}
+
 							if ngs.Arr[x][ty] == -1 {
 								break
 							}
@@ -367,6 +383,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][y] = -1
 
 						for ty := y - 1; ty >= 0; ty-- {
+							if !maskarr[y] {
+								continue
+							}
+
 							if ngs.Arr[x][ty] == -1 {
 								break
 							}
