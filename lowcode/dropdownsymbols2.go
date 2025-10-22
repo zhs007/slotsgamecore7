@@ -338,6 +338,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 			}
 		}
 
+		if isRoll {
+			return true, ngs, nil
+		}
+
 		for x := ngs.Width - 2; x >= 0; x-- {
 			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
 				if ngs.Arr[x][y] == -1 {
@@ -468,6 +472,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 		}
 	}
 
+	if ngs != gs {
+		return true, ngs, nil
+	}
+
 	// 滚动时先 x 从 1 开始扫(从下往上)，看能不能向左滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动; 如果一个图标滚动了,上面的图标也都应该一起动;滚动马上执行,这样后面的图标才有位置动
 	// 再 x 从 0 开始扫，前面已经滚动过的轴跳过，看能不能向右滚，如果能滚就直接处理，空的位置可以留下来，后面的就可以一个方向滚动
 	// 就这个顺序迭代
@@ -525,6 +533,10 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 				}
 			}
 		}
+	}
+
+	if isRoll {
+		return true, ngs, nil
 	}
 
 	for x := ngs.Width - 2; x >= 0; x-- {
