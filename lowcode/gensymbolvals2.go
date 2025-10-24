@@ -122,6 +122,7 @@ type GenSymbolVals2Config struct {
 	StrWeight            string                          `yaml:"number" json:"weight"`
 	WeightVW             *sgc7game.ValWeights2           `yaml:"-" json:"-"`
 	DefaultVal           int                             `yaml:"defaultVal" json:"defaultVal"`
+	IsForceRefresh       bool                            `yaml:"isForceRefresh" json:"isForceRefresh"`
 	MaxVal               int                             `yaml:"maxVal" json:"maxVal"`
 	IsAlwaysGen          bool                            `yaml:"isAlwaysGen" json:"isAlwaysGen"`
 	MapSymbolWeights     map[string]string               `yaml:"symbolWeights" json:"symbolWeights"`
@@ -466,7 +467,7 @@ func (genSymbolVals2 *GenSymbolVals2) procWeight(gameProp *GameProperty, os *sgc
 		x := pos[i*2]
 		y := pos[i*2+1]
 
-		if nos.Arr[x][y] != genSymbolVals2.Config.DefaultVal {
+		if !genSymbolVals2.Config.IsForceRefresh && nos.Arr[x][y] != genSymbolVals2.Config.DefaultVal {
 			continue
 		}
 
@@ -870,6 +871,7 @@ func NewGenSymbolVals2(name string) IComponent {
 // "genType": "add",
 // "maxVal": 0,
 // "isAlwaysGen": true,
+// "isForceRefresh": true
 // "srcComponents": [
 //
 //	"rs-pos-wm"
@@ -884,6 +886,7 @@ type jsonGenSymbolVals2 struct {
 	SrcSymbols           []string               `json:"srcSymbols"`
 	SrcComponents        []string               `json:"srcComponents"`
 	DefaultVal           int                    `json:"defaultVal"`
+	IsForceRefresh       bool                   `json:"isForceRefresh"`
 	StrGenType           string                 `json:"genType"`
 	Number               int                    `json:"number"`
 	StrWeight            string                 `json:"weight"`
@@ -903,6 +906,7 @@ func (jcfg *jsonGenSymbolVals2) build() *GenSymbolVals2Config {
 		StrWeight:            jcfg.StrWeight,
 		MaxVal:               jcfg.MaxVal,
 		IsAlwaysGen:          jcfg.IsAlwaysGen,
+		IsForceRefresh:       jcfg.IsForceRefresh,
 	}
 
 	cfg.MapSymbolWeights = make(map[string]string, len(jcfg.SymbolWeights))

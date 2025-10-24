@@ -166,12 +166,12 @@ func (jbr *jsonBasicReels) build() *BasicReelsConfig {
 	return cfg
 }
 
-type jsonBasicReels2 struct {
+type jsonBasicReelsT struct {
 	ReelSet      string `json:"reelSet"`
 	IsExpandReel string `json:"isExpandReel"`
 }
 
-func (jbr *jsonBasicReels2) build() *BasicReelsConfig {
+func (jbr *jsonBasicReelsT) build() *BasicReelsConfig {
 	cfg := &BasicReelsConfig{
 		ReelSet:      jbr.ReelSet,
 		IsExpandReel: jbr.IsExpandReel == "true",
@@ -202,7 +202,7 @@ func parseBasicReels(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 
 	err = sonic.Unmarshal(buf, data)
 	if err != nil {
-		data2 := &jsonBasicReels2{}
+		data2 := &jsonBasicReelsT{}
 
 		err = sonic.Unmarshal(buf, data2)
 		if err != nil {
