@@ -96,6 +96,8 @@ func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
 	if key == CCVValueNumNow {
 		val := collectorData.Val + off
 
+		collectorData.NewCollector = off
+
 		collectorData.BasicComponentData.SetConfigIntVal(key, val)
 
 		return val
