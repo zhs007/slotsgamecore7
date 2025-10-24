@@ -125,6 +125,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(DropDownSymbols2TypeName, NewDropDownSymbols2)
 	mgr.Reg(HoldAndRespinReelsTypeName, NewHoldAndRespinReels)
 	mgr.Reg(GenMaskTypeName, NewGenMask)
+	mgr.Reg(BasicReels2TypeName, NewBasicReels2)
 
 	return mgr
 }

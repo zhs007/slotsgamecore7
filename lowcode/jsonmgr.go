@@ -119,4 +119,5 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(DropDownSymbols2TypeName), parseDropDownSymbols2)
 	gJsonMgr.RegLoadComponent(strings.ToLower(HoldAndRespinReelsTypeName), parseHoldAndRespinReels)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenMaskTypeName), parseGenMask)
+	gJsonMgr.RegLoadComponent(strings.ToLower(BasicReels2TypeName), parseBasicReels2)
 }

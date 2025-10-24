@@ -172,14 +172,14 @@ func NewBasicReels2(name string) IComponent {
 // "height": 4,
 type jsonBasicReels2 struct {
 	ReelSet      string `json:"reelSet"`
-	IsExpandReel string `json:"isExpandReel"`
+	IsExpandReel bool   `json:"isExpandReel"`
 	Height       int    `json:"height"`
 }
 
 func (jbr *jsonBasicReels2) build() *BasicReels2Config {
 	cfg := &BasicReels2Config{
 		ReelSet:      jbr.ReelSet,
-		IsExpandReel: jbr.IsExpandReel == "true",
+		IsExpandReel: jbr.IsExpandReel,
 		Height:       jbr.Height,
 	}
 
