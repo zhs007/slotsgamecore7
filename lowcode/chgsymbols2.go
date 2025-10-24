@@ -27,6 +27,7 @@ const (
 	CS2STypeMask               ChgSymbols2SourceType = 2
 	CS2STypePositionCollection ChgSymbols2SourceType = 3
 	CS2STypeRowMask            ChgSymbols2SourceType = 4
+	CS2STypeAllMask            ChgSymbols2SourceType = 5
 )
 
 func (t ChgSymbols2SourceType) IsReelsMode() bool {
@@ -43,6 +44,8 @@ func parseChgSymbols2SourceType(str string) ChgSymbols2SourceType {
 		return CS2STypePositionCollection
 	case "rowmask":
 		return CS2STypeRowMask
+	case "allmask":
+		return CS2STypeAllMask
 	}
 
 	return CS2STypeAll
@@ -462,6 +465,42 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 					}
 				}
 			}
+		case CS2STypeAllMask:
+			imaskd1 := gameProp.GetComponentDataWithName(chgSymbols2.Config.SrcMask)
+			imaskd2 := gameProp.GetComponentDataWithName(chgSymbols2.Config.SrcRowMask)
+			if imaskd1 != nil && imaskd2 != nil {
+				arr1 := imaskd1.GetMask()
+				if len(arr1) != gs.Width {
+					goutils.Error("ChgSymbols2.getSrcPos:CS2STypeAllMask:len(arr1)!=gs.Width",
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return nil, ErrInvalidComponentConfig
+				}
+
+				arr2 := imaskd2.GetMask()
+				if len(arr2) != gs.Height {
+					goutils.Error("ChgSymbols2.getSrcPos:CS2STypeAllMask:len(arr2)!=gs.Height",
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return nil, ErrInvalidComponentConfig
+				}
+
+				for x := 0; x < gs.Width; x++ {
+					if arr1[x] {
+						for y := 0; y < gs.Height; y++ {
+							if !maskarr[y] {
+								continue
+							}
+
+							if arr2[y] {
+								for x := 0; x < gs.Width; x++ {
+									pos = append(pos, x, y)
+								}
+							}
+						}
+					}
+				}
+			}
 		default:
 			goutils.Error("ChgSymbols2.getSrcPos:ErrUnsupportedSourceType",
 				slog.String("srcType", chgSymbols2.Config.StrSrcType),
@@ -525,6 +564,38 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 					if arr[x] {
 						for y := 0; y < gs.Height; y++ {
 							pos = append(pos, x, y)
+						}
+					}
+				}
+			}
+		case CS2STypeAllMask:
+			imaskd1 := gameProp.GetComponentDataWithName(chgSymbols2.Config.SrcMask)
+			imaskd2 := gameProp.GetComponentDataWithName(chgSymbols2.Config.SrcRowMask)
+			if imaskd1 != nil && imaskd2 != nil {
+				arr1 := imaskd1.GetMask()
+				if len(arr1) != gs.Width {
+					goutils.Error("ChgSymbols2.getSrcPos:CS2STypeAllMask:len(arr1)!=gs.Width",
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return nil, ErrInvalidComponentConfig
+				}
+
+				arr2 := imaskd2.GetMask()
+				if len(arr2) != gs.Height {
+					goutils.Error("ChgSymbols2.getSrcPos:CS2STypeAllMask:len(arr2)!=gs.Height",
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return nil, ErrInvalidComponentConfig
+				}
+
+				for x := 0; x < gs.Width; x++ {
+					if arr1[x] {
+						for y := 0; y < gs.Height; y++ {
+							if arr2[y] {
+								for x := 0; x < gs.Width; x++ {
+									pos = append(pos, x, y)
+								}
+							}
 						}
 					}
 				}
