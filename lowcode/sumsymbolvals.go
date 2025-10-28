@@ -181,11 +181,11 @@ func (sumSymbolVals *SumSymbolVals) Init(fn string, pool *GamePropertyPool) erro
 // fields such as parsed Type and initializes any Awards.
 func (sumSymbolVals *SumSymbolVals) InitEx(cfg any, pool *GamePropertyPool) error {
 	cd, ok := cfg.(*SumSymbolValsConfig)
-    	if !ok {
-    		goutils.Error("SumSymbolVals.InitEx:invalid cfg type",
-    			slog.Any("cfg", cfg))
-    		return ErrInvalidComponentConfig
-    	}
+	if !ok {
+		goutils.Error("SumSymbolVals.InitEx:invalid cfg type",
+			slog.Any("cfg", cfg))
+		return ErrInvalidComponentConfig
+	}
 	sumSymbolVals.Config = cd
 	sumSymbolVals.Config.ComponentType = SumSymbolValsTypeName
 
@@ -299,9 +299,20 @@ func (sumSymbolVals *SumSymbolVals) OnPlayGame(gameProp *GameProperty, curpr *sg
 	os := sumSymbolVals.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	if os != nil {
 		val := sumSymbolVals.sum(gameProp, os)
+
+		if val <= 0 {
+			nc := sumSymbolVals.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
 		cd.Number = val
 
 		sumSymbolVals.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+	} else {
+		nc := sumSymbolVals.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
 	}
 
 	nc := sumSymbolVals.onStepEnd(gameProp, curpr, gp, "")
