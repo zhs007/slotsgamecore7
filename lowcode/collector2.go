@@ -71,6 +71,7 @@ type Collector2Data struct {
 	BasicComponentData
 	Val          int // 当前总值, Current total value
 	NewCollector int // 这一个step收集到的, The values collected in this step
+	cfg          *Collector2Config
 }
 
 func (collectorData *Collector2Data) OnNewGame(gameProp *GameProperty, component IComponent) {
@@ -96,7 +97,17 @@ func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
 	if key == CCVValueNumNow {
 		val := collectorData.Val + off
 
-		collectorData.NewCollector = off
+		if val < 0 {
+			val = 0
+		}
+
+		if val > collectorData.cfg.MaxVal && collectorData.cfg.MaxVal > 0 {
+			val = collectorData.cfg.MaxVal
+
+			collectorData.NewCollector = collectorData.cfg.MaxVal - collectorData.Val
+		} else {
+			collectorData.NewCollector = off
+		}
 
 		collectorData.BasicComponentData.SetConfigIntVal(key, val)
 
@@ -408,7 +419,9 @@ func (collector *Collector2) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.Pl
 }
 
 func (collector *Collector2) NewComponentData() IComponentData {
-	return &Collector2Data{}
+	return &Collector2Data{
+		cfg: collector.Config,
+	}
 }
 
 func (collector *Collector2) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {

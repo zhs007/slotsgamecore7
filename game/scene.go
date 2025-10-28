@@ -321,9 +321,9 @@ func (gs *GameScene) RandReelsWithReelDataAndHeight(reels *ReelsData, height int
 
 		gs.Indexes = append(gs.Indexes, cn)
 
-		if height < len(arr) {
+		if height > 0 && height < len(arr) {
 			for y := range arr {
-				if y < height {
+				if y < len(arr)-height {
 					gs.Arr[x][y] = -1
 
 					continue
