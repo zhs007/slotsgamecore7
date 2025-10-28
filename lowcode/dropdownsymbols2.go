@@ -42,6 +42,7 @@ type DropDownSymbols2Config struct {
 	StrType              string               `yaml:"type" json:"type"`                                 // 类型
 	Type                 DropDownSymbols2Type `yaml:"-" json:"-"`                                       // 类型
 	RowMask              string               `yaml:"rowMask" json:"rowMask"`                           // rowMask
+	OutputToComponent    string               `yaml:"outputToComponent" json:"outputToComponent"`       // outputToComponent
 	MapAwards            map[string][]*Award  `yaml:"controllers" json:"controllers"`
 }
 
@@ -112,8 +113,7 @@ func (dropDownSymbols *DropDownSymbols2) ProcControllers(gameProp *GameProperty,
 	}
 }
 
-func (dropDownSymbols *DropDownSymbols2) procNormalWithOS(ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
-
+func (dropDownSymbols *DropDownSymbols2) procNormalWithOS(gameProp *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
 	for x, arr := range ngs.Arr {
 		for y := len(arr) - 1; y >= 0; {
 			if arr[y] == -1 {
@@ -138,6 +138,29 @@ func (dropDownSymbols *DropDownSymbols2) procNormalWithOS(ngs *sgc7game.GameScen
 			} else {
 				y--
 			}
+		}
+	}
+
+	if dropDownSymbols.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[dropDownSymbols.Config.OutputToComponent]
+		if isok {
+			pccd := gameProp.GetComponentData(pc)
+			pccd.ClearPos()
+
+			for x, arr := range ngs.Arr {
+				for y := len(arr) - 1; y >= 0; y-- {
+					if arr[y] == -1 {
+						pc.AddPos(pccd, x, y)
+					}
+				}
+			}
+
+			return nil
+		} else {
+			goutils.Error("DropDownSymbols2.procNormalWithOS:OutputToComponent",
+				goutils.Err(ErrInvalidGameConfig))
+
+			return ErrInvalidGameConfig
 		}
 	}
 
@@ -173,6 +196,29 @@ func (dropDownSymbols *DropDownSymbols2) procNormal(gameProp *GameProperty, gs *
 			} else {
 				y--
 			}
+		}
+	}
+
+	if dropDownSymbols.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[dropDownSymbols.Config.OutputToComponent]
+		if isok {
+			pccd := gameProp.GetComponentData(pc)
+			pccd.ClearPos()
+
+			for x, arr := range ngs.Arr {
+				for y := len(arr) - 1; y >= 0; y-- {
+					if arr[y] == -1 {
+						pc.AddPos(pccd, x, y)
+					}
+				}
+			}
+
+			return ngs, nil
+		} else {
+			goutils.Error("DropDownSymbols2.procNormalWithOS:OutputToComponent",
+				goutils.Err(ErrInvalidGameConfig))
+
+			return nil, ErrInvalidGameConfig
 		}
 	}
 
@@ -630,7 +676,7 @@ func (dropDownSymbols *DropDownSymbols2) OnPlayGame(gameProp *GameProperty, curp
 
 		switch dropDownSymbols.Config.Type {
 		case DDS2TypeNormal:
-			err := dropDownSymbols.procNormalWithOS(ngs, nos)
+			err := dropDownSymbols.procNormalWithOS(gameProp, ngs, nos)
 			if err != nil {
 				goutils.Error("DropDownSymbols2.OnPlayGame:procNormalWithOS",
 					goutils.Err(err))
@@ -724,12 +770,14 @@ func NewDropDownSymbols2(name string) IComponent {
 // "isNeedProcSymbolVals": false,
 // "type": "hexGridStaggered"
 // "rowMask": "mask-height4"
+// "outputToComponent": "bg-pos-dropdown"
 type jsonDropDownSymbols2 struct {
 	HoldSymbols          []string `json:"holdSymbols"`          // 不需要下落的symbol
 	IsNeedProcSymbolVals bool     `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int      `json:"emptySymbolVal"`       // 空的symbolVal是什么
 	Type                 string   `json:"type"`                 // 类型
 	RowMask              string   `json:"rowMask"`              // rowMask
+	OutputToComponent    string   `json:"outputToComponent"`    // outputToComponent
 }
 
 func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
@@ -739,6 +787,7 @@ func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
 		EmptySymbolVal:       jcfg.EmptySymbolVal,
 		StrType:              strings.ToLower(jcfg.Type),
 		RowMask:              jcfg.RowMask,
+		OutputToComponent:    jcfg.OutputToComponent,
 	}
 
 	return cfg
