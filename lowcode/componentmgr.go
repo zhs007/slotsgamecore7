@@ -126,6 +126,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(HoldAndRespinReelsTypeName, NewHoldAndRespinReels)
 	mgr.Reg(GenMaskTypeName, NewGenMask)
 	mgr.Reg(BasicReels2TypeName, NewBasicReels2)
+	mgr.Reg(RefillSymbols2TypeName, NewRefillSymbols2)
 
 	return mgr
 }
