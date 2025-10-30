@@ -309,6 +309,46 @@ func (bomb *Bomb) bomb(gameProp *GameProperty, gs *sgc7game.GameScene, x int, y 
 	cx := bomb.Config.BombWidth / 2
 	cy := bomb.Config.BombHeight / 2
 
+	if bomb.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[bomb.Config.OutputToComponent]
+		if isok {
+			pccd := gameProp.GetComponentData(pc)
+			pccd.ClearPos()
+
+			bsd.newData()
+			bsd.AddPos(x, y)
+			pccd.AddPos(x, y)
+
+			for sx, arr := range bomb.Config.BombData {
+				for sy, v := range arr {
+					tx := x + sx - cx
+					ty := y + sy - cy
+					if v != 0 && tx >= 0 && ty >= 0 && tx < gs.Width && ty < gs.Height {
+						if bomb.canBomb(gameProp, tx, ty, curpr, gp) {
+							if tx != x || ty != y {
+								bsd.AddPos(tx, ty)
+								pccd.AddPos(tx, ty)
+							}
+
+							if bomb.Config.BombTargetType == BTTypeRemove {
+								gs.Arr[tx][ty] = -1
+							} else {
+								gs.Arr[tx][ty] = bomb.Config.TargetSymbolCode
+							}
+						}
+					}
+				}
+			}
+
+			return
+		}
+
+		goutils.Error("Bomb.bomb:OutputToComponent",
+			goutils.Err(ErrInvalidGameConfig))
+
+		return
+	}
+
 	bsd.newData()
 	bsd.AddPos(x, y)
 
