@@ -101,24 +101,15 @@ func (chgSymbolValsData *ChgSymbolValsData) OnNewGame(gameProp *GameProperty, co
 
 // onNewStep -
 func (chgSymbolValsData *ChgSymbolValsData) onNewStep() {
-	if !gIsReleaseMode {
-		chgSymbolValsData.PosComponentData.Clear()
-	}
+	chgSymbolValsData.PosComponentData.Clear()
+	chgSymbolValsData.UsedOtherScenes = nil
 }
 
 // Clone
 func (chgSymbolValsData *ChgSymbolValsData) Clone() IComponentData {
-	if !gIsReleaseMode {
-		target := &ChgSymbolValsData{
-			BasicComponentData: chgSymbolValsData.CloneBasicComponentData(),
-			PosComponentData:   chgSymbolValsData.PosComponentData.Clone(),
-		}
-
-		return target
-	}
-
 	target := &ChgSymbolValsData{
 		BasicComponentData: chgSymbolValsData.CloneBasicComponentData(),
+		PosComponentData:   chgSymbolValsData.PosComponentData.Clone(),
 	}
 
 	return target
