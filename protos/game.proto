@@ -120,6 +120,10 @@ message GameScenePlayResult {
     int32 value = 11;       // 如果是奖励FreeSpin，这里是次数
 }
 
+message SPGridList {
+    repeated GameScene scenes = 1;
+}
+
 // PlayResult - result for play
 message PlayResult {
     string curGameMod = 1;                      // 当前游戏模块，一般是 bg、fg 等等
@@ -138,6 +142,7 @@ message PlayResult {
     int64 jackpotCoinWin = 14;                  // 如果有游戏自身的jackpot奖励数据，这里是jackpot奖励的汇总，单位是coin，也就是线注的倍数
     int64 jackpotCashWin = 15;                  // 如果有游戏自身的jackpot奖励数据，这里是jackpot奖励的汇总，单位是货币单位，也就是实际的赢得
     int32 jackpotType = 16;                     // jackpot类型
+    map<string, SPGridList> spGrid = 17;        // spgrid
 }
 
 // GameResult - game result

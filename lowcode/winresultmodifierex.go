@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -340,7 +341,7 @@ type jsonWinResultModifierEx struct {
 
 func (jcfg *jsonWinResultModifierEx) build() *WinResultModifierExConfig {
 	cfg := &WinResultModifierExConfig{
-		StrType:          jcfg.Type,
+		StrType:          strings.ToLower(jcfg.Type),
 		SourceComponents: jcfg.SourceComponents,
 		MapTargetSymbols: make(map[string]int),
 	}

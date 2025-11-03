@@ -45,6 +45,22 @@ func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 		r.ClientData.PrizeScenes = append(r.ClientData.PrizeScenes, cs)
 	}
 
+	// SPGrid - map[string][]*GameScene -> map[string]*SPGridList
+	if len(playResult.SPGrid) > 0 {
+		if r.ClientData.SpGrid == nil {
+			r.ClientData.SpGrid = make(map[string]*sgc7pb.SPGridList)
+		}
+
+		for k, lst := range playResult.SPGrid {
+			pbl := &sgc7pb.SPGridList{}
+			for _, gs := range lst {
+				pbl.Scenes = append(pbl.Scenes, sgc7pbutils.BuildPBGameScene(gs))
+			}
+
+			r.ClientData.SpGrid[k] = pbl
+		}
+	}
+
 	r.ClientData.PrizeCoinWin = int64(playResult.PrizeCoinWin)
 	r.ClientData.PrizeCashWin = playResult.PrizeCashWin
 
