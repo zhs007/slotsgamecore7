@@ -1,10 +1,13 @@
 package mathtoolset2
 
 import (
+	"fmt"
 	"io"
 	"log/slog"
+	"sort"
 	"strings"
 
+	"github.com/xuri/excelize/v2"
 	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 )
@@ -143,11 +146,96 @@ func LoadReelsStats2(reader io.Reader) (*ReelsStats2, error) {
 	rss2 := NewReelsStats2(reelnum)
 
 	for s, arr := range mapSymbols {
-		rss2.Symbols = append(rss2.Symbols, s)
-		for i, v := range arr {
-			rss2.Reels[i].MapSymbols[s] = v
+		ls := strings.ToLower(strings.TrimSpace(s))
+		if ls == "total" || ls == "" {
+			for i, v := range arr {
+				rss2.Reels[i].TotalSymbolNum = v
+			}
+		} else {
+			rss2.Symbols = append(rss2.Symbols, s)
+			for i, v := range arr {
+				rss2.Reels[i].MapSymbols[s] = v
+			}
 		}
 	}
 
 	return rss2, nil
+}
+
+func (rss2 *ReelsStats2) SaveExcel(fn string) error {
+	f := excelize.NewFile()
+
+	sheet := f.GetSheetName(0)
+
+	f.SetCellStr(sheet, goutils.Pos2Cell(0, 0), "symbol")
+	for i := range rss2.Reels {
+		f.SetCellStr(sheet, goutils.Pos2Cell(i+1, 0), fmt.Sprintf("reel%v", i+1))
+	}
+
+	y := 1
+
+	for _, s := range rss2.Symbols {
+		f.SetCellValue(sheet, goutils.Pos2Cell(0, y), s)
+
+		for i, reel := range rss2.Reels {
+			statsNum, isok := reel.MapSymbols[s]
+			if isok {
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), statsNum)
+			} else {
+				f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), 0)
+			}
+		}
+
+		y++
+	}
+
+	for i, rs := range rss2.Reels {
+		f.SetCellValue(sheet, goutils.Pos2Cell(i+1, y), rs.TotalSymbolNum)
+	}
+
+	// ensure any library-level errors are propagated via SaveAs
+	// delete the default sheet if user expects a single-sheet file? keep as-is
+	return f.SaveAs(fn)
+}
+
+// BuildReelsStats2 builds ReelsStats2 from raw reels data (each reel is []string)
+func BuildReelsStats2(reels [][]string) (*ReelsStats2, error) {
+	if len(reels) == 0 {
+		goutils.Error("BuildReelsStats2:empty reels",
+			goutils.Err(ErrInvalidReelsStats2File))
+
+		return nil, ErrInvalidReelsStats2File
+	}
+
+	rss := NewReelsStats2(len(reels))
+
+	// collect symbols set
+	symset := make(map[string]struct{})
+
+	for i, r := range reels {
+		if r == nil {
+			rss.Reels[i].TotalSymbolNum = 0
+			continue
+		}
+
+		rss.Reels[i].TotalSymbolNum = len(r)
+
+		for _, s := range r {
+			s = strings.TrimSpace(s)
+			if s == "" {
+				continue
+			}
+
+			rss.Reels[i].MapSymbols[s]++
+			symset[s] = struct{}{}
+		}
+	}
+
+	// build sorted Symbols slice
+	for s := range symset {
+		rss.Symbols = append(rss.Symbols, s)
+	}
+	sort.Strings(rss.Symbols)
+
+	return rss, nil
 }
