@@ -7,28 +7,29 @@ import (
 
 // PlayResult - result for play
 type PlayResult struct {
-	CurGameMod       string       `json:"curgamemod"`
-	CurGameModParams any          `json:"curgamemodparams"`
-	NextGameMod      string       `json:"nextgamemod"`
-	Scenes           []*GameScene `json:"scenes"`
-	OtherScenes      []*GameScene `json:"otherscenes"`
-	PrizeScenes      []*GameScene `json:"prizescenes"`
-	PrizeCoinWin     int          `json:"prizecoinwin"`
-	PrizeCashWin     int64        `json:"prizecashwin"`
-	JackpotCoinWin   int          `json:"jackpotcoinwin"`
-	JackpotCashWin   int64        `json:"jackpotcashwin"`
-	JackpotType      int          `json:"jackpottype"`
-	Results          []*Result    `json:"results"`
-	MulPos           []int        `json:"mulpos"`
-	NextCmds         []string     `json:"-"`
-	NextCmdParams    []string     `json:"-"`
-	CoinWin          int          `json:"-"`
-	CashWin          int64        `json:"-"`
-	IsFinish         bool         `json:"-"`
-	IsWait           bool         `json:"-"`
-	CurIndex         int          `json:"-"`
-	ParentIndex      int          `json:"-"`
-	ModType          string       `json:"-"`
+	CurGameMod       string                  `json:"curgamemod"`
+	CurGameModParams any                     `json:"curgamemodparams"`
+	NextGameMod      string                  `json:"nextgamemod"`
+	Scenes           []*GameScene            `json:"scenes"`
+	OtherScenes      []*GameScene            `json:"otherscenes"`
+	PrizeScenes      []*GameScene            `json:"prizescenes"`
+	PrizeCoinWin     int                     `json:"prizecoinwin"`
+	PrizeCashWin     int64                   `json:"prizecashwin"`
+	JackpotCoinWin   int                     `json:"jackpotcoinwin"`
+	JackpotCashWin   int64                   `json:"jackpotcashwin"`
+	JackpotType      int                     `json:"jackpottype"`
+	Results          []*Result               `json:"results"`
+	MulPos           []int                   `json:"mulpos"`
+	NextCmds         []string                `json:"-"`
+	NextCmdParams    []string                `json:"-"`
+	CoinWin          int                     `json:"-"`
+	CashWin          int64                   `json:"-"`
+	IsFinish         bool                    `json:"-"`
+	IsWait           bool                    `json:"-"`
+	CurIndex         int                     `json:"-"`
+	ParentIndex      int                     `json:"-"`
+	ModType          string                  `json:"-"`
+	SPGrid           map[string][]*GameScene `json:"spgrid"`
 }
 
 // NewPlayResult - new a PlayResult
