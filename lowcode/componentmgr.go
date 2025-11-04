@@ -127,6 +127,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(GenMaskTypeName, NewGenMask)
 	mgr.Reg(BasicReels2TypeName, NewBasicReels2)
 	mgr.Reg(RefillSymbols2TypeName, NewRefillSymbols2)
+	mgr.Reg(GenSPGridTypeName, NewGenSPGrid)
 
 	return mgr
 }

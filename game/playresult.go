@@ -39,6 +39,7 @@ func NewPlayResult(curGameMod string, curIndex int, parentIndex int, modType str
 		CurIndex:    curIndex,
 		ParentIndex: parentIndex,
 		ModType:     modType,
+		SPGrid:      make(map[string][]*GameScene),
 	}
 }
 
