@@ -51,9 +51,9 @@ func addWinResult(sv IService, pr *sgc7pb.ReplyPlay, playResult *sgc7game.PlayRe
 			r.ClientData.SpGrid = make(map[string]*sgc7pb.SPGridList)
 		}
 
-		for k, lst := range playResult.SPGrid {
+		for k, spgrid := range playResult.SPGrid {
 			pbl := &sgc7pb.SPGridList{}
-			for _, gs := range lst {
+			for _, gs := range spgrid.Grid {
 				pbl.Scenes = append(pbl.Scenes, sgc7pbutils.BuildPBGameScene(gs))
 			}
 

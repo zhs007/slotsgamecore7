@@ -76,7 +76,10 @@ func (gen *GenSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayRes
 	// This implementation intentionally does not modify the play result.
 	// It simply ends this step and returns ErrComponentDoNothing so the caller
 	// can proceed. Later this can be extended to actually generate SPGrid scenes.
-	curpr.SPGrid[gen.GetName()] = []*sgc7game.GameScene{}
+	curpr.SPGrid[gen.GetName()] = &sgc7game.SPGrid{
+		Width:  gen.Config.Width,
+		Height: gen.Config.Height,
+	}
 
 	nc := gen.onStepEnd(gameProp, curpr, gp, "")
 
