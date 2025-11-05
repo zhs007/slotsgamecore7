@@ -180,7 +180,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		if !gIsReleaseMode {
 			if goutils.IndexOfStringSlice(gameProp.Pool.Config.MapBetConfigs[int(stake.CashBet/stake.CoinBet)].ForceEndings, nextComponentName, 0) >= 0 {
-				nextComponentName = ""
+				// nextComponentName = ""
+				break
 			}
 		}
 
