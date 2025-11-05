@@ -180,7 +180,8 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 
 		if !gIsReleaseMode {
 			if goutils.IndexOfStringSlice(gameProp.Pool.Config.MapBetConfigs[int(stake.CashBet/stake.CoinBet)].ForceEndings, nextComponentName, 0) >= 0 {
-				nextComponentName = ""
+				// nextComponentName = ""
+				break
 			}
 		}
 
@@ -201,6 +202,7 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 			// 后续可以考虑去掉循环回滚
 			if !gameProp.IsRespin(nc) && gameProp.callStack.IsInCurCallStack(nc) {
 				goutils.Error("BasicGameMod.OnPlay:procRespinBeforeStepEnding:IsInCurCallStack",
+					slog.String("component", nc),
 					goutils.Err(ErrInvalidComponentConfig))
 
 				break
