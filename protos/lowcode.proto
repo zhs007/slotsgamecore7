@@ -3,6 +3,10 @@ package sgc7pb;
 option go_package = "github.com/zhs007/slotsgamecore7/sgc7pb";
 import "google/protobuf/any.proto";
 
+message UsedSPGridData {
+    repeated int32 usedSPGrid = 1;
+}
+
 // ComponentData
 message ComponentData {
     repeated int32 usedScenes = 1;
@@ -16,6 +20,7 @@ message ComponentData {
     repeated int32 srcScenes = 10;
     int32 output = 11;
     string strOutput = 12;
+    map<string, UsedSPGridData> mapUsedSPGrid = 13;
 }
 
 // BasicComponentData

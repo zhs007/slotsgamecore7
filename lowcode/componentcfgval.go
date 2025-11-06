@@ -35,6 +35,7 @@ const (
 	CCVValueNumNow                string = "valuenumnow"                // 可以修改配置项里的 valueNumNow
 	CCVOpenNum                    string = "opennum"                    // 可以修改配置项里的 opennum
 	CCVSPWeight                   string = "spweight"                   // 可以修改配置项里的 spweight
+	CCVGigaWeight                 string = "gigaweight"                 // 可以修改配置项里的 gigaweight
 )
 
 const (
