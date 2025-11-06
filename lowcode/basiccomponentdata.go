@@ -208,6 +208,8 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 		pbcd.SrcScenes = append(pbcd.SrcScenes, int32(v))
 	}
 
+	pbcd.MapUsedSPGrid = make(map[string]*sgc7pb.UsedSPGridData)
+
 	for k, v := range basicComponentData.MapUsedSPGric {
 		usp := &sgc7pb.UsedSPGridData{}
 
