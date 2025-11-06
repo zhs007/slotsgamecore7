@@ -6,9 +6,7 @@ import (
 )
 
 type SPGrid struct {
-	Width  int          `json:"width"`
-	Height int          `json:"height"`
-	Grid   []*GameScene `json:"grid"`
+	Grid []*GameScene `json:"grid"`
 }
 
 // PlayResult - result for play

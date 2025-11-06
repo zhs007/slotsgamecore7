@@ -40,9 +40,7 @@ func Test_addWinResult_SPGrid(t *testing.T) {
 	prInternal := sgc7game.NewPlayResult("bg", 0, 0, "bg")
 	prInternal.SPGrid = make(map[string]*sgc7game.SPGrid)
 	prInternal.SPGrid["key1"] = &sgc7game.SPGrid{
-		Width:  3,
-		Height: 2,
-		Grid:   []*sgc7game.GameScene{gs1, gs2},
+		Grid: []*sgc7game.GameScene{gs1, gs2},
 	}
 
 	reply := &sgc7pb.ReplyPlay{}

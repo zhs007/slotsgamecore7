@@ -22,27 +22,72 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type UsedSPGridData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UsedSPGrid    []int32                `protobuf:"varint,1,rep,packed,name=usedSPGrid,proto3" json:"usedSPGrid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsedSPGridData) Reset() {
+	*x = UsedSPGridData{}
+	mi := &file_lowcode_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsedSPGridData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsedSPGridData) ProtoMessage() {}
+
+func (x *UsedSPGridData) ProtoReflect() protoreflect.Message {
+	mi := &file_lowcode_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsedSPGridData.ProtoReflect.Descriptor instead.
+func (*UsedSPGridData) Descriptor() ([]byte, []int) {
+	return file_lowcode_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *UsedSPGridData) GetUsedSPGrid() []int32 {
+	if x != nil {
+		return x.UsedSPGrid
+	}
+	return nil
+}
+
 // ComponentData
 type ComponentData struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	UsedScenes      []int32                `protobuf:"varint,1,rep,packed,name=usedScenes,proto3" json:"usedScenes,omitempty"`
-	UsedOtherScenes []int32                `protobuf:"varint,2,rep,packed,name=usedOtherScenes,proto3" json:"usedOtherScenes,omitempty"`
-	UsedResults     []int32                `protobuf:"varint,3,rep,packed,name=usedResults,proto3" json:"usedResults,omitempty"`
-	UsedPrizeScenes []int32                `protobuf:"varint,4,rep,packed,name=usedPrizeScenes,proto3" json:"usedPrizeScenes,omitempty"`
-	CoinWin         int32                  `protobuf:"varint,5,opt,name=coinWin,proto3" json:"coinWin,omitempty"`
-	CashWin         int64                  `protobuf:"varint,6,opt,name=cashWin,proto3" json:"cashWin,omitempty"`
-	TargetScene     int32                  `protobuf:"varint,8,opt,name=targetScene,proto3" json:"targetScene,omitempty"`
-	RunIndex        int32                  `protobuf:"varint,9,opt,name=runIndex,proto3" json:"runIndex,omitempty"`
-	SrcScenes       []int32                `protobuf:"varint,10,rep,packed,name=srcScenes,proto3" json:"srcScenes,omitempty"`
-	Output          int32                  `protobuf:"varint,11,opt,name=output,proto3" json:"output,omitempty"`
-	StrOutput       string                 `protobuf:"bytes,12,opt,name=strOutput,proto3" json:"strOutput,omitempty"`
+	state           protoimpl.MessageState     `protogen:"open.v1"`
+	UsedScenes      []int32                    `protobuf:"varint,1,rep,packed,name=usedScenes,proto3" json:"usedScenes,omitempty"`
+	UsedOtherScenes []int32                    `protobuf:"varint,2,rep,packed,name=usedOtherScenes,proto3" json:"usedOtherScenes,omitempty"`
+	UsedResults     []int32                    `protobuf:"varint,3,rep,packed,name=usedResults,proto3" json:"usedResults,omitempty"`
+	UsedPrizeScenes []int32                    `protobuf:"varint,4,rep,packed,name=usedPrizeScenes,proto3" json:"usedPrizeScenes,omitempty"`
+	CoinWin         int32                      `protobuf:"varint,5,opt,name=coinWin,proto3" json:"coinWin,omitempty"`
+	CashWin         int64                      `protobuf:"varint,6,opt,name=cashWin,proto3" json:"cashWin,omitempty"`
+	TargetScene     int32                      `protobuf:"varint,8,opt,name=targetScene,proto3" json:"targetScene,omitempty"`
+	RunIndex        int32                      `protobuf:"varint,9,opt,name=runIndex,proto3" json:"runIndex,omitempty"`
+	SrcScenes       []int32                    `protobuf:"varint,10,rep,packed,name=srcScenes,proto3" json:"srcScenes,omitempty"`
+	Output          int32                      `protobuf:"varint,11,opt,name=output,proto3" json:"output,omitempty"`
+	StrOutput       string                     `protobuf:"bytes,12,opt,name=strOutput,proto3" json:"strOutput,omitempty"`
+	MapUsedSPGrid   map[string]*UsedSPGridData `protobuf:"bytes,13,rep,name=mapUsedSPGrid,proto3" json:"mapUsedSPGrid,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ComponentData) Reset() {
 	*x = ComponentData{}
-	mi := &file_lowcode_proto_msgTypes[0]
+	mi := &file_lowcode_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +99,7 @@ func (x *ComponentData) String() string {
 func (*ComponentData) ProtoMessage() {}
 
 func (x *ComponentData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[0]
+	mi := &file_lowcode_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +112,7 @@ func (x *ComponentData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ComponentData.ProtoReflect.Descriptor instead.
 func (*ComponentData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{0}
+	return file_lowcode_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ComponentData) GetUsedScenes() []int32 {
@@ -147,6 +192,13 @@ func (x *ComponentData) GetStrOutput() string {
 	return ""
 }
 
+func (x *ComponentData) GetMapUsedSPGrid() map[string]*UsedSPGridData {
+	if x != nil {
+		return x.MapUsedSPGrid
+	}
+	return nil
+}
+
 // BasicComponentData
 type BasicComponentData struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
@@ -157,7 +209,7 @@ type BasicComponentData struct {
 
 func (x *BasicComponentData) Reset() {
 	*x = BasicComponentData{}
-	mi := &file_lowcode_proto_msgTypes[1]
+	mi := &file_lowcode_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -169,7 +221,7 @@ func (x *BasicComponentData) String() string {
 func (*BasicComponentData) ProtoMessage() {}
 
 func (x *BasicComponentData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[1]
+	mi := &file_lowcode_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -182,7 +234,7 @@ func (x *BasicComponentData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BasicComponentData.ProtoReflect.Descriptor instead.
 func (*BasicComponentData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{1}
+	return file_lowcode_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *BasicComponentData) GetBasicComponentData() *ComponentData {
@@ -203,7 +255,7 @@ type BookOfData struct {
 
 func (x *BookOfData) Reset() {
 	*x = BookOfData{}
-	mi := &file_lowcode_proto_msgTypes[2]
+	mi := &file_lowcode_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -215,7 +267,7 @@ func (x *BookOfData) String() string {
 func (*BookOfData) ProtoMessage() {}
 
 func (x *BookOfData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[2]
+	mi := &file_lowcode_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -228,7 +280,7 @@ func (x *BookOfData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BookOfData.ProtoReflect.Descriptor instead.
 func (*BookOfData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{2}
+	return file_lowcode_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *BookOfData) GetBasicComponentData() *ComponentData {
@@ -256,7 +308,7 @@ type BookOf2Data struct {
 
 func (x *BookOf2Data) Reset() {
 	*x = BookOf2Data{}
-	mi := &file_lowcode_proto_msgTypes[3]
+	mi := &file_lowcode_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -268,7 +320,7 @@ func (x *BookOf2Data) String() string {
 func (*BookOf2Data) ProtoMessage() {}
 
 func (x *BookOf2Data) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[3]
+	mi := &file_lowcode_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -281,7 +333,7 @@ func (x *BookOf2Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BookOf2Data.ProtoReflect.Descriptor instead.
 func (*BookOf2Data) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{3}
+	return file_lowcode_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *BookOf2Data) GetBasicComponentData() *ComponentData {
@@ -309,7 +361,7 @@ type CollectorData struct {
 
 func (x *CollectorData) Reset() {
 	*x = CollectorData{}
-	mi := &file_lowcode_proto_msgTypes[4]
+	mi := &file_lowcode_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -321,7 +373,7 @@ func (x *CollectorData) String() string {
 func (*CollectorData) ProtoMessage() {}
 
 func (x *CollectorData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[4]
+	mi := &file_lowcode_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -334,7 +386,7 @@ func (x *CollectorData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CollectorData.ProtoReflect.Descriptor instead.
 func (*CollectorData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{4}
+	return file_lowcode_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CollectorData) GetVal() int32 {
@@ -365,7 +417,7 @@ type LightningData struct {
 
 func (x *LightningData) Reset() {
 	*x = LightningData{}
-	mi := &file_lowcode_proto_msgTypes[5]
+	mi := &file_lowcode_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -377,7 +429,7 @@ func (x *LightningData) String() string {
 func (*LightningData) ProtoMessage() {}
 
 func (x *LightningData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[5]
+	mi := &file_lowcode_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -390,7 +442,7 @@ func (x *LightningData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LightningData.ProtoReflect.Descriptor instead.
 func (*LightningData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{5}
+	return file_lowcode_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *LightningData) GetBasicComponentData() *ComponentData {
@@ -440,7 +492,7 @@ type MultiLevelMysteryData struct {
 
 func (x *MultiLevelMysteryData) Reset() {
 	*x = MultiLevelMysteryData{}
-	mi := &file_lowcode_proto_msgTypes[6]
+	mi := &file_lowcode_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -452,7 +504,7 @@ func (x *MultiLevelMysteryData) String() string {
 func (*MultiLevelMysteryData) ProtoMessage() {}
 
 func (x *MultiLevelMysteryData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[6]
+	mi := &file_lowcode_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -465,7 +517,7 @@ func (x *MultiLevelMysteryData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MultiLevelMysteryData.ProtoReflect.Descriptor instead.
 func (*MultiLevelMysteryData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{6}
+	return file_lowcode_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MultiLevelMysteryData) GetBasicComponentData() *ComponentData {
@@ -500,7 +552,7 @@ type MultiLevelReelsData struct {
 
 func (x *MultiLevelReelsData) Reset() {
 	*x = MultiLevelReelsData{}
-	mi := &file_lowcode_proto_msgTypes[7]
+	mi := &file_lowcode_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -512,7 +564,7 @@ func (x *MultiLevelReelsData) String() string {
 func (*MultiLevelReelsData) ProtoMessage() {}
 
 func (x *MultiLevelReelsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[7]
+	mi := &file_lowcode_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -525,7 +577,7 @@ func (x *MultiLevelReelsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MultiLevelReelsData.ProtoReflect.Descriptor instead.
 func (*MultiLevelReelsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{7}
+	return file_lowcode_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *MultiLevelReelsData) GetBasicComponentData() *ComponentData {
@@ -553,7 +605,7 @@ type MysteryData struct {
 
 func (x *MysteryData) Reset() {
 	*x = MysteryData{}
-	mi := &file_lowcode_proto_msgTypes[8]
+	mi := &file_lowcode_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -565,7 +617,7 @@ func (x *MysteryData) String() string {
 func (*MysteryData) ProtoMessage() {}
 
 func (x *MysteryData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[8]
+	mi := &file_lowcode_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -578,7 +630,7 @@ func (x *MysteryData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MysteryData.ProtoReflect.Descriptor instead.
 func (*MysteryData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{8}
+	return file_lowcode_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *MysteryData) GetBasicComponentData() *ComponentData {
@@ -606,7 +658,7 @@ type OverlaySymbolData struct {
 
 func (x *OverlaySymbolData) Reset() {
 	*x = OverlaySymbolData{}
-	mi := &file_lowcode_proto_msgTypes[9]
+	mi := &file_lowcode_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -618,7 +670,7 @@ func (x *OverlaySymbolData) String() string {
 func (*OverlaySymbolData) ProtoMessage() {}
 
 func (x *OverlaySymbolData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[9]
+	mi := &file_lowcode_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -631,7 +683,7 @@ func (x *OverlaySymbolData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OverlaySymbolData.ProtoReflect.Descriptor instead.
 func (*OverlaySymbolData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{9}
+	return file_lowcode_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *OverlaySymbolData) GetBasicComponentData() *ComponentData {
@@ -659,7 +711,7 @@ type BasicWinsData struct {
 
 func (x *BasicWinsData) Reset() {
 	*x = BasicWinsData{}
-	mi := &file_lowcode_proto_msgTypes[10]
+	mi := &file_lowcode_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -671,7 +723,7 @@ func (x *BasicWinsData) String() string {
 func (*BasicWinsData) ProtoMessage() {}
 
 func (x *BasicWinsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[10]
+	mi := &file_lowcode_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -684,7 +736,7 @@ func (x *BasicWinsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BasicWinsData.ProtoReflect.Descriptor instead.
 func (*BasicWinsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{10}
+	return file_lowcode_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *BasicWinsData) GetBasicComponentData() *ComponentData {
@@ -712,7 +764,7 @@ type ReelSetMysteryData struct {
 
 func (x *ReelSetMysteryData) Reset() {
 	*x = ReelSetMysteryData{}
-	mi := &file_lowcode_proto_msgTypes[11]
+	mi := &file_lowcode_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -724,7 +776,7 @@ func (x *ReelSetMysteryData) String() string {
 func (*ReelSetMysteryData) ProtoMessage() {}
 
 func (x *ReelSetMysteryData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[11]
+	mi := &file_lowcode_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -737,7 +789,7 @@ func (x *ReelSetMysteryData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReelSetMysteryData.ProtoReflect.Descriptor instead.
 func (*ReelSetMysteryData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{11}
+	return file_lowcode_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ReelSetMysteryData) GetBasicComponentData() *ComponentData {
@@ -765,7 +817,7 @@ type MultiLevelReplaceReelData struct {
 
 func (x *MultiLevelReplaceReelData) Reset() {
 	*x = MultiLevelReplaceReelData{}
-	mi := &file_lowcode_proto_msgTypes[12]
+	mi := &file_lowcode_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -777,7 +829,7 @@ func (x *MultiLevelReplaceReelData) String() string {
 func (*MultiLevelReplaceReelData) ProtoMessage() {}
 
 func (x *MultiLevelReplaceReelData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[12]
+	mi := &file_lowcode_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +842,7 @@ func (x *MultiLevelReplaceReelData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MultiLevelReplaceReelData.ProtoReflect.Descriptor instead.
 func (*MultiLevelReplaceReelData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{12}
+	return file_lowcode_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *MultiLevelReplaceReelData) GetBasicComponentData() *ComponentData {
@@ -828,7 +880,7 @@ type RespinData struct {
 
 func (x *RespinData) Reset() {
 	*x = RespinData{}
-	mi := &file_lowcode_proto_msgTypes[13]
+	mi := &file_lowcode_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -840,7 +892,7 @@ func (x *RespinData) String() string {
 func (*RespinData) ProtoMessage() {}
 
 func (x *RespinData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[13]
+	mi := &file_lowcode_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -853,7 +905,7 @@ func (x *RespinData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RespinData.ProtoReflect.Descriptor instead.
 func (*RespinData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{13}
+	return file_lowcode_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RespinData) GetBasicComponentData() *ComponentData {
@@ -954,7 +1006,7 @@ type Respin2Data struct {
 
 func (x *Respin2Data) Reset() {
 	*x = Respin2Data{}
-	mi := &file_lowcode_proto_msgTypes[14]
+	mi := &file_lowcode_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -966,7 +1018,7 @@ func (x *Respin2Data) String() string {
 func (*Respin2Data) ProtoMessage() {}
 
 func (x *Respin2Data) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[14]
+	mi := &file_lowcode_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -979,7 +1031,7 @@ func (x *Respin2Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Respin2Data.ProtoReflect.Descriptor instead.
 func (*Respin2Data) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{14}
+	return file_lowcode_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *Respin2Data) GetBasicComponentData() *ComponentData {
@@ -1067,7 +1119,7 @@ type MaskData struct {
 
 func (x *MaskData) Reset() {
 	*x = MaskData{}
-	mi := &file_lowcode_proto_msgTypes[15]
+	mi := &file_lowcode_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1079,7 +1131,7 @@ func (x *MaskData) String() string {
 func (*MaskData) ProtoMessage() {}
 
 func (x *MaskData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[15]
+	mi := &file_lowcode_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1092,7 +1144,7 @@ func (x *MaskData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MaskData.ProtoReflect.Descriptor instead.
 func (*MaskData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{15}
+	return file_lowcode_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *MaskData) GetBasicComponentData() *ComponentData {
@@ -1143,7 +1195,7 @@ type SymbolCollectionData struct {
 
 func (x *SymbolCollectionData) Reset() {
 	*x = SymbolCollectionData{}
-	mi := &file_lowcode_proto_msgTypes[16]
+	mi := &file_lowcode_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1155,7 +1207,7 @@ func (x *SymbolCollectionData) String() string {
 func (*SymbolCollectionData) ProtoMessage() {}
 
 func (x *SymbolCollectionData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[16]
+	mi := &file_lowcode_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1168,7 +1220,7 @@ func (x *SymbolCollectionData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SymbolCollectionData.ProtoReflect.Descriptor instead.
 func (*SymbolCollectionData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{16}
+	return file_lowcode_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SymbolCollectionData) GetBasicComponentData() *ComponentData {
@@ -1214,7 +1266,7 @@ type SymbolTriggerData struct {
 
 func (x *SymbolTriggerData) Reset() {
 	*x = SymbolTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[17]
+	mi := &file_lowcode_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1226,7 +1278,7 @@ func (x *SymbolTriggerData) String() string {
 func (*SymbolTriggerData) ProtoMessage() {}
 
 func (x *SymbolTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[17]
+	mi := &file_lowcode_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1239,7 +1291,7 @@ func (x *SymbolTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SymbolTriggerData.ProtoReflect.Descriptor instead.
 func (*SymbolTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{17}
+	return file_lowcode_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *SymbolTriggerData) GetBasicComponentData() *ComponentData {
@@ -1295,7 +1347,7 @@ type MultiWeightAwardsData struct {
 
 func (x *MultiWeightAwardsData) Reset() {
 	*x = MultiWeightAwardsData{}
-	mi := &file_lowcode_proto_msgTypes[18]
+	mi := &file_lowcode_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1307,7 +1359,7 @@ func (x *MultiWeightAwardsData) String() string {
 func (*MultiWeightAwardsData) ProtoMessage() {}
 
 func (x *MultiWeightAwardsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[18]
+	mi := &file_lowcode_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1320,7 +1372,7 @@ func (x *MultiWeightAwardsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MultiWeightAwardsData.ProtoReflect.Descriptor instead.
 func (*MultiWeightAwardsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{18}
+	return file_lowcode_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *MultiWeightAwardsData) GetBasicComponentData() *ComponentData {
@@ -1350,7 +1402,7 @@ type SymbolValWinsData struct {
 
 func (x *SymbolValWinsData) Reset() {
 	*x = SymbolValWinsData{}
-	mi := &file_lowcode_proto_msgTypes[19]
+	mi := &file_lowcode_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1362,7 +1414,7 @@ func (x *SymbolValWinsData) String() string {
 func (*SymbolValWinsData) ProtoMessage() {}
 
 func (x *SymbolValWinsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[19]
+	mi := &file_lowcode_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1375,7 +1427,7 @@ func (x *SymbolValWinsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SymbolValWinsData.ProtoReflect.Descriptor instead.
 func (*SymbolValWinsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{19}
+	return file_lowcode_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *SymbolValWinsData) GetBasicComponentData() *ComponentData {
@@ -1417,7 +1469,7 @@ type WeightReelsData struct {
 
 func (x *WeightReelsData) Reset() {
 	*x = WeightReelsData{}
-	mi := &file_lowcode_proto_msgTypes[20]
+	mi := &file_lowcode_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1429,7 +1481,7 @@ func (x *WeightReelsData) String() string {
 func (*WeightReelsData) ProtoMessage() {}
 
 func (x *WeightReelsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[20]
+	mi := &file_lowcode_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1442,7 +1494,7 @@ func (x *WeightReelsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeightReelsData.ProtoReflect.Descriptor instead.
 func (*WeightReelsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{20}
+	return file_lowcode_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *WeightReelsData) GetBasicComponentData() *ComponentData {
@@ -1475,7 +1527,7 @@ type ScatterTriggerData struct {
 
 func (x *ScatterTriggerData) Reset() {
 	*x = ScatterTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[21]
+	mi := &file_lowcode_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1487,7 +1539,7 @@ func (x *ScatterTriggerData) String() string {
 func (*ScatterTriggerData) ProtoMessage() {}
 
 func (x *ScatterTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[21]
+	mi := &file_lowcode_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1500,7 +1552,7 @@ func (x *ScatterTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScatterTriggerData.ProtoReflect.Descriptor instead.
 func (*ScatterTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{21}
+	return file_lowcode_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ScatterTriggerData) GetBasicComponentData() *ComponentData {
@@ -1568,7 +1620,7 @@ type LinesTriggerData struct {
 
 func (x *LinesTriggerData) Reset() {
 	*x = LinesTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[22]
+	mi := &file_lowcode_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1580,7 +1632,7 @@ func (x *LinesTriggerData) String() string {
 func (*LinesTriggerData) ProtoMessage() {}
 
 func (x *LinesTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[22]
+	mi := &file_lowcode_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1593,7 +1645,7 @@ func (x *LinesTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinesTriggerData.ProtoReflect.Descriptor instead.
 func (*LinesTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{22}
+	return file_lowcode_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *LinesTriggerData) GetBasicComponentData() *ComponentData {
@@ -1661,7 +1713,7 @@ type WaysTriggerData struct {
 
 func (x *WaysTriggerData) Reset() {
 	*x = WaysTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[23]
+	mi := &file_lowcode_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1673,7 +1725,7 @@ func (x *WaysTriggerData) String() string {
 func (*WaysTriggerData) ProtoMessage() {}
 
 func (x *WaysTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[23]
+	mi := &file_lowcode_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1686,7 +1738,7 @@ func (x *WaysTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WaysTriggerData.ProtoReflect.Descriptor instead.
 func (*WaysTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{23}
+	return file_lowcode_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *WaysTriggerData) GetBasicComponentData() *ComponentData {
@@ -1754,7 +1806,7 @@ type ClusterTriggerData struct {
 
 func (x *ClusterTriggerData) Reset() {
 	*x = ClusterTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[24]
+	mi := &file_lowcode_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1766,7 +1818,7 @@ func (x *ClusterTriggerData) String() string {
 func (*ClusterTriggerData) ProtoMessage() {}
 
 func (x *ClusterTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[24]
+	mi := &file_lowcode_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1779,7 +1831,7 @@ func (x *ClusterTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterTriggerData.ProtoReflect.Descriptor instead.
 func (*ClusterTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{24}
+	return file_lowcode_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ClusterTriggerData) GetBasicComponentData() *ComponentData {
@@ -1843,7 +1895,7 @@ type WinResultMultiData struct {
 
 func (x *WinResultMultiData) Reset() {
 	*x = WinResultMultiData{}
-	mi := &file_lowcode_proto_msgTypes[25]
+	mi := &file_lowcode_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1855,7 +1907,7 @@ func (x *WinResultMultiData) String() string {
 func (*WinResultMultiData) ProtoMessage() {}
 
 func (x *WinResultMultiData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[25]
+	mi := &file_lowcode_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1868,7 +1920,7 @@ func (x *WinResultMultiData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WinResultMultiData.ProtoReflect.Descriptor instead.
 func (*WinResultMultiData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{25}
+	return file_lowcode_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *WinResultMultiData) GetBasicComponentData() *ComponentData {
@@ -1903,7 +1955,7 @@ type WeightAwardsData struct {
 
 func (x *WeightAwardsData) Reset() {
 	*x = WeightAwardsData{}
-	mi := &file_lowcode_proto_msgTypes[26]
+	mi := &file_lowcode_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1915,7 +1967,7 @@ func (x *WeightAwardsData) String() string {
 func (*WeightAwardsData) ProtoMessage() {}
 
 func (x *WeightAwardsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[26]
+	mi := &file_lowcode_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1928,7 +1980,7 @@ func (x *WeightAwardsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeightAwardsData.ProtoReflect.Descriptor instead.
 func (*WeightAwardsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{26}
+	return file_lowcode_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *WeightAwardsData) GetBasicComponentData() *ComponentData {
@@ -1956,7 +2008,7 @@ type RemoveSymbolsData struct {
 
 func (x *RemoveSymbolsData) Reset() {
 	*x = RemoveSymbolsData{}
-	mi := &file_lowcode_proto_msgTypes[27]
+	mi := &file_lowcode_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1968,7 +2020,7 @@ func (x *RemoveSymbolsData) String() string {
 func (*RemoveSymbolsData) ProtoMessage() {}
 
 func (x *RemoveSymbolsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[27]
+	mi := &file_lowcode_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1981,7 +2033,7 @@ func (x *RemoveSymbolsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveSymbolsData.ProtoReflect.Descriptor instead.
 func (*RemoveSymbolsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{27}
+	return file_lowcode_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *RemoveSymbolsData) GetBasicComponentData() *ComponentData {
@@ -2009,7 +2061,7 @@ type WeightBranchData struct {
 
 func (x *WeightBranchData) Reset() {
 	*x = WeightBranchData{}
-	mi := &file_lowcode_proto_msgTypes[28]
+	mi := &file_lowcode_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2021,7 +2073,7 @@ func (x *WeightBranchData) String() string {
 func (*WeightBranchData) ProtoMessage() {}
 
 func (x *WeightBranchData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[28]
+	mi := &file_lowcode_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2034,7 +2086,7 @@ func (x *WeightBranchData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeightBranchData.ProtoReflect.Descriptor instead.
 func (*WeightBranchData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{28}
+	return file_lowcode_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *WeightBranchData) GetBasicComponentData() *ComponentData {
@@ -2063,7 +2115,7 @@ type RollSymbolData struct {
 
 func (x *RollSymbolData) Reset() {
 	*x = RollSymbolData{}
-	mi := &file_lowcode_proto_msgTypes[29]
+	mi := &file_lowcode_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2075,7 +2127,7 @@ func (x *RollSymbolData) String() string {
 func (*RollSymbolData) ProtoMessage() {}
 
 func (x *RollSymbolData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[29]
+	mi := &file_lowcode_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2088,7 +2140,7 @@ func (x *RollSymbolData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RollSymbolData.ProtoReflect.Descriptor instead.
 func (*RollSymbolData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{29}
+	return file_lowcode_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *RollSymbolData) GetBasicComponentData() *ComponentData {
@@ -2117,7 +2169,7 @@ type QueueBranchData struct {
 
 func (x *QueueBranchData) Reset() {
 	*x = QueueBranchData{}
-	mi := &file_lowcode_proto_msgTypes[30]
+	mi := &file_lowcode_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2129,7 +2181,7 @@ func (x *QueueBranchData) String() string {
 func (*QueueBranchData) ProtoMessage() {}
 
 func (x *QueueBranchData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[30]
+	mi := &file_lowcode_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2142,7 +2194,7 @@ func (x *QueueBranchData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QueueBranchData.ProtoReflect.Descriptor instead.
 func (*QueueBranchData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{30}
+	return file_lowcode_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *QueueBranchData) GetBasicComponentData() *ComponentData {
@@ -2177,7 +2229,7 @@ type SymbolCollection2Data struct {
 
 func (x *SymbolCollection2Data) Reset() {
 	*x = SymbolCollection2Data{}
-	mi := &file_lowcode_proto_msgTypes[31]
+	mi := &file_lowcode_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2189,7 +2241,7 @@ func (x *SymbolCollection2Data) String() string {
 func (*SymbolCollection2Data) ProtoMessage() {}
 
 func (x *SymbolCollection2Data) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[31]
+	mi := &file_lowcode_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2202,7 +2254,7 @@ func (x *SymbolCollection2Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SymbolCollection2Data.ProtoReflect.Descriptor instead.
 func (*SymbolCollection2Data) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{31}
+	return file_lowcode_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *SymbolCollection2Data) GetBasicComponentData() *ComponentData {
@@ -2232,7 +2284,7 @@ type PiggyBankData struct {
 
 func (x *PiggyBankData) Reset() {
 	*x = PiggyBankData{}
-	mi := &file_lowcode_proto_msgTypes[32]
+	mi := &file_lowcode_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2244,7 +2296,7 @@ func (x *PiggyBankData) String() string {
 func (*PiggyBankData) ProtoMessage() {}
 
 func (x *PiggyBankData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[32]
+	mi := &file_lowcode_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2257,7 +2309,7 @@ func (x *PiggyBankData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PiggyBankData.ProtoReflect.Descriptor instead.
 func (*PiggyBankData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{32}
+	return file_lowcode_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *PiggyBankData) GetBasicComponentData() *ComponentData {
@@ -2301,7 +2353,7 @@ type WinResultCacheData struct {
 
 func (x *WinResultCacheData) Reset() {
 	*x = WinResultCacheData{}
-	mi := &file_lowcode_proto_msgTypes[33]
+	mi := &file_lowcode_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2313,7 +2365,7 @@ func (x *WinResultCacheData) String() string {
 func (*WinResultCacheData) ProtoMessage() {}
 
 func (x *WinResultCacheData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[33]
+	mi := &file_lowcode_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2326,7 +2378,7 @@ func (x *WinResultCacheData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WinResultCacheData.ProtoReflect.Descriptor instead.
 func (*WinResultCacheData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{33}
+	return file_lowcode_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *WinResultCacheData) GetBasicComponentData() *ComponentData {
@@ -2368,7 +2420,7 @@ type PositionCollectionData struct {
 
 func (x *PositionCollectionData) Reset() {
 	*x = PositionCollectionData{}
-	mi := &file_lowcode_proto_msgTypes[34]
+	mi := &file_lowcode_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2380,7 +2432,7 @@ func (x *PositionCollectionData) String() string {
 func (*PositionCollectionData) ProtoMessage() {}
 
 func (x *PositionCollectionData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[34]
+	mi := &file_lowcode_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2393,7 +2445,7 @@ func (x *PositionCollectionData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PositionCollectionData.ProtoReflect.Descriptor instead.
 func (*PositionCollectionData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{34}
+	return file_lowcode_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *PositionCollectionData) GetBasicComponentData() *ComponentData {
@@ -2421,7 +2473,7 @@ type RollNumberData struct {
 
 func (x *RollNumberData) Reset() {
 	*x = RollNumberData{}
-	mi := &file_lowcode_proto_msgTypes[35]
+	mi := &file_lowcode_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2433,7 +2485,7 @@ func (x *RollNumberData) String() string {
 func (*RollNumberData) ProtoMessage() {}
 
 func (x *RollNumberData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[35]
+	mi := &file_lowcode_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2446,7 +2498,7 @@ func (x *RollNumberData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RollNumberData.ProtoReflect.Descriptor instead.
 func (*RollNumberData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{35}
+	return file_lowcode_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *RollNumberData) GetBasicComponentData() *ComponentData {
@@ -2474,7 +2526,7 @@ type GenGigaSymbolData struct {
 
 func (x *GenGigaSymbolData) Reset() {
 	*x = GenGigaSymbolData{}
-	mi := &file_lowcode_proto_msgTypes[36]
+	mi := &file_lowcode_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2486,7 +2538,7 @@ func (x *GenGigaSymbolData) String() string {
 func (*GenGigaSymbolData) ProtoMessage() {}
 
 func (x *GenGigaSymbolData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[36]
+	mi := &file_lowcode_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2499,7 +2551,7 @@ func (x *GenGigaSymbolData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenGigaSymbolData.ProtoReflect.Descriptor instead.
 func (*GenGigaSymbolData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{36}
+	return file_lowcode_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GenGigaSymbolData) GetBasicComponentData() *ComponentData {
@@ -2527,7 +2579,7 @@ type MoveSymbolData struct {
 
 func (x *MoveSymbolData) Reset() {
 	*x = MoveSymbolData{}
-	mi := &file_lowcode_proto_msgTypes[37]
+	mi := &file_lowcode_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2539,7 +2591,7 @@ func (x *MoveSymbolData) String() string {
 func (*MoveSymbolData) ProtoMessage() {}
 
 func (x *MoveSymbolData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[37]
+	mi := &file_lowcode_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2552,7 +2604,7 @@ func (x *MoveSymbolData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoveSymbolData.ProtoReflect.Descriptor instead.
 func (*MoveSymbolData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{37}
+	return file_lowcode_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *MoveSymbolData) GetBasicComponentData() *ComponentData {
@@ -2580,7 +2632,7 @@ type CatchSymbolsData struct {
 
 func (x *CatchSymbolsData) Reset() {
 	*x = CatchSymbolsData{}
-	mi := &file_lowcode_proto_msgTypes[38]
+	mi := &file_lowcode_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2592,7 +2644,7 @@ func (x *CatchSymbolsData) String() string {
 func (*CatchSymbolsData) ProtoMessage() {}
 
 func (x *CatchSymbolsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[38]
+	mi := &file_lowcode_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2605,7 +2657,7 @@ func (x *CatchSymbolsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CatchSymbolsData.ProtoReflect.Descriptor instead.
 func (*CatchSymbolsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{38}
+	return file_lowcode_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *CatchSymbolsData) GetBasicComponentData() *ComponentData {
@@ -2633,7 +2685,7 @@ type BurstSymbolsData struct {
 
 func (x *BurstSymbolsData) Reset() {
 	*x = BurstSymbolsData{}
-	mi := &file_lowcode_proto_msgTypes[39]
+	mi := &file_lowcode_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2645,7 +2697,7 @@ func (x *BurstSymbolsData) String() string {
 func (*BurstSymbolsData) ProtoMessage() {}
 
 func (x *BurstSymbolsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[39]
+	mi := &file_lowcode_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2658,7 +2710,7 @@ func (x *BurstSymbolsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BurstSymbolsData.ProtoReflect.Descriptor instead.
 func (*BurstSymbolsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{39}
+	return file_lowcode_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *BurstSymbolsData) GetBasicComponentData() *ComponentData {
@@ -2687,7 +2739,7 @@ type WinResultModifierData struct {
 
 func (x *WinResultModifierData) Reset() {
 	*x = WinResultModifierData{}
-	mi := &file_lowcode_proto_msgTypes[40]
+	mi := &file_lowcode_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2699,7 +2751,7 @@ func (x *WinResultModifierData) String() string {
 func (*WinResultModifierData) ProtoMessage() {}
 
 func (x *WinResultModifierData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[40]
+	mi := &file_lowcode_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2712,7 +2764,7 @@ func (x *WinResultModifierData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WinResultModifierData.ProtoReflect.Descriptor instead.
 func (*WinResultModifierData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{40}
+	return file_lowcode_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *WinResultModifierData) GetBasicComponentData() *ComponentData {
@@ -2749,7 +2801,7 @@ type ReelTriggerData struct {
 
 func (x *ReelTriggerData) Reset() {
 	*x = ReelTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[41]
+	mi := &file_lowcode_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2761,7 +2813,7 @@ func (x *ReelTriggerData) String() string {
 func (*ReelTriggerData) ProtoMessage() {}
 
 func (x *ReelTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[41]
+	mi := &file_lowcode_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2774,7 +2826,7 @@ func (x *ReelTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReelTriggerData.ProtoReflect.Descriptor instead.
 func (*ReelTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{41}
+	return file_lowcode_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ReelTriggerData) GetBasicComponentData() *ComponentData {
@@ -2817,7 +2869,7 @@ type JackpotData struct {
 
 func (x *JackpotData) Reset() {
 	*x = JackpotData{}
-	mi := &file_lowcode_proto_msgTypes[42]
+	mi := &file_lowcode_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2829,7 +2881,7 @@ func (x *JackpotData) String() string {
 func (*JackpotData) ProtoMessage() {}
 
 func (x *JackpotData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[42]
+	mi := &file_lowcode_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2842,7 +2894,7 @@ func (x *JackpotData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JackpotData.ProtoReflect.Descriptor instead.
 func (*JackpotData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{42}
+	return file_lowcode_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *JackpotData) GetBasicComponentData() *ComponentData {
@@ -2877,7 +2929,7 @@ type CheckValData struct {
 
 func (x *CheckValData) Reset() {
 	*x = CheckValData{}
-	mi := &file_lowcode_proto_msgTypes[43]
+	mi := &file_lowcode_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2889,7 +2941,7 @@ func (x *CheckValData) String() string {
 func (*CheckValData) ProtoMessage() {}
 
 func (x *CheckValData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[43]
+	mi := &file_lowcode_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2902,7 +2954,7 @@ func (x *CheckValData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckValData.ProtoReflect.Descriptor instead.
 func (*CheckValData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{43}
+	return file_lowcode_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *CheckValData) GetBasicComponentData() *ComponentData {
@@ -2930,7 +2982,7 @@ type AddSymbolsData struct {
 
 func (x *AddSymbolsData) Reset() {
 	*x = AddSymbolsData{}
-	mi := &file_lowcode_proto_msgTypes[44]
+	mi := &file_lowcode_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2942,7 +2994,7 @@ func (x *AddSymbolsData) String() string {
 func (*AddSymbolsData) ProtoMessage() {}
 
 func (x *AddSymbolsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[44]
+	mi := &file_lowcode_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2955,7 +3007,7 @@ func (x *AddSymbolsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddSymbolsData.ProtoReflect.Descriptor instead.
 func (*AddSymbolsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{44}
+	return file_lowcode_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *AddSymbolsData) GetBasicComponentData() *ComponentData {
@@ -2988,7 +3040,7 @@ type AdjacentPayTriggerData struct {
 
 func (x *AdjacentPayTriggerData) Reset() {
 	*x = AdjacentPayTriggerData{}
-	mi := &file_lowcode_proto_msgTypes[45]
+	mi := &file_lowcode_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3000,7 +3052,7 @@ func (x *AdjacentPayTriggerData) String() string {
 func (*AdjacentPayTriggerData) ProtoMessage() {}
 
 func (x *AdjacentPayTriggerData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[45]
+	mi := &file_lowcode_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3013,7 +3065,7 @@ func (x *AdjacentPayTriggerData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdjacentPayTriggerData.ProtoReflect.Descriptor instead.
 func (*AdjacentPayTriggerData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{45}
+	return file_lowcode_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *AdjacentPayTriggerData) GetBasicComponentData() *ComponentData {
@@ -3076,7 +3128,7 @@ type RandomMoveSymbolsData struct {
 
 func (x *RandomMoveSymbolsData) Reset() {
 	*x = RandomMoveSymbolsData{}
-	mi := &file_lowcode_proto_msgTypes[46]
+	mi := &file_lowcode_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3088,7 +3140,7 @@ func (x *RandomMoveSymbolsData) String() string {
 func (*RandomMoveSymbolsData) ProtoMessage() {}
 
 func (x *RandomMoveSymbolsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[46]
+	mi := &file_lowcode_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3101,7 +3153,7 @@ func (x *RandomMoveSymbolsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RandomMoveSymbolsData.ProtoReflect.Descriptor instead.
 func (*RandomMoveSymbolsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{46}
+	return file_lowcode_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *RandomMoveSymbolsData) GetBasicComponentData() *ComponentData {
@@ -3131,7 +3183,7 @@ type FeatureBarData struct {
 
 func (x *FeatureBarData) Reset() {
 	*x = FeatureBarData{}
-	mi := &file_lowcode_proto_msgTypes[47]
+	mi := &file_lowcode_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3143,7 +3195,7 @@ func (x *FeatureBarData) String() string {
 func (*FeatureBarData) ProtoMessage() {}
 
 func (x *FeatureBarData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[47]
+	mi := &file_lowcode_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3156,7 +3208,7 @@ func (x *FeatureBarData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeatureBarData.ProtoReflect.Descriptor instead.
 func (*FeatureBarData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{47}
+	return file_lowcode_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *FeatureBarData) GetBasicComponentData() *ComponentData {
@@ -3198,7 +3250,7 @@ type BombData struct {
 
 func (x *BombData) Reset() {
 	*x = BombData{}
-	mi := &file_lowcode_proto_msgTypes[48]
+	mi := &file_lowcode_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3210,7 +3262,7 @@ func (x *BombData) String() string {
 func (*BombData) ProtoMessage() {}
 
 func (x *BombData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[48]
+	mi := &file_lowcode_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3223,7 +3275,7 @@ func (x *BombData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BombData.ProtoReflect.Descriptor instead.
 func (*BombData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{48}
+	return file_lowcode_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *BombData) GetBasicComponentData() *ComponentData {
@@ -3251,7 +3303,7 @@ type SumSymbolValsData struct {
 
 func (x *SumSymbolValsData) Reset() {
 	*x = SumSymbolValsData{}
-	mi := &file_lowcode_proto_msgTypes[49]
+	mi := &file_lowcode_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3263,7 +3315,7 @@ func (x *SumSymbolValsData) String() string {
 func (*SumSymbolValsData) ProtoMessage() {}
 
 func (x *SumSymbolValsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[49]
+	mi := &file_lowcode_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3276,7 +3328,7 @@ func (x *SumSymbolValsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SumSymbolValsData.ProtoReflect.Descriptor instead.
 func (*SumSymbolValsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{49}
+	return file_lowcode_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *SumSymbolValsData) GetBasicComponentData() *ComponentData {
@@ -3304,7 +3356,7 @@ type TreasureChestData struct {
 
 func (x *TreasureChestData) Reset() {
 	*x = TreasureChestData{}
-	mi := &file_lowcode_proto_msgTypes[50]
+	mi := &file_lowcode_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3316,7 +3368,7 @@ func (x *TreasureChestData) String() string {
 func (*TreasureChestData) ProtoMessage() {}
 
 func (x *TreasureChestData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[50]
+	mi := &file_lowcode_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3329,7 +3381,7 @@ func (x *TreasureChestData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TreasureChestData.ProtoReflect.Descriptor instead.
 func (*TreasureChestData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{50}
+	return file_lowcode_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *TreasureChestData) GetBasicComponentData() *ComponentData {
@@ -3357,7 +3409,7 @@ type MoveSymbols2Data struct {
 
 func (x *MoveSymbols2Data) Reset() {
 	*x = MoveSymbols2Data{}
-	mi := &file_lowcode_proto_msgTypes[51]
+	mi := &file_lowcode_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3369,7 +3421,7 @@ func (x *MoveSymbols2Data) String() string {
 func (*MoveSymbols2Data) ProtoMessage() {}
 
 func (x *MoveSymbols2Data) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[51]
+	mi := &file_lowcode_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3382,7 +3434,7 @@ func (x *MoveSymbols2Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoveSymbols2Data.ProtoReflect.Descriptor instead.
 func (*MoveSymbols2Data) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{51}
+	return file_lowcode_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *MoveSymbols2Data) GetBasicComponentData() *ComponentData {
@@ -3410,7 +3462,7 @@ type MergePositionCollectionData struct {
 
 func (x *MergePositionCollectionData) Reset() {
 	*x = MergePositionCollectionData{}
-	mi := &file_lowcode_proto_msgTypes[52]
+	mi := &file_lowcode_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3422,7 +3474,7 @@ func (x *MergePositionCollectionData) String() string {
 func (*MergePositionCollectionData) ProtoMessage() {}
 
 func (x *MergePositionCollectionData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[52]
+	mi := &file_lowcode_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3435,7 +3487,7 @@ func (x *MergePositionCollectionData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MergePositionCollectionData.ProtoReflect.Descriptor instead.
 func (*MergePositionCollectionData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{52}
+	return file_lowcode_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *MergePositionCollectionData) GetBasicComponentData() *ComponentData {
@@ -3466,7 +3518,7 @@ type FeatureBar2Data struct {
 
 func (x *FeatureBar2Data) Reset() {
 	*x = FeatureBar2Data{}
-	mi := &file_lowcode_proto_msgTypes[53]
+	mi := &file_lowcode_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3478,7 +3530,7 @@ func (x *FeatureBar2Data) String() string {
 func (*FeatureBar2Data) ProtoMessage() {}
 
 func (x *FeatureBar2Data) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[53]
+	mi := &file_lowcode_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3491,7 +3543,7 @@ func (x *FeatureBar2Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeatureBar2Data.ProtoReflect.Descriptor instead.
 func (*FeatureBar2Data) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{53}
+	return file_lowcode_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *FeatureBar2Data) GetBasicComponentData() *ComponentData {
@@ -3544,7 +3596,7 @@ type FeaturePickData struct {
 
 func (x *FeaturePickData) Reset() {
 	*x = FeaturePickData{}
-	mi := &file_lowcode_proto_msgTypes[54]
+	mi := &file_lowcode_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3556,7 +3608,7 @@ func (x *FeaturePickData) String() string {
 func (*FeaturePickData) ProtoMessage() {}
 
 func (x *FeaturePickData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[54]
+	mi := &file_lowcode_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3569,7 +3621,7 @@ func (x *FeaturePickData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeaturePickData.ProtoReflect.Descriptor instead.
 func (*FeaturePickData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{54}
+	return file_lowcode_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *FeaturePickData) GetBasicComponentData() *ComponentData {
@@ -3626,7 +3678,7 @@ type ReelsCollectorData struct {
 
 func (x *ReelsCollectorData) Reset() {
 	*x = ReelsCollectorData{}
-	mi := &file_lowcode_proto_msgTypes[55]
+	mi := &file_lowcode_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3638,7 +3690,7 @@ func (x *ReelsCollectorData) String() string {
 func (*ReelsCollectorData) ProtoMessage() {}
 
 func (x *ReelsCollectorData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[55]
+	mi := &file_lowcode_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3651,7 +3703,7 @@ func (x *ReelsCollectorData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReelsCollectorData.ProtoReflect.Descriptor instead.
 func (*ReelsCollectorData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{55}
+	return file_lowcode_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *ReelsCollectorData) GetBasicComponentData() *ComponentData {
@@ -3686,7 +3738,7 @@ type FlowDownSymbolsData struct {
 
 func (x *FlowDownSymbolsData) Reset() {
 	*x = FlowDownSymbolsData{}
-	mi := &file_lowcode_proto_msgTypes[56]
+	mi := &file_lowcode_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3698,7 +3750,7 @@ func (x *FlowDownSymbolsData) String() string {
 func (*FlowDownSymbolsData) ProtoMessage() {}
 
 func (x *FlowDownSymbolsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[56]
+	mi := &file_lowcode_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3711,7 +3763,7 @@ func (x *FlowDownSymbolsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FlowDownSymbolsData.ProtoReflect.Descriptor instead.
 func (*FlowDownSymbolsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{56}
+	return file_lowcode_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *FlowDownSymbolsData) GetBasicComponentData() *ComponentData {
@@ -3740,7 +3792,7 @@ type HoldAndWinData struct {
 
 func (x *HoldAndWinData) Reset() {
 	*x = HoldAndWinData{}
-	mi := &file_lowcode_proto_msgTypes[57]
+	mi := &file_lowcode_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3752,7 +3804,7 @@ func (x *HoldAndWinData) String() string {
 func (*HoldAndWinData) ProtoMessage() {}
 
 func (x *HoldAndWinData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[57]
+	mi := &file_lowcode_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3765,7 +3817,7 @@ func (x *HoldAndWinData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HoldAndWinData.ProtoReflect.Descriptor instead.
 func (*HoldAndWinData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{57}
+	return file_lowcode_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *HoldAndWinData) GetBasicComponentData() *ComponentData {
@@ -3800,7 +3852,7 @@ type ChgSymbols2Data struct {
 
 func (x *ChgSymbols2Data) Reset() {
 	*x = ChgSymbols2Data{}
-	mi := &file_lowcode_proto_msgTypes[58]
+	mi := &file_lowcode_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3812,7 +3864,7 @@ func (x *ChgSymbols2Data) String() string {
 func (*ChgSymbols2Data) ProtoMessage() {}
 
 func (x *ChgSymbols2Data) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[58]
+	mi := &file_lowcode_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3825,7 +3877,7 @@ func (x *ChgSymbols2Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChgSymbols2Data.ProtoReflect.Descriptor instead.
 func (*ChgSymbols2Data) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{58}
+	return file_lowcode_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *ChgSymbols2Data) GetBasicComponentData() *ComponentData {
@@ -3853,7 +3905,7 @@ type ChgSymbolsInReelsData struct {
 
 func (x *ChgSymbolsInReelsData) Reset() {
 	*x = ChgSymbolsInReelsData{}
-	mi := &file_lowcode_proto_msgTypes[59]
+	mi := &file_lowcode_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3865,7 +3917,7 @@ func (x *ChgSymbolsInReelsData) String() string {
 func (*ChgSymbolsInReelsData) ProtoMessage() {}
 
 func (x *ChgSymbolsInReelsData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[59]
+	mi := &file_lowcode_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3878,7 +3930,7 @@ func (x *ChgSymbolsInReelsData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChgSymbolsInReelsData.ProtoReflect.Descriptor instead.
 func (*ChgSymbolsInReelsData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{59}
+	return file_lowcode_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *ChgSymbolsInReelsData) GetBasicComponentData() *ComponentData {
@@ -3905,7 +3957,7 @@ type CascadingRegulatorData struct {
 
 func (x *CascadingRegulatorData) Reset() {
 	*x = CascadingRegulatorData{}
-	mi := &file_lowcode_proto_msgTypes[60]
+	mi := &file_lowcode_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3917,7 +3969,7 @@ func (x *CascadingRegulatorData) String() string {
 func (*CascadingRegulatorData) ProtoMessage() {}
 
 func (x *CascadingRegulatorData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[60]
+	mi := &file_lowcode_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3930,7 +3982,7 @@ func (x *CascadingRegulatorData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CascadingRegulatorData.ProtoReflect.Descriptor instead.
 func (*CascadingRegulatorData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{60}
+	return file_lowcode_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *CascadingRegulatorData) GetBasicComponentData() *ComponentData {
@@ -3951,7 +4003,7 @@ type WinResultLimiterData struct {
 
 func (x *WinResultLimiterData) Reset() {
 	*x = WinResultLimiterData{}
-	mi := &file_lowcode_proto_msgTypes[61]
+	mi := &file_lowcode_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3963,7 +4015,7 @@ func (x *WinResultLimiterData) String() string {
 func (*WinResultLimiterData) ProtoMessage() {}
 
 func (x *WinResultLimiterData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[61]
+	mi := &file_lowcode_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3976,7 +4028,7 @@ func (x *WinResultLimiterData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WinResultLimiterData.ProtoReflect.Descriptor instead.
 func (*WinResultLimiterData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{61}
+	return file_lowcode_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *WinResultLimiterData) GetBasicComponentData() *ComponentData {
@@ -4010,7 +4062,7 @@ type SymbolValsSPData struct {
 
 func (x *SymbolValsSPData) Reset() {
 	*x = SymbolValsSPData{}
-	mi := &file_lowcode_proto_msgTypes[62]
+	mi := &file_lowcode_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4022,7 +4074,7 @@ func (x *SymbolValsSPData) String() string {
 func (*SymbolValsSPData) ProtoMessage() {}
 
 func (x *SymbolValsSPData) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[62]
+	mi := &file_lowcode_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4035,7 +4087,7 @@ func (x *SymbolValsSPData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SymbolValsSPData.ProtoReflect.Descriptor instead.
 func (*SymbolValsSPData) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{62}
+	return file_lowcode_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *SymbolValsSPData) GetBasicComponentData() *ComponentData {
@@ -4111,7 +4163,7 @@ type GameParam struct {
 
 func (x *GameParam) Reset() {
 	*x = GameParam{}
-	mi := &file_lowcode_proto_msgTypes[63]
+	mi := &file_lowcode_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4123,7 +4175,7 @@ func (x *GameParam) String() string {
 func (*GameParam) ProtoMessage() {}
 
 func (x *GameParam) ProtoReflect() protoreflect.Message {
-	mi := &file_lowcode_proto_msgTypes[63]
+	mi := &file_lowcode_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4136,7 +4188,7 @@ func (x *GameParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameParam.ProtoReflect.Descriptor instead.
 func (*GameParam) Descriptor() ([]byte, []int) {
-	return file_lowcode_proto_rawDescGZIP(), []int{63}
+	return file_lowcode_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *GameParam) GetFirstComponent() string {
@@ -4199,7 +4251,11 @@ var File_lowcode_proto protoreflect.FileDescriptor
 
 const file_lowcode_proto_rawDesc = "" +
 	"\n" +
-	"\rlowcode.proto\x12\x06sgc7pb\x1a\x19google/protobuf/any.proto\"\xeb\x02\n" +
+	"\rlowcode.proto\x12\x06sgc7pb\x1a\x19google/protobuf/any.proto\"0\n" +
+	"\x0eUsedSPGridData\x12\x1e\n" +
+	"\n" +
+	"usedSPGrid\x18\x01 \x03(\x05R\n" +
+	"usedSPGrid\"\x95\x04\n" +
 	"\rComponentData\x12\x1e\n" +
 	"\n" +
 	"usedScenes\x18\x01 \x03(\x05R\n" +
@@ -4214,7 +4270,11 @@ const file_lowcode_proto_rawDesc = "" +
 	"\tsrcScenes\x18\n" +
 	" \x03(\x05R\tsrcScenes\x12\x16\n" +
 	"\x06output\x18\v \x01(\x05R\x06output\x12\x1c\n" +
-	"\tstrOutput\x18\f \x01(\tR\tstrOutput\"[\n" +
+	"\tstrOutput\x18\f \x01(\tR\tstrOutput\x12N\n" +
+	"\rmapUsedSPGrid\x18\r \x03(\v2(.sgc7pb.ComponentData.MapUsedSPGridEntryR\rmapUsedSPGrid\x1aX\n" +
+	"\x12MapUsedSPGridEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.sgc7pb.UsedSPGridDataR\x05value:\x028\x01\"[\n" +
 	"\x12BasicComponentData\x12E\n" +
 	"\x12basicComponentData\x18\x01 \x01(\v2\x15.sgc7pb.ComponentDataR\x12basicComponentData\"m\n" +
 	"\n" +
@@ -4534,148 +4594,152 @@ func file_lowcode_proto_rawDescGZIP() []byte {
 	return file_lowcode_proto_rawDescData
 }
 
-var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 67)
+var file_lowcode_proto_msgTypes = make([]protoimpl.MessageInfo, 69)
 var file_lowcode_proto_goTypes = []any{
-	(*ComponentData)(nil),               // 0: sgc7pb.ComponentData
-	(*BasicComponentData)(nil),          // 1: sgc7pb.BasicComponentData
-	(*BookOfData)(nil),                  // 2: sgc7pb.BookOfData
-	(*BookOf2Data)(nil),                 // 3: sgc7pb.BookOf2Data
-	(*CollectorData)(nil),               // 4: sgc7pb.CollectorData
-	(*LightningData)(nil),               // 5: sgc7pb.LightningData
-	(*MultiLevelMysteryData)(nil),       // 6: sgc7pb.MultiLevelMysteryData
-	(*MultiLevelReelsData)(nil),         // 7: sgc7pb.MultiLevelReelsData
-	(*MysteryData)(nil),                 // 8: sgc7pb.MysteryData
-	(*OverlaySymbolData)(nil),           // 9: sgc7pb.OverlaySymbolData
-	(*BasicWinsData)(nil),               // 10: sgc7pb.BasicWinsData
-	(*ReelSetMysteryData)(nil),          // 11: sgc7pb.ReelSetMysteryData
-	(*MultiLevelReplaceReelData)(nil),   // 12: sgc7pb.MultiLevelReplaceReelData
-	(*RespinData)(nil),                  // 13: sgc7pb.RespinData
-	(*Respin2Data)(nil),                 // 14: sgc7pb.Respin2Data
-	(*MaskData)(nil),                    // 15: sgc7pb.MaskData
-	(*SymbolCollectionData)(nil),        // 16: sgc7pb.SymbolCollectionData
-	(*SymbolTriggerData)(nil),           // 17: sgc7pb.SymbolTriggerData
-	(*MultiWeightAwardsData)(nil),       // 18: sgc7pb.MultiWeightAwardsData
-	(*SymbolValWinsData)(nil),           // 19: sgc7pb.SymbolValWinsData
-	(*WeightReelsData)(nil),             // 20: sgc7pb.WeightReelsData
-	(*ScatterTriggerData)(nil),          // 21: sgc7pb.ScatterTriggerData
-	(*LinesTriggerData)(nil),            // 22: sgc7pb.LinesTriggerData
-	(*WaysTriggerData)(nil),             // 23: sgc7pb.WaysTriggerData
-	(*ClusterTriggerData)(nil),          // 24: sgc7pb.ClusterTriggerData
-	(*WinResultMultiData)(nil),          // 25: sgc7pb.WinResultMultiData
-	(*WeightAwardsData)(nil),            // 26: sgc7pb.WeightAwardsData
-	(*RemoveSymbolsData)(nil),           // 27: sgc7pb.RemoveSymbolsData
-	(*WeightBranchData)(nil),            // 28: sgc7pb.WeightBranchData
-	(*RollSymbolData)(nil),              // 29: sgc7pb.RollSymbolData
-	(*QueueBranchData)(nil),             // 30: sgc7pb.QueueBranchData
-	(*SymbolCollection2Data)(nil),       // 31: sgc7pb.SymbolCollection2Data
-	(*PiggyBankData)(nil),               // 32: sgc7pb.PiggyBankData
-	(*WinResultCacheData)(nil),          // 33: sgc7pb.WinResultCacheData
-	(*PositionCollectionData)(nil),      // 34: sgc7pb.PositionCollectionData
-	(*RollNumberData)(nil),              // 35: sgc7pb.RollNumberData
-	(*GenGigaSymbolData)(nil),           // 36: sgc7pb.GenGigaSymbolData
-	(*MoveSymbolData)(nil),              // 37: sgc7pb.MoveSymbolData
-	(*CatchSymbolsData)(nil),            // 38: sgc7pb.CatchSymbolsData
-	(*BurstSymbolsData)(nil),            // 39: sgc7pb.BurstSymbolsData
-	(*WinResultModifierData)(nil),       // 40: sgc7pb.WinResultModifierData
-	(*ReelTriggerData)(nil),             // 41: sgc7pb.ReelTriggerData
-	(*JackpotData)(nil),                 // 42: sgc7pb.JackpotData
-	(*CheckValData)(nil),                // 43: sgc7pb.CheckValData
-	(*AddSymbolsData)(nil),              // 44: sgc7pb.AddSymbolsData
-	(*AdjacentPayTriggerData)(nil),      // 45: sgc7pb.AdjacentPayTriggerData
-	(*RandomMoveSymbolsData)(nil),       // 46: sgc7pb.RandomMoveSymbolsData
-	(*FeatureBarData)(nil),              // 47: sgc7pb.FeatureBarData
-	(*BombData)(nil),                    // 48: sgc7pb.BombData
-	(*SumSymbolValsData)(nil),           // 49: sgc7pb.SumSymbolValsData
-	(*TreasureChestData)(nil),           // 50: sgc7pb.TreasureChestData
-	(*MoveSymbols2Data)(nil),            // 51: sgc7pb.MoveSymbols2Data
-	(*MergePositionCollectionData)(nil), // 52: sgc7pb.MergePositionCollectionData
-	(*FeatureBar2Data)(nil),             // 53: sgc7pb.FeatureBar2Data
-	(*FeaturePickData)(nil),             // 54: sgc7pb.FeaturePickData
-	(*ReelsCollectorData)(nil),          // 55: sgc7pb.ReelsCollectorData
-	(*FlowDownSymbolsData)(nil),         // 56: sgc7pb.FlowDownSymbolsData
-	(*HoldAndWinData)(nil),              // 57: sgc7pb.HoldAndWinData
-	(*ChgSymbols2Data)(nil),             // 58: sgc7pb.ChgSymbols2Data
-	(*ChgSymbolsInReelsData)(nil),       // 59: sgc7pb.ChgSymbolsInReelsData
-	(*CascadingRegulatorData)(nil),      // 60: sgc7pb.CascadingRegulatorData
-	(*WinResultLimiterData)(nil),        // 61: sgc7pb.WinResultLimiterData
-	(*SymbolValsSPData)(nil),            // 62: sgc7pb.SymbolValsSPData
-	(*GameParam)(nil),                   // 63: sgc7pb.GameParam
-	nil,                                 // 64: sgc7pb.GameParam.MapComponentsEntry
-	nil,                                 // 65: sgc7pb.GameParam.MapValsEntry
-	nil,                                 // 66: sgc7pb.GameParam.MapStrValsEntry
-	(*anypb.Any)(nil),                   // 67: google.protobuf.Any
+	(*UsedSPGridData)(nil),              // 0: sgc7pb.UsedSPGridData
+	(*ComponentData)(nil),               // 1: sgc7pb.ComponentData
+	(*BasicComponentData)(nil),          // 2: sgc7pb.BasicComponentData
+	(*BookOfData)(nil),                  // 3: sgc7pb.BookOfData
+	(*BookOf2Data)(nil),                 // 4: sgc7pb.BookOf2Data
+	(*CollectorData)(nil),               // 5: sgc7pb.CollectorData
+	(*LightningData)(nil),               // 6: sgc7pb.LightningData
+	(*MultiLevelMysteryData)(nil),       // 7: sgc7pb.MultiLevelMysteryData
+	(*MultiLevelReelsData)(nil),         // 8: sgc7pb.MultiLevelReelsData
+	(*MysteryData)(nil),                 // 9: sgc7pb.MysteryData
+	(*OverlaySymbolData)(nil),           // 10: sgc7pb.OverlaySymbolData
+	(*BasicWinsData)(nil),               // 11: sgc7pb.BasicWinsData
+	(*ReelSetMysteryData)(nil),          // 12: sgc7pb.ReelSetMysteryData
+	(*MultiLevelReplaceReelData)(nil),   // 13: sgc7pb.MultiLevelReplaceReelData
+	(*RespinData)(nil),                  // 14: sgc7pb.RespinData
+	(*Respin2Data)(nil),                 // 15: sgc7pb.Respin2Data
+	(*MaskData)(nil),                    // 16: sgc7pb.MaskData
+	(*SymbolCollectionData)(nil),        // 17: sgc7pb.SymbolCollectionData
+	(*SymbolTriggerData)(nil),           // 18: sgc7pb.SymbolTriggerData
+	(*MultiWeightAwardsData)(nil),       // 19: sgc7pb.MultiWeightAwardsData
+	(*SymbolValWinsData)(nil),           // 20: sgc7pb.SymbolValWinsData
+	(*WeightReelsData)(nil),             // 21: sgc7pb.WeightReelsData
+	(*ScatterTriggerData)(nil),          // 22: sgc7pb.ScatterTriggerData
+	(*LinesTriggerData)(nil),            // 23: sgc7pb.LinesTriggerData
+	(*WaysTriggerData)(nil),             // 24: sgc7pb.WaysTriggerData
+	(*ClusterTriggerData)(nil),          // 25: sgc7pb.ClusterTriggerData
+	(*WinResultMultiData)(nil),          // 26: sgc7pb.WinResultMultiData
+	(*WeightAwardsData)(nil),            // 27: sgc7pb.WeightAwardsData
+	(*RemoveSymbolsData)(nil),           // 28: sgc7pb.RemoveSymbolsData
+	(*WeightBranchData)(nil),            // 29: sgc7pb.WeightBranchData
+	(*RollSymbolData)(nil),              // 30: sgc7pb.RollSymbolData
+	(*QueueBranchData)(nil),             // 31: sgc7pb.QueueBranchData
+	(*SymbolCollection2Data)(nil),       // 32: sgc7pb.SymbolCollection2Data
+	(*PiggyBankData)(nil),               // 33: sgc7pb.PiggyBankData
+	(*WinResultCacheData)(nil),          // 34: sgc7pb.WinResultCacheData
+	(*PositionCollectionData)(nil),      // 35: sgc7pb.PositionCollectionData
+	(*RollNumberData)(nil),              // 36: sgc7pb.RollNumberData
+	(*GenGigaSymbolData)(nil),           // 37: sgc7pb.GenGigaSymbolData
+	(*MoveSymbolData)(nil),              // 38: sgc7pb.MoveSymbolData
+	(*CatchSymbolsData)(nil),            // 39: sgc7pb.CatchSymbolsData
+	(*BurstSymbolsData)(nil),            // 40: sgc7pb.BurstSymbolsData
+	(*WinResultModifierData)(nil),       // 41: sgc7pb.WinResultModifierData
+	(*ReelTriggerData)(nil),             // 42: sgc7pb.ReelTriggerData
+	(*JackpotData)(nil),                 // 43: sgc7pb.JackpotData
+	(*CheckValData)(nil),                // 44: sgc7pb.CheckValData
+	(*AddSymbolsData)(nil),              // 45: sgc7pb.AddSymbolsData
+	(*AdjacentPayTriggerData)(nil),      // 46: sgc7pb.AdjacentPayTriggerData
+	(*RandomMoveSymbolsData)(nil),       // 47: sgc7pb.RandomMoveSymbolsData
+	(*FeatureBarData)(nil),              // 48: sgc7pb.FeatureBarData
+	(*BombData)(nil),                    // 49: sgc7pb.BombData
+	(*SumSymbolValsData)(nil),           // 50: sgc7pb.SumSymbolValsData
+	(*TreasureChestData)(nil),           // 51: sgc7pb.TreasureChestData
+	(*MoveSymbols2Data)(nil),            // 52: sgc7pb.MoveSymbols2Data
+	(*MergePositionCollectionData)(nil), // 53: sgc7pb.MergePositionCollectionData
+	(*FeatureBar2Data)(nil),             // 54: sgc7pb.FeatureBar2Data
+	(*FeaturePickData)(nil),             // 55: sgc7pb.FeaturePickData
+	(*ReelsCollectorData)(nil),          // 56: sgc7pb.ReelsCollectorData
+	(*FlowDownSymbolsData)(nil),         // 57: sgc7pb.FlowDownSymbolsData
+	(*HoldAndWinData)(nil),              // 58: sgc7pb.HoldAndWinData
+	(*ChgSymbols2Data)(nil),             // 59: sgc7pb.ChgSymbols2Data
+	(*ChgSymbolsInReelsData)(nil),       // 60: sgc7pb.ChgSymbolsInReelsData
+	(*CascadingRegulatorData)(nil),      // 61: sgc7pb.CascadingRegulatorData
+	(*WinResultLimiterData)(nil),        // 62: sgc7pb.WinResultLimiterData
+	(*SymbolValsSPData)(nil),            // 63: sgc7pb.SymbolValsSPData
+	(*GameParam)(nil),                   // 64: sgc7pb.GameParam
+	nil,                                 // 65: sgc7pb.ComponentData.MapUsedSPGridEntry
+	nil,                                 // 66: sgc7pb.GameParam.MapComponentsEntry
+	nil,                                 // 67: sgc7pb.GameParam.MapValsEntry
+	nil,                                 // 68: sgc7pb.GameParam.MapStrValsEntry
+	(*anypb.Any)(nil),                   // 69: google.protobuf.Any
 }
 var file_lowcode_proto_depIdxs = []int32{
-	0,  // 0: sgc7pb.BasicComponentData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 1: sgc7pb.BookOfData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 2: sgc7pb.BookOf2Data.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 3: sgc7pb.LightningData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 4: sgc7pb.MultiLevelMysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 5: sgc7pb.MultiLevelReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 6: sgc7pb.MysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 7: sgc7pb.OverlaySymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 8: sgc7pb.BasicWinsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 9: sgc7pb.ReelSetMysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 10: sgc7pb.MultiLevelReplaceReelData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 11: sgc7pb.RespinData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 12: sgc7pb.Respin2Data.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 13: sgc7pb.MaskData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 14: sgc7pb.SymbolCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 15: sgc7pb.SymbolTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 16: sgc7pb.MultiWeightAwardsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 17: sgc7pb.SymbolValWinsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 18: sgc7pb.WeightReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 19: sgc7pb.ScatterTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 20: sgc7pb.LinesTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 21: sgc7pb.WaysTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 22: sgc7pb.ClusterTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 23: sgc7pb.WinResultMultiData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 24: sgc7pb.WeightAwardsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 25: sgc7pb.RemoveSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 26: sgc7pb.WeightBranchData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 27: sgc7pb.RollSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 28: sgc7pb.QueueBranchData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 29: sgc7pb.SymbolCollection2Data.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 30: sgc7pb.PiggyBankData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 31: sgc7pb.WinResultCacheData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 32: sgc7pb.PositionCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 33: sgc7pb.RollNumberData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 34: sgc7pb.GenGigaSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 35: sgc7pb.MoveSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 36: sgc7pb.CatchSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 37: sgc7pb.BurstSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 38: sgc7pb.WinResultModifierData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 39: sgc7pb.ReelTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 40: sgc7pb.JackpotData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 41: sgc7pb.CheckValData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 42: sgc7pb.AddSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 43: sgc7pb.AdjacentPayTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 44: sgc7pb.RandomMoveSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 45: sgc7pb.FeatureBarData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 46: sgc7pb.BombData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 47: sgc7pb.SumSymbolValsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 48: sgc7pb.TreasureChestData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 49: sgc7pb.MoveSymbols2Data.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 50: sgc7pb.MergePositionCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 51: sgc7pb.FeatureBar2Data.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 52: sgc7pb.FeaturePickData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 53: sgc7pb.ReelsCollectorData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 54: sgc7pb.FlowDownSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 55: sgc7pb.HoldAndWinData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 56: sgc7pb.ChgSymbols2Data.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 57: sgc7pb.ChgSymbolsInReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 58: sgc7pb.CascadingRegulatorData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 59: sgc7pb.WinResultLimiterData.basicComponentData:type_name -> sgc7pb.ComponentData
-	0,  // 60: sgc7pb.SymbolValsSPData.basicComponentData:type_name -> sgc7pb.ComponentData
-	64, // 61: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
-	65, // 62: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
-	66, // 63: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
-	67, // 64: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
-	65, // [65:65] is the sub-list for method output_type
-	65, // [65:65] is the sub-list for method input_type
-	65, // [65:65] is the sub-list for extension type_name
-	65, // [65:65] is the sub-list for extension extendee
-	0,  // [0:65] is the sub-list for field type_name
+	65, // 0: sgc7pb.ComponentData.mapUsedSPGrid:type_name -> sgc7pb.ComponentData.MapUsedSPGridEntry
+	1,  // 1: sgc7pb.BasicComponentData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 2: sgc7pb.BookOfData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 3: sgc7pb.BookOf2Data.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 4: sgc7pb.LightningData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 5: sgc7pb.MultiLevelMysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 6: sgc7pb.MultiLevelReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 7: sgc7pb.MysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 8: sgc7pb.OverlaySymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 9: sgc7pb.BasicWinsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 10: sgc7pb.ReelSetMysteryData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 11: sgc7pb.MultiLevelReplaceReelData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 12: sgc7pb.RespinData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 13: sgc7pb.Respin2Data.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 14: sgc7pb.MaskData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 15: sgc7pb.SymbolCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 16: sgc7pb.SymbolTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 17: sgc7pb.MultiWeightAwardsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 18: sgc7pb.SymbolValWinsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 19: sgc7pb.WeightReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 20: sgc7pb.ScatterTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 21: sgc7pb.LinesTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 22: sgc7pb.WaysTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 23: sgc7pb.ClusterTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 24: sgc7pb.WinResultMultiData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 25: sgc7pb.WeightAwardsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 26: sgc7pb.RemoveSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 27: sgc7pb.WeightBranchData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 28: sgc7pb.RollSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 29: sgc7pb.QueueBranchData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 30: sgc7pb.SymbolCollection2Data.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 31: sgc7pb.PiggyBankData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 32: sgc7pb.WinResultCacheData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 33: sgc7pb.PositionCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 34: sgc7pb.RollNumberData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 35: sgc7pb.GenGigaSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 36: sgc7pb.MoveSymbolData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 37: sgc7pb.CatchSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 38: sgc7pb.BurstSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 39: sgc7pb.WinResultModifierData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 40: sgc7pb.ReelTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 41: sgc7pb.JackpotData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 42: sgc7pb.CheckValData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 43: sgc7pb.AddSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 44: sgc7pb.AdjacentPayTriggerData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 45: sgc7pb.RandomMoveSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 46: sgc7pb.FeatureBarData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 47: sgc7pb.BombData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 48: sgc7pb.SumSymbolValsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 49: sgc7pb.TreasureChestData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 50: sgc7pb.MoveSymbols2Data.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 51: sgc7pb.MergePositionCollectionData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 52: sgc7pb.FeatureBar2Data.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 53: sgc7pb.FeaturePickData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 54: sgc7pb.ReelsCollectorData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 55: sgc7pb.FlowDownSymbolsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 56: sgc7pb.HoldAndWinData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 57: sgc7pb.ChgSymbols2Data.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 58: sgc7pb.ChgSymbolsInReelsData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 59: sgc7pb.CascadingRegulatorData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 60: sgc7pb.WinResultLimiterData.basicComponentData:type_name -> sgc7pb.ComponentData
+	1,  // 61: sgc7pb.SymbolValsSPData.basicComponentData:type_name -> sgc7pb.ComponentData
+	66, // 62: sgc7pb.GameParam.mapComponents:type_name -> sgc7pb.GameParam.MapComponentsEntry
+	67, // 63: sgc7pb.GameParam.mapVals:type_name -> sgc7pb.GameParam.MapValsEntry
+	68, // 64: sgc7pb.GameParam.mapStrVals:type_name -> sgc7pb.GameParam.MapStrValsEntry
+	0,  // 65: sgc7pb.ComponentData.MapUsedSPGridEntry.value:type_name -> sgc7pb.UsedSPGridData
+	69, // 66: sgc7pb.GameParam.MapComponentsEntry.value:type_name -> google.protobuf.Any
+	67, // [67:67] is the sub-list for method output_type
+	67, // [67:67] is the sub-list for method input_type
+	67, // [67:67] is the sub-list for extension type_name
+	67, // [67:67] is the sub-list for extension extendee
+	0,  // [0:67] is the sub-list for field type_name
 }
 
 func init() { file_lowcode_proto_init() }
@@ -4689,7 +4753,7 @@ func file_lowcode_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lowcode_proto_rawDesc), len(file_lowcode_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   67,
+			NumMessages:   69,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

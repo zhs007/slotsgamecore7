@@ -1,6 +1,8 @@
 package lowcode
 
 import (
+	"slices"
+
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -22,6 +24,7 @@ type BasicComponentData struct {
 	SrcScenes             []int
 	Output                int
 	StrOutput             string
+	MapUsedSPGric         map[string][]int
 }
 
 // Clone
@@ -35,6 +38,7 @@ func (basicComponentData *BasicComponentData) CloneBasicComponentData() BasicCom
 		MapConfigIntVals:      make(map[string]int),
 		Output:                basicComponentData.Output,
 		StrOutput:             basicComponentData.StrOutput,
+		MapUsedSPGric:         make(map[string][]int),
 	}
 
 	target.UsedScenes = make([]int, len(basicComponentData.UsedScenes))
@@ -63,9 +67,11 @@ func (basicComponentData *BasicComponentData) CloneBasicComponentData() BasicCom
 	target.SrcScenes = make([]int, len(basicComponentData.SrcScenes))
 	copy(target.SrcScenes, basicComponentData.SrcScenes)
 
-	// if !gIsReleaseMode {
-	// 	target.ForceBranchIndex = basicComponentData.ForceBranchIndex
-	// }
+	if basicComponentData.MapUsedSPGric != nil {
+		for k, v := range basicComponentData.MapUsedSPGric {
+			target.MapUsedSPGric[k] = slices.Clone(v)
+		}
+	}
 
 	return target
 }
@@ -161,6 +167,14 @@ func (basicComponentData *BasicComponentData) LoadPBComponentData(pb *sgc7pb.Com
 		basicComponentData.SrcScenes = append(basicComponentData.SrcScenes, int(v))
 	}
 
+	for k, v := range pb.MapUsedSPGrid {
+		basicComponentData.MapUsedSPGric[k] = nil
+
+		for _, vv := range v.UsedSPGrid {
+			basicComponentData.MapUsedSPGric[k] = append(basicComponentData.MapUsedSPGric[k], int(vv))
+		}
+	}
+
 	return nil
 }
 
@@ -192,6 +206,16 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 
 	for _, v := range basicComponentData.SrcScenes {
 		pbcd.SrcScenes = append(pbcd.SrcScenes, int32(v))
+	}
+
+	for k, v := range basicComponentData.MapUsedSPGric {
+		usp := &sgc7pb.UsedSPGridData{}
+
+		for _, vv := range v {
+			usp.UsedSPGrid = append(usp.UsedSPGrid, int32(vv))
+		}
+
+		pbcd.MapUsedSPGrid[k] = usp
 	}
 
 	return pbcd

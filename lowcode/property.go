@@ -41,6 +41,12 @@ type HistoryComponentData struct {
 	ForeachIndex int
 }
 
+type SPGridStack struct {
+	Width  int
+	Height int
+	Stack  *SceneStack
+}
+
 type GameProperty struct {
 	CurBetMul                        int
 	Pool                             *GamePropertyPool
@@ -68,6 +74,7 @@ type GameProperty struct {
 	rng                              IRNG
 	featureLevel                     IFeatureLevel
 	lstNeedOnStepEndStats2Components []string
+	MapSPGridStack                   map[string]*SPGridStack
 }
 
 func (gameProp *GameProperty) GetBetMul() int {

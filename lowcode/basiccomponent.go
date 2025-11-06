@@ -75,6 +75,56 @@ func (basicComponent *BasicComponent) AddScene(gameProp *GameProperty, curpr *sg
 	gameProp.SceneStack.Push(basicComponent.Name, sc)
 }
 
+// AddSPGrid -
+func (basicComponent *BasicComponent) NewSPGrid(spgrid string, gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	w int, h int, basicCD *BasicComponentData) {
+
+	if curpr.SPGrid == nil {
+		curpr.SPGrid = make(map[string]*sgc7game.SPGrid)
+	}
+
+	if curpr.SPGrid[spgrid] == nil {
+		curpr.SPGrid[spgrid] = &sgc7game.SPGrid{}
+	}
+
+	if gameProp.MapSPGridStack[spgrid] == nil {
+		gameProp.MapSPGridStack[spgrid] = &SPGridStack{
+			Width:  w,
+			Height: h,
+			Stack:  NewSceneStack(false),
+		}
+	}
+
+	if basicCD.MapUsedSPGric == nil {
+		basicCD.MapUsedSPGric = make(map[string][]int)
+	}
+
+	if _, ok := basicCD.MapUsedSPGric[spgrid]; !ok {
+		basicCD.MapUsedSPGric[spgrid] = make([]int, 0)
+	}
+}
+
+// AddSPGrid -
+func (basicComponent *BasicComponent) AddSPGrid(spgrid string, gameProp *GameProperty, curpr *sgc7game.PlayResult,
+	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
+
+	basicComponent.NewSPGrid(spgrid, gameProp, curpr, sc.Width, sc.Height, basicCD)
+
+	si := len(curpr.SPGrid[spgrid].Grid)
+	basicCD.MapUsedSPGric[spgrid] = append(basicCD.MapUsedSPGric[spgrid], si)
+	curpr.SPGrid[spgrid].Grid = append(curpr.SPGrid[spgrid].Grid, sc)
+
+	gameProp.MapSPGridStack[spgrid].Stack.Push(basicComponent.Name, sc)
+}
+
+func (basicComponent *BasicComponent) GetSPGrid(spgrid string, gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, si int) *sgc7game.GameScene {
+	if gameProp.MapSPGridStack[spgrid] == nil {
+		return nil
+	}
+
+	return gameProp.MapSPGridStack[spgrid].Stack.GetTargetScene3(gameProp, basicComponent.Config, si, curpr, prs)
+}
+
 // AddOtherScene -
 func (basicComponent *BasicComponent) AddOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult,
 	sc *sgc7game.GameScene, basicCD *BasicComponentData) {
