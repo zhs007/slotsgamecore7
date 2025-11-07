@@ -299,10 +299,12 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		} else if gs.Arr[x][gs.Height-2] == gen.Config.EmptySymbolCode {
 			if gs.Arr[x][0] == gen.Config.BlankSymbolCode {
 				gs.Arr[x][gs.Height-2] = gen.Config.BlankSymbolCode
-				gs.Arr[x][0] = gen.Config.EmptySymbolCode
-			} else if gs.Arr[x][1] != gen.Config.EmptySymbolCode {
+				gs.Arr[x][0] = -1
+			} else if gs.Arr[x][0] != gen.Config.EmptySymbolCode {
 				gs.Arr[x][gs.Height-2] = gs.Arr[x][0]
-				gs.Arr[x][0] = gen.Config.EmptySymbolCode
+				gs.Arr[x][0] = -1
+			} else {
+				gs.Arr[x][0] = -1
 			}
 		}
 	}

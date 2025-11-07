@@ -129,6 +129,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RefillSymbols2TypeName, NewRefillSymbols2)
 	mgr.Reg(GenSPGridTypeName, NewGenSPGrid)
 	mgr.Reg(InitTropiCoolSPGridTypeName, NewInitTropiCoolSPGrid)
+	mgr.Reg(DropDownTropiCoolSPGridTypeName, NewDropDownTropiCoolSPGrid)
 
 	return mgr
 }
