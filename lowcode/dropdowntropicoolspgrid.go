@@ -98,6 +98,10 @@ func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, 
 
 	spgrid.Arr[x][0] = -1
 
+	if sym == gen.Config.BlankSymbolCode {
+		return gen.getSPGridSymbol(spgrid, x)
+	}
+
 	return sym
 }
 
@@ -142,14 +146,6 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 				}
 
 				ngs.Arr[x][y] = sym
-			}
-		}
-	}
-
-	for x := 0; x < gs.Width; x++ {
-		for y := gs.Height - 1; y >= 0; y-- {
-			if ngs.Arr[x][y] == gen.Config.BlankSymbolCode {
-				ngs.Arr[x][y] = -1
 			}
 		}
 	}
