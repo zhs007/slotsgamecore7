@@ -69,6 +69,10 @@ func (bgm *BasicGameMod) OnPlay(game sgc7game.IGame, plugin sgc7plugin.IPlugin, 
 	gameProp.SceneStack.onStepStart(pr)
 	gameProp.OtherSceneStack.onStepStart(pr)
 
+	for _, v := range gameProp.MapSPGridStack {
+		v.Stack.onStepStart(pr)
+	}
+
 	var curComponent IComponent
 
 	if gp.FirstComponent != "" {

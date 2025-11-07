@@ -96,6 +96,8 @@ func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, 
 		spgrid.Arr[x][y] = spgrid.Arr[x][y-1]
 	}
 
+	spgrid.Arr[x][0] = -1
+
 	return sym
 }
 
@@ -117,9 +119,9 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return "", ErrInvalidComponentConfig
 	}
 
-	spgrid := stackSPGrid.Stack.GetTopSceneEx(curpr, prs)
+	spgrid := stackSPGrid.Stack.GetTopSPGridEx(gen.Config.SPGrid, curpr, prs)
 	if spgrid == nil {
-		goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:GetTopSceneEx",
+		goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:GetTopSPGridEx",
 			slog.String("SPGrid", gen.Config.SPGrid),
 			goutils.Err(ErrInvalidComponentConfig))
 
@@ -139,11 +141,7 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 					break
 				}
 
-				if ngs == gs {
-					ngs = gs.Clone()
-				}
-
-				gs.Arr[x][y] = sym
+				ngs.Arr[x][y] = sym
 			}
 		}
 	}
@@ -151,7 +149,7 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 	for x := 0; x < gs.Width; x++ {
 		for y := gs.Height - 1; y >= 0; y-- {
 			if ngs.Arr[x][y] == gen.Config.BlankSymbolCode {
-				gs.Arr[x][y] = -1
+				ngs.Arr[x][y] = -1
 			}
 		}
 	}

@@ -124,4 +124,6 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(BasicReels2TypeName), parseBasicReels2)
 	gJsonMgr.RegLoadComponent(strings.ToLower(RefillSymbols2TypeName), parseRefillSymbols2)
 	gJsonMgr.RegLoadComponent(strings.ToLower(DropDownTropiCoolSPGridTypeName), parseDropDownTropiCoolSPGrid)
+	gJsonMgr.RegLoadComponent(strings.ToLower(AlignTropiCoolSPGridTypeName), parseAlignTropiCoolSPGrid)
+	gJsonMgr.RegLoadComponent(strings.ToLower(RefillTropiCoolSPGridTypeName), parseRefillTropiCoolSPGrid)
 }
