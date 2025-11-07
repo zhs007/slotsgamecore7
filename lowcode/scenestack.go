@@ -149,6 +149,26 @@ func (stack *SceneStack) GetTopSceneEx(curpr *sgc7game.PlayResult, prs []*sgc7ga
 	return stack.Scenes[len(stack.Scenes)-1].Scene
 }
 
+func (stack *SceneStack) GetTopSPGridEx(spgrid string, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) *sgc7game.GameScene {
+	if len(stack.Scenes) == 0 {
+		if len(prs) == 0 {
+			return nil
+		}
+
+		if prs[len(prs)-1].SPGrid == nil || prs[len(prs)-1].SPGrid[spgrid] == nil || len(prs[len(prs)-1].SPGrid[spgrid].Grid) == 0 {
+			return nil
+		}
+
+		restored := prs[len(prs)-1].SPGrid[spgrid].Grid[len(prs[len(prs)-1].SPGrid[spgrid].Grid)-1]
+		stack.Push("", restored)
+		curpr.Scenes = append(curpr.Scenes, restored)
+
+		return stack.Scenes[len(stack.Scenes)-1].Scene
+	}
+
+	return stack.Scenes[len(stack.Scenes)-1].Scene
+}
+
 // GetPreTopScene returns the scene just below the top. If the stack has at
 // least two entries, it returns the second-from-top element. If the stack
 // has exactly one entry and prs is provided, it inserts a pre-scene from
@@ -269,7 +289,7 @@ func (stack *SceneStack) TruncateTo(num int) {
 	if num >= len(stack.Scenes) {
 		return
 	}
-    
+
 	stack.Scenes = stack.Scenes[:num]
 }
 
