@@ -116,7 +116,8 @@ func (gen *AlignTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 	newspgrid := spgrid
 
 	ismoved := false
-	for x := 0; x < newspgrid.Width-1; {
+	maxx := spgrid.Width - 1
+	for x := 0; x < maxx; {
 		isnone := true
 		for y := 0; y < newspgrid.Height; y++ {
 			if newspgrid.Arr[x][y] != -1 {
@@ -142,6 +143,8 @@ func (gen *AlignTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 			}
 
 			ismoved = true
+
+			maxx--
 		} else {
 			x++
 		}
