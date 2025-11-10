@@ -132,6 +132,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(DropDownTropiCoolSPGridTypeName, NewDropDownTropiCoolSPGrid)
 	mgr.Reg(AlignTropiCoolSPGridTypeName, NewAlignTropiCoolSPGrid)
 	mgr.Reg(RefillTropiCoolSPGridTypeName, NewRefillTropiCoolSPGrid)
+	mgr.Reg(CollectorPayTriggerTypeName, NewCollectorPayTrigger)
 
 	return mgr
 }
