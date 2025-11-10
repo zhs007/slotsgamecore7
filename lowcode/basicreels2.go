@@ -21,7 +21,9 @@ type BasicReels2Config struct {
 	ReelSet              string   `yaml:"reelSet" json:"reelSet"`
 	IsExpandReel         bool     `yaml:"isExpandReel" json:"isExpandReel"`
 	Height               int      `yaml:"height" json:"height"`
-	Awards               []*Award `yaml:"awards" json:"awards"` // 新的奖励系统
+	MaskX                string   `yaml:"maskX" json:"maskX"`
+	MaskY                string   `yaml:"maskY" json:"maskY"`
+	Controllers          []*Award `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -66,8 +68,8 @@ func (basicReels2 *BasicReels2) InitEx(cfg any, pool *GamePropertyPool) error {
 	basicReels2.Config = cfg.(*BasicReels2Config)
 	basicReels2.Config.ComponentType = BasicReels2TypeName
 
-	for _, award := range basicReels2.Config.Awards {
-		award.Init()
+	for _, ctrl := range basicReels2.Config.Controllers {
+		ctrl.Init()
 	}
 
 	basicReels2.onInit(&basicReels2.Config.BasicComponentConfig)
@@ -95,9 +97,22 @@ func (basicReels2 *BasicReels2) getHeight(basicCD *BasicComponentData) int {
 
 // OnProcControllers -
 func (basicReels2 *BasicReels2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
-	if len(basicReels2.Config.Awards) > 0 {
-		gameProp.procAwards(plugin, basicReels2.Config.Awards, curpr, gp)
+	if len(basicReels2.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, basicReels2.Config.Controllers, curpr, gp)
 	}
+}
+
+func (basicReels2 *BasicReels2) getMaskX(gameProp *GameProperty, basicCD *BasicComponentData) string {
+	str := basicCD.GetConfigVal(CCVMaskX)
+	if str != "" {
+		if str == "<empty>" {
+			return ""
+		}
+
+		return str
+	}
+
+	return basicReels2.Config.MaskX
 }
 
 // playgame
@@ -136,7 +151,31 @@ func (basicReels2 *BasicReels2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 			return "", ErrInvalidReels
 		}
 
-		sc.RandReelsWithReelDataAndHeight(gameProp.CurReels, height, plugin)
+		maskx := basicReels2.getMaskX(gameProp, bcd)
+
+		if maskx != "" {
+			imaskd := gameProp.GetComponentDataWithName(basicReels2.Config.MaskX)
+			if imaskd != nil {
+				arr := imaskd.GetMask()
+				if len(arr) != sc.Width {
+					goutils.Error("BasicReels2.OnPlayGame:MaskX:len(arr)!=gs.Width",
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return "", ErrInvalidComponentConfig
+				}
+
+				sc.RandReelsWithReelDataMaskAndHeight(gameProp.CurReels, height, arr, plugin)
+
+			} else {
+				goutils.Error("BasicReels2.OnPlayGame:MaskX",
+					slog.String("maskX", maskx),
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return "", ErrInvalidComponentConfig
+			}
+		} else {
+			sc.RandReelsWithReelDataAndHeight(gameProp.CurReels, height, plugin)
+		}
 	}
 
 	basicReels2.AddScene(gameProp, curpr, sc, bcd)
@@ -167,13 +206,16 @@ func NewBasicReels2(name string) IComponent {
 	return basicReels2
 }
 
-// "isExpandReel": "false",
-// "reelSet": "bgreelweight",
-// "height": 4,
+// "isExpandReel": false,
+// "height": 6,
+// "reelSet": "bg-reel01",
+// "maskX": "mask-6"
 type jsonBasicReels2 struct {
 	ReelSet      string `json:"reelSet"`
 	IsExpandReel bool   `json:"isExpandReel"`
 	Height       int    `json:"height"`
+	MaskX        string `json:"maskX"`
+	MaskY        string `json:"maskY"`
 }
 
 func (jbr *jsonBasicReels2) build() *BasicReels2Config {
@@ -181,6 +223,8 @@ func (jbr *jsonBasicReels2) build() *BasicReels2Config {
 		ReelSet:      jbr.ReelSet,
 		IsExpandReel: jbr.IsExpandReel,
 		Height:       jbr.Height,
+		MaskX:        jbr.MaskX,
+		MaskY:        jbr.MaskY,
 	}
 
 	return cfg
@@ -217,7 +261,7 @@ func parseBasicReels2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	cfgd = data.build()
 
 	if ctrls != nil {
-		awards, err := parseControllers(ctrls)
+		controllers, err := parseControllers(ctrls)
 		if err != nil {
 			goutils.Error("parseBasicReels2:parseControllers",
 				goutils.Err(err))
@@ -225,7 +269,7 @@ func parseBasicReels2(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 			return "", err
 		}
 
-		cfgd.Awards = awards
+		cfgd.Controllers = controllers
 	}
 
 	gamecfg.mapConfig[label] = cfgd
