@@ -283,6 +283,8 @@ func (gen *RefillTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 		if isnone {
 			startX = x
+
+			break
 		}
 	}
 
