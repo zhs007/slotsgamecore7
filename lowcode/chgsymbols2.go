@@ -58,6 +58,7 @@ const (
 	CS2SSTypeNone         ChgSymbols2SourceSymbolType = 0
 	CS2SSTypeSymbols      ChgSymbols2SourceSymbolType = 1
 	CS2SSTypeSymbolWeight ChgSymbols2SourceSymbolType = 2
+	CS2SSTypeNoEmpty      ChgSymbols2SourceSymbolType = 3
 )
 
 func parseChgSymbols2SourceSymbolType(str string) ChgSymbols2SourceSymbolType {
@@ -66,6 +67,8 @@ func parseChgSymbols2SourceSymbolType(str string) ChgSymbols2SourceSymbolType {
 		return CS2SSTypeSymbols
 	case "symbolweight":
 		return CS2SSTypeSymbolWeight
+	case "noempty":
+		return CS2SSTypeNoEmpty
 	}
 
 	return CS2SSTypeNone
@@ -635,6 +638,19 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 	}
 
 	switch chgSymbols2.Config.SrcSymbolType {
+	case CS2SSTypeNoEmpty:
+		npos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
+
+		for i := range len(pos) / 2 {
+			x := pos[i*2]
+			y := pos[i*2+1]
+
+			if gs.Arr[x][y] >= 0 {
+				npos = append(npos, x, y)
+			}
+		}
+
+		return npos, nil
 	case CS2SSTypeSymbols:
 		npos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
 
@@ -1048,6 +1064,7 @@ func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
 		Symbol:                jcfg.Symbol,
 		MaxNumber:             jcfg.MaxNumber,
 		RowMask:               jcfg.RowMask,
+		Symbols:               slices.Clone(jcfg.Symbols),
 	}
 
 	return cfg

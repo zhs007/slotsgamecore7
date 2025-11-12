@@ -28,6 +28,8 @@ const (
 	RTBonus = 10
 	// RTAdjacentPay - AdjacentPay
 	RTAdjacentPay = 11
+	// RTCollectorPay - CollectorPay
+	RTCollectorPay = 12
 )
 
 // Result - result for slots game

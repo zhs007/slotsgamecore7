@@ -24,6 +24,7 @@ type GamePropertyPool struct {
 	mapIntValWeights map[string]*sgc7game.ValWeights2
 	newRNG           FuncNewRNG
 	newFeatureLevel  FuncNewFeatureLevel
+	posPool          *PosPool
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -286,6 +287,7 @@ func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLeve
 		mapIntValWeights: make(map[string]*sgc7game.ValWeights2),
 		newRNG:           funcNewRNG,
 		newFeatureLevel:  funcNewFeatureLevel,
+		posPool:          NewPosPool(cfg.Width * cfg.Height * 2),
 	}
 
 	if cfg.SymbolsViewer == "" {
