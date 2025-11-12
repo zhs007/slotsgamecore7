@@ -24,7 +24,6 @@ type GamePropertyPool struct {
 	mapIntValWeights map[string]*sgc7game.ValWeights2
 	newRNG           FuncNewRNG
 	newFeatureLevel  FuncNewFeatureLevel
-	posPool          *PosPool
 }
 
 func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
@@ -45,6 +44,7 @@ func (pool *GamePropertyPool) newGameProp(betMul int) *GameProperty {
 		rng:              pool.newRNG(),
 		featureLevel:     pool.newFeatureLevel(betMul),
 		MapSPGridStack:   make(map[string]*SPGridStack),
+		posPool:          NewPosPool(pool.Config.Width * pool.Config.Height * 2),
 	}
 
 	if gameProp.CurLineData != nil {
@@ -287,7 +287,6 @@ func newGamePropertyPool2(cfg *Config, funcNewRNG FuncNewRNG, funcNewFeatureLeve
 		mapIntValWeights: make(map[string]*sgc7game.ValWeights2),
 		newRNG:           funcNewRNG,
 		newFeatureLevel:  funcNewFeatureLevel,
-		posPool:          NewPosPool(cfg.Width * cfg.Height * 2),
 	}
 
 	if cfg.SymbolsViewer == "" {

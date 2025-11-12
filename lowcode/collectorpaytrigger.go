@@ -377,7 +377,7 @@ func (cpt *CollectorPayTrigger) calcSymbolCodeValue(symbol int, mainSymbol int) 
 			return -1
 		}
 
-		if v == 1 && symbol == mainSymbol {
+		if v == 1 && symbol != mainSymbol {
 			return -1
 		}
 
@@ -399,69 +399,101 @@ func (cpt *CollectorPayTrigger) calcTileValue(gs *sgc7game.GameScene, mainSymbol
 
 	if gs.Arr[x][y] == -1 {
 		if isIgnoreEmpty {
-			return -1
+			return 0
 		}
 
-		return 0
+		return -1
 	}
 
 	return cpt.calcSymbolCodeValue(gs.Arr[x][y], mainSymbol)
 }
 
-// 计算当前位置周围4格的价值,可能会有深度搜索,所以pos是已经走过的位置,返回下一个位置的坐标和新的pos,这个pos会包含新的位置
-func (cpt *CollectorPayTrigger) calcNextTile(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) (int, int) {
+// // 计算当前位置周围4格的价值,可能会有深度搜索,所以pos是已经走过的位置,返回下一个位置的坐标和新的pos,这个pos会包含新的位置
+// func (cpt *CollectorPayTrigger) calcNextTile(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) (int, int) {
 
-	curv := -1
-	nx := -1
-	ny := -1
+// 	curv := -1
+// 	nx := -1
+// 	ny := -1
 
+// 	if y < gs.Height-1 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
+// 		if cv > curv {
+// 			curv = cv
+
+// 			nx = x
+// 			ny = y + 1
+// 		}
+// 	}
+
+// 	if y > 0 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
+// 		if cv > curv {
+// 			curv = cv
+
+// 			nx = x
+// 			ny = y - 1
+// 		}
+// 	}
+
+// 	if x > 0 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
+// 		if cv > curv {
+// 			curv = cv
+
+// 			nx = x - 1
+// 			ny = y
+// 		}
+// 	}
+
+// 	if x < gs.Width-1 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
+// 		if cv > curv {
+// 			curv = cv
+
+// 			nx = x + 1
+// 			ny = y
+// 		}
+// 	}
+
+// 	if curv == -1 {
+// 		return -1, -1
+// 	}
+
+// 	pd.Add(nx, ny)
+
+// 	return nx, ny
+// }
+
+func (cpt *CollectorPayTrigger) isCanEnding(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) bool {
 	if y < gs.Height-1 {
 		cv := cpt.calcTileValue(gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
-		if cv > curv {
-			curv = cv
-
-			nx = x
-			ny = y + 1
+		if cv >= 0 {
+			return false
 		}
 	}
 
 	if y > 0 {
 		cv := cpt.calcTileValue(gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
-		if cv > curv {
-			curv = cv
-
-			nx = x
-			ny = y - 1
+		if cv >= 0 {
+			return false
 		}
 	}
 
 	if x > 0 {
 		cv := cpt.calcTileValue(gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
-		if cv > curv {
-			curv = cv
-
-			nx = x - 1
-			ny = y
+		if cv >= 0 {
+			return false
 		}
 	}
 
 	if x < gs.Width-1 {
 		cv := cpt.calcTileValue(gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
-		if cv > curv {
-			curv = cv
-
-			nx = x + 1
-			ny = y
+		if cv >= 0 {
+			return false
 		}
 	}
 
-	if curv == -1 {
-		return -1, -1
-	}
-
-	pd.Add(nx, ny)
-
-	return nx, ny
+	return true
 }
 
 // 找到一条路径,返回该路径上的最大价值以及路径数组,找到第一个大于普通符号的位置就返回
@@ -472,203 +504,106 @@ func (cpt *CollectorPayTrigger) findPathDeep(gameProp *GameProperty, gs *sgc7gam
 	}
 
 	if csv > 4 {
-		npd := gameProp.Pool.posPool.Clone(pd)
+		npd := gameProp.posPool.Clone(pd)
 		npd.Add(x, y)
 
 		return csv, npd
 	}
 
-	maxv := csv
-	maxvpd := gameProp.Pool.posPool.Clone(pd)
-	maxvpd.Add(x, y)
+	if csv != 4 && csv != 0 {
+		npd := gameProp.posPool.Clone(pd)
+		npd.Add(x, y)
+
+		return csv, npd
+	}
+
+	tmppd := gameProp.posPool.Clone(pd)
+	tmppd.Add(x, y)
+
+	if cpt.isCanEnding(gs, mainSymbol, x, y, tmppd, isIgnoreEmpty) {
+		return csv, tmppd
+	}
+
+	maxv := -1
+	var maxvpd *PosData
 
 	if y < gs.Height-1 {
-		// cv := cpt.calcTileValue(gs, mainSymbol, x, y+1, maxvpd, isIgnoreEmpty)
-		// if cv >= 0 {
-		// 	npd := gameProp.Pool.posPool.Clone(maxvpd)
-		// 	npd.Add(x, y+1)
-
-		// 	if cv > 4 {
-		// 		if maxv < cv || (maxv == cv && len(maxvpd.pos) > len(npd.pos)) {
-		// 			maxv = cv
-
-		// 			if maxvpd != nil {
-		// 				gameProp.Pool.posPool.Put(maxvpd)
-		// 			}
-
-		// 			maxvpd = npd
-		// 		} else {
-		// 			gameProp.Pool.posPool.Put(npd)
-		// 		}
-		// 	} else {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, maxvpd, isIgnoreEmpty)
+		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, tmppd, isIgnoreEmpty)
 		if cdv >= 0 {
-			// gameProp.Pool.posPool.Put(maxvpd)
+			// gameProp.posPool.Put(tmppd)
 
 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
 			} else {
-				gameProp.Pool.posPool.Put(cdpd)
+				gameProp.posPool.Put(cdpd)
 			}
-			// } else {
-			// 	maxv = cv
-
-			// 	if maxvpd != nil {
-			// 		gameProp.Pool.posPool.Put(maxvpd)
-			// 	}
-
-			// 	maxvpd = npd
-			// }
-			// }
 		}
 	}
 
 	if y > 0 {
-		// cv := cpt.calcTileValue(gs, mainSymbol, x, y-1, maxvpd, isIgnoreEmpty)
-		// if cv >= 0 {
-		// 	npd := gameProp.Pool.posPool.Clone(maxvpd)
-		// 	npd.Add(x, y-1)
-
-		// 	if cv > 4 || (maxv == cv && len(maxvpd.pos) > len(npd.pos)) {
-		// 		if maxv < cv {
-		// 			maxv = cv
-
-		// 			if maxvpd != nil {
-		// 				gameProp.Pool.posPool.Put(maxvpd)
-		// 			}
-
-		// 			maxvpd = npd
-		// 		} else {
-		// 			gameProp.Pool.posPool.Put(npd)
-		// 		}
-		// 	} else {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, maxvpd, isIgnoreEmpty)
+		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, tmppd, isIgnoreEmpty)
 		if cdv >= 0 {
-			// gameProp.Pool.posPool.Put(maxvpd)
+			// gameProp.posPool.Put(tmppd)
 
 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
 			} else {
-				gameProp.Pool.posPool.Put(cdpd)
+				gameProp.posPool.Put(cdpd)
 			}
-			// 	} else {
-			// 		maxv = cv
-
-			// 		if maxvpd != nil {
-			// 			gameProp.Pool.posPool.Put(maxvpd)
-			// 		}
-
-			// 		maxvpd = npd
-			// 	}
-			// }
 		}
 	}
 
 	if x > 0 {
-		// cv := cpt.calcTileValue(gs, mainSymbol, x-1, y, maxvpd, isIgnoreEmpty)
-		// if cv >= 0 {
-		// 	npd := gameProp.Pool.posPool.Clone(maxvpd)
-		// 	npd.Add(x-1, y)
-
-		// 	if cv > 4 || (maxv == cv && len(maxvpd.pos) > len(npd.pos)) {
-		// 		if maxv < cv {
-		// 			maxv = cv
-
-		// 			if maxvpd != nil {
-		// 				gameProp.Pool.posPool.Put(maxvpd)
-		// 			}
-
-		// 			maxvpd = npd
-		// 		} else {
-		// 			gameProp.Pool.posPool.Put(npd)
-		// 		}
-		// 	} else {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, maxvpd, isIgnoreEmpty)
+		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, tmppd, isIgnoreEmpty)
 		if cdv >= 0 {
-			// gameProp.Pool.posPool.Put(maxvpd)
+			// gameProp.posPool.Put(tmppd)
 
 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
 			} else {
-				gameProp.Pool.posPool.Put(cdpd)
+				gameProp.posPool.Put(cdpd)
 			}
-			// 	} else {
-			// 		maxv = cv
-
-			// 		if maxvpd != nil {
-			// 			gameProp.Pool.posPool.Put(maxvpd)
-			// 		}
-
-			// 		maxvpd = npd
-			// 	}
-			// }
 		}
 	}
 
 	if x < gs.Width-1 {
-		// cv := cpt.calcTileValue(gs, mainSymbol, x+1, y, maxvpd, isIgnoreEmpty)
-		// if cv >= 0 {
-		// 	npd := gameProp.Pool.posPool.Clone(maxvpd)
-		// 	npd.Add(x+1, y)
-
-		// 	if cv > 4 || (maxv == cv && len(maxvpd.pos) > len(npd.pos)) {
-		// 		if maxv < cv {
-		// 			maxv = cv
-
-		// 			if maxvpd != nil {
-		// 				gameProp.Pool.posPool.Put(maxvpd)
-		// 			}
-
-		// 			maxvpd = npd
-		// 		} else {
-		// 			gameProp.Pool.posPool.Put(npd)
-		// 		}
-		// 	} else {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, maxvpd, isIgnoreEmpty)
+		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, tmppd, isIgnoreEmpty)
 		if cdv >= 0 {
-			// gameProp.Pool.posPool.Put(maxvpd)
+			// gameProp.posPool.Put(tmppd)
 
 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
 			} else {
-				gameProp.Pool.posPool.Put(cdpd)
+				gameProp.posPool.Put(cdpd)
 			}
-			// 	} else {
-			// 		maxv = cv
-
-			// 		if maxvpd != nil {
-			// 			gameProp.Pool.posPool.Put(maxvpd)
-			// 		}
-
-			// 		maxvpd = npd
-			// 	}
-			// }
 		}
 	}
+
+	gameProp.posPool.Put(tmppd)
 
 	if maxv >= 0 {
 		return maxv, maxvpd
@@ -679,7 +614,7 @@ func (cpt *CollectorPayTrigger) findPathDeep(gameProp *GameProperty, gs *sgc7gam
 
 // 找到一条路径,返回该路径上的最大价值以及路径数组,找到第一个大于普通符号的位置就返回
 func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.GameScene, mainSymbol int, x, y int, isIgnoreEmpty bool) (int, *PosData) {
-	pd := gameProp.Pool.posPool.Get()
+	pd := gameProp.posPool.Get()
 
 	pd.Add(x, y)
 
@@ -693,7 +628,7 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
@@ -708,7 +643,7 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
@@ -723,7 +658,7 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
@@ -738,7 +673,7 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 				maxv = cdv
 
 				if maxvpd != nil {
-					gameProp.Pool.posPool.Put(maxvpd)
+					gameProp.posPool.Put(maxvpd)
 				}
 
 				maxvpd = cdpd
@@ -746,7 +681,7 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 		}
 	}
 
-	gameProp.Pool.posPool.Put(pd)
+	gameProp.posPool.Put(pd)
 
 	return maxv, maxvpd
 }
@@ -804,7 +739,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 
 							ngs.Arr[ex][ey] = mainSymbol
 
-							gameProp.Pool.posPool.Put(pd)
+							gameProp.posPool.Put(pd)
 
 							cpt.AddScene(gameProp, curpr, ngs, bcd)
 							cpt.AddResult(curpr, ret, bcd)

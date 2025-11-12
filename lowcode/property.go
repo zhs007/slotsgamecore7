@@ -75,6 +75,7 @@ type GameProperty struct {
 	featureLevel                     IFeatureLevel
 	lstNeedOnStepEndStats2Components []string
 	MapSPGridStack                   map[string]*SPGridStack
+	posPool                          *PosPool
 }
 
 func (gameProp *GameProperty) GetBetMul() int {

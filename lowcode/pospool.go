@@ -1,8 +1,6 @@
 package lowcode
 
 import (
-	"sync"
-
 	"github.com/zhs007/goutils"
 )
 
@@ -19,29 +17,40 @@ func (pd *PosData) Has(x, y int) bool {
 }
 
 type PosPool struct {
-	pool sync.Pool
+	pool []*PosData
 	size int
 }
 
 func NewPosPool(size int) *PosPool {
-	return &PosPool{
-		pool: sync.Pool{
-			New: func() any {
-				return &PosData{
-					pos: make([]int, 0, size),
-				}
-			},
-		},
+	pp := &PosPool{
+		pool: make([]*PosData, 128),
 		size: size,
 	}
+
+	for i := 0; i < 128; i++ {
+		pp.pool[i] = &PosData{
+			pos: make([]int, 0, size),
+		}
+	}
+
+	return pp
 }
 
 func (pp *PosPool) Get() *PosData {
-	return pp.pool.Get().(*PosData)
+	if len(pp.pool) == 0 {
+		return &PosData{
+			pos: make([]int, 0, pp.size),
+		}
+	}
+
+	pd := pp.pool[len(pp.pool)-1]
+	pp.pool = pp.pool[:len(pp.pool)-1]
+
+	return pd
 }
 
 func (pp *PosPool) Clone(pd *PosData) *PosData {
-	npd := pp.pool.Get().(*PosData)
+	npd := pp.Get()
 
 	npd.pos = append(npd.pos, pd.pos...)
 
@@ -51,5 +60,5 @@ func (pp *PosPool) Clone(pd *PosData) *PosData {
 func (pp *PosPool) Put(pd *PosData) {
 	pd.pos = pd.pos[:0]
 
-	pp.pool.Put(pd)
+	pp.pool = append(pp.pool, pd)
 }
