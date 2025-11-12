@@ -22,7 +22,6 @@ const AdjacentPayTriggerTypeName = "adjacentPayTrigger"
 
 type AdjacentPayTriggerData struct {
 	BasicComponentData
-	PosComponentData
 	NextComponent     string
 	SymbolNum         int
 	WildNum           int
@@ -49,10 +48,7 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) onNewStep() {
 	adjacentPayTriggerData.RespinNum = 0
 	adjacentPayTriggerData.Wins = 0
 	adjacentPayTriggerData.WinMulti = 1
-
-	if !gIsReleaseMode {
-		adjacentPayTriggerData.PosComponentData.Clear()
-	}
+	adjacentPayTriggerData.Pos = nil
 }
 
 // Clone
@@ -66,10 +62,6 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) Clone() IComponentData {
 		Wins:               adjacentPayTriggerData.Wins,
 		WinMulti:           adjacentPayTriggerData.WinMulti,
 		SymbolCodes:        slices.Clone(adjacentPayTriggerData.SymbolCodes),
-	}
-
-	if !gIsReleaseMode {
-		target.PosComponentData = adjacentPayTriggerData.PosComponentData.Clone()
 	}
 
 	return target
@@ -112,16 +104,6 @@ func (adjacentPayTriggerData *AdjacentPayTriggerData) GetValEx(key string, getTy
 	}
 
 	return 0, false
-}
-
-// GetPos -
-func (adjacentPayTriggerData *AdjacentPayTriggerData) GetPos() []int {
-	return adjacentPayTriggerData.Pos
-}
-
-// AddPos -
-func (adjacentPayTriggerData *AdjacentPayTriggerData) AddPos(x, y int) {
-	adjacentPayTriggerData.PosComponentData.Add(x, y)
 }
 
 func (adjacentPayTriggerData *AdjacentPayTriggerData) SetSymbolCodes(symbolCodes []int) {

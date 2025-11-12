@@ -21,6 +21,7 @@ message ComponentData {
     int32 output = 11;
     string strOutput = 12;
     map<string, UsedSPGridData> mapUsedSPGrid = 13;
+    repeated int32 pos = 14;
 }
 
 // BasicComponentData

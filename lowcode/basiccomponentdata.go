@@ -3,6 +3,7 @@ package lowcode
 import (
 	"slices"
 
+	"github.com/zhs007/goutils"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	"github.com/zhs007/slotsgamecore7/sgc7pb"
@@ -25,6 +26,7 @@ type BasicComponentData struct {
 	Output                int
 	StrOutput             string
 	MapUsedSPGric         map[string][]int
+	Pos                   []int
 }
 
 // Clone
@@ -39,6 +41,7 @@ func (basicComponentData *BasicComponentData) CloneBasicComponentData() BasicCom
 		Output:                basicComponentData.Output,
 		StrOutput:             basicComponentData.StrOutput,
 		MapUsedSPGric:         make(map[string][]int),
+		Pos:                   slices.Clone(basicComponentData.Pos),
 	}
 
 	target.UsedScenes = make([]int, len(basicComponentData.UsedScenes))
@@ -175,6 +178,10 @@ func (basicComponentData *BasicComponentData) LoadPBComponentData(pb *sgc7pb.Com
 		}
 	}
 
+	for _, v := range pb.Pos {
+		basicComponentData.Pos = append(basicComponentData.Pos, int(v))
+	}
+
 	return nil
 }
 
@@ -220,6 +227,10 @@ func (basicComponentData *BasicComponentData) BuildPBBasicComponentData() *sgc7p
 		pbcd.MapUsedSPGrid[k] = usp
 	}
 
+	for _, v := range basicComponentData.Pos {
+		pbcd.Pos = append(pbcd.Pos, int32(v))
+	}
+
 	return pbcd
 }
 
@@ -250,20 +261,22 @@ func (basicComponentData *BasicComponentData) AddSymbol(symbolCode int) {
 
 // GetPos -
 func (basicComponentData *BasicComponentData) GetPos() []int {
-	return nil
+	return basicComponentData.Pos
 }
 
 // HasPos -
 func (basicComponentData *BasicComponentData) HasPos(x int, y int) bool {
-	return false
+	return goutils.IndexOfInt2Slice(basicComponentData.Pos, x, y, 0) >= 0
 }
 
 // AddPos -
 func (basicComponentData *BasicComponentData) AddPos(x int, y int) {
+	basicComponentData.Pos = append(basicComponentData.Pos, x, y)
 }
 
 // ClearPos -
 func (basicComponentData *BasicComponentData) ClearPos() {
+	basicComponentData.Pos = nil
 }
 
 // GetLastRespinNum -
@@ -335,4 +348,8 @@ func (basicComponentData *BasicComponentData) SetSymbolCodes(symbolCodes []int) 
 
 func (basicComponentData *BasicComponentData) GetSymbolCodes() []int {
 	return nil
+}
+
+func (basicComponentData *BasicComponentData) MergePosList(pos []int) {
+	basicComponentData.Pos = append(basicComponentData.Pos, pos...)
 }
