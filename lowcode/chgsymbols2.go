@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"slices"
@@ -79,6 +80,7 @@ const (
 	CS2TypeMysteryOnReels ChgSymbols2Type = 3
 	CS2TypeUpSymbol       ChgSymbols2Type = 4
 	CS2TypeEachPosRandom  ChgSymbols2Type = 5
+	CS2TypeSymbols        ChgSymbols2Type = 6
 )
 
 func parseChgSymbols2Type(str string) ChgSymbols2Type {
@@ -93,6 +95,8 @@ func parseChgSymbols2Type(str string) ChgSymbols2Type {
 		return CS2TypeUpSymbol
 	case "eachposrandom":
 		return CS2TypeEachPosRandom
+	case "symbols":
+		return CS2TypeSymbols
 	}
 
 	return CS2TypeSymbol
@@ -222,6 +226,8 @@ type ChgSymbols2Config struct {
 	SrcSymbolWeightVW2    *sgc7game.ValWeights2       `yaml:"-" json:"-"`
 	Symbol                string                      `yaml:"symbol" json:"symbol"`
 	SymbolCode            int                         `yaml:"-" json:"-"`
+	Symbols               []string                    `yaml:"symbols" json:"symbols"`
+	SymbolCodes           []int                       `yaml:"-" json:"-"`
 	MaxNumber             int                         `yaml:"maxNumber" json:"maxNumber"`
 	RowMask               string                      `yaml:"rowMask" json:"rowMask"`
 	MapControllers        map[string][]*Award         `yaml:"controllers" json:"controllers"`
@@ -292,6 +298,8 @@ func (chgSymbols2 *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 			goutils.Error("ChgSymbols2.InitEx:Symbol",
 				slog.String("symbol", s),
 				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
 		}
 
 		chgSymbols2.Config.SrcSymbolCodes = append(chgSymbols2.Config.SrcSymbolCodes, sc)
@@ -335,6 +343,19 @@ func (chgSymbols2 *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 
 		chgSymbols2.Config.WeightVW2 = vw2
+	}
+
+	for _, s := range chgSymbols2.Config.Symbols {
+		sc, isok := pool.DefaultPaytables.MapSymbols[s]
+		if !isok {
+			goutils.Error("ChgSymbols2.InitEx:Symbols",
+				slog.String("symbol", s),
+				goutils.Err(ErrInvalidSymbol))
+
+			return ErrInvalidSymbol
+		}
+
+		chgSymbols2.Config.SymbolCodes = append(chgSymbols2.Config.SymbolCodes, sc)
 	}
 
 	for _, ctrls := range chgSymbols2.Config.MapControllers {
@@ -734,6 +755,27 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 
 			return nc, ErrComponentDoNothing
 		}
+	case CS2TypeSymbols:
+		ngs, err := chgSymbols2.procSymbolsWithPos(gameProp, plugin, gs, pos, chgSymbols2.Config.SymbolCodes, cd)
+		if err != nil {
+			goutils.Error("ChgSymbols2.procPos:procSymbolsWithPos",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		if ngs != gs {
+			chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+			for _, symbolCode := range chgSymbols2.Config.SymbolCodes {
+				chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
+					gameProp.Pool.DefaultPaytables.GetStringFromInt(symbolCode))
+			}
+		} else {
+			nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
 	}
 
 	chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
@@ -771,6 +813,36 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 
 			cd.AddPos(x, y)
 		}
+	}
+
+	return ngs, nil
+}
+
+// procSymbolsWithPos
+func (chgSymbols2 *ChgSymbols2) procSymbolsWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, symbolCodes []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+	ngs := gs.CloneEx(gameProp.PoolScene)
+
+	for _, v := range symbolCodes {
+		cr, err := plugin.Random(context.Background(), len(pos)/2)
+		if err != nil {
+			goutils.Error("ChgSymbols2.procSymbolsWithPos:Random",
+				goutils.Err(err))
+
+			return nil, err
+		}
+
+		ngs.Arr[pos[cr*2]][pos[cr*2+1]] = v
+
+		cd.AddPos(pos[cr*2], pos[cr*2+1])
+
+		if len(pos) <= 2 {
+			goutils.Error("ChgSymbols2.procSymbolsWithPos",
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, ErrInvalidComponentConfig
+		}
+
+		pos = append(pos[:cr*2], pos[cr*2+2:]...)
 	}
 
 	return ngs, nil
@@ -951,6 +1023,7 @@ type jsonChgSymbols2 struct {
 	SrcPositionCollection []string `json:"srcPositionCollection"`
 	SrcSymbolWeight       string   `json:"srcSymbolWeight"`
 	Symbol                string   `json:"symbol"`
+	Symbols               []string `json:"symbols"`
 	MaxNumber             int      `json:"maxNumber"`
 	SrcRowMask            string   `json:"srcRowMask"`
 	SrcMask               string   `json:"srcMask"`
