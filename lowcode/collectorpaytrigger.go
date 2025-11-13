@@ -376,6 +376,14 @@ func (cpt *CollectorPayTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+// OnProcControllers -
+func (cpt *CollectorPayTrigger) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	awards, isok := cpt.Config.MapControllers[strVal]
+	if isok {
+		gameProp.procAwards(plugin, awards, curpr, gp)
+	}
+}
+
 func (cpt *CollectorPayTrigger) calcSymbolCodeValue(symbol int, mainSymbol int) int {
 	v, isok := cpt.Config.mapSymbolValues[symbol]
 	if isok {
@@ -701,6 +709,9 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	bcd := icd.(*BasicComponentData)
+	bcd.UsedScenes = nil
+	bcd.UsedResults = nil
+
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
@@ -713,6 +724,10 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	}
 
 	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), bcd)
+
+	if len(bcd.UsedResults) > 0 {
+		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
+	}
 
 	nc := cpt.onStepEnd(gameProp, curpr, gp, "")
 
@@ -880,7 +895,7 @@ func (j *jsonCollectorPayTrigger) build() *CollectorPayTriggerConfig {
 }
 
 func parseCollectorPayTrigger(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseCollectorPayTrigger:getConfigInCell",
 			goutils.Err(err))
@@ -907,6 +922,18 @@ func parseCollectorPayTrigger(gamecfg *BetConfig, cell *ast.Node) (string, error
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
+		if err != nil {
+			goutils.Error("parseDropDownSymbols2:parseAllAndStrMapControllers2",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.MapControllers = mapAwards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
