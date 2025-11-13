@@ -633,7 +633,6 @@ func (gameProp *GameProperty) procAwards(plugin sgc7plugin.IPlugin, awards []*Aw
 func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
 	switch award.Type {
 	case AwardSetComponentConfigVal:
-		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.StrParams[1])
 		if err != nil {
 			goutils.Error("GameProperty.RunController:AwardSetComponentConfigVal:SetComponentConfigVal",
@@ -642,7 +641,6 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 			return
 		}
 	case AwardSetComponentConfigIntVal:
-		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, val int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
@@ -681,7 +679,7 @@ func (gameProp *GameProperty) RunController(award *Award, plugin sgc7plugin.IPlu
 			return
 		}
 	case AwardChgComponentConfigIntVal:
-		gameProp.UseComponent(award.StrParams[0])
+
 		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, off int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
@@ -787,7 +785,6 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	case AwardSetComponentConfigVal:
-		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.SetComponentConfigVal(award.StrParams[0], award.GetStringVal(gameProp, 0))
 		if err != nil {
 			goutils.Error("GameProperty.procAward:AwardSetComponentConfigVal:SetComponentConfigVal",
@@ -796,7 +793,6 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	case AwardSetComponentConfigIntVal:
-		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.SetComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, val int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, award.GetVal(gameProp, 0))
@@ -836,7 +832,6 @@ func (gameProp *GameProperty) procAward(plugin sgc7plugin.IPlugin, award *Award,
 			return
 		}
 	case AwardChgComponentConfigIntVal:
-		gameProp.UseComponent(award.StrParams[0])
 		err := gameProp.ChgComponentConfigIntVal(award.StrParams[0], award.GetVal(gameProp, 0), func(componentName string, valName string, off int) bool {
 			if valName == CCVLastTriggerNum {
 				err := gameProp.Pool.PushTrigger(gameProp, plugin, curpr, gp, componentName, 0)
