@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -34,16 +35,19 @@ func parseDropDownSymbols2Type(strType string) DropDownSymbols2Type {
 
 // DropDownSymbols2Config - configuration for DropDownSymbols2
 type DropDownSymbols2Config struct {
-	BasicComponentConfig `yaml:",inline" json:",inline"`
-	HoldSymbols          []string             `yaml:"holdSymbols" json:"holdSymbols"`                   // 不需要下落的symbol
-	HoldSymbolCodes      []int                `yaml:"-" json:"-"`                                       // 不需要下落的symbol
-	IsNeedProcSymbolVals bool                 `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
-	EmptySymbolVal       int                  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
-	StrType              string               `yaml:"type" json:"type"`                                 // 类型
-	Type                 DropDownSymbols2Type `yaml:"-" json:"-"`                                       // 类型
-	RowMask              string               `yaml:"rowMask" json:"rowMask"`                           // rowMask
-	OutputToComponent    string               `yaml:"outputToComponent" json:"outputToComponent"`       // outputToComponent
-	MapAwards            map[string][]*Award  `yaml:"controllers" json:"controllers"`
+	BasicComponentConfig    `yaml:",inline" json:",inline"`
+	HoldSymbols             []string             `yaml:"holdSymbols" json:"holdSymbols"`                   // 不需要下落的symbol
+	HoldSymbolCodes         []int                `yaml:"-" json:"-"`                                       // 不需要下落的symbol
+	IsNeedProcSymbolVals    bool                 `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
+	EmptySymbolVal          int                  `yaml:"emptySymbolVal" json:"emptySymbolVal"`             // 空的symbolVal是什么
+	StrType                 string               `yaml:"type" json:"type"`                                 // 类型
+	Type                    DropDownSymbols2Type `yaml:"-" json:"-"`                                       // 类型
+	RowMask                 string               `yaml:"rowMask" json:"rowMask"`                           // rowMask
+	bottomSymbolCodes       []int                `yaml:"-" json:"-"`                                       // sp trigger
+	leftSymbolCodes         []int                `yaml:"-" json:"-"`                                       // sp trigger
+	leftOrBottomSymbolCodes []int                `yaml:"-" json:"-"`                                       // sp trigger
+	OutputToComponent       string               `yaml:"outputToComponent" json:"outputToComponent"`       // outputToComponent
+	MapAwards               map[string][]*Award  `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -97,6 +101,24 @@ func (dropDownSymbols *DropDownSymbols2) InitEx(cfg any, pool *GamePropertyPool)
 	for _, awards := range dropDownSymbols.Config.MapAwards {
 		for _, award := range awards {
 			award.Init()
+		}
+	}
+
+	for k, v := range pool.DefaultPaytables.MapSymbols {
+		str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", k)
+		str1 := fmt.Sprintf("<%v-AtBottom>", k)
+		str2 := fmt.Sprintf("<%v-AtLeft>", k)
+
+		if dropDownSymbols.Config.MapAwards[str0] != nil {
+			dropDownSymbols.Config.leftOrBottomSymbolCodes = append(dropDownSymbols.Config.leftOrBottomSymbolCodes, v)
+		}
+
+		if dropDownSymbols.Config.MapAwards[str1] != nil {
+			dropDownSymbols.Config.bottomSymbolCodes = append(dropDownSymbols.Config.bottomSymbolCodes, v)
+		}
+
+		if dropDownSymbols.Config.MapAwards[str2] != nil {
+			dropDownSymbols.Config.leftSymbolCodes = append(dropDownSymbols.Config.leftSymbolCodes, v)
 		}
 	}
 
@@ -255,6 +277,49 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggeredWithOS(ngs *sgc7gam
 	}
 
 	return nil
+}
+
+func (dropDownSymbols *DropDownSymbols2) procSPController(gameProp *GameProperty, gs *sgc7game.GameScene, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
+	if len(dropDownSymbols.Config.bottomSymbolCodes) == 0 && len(dropDownSymbols.Config.leftSymbolCodes) == 0 && len(dropDownSymbols.Config.leftOrBottomSymbolCodes) == 0 {
+		return
+	}
+
+	if len(dropDownSymbols.Config.bottomSymbolCodes) > 0 || len(dropDownSymbols.Config.leftOrBottomSymbolCodes) > 0 {
+		y := gs.Height - 1
+
+		for x := 0; x < gs.Width; x++ {
+			if goutils.IndexOfIntSlice(dropDownSymbols.Config.bottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
+				str1 := fmt.Sprintf("<%v-AtBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
+
+				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str1)
+			}
+
+			if goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
+				str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
+
+				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str0)
+			}
+		}
+	}
+
+	if len(dropDownSymbols.Config.leftSymbolCodes) > 0 || len(dropDownSymbols.Config.leftOrBottomSymbolCodes) > 0 {
+		x := 0
+
+		for y := gs.Height - 1; y >= 0; y-- {
+			if goutils.IndexOfIntSlice(dropDownSymbols.Config.leftSymbolCodes, gs.Arr[x][y], 0) >= 0 {
+				str2 := fmt.Sprintf("<%v-AtLeft>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
+
+				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str2)
+			}
+
+			if goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
+				str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
+
+				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str0)
+			}
+		}
+	}
+
 }
 
 func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProperty, gs *sgc7game.GameScene) (bool, *sgc7game.GameScene, error) {
@@ -766,6 +831,8 @@ func (dropDownSymbols *DropDownSymbols2) OnPlayGame(gameProp *GameProperty, curp
 			}
 
 			if ngs != gs {
+				dropDownSymbols.procSPController(gameProp, ngs, plugin, curpr, gp)
+
 				dropDownSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
 				if istrigger {
