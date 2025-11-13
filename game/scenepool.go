@@ -1,6 +1,8 @@
 package sgc7game
 
 import (
+	"slices"
+
 	"github.com/zhs007/goutils"
 )
 
@@ -12,6 +14,11 @@ type gameScenePool struct {
 }
 
 func (pool *gameScenePool) put(gs *GameScene) {
+	if slices.Contains(pool.Pools, gs) {
+		goutils.Error("gameScenePool.put:already in pool")
+		return
+	}
+
 	pool.Pools = append(pool.Pools, gs)
 }
 

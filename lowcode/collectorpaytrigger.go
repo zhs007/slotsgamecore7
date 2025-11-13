@@ -484,80 +484,52 @@ func (cpt *CollectorPayTrigger) findPathDeep(gameProp *GameProperty, gs *sgc7gam
 	if y < gs.Height-1 {
 		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, tmppd, isIgnoreEmpty)
 		if cdv >= 0 {
-			// gameProp.posPool.Put(tmppd)
-
 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
 				maxv = cdv
 
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
-				}
-
 				maxvpd = cdpd
-			} else {
-				gameProp.posPool.Put(cdpd)
 			}
 		}
 	}
 
 	if y > 0 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, tmppd, isIgnoreEmpty)
-		if cdv >= 0 {
-			// gameProp.posPool.Put(tmppd)
+		if maxvpd == nil || !maxvpd.Has(x, y-1) {
+			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, tmppd, isIgnoreEmpty)
+			if cdv >= 0 {
+				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+					maxv = cdv
 
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
-
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
+					maxvpd = cdpd
 				}
-
-				maxvpd = cdpd
-			} else {
-				gameProp.posPool.Put(cdpd)
 			}
 		}
 	}
 
 	if x > 0 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, tmppd, isIgnoreEmpty)
-		if cdv >= 0 {
-			// gameProp.posPool.Put(tmppd)
+		if maxvpd == nil || !maxvpd.Has(x-1, y) {
+			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, tmppd, isIgnoreEmpty)
+			if cdv >= 0 {
+				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+					maxv = cdv
 
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
-
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
+					maxvpd = cdpd
 				}
-
-				maxvpd = cdpd
-			} else {
-				gameProp.posPool.Put(cdpd)
 			}
 		}
 	}
 
 	if x < gs.Width-1 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, tmppd, isIgnoreEmpty)
-		if cdv >= 0 {
-			// gameProp.posPool.Put(tmppd)
+		if maxvpd == nil || !maxvpd.Has(x+1, y) {
+			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, tmppd, isIgnoreEmpty)
+			if cdv >= 0 {
+				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+					maxv = cdv
 
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
-
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
+					maxvpd = cdpd
 				}
-
-				maxvpd = cdpd
-			} else {
-				gameProp.posPool.Put(cdpd)
 			}
 		}
 	}
-
-	gameProp.posPool.Put(tmppd)
 
 	if maxv >= 0 {
 		return maxv, maxvpd
@@ -581,61 +553,49 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
 				maxv = cdv
 
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
-				}
-
 				maxvpd = cdpd
 			}
 		}
 	}
 
 	if y > 0 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
-		if cdv > 0 {
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
+		if maxvpd == nil || !maxvpd.Has(x, y-1) {
+			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
+			if cdv > 0 {
+				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+					maxv = cdv
 
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
+					maxvpd = cdpd
 				}
-
-				maxvpd = cdpd
 			}
 		}
 	}
 
 	if x < gs.Width-1 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
-		if cdv > 0 {
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
+		if maxvpd == nil || !maxvpd.Has(x+1, y) {
+			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
+			if cdv > 0 {
+				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+					maxv = cdv
 
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
+					maxvpd = cdpd
 				}
-
-				maxvpd = cdpd
 			}
 		}
 	}
 
 	if x > 0 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
-		if cdv > 0 {
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
+		if maxvpd == nil || !maxvpd.Has(x-1, y) {
+			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
+			if cdv > 0 {
+				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+					maxv = cdv
 
-				if maxvpd != nil {
-					gameProp.posPool.Put(maxvpd)
+					maxvpd = cdpd
 				}
-
-				maxvpd = cdpd
 			}
 		}
 	}
-
-	gameProp.posPool.Put(pd)
 
 	return maxv, maxvpd
 }
@@ -706,8 +666,6 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 
 							ngs.Arr[ex][ey] = mainSymbol
 
-							gameProp.posPool.Put(pd)
-
 							cpt.AddScene(gameProp, curpr, ngs, bcd)
 							cpt.AddResult(curpr, ret, bcd)
 
@@ -757,8 +715,6 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), bcd)
 
 	nc := cpt.onStepEnd(gameProp, curpr, gp, "")
-
-	gameProp.PoolScene.Put(ngs)
 
 	return nc, nil
 }

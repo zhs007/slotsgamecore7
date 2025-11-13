@@ -1173,6 +1173,7 @@ func (gameProp *GameProperty) onStepEnd(curBetMode int, gp *GameParams, pr *sgc7
 
 	if pr.IsFinish {
 		gameProp.PoolScene.Reset()
+		gameProp.posPool.Reset()
 	}
 }
 

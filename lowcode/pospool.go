@@ -18,6 +18,7 @@ func (pd *PosData) Has(x, y int) bool {
 
 type PosPool struct {
 	pool []*PosData
+	used []*PosData
 	size int
 }
 
@@ -38,13 +39,19 @@ func NewPosPool(size int) *PosPool {
 
 func (pp *PosPool) Get() *PosData {
 	if len(pp.pool) == 0 {
-		return &PosData{
+		pd := &PosData{
 			pos: make([]int, 0, pp.size),
 		}
+
+		pp.used = append(pp.used, pd)
+
+		return pd
 	}
 
 	pd := pp.pool[len(pp.pool)-1]
 	pp.pool = pp.pool[:len(pp.pool)-1]
+
+	pp.used = append(pp.used, pd)
 
 	return pd
 }
@@ -65,4 +72,13 @@ func (pp *PosPool) Put(pd *PosData) {
 	pd.pos = pd.pos[:0]
 
 	pp.pool = append(pp.pool, pd)
+}
+
+func (pp *PosPool) Reset() {
+	for _, pd := range pp.used {
+		pd.pos = pd.pos[:0]
+	}
+
+	pp.pool = append(pp.pool, pp.used...)
+	pp.used = pp.used[:0]
 }
