@@ -58,6 +58,10 @@ func (pp *PosPool) Clone(pd *PosData) *PosData {
 }
 
 func (pp *PosPool) Put(pd *PosData) {
+	if pd == nil {
+		return
+	}
+
 	pd.pos = pd.pos[:0]
 
 	pp.pool = append(pp.pool, pd)

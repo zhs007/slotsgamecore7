@@ -319,16 +319,16 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 		isRoll := false
 
 		for x := 1; x < ngs.Width; x++ {
-			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
-				if ngs.Arr[x][y] == -1 {
-					break
-				}
+			if x%2 == 1 {
+				for y := len(ngs.Arr[x]) - 1; y >= 0; y-- {
+					if ngs.Arr[x][y] == -1 {
+						break
+					}
 
-				if !maskarr[y] {
-					continue
-				}
+					if !maskarr[y] {
+						continue
+					}
 
-				if x%2 == 1 {
 					if ngs.Arr[x-1][y] == -1 {
 						if ngs == gs {
 							ngs = gs.CloneEx(gameProp.PoolScene)
@@ -354,7 +354,18 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 							ngs.Arr[x][ty] = -1
 						}
 					}
-				} else {
+
+				}
+			} else {
+				for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+					if ngs.Arr[x][y] == -1 {
+						break
+					}
+
+					if !maskarr[y] {
+						continue
+					}
+
 					if ngs.Arr[x-1][y+1] == -1 {
 						if ngs == gs {
 							ngs = gs.CloneEx(gameProp.PoolScene)
@@ -380,6 +391,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 							ngs.Arr[x][ty] = -1
 						}
 					}
+
 				}
 			}
 		}
@@ -389,16 +401,16 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 		}
 
 		for x := ngs.Width - 2; x >= 0; x-- {
-			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
-				if ngs.Arr[x][y] == -1 {
-					break
-				}
+			if x%2 == 1 {
+				for y := len(ngs.Arr[x]) - 1; y >= 0; y-- {
+					if ngs.Arr[x][y] == -1 {
+						break
+					}
 
-				if !maskarr[y] {
-					continue
-				}
+					if !maskarr[y] {
+						continue
+					}
 
-				if x%2 == 1 {
 					if ngs.Arr[x+1][y] == -1 {
 						if ngs == gs {
 							ngs = gs.CloneEx(gameProp.PoolScene)
@@ -424,7 +436,18 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 							ngs.Arr[x][ty] = -1
 						}
 					}
-				} else {
+
+				}
+			} else {
+				for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+					if ngs.Arr[x][y] == -1 {
+						break
+					}
+
+					if !maskarr[y] {
+						continue
+					}
+
 					if ngs.Arr[x+1][y+1] == -1 {
 						if ngs == gs {
 							ngs = gs.CloneEx(gameProp.PoolScene)
@@ -450,6 +473,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 							ngs.Arr[x][ty] = -1
 						}
 					}
+
 				}
 			}
 		}
@@ -528,12 +552,12 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 	isRoll := false
 
 	for x := 1; x < ngs.Width; x++ {
-		for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
-			if ngs.Arr[x][y] == -1 {
-				break
-			}
+		if x%2 == 1 {
+			for y := len(ngs.Arr[x]) - 1; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					break
+				}
 
-			if x%2 == 1 {
 				if ngs.Arr[x-1][y] == -1 {
 					if ngs == gs {
 						ngs = gs.CloneEx(gameProp.PoolScene)
@@ -555,7 +579,14 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][ty] = -1
 					}
 				}
-			} else {
+
+			}
+		} else {
+			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					break
+				}
+
 				if ngs.Arr[x-1][y+1] == -1 {
 					if ngs == gs {
 						ngs = gs.CloneEx(gameProp.PoolScene)
@@ -577,6 +608,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][ty] = -1
 					}
 				}
+
 			}
 		}
 	}
@@ -586,12 +618,12 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 	}
 
 	for x := ngs.Width - 2; x >= 0; x-- {
-		for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
-			if ngs.Arr[x][y] == -1 {
-				break
-			}
+		if x%2 == 1 {
+			for y := len(ngs.Arr[x]) - 1; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					break
+				}
 
-			if x%2 == 1 {
 				if ngs.Arr[x+1][y] == -1 {
 					if ngs == gs {
 						ngs = gs.CloneEx(gameProp.PoolScene)
@@ -613,7 +645,14 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][ty] = -1
 					}
 				}
-			} else {
+
+			}
+		} else {
+			for y := len(ngs.Arr[x]) - 2; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					break
+				}
+
 				if ngs.Arr[x+1][y+1] == -1 {
 					if ngs == gs {
 						ngs = gs.CloneEx(gameProp.PoolScene)
@@ -635,6 +674,7 @@ func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProp
 						ngs.Arr[x][ty] = -1
 					}
 				}
+
 			}
 		}
 	}
