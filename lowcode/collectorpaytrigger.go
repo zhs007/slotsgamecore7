@@ -711,6 +711,7 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	bcd := icd.(*BasicComponentData)
 	bcd.UsedScenes = nil
 	bcd.UsedResults = nil
+	bcd.Pos = nil
 
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
 
