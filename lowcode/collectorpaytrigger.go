@@ -15,9 +15,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// CollectorPayTriggerTypeName is the component type name for the collector pay trigger.
 const CollectorPayTriggerTypeName = "collectorPayTrigger"
 
 // CollectorPayTriggerConfig - configuration for CollectorPayTrigger
+// CollectorPayTriggerConfig is the configuration for the CollectorPayTrigger component.
 type CollectorPayTriggerConfig struct {
 	BasicComponentConfig   `yaml:",inline" json:",inline"`
 	CategoryCount          int                 `yaml:"categoryCount" json:"categoryCount"`
@@ -55,6 +57,7 @@ type CollectorPayTriggerConfig struct {
 	MapControllers         map[string][]*Award `yaml:"mapControllers" json:"mapControllers"` // 新的奖励系统
 }
 
+// SetLinkComponent sets a link ("next" or "jump") to another component by name.
 func (cfg *CollectorPayTriggerConfig) SetLinkComponent(link string, componentName string) {
 	switch link {
 	case "next":
@@ -64,12 +67,14 @@ func (cfg *CollectorPayTriggerConfig) SetLinkComponent(link string, componentNam
 	}
 }
 
+// CollectorPayTrigger is the runtime component that implements collector pay trigger logic.
 type CollectorPayTrigger struct {
 	*BasicComponent `json:"-"`
 	Config          *CollectorPayTriggerConfig `json:"config"`
 }
 
 // Init - load from file
+// Init loads the component configuration from a YAML file and initializes the component.
 func (cpt *CollectorPayTrigger) Init(fn string, pool *GamePropertyPool) error {
 	data, err := os.ReadFile(fn)
 	if err != nil {
@@ -95,6 +100,7 @@ func (cpt *CollectorPayTrigger) Init(fn string, pool *GamePropertyPool) error {
 }
 
 // InitEx - initialize from config object
+// InitEx initializes the component from an in-memory config object (usually unmarshaled from YAML).
 func (cpt *CollectorPayTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	cpt.Config = cfg.(*CollectorPayTriggerConfig)
 	cpt.Config.ComponentType = CollectorPayTriggerTypeName
@@ -393,6 +399,10 @@ func (cpt *CollectorPayTrigger) calcTileValue(gs *sgc7game.GameScene, mainSymbol
 		return -1
 	}
 
+	if gs.Arr[x][y] == -3 {
+		return -1
+	}
+
 	if gs.Arr[x][y] == -2 {
 		return 0
 	}
@@ -407,62 +417,6 @@ func (cpt *CollectorPayTrigger) calcTileValue(gs *sgc7game.GameScene, mainSymbol
 
 	return cpt.calcSymbolCodeValue(gs.Arr[x][y], mainSymbol)
 }
-
-// // 计算当前位置周围4格的价值,可能会有深度搜索,所以pos是已经走过的位置,返回下一个位置的坐标和新的pos,这个pos会包含新的位置
-// func (cpt *CollectorPayTrigger) calcNextTile(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) (int, int) {
-
-// 	curv := -1
-// 	nx := -1
-// 	ny := -1
-
-// 	if y < gs.Height-1 {
-// 		cv := cpt.calcTileValue(gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
-// 		if cv > curv {
-// 			curv = cv
-
-// 			nx = x
-// 			ny = y + 1
-// 		}
-// 	}
-
-// 	if y > 0 {
-// 		cv := cpt.calcTileValue(gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
-// 		if cv > curv {
-// 			curv = cv
-
-// 			nx = x
-// 			ny = y - 1
-// 		}
-// 	}
-
-// 	if x > 0 {
-// 		cv := cpt.calcTileValue(gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
-// 		if cv > curv {
-// 			curv = cv
-
-// 			nx = x - 1
-// 			ny = y
-// 		}
-// 	}
-
-// 	if x < gs.Width-1 {
-// 		cv := cpt.calcTileValue(gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
-// 		if cv > curv {
-// 			curv = cv
-
-// 			nx = x + 1
-// 			ny = y
-// 		}
-// 	}
-
-// 	if curv == -1 {
-// 		return -1, -1
-// 	}
-
-// 	pd.Add(nx, ny)
-
-// 	return nx, ny
-// }
 
 func (cpt *CollectorPayTrigger) isCanEnding(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) bool {
 	if y < gs.Height-1 {
@@ -686,6 +640,16 @@ func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.Ga
 	return maxv, maxvpd
 }
 
+func (cpt *CollectorPayTrigger) rechgScene(gs *sgc7game.GameScene) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			if gs.Arr[x][y] < 0 {
+				gs.Arr[x][y] = -1
+			}
+		}
+	}
+}
+
 // procSymbolsWithPos
 func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, bet int, bcd *BasicComponentData) error {
 	ngs := gs
@@ -707,11 +671,14 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 								LineIndex: -1,
 							}
 
+							ngs1 := ngs.CloneEx(gameProp.PoolScene)
+							cpt.rechgScene(ngs)
+							ngs = ngs1
+
 							ngs.Arr[sx][sy] = -2
 
 							coreSymbol := -1
 
-							ngs = ngs.CloneEx(gameProp.PoolScene)
 							for i := 0; i < len(pd.pos); i += 2 {
 								tx := pd.pos[i]
 								ty := pd.pos[i+1]
@@ -765,28 +732,44 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 		}
 	}
 
+	cpt.rechgScene(ngs)
+
 	return nil
 }
 
 // OnPlayGame - check collector value and proc awards when reach threshold
+// OnPlayGame processes a play event for the component and returns the next component name (if any).
 func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	bcd := icd.(*BasicComponentData)
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
 
-	cpt.procCollect(gameProp, curpr, gs, int(stake.CashBet)/int(stake.CoinBet), bcd)
+	ngs := gs.CloneEx(gameProp.PoolScene)
+	for x := 0; x < ngs.Width; x++ {
+		for y := 0; y < ngs.Height; y++ {
+			if ngs.Arr[x][y] == -1 {
+				ngs.Arr[x][y] = -3
+			}
+		}
+	}
+
+	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), bcd)
 
 	nc := cpt.onStepEnd(gameProp, curpr, gp, "")
+
+	gameProp.PoolScene.Put(ngs)
 
 	return nc, nil
 }
 
 // OnAsciiGame - output to asciigame (no-op)
+// OnAsciiGame outputs the component state to an asciigame representation (no-op for this component).
 func (cpt *CollectorPayTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
 }
 
+// NewCollectorPayTrigger creates a new CollectorPayTrigger component instance.
 func NewCollectorPayTrigger(name string) IComponent {
 	return &CollectorPayTrigger{
 		BasicComponent: NewBasicComponent(name, 0),
