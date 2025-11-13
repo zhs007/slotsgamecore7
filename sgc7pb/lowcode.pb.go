@@ -81,6 +81,7 @@ type ComponentData struct {
 	Output          int32                      `protobuf:"varint,11,opt,name=output,proto3" json:"output,omitempty"`
 	StrOutput       string                     `protobuf:"bytes,12,opt,name=strOutput,proto3" json:"strOutput,omitempty"`
 	MapUsedSPGrid   map[string]*UsedSPGridData `protobuf:"bytes,13,rep,name=mapUsedSPGrid,proto3" json:"mapUsedSPGrid,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Pos             []int32                    `protobuf:"varint,14,rep,packed,name=pos,proto3" json:"pos,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -195,6 +196,13 @@ func (x *ComponentData) GetStrOutput() string {
 func (x *ComponentData) GetMapUsedSPGrid() map[string]*UsedSPGridData {
 	if x != nil {
 		return x.MapUsedSPGrid
+	}
+	return nil
+}
+
+func (x *ComponentData) GetPos() []int32 {
+	if x != nil {
+		return x.Pos
 	}
 	return nil
 }
@@ -4255,7 +4263,7 @@ const file_lowcode_proto_rawDesc = "" +
 	"\x0eUsedSPGridData\x12\x1e\n" +
 	"\n" +
 	"usedSPGrid\x18\x01 \x03(\x05R\n" +
-	"usedSPGrid\"\x95\x04\n" +
+	"usedSPGrid\"\xa7\x04\n" +
 	"\rComponentData\x12\x1e\n" +
 	"\n" +
 	"usedScenes\x18\x01 \x03(\x05R\n" +
@@ -4271,7 +4279,8 @@ const file_lowcode_proto_rawDesc = "" +
 	" \x03(\x05R\tsrcScenes\x12\x16\n" +
 	"\x06output\x18\v \x01(\x05R\x06output\x12\x1c\n" +
 	"\tstrOutput\x18\f \x01(\tR\tstrOutput\x12N\n" +
-	"\rmapUsedSPGrid\x18\r \x03(\v2(.sgc7pb.ComponentData.MapUsedSPGridEntryR\rmapUsedSPGrid\x1aX\n" +
+	"\rmapUsedSPGrid\x18\r \x03(\v2(.sgc7pb.ComponentData.MapUsedSPGridEntryR\rmapUsedSPGrid\x12\x10\n" +
+	"\x03pos\x18\x0e \x03(\x05R\x03pos\x1aX\n" +
 	"\x12MapUsedSPGridEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
 	"\x05value\x18\x02 \x01(\v2\x16.sgc7pb.UsedSPGridDataR\x05value:\x028\x01\"[\n" +

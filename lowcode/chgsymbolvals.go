@@ -90,7 +90,6 @@ func parseChgSymbolValsTargetType(strType string) ChgSymbolValsTargetType {
 
 type ChgSymbolValsData struct {
 	BasicComponentData
-	PosComponentData
 	targetVal int
 }
 
@@ -101,15 +100,14 @@ func (chgSymbolValsData *ChgSymbolValsData) OnNewGame(gameProp *GameProperty, co
 
 // onNewStep -
 func (chgSymbolValsData *ChgSymbolValsData) onNewStep() {
-	chgSymbolValsData.PosComponentData.Clear()
 	chgSymbolValsData.UsedOtherScenes = nil
+	chgSymbolValsData.Pos = nil
 }
 
 // Clone
 func (chgSymbolValsData *ChgSymbolValsData) Clone() IComponentData {
 	target := &ChgSymbolValsData{
 		BasicComponentData: chgSymbolValsData.CloneBasicComponentData(),
-		PosComponentData:   chgSymbolValsData.PosComponentData.Clone(),
 	}
 
 	return target
@@ -120,16 +118,6 @@ func (chgSymbolValsData *ChgSymbolValsData) BuildPBComponentData() proto.Message
 	return &sgc7pb.BasicComponentData{
 		BasicComponentData: chgSymbolValsData.BuildPBBasicComponentData(),
 	}
-}
-
-// GetPos -
-func (chgSymbolValsData *ChgSymbolValsData) GetPos() []int {
-	return chgSymbolValsData.Pos
-}
-
-// AddPos -
-func (chgSymbolValsData *ChgSymbolValsData) AddPos(x, y int) {
-	chgSymbolValsData.PosComponentData.Add(x, y)
 }
 
 // ChgSymbolValsConfig - configuration for ChgSymbolVals
