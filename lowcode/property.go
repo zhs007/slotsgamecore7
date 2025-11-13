@@ -283,6 +283,14 @@ func (gameProp *GameProperty) ProcRespin(pr *sgc7game.PlayResult, gp *GameParams
 		for _, v := range gameProp.usedComponent {
 			if goutils.IndexOfStringSlice(gp.HistoryComponents, v, 0) < 0 {
 				cd := gameProp.GetGlobalComponentDataWithName(v)
+				if cd == nil {
+					goutils.Error("GameProperty.ProcRespin:GetGlobalComponentDataWithName",
+						slog.String("component", v),
+						goutils.Err(ErrInvalidComponentData))
+
+					continue
+				}
+
 				gp.AddComponentData(v, cd)
 			}
 		}
