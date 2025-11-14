@@ -37,6 +37,8 @@ const (
 	CCVSPWeight                   string = "spweight"                   // 可以修改配置项里的 spweight
 	CCVGigaWeight                 string = "gigaweight"                 // 可以修改配置项里的 gigaweight
 	CCVMaskX                      string = "maskx"                      // 可以修改配置项里的 maskx
+	CCVNumberWeight               string = "numberweight"               // 可以修改配置项里的 numberweight
+	CCVSymbolWeight               string = "symbolweight"               // 可以修改配置项里的 symbolweight
 )
 
 const (

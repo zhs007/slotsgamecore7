@@ -116,4 +116,8 @@ type IComponentData interface {
 	SetSymbolCodes(symbolCodes []int)
 
 	GetSymbolCodes() []int
+
+	ClearSymbolCodes()
+
+	AddSymbolCodes(symbolCodes []int)
 }
