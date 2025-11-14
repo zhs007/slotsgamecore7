@@ -201,7 +201,7 @@ func (genSymbolCollection *GenSymbolCollection) OnPlayGame(gameProp *GamePropert
 			return "", err
 		}
 
-		icd.AddSymbolCodes([]int{cr.Int()})
+		isc.AddSymbolCodes([]int{cr.Int()})
 	}
 
 	nc := genSymbolCollection.onStepEnd(gameProp, curpr, gp, "")
