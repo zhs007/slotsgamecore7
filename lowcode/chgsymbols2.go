@@ -229,8 +229,7 @@ type ChgSymbols2Config struct {
 	SrcSymbolWeightVW2    *sgc7game.ValWeights2       `yaml:"-" json:"-"`
 	Symbol                string                      `yaml:"symbol" json:"symbol"`
 	SymbolCode            int                         `yaml:"-" json:"-"`
-	Symbols               []string                    `yaml:"symbols" json:"symbols"`
-	SymbolCodes           []int                       `yaml:"-" json:"-"`
+	SymbolCollection      string                      `json:"symbolCollection"`
 	MaxNumber             int                         `yaml:"maxNumber" json:"maxNumber"`
 	RowMask               string                      `yaml:"rowMask" json:"rowMask"`
 	MapControllers        map[string][]*Award         `yaml:"controllers" json:"controllers"`
@@ -346,19 +345,6 @@ func (chgSymbols2 *ChgSymbols2) InitEx(cfg any, pool *GamePropertyPool) error {
 		}
 
 		chgSymbols2.Config.WeightVW2 = vw2
-	}
-
-	for _, s := range chgSymbols2.Config.Symbols {
-		sc, isok := pool.DefaultPaytables.MapSymbols[s]
-		if !isok {
-			goutils.Error("ChgSymbols2.InitEx:Symbols",
-				slog.String("symbol", s),
-				goutils.Err(ErrInvalidSymbol))
-
-			return ErrInvalidSymbol
-		}
-
-		chgSymbols2.Config.SymbolCodes = append(chgSymbols2.Config.SymbolCodes, sc)
 	}
 
 	for _, ctrls := range chgSymbols2.Config.MapControllers {
@@ -772,7 +758,20 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 			return nc, ErrComponentDoNothing
 		}
 	case CS2TypeSymbols:
-		ngs, err := chgSymbols2.procSymbolsWithPos(gameProp, plugin, gs, pos, chgSymbols2.Config.SymbolCodes, cd)
+		if chgSymbols2.Config.SymbolCollection == "" {
+			goutils.Error("ChgSymbols2.procPos:SymbolCollection is empty",
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return "", ErrInvalidComponentConfig
+		}
+
+		var symbolcodes []int
+		isc := gameProp.GetComponentDataWithName(chgSymbols2.Config.SymbolCollection)
+		if isc != nil {
+			symbolcodes = isc.GetSymbolCodes()
+		}
+
+		ngs, err := chgSymbols2.procSymbolsWithPos(gameProp, plugin, gs, pos, symbolcodes, cd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolsWithPos",
 				goutils.Err(err))
@@ -783,7 +782,7 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 		if ngs != gs {
 			chgSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-			for _, symbolCode := range chgSymbols2.Config.SymbolCodes {
+			for _, symbolCode := range symbolcodes {
 				chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
 					gameProp.Pool.DefaultPaytables.GetStringFromInt(symbolCode))
 			}
@@ -1026,6 +1025,7 @@ func NewChgSymbols2(name string) IComponent {
 // "blankSymbol": "BN"
 // "srcRowMask": "mask-left"
 // "rowMask": "mask-height4"
+// "symbolCollection": "bg-allms"
 type jsonChgSymbols2 struct {
 	StrSrcType            string   `json:"srcType"`
 	StrSrcSymbolType      string   `json:"srcSymbolType"`
@@ -1039,7 +1039,7 @@ type jsonChgSymbols2 struct {
 	SrcPositionCollection []string `json:"srcPositionCollection"`
 	SrcSymbolWeight       string   `json:"srcSymbolWeight"`
 	Symbol                string   `json:"symbol"`
-	Symbols               []string `json:"symbols"`
+	SymbolCollection      string   `json:"symbolCollection"`
 	MaxNumber             int      `json:"maxNumber"`
 	SrcRowMask            string   `json:"srcRowMask"`
 	SrcMask               string   `json:"srcMask"`
@@ -1064,7 +1064,7 @@ func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
 		Symbol:                jcfg.Symbol,
 		MaxNumber:             jcfg.MaxNumber,
 		RowMask:               jcfg.RowMask,
-		Symbols:               slices.Clone(jcfg.Symbols),
+		SymbolCollection:      jcfg.SymbolCollection,
 	}
 
 	return cfg

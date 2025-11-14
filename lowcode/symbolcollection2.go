@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -64,6 +65,11 @@ func (symbolCollection2Data *SymbolCollection2Data) BuildPBComponentData() proto
 
 // GetSymbols -
 func (symbolCollection2Data *SymbolCollection2Data) GetSymbols() []int {
+	return symbolCollection2Data.SymbolCodes
+}
+
+// GetSymbolCodes -
+func (symbolCollection2Data *SymbolCollection2Data) GetSymbolCodes() []int {
 	return symbolCollection2Data.SymbolCodes
 }
 
@@ -287,13 +293,23 @@ func NewSymbolCollection2(name string) IComponent {
 	}
 }
 
-// "configuration": {
-// },
+// "maxSymbolNum": 0,
+// "initSymbols": [
+//
+//	"RP",
+//	"PP",
+//	"GP",
+//	"BP"
+//
+// ]
 type jsonSymbolCollection2 struct {
+	InitSymbols []string `json:"initSymbols"`
 }
 
 func (jr *jsonSymbolCollection2) build() *SymbolCollection2Config {
-	cfg := &SymbolCollection2Config{}
+	cfg := &SymbolCollection2Config{
+		InitSymbols: slices.Clone(jr.InitSymbols),
+	}
 
 	return cfg
 }
