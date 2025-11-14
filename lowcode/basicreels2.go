@@ -154,7 +154,7 @@ func (basicReels2 *BasicReels2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		maskx := basicReels2.getMaskX(gameProp, bcd)
 
 		if maskx != "" {
-			imaskd := gameProp.GetComponentDataWithName(basicReels2.Config.MaskX)
+			imaskd := gameProp.GetComponentDataWithName(maskx)
 			if imaskd != nil {
 				arr := imaskd.GetMask()
 				if len(arr) != sc.Width {

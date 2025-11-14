@@ -365,6 +365,8 @@ func (gs *GameScene) RandReelsWithReelDataMaskAndHeight(reels *ReelsData, height
 				gs.Arr[x][y] = -1
 			}
 
+			gs.Indexes = append(gs.Indexes, -1)
+
 			continue
 		}
 
