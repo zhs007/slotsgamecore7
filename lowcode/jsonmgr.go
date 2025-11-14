@@ -98,6 +98,7 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(WinResultModifierExTypeName), parseWinResultModifierEx)
 	gJsonMgr.RegLoadComponent(strings.ToLower(RandomMoveSymbolsTypeName), parseRandomMoveSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenPositionCollectionTypeName), parseGenPositionCollection)
+	gJsonMgr.RegLoadComponent(strings.ToLower(GenSymbolCollectionTypeName), parseGenSymbolCollection)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenSPGridTypeName), parseGenSPGrid)
 	gJsonMgr.RegLoadComponent(strings.ToLower(InitTropiCoolSPGridTypeName), parseInitTropiCoolSPGrid)
 	gJsonMgr.RegLoadComponent(strings.ToLower(FeatureBarTypeName), parseFeatureBar)

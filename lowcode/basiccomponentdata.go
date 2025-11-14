@@ -346,8 +346,16 @@ func (basicComponentData *BasicComponentData) SetSymbolCodes(symbolCodes []int) 
 
 }
 
+func (basicComponentData *BasicComponentData) AddSymbolCodes(symbolCodes []int) {
+
+}
+
 func (basicComponentData *BasicComponentData) GetSymbolCodes() []int {
 	return nil
+}
+
+func (basicComponentData *BasicComponentData) ClearSymbolCodes() {
+
 }
 
 func (basicComponentData *BasicComponentData) MergePosList(pos []int) {

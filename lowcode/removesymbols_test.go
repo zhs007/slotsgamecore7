@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	"github.com/zhs007/slotsgamecore7/asciigame"
+	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
 	stats2 "github.com/zhs007/slotsgamecore7/stats2"
 	"google.golang.org/protobuf/proto"
@@ -13,121 +13,161 @@ import (
 )
 
 // rsFake component and component data to provide positions via GetPos
-type rsFakeCD struct{
-	pos []int
+type rsFakeCD struct {
+	pos     []int
 	results []int
 }
 
 func (f *rsFakeCD) OnNewGame(gameProp *GameProperty, component IComponent) {}
-func (f *rsFakeCD) BuildPBComponentData() proto.Message { return nil }
-func (f *rsFakeCD) Clone() IComponentData { return &rsFakeCD{pos: append([]int{}, f.pos...), results: append([]int{}, f.results...)} }
+func (f *rsFakeCD) BuildPBComponentData() proto.Message                    { return nil }
+func (f *rsFakeCD) Clone() IComponentData {
+	return &rsFakeCD{pos: append([]int{}, f.pos...), results: append([]int{}, f.results...)}
+}
 func (f *rsFakeCD) GetValEx(key string, getType GetComponentValType) (int, bool) { return 0, false }
-func (f *rsFakeCD) GetStrVal(key string) (string, bool) { return "", false }
-func (f *rsFakeCD) GetConfigVal(key string) string { return "" }
-func (f *rsFakeCD) SetConfigVal(key string, val string) {}
-func (f *rsFakeCD) GetConfigIntVal(key string) (int, bool) { return 0, false }
-func (f *rsFakeCD) SetConfigIntVal(key string, val int) {}
-func (f *rsFakeCD) ChgConfigIntVal(key string, off int) int { return 0 }
-func (f *rsFakeCD) ClearConfigIntVal(key string) {}
-func (f *rsFakeCD) GetResults() []int { return f.results }
-func (f *rsFakeCD) GetOutput() int { return 0 }
-func (f *rsFakeCD) GetStringOutput() string { return "" }
-func (f *rsFakeCD) GetSymbols() []int { return nil }
-func (f *rsFakeCD) AddSymbol(symbolCode int) {}
-func (f *rsFakeCD) GetPos() []int { return f.pos }
-func (f *rsFakeCD) HasPos(x int, y int) bool { return false }
-func (f *rsFakeCD) AddPos(x int, y int) {}
-func (f *rsFakeCD) ClearPos() {}
-func (f *rsFakeCD) GetLastRespinNum() int { return 0 }
-func (f *rsFakeCD) GetCurRespinNum() int { return 0 }
-func (f *rsFakeCD) IsRespinEnding() bool { return false }
-func (f *rsFakeCD) IsRespinStarted() bool { return false }
-func (f *rsFakeCD) AddTriggerRespinAward(award *Award) {}
-func (f *rsFakeCD) AddRespinTimes(num int) {}
-func (f *rsFakeCD) TriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {}
-func (f *rsFakeCD) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {}
-func (f *rsFakeCD) GetMask() []bool { return nil }
+func (f *rsFakeCD) GetStrVal(key string) (string, bool)                          { return "", false }
+func (f *rsFakeCD) GetConfigVal(key string) string                               { return "" }
+func (f *rsFakeCD) SetConfigVal(key string, val string)                          {}
+func (f *rsFakeCD) GetConfigIntVal(key string) (int, bool)                       { return 0, false }
+func (f *rsFakeCD) SetConfigIntVal(key string, val int)                          {}
+func (f *rsFakeCD) ChgConfigIntVal(key string, off int) int                      { return 0 }
+func (f *rsFakeCD) ClearConfigIntVal(key string)                                 {}
+func (f *rsFakeCD) GetResults() []int                                            { return f.results }
+func (f *rsFakeCD) GetOutput() int                                               { return 0 }
+func (f *rsFakeCD) GetStringOutput() string                                      { return "" }
+func (f *rsFakeCD) GetSymbols() []int                                            { return nil }
+func (f *rsFakeCD) AddSymbol(symbolCode int)                                     {}
+func (f *rsFakeCD) GetPos() []int                                                { return f.pos }
+func (f *rsFakeCD) HasPos(x int, y int) bool                                     { return false }
+func (f *rsFakeCD) AddPos(x int, y int)                                          {}
+func (f *rsFakeCD) ClearPos()                                                    {}
+func (f *rsFakeCD) GetLastRespinNum() int                                        { return 0 }
+func (f *rsFakeCD) GetCurRespinNum() int                                         { return 0 }
+func (f *rsFakeCD) IsRespinEnding() bool                                         { return false }
+func (f *rsFakeCD) IsRespinStarted() bool                                        { return false }
+func (f *rsFakeCD) AddTriggerRespinAward(award *Award)                           {}
+func (f *rsFakeCD) AddRespinTimes(num int)                                       {}
+func (f *rsFakeCD) TriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
+}
+func (f *rsFakeCD) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
+}
+func (f *rsFakeCD) GetMask() []bool                    { return nil }
 func (f *rsFakeCD) ChgMask(curMask int, val bool) bool { return false }
-func (f *rsFakeCD) PutInMoney(coins int) {}
-func (f *rsFakeCD) ChgReelsCollector(reelsData []int) {}
-func (f *rsFakeCD) SetSymbolCodes(symbolCodes []int) {}
-func (f *rsFakeCD) GetSymbolCodes() []int { return nil }
+func (f *rsFakeCD) PutInMoney(coins int)               {}
+func (f *rsFakeCD) ChgReelsCollector(reelsData []int)  {}
+func (f *rsFakeCD) SetSymbolCodes(symbolCodes []int)   {}
+func (f *rsFakeCD) GetSymbolCodes() []int              { return nil }
+func (f *rsFakeCD) AddSymbolCodes(symbolCodes []int)   {}
+func (f *rsFakeCD) ClearSymbolCodes()                  {}
 
-type rsFakeComp struct{ name string; pos []int; results []int }
+type rsFakeComp struct {
+	name    string
+	pos     []int
+	results []int
+}
+
 func (f *rsFakeComp) Init(fn string, pool *GamePropertyPool) error { return nil }
 func (f *rsFakeComp) InitEx(cfg any, pool *GamePropertyPool) error { return nil }
 func (f *rsFakeComp) OnGameInited(components *ComponentList) error { return nil }
 func (f *rsFakeComp) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) { return "", nil }
-func (f *rsFakeComp) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error { return nil }
-func (f *rsFakeComp) NewComponentData() IComponentData { return &rsFakeCD{pos: append([]int{}, f.pos...), results: append([]int{}, f.results...)} }
-func (f *rsFakeComp) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {}
-func (f *rsFakeComp) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, canRemove bool) (string, error) { return "", nil }
-func (f *rsFakeComp) GetName() string { return f.name }
-func (f *rsFakeComp) IsRespin() bool { return false }
-func (f *rsFakeComp) IsForeach() bool { return false }
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+	return "", nil
+}
+func (f *rsFakeComp) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, cd IComponentData) error {
+	return nil
+}
+func (f *rsFakeComp) NewComponentData() IComponentData {
+	return &rsFakeCD{pos: append([]int{}, f.pos...), results: append([]int{}, f.results...)}
+}
+func (f *rsFakeComp) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+}
+func (f *rsFakeComp) ProcRespinOnStepEnd(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, canRemove bool) (string, error) {
+	return "", nil
+}
+func (f *rsFakeComp) GetName() string                         { return f.name }
+func (f *rsFakeComp) IsRespin() bool                          { return false }
+func (f *rsFakeComp) IsForeach() bool                         { return false }
 func (f *rsFakeComp) NewStats2(parent string) *stats2.Feature { return nil }
-func (f *rsFakeComp) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {}
-func (f *rsFakeComp) IsNeedOnStepEndStats2() bool { return false }
-func (f *rsFakeComp) GetAllLinkComponents() []string { return nil }
-func (f *rsFakeComp) GetNextLinkComponents() []string { return nil }
+func (f *rsFakeComp) OnStats2(icd IComponentData, s2 *stats2.Cache, gameProp *GameProperty, gp *GameParams, pr *sgc7game.PlayResult, isOnStepEnd bool) {
+}
+func (f *rsFakeComp) IsNeedOnStepEndStats2() bool      { return false }
+func (f *rsFakeComp) GetAllLinkComponents() []string   { return nil }
+func (f *rsFakeComp) GetNextLinkComponents() []string  { return nil }
 func (f *rsFakeComp) GetChildLinkComponents() []string { return nil }
-func (f *rsFakeComp) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) { return false, nil }
-func (f *rsFakeComp) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {}
+func (f *rsFakeComp) CanTriggerWithScene(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake, icd IComponentData) (bool, []*sgc7game.Result) {
+	return false, nil
+}
+func (f *rsFakeComp) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+}
 func (f *rsFakeComp) IsMask() bool { return false }
-func (f *rsFakeComp) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error { return nil }
-func (f *rsFakeComp) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, mask bool) error { return nil }
-func (f *rsFakeComp) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error { return nil }
-func (f *rsFakeComp) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error { return nil }
+func (f *rsFakeComp) SetMask(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
+	return nil
+}
+func (f *rsFakeComp) SetMaskVal(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, index int, mask bool) error {
+	return nil
+}
+func (f *rsFakeComp) SetMaskOnlyTrue(plugin sgc7plugin.IPlugin, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, cd IComponentData, mask []bool) error {
+	return nil
+}
+func (f *rsFakeComp) EachSymbols(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) error {
+	return nil
+}
 func (f *rsFakeComp) AddPos(cd IComponentData, x int, y int) {}
 func (f *rsFakeComp) OnPlayGameWithSet(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData, set int) (string, error) { return "", nil }
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData, set int) (string, error) {
+	return "", nil
+}
 func (f *rsFakeComp) ClearData(icd IComponentData, bForceNow bool) {}
-func (f *rsFakeComp) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, ps *PlayerState, betMethod int, bet int) error { return nil }
+func (f *rsFakeComp) InitPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, ps *PlayerState, betMethod int, bet int) error {
+	return nil
+}
 func (f *rsFakeComp) NewPlayerState() IComponentPS { return nil }
-func (f *rsFakeComp) OnUpdateDataWithPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, ps *PlayerState, betMethod int, bet int, cd IComponentData) {}
-func (f *rsFakeComp) ChgReelsCollector(icd IComponentData, ps *PlayerState, betMethod int, bet int, reelsData []int) {}
-
+func (f *rsFakeComp) OnUpdateDataWithPlayerState(pool *GamePropertyPool, gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, ps *PlayerState, betMethod int, bet int, cd IComponentData) {
+}
+func (f *rsFakeComp) ChgReelsCollector(icd IComponentData, ps *PlayerState, betMethod int, bet int, reelsData []int) {
+}
 
 // rsOutCD is a minimal component data implementation that records AddPos
 // calls so tests can verify positions were emitted to an output component.
 type rsOutCD struct{ pos []int }
 
-func (r *rsOutCD) OnNewGame(gameProp *GameProperty, component IComponent) {}
-func (r *rsOutCD) BuildPBComponentData() proto.Message { return nil }
-func (r *rsOutCD) Clone() IComponentData { return &rsOutCD{pos: append([]int{}, r.pos...)} }
+func (r *rsOutCD) OnNewGame(gameProp *GameProperty, component IComponent)       {}
+func (r *rsOutCD) BuildPBComponentData() proto.Message                          { return nil }
+func (r *rsOutCD) Clone() IComponentData                                        { return &rsOutCD{pos: append([]int{}, r.pos...)} }
 func (r *rsOutCD) GetValEx(key string, getType GetComponentValType) (int, bool) { return 0, false }
-func (r *rsOutCD) GetStrVal(key string) (string, bool) { return "", false }
-func (r *rsOutCD) GetConfigVal(key string) string { return "" }
-func (r *rsOutCD) SetConfigVal(key string, val string) {}
-func (r *rsOutCD) GetConfigIntVal(key string) (int, bool) { return 0, false }
-func (r *rsOutCD) SetConfigIntVal(key string, val int) {}
-func (r *rsOutCD) ChgConfigIntVal(key string, off int) int { return 0 }
-func (r *rsOutCD) ClearConfigIntVal(key string) {}
-func (r *rsOutCD) GetResults() []int { return nil }
-func (r *rsOutCD) GetOutput() int { return 0 }
-func (r *rsOutCD) GetStringOutput() string { return "" }
-func (r *rsOutCD) GetSymbols() []int { return nil }
-func (r *rsOutCD) AddSymbol(symbolCode int) {}
-func (r *rsOutCD) GetPos() []int { return append([]int{}, r.pos...) }
-func (r *rsOutCD) HasPos(x int, y int) bool { return false }
-func (r *rsOutCD) AddPos(x int, y int) { r.pos = append(r.pos, x, y) }
-func (r *rsOutCD) ClearPos() { r.pos = nil }
-func (r *rsOutCD) GetLastRespinNum() int { return 0 }
-func (r *rsOutCD) GetCurRespinNum() int { return 0 }
-func (r *rsOutCD) IsRespinEnding() bool { return false }
-func (r *rsOutCD) IsRespinStarted() bool { return false }
-func (r *rsOutCD) AddTriggerRespinAward(award *Award) {}
-func (r *rsOutCD) AddRespinTimes(num int) {}
-func (r *rsOutCD) TriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {}
-func (r *rsOutCD) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {}
-func (r *rsOutCD) GetMask() []bool { return nil }
+func (r *rsOutCD) GetStrVal(key string) (string, bool)                          { return "", false }
+func (r *rsOutCD) GetConfigVal(key string) string                               { return "" }
+func (r *rsOutCD) SetConfigVal(key string, val string)                          {}
+func (r *rsOutCD) GetConfigIntVal(key string) (int, bool)                       { return 0, false }
+func (r *rsOutCD) SetConfigIntVal(key string, val int)                          {}
+func (r *rsOutCD) ChgConfigIntVal(key string, off int) int                      { return 0 }
+func (r *rsOutCD) ClearConfigIntVal(key string)                                 {}
+func (r *rsOutCD) GetResults() []int                                            { return nil }
+func (r *rsOutCD) GetOutput() int                                               { return 0 }
+func (r *rsOutCD) GetStringOutput() string                                      { return "" }
+func (r *rsOutCD) GetSymbols() []int                                            { return nil }
+func (r *rsOutCD) AddSymbol(symbolCode int)                                     {}
+func (r *rsOutCD) GetPos() []int                                                { return append([]int{}, r.pos...) }
+func (r *rsOutCD) HasPos(x int, y int) bool                                     { return false }
+func (r *rsOutCD) AddPos(x int, y int)                                          { r.pos = append(r.pos, x, y) }
+func (r *rsOutCD) ClearPos()                                                    { r.pos = nil }
+func (r *rsOutCD) GetLastRespinNum() int                                        { return 0 }
+func (r *rsOutCD) GetCurRespinNum() int                                         { return 0 }
+func (r *rsOutCD) IsRespinEnding() bool                                         { return false }
+func (r *rsOutCD) IsRespinStarted() bool                                        { return false }
+func (r *rsOutCD) AddTriggerRespinAward(award *Award)                           {}
+func (r *rsOutCD) AddRespinTimes(num int)                                       {}
+func (r *rsOutCD) TriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams) {
+}
+func (r *rsOutCD) PushTriggerRespin(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, num int) {
+}
+func (r *rsOutCD) GetMask() []bool                    { return nil }
 func (r *rsOutCD) ChgMask(curMask int, val bool) bool { return false }
-func (r *rsOutCD) PutInMoney(coins int) {}
-func (r *rsOutCD) ChgReelsCollector(reelsData []int) {}
-func (r *rsOutCD) SetSymbolCodes(symbolCodes []int) {}
-func (r *rsOutCD) GetSymbolCodes() []int { return nil }
-
+func (r *rsOutCD) PutInMoney(coins int)               {}
+func (r *rsOutCD) ChgReelsCollector(reelsData []int)  {}
+func (r *rsOutCD) SetSymbolCodes(symbolCodes []int)   {}
+func (r *rsOutCD) GetSymbolCodes() []int              { return nil }
+func (r *rsOutCD) AddSymbolCodes(symbolCodes []int)   {}
+func (r *rsOutCD) ClearSymbolCodes()                  {}
 
 // minimal helper to build a GameScene with given dimensions and symbol matrix
 func newSceneFromMatrix(mat [][]int) *sgc7game.GameScene {
@@ -181,7 +221,9 @@ func TestOnBasic_SourcePositionCollection(t *testing.T) {
 		{1, 1, 1},
 	}
 	sc, err := sgc7game.NewGameSceneWithArr2(mat)
-	if err != nil { t.Fatal(err) }
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	pr := sgc7game.NewPlayResult("m", 0, 0, "t")
 	pr.Scenes = append(pr.Scenes, sc)
@@ -190,7 +232,7 @@ func TestOnBasic_SourcePositionCollection(t *testing.T) {
 	pool.newRNG = func() IRNG { return &stubRNG{} }
 	pool.newFeatureLevel = func(b int) IFeatureLevel { return &stubFeatureLevel{} }
 
-	gp := NewGameParam(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	gp := NewGameParam(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 
 	// prepare GameProperty with a fake component that will provide positions
 	gameProp := pool.newGameProp(1)
@@ -203,7 +245,7 @@ func TestOnBasic_SourcePositionCollection(t *testing.T) {
 	}
 
 	// fake provider component
-	fcomp := &rsFakeComp{name: "src" , pos: []int{0,1, 1,1, 2,1}}
+	fcomp := &rsFakeComp{name: "src", pos: []int{0, 1, 1, 1, 2, 1}}
 	gameProp.Components.MapComponents = map[string]IComponent{"src": fcomp}
 
 	// initialize gameProp for a new game so callStack nodes are prepared
@@ -268,7 +310,9 @@ func TestAdjacentPay_MiddleRetention(t *testing.T) {
 		{1, 1, 1},
 	}
 	sc, err := sgc7game.NewGameSceneWithArr2(mat)
-	if err != nil { t.Fatal(err) }
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	pr := sgc7game.NewPlayResult("m", 0, 0, "t")
 	pr.Scenes = append(pr.Scenes, sc)
@@ -277,15 +321,15 @@ func TestAdjacentPay_MiddleRetention(t *testing.T) {
 	pool.newRNG = func() IRNG { return &stubRNG{} }
 	pool.newFeatureLevel = func(b int) IFeatureLevel { return &stubFeatureLevel{} }
 
-	gp := NewGameParam(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	gp := NewGameParam(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 
 	gameProp := pool.newGameProp(1)
 	gameProp.Components = NewComponentList()
 	gameProp.SceneStack.Push("rs", sc)
-	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 
 	// create provider component with a result containing three positions
-	fakeResComp := &rsFakeComp{name:"bg-pay"}
+	fakeResComp := &rsFakeComp{name: "bg-pay"}
 	// prepare a component that would have produced a result listing positions
 	// We simulate by adding a result to playresult and letting component's GetCurComponentDataWithName return nil so removeSymbols reads curpr.Results
 	gameProp.Components.MapComponents = map[string]IComponent{"bg-pay": fakeResComp}
@@ -298,7 +342,7 @@ func TestAdjacentPay_MiddleRetention(t *testing.T) {
 	// put the fake component into map and into global node so GetCurComponentDataWithName can find it
 	gameProp.Components.MapComponents["bg-pay"] = fakeResComp
 	// set playresult's Results
-	r := &sgc7game.Result{Type: sgc7game.RTAdjacentPay, LineIndex: 0, Symbol: 0, Pos: []int{0,1,1,1,2,1}}
+	r := &sgc7game.Result{Type: sgc7game.RTAdjacentPay, LineIndex: 0, Symbol: 0, Pos: []int{0, 1, 1, 1, 2, 1}}
 	pr.Results = append(pr.Results, r)
 
 	// set the global callStack node's MapComponentData so GetCurComponentDataWithName returns it
@@ -339,12 +383,16 @@ func TestOutputToComponentAndOtherScene(t *testing.T) {
 	pool.newRNG = func() IRNG { return &stubRNG{} }
 	pool.newFeatureLevel = func(b int) IFeatureLevel { return &stubFeatureLevel{} }
 
-	gp := NewGameParam(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	gp := NewGameParam(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 	gameProp := pool.newGameProp(1)
 	gameProp.Components = NewComponentList()
-	if gameProp.SceneStack == nil { gameProp.SceneStack = NewSceneStack(false) }
-	if gameProp.OtherSceneStack == nil { gameProp.OtherSceneStack = NewSceneStack(true) }
-	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	if gameProp.SceneStack == nil {
+		gameProp.SceneStack = NewSceneStack(false)
+	}
+	if gameProp.OtherSceneStack == nil {
+		gameProp.OtherSceneStack = NewSceneStack(true)
+	}
+	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 	gameProp.SceneStack.Push("rs", sc)
 
 	// also prepare an other-scene so IsNeedProcSymbolVals branch uses it
@@ -353,7 +401,7 @@ func TestOutputToComponentAndOtherScene(t *testing.T) {
 	gameProp.OtherSceneStack.Push("rs", other)
 
 	// source positions
-	fcomp := &rsFakeComp{name: "src", pos: []int{0,1, 1,1}}
+	fcomp := &rsFakeComp{name: "src", pos: []int{0, 1, 1, 1}}
 	gameProp.Components.MapComponents = map[string]IComponent{"src": fcomp}
 
 	// output component to receive removed positions
@@ -404,16 +452,16 @@ func TestAvgHeightZeroBranch(t *testing.T) {
 	// if no removals occur, AvgHeight must be zero
 	mat := [][]int{{1}}
 	sc, _ := sgc7game.NewGameSceneWithArr2(mat)
-	pr := sgc7game.NewPlayResult("m",0,0,"t")
+	pr := sgc7game.NewPlayResult("m", 0, 0, "t")
 	pr.Scenes = append(pr.Scenes, sc)
 
-	pool := &GamePropertyPool{Config: &Config{Width:1, Height:1}}
+	pool := &GamePropertyPool{Config: &Config{Width: 1, Height: 1}}
 	pool.newRNG = func() IRNG { return &stubRNG{} }
 	pool.newFeatureLevel = func(b int) IFeatureLevel { return &stubFeatureLevel{} }
-	gp := NewGameParam(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	gp := NewGameParam(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 	gameProp := pool.newGameProp(1)
 	gameProp.Components = NewComponentList()
-	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 	gameProp.SceneStack.Push("rs", sc)
 
 	comp := NewRemoveSymbols("rs").(*RemoveSymbols)
@@ -433,27 +481,27 @@ func TestAvgHeightZeroBranch(t *testing.T) {
 func TestBasicTargetComponentsRemoval(t *testing.T) {
 	// test basic removal via TargetComponents using curpr.Results positions
 	mat := [][]int{
-		{1,1,1},
-		{1,1,1},
-		{1,1,1},
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
 	}
 	sc, _ := sgc7game.NewGameSceneWithArr2(mat)
-	pr := sgc7game.NewPlayResult("m",0,0,"t")
+	pr := sgc7game.NewPlayResult("m", 0, 0, "t")
 	pr.Scenes = append(pr.Scenes, sc)
 
-	pool := &GamePropertyPool{Config: &Config{Width:3, Height:3}}
+	pool := &GamePropertyPool{Config: &Config{Width: 3, Height: 3}}
 	pool.newRNG = func() IRNG { return &stubRNG{} }
 	pool.newFeatureLevel = func(b int) IFeatureLevel { return &stubFeatureLevel{} }
-	gp := NewGameParam(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	gp := NewGameParam(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 	gameProp := pool.newGameProp(1)
 	gameProp.Components = NewComponentList()
-	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet:1, CashBet:1}, nil)
+	_ = gameProp.OnNewGame(&sgc7game.Stake{CoinBet: 1, CashBet: 1}, nil)
 	gameProp.SceneStack.Push("rs", sc)
 
 	// create a fake previous component with a result
 	fake := &rsFakeComp{name: "bg-pay"}
 	gameProp.Components.MapComponents = map[string]IComponent{"bg-pay": fake}
-	r := &sgc7game.Result{Type: sgc7game.RTAdjacentPay, LineIndex:0, Symbol:0, Pos: []int{0,1,1,1}}
+	r := &sgc7game.Result{Type: sgc7game.RTAdjacentPay, LineIndex: 0, Symbol: 0, Pos: []int{0, 1, 1, 1}}
 	pr.Results = append(pr.Results, r)
 
 	// put fake component data into callStack so GetCurComponentDataWithName returns it

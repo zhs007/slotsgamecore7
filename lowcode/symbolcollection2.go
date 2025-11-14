@@ -73,6 +73,18 @@ func (symbolCollection2Data *SymbolCollection2Data) GetSymbolCodes() []int {
 	return symbolCollection2Data.SymbolCodes
 }
 
+func (symbolCollection2Data *SymbolCollection2Data) SetSymbolCodes(symbolCodes []int) {
+	symbolCollection2Data.SymbolCodes = symbolCodes
+}
+
+func (symbolCollection2Data *SymbolCollection2Data) ClearSymbolCodes() {
+	symbolCollection2Data.SymbolCodes = nil
+}
+
+func (symbolCollection2Data *SymbolCollection2Data) AddSymbolCodes(symbolCodes []int) {
+	symbolCollection2Data.SymbolCodes = append(symbolCollection2Data.SymbolCodes, symbolCodes...)
+}
+
 // AddSymbol -
 func (symbolCollection2Data *SymbolCollection2Data) AddSymbol(symbolCode int) {
 	symbolCollection2Data.SymbolCodes = append(symbolCollection2Data.SymbolCodes, symbolCode)
