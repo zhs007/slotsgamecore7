@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/bytedance/sonic"
@@ -181,13 +182,13 @@ type ChgSymbolsInReelsConfig struct {
 	Height               int                               `yaml:"Height" json:"Height"`
 	BlankSymbol          string                            `yaml:"blankSymbol" json:"blankSymbol"`
 	BlankSymbolCode      int                               `yaml:"-" json:"-"`
-	MaxNumber            int                               `yaml:"maxNumber" json:"maxNumber"`
-	MapSymbol            map[int]string                    `json:"mapSymbol"`
-	MapSymbolCode        map[int]int                       `json:"-"`
-	MapSymbolWeight      map[int]string                    `json:"mapWeight"`
-	MapSymbolWeightVW    map[int]*sgc7game.ValWeights2     `json:"-"`
-	MapSrcSymbols        map[int]string                    `json:"mapSrcSymbols"`
-	MapSrcSymbolCodes    map[int]int                       `json:"-"`
+	MapSymbol            map[int]string                    `yaml:"mapSymbol" json:"mapSymbol"`
+	MapSymbolCode        map[int]int                       `yaml:"-" json:"-"`
+	MapSymbolWeight      map[int]string                    `yaml:"mapWeight" json:"mapWeight"`
+	MapSymbolWeightVW    map[int]*sgc7game.ValWeights2     `yaml:"-" json:"-"`
+	MapSrcSymbols        map[int][]string                  `yaml:"mapSrcSymbols" json:"mapSrcSymbols"`
+	MapSrcSymbolCodes    map[int][]int                     `yaml:"-" json:"-"`
+	MapNumber            map[int]int                       `yaml:"mapNumber" json:"mapNumber"`
 	Controllers          []*Award                          `yaml:"controllers" json:"controllers"`
 	JumpToComponent      string                            `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
@@ -276,16 +277,19 @@ func (chgSymbolsInReels *ChgSymbolsInReels) InitEx(cfg any, pool *GamePropertyPo
 	}
 
 	if len(chgSymbolsInReels.Config.MapSrcSymbols) > 0 {
-		chgSymbolsInReels.Config.MapSrcSymbolCodes = make(map[int]int, len(chgSymbolsInReels.Config.MapSrcSymbols))
-		for k, v := range chgSymbolsInReels.Config.MapSrcSymbols {
-			symbolCode, isok := pool.DefaultPaytables.MapSymbols[v]
-			if !isok {
-				goutils.Error("ChgSymbolsInReels.InitEx:MapSrcSymbols",
-					slog.String("symbol", v),
-					goutils.Err(ErrInvalidSymbol))
-				return ErrInvalidSymbol
+		chgSymbolsInReels.Config.MapSrcSymbolCodes = make(map[int][]int, len(chgSymbolsInReels.Config.MapSrcSymbols))
+		for k, arr := range chgSymbolsInReels.Config.MapSrcSymbols {
+			for _, v := range arr {
+				symbolCode, isok := pool.DefaultPaytables.MapSymbols[v]
+				if !isok {
+					goutils.Error("ChgSymbolsInReels.InitEx:MapSrcSymbols",
+						slog.String("symbol", v),
+						goutils.Err(ErrInvalidSymbol))
+					return ErrInvalidSymbol
+				}
+
+				chgSymbolsInReels.Config.MapSrcSymbolCodes[k] = append(chgSymbolsInReels.Config.MapSrcSymbolCodes[k], symbolCode)
 			}
-			chgSymbolsInReels.Config.MapSrcSymbolCodes[k] = symbolCode
 		}
 	}
 
@@ -312,16 +316,36 @@ func (chgSymbolsInReels *ChgSymbolsInReels) ProcControllers(gameProp *GameProper
 	}
 }
 
+func (chgSymbolsInReels *ChgSymbolsInReels) isEmpty(mapPos map[int][]int) bool {
+	for _, arr := range mapPos {
+		if len(arr) > 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (chgSymbolsInReels *ChgSymbolsInReels) newMapPos(gameProp *GameProperty) map[int][]int {
+	mapPos := make(map[int][]int)
+
+	for x := 0; x < gameProp.GetVal(GamePropWidth); x++ {
+		mapPos[x] = make([]int, 0, gameProp.GetVal(GamePropHeight))
+	}
+
+	return mapPos
+}
+
 // getSrcPos
 func (chgSymbolsInReels *ChgSymbolsInReels) getSrcPos(gameProp *GameProperty, _ sgc7plugin.IPlugin,
-	gs *sgc7game.GameScene) ([]int, error) {
+	gs *sgc7game.GameScene) (map[int][]int, error) {
 
-	pos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
+	mapPos := chgSymbolsInReels.newMapPos(gameProp)
 
 	if chgSymbolsInReels.Config.SrcType == CSIRSTypeAll {
 		for x := 0; x < gameProp.GetVal(GamePropWidth); x++ {
 			for y := 0; y < gameProp.GetVal(GamePropHeight); y++ {
-				pos = append(pos, x, y)
+				mapPos[x] = append(mapPos[x], y)
 			}
 		}
 	} else {
@@ -332,23 +356,22 @@ func (chgSymbolsInReels *ChgSymbolsInReels) getSrcPos(gameProp *GameProperty, _ 
 		return nil, ErrInvalidComponentConfig
 	}
 
-	if len(pos) == 0 {
+	if chgSymbolsInReels.isEmpty(mapPos) {
 		return nil, nil
 	}
 
 	if chgSymbolsInReels.Config.SrcSymbolType == CSIRSSTypeSymbols {
-		npos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
+		nMapPos := chgSymbolsInReels.newMapPos(gameProp)
 
-		for i := range len(pos) / 2 {
-			x := pos[i*2]
-			y := pos[i*2+1]
-
-			if chgSymbolsInReels.Config.MapSrcSymbolCodes[x] == gs.Arr[x][y] {
-				npos = append(npos, x, y)
+		for x, arr := range mapPos {
+			for _, y := range arr {
+				if slices.Contains(chgSymbolsInReels.Config.MapSrcSymbolCodes[x], gs.Arr[x][y]) {
+					nMapPos[x] = append(nMapPos[x], y)
+				}
 			}
 		}
 
-		return npos, nil
+		return nMapPos, nil
 	}
 
 	goutils.Error("ChgSymbolsInReels.getSrcPos:SrcSymbolType",
@@ -386,7 +409,8 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curp
 		return nc, ErrComponentDoNothing
 	}
 
-	if chgSymbolsInReels.Config.Type == CSIRCTypeEachPosRandom {
+	switch chgSymbolsInReels.Config.Type {
+	case CSIRCTypeEachPosRandom:
 		ngs, err := chgSymbolsInReels.procEachPosRandomWithPos(gameProp, plugin, gs, pos, cd)
 		if err != nil {
 			goutils.Error("ChgSymbolsInReels.procPos:procEachPosRandomWithPos",
@@ -410,7 +434,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curp
 		}
 
 		chgSymbolsInReels.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-	} else {
+	default:
 		goutils.Error("ChgSymbolsInReels.procPos:Type",
 			slog.String("Type", chgSymbolsInReels.Config.StrType),
 			goutils.Err(ErrInvalidComponentConfig))
@@ -425,7 +449,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curp
 
 // procEachPosRandomWithPos
 func (chgSymbolsInReels *ChgSymbolsInReels) procEachPosRandomWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
-	gs *sgc7game.GameScene, pos []int, cd *ChgSymbolsInReelsData) (*sgc7game.GameScene, error) {
+	gs *sgc7game.GameScene, mapPos map[int][]int, cd *ChgSymbolsInReelsData) (*sgc7game.GameScene, error) {
 
 	if len(chgSymbolsInReels.Config.MapSymbolWeightVW) == 0 {
 		goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:MapSymbolWeightVW",
@@ -435,82 +459,105 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procEachPosRandomWithPos(gameProp *G
 	}
 
 	ngs := gs
-	maxNumber := chgSymbolsInReels.Config.MaxNumber
 
-	switch chgSymbolsInReels.Config.NumberType {
-	case CSIRNTypeNumberWeight:
-		goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:Type",
-			slog.String("NumberType", chgSymbolsInReels.Config.StrNumberType),
-			goutils.Err(ErrInvalidComponentConfig))
+	for x, yarr := range mapPos {
+		maxNumber := 0
 
-		return nil, ErrInvalidComponentConfig
-	case CSIRNTypeNoLimit:
-		maxNumber = 0
-	}
+		switch chgSymbolsInReels.Config.NumberType {
+		case CSIRNTypeNumberWeight:
+			goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:Type",
+				slog.String("NumberType", chgSymbolsInReels.Config.StrNumberType),
+				goutils.Err(ErrInvalidComponentConfig))
 
-	if maxNumber > 0 && len(pos) > maxNumber*2 {
-		curnum := 0
-		for i := range len(pos) / 2 {
-			x := pos[i*2]
-			y := pos[i*2+1]
-
-			vw2 := chgSymbolsInReels.Config.MapSymbolWeightVW[x]
-
-			curs, err := vw2.RandVal(plugin)
-			if err != nil {
-				goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:RandVal",
-					goutils.Err(err))
-
-				return nil, err
-			}
-
-			sc := curs.Int()
-
-			if sc != chgSymbolsInReels.Config.BlankSymbolCode {
-				if ngs == gs {
-					ngs = gs.CloneEx(gameProp.PoolScene)
-				}
-
-				ngs.Arr[x][y] = sc
-				cd.AddPos(x, y)
-
-				curnum++
-				if curnum >= chgSymbolsInReels.Config.MaxNumber {
-					break
-				}
-			}
+			return nil, ErrInvalidComponentConfig
+		case CSIRNTypeNumber:
+			maxNumber = chgSymbolsInReels.Config.MapNumber[x]
 		}
-	} else {
-		for i := range len(pos) / 2 {
-			x := pos[i*2]
-			y := pos[i*2+1]
 
-			vw2 := chgSymbolsInReels.Config.MapSymbolWeightVW[x]
+		if maxNumber > 0 && len(yarr) > maxNumber {
+			curnum := 0
+			for _, y := range yarr {
+				vw2 := chgSymbolsInReels.Config.MapSymbolWeightVW[x]
 
-			curs, err := vw2.RandVal(plugin)
-			if err != nil {
-				goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:RandVal",
-					goutils.Err(err))
+				curs, err := vw2.RandVal(plugin)
+				if err != nil {
+					goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:RandVal",
+						goutils.Err(err))
 
-				return nil, err
-			}
-
-			sc := curs.Int()
-
-			if sc != chgSymbolsInReels.Config.BlankSymbolCode {
-				if ngs == gs {
-					ngs = gs.CloneEx(gameProp.PoolScene)
+					return nil, err
 				}
 
-				ngs.Arr[x][y] = sc
+				sc := curs.Int()
 
-				cd.AddPos(x, y)
+				if sc != chgSymbolsInReels.Config.BlankSymbolCode {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[x][y] = sc
+					cd.AddPos(x, y)
+
+					curnum++
+					if curnum >= maxNumber {
+						break
+					}
+				}
+			}
+		} else {
+			for _, y := range yarr {
+
+				vw2 := chgSymbolsInReels.Config.MapSymbolWeightVW[x]
+
+				curs, err := vw2.RandVal(plugin)
+				if err != nil {
+					goutils.Error("ChgSymbolsInReels.procEachPosRandomWithPos:RandVal",
+						goutils.Err(err))
+
+					return nil, err
+				}
+
+				sc := curs.Int()
+
+				if sc != chgSymbolsInReels.Config.BlankSymbolCode {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[x][y] = sc
+
+					cd.AddPos(x, y)
+				}
 			}
 		}
 	}
 
 	return ngs, nil
 }
+
+// // procSymbolWeightWithPos
+// func (chgSymbols *ChgSymbolsInReels) procSymbolWeightWithPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
+// 	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, mapPos map[int][]int, cd *ChgSymbolsInReelsData) (*sgc7game.GameScene, error) {
+
+// 	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
+// 	curs, err := vw2.RandVal(plugin)
+// 	if err != nil {
+// 		goutils.Error("ChgSymbols2.procSymbolWeightWithPos:RandVal",
+// 			goutils.Err(err))
+
+// 		return nil, err
+// 	}
+
+// 	sc := curs.Int()
+
+// 	if sc != chgSymbols2.Config.BlankSymbolCode {
+// 		chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
+// 			gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
+
+// 		return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, sc, cd)
+// 	}
+
+// 	return gs, nil
+// }
 
 // playgame
 func (chgSymbols *ChgSymbolsInReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
@@ -558,63 +605,140 @@ func NewChgSymbolsInReels(name string) IComponent {
 
 // "srcType": "all",
 // "srcSymbolType": "symbols",
-// "numberType": "noLimit",
+// "numberType": "number",
 // "type": "symbolWeight",
 // "isAlwaysGen": false,
 // "Height": 0,
-// "mapSymbol": [
-//
-//	[
-//		1,
-//		"CL"
-//	]
-//
-// ],
 // "mapWeight": [
 //
 //	[
-//		1,
-//		"bgmytocl"
+//	    1,
+//	    "bg_chgvs"
 //	],
 //	[
-//		2,
-//		"bgmytoco"
+//	    2,
+//	    "bg_chgvs"
 //	],
 //	[
-//		3,
-//		"bgmytoco"
+//	    3,
+//	    "bg_chgvs"
 //	],
 //	[
-//		4,
-//		"bgmytoco"
+//	    4,
+//	    "bg_chgvs"
 //	],
 //	[
-//		5,
-//		"bgmytoco"
+//	    5,
+//	    "bg_chgvs"
+//	]
+//
+// ],
+// "blankSymbol": "BN",
+// "mapNumber": [
+//
+//	[
+//	    1,
+//	    1
+//	],
+//	[
+//	    2,
+//	    1
+//	],
+//	[
+//	    3,
+//	    1
+//	],
+//	[
+//	    4,
+//	    1
+//	],
+//	[
+//	    5,
+//	    1
 //	]
 //
 // ],
 // "mapSrcSymbols": [
 //
 //	[
-//		1,
-//		"MY"
+//	    1,
+//	    [
+//	        "WL",
+//	        "L1",
+//	        "L2",
+//	        "L3",
+//	        "L4",
+//	        "L5",
+//	        "H1",
+//	        "H2",
+//	        "H3",
+//	        "H4",
+//	        "H5"
+//	    ]
 //	],
 //	[
-//		2,
-//		"MY"
+//	    2,
+//	    [
+//	        "WL",
+//	        "L1",
+//	        "L2",
+//	        "L3",
+//	        "L4",
+//	        "L5",
+//	        "H1",
+//	        "H2",
+//	        "H3",
+//	        "H4",
+//	        "H5"
+//	    ]
 //	],
 //	[
-//		3,
-//		"MY"
+//	    3,
+//	    [
+//	        "WL",
+//	        "L1",
+//	        "L2",
+//	        "L3",
+//	        "L4",
+//	        "L5",
+//	        "H1",
+//	        "H2",
+//	        "H3",
+//	        "H4",
+//	        "H5"
+//	    ]
 //	],
 //	[
-//		4,
-//		"MY"
+//	    4,
+//	    [
+//	        "WL",
+//	        "L1",
+//	        "L2",
+//	        "L3",
+//	        "L4",
+//	        "L5",
+//	        "H1",
+//	        "H2",
+//	        "H3",
+//	        "H4",
+//	        "H5"
+//	    ]
 //	],
 //	[
-//		5,
-//		"MY"
+//	    5,
+//	    [
+//	        "WL",
+//	        "L1",
+//	        "L2",
+//	        "L3",
+//	        "L4",
+//	        "L5",
+//	        "H1",
+//	        "H2",
+//	        "H3",
+//	        "H4",
+//	        "H5"
+//	    ]
 //	]
 //
 // ]
@@ -625,6 +749,7 @@ type jsonChgSymbolsInReels struct {
 	StrType          string          `json:"type"`
 	IsAlwaysGen      bool            `json:"isAlwaysGen"`
 	Height           int             `json:"Height"`
+	MapNumber        [][]interface{} `json:"mapNumber"`
 	MapSymbol        [][]interface{} `json:"mapSymbol"`
 	MapWeight        [][]interface{} `json:"mapWeight"`
 	MapSrcSymbols    [][]interface{} `json:"mapSrcSymbols"`
@@ -640,6 +765,22 @@ func (jcfg *jsonChgSymbolsInReels) build() *ChgSymbolsInReelsConfig {
 		IsAlwaysGen:      jcfg.IsAlwaysGen,
 		Height:           jcfg.Height,
 		BlankSymbol:      jcfg.BlankSymbol,
+	}
+
+	if len(jcfg.MapNumber) > 0 {
+		cfg.MapNumber = make(map[int]int, len(jcfg.MapNumber))
+
+		for _, arr := range jcfg.MapNumber {
+			if len(arr) != 2 {
+				goutils.Error("jsonChgSymbolsInReels.build:MapNumber:arr")
+
+				return nil
+			}
+
+			k := arr[0].(float64)
+			v := arr[1].(float64)
+			cfg.MapNumber[int(k)-1] = int(v) // [1,w] => [0,w)
+		}
 	}
 
 	if len(jcfg.MapSymbol) > 0 {
@@ -675,7 +816,7 @@ func (jcfg *jsonChgSymbolsInReels) build() *ChgSymbolsInReelsConfig {
 	}
 
 	if len(jcfg.MapSrcSymbols) > 0 {
-		cfg.MapSrcSymbols = make(map[int]string, len(jcfg.MapSrcSymbols))
+		cfg.MapSrcSymbols = make(map[int][]string, len(jcfg.MapSrcSymbols))
 
 		for _, arr := range jcfg.MapSrcSymbols {
 			if len(arr) != 2 {
@@ -685,8 +826,11 @@ func (jcfg *jsonChgSymbolsInReels) build() *ChgSymbolsInReelsConfig {
 			}
 
 			k := arr[0].(float64)
-			v := arr[1].(string)
-			cfg.MapSrcSymbols[int(k)-1] = v // [1,w] => [0,w)
+			arr1 := arr[1].([]interface{})
+			for _, v := range arr1 {
+				cfg.MapSrcSymbols[int(k)-1] = append(cfg.MapSrcSymbols[int(k)-1], v.(string))
+			}
+			// cfg.MapSrcSymbols[int(k)-1] = v // [1,w] => [0,w)
 		}
 	}
 
