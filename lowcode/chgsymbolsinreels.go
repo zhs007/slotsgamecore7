@@ -442,7 +442,7 @@ func (chgSymbolsInReels *ChgSymbolsInReels) procPos(gameProp *GameProperty, curp
 		return "", ErrInvalidComponentConfig
 	}
 
-	nc := chgSymbolsInReels.onStepEnd(gameProp, curpr, gp, "")
+	nc := chgSymbolsInReels.onStepEnd(gameProp, curpr, gp, chgSymbolsInReels.Config.JumpToComponent)
 
 	return nc, nil
 }
