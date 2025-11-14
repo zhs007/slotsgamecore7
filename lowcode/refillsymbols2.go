@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
@@ -24,6 +25,8 @@ type RefillSymbols2Config struct {
 	DefaultSymbolVal     int    `yaml:"defaultSymbolVal" json:"defaultSymbolVal"`         // 重新填充的symbolVal是什么
 	OutputToComponent    string `yaml:"outputToComponent" json:"outputToComponent"`       // 输出到哪个组件
 	Height               int    `yaml:"height" json:"height"`                             // 重新填充的symbolVal是什么
+	MaskX                string `yaml:"maskX" json:"maskX"`                               // maskX
+	MaskY                string `yaml:"maskY" json:"maskY"`                               // maskY
 }
 
 // SetLinkComponent
@@ -82,13 +85,372 @@ func (refillSymbols2 *RefillSymbols2) getSymbol(rd *sgc7game.ReelsData, x int, i
 	return rd.Reels[x][index]
 }
 
-func (refillSymbols2 *RefillSymbols2) GetHeight(basicCD *BasicComponentData) int {
+func (refillSymbols2 *RefillSymbols2) getHeight(basicCD *BasicComponentData) int {
 	height, isok := basicCD.GetConfigIntVal(CCVHeight)
 	if isok {
 		return height
 	}
 
 	return refillSymbols2.Config.Height
+}
+
+func (refillSymbols2 *RefillSymbols2) getMaskX(gameProp *GameProperty, basicCD *BasicComponentData) string {
+	str := basicCD.GetConfigVal(CCVMaskX)
+	if str != "" {
+		return str
+	}
+
+	return refillSymbols2.Config.MaskX
+}
+
+func (refillSymbols2 *RefillSymbols2) refillHeightAndMaskX(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, os *sgc7game.GameScene,
+	height int, maskX string, outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
+
+	var maskArr []bool
+	if maskX == "<empty>" {
+		maskArr = make([]bool, 0, gs.Width)
+
+		for i := 0; i < gs.Width; i++ {
+			maskArr = append(maskArr, true)
+		}
+	} else {
+		imaskd := gameProp.GetComponentDataWithName(maskX)
+		if imaskd != nil {
+			maskArr = imaskd.GetMask()
+			if len(maskArr) != gs.Width {
+				goutils.Error("RefillSymbols2.refillHeightAndMaskX:MaskX:len(arr)!=gs.Width",
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return nil, nil, ErrInvalidComponentConfig
+			}
+		} else {
+			goutils.Error("RefillSymbols2.refillHeightAndMaskX:MaskX",
+				slog.String("maskX", maskX),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, nil, ErrInvalidComponentConfig
+		}
+	}
+
+	ngs := gs
+	cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+	if os != nil {
+		nos := os
+
+		for x := 0; x < gs.Width; x++ {
+			if !maskArr[x] {
+				continue
+			} else {
+				if ngs.Indexes[x] < 0 {
+					ci, err := plugin.Random(context.Background(), len(cr.Reels[x]))
+					if err != nil {
+						goutils.Error("RefillSymbols2.refillHeightAndMaskX:Random",
+							slog.Int("len", len(cr.Reels[x])),
+							goutils.Err(err))
+
+						return nil, nil, err
+					}
+
+					ngs.Indexes[x] = ci
+				}
+			}
+
+			for y := gs.Height - 1; y >= 0; y-- {
+				if y < gs.Height-height {
+					continue
+				}
+
+				if ngs.Arr[x][y] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+					ngs.Indexes[x]--
+
+					nos.Arr[x][y] = refillSymbols2.Config.DefaultSymbolVal
+
+					if outputCD != nil {
+						outputCD.AddPos(x, y)
+					}
+				}
+			}
+		}
+
+		return ngs, nos, nil
+	}
+
+	for x := 0; x < gs.Width; x++ {
+		if !maskArr[x] {
+			continue
+		} else {
+			if ngs.Indexes[x] < 0 {
+				ci, err := plugin.Random(context.Background(), len(cr.Reels[x]))
+				if err != nil {
+					goutils.Error("RefillSymbols2.refillHeightAndMaskX:Random",
+						slog.Int("len", len(cr.Reels[x])),
+						goutils.Err(err))
+
+					return nil, nil, err
+				}
+
+				ngs.Indexes[x] = ci
+			}
+		}
+
+		for y := gs.Height - 1; y >= 0; y-- {
+			if y < gs.Height-height {
+				continue
+			}
+
+			if ngs.Arr[x][y] == -1 {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+				ngs.Indexes[x]--
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
+			}
+		}
+	}
+
+	return ngs, nil, nil
+}
+
+func (refillSymbols2 *RefillSymbols2) refillMaskX(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, os *sgc7game.GameScene,
+	maskX string, outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
+
+	var maskArr []bool
+	if maskX == "<empty>" {
+		maskArr = make([]bool, 0, gs.Width)
+
+		for i := 0; i < gs.Width; i++ {
+			maskArr = append(maskArr, true)
+		}
+	} else {
+		imaskd := gameProp.GetComponentDataWithName(maskX)
+		if imaskd != nil {
+			maskArr = imaskd.GetMask()
+			if len(maskArr) != gs.Width {
+				goutils.Error("RefillSymbols2.refillMaskX:MaskX:len(arr)!=gs.Width",
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return nil, nil, ErrInvalidComponentConfig
+			}
+		} else {
+			goutils.Error("RefillSymbols2.refillMaskX:MaskX",
+				slog.String("maskX", maskX),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, nil, ErrInvalidComponentConfig
+		}
+	}
+
+	ngs := gs
+	cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+	if os != nil {
+		nos := os
+
+		for x := 0; x < gs.Width; x++ {
+			if !maskArr[x] {
+				continue
+			} else {
+				if ngs.Indexes[x] < 0 {
+					ci, err := plugin.Random(context.Background(), len(cr.Reels[x]))
+					if err != nil {
+						goutils.Error("RefillSymbols2.refillMaskX:Random",
+							slog.Int("len", len(cr.Reels[x])),
+							goutils.Err(err))
+
+						return nil, nil, err
+					}
+
+					ngs.Indexes[x] = ci
+				}
+			}
+
+			for y := gs.Height - 1; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+					ngs.Indexes[x]--
+
+					nos.Arr[x][y] = refillSymbols2.Config.DefaultSymbolVal
+
+					if outputCD != nil {
+						outputCD.AddPos(x, y)
+					}
+				}
+			}
+		}
+
+		return ngs, nos, nil
+	}
+
+	for x := 0; x < gs.Width; x++ {
+		if !maskArr[x] {
+			continue
+		} else {
+			if ngs.Indexes[x] < 0 {
+				ci, err := plugin.Random(context.Background(), len(cr.Reels[x]))
+				if err != nil {
+					goutils.Error("RefillSymbols2.refillMaskX:Random",
+						slog.Int("len", len(cr.Reels[x])),
+						goutils.Err(err))
+
+					return nil, nil, err
+				}
+
+				ngs.Indexes[x] = ci
+			}
+		}
+
+		for y := gs.Height - 1; y >= 0; y-- {
+			if ngs.Arr[x][y] == -1 {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+				ngs.Indexes[x]--
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
+			}
+		}
+	}
+
+	return ngs, nil, nil
+}
+
+func (refillSymbols2 *RefillSymbols2) refillOnlyHeight(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene,
+	height int, outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
+	ngs := gs
+
+	if os != nil {
+		nos := os
+
+		for x := 0; x < gs.Width; x++ {
+			for y := gs.Height - 1; y >= 0; y-- {
+				if y < gs.Height-height {
+					continue
+				}
+
+				if ngs.Arr[x][y] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
+
+					cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+					ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+					ngs.Indexes[x]--
+
+					nos.Arr[x][y] = refillSymbols2.Config.DefaultSymbolVal
+
+					if outputCD != nil {
+						outputCD.AddPos(x, y)
+					}
+				}
+			}
+		}
+
+		return ngs, nos
+	}
+
+	for x := 0; x < gs.Width; x++ {
+		for y := gs.Height - 1; y >= 0; y-- {
+			if y < gs.Height-height {
+				continue
+			}
+
+			if ngs.Arr[x][y] == -1 {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+				ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+				ngs.Indexes[x]--
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
+			}
+		}
+	}
+
+	return ngs, nil
+}
+
+func (refillSymbols2 *RefillSymbols2) refill(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene,
+	outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
+	ngs := gs
+
+	if os != nil {
+		nos := os
+
+		for x := 0; x < gs.Width; x++ {
+			for y := gs.Height - 1; y >= 0; y-- {
+				if ngs.Arr[x][y] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+						nos = os.CloneEx(gameProp.PoolScene)
+					}
+
+					cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+					ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+					ngs.Indexes[x]--
+
+					nos.Arr[x][y] = refillSymbols2.Config.DefaultSymbolVal
+
+					if outputCD != nil {
+						outputCD.AddPos(x, y)
+					}
+				}
+			}
+		}
+
+		return ngs, nos
+	}
+
+	for x := 0; x < gs.Width; x++ {
+		for y := gs.Height - 1; y >= 0; y-- {
+			if ngs.Arr[x][y] == -1 {
+				if ngs == gs {
+					ngs = gs.CloneEx(gameProp.PoolScene)
+				}
+
+				cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
+
+				ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
+				ngs.Indexes[x]--
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
+			}
+		}
+	}
+
+	return ngs, nil
 }
 
 // playgame
@@ -101,7 +463,6 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 	bcd.UsedOtherScenes = nil
 
 	gs := refillSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
-	ngs := gs
 
 	var os *sgc7game.GameScene
 	if refillSymbols2.Config.IsNeedProcSymbolVals {
@@ -122,134 +483,87 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 		outputCD.ClearPos()
 	}
 
-	height := refillSymbols2.GetHeight(bcd)
+	height := refillSymbols2.getHeight(bcd)
+	maskX := refillSymbols2.getMaskX(gameProp, bcd)
+
+	if maskX != "" {
+		if height > 0 && height < gs.Height {
+			ngs, nos, err := refillSymbols2.refillHeightAndMaskX(gameProp, plugin, gs, os, height, maskX, outputCD)
+			if err != nil {
+				goutils.Error("RefillSymbols2.OnPlayGame:refillHeightAndMaskX",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			if ngs == gs {
+				nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+				return nc, ErrComponentDoNothing
+			}
+
+			refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+			if nos != nil {
+				refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
+			}
+
+			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
+		}
+
+		ngs, nos, err := refillSymbols2.refillMaskX(gameProp, plugin, gs, os, maskX, outputCD)
+		if err != nil {
+			goutils.Error("RefillSymbols2.OnPlayGame:refillMaskX",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		if ngs == gs {
+			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, ErrComponentDoNothing
+		}
+
+		if nos != nil {
+			refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
+		}
+
+		refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+
+		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
+	}
 
 	if height > 0 && height < gs.Height {
-		if os != nil {
-			nos := os
+		ngs, nos := refillSymbols2.refillOnlyHeight(gameProp, gs, os, height, outputCD)
+		if ngs == gs {
+			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
-			for x := 0; x < gs.Width; x++ {
-				for y := gs.Height - 1; y >= 0; y-- {
-					if y < gs.Height-height {
-						continue
-					}
-
-					if ngs.Arr[x][y] == -1 {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
-							nos = os.CloneEx(gameProp.PoolScene)
-						}
-
-						cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
-
-						ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
-						ngs.Indexes[x]--
-
-						nos.Arr[x][y] = refillSymbols2.Config.DefaultSymbolVal
-
-						if outputCD != nil {
-							outputCD.AddPos(x, y)
-						}
-					}
-				}
-			}
-
-			if ngs == gs {
-				nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, ErrComponentDoNothing
-			}
-
-			refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
-		} else {
-			for x := 0; x < gs.Width; x++ {
-				for y := gs.Height - 1; y >= 0; y-- {
-					if y < gs.Height-height {
-						continue
-					}
-
-					if ngs.Arr[x][y] == -1 {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
-						}
-
-						cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
-
-						ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
-						ngs.Indexes[x]--
-
-						if outputCD != nil {
-							outputCD.AddPos(x, y)
-						}
-					}
-				}
-			}
-
-			if ngs == gs {
-				nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, ErrComponentDoNothing
-			}
+			return nc, ErrComponentDoNothing
 		}
-	} else {
-		if os != nil {
-			nos := os
 
-			for x := 0; x < gs.Width; x++ {
-				for y := gs.Height - 1; y >= 0; y-- {
-					if ngs.Arr[x][y] == -1 {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
-							nos = os.CloneEx(gameProp.PoolScene)
-						}
-
-						cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
-
-						ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
-						ngs.Indexes[x]--
-
-						nos.Arr[x][y] = refillSymbols2.Config.DefaultSymbolVal
-
-						if outputCD != nil {
-							outputCD.AddPos(x, y)
-						}
-					}
-				}
-			}
-
-			if ngs == gs {
-				nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, ErrComponentDoNothing
-			}
-
+		refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+		if nos != nil {
 			refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
-		} else {
-			for x := 0; x < gs.Width; x++ {
-				for y := gs.Height - 1; y >= 0; y-- {
-					if ngs.Arr[x][y] == -1 {
-						if ngs == gs {
-							ngs = gs.CloneEx(gameProp.PoolScene)
-						}
-
-						cr := gameProp.Pool.Config.MapReels[ngs.ReelName]
-
-						ngs.Arr[x][y] = refillSymbols2.getSymbol(cr, x, ngs.Indexes[x])
-						ngs.Indexes[x]--
-
-						if outputCD != nil {
-							outputCD.AddPos(x, y)
-						}
-					}
-				}
-			}
-
-			if ngs == gs {
-				nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, ErrComponentDoNothing
-			}
 		}
+
+		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
+	}
+
+	ngs, nos := refillSymbols2.refill(gameProp, gs, os, outputCD)
+	if ngs == gs {
+		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
+
+	if nos != nil {
+		refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
 	}
 
 	refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
@@ -283,13 +597,16 @@ func NewRefillSymbols2(name string) IComponent {
 // "isNeedProcSymbolVals": false,
 // "emptySymbolVal": -1,
 // "defaultSymbolVal": 0,
-// "Height": 4
+// "Height": 6,
+// "maskX": "mask-6"
 type jsonRefillSymbols2 struct {
 	IsNeedProcSymbolVals bool   `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int    `json:"emptySymbolVal"`       // 空的symbolVal是什么
 	DefaultSymbolVal     int    `json:"defaultSymbolVal"`     // 重新填充的symbolVal是什么
 	OutputToComponent    string `json:"outputToComponent"`    // 输出到哪个组件
 	Height               int    `json:"Height"`               // height, <=0 is ignore
+	MaskX                string `json:"maskX"`                // maskX
+	MaskY                string `json:"maskY"`                // maskY
 }
 
 func (jcfg *jsonRefillSymbols2) build() *RefillSymbols2Config {
@@ -299,6 +616,8 @@ func (jcfg *jsonRefillSymbols2) build() *RefillSymbols2Config {
 		DefaultSymbolVal:     jcfg.DefaultSymbolVal,
 		OutputToComponent:    jcfg.OutputToComponent,
 		Height:               jcfg.Height,
+		MaskX:                jcfg.MaskX,
+		MaskY:                jcfg.MaskY,
 	}
 
 	return cfg
