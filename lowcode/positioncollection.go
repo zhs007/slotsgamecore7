@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -26,7 +27,7 @@ const (
 )
 
 func parsePositionCollectionType(strType string) PositionCollectionType {
-	if strType == "nonRepeatable" {
+	if strType == "nonrepeatable" {
 		return PCTypeNonRepeatable
 	}
 
@@ -36,6 +37,7 @@ func parsePositionCollectionType(strType string) PositionCollectionType {
 type PositionCollectionData struct {
 	BasicComponentData
 	Pos []int
+	cfg *PositionCollectionConfig
 }
 
 // OnNewGame -
@@ -91,6 +93,12 @@ func (positionCollectionData *PositionCollectionData) HasPos(x int, y int) bool 
 
 // AddPos -
 func (positionCollectionData *PositionCollectionData) AddPos(x int, y int) {
+	if positionCollectionData.cfg.Type == PCTypeNonRepeatable {
+		if positionCollectionData.HasPos(x, y) {
+			return
+		}
+	}
+
 	positionCollectionData.Pos = append(positionCollectionData.Pos, x, y)
 }
 
@@ -223,7 +231,9 @@ func (positionCollection *PositionCollection) OnAsciiGame(gameProp *GameProperty
 
 // NewComponentData -
 func (positionCollection *PositionCollection) NewComponentData() IComponentData {
-	return &PositionCollectionData{}
+	return &PositionCollectionData{
+		cfg: positionCollection.Config,
+	}
 }
 
 // OnGameInited - on game inited
@@ -273,7 +283,7 @@ type jsonPositionCollection struct {
 
 func (jcfg *jsonPositionCollection) build() *PositionCollectionConfig {
 	cfg := &PositionCollectionConfig{
-		StrType:     jcfg.Type,
+		StrType:     strings.ToLower(jcfg.Type),
 		IsNeedClear: jcfg.IsNeedClear,
 	}
 
