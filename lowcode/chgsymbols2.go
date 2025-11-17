@@ -234,6 +234,8 @@ type ChgSymbols2Config struct {
 	RowMask               string                      `yaml:"rowMask" json:"rowMask"`
 	MapControllers        map[string][]*Award         `yaml:"controllers" json:"controllers"`
 	JumpToComponent       string                      `yaml:"jumpToComponent" json:"jumpToComponent"`
+	OutputToComponent     string                      `yaml:"outputToComponent" json:"outputToComponent"`
+	IsClearOutput         bool                        `yaml:"isClearOutput" json:"isClearOutput"`
 }
 
 // SetLinkComponent
@@ -806,6 +808,19 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sgc7game.GameScene, pos []int, symbolCode int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
+	var outputCD IComponentData
+
+	if chgSymbols2.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[chgSymbols2.Config.OutputToComponent]
+		if isok {
+			outputCD = gameProp.GetComponentData(pc)
+
+			if chgSymbols2.Config.IsClearOutput {
+				outputCD.ClearPos()
+			}
+		}
+	}
+
 	if chgSymbols2.Config.ExitType == CS2ETypeMaxNumber {
 		curnum := 0
 		for i := range len(pos) / 2 {
@@ -815,6 +830,10 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 			ngs.Arr[x][y] = symbolCode
 
 			cd.AddPos(x, y)
+
+			if outputCD != nil {
+				outputCD.AddPos(x, y)
+			}
 
 			curnum++
 			if curnum >= chgSymbols2.Config.MaxNumber {
@@ -829,6 +848,10 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 			ngs.Arr[x][y] = symbolCode
 
 			cd.AddPos(x, y)
+
+			if outputCD != nil {
+				outputCD.AddPos(x, y)
+			}
 		}
 	}
 
@@ -837,6 +860,19 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 
 // procSymbolsWithPos
 func (chgSymbols2 *ChgSymbols2) procSymbolsWithPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, symbolCodes []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+	var outputCD IComponentData
+
+	if chgSymbols2.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[chgSymbols2.Config.OutputToComponent]
+		if isok {
+			outputCD = gameProp.GetComponentData(pc)
+
+			if chgSymbols2.Config.IsClearOutput {
+				outputCD.ClearPos()
+			}
+		}
+	}
+
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
 	for _, v := range symbolCodes {
@@ -851,6 +887,10 @@ func (chgSymbols2 *ChgSymbols2) procSymbolsWithPos(gameProp *GameProperty, plugi
 		ngs.Arr[pos[cr*2]][pos[cr*2+1]] = v
 
 		cd.AddPos(pos[cr*2], pos[cr*2+1])
+
+		if outputCD != nil {
+			outputCD.AddPos(pos[cr*2], pos[cr*2+1])
+		}
 
 		if len(pos) <= 2 {
 			goutils.Error("ChgSymbols2.procSymbolsWithPos",
@@ -894,6 +934,19 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, 
 func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
 	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
 
+	var outputCD IComponentData
+
+	if chgSymbols2.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[chgSymbols2.Config.OutputToComponent]
+		if isok {
+			outputCD = gameProp.GetComponentData(pc)
+
+			if chgSymbols2.Config.IsClearOutput {
+				outputCD.ClearPos()
+			}
+		}
+	}
+
 	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
 
 	ngs := gs
@@ -922,6 +975,10 @@ func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty,
 				ngs.Arr[x][y] = sc
 
 				cd.AddPos(x, y)
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
 
 				curnum++
 
@@ -956,6 +1013,10 @@ func (chgSymbols2 *ChgSymbols2) procEachPosRandomWithPos(gameProp *GameProperty,
 				ngs.Arr[x][y] = sc
 
 				cd.AddPos(x, y)
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
 
 				chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
 					gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
@@ -1029,6 +1090,7 @@ func NewChgSymbols2(name string) IComponent {
 // "rowMask": "mask-height4"
 // "symbolCollection": "bg-allms"
 // "outputToComponent": "bg-sc-bottom",
+// "isClearOutput": true,
 type jsonChgSymbols2 struct {
 	StrSrcType            string   `json:"srcType"`
 	StrSrcSymbolType      string   `json:"srcSymbolType"`
@@ -1047,6 +1109,8 @@ type jsonChgSymbols2 struct {
 	SrcRowMask            string   `json:"srcRowMask"`
 	SrcMask               string   `json:"srcMask"`
 	RowMask               string   `json:"rowMask"`
+	OutputToComponent     string   `json:"outputToComponent"`
+	IsClearOutput         bool     `json:"isClearOutput"`
 }
 
 func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
@@ -1068,6 +1132,8 @@ func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
 		MaxNumber:             jcfg.MaxNumber,
 		RowMask:               jcfg.RowMask,
 		SymbolCollection:      jcfg.SymbolCollection,
+		OutputToComponent:     jcfg.OutputToComponent,
+		IsClearOutput:         jcfg.IsClearOutput,
 	}
 
 	return cfg

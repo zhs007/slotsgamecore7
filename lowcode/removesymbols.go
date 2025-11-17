@@ -281,6 +281,9 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 								ngs.Arr[x][y] = -1
 								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
 
+								rscd.X = x
+								rscd.Y = y
+
 								if outputCD != nil {
 									outputCD.AddPos(x, y)
 								}
@@ -310,6 +313,9 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 						ngs.Arr[x][y] = -1
 						nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+						rscd.X = x
+						rscd.Y = y
 
 						if outputCD != nil {
 							outputCD.AddPos(x, y)
@@ -353,6 +359,9 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 								ngs.Arr[x][y] = -1
 
+								rscd.X = x
+								rscd.Y = y
+
 								if outputCD != nil {
 									outputCD.AddPos(x, y)
 								}
@@ -381,6 +390,9 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 						}
 
 						ngs.Arr[x][y] = -1
+
+						rscd.X = x
+						rscd.Y = y
 
 						if outputCD != nil {
 							outputCD.AddPos(x, y)
