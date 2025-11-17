@@ -53,14 +53,21 @@ type RemoveSymbolsData struct {
 	BasicComponentData
 	RemovedNum int
 	AvgHeight  int // average removed symbol height; fixed-point: 100==1.0
+	X          int
+	Y          int
 }
 
 // GetValEx returns the integer value associated with the provided key for
 // this component data. It supports "CVAvgHeight" to expose the calculated
 // average remove height.
 func (removeSymbolsData *RemoveSymbolsData) GetValEx(key string, getType GetComponentValType) (int, bool) {
-	if key == CVAvgHeight {
+	switch key {
+	case CVAvgHeight:
 		return removeSymbolsData.AvgHeight, true
+	case CVX:
+		return removeSymbolsData.X, true
+	case CVY:
+		return removeSymbolsData.Y, true
 	}
 
 	return 0, false
@@ -81,6 +88,8 @@ func (removeSymbolsData *RemoveSymbolsData) onNewStep() {
 
 	// Always initialize AvgHeight to avoid carrying old values between steps
 	removeSymbolsData.AvgHeight = 0
+	removeSymbolsData.X = -1
+	removeSymbolsData.Y = -1
 }
 
 // Clone creates a shallow copy of RemoveSymbolsData suitable for storing as
