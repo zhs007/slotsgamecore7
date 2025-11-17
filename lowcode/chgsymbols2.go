@@ -458,6 +458,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 				arr := imaskd.GetMask()
 				if len(arr) != gs.Width {
 					goutils.Error("ChgSymbols2.getSrcPos:Mask:len(arr)!=gs.Width",
+						slog.String("componentName", chgSymbols2.GetName()),
 						goutils.Err(ErrInvalidComponentConfig))
 
 					return nil, ErrInvalidComponentConfig
@@ -565,6 +566,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 				arr := imaskd.GetMask()
 				if len(arr) != gs.Width {
 					goutils.Error("ChgSymbols2.getSrcPos:Mask:len(arr)!=gs.Width",
+						slog.String("componentName", chgSymbols2.GetName()),
 						goutils.Err(ErrInvalidComponentConfig))
 
 					return nil, ErrInvalidComponentConfig
@@ -1026,6 +1028,7 @@ func NewChgSymbols2(name string) IComponent {
 // "srcRowMask": "mask-left"
 // "rowMask": "mask-height4"
 // "symbolCollection": "bg-allms"
+// "outputToComponent": "bg-sc-bottom",
 type jsonChgSymbols2 struct {
 	StrSrcType            string   `json:"srcType"`
 	StrSrcSymbolType      string   `json:"srcSymbolType"`

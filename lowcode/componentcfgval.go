@@ -39,6 +39,7 @@ const (
 	CCVMaskX                      string = "maskx"                      // 可以修改配置项里的 maskx
 	CCVNumberWeight               string = "numberweight"               // 可以修改配置项里的 numberweight
 	CCVSymbolWeight               string = "symbolweight"               // 可以修改配置项里的 symbolweight
+	CCVReelIndex                  string = "reelindex"                  // 可以修改配置项里的 reelindex
 )
 
 const (
