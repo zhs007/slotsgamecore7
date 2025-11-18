@@ -11,11 +11,78 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"gopkg.in/yaml.v2"
 )
 
 const RefillSymbols2TypeName = "refillSymbols2"
+
+type RefillSymbols2Data struct {
+	BasicComponentData
+	cfg *RefillSymbols2Config
+}
+
+// OnNewGame -
+func (rs2d *RefillSymbols2Data) OnNewGame(gameProp *GameProperty, component IComponent) {
+	rs2d.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// OnNewStep -
+func (rs2d *RefillSymbols2Data) onNewStep() {
+	rs2d.UsedScenes = nil
+	rs2d.UsedOtherScenes = nil
+}
+
+// Clone
+func (rs2d *RefillSymbols2Data) Clone() IComponentData {
+	target := &RefillSymbols2Data{
+		BasicComponentData: rs2d.CloneBasicComponentData(),
+		cfg:                rs2d.cfg,
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (rs2d *RefillSymbols2Data) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.BasicComponentData{
+		BasicComponentData: rs2d.BuildPBBasicComponentData(),
+	}
+
+	return pbcd
+}
+
+// ChgConfigIntVal -
+func (rs2d *RefillSymbols2Data) ChgConfigIntVal(key string, off int) int {
+	if key == CCVHeight {
+		if rs2d.cfg.Height > 0 {
+			rs2d.MapConfigIntVals[key] = rs2d.cfg.Height
+		}
+	}
+
+	return rs2d.BasicComponentData.ChgConfigIntVal(key, off)
+}
+
+// GetValEx -
+func (rs2d *RefillSymbols2Data) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	switch key {
+	case CVHeight:
+		return rs2d.getHeight(), true
+	}
+
+	return 0, false
+}
+
+func (rs2d *RefillSymbols2Data) getHeight() int {
+	height, isok := rs2d.GetConfigIntVal(CCVHeight)
+	if isok {
+		return height
+	}
+
+	return rs2d.cfg.Height
+}
 
 // RefillSymbols2Config - configuration for RefillSymbols2
 type RefillSymbols2Config struct {
@@ -94,7 +161,7 @@ func (refillSymbols2 *RefillSymbols2) getHeight(basicCD *BasicComponentData) int
 	return refillSymbols2.Config.Height
 }
 
-func (refillSymbols2 *RefillSymbols2) getMaskX(gameProp *GameProperty, basicCD *BasicComponentData) string {
+func (refillSymbols2 *RefillSymbols2) getMaskX(_ *GameProperty, basicCD *BasicComponentData) string {
 	str := basicCD.GetConfigVal(CCVMaskX)
 	if str != "" {
 		return str
@@ -457,10 +524,9 @@ func (refillSymbols2 *RefillSymbols2) refill(gameProp *GameProperty, gs *sgc7gam
 func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
 
-	bcd := cd.(*BasicComponentData)
+	rs2d := cd.(*RefillSymbols2Data)
 
-	bcd.UsedScenes = nil
-	bcd.UsedOtherScenes = nil
+	rs2d.onNewStep()
 
 	gs := refillSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -483,8 +549,8 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 		outputCD.ClearPos()
 	}
 
-	height := refillSymbols2.getHeight(bcd)
-	maskX := refillSymbols2.getMaskX(gameProp, bcd)
+	height := refillSymbols2.getHeight(&rs2d.BasicComponentData)
+	maskX := refillSymbols2.getMaskX(gameProp, &rs2d.BasicComponentData)
 
 	if maskX != "" {
 		if height > 0 && height < gs.Height {
@@ -502,9 +568,9 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 				return nc, ErrComponentDoNothing
 			}
 
-			refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+			refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 			if nos != nil {
-				refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
+				refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
 			}
 
 			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
@@ -527,10 +593,10 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != nil {
-			refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
+			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
 		}
 
-		refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 
 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -545,9 +611,9 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 			return nc, ErrComponentDoNothing
 		}
 
-		refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 		if nos != nil {
-			refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
+			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
 		}
 
 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
@@ -563,10 +629,10 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 	}
 
 	if nos != nil {
-		refillSymbols2.AddOtherScene(gameProp, curpr, nos, bcd)
+		refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
 	}
 
-	refillSymbols2.AddScene(gameProp, curpr, ngs, bcd)
+	refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 
 	nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -586,6 +652,13 @@ func (refillSymbols2 *RefillSymbols2) OnAsciiGame(gameProp *GameProperty, pr *sg
 
 // EachUsedResults -
 func (refillSymbols2 *RefillSymbols2) EachUsedResults(pr *sgc7game.PlayResult, pbComponentData *anypb.Any, oneach FuncOnEachUsedResult) {
+}
+
+// NewComponentData -
+func (refillSymbols2 *RefillSymbols2) NewComponentData() IComponentData {
+	return &RefillSymbols2Data{
+		cfg: refillSymbols2.Config,
+	}
 }
 
 func NewRefillSymbols2(name string) IComponent {

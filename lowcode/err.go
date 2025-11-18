@@ -130,6 +130,11 @@ var (
 	// ErrInvalidIntValMappingValue - invalid IntValMapping value
 	ErrInvalidIntValMappingValue = errors.New("invalid IntValMapping value")
 
+	// ErrInvalidStringValMappingFile - invalid StringValMappingFile
+	ErrInvalidStringValMappingFile = errors.New("invalid StringValMappingFile")
+	// ErrInvalidStringValMappingValue - invalid StringValMapping value
+	ErrInvalidStringValMappingValue = errors.New("invalid StringValMapping value")
+
 	// ErrInvalidWeightVal - invalid weight value
 	ErrInvalidWeightVal = errors.New("invalid weight value")
 

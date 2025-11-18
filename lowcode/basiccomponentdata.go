@@ -94,6 +94,10 @@ func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, 
 
 // GetValEx -
 func (basicComponentData *BasicComponentData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVOutputInt {
+		return basicComponentData.Output, true
+	}
+
 	return 0, false
 }
 
@@ -339,6 +343,10 @@ func (basicComponentData *BasicComponentData) ChgReelsCollector(reelsData []int)
 
 // GetStrVal -
 func (basicComponentData *BasicComponentData) GetStrVal(key string) (string, bool) {
+	if key == CVOutputString {
+		return basicComponentData.StrOutput, true
+	}
+
 	return "", false
 }
 

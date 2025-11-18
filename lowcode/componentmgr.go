@@ -80,6 +80,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(PiggyBankTypeName, NewPiggyBank)
 	mgr.Reg(AddSymbolsTypeName, NewAddSymbols)
 	mgr.Reg(IntValMappingTypeName, NewIntValMapping)
+	mgr.Reg(StringValMappingTypeName, NewStringValMapping)
 	mgr.Reg(WeightBranchTypeName, NewWeightBranch)
 	mgr.Reg(GenGigaSymbolTypeName, NewGenGigaSymbol)
 	mgr.Reg(GenSymbolValsWithPosTypeName, NewGenSymbolValsWithPos)
@@ -105,6 +106,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(RandomMoveSymbolsTypeName, NewRandomMoveSymbols)
 	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
 	mgr.Reg(GenSymbolCollectionTypeName, NewGenSymbolCollection)
+	mgr.Reg(DropSymbolsTypeName, NewDropSymbols)
 	mgr.Reg(FeatureBarTypeName, NewFeatureBar)
 	mgr.Reg(BombTypeName, NewBomb)
 	mgr.Reg(SumSymbolValsTypeName, NewSumSymbolVals)
@@ -134,6 +136,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(AlignTropiCoolSPGridTypeName, NewAlignTropiCoolSPGrid)
 	mgr.Reg(RefillTropiCoolSPGridTypeName, NewRefillTropiCoolSPGrid)
 	mgr.Reg(CollectorPayTriggerTypeName, NewCollectorPayTrigger)
+	mgr.Reg(CalculatorTypeName, NewCalculator)
 
 	return mgr
 }

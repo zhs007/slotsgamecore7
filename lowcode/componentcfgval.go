@@ -39,6 +39,9 @@ const (
 	CCVMaskX                      string = "maskx"                      // 可以修改配置项里的 maskx
 	CCVNumberWeight               string = "numberweight"               // 可以修改配置项里的 numberweight
 	CCVSymbolWeight               string = "symbolweight"               // 可以修改配置项里的 symbolweight
+	CCVReelIndex                  string = "reelindex"                  // 可以修改配置项里的 reelindex
+	CCVInput1                     string = "input1"                     // 可以修改配置项里的 input1
+	CCVInput2                     string = "input2"                     // 可以修改配置项里的 input2
 )
 
 const (
@@ -63,6 +66,9 @@ const (
 	CVWinResultNum          string = "winresultnum"          // winResultNum
 	CCValueNum              string = "valuenum"              // valueNum
 	CVHeight                string = "height"                // height
+	CVX                     string = "x"                     // x
+	CVY                     string = "y"                     // y
+	CVOutputString          string = "outputstring"          // outputstring
 )
 
 const (

@@ -102,7 +102,7 @@ func (basicReels2 *BasicReels2) ProcControllers(gameProp *GameProperty, plugin s
 	}
 }
 
-func (basicReels2 *BasicReels2) getMaskX(gameProp *GameProperty, basicCD *BasicComponentData) string {
+func (basicReels2 *BasicReels2) getMaskX(_ *GameProperty, basicCD *BasicComponentData) string {
 	str := basicCD.GetConfigVal(CCVMaskX)
 	if str != "" {
 		if str == "<empty>" {
