@@ -68,6 +68,7 @@ const (
 	CVHeight                string = "height"                // height
 	CVX                     string = "x"                     // x
 	CVY                     string = "y"                     // y
+	CVOutputString          string = "outputstring"          // outputstring
 )
 
 const (

@@ -343,6 +343,10 @@ func (basicComponentData *BasicComponentData) ChgReelsCollector(reelsData []int)
 
 // GetStrVal -
 func (basicComponentData *BasicComponentData) GetStrVal(key string) (string, bool) {
+	if key == CVOutputString {
+		return basicComponentData.StrOutput, true
+	}
+
 	return "", false
 }
 

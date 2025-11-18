@@ -70,6 +70,7 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(PiggyBankTypeName), parsePiggyBank)
 	gJsonMgr.RegLoadComponent(strings.ToLower(AddSymbolsTypeName), parseAddSymbols)
 	gJsonMgr.RegLoadComponent(strings.ToLower(IntValMappingTypeName), parseIntValMapping)
+	gJsonMgr.RegLoadComponent(strings.ToLower(StringValMappingTypeName), parseStringValMapping)
 	gJsonMgr.RegLoadComponent(strings.ToLower(WeightBranchTypeName), parseWeightBranch)
 	gJsonMgr.RegLoadComponent(strings.ToLower(ClusterTriggerTypeName), parseClusterTrigger)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenGigaSymbolTypeName), parseGenGigaSymbol)

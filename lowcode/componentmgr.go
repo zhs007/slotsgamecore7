@@ -80,6 +80,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(PiggyBankTypeName, NewPiggyBank)
 	mgr.Reg(AddSymbolsTypeName, NewAddSymbols)
 	mgr.Reg(IntValMappingTypeName, NewIntValMapping)
+	mgr.Reg(StringValMappingTypeName, NewStringValMapping)
 	mgr.Reg(WeightBranchTypeName, NewWeightBranch)
 	mgr.Reg(GenGigaSymbolTypeName, NewGenGigaSymbol)
 	mgr.Reg(GenSymbolValsWithPosTypeName, NewGenSymbolValsWithPos)
