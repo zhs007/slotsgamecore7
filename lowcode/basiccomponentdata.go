@@ -94,6 +94,10 @@ func (basicComponentData *BasicComponentData) OnNewGame(gameProp *GameProperty, 
 
 // GetValEx -
 func (basicComponentData *BasicComponentData) GetValEx(key string, getType GetComponentValType) (int, bool) {
+	if key == CVOutputInt {
+		return basicComponentData.Output, true
+	}
+
 	return 0, false
 }
 

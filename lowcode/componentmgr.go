@@ -135,6 +135,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(AlignTropiCoolSPGridTypeName, NewAlignTropiCoolSPGrid)
 	mgr.Reg(RefillTropiCoolSPGridTypeName, NewRefillTropiCoolSPGrid)
 	mgr.Reg(CollectorPayTriggerTypeName, NewCollectorPayTrigger)
+	mgr.Reg(CalculatorTypeName, NewCalculator)
 
 	return mgr
 }

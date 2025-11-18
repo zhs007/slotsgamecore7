@@ -83,7 +83,7 @@ func (dropSymbols *DropSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 }
 
 // getReelIndex - helper
-func (dropSymbols *DropSymbols) getReelIndex(gameProp *GameProperty, cd *BasicComponentData) int {
+func (dropSymbols *DropSymbols) getReelIndex(_ *GameProperty, cd *BasicComponentData) int {
 	v, isok := cd.GetConfigIntVal(CCVReelIndex)
 	if isok {
 		return v
@@ -108,6 +108,12 @@ func (dropSymbols *DropSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	}
 
 	reelindex := dropSymbols.getReelIndex(gameProp, bcd)
+	if reelindex < 0 || reelindex >= gs.Width {
+		// 这里表示不需要处理
+		nc := dropSymbols.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, ErrComponentDoNothing
+	}
 
 	ngs := gs
 
