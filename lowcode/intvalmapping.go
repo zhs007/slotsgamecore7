@@ -11,10 +11,61 @@ import (
 	"github.com/zhs007/slotsgamecore7/asciigame"
 	sgc7game "github.com/zhs007/slotsgamecore7/game"
 	sgc7plugin "github.com/zhs007/slotsgamecore7/plugin"
+	"github.com/zhs007/slotsgamecore7/sgc7pb"
+	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v2"
 )
 
 const IntValMappingTypeName = "intValMapping"
+
+type IntValMappingData struct {
+	BasicComponentData
+	cfg *IntValMappingConfig
+}
+
+// OnNewGame -
+func (svmd *IntValMappingData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	svmd.BasicComponentData.OnNewGame(gameProp, component)
+}
+
+// Clone
+func (svmd *IntValMappingData) Clone() IComponentData {
+	target := &IntValMappingData{
+		BasicComponentData: svmd.CloneBasicComponentData(),
+		cfg:                svmd.cfg,
+	}
+
+	return target
+}
+
+// BuildPBComponentData
+func (svmd *IntValMappingData) BuildPBComponentData() proto.Message {
+	pbcd := &sgc7pb.BasicComponentData{
+		BasicComponentData: svmd.BuildPBBasicComponentData(),
+	}
+
+	return pbcd
+}
+
+// ChgConfigIntVal -
+func (svmd *IntValMappingData) ChgConfigIntVal(key string, off int) int {
+	if key == CCVInputVal {
+		if svmd.cfg.InputVal > 0 {
+			svmd.MapConfigIntVals[key] = svmd.cfg.InputVal
+		}
+	}
+
+	return svmd.BasicComponentData.ChgConfigIntVal(key, off)
+}
+
+func (svmd *IntValMappingData) getInputVal() int {
+	input, isok := svmd.GetConfigIntVal(CCVInputVal)
+	if isok {
+		return input
+	}
+
+	return svmd.cfg.InputVal
+}
 
 // IntValMappingConfig - configuration for IntValMapping
 type IntValMappingConfig struct {
@@ -23,6 +74,7 @@ type IntValMappingConfig struct {
 	ValMappingVM         *sgc7game.ValMapping2 `yaml:"-" json:"-"`
 	InputVal             int                   `yaml:"inputVal" json:"inputVal"`
 	ComponentOutput      string                `yaml:"componentOutput" json:"componentOutput"`
+	Controllers          []*Award              `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -85,29 +137,31 @@ func (intValMapping *IntValMapping) InitEx(cfg any, pool *GamePropertyPool) erro
 		return ErrInvalidIntValMappingFile
 	}
 
+	for _, ctrl := range intValMapping.Config.Controllers {
+		ctrl.Init()
+	}
+
 	intValMapping.onInit(&intValMapping.Config.BasicComponentConfig)
 
 	return nil
 }
 
-func (intValMapping *IntValMapping) getInput(basicCD *BasicComponentData) int {
-	v, isok := basicCD.GetConfigIntVal(CCVInputVal)
-	if isok {
-		return v
+// OnProcControllers -
+func (intValMapping *IntValMapping) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(intValMapping.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, intValMapping.Config.Controllers, curpr, gp)
 	}
-
-	return intValMapping.Config.InputVal
 }
 
 // playgame
 func (intValMapping *IntValMapping) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*IntValMappingData)
 
 	// cd.Output = 0
 
-	in := intValMapping.getInput(cd)
+	in := cd.getInputVal()
 
 	mv, isok := intValMapping.Config.ValMappingVM.MapVals[in]
 	if !isok {
@@ -119,6 +173,8 @@ func (intValMapping *IntValMapping) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 	cd.Output = mv.Int()
 
+	intValMapping.ProcControllers(gameProp, plugin, curpr, gp, cd.Output, "")
+
 	nc := intValMapping.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
@@ -126,17 +182,19 @@ func (intValMapping *IntValMapping) OnPlayGame(gameProp *GameProperty, curpr *sg
 
 // OnAsciiGame - outpur to asciigame
 func (intValMapping *IntValMapping) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
-	cd := icd.(*BasicComponentData)
+	cd := icd.(*IntValMappingData)
 
-	fmt.Printf("rollSymbol %v, %v => %v \n", intValMapping.GetName(), intValMapping.getInput(cd), cd.Output)
+	fmt.Printf("rollSymbol %v, %v => %v \n", intValMapping.GetName(), cd.getInputVal(), cd.Output)
 
 	return nil
 }
 
-// // OnStats
-// func (intValMapping *IntValMapping) OnStats(feature *sgc7stats.Feature, stake *sgc7game.Stake, lst []*sgc7game.PlayResult) (bool, int64, int64) {
-// 	return false, 0, 0
-// }
+// NewComponentData -
+func (intValMapping *IntValMapping) NewComponentData() IComponentData {
+	return &IntValMappingData{
+		cfg: intValMapping.Config,
+	}
+}
 
 func NewIntValMapping(name string) IComponent {
 	return &IntValMapping{
@@ -159,13 +217,11 @@ func (jcfg *jsonIntValMapping) build() *IntValMappingConfig {
 		InputVal:   jcfg.InputVal,
 	}
 
-	// cfg.UseSceneV3 = true
-
 	return cfg
 }
 
 func parseIntValMapping(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseIntValMapping:getConfigInCell",
 			goutils.Err(err))
@@ -192,6 +248,18 @@ func parseIntValMapping(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		controllers, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseIntValMapping:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Controllers = controllers
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig

@@ -506,9 +506,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 							}
 
 							if arr2[y] {
-								for x := 0; x < gs.Width; x++ {
-									pos = append(pos, x, y)
-								}
+								pos = append(pos, x, y)
 							}
 						}
 					}
@@ -606,9 +604,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 					if arr1[x] {
 						for y := 0; y < gs.Height; y++ {
 							if arr2[y] {
-								for x := 0; x < gs.Width; x++ {
-									pos = append(pos, x, y)
-								}
+								pos = append(pos, x, y)
 							}
 						}
 					}
@@ -799,7 +795,7 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 
 	chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
 
-	nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, "")
+	nc := chgSymbols2.onStepEnd(gameProp, curpr, gp, chgSymbols2.Config.JumpToComponent)
 
 	return nc, nil
 }
