@@ -85,7 +85,7 @@ func (collectorData *Collector2Data) onNewStep() {
 }
 
 func (collectorData *Collector2Data) SetConfigIntVal(key string, val int) {
-	if key == CCVValueNum {
+	if key == CCVValueNum || key == CCVValueNumNow {
 		collectorData.Val = val
 	} else {
 		collectorData.BasicComponentData.SetConfigIntVal(key, val)
@@ -110,6 +110,8 @@ func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
 		}
 
 		collectorData.BasicComponentData.SetConfigIntVal(key, val)
+
+		collectorData.Val = val
 
 		return val
 	} else {
@@ -542,6 +544,17 @@ func (collector *Collector2) OnUpdateDataWithPlayerState(pool *GamePropertyPool,
 
 			cps.Value = val
 		}
+	} else {
+		cd2, isok := cd.(*Collector2Data)
+		if !isok {
+			goutils.Error("Collector2.OnUpdateDataWithPlayerState:Collector2Data",
+				goutils.Err(ErrInvalidComponentData))
+
+			return
+		}
+
+		collector.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
+		collector.ProcControllers(gameProp, plugin, curpr, gp, cd2.Val, fmt.Sprintf("%d", cd2.Val))
 	}
 }
 
