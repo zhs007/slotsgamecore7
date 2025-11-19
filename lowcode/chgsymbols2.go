@@ -506,9 +506,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 							}
 
 							if arr2[y] {
-								for x := 0; x < gs.Width; x++ {
-									pos = append(pos, x, y)
-								}
+								pos = append(pos, x, y)
 							}
 						}
 					}
@@ -606,9 +604,7 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 					if arr1[x] {
 						for y := 0; y < gs.Height; y++ {
 							if arr2[y] {
-								for x := 0; x < gs.Width; x++ {
-									pos = append(pos, x, y)
-								}
+								pos = append(pos, x, y)
 							}
 						}
 					}
