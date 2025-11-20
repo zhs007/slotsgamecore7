@@ -382,6 +382,51 @@ func CalcScatterEx2(scene *GameScene, scatter int, nums int, isScatter FuncIsSca
 	return nil
 }
 
+// CalcScatterEx3 - calc scatter
+func CalcScatterEx3(scene *GameScene, scatter int, nums int, maxnum int, isScatter FuncIsScatter, height int, isReversalHeight bool) *Result {
+	if height <= 0 || height > len(scene.Arr[0]) {
+		height = len(scene.Arr[0])
+	}
+
+	curnums := 0
+	pos := make([]int, 0, len(scene.Arr)*len(scene.Arr[0])*2)
+	if isReversalHeight {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := len(scene.Arr[0]) - 1; y >= len(scene.Arr[0])-height; y-- {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					curnums++
+
+					pos = append(pos, x, y)
+				}
+			}
+		}
+	} else {
+		for x := 0; x < len(scene.Arr); x++ {
+			for y := 0; y < height; y++ {
+				if isScatter(scatter, scene.Arr[x][y]) {
+					curnums++
+
+					pos = append(pos, x, y)
+				}
+			}
+		}
+	}
+
+	if curnums >= nums && curnums <= maxnum {
+		r := &Result{
+			Symbol:     scatter,
+			Type:       RTScatterEx,
+			LineIndex:  -1,
+			Pos:        pos,
+			SymbolNums: curnums,
+		}
+
+		return r
+	}
+
+	return nil
+}
+
 // CalcReelScatterEx - calc scatter
 func CalcReelScatterEx(scene *GameScene, scatter int, nums int, isScatter FuncIsScatter) *Result {
 	curnums := 0

@@ -133,6 +133,7 @@ type ScatterTriggerConfig struct {
 	OSMulTypeString                 string                        `yaml:"symbolValsMulti" json:"symbolValsMulti"`       // OtherSceneMultiType
 	OSMulType                       OtherSceneMultiType           `yaml:"-" json:"-"`                                   // OtherSceneMultiType
 	MinNum                          int                           `yaml:"minNum" json:"minNum"`                         // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
+	MaxNum                          int                           `yaml:"maxNum" json:"maxNum"`                         // like 3，countscatter 或 countscatterInArea 或 checkLines 或 checkWays 时生效
 	WildSymbols                     []string                      `yaml:"wildSymbols" json:"wildSymbols"`               // wild etc
 	WildSymbolCodes                 []int                         `yaml:"-" json:"-"`                                   // wild symbolCode
 	PosArea                         []int                         `yaml:"posArea" json:"posArea"`                       // 只在countscatterInArea时生效，[minx,maxx,miny,maxy]，当x，y分别符合双闭区间才合法
@@ -440,22 +441,42 @@ func (scatterTrigger *ScatterTrigger) canTrigger(gameProp *GameProperty, gs *sgc
 			}
 		}
 	case STTypeCountScatter:
-		ret := sgc7game.CalcScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
-			return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-		}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
+		if scatterTrigger.Config.MaxNum > 0 {
+			ret := sgc7game.CalcScatterEx3(gs, symbols[0], scatterTrigger.Config.MinNum, scatterTrigger.Config.MaxNum, func(scatter int, cursymbol int) bool {
+				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
 
-		if ret != nil {
-			if scatterTrigger.Config.BetType != BTypeNoPay {
-				if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
-					ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
-					ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet3(stake, scatterTrigger.Config.BetType)
+			if ret != nil {
+				if scatterTrigger.Config.BetType != BTypeNoPay {
+					if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
+						ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet3(stake, scatterTrigger.Config.BetType)
+					}
 				}
+
+				isTrigger = true
+
+				lst = append(lst, ret)
 			}
+		} else {
+			ret := sgc7game.CalcScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
+				return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0 || goutils.IndexOfIntSlice(scatterTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+			}, scatterTrigger.GetHeight(&std.BasicComponentData), scatterTrigger.Config.IsReversalHeight)
 
-			isTrigger = true
+			if ret != nil {
+				if scatterTrigger.Config.BetType != BTypeNoPay {
+					if scatterTrigger.Config.SymbolCodeCountScatterPayAs > 0 {
+						ret.Mul = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CoinWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1]
+						ret.CashWin = gameProp.CurPaytables.MapPay[scatterTrigger.Config.SymbolCodeCountScatterPayAs][ret.SymbolNums-1] * gameProp.GetBet3(stake, scatterTrigger.Config.BetType)
+					}
+				}
 
-			lst = append(lst, ret)
+				isTrigger = true
+
+				lst = append(lst, ret)
+			}
 		}
 	case STTypeCountScatterReels:
 		ret := sgc7game.CalcReelScatterEx2(gs, symbols[0], scatterTrigger.Config.MinNum, func(scatter int, cursymbol int) bool {
@@ -854,6 +875,7 @@ func NewScatterTrigger(name string) IComponent {
 //		"respinNum": 10,
 //		"putMoneyInPiggyBank": "bg-piggybank"
 // 		"reelsCollector": "bg-collect"
+// "maxNum": 5
 
 type jsonScatterTrigger struct {
 	Symbols                       []string   `json:"symbols"`
@@ -861,6 +883,7 @@ type jsonScatterTrigger struct {
 	BetType                       string     `json:"betType"`
 	SymbolValsMulti               string     `json:"symbolValsMulti"`
 	MinNum                        int        `json:"minNum"`
+	MaxNum                        int        `json:"maxNum"`
 	WildSymbols                   []string   `json:"wildSymbols"`
 	PosArea                       []int      `json:"posArea"`
 	CountScatterPayAs             string     `json:"countScatterPayAs"`
@@ -888,6 +911,7 @@ func (jcfg *jsonScatterTrigger) build() *ScatterTriggerConfig {
 		Type:               jcfg.TriggerType,
 		BetTypeString:      jcfg.BetType,
 		MinNum:             jcfg.MinNum,
+		MaxNum:             jcfg.MaxNum,
 		WildSymbols:        jcfg.WildSymbols,
 		PosArea:            jcfg.PosArea,
 		CountScatterPayAs:  jcfg.CountScatterPayAs,
