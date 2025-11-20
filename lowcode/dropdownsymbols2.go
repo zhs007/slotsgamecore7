@@ -127,6 +127,15 @@ func (dropDownSymbols *DropDownSymbols2) InitEx(cfg any, pool *GamePropertyPool)
 	return nil
 }
 
+func (dropDownSymbols *DropDownSymbols2) getRowMask(basicCD *BasicComponentData) string {
+	str := basicCD.GetConfigVal(CCVRowMask)
+	if str != "" {
+		return str
+	}
+
+	return dropDownSymbols.Config.RowMask
+}
+
 // OnProcControllers -
 func (dropDownSymbols *DropDownSymbols2) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
 	awards, isok := dropDownSymbols.Config.MapAwards[strVal]
@@ -322,13 +331,15 @@ func (dropDownSymbols *DropDownSymbols2) procSPController(gameProp *GameProperty
 
 }
 
-func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProperty, gs *sgc7game.GameScene) (bool, *sgc7game.GameScene, error) {
+func (dropDownSymbols *DropDownSymbols2) procHexGridStaggered(gameProp *GameProperty, gs *sgc7game.GameScene, bcd *BasicComponentData) (bool, *sgc7game.GameScene, error) {
 
 	ngs := gs
 
+	rowMask := dropDownSymbols.getRowMask(bcd)
+
 	// 有 rowMask 时很复杂,最后的下落不能算trigger,应该算refill
-	if dropDownSymbols.Config.RowMask != "" {
-		imaskd := gameProp.GetComponentDataWithName(dropDownSymbols.Config.RowMask)
+	if rowMask != "" {
+		imaskd := gameProp.GetComponentDataWithName(rowMask)
 		if imaskd == nil {
 			goutils.Error("DropDownSymbols2.getSrcPos:RowMask:imaskd==nil",
 				goutils.Err(ErrInvalidComponentConfig))
@@ -822,7 +833,7 @@ func (dropDownSymbols *DropDownSymbols2) OnPlayGame(gameProp *GameProperty, curp
 				return dropDownSymbols.onStepEnd(gameProp, curpr, gp, ""), nil
 			}
 		case DDS2TypeHexGridStaggered:
-			istrigger, ngs, err := dropDownSymbols.procHexGridStaggered(gameProp, gs)
+			istrigger, ngs, err := dropDownSymbols.procHexGridStaggered(gameProp, gs, bcd)
 			if err != nil {
 				goutils.Error("DropDownSymbols2.OnPlayGame:procHexGridStaggered",
 					goutils.Err(err))
