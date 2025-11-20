@@ -42,6 +42,7 @@ const (
 	CCVReelIndex                  string = "reelindex"                  // 可以修改配置项里的 reelindex
 	CCVInput1                     string = "input1"                     // 可以修改配置项里的 input1
 	CCVInput2                     string = "input2"                     // 可以修改配置项里的 input2
+	CCVRowMask                    string = "rowmask"                    // 可以修改配置项里的 rowmask
 )
 
 const (

@@ -105,6 +105,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(WinResultModifierExTypeName, NewWinResultModifierEx)
 	mgr.Reg(RandomMoveSymbolsTypeName, NewRandomMoveSymbols)
 	mgr.Reg(GenPositionCollectionTypeName, NewGenPositionCollection)
+	mgr.Reg(GenPositionCollectionWithSymbolTypeName, NewGenPositionCollectionWithSymbol)
 	mgr.Reg(GenSymbolCollectionTypeName, NewGenSymbolCollection)
 	mgr.Reg(DropSymbolsTypeName, NewDropSymbols)
 	mgr.Reg(FeatureBarTypeName, NewFeatureBar)

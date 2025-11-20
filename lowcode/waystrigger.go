@@ -275,6 +275,15 @@ func (waysTrigger *WaysTrigger) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (waysTrigger *WaysTrigger) getRowMask(basicCD *BasicComponentData) string {
+	str := basicCD.GetConfigVal(CCVRowMask)
+	if str != "" {
+		return str
+	}
+
+	return waysTrigger.Config.RowMask
+}
+
 // playgame
 func (waysTrigger *WaysTrigger) procMask(gs *sgc7game.GameScene, gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
 	plugin sgc7plugin.IPlugin, ret *sgc7game.Result) error {
@@ -352,8 +361,10 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		return isTrigger, lst
 	}
 
-	if waysTrigger.Config.RowMask != "" {
-		maskCompData := gameProp.GetComponentDataWithName(waysTrigger.Config.RowMask)
+	rowMask := waysTrigger.getRowMask(&cd.BasicComponentData)
+
+	if rowMask != "" {
+		maskCompData := gameProp.GetComponentDataWithName(rowMask)
 		if maskCompData == nil {
 			goutils.Error("WaysTrigger.canTrigger:GetComponentDataWithName",
 				goutils.Err(ErrInvalidComponentConfig))

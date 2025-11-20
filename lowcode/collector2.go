@@ -225,7 +225,7 @@ func (collector *Collector2) onAdd(plugin sgc7plugin.IPlugin, startVal int, num 
 		for i := 1; i <= num; i++ {
 			cl := startVal + i
 			if cl >= collector.Config.MaxVal {
-				collector.onLevelUp(plugin, gameProp, curpr, gp, -1, false)
+				collector.onLevelUp(plugin, gameProp, curpr, gp, collector.Config.MaxVal, false)
 				break
 			} else {
 				collector.onLevelUp(plugin, gameProp, curpr, gp, cl, false)
