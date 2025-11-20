@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -23,6 +24,7 @@ type BasicReels2Config struct {
 	Height               int      `yaml:"height" json:"height"`
 	MaskX                string   `yaml:"maskX" json:"maskX"`
 	MaskY                string   `yaml:"maskY" json:"maskY"`
+	MustTrigger          []string `yaml:"mustTrigger" json:"mustTrigger"`
 	Controllers          []*Award `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
@@ -210,12 +212,19 @@ func NewBasicReels2(name string) IComponent {
 // "height": 6,
 // "reelSet": "bg-reel01",
 // "maskX": "mask-6"
+// "mustTrigger": [
+//
+//	"silver-must-co",
+//	"silver-must-ca"
+//
+// ]
 type jsonBasicReels2 struct {
-	ReelSet      string `json:"reelSet"`
-	IsExpandReel bool   `json:"isExpandReel"`
-	Height       int    `json:"height"`
-	MaskX        string `json:"maskX"`
-	MaskY        string `json:"maskY"`
+	ReelSet      string   `json:"reelSet"`
+	IsExpandReel bool     `json:"isExpandReel"`
+	Height       int      `json:"height"`
+	MaskX        string   `json:"maskX"`
+	MaskY        string   `json:"maskY"`
+	MustTrigger  []string `json:"mustTrigger"`
 }
 
 func (jbr *jsonBasicReels2) build() *BasicReels2Config {
@@ -225,6 +234,7 @@ func (jbr *jsonBasicReels2) build() *BasicReels2Config {
 		Height:       jbr.Height,
 		MaskX:        jbr.MaskX,
 		MaskY:        jbr.MaskY,
+		MustTrigger:  slices.Clone(jbr.MustTrigger),
 	}
 
 	return cfg
