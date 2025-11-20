@@ -110,8 +110,11 @@ func (addSymbolsData *AddSymbolsData) GetValEx(key string, getType GetComponentV
 // ChgConfigIntVal -
 func (addSymbolsData *AddSymbolsData) ChgConfigIntVal(key string, off int) int {
 	if key == CCVHeight {
-		if addSymbolsData.cfg.Height > 0 {
-			addSymbolsData.MapConfigIntVals[key] = addSymbolsData.cfg.Height
+		_, isok := addSymbolsData.MapConfigIntVals[key]
+		if !isok {
+			if addSymbolsData.cfg.Height > 0 {
+				addSymbolsData.MapConfigIntVals[key] = addSymbolsData.cfg.Height
+			}
 		}
 	}
 
