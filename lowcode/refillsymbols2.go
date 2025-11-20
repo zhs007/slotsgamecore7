@@ -57,8 +57,11 @@ func (rs2d *RefillSymbols2Data) BuildPBComponentData() proto.Message {
 // ChgConfigIntVal -
 func (rs2d *RefillSymbols2Data) ChgConfigIntVal(key string, off int) int {
 	if key == CCVHeight {
-		if rs2d.cfg.Height > 0 {
-			rs2d.MapConfigIntVals[key] = rs2d.cfg.Height
+		_, isok := rs2d.MapConfigIntVals[key]
+		if !isok {
+			if rs2d.cfg.Height > 0 {
+				rs2d.MapConfigIntVals[key] = rs2d.cfg.Height
+			}
 		}
 	}
 

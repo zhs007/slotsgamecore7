@@ -50,8 +50,11 @@ func (svmd *IntValMappingData) BuildPBComponentData() proto.Message {
 // ChgConfigIntVal -
 func (svmd *IntValMappingData) ChgConfigIntVal(key string, off int) int {
 	if key == CCVInputVal {
-		if svmd.cfg.InputVal > 0 {
-			svmd.MapConfigIntVals[key] = svmd.cfg.InputVal
+		_, isok := svmd.MapConfigIntVals[key]
+		if !isok {
+			if svmd.cfg.InputVal > 0 {
+				svmd.MapConfigIntVals[key] = svmd.cfg.InputVal
+			}
 		}
 	}
 

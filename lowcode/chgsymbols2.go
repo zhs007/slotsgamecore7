@@ -195,8 +195,11 @@ func (chgSymbolsData *ChgSymbols2Data) AddPosEx(x int, y int) {
 // ChgConfigIntVal -
 func (chgSymbolsData *ChgSymbols2Data) ChgConfigIntVal(key string, off int) int {
 	if key == CCVHeight {
-		if chgSymbolsData.cfg.Height > 0 {
-			chgSymbolsData.MapConfigIntVals[key] = chgSymbolsData.cfg.Height
+		_, isok := chgSymbolsData.MapConfigIntVals[key]
+		if !isok {
+			if chgSymbolsData.cfg.Height > 0 {
+				chgSymbolsData.MapConfigIntVals[key] = chgSymbolsData.cfg.Height
+			}
 		}
 	}
 

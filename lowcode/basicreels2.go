@@ -3,6 +3,7 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -23,6 +24,7 @@ type BasicReels2Config struct {
 	Height               int      `yaml:"height" json:"height"`
 	MaskX                string   `yaml:"maskX" json:"maskX"`
 	MaskY                string   `yaml:"maskY" json:"maskY"`
+	MustTrigger          []string `yaml:"mustTrigger" json:"mustTrigger"`
 	Controllers          []*Award `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
@@ -115,6 +117,18 @@ func (basicReels2 *BasicReels2) getMaskX(_ *GameProperty, basicCD *BasicComponen
 	return basicReels2.Config.MaskX
 }
 
+// canTrigger
+func (basicReels2 *BasicReels2) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, curpr *sgc7game.PlayResult, stake *sgc7game.Stake) bool {
+	for _, v := range basicReels2.Config.MustTrigger {
+		isok := gameProp.CanTrigger(v, gs, curpr, stake)
+		if !isok {
+			return false
+		}
+	}
+
+	return true
+}
+
 // playgame
 func (basicReels2 *BasicReels2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -141,40 +155,92 @@ func (basicReels2 *BasicReels2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	height := basicReels2.getHeight(bcd)
 
-	if basicReels2.Config.IsExpandReel {
-		sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)
-	} else {
-		if height <= 0 && height > sc.Height {
-			goutils.Error("BasicReels2.OnPlayGame:MapReels",
-				goutils.Err(ErrInvalidReels))
+	if len(basicReels2.Config.MustTrigger) > 0 {
+		for i := 0; i < 10000; i++ {
+			if basicReels2.Config.IsExpandReel {
+				sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)
+			} else {
+				if height <= 0 && height > sc.Height {
+					goutils.Error("BasicReels2.OnPlayGame:MapReels",
+						goutils.Err(ErrInvalidReels))
 
-			return "", ErrInvalidReels
-		}
-
-		maskx := basicReels2.getMaskX(gameProp, bcd)
-
-		if maskx != "" {
-			imaskd := gameProp.GetComponentDataWithName(maskx)
-			if imaskd != nil {
-				arr := imaskd.GetMask()
-				if len(arr) != sc.Width {
-					goutils.Error("BasicReels2.OnPlayGame:MaskX:len(arr)!=gs.Width",
-						goutils.Err(ErrInvalidComponentConfig))
-
-					return "", ErrInvalidComponentConfig
+					return "", ErrInvalidReels
 				}
 
-				sc.RandReelsWithReelDataMaskAndHeight(gameProp.CurReels, height, arr, plugin)
+				maskx := basicReels2.getMaskX(gameProp, bcd)
 
-			} else {
-				goutils.Error("BasicReels2.OnPlayGame:MaskX",
-					slog.String("maskX", maskx),
+				if maskx != "" {
+					imaskd := gameProp.GetComponentDataWithName(maskx)
+					if imaskd != nil {
+						arr := imaskd.GetMask()
+						if len(arr) != sc.Width {
+							goutils.Error("BasicReels2.OnPlayGame:MaskX:len(arr)!=gs.Width",
+								goutils.Err(ErrInvalidComponentConfig))
+
+							return "", ErrInvalidComponentConfig
+						}
+
+						sc.RandReelsWithReelDataMaskAndHeight(gameProp.CurReels, height, arr, plugin)
+
+					} else {
+						goutils.Error("BasicReels2.OnPlayGame:MaskX",
+							slog.String("maskX", maskx),
+							goutils.Err(ErrInvalidComponentConfig))
+
+						return "", ErrInvalidComponentConfig
+					}
+				} else {
+					sc.RandReelsWithReelDataAndHeight(gameProp.CurReels, height, plugin)
+				}
+			}
+
+			if basicReels2.canTrigger(gameProp, sc, curpr, stake) {
+				break
+			}
+
+			if i >= 9999 {
+				goutils.Error("BasicReels2.OnPlayGame:canTrigger",
 					goutils.Err(ErrInvalidComponentConfig))
 
 				return "", ErrInvalidComponentConfig
 			}
+		}
+	} else {
+		if basicReels2.Config.IsExpandReel {
+			sc.RandExpandReelsWithReelData(gameProp.CurReels, plugin)
 		} else {
-			sc.RandReelsWithReelDataAndHeight(gameProp.CurReels, height, plugin)
+			if height <= 0 && height > sc.Height {
+				goutils.Error("BasicReels2.OnPlayGame:MapReels",
+					goutils.Err(ErrInvalidReels))
+
+				return "", ErrInvalidReels
+			}
+
+			maskx := basicReels2.getMaskX(gameProp, bcd)
+
+			if maskx != "" {
+				imaskd := gameProp.GetComponentDataWithName(maskx)
+				if imaskd != nil {
+					arr := imaskd.GetMask()
+					if len(arr) != sc.Width {
+						goutils.Error("BasicReels2.OnPlayGame:MaskX:len(arr)!=gs.Width",
+							goutils.Err(ErrInvalidComponentConfig))
+
+						return "", ErrInvalidComponentConfig
+					}
+
+					sc.RandReelsWithReelDataMaskAndHeight(gameProp.CurReels, height, arr, plugin)
+
+				} else {
+					goutils.Error("BasicReels2.OnPlayGame:MaskX",
+						slog.String("maskX", maskx),
+						goutils.Err(ErrInvalidComponentConfig))
+
+					return "", ErrInvalidComponentConfig
+				}
+			} else {
+				sc.RandReelsWithReelDataAndHeight(gameProp.CurReels, height, plugin)
+			}
 		}
 	}
 
@@ -210,12 +276,19 @@ func NewBasicReels2(name string) IComponent {
 // "height": 6,
 // "reelSet": "bg-reel01",
 // "maskX": "mask-6"
+// "mustTrigger": [
+//
+//	"silver-must-co",
+//	"silver-must-ca"
+//
+// ]
 type jsonBasicReels2 struct {
-	ReelSet      string `json:"reelSet"`
-	IsExpandReel bool   `json:"isExpandReel"`
-	Height       int    `json:"height"`
-	MaskX        string `json:"maskX"`
-	MaskY        string `json:"maskY"`
+	ReelSet      string   `json:"reelSet"`
+	IsExpandReel bool     `json:"isExpandReel"`
+	Height       int      `json:"height"`
+	MaskX        string   `json:"maskX"`
+	MaskY        string   `json:"maskY"`
+	MustTrigger  []string `json:"mustTrigger"`
 }
 
 func (jbr *jsonBasicReels2) build() *BasicReels2Config {
@@ -225,6 +298,7 @@ func (jbr *jsonBasicReels2) build() *BasicReels2Config {
 		Height:       jbr.Height,
 		MaskX:        jbr.MaskX,
 		MaskY:        jbr.MaskY,
+		MustTrigger:  slices.Clone(jbr.MustTrigger),
 	}
 
 	return cfg

@@ -22,11 +22,15 @@ type DropSymbolsConfig struct {
 	Number               int    `yaml:"number" json:"number"`
 	Symbol               string `yaml:"symbol" json:"symbol"`
 	SymbolCode           int    `yaml:"-" json:"-"`
+	JumpToComponent      string `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
 }
 
 func (cfg *DropSymbolsConfig) SetLinkComponent(link string, componentName string) {
-	if link == "next" {
+	switch link {
+	case "next":
 		cfg.DefaultNextComponent = componentName
+	case "jump":
+		cfg.JumpToComponent = componentName
 	}
 }
 
@@ -140,7 +144,7 @@ func (dropSymbols *DropSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		return nc, nil
 	}
 
-	nc := dropSymbols.onStepEnd(gameProp, curpr, gp, "")
+	nc := dropSymbols.onStepEnd(gameProp, curpr, gp, dropSymbols.Config.JumpToComponent)
 
 	return nc, ErrComponentDoNothing
 }
