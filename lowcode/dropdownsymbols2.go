@@ -293,7 +293,7 @@ func (dropDownSymbols *DropDownSymbols2) procSPController(gameProp *GameProperty
 		return
 	}
 
-	if len(dropDownSymbols.Config.bottomSymbolCodes) > 0 || len(dropDownSymbols.Config.leftOrBottomSymbolCodes) > 0 {
+	if len(dropDownSymbols.Config.bottomSymbolCodes) > 0 {
 		y := gs.Height - 1
 
 		for x := 0; x < gs.Width; x++ {
@@ -302,16 +302,10 @@ func (dropDownSymbols *DropDownSymbols2) procSPController(gameProp *GameProperty
 
 				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str1)
 			}
-
-			if goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
-				str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
-
-				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str0)
-			}
 		}
 	}
 
-	if len(dropDownSymbols.Config.leftSymbolCodes) > 0 || len(dropDownSymbols.Config.leftOrBottomSymbolCodes) > 0 {
+	if len(dropDownSymbols.Config.leftSymbolCodes) > 0 {
 		x := 0
 
 		for y := gs.Height - 1; y >= 0; y-- {
@@ -320,11 +314,17 @@ func (dropDownSymbols *DropDownSymbols2) procSPController(gameProp *GameProperty
 
 				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str2)
 			}
+		}
+	}
 
-			if goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
-				str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
+	if len(dropDownSymbols.Config.leftOrBottomSymbolCodes) > 0 {
+		for x := 0; x < gs.Width; x++ {
+			for y := gs.Height - 1; y >= 0; y-- {
+				if (x == 0 || y == gs.Height) && goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
+					str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
 
-				dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str0)
+					dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str0)
+				}
 			}
 		}
 	}
