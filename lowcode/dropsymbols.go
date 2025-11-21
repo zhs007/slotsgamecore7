@@ -18,11 +18,12 @@ const DropSymbolsTypeName = "dropSymbols"
 // DropSymbolsConfig - configuration for DropSymbols (placeholder)
 type DropSymbolsConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	ReelIndex            int    `yaml:"reelIndex" json:"reelIndex"`
-	Number               int    `yaml:"number" json:"number"`
-	Symbol               string `yaml:"symbol" json:"symbol"`
-	SymbolCode           int    `yaml:"-" json:"-"`
-	JumpToComponent      string `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
+	ReelIndex            int                 `yaml:"reelIndex" json:"reelIndex"`
+	Number               int                 `yaml:"number" json:"number"`
+	Symbol               string              `yaml:"symbol" json:"symbol"`
+	SymbolCode           int                 `yaml:"-" json:"-"`
+	JumpToComponent      string              `yaml:"jumpToComponent" json:"jumpToComponent"` // jump to
+	MapControllers       map[string][]*Award `yaml:"controllers" json:"controllers"`
 }
 
 func (cfg *DropSymbolsConfig) SetLinkComponent(link string, componentName string) {
@@ -81,9 +82,23 @@ func (dropSymbols *DropSymbols) InitEx(cfg any, pool *GamePropertyPool) error {
 		return ErrInvalidComponentConfig
 	}
 
+	for _, awards := range dropSymbols.Config.MapControllers {
+		for _, award := range awards {
+			award.Init()
+		}
+	}
+
 	dropSymbols.onInit(&dropSymbols.Config.BasicComponentConfig)
 
 	return nil
+}
+
+// OnProcControllers -
+func (dropSymbols *DropSymbols) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	awards, isok := dropSymbols.Config.MapControllers[strVal]
+	if isok {
+		gameProp.procAwards(plugin, awards, curpr, gp)
+	}
 }
 
 // getReelIndex - helper
@@ -137,6 +152,8 @@ func (dropSymbols *DropSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	}
 
 	if ngs != gs {
+		dropSymbols.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
+
 		dropSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
 		nc := dropSymbols.onStepEnd(gameProp, curpr, gp, dropSymbols.Config.JumpToComponent)
@@ -180,7 +197,7 @@ func (jcfg *jsonDropSymbols) build() *DropSymbolsConfig {
 }
 
 func parseDropSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseDropSymbols:getConfigInCell",
 			goutils.Err(err))
@@ -207,6 +224,18 @@ func parseDropSymbols(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		mapAwards, err := parseAllAndStrMapControllers2(ctrls)
+		if err != nil {
+			goutils.Error("parseDropDownSymbols2:parseAllAndStrMapControllers2",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.MapControllers = mapAwards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
