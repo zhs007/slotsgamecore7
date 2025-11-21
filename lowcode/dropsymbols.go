@@ -139,12 +139,12 @@ func (dropSymbols *DropSymbols) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	if ngs != gs {
 		dropSymbols.AddScene(gameProp, curpr, ngs, bcd)
 
-		nc := dropSymbols.onStepEnd(gameProp, curpr, gp, "")
+		nc := dropSymbols.onStepEnd(gameProp, curpr, gp, dropSymbols.Config.JumpToComponent)
 
 		return nc, nil
 	}
 
-	nc := dropSymbols.onStepEnd(gameProp, curpr, gp, dropSymbols.Config.JumpToComponent)
+	nc := dropSymbols.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, ErrComponentDoNothing
 }
