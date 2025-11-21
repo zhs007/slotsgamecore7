@@ -98,9 +98,9 @@ func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, 
 
 	spgrid.Arr[x][0] = -1
 
-	if sym == gen.Config.BlankSymbolCode {
-		return gen.getSPGridSymbol(spgrid, x)
-	}
+	// if sym == gen.Config.BlankSymbolCode {
+	// 	return gen.getSPGridSymbol(spgrid, x)
+	// }
 
 	return sym
 }
@@ -151,6 +151,48 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	gen.AddScene(gameProp, curpr, ngs, bcd)
+
+	ngs2 := ngs
+	for x := 0; x < gs.Width; x++ {
+		for y := gs.Height - 1; y >= 0; y-- {
+			if ngs2.Arr[x][y] == gen.Config.BlankSymbolCode {
+				if ngs2 == ngs {
+					ngs2 = ngs.CloneEx(gameProp.PoolScene)
+				}
+
+				ngs2.Arr[x][y] = -1
+			}
+		}
+	}
+
+	if ngs2 != ngs {
+		for _, arr := range ngs2.Arr {
+			for y := len(arr) - 1; y >= 0; {
+				if arr[y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						if arr[y1] != -1 {
+							arr[y] = arr[y1]
+							arr[y1] = -1
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		gen.AddScene(gameProp, curpr, ngs2, bcd)
+	}
+
 	gen.AddSPGrid(gen.Config.SPGrid, gameProp, curpr, newspgrid, bcd)
 
 	nc := gen.onStepEnd(gameProp, curpr, gp, "")
