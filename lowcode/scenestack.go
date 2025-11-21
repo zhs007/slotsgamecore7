@@ -161,7 +161,16 @@ func (stack *SceneStack) GetTopSPGridEx(spgrid string, curpr *sgc7game.PlayResul
 
 		restored := prs[len(prs)-1].SPGrid[spgrid].Grid[len(prs[len(prs)-1].SPGrid[spgrid].Grid)-1]
 		stack.Push("", restored)
-		curpr.Scenes = append(curpr.Scenes, restored)
+
+		if curpr.SPGrid == nil {
+			curpr.SPGrid = make(map[string]*sgc7game.SPGrid)
+		}
+
+		if curpr.SPGrid[spgrid] == nil {
+			curpr.SPGrid[spgrid] = &sgc7game.SPGrid{}
+		}
+
+		curpr.SPGrid[spgrid].Grid = append(curpr.SPGrid[spgrid].Grid, restored)
 
 		return stack.Scenes[len(stack.Scenes)-1].Scene
 	}
