@@ -87,10 +87,11 @@ func (jackpotData *JackpotData) GetValEx(key string, getType GetComponentValType
 // JackpotConfig - configuration for Jackpot
 type JackpotConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	BetTypeString        string  `yaml:"betType" json:"betType"`   // bet or totalBet or noPay
-	BetType              BetType `yaml:"-" json:"-"`               // bet or totalBet or noPay
-	Wins                 int     `yaml:"wins" json:"wins"`         // wins
-	WinMulti             int     `yaml:"winMulti" json:"winMulti"` // winMulti，最后的中奖倍数，默认为1
+	BetTypeString        string   `yaml:"betType" json:"betType"`         // bet or totalBet or noPay
+	BetType              BetType  `yaml:"-" json:"-"`                     // bet or totalBet or noPay
+	Wins                 int      `yaml:"wins" json:"wins"`               // wins
+	WinMulti             int      `yaml:"winMulti" json:"winMulti"`       // winMulti，最后的中奖倍数，默认为1
+	Controllers          []*Award `yaml:"controllers" json:"controllers"` // 新的奖励系统
 }
 
 // SetLinkComponent
@@ -141,16 +142,25 @@ func (jackpot *Jackpot) InitEx(cfg any, pool *GamePropertyPool) error {
 		jackpot.Config.WinMulti = 0
 	}
 
+	for _, ctrl := range jackpot.Config.Controllers {
+		ctrl.Init()
+	}
+
 	jackpot.onInit(&jackpot.Config.BasicComponentConfig)
 
 	return nil
 }
 
+// OnProcControllers -
+func (jackpot *Jackpot) ProcControllers(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, val int, strVal string) {
+	if len(jackpot.Config.Controllers) > 0 {
+		gameProp.procAwards(plugin, jackpot.Config.Controllers, curpr, gp)
+	}
+}
+
 // playgame
 func (jackpot *Jackpot) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
-
-	// winResultMulti.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs)
 
 	cd := icd.(*JackpotData)
 	cd.UsedResults = nil
@@ -269,7 +279,7 @@ func (jwt *jsonJackpot) build() *JackpotConfig {
 }
 
 func parseJackpot(gamecfg *BetConfig, cell *ast.Node) (string, error) {
-	cfg, label, _, err := getConfigInCell(cell)
+	cfg, label, ctrls, err := getConfigInCell(cell)
 	if err != nil {
 		goutils.Error("parseJackpot:getConfigInCell",
 			goutils.Err(err))
@@ -296,6 +306,18 @@ func parseJackpot(gamecfg *BetConfig, cell *ast.Node) (string, error) {
 	}
 
 	cfgd := data.build()
+
+	if ctrls != nil {
+		awards, err := parseControllers(ctrls)
+		if err != nil {
+			goutils.Error("parseBasicReels:parseControllers",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		cfgd.Controllers = awards
+	}
 
 	gamecfg.mapConfig[label] = cfgd
 	gamecfg.mapBasicConfig[label] = &cfgd.BasicComponentConfig
