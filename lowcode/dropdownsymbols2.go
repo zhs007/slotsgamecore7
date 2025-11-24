@@ -320,7 +320,7 @@ func (dropDownSymbols *DropDownSymbols2) procSPController(gameProp *GameProperty
 	if len(dropDownSymbols.Config.leftOrBottomSymbolCodes) > 0 {
 		for x := 0; x < gs.Width; x++ {
 			for y := gs.Height - 1; y >= 0; y-- {
-				if (x == 0 || y == gs.Height) && goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
+				if (x == 0 || y == gs.Height-1) && goutils.IndexOfIntSlice(dropDownSymbols.Config.leftOrBottomSymbolCodes, gs.Arr[x][y], 0) >= 0 {
 					str0 := fmt.Sprintf("<%v-AtLeftOrBottom>", gameProp.Pool.DefaultPaytables.GetStringFromInt(gs.Arr[x][y]))
 
 					dropDownSymbols.ProcControllers(gameProp, plugin, curpr, gp, 0, str0)
