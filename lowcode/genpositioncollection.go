@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -405,8 +406,8 @@ type jsonGenPositionCollection struct {
 
 func (jcfg *jsonGenPositionCollection) build() *GenPositionCollectionConfig {
 	cfg := &GenPositionCollectionConfig{
-		StrSrcType:               jcfg.SrcType,
-		StrCoreType:              jcfg.CoreType,
+		StrSrcType:               strings.ToLower(jcfg.SrcType),
+		StrCoreType:              strings.ToLower(jcfg.CoreType),
 		Number:                   jcfg.Number,
 		NumberWeight:             jcfg.NumberWeight,
 		OutputPositionCollection: jcfg.OutputPositionCollection,

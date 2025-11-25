@@ -96,7 +96,7 @@ func (gen *MergeSPGrid) ProcControllers(gameProp *GameProperty, plugin sgc7plugi
 	}
 }
 
-func (gen *MergeSPGrid) getSource1(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, prs []*sgc7game.PlayResult) (*sgc7game.GameScene, error) {
+func (gen *MergeSPGrid) getSource1(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) (*sgc7game.GameScene, error) {
 	if gen.Config.Source1 != "" {
 		stackSPGrid, isok := gameProp.MapSPGridStack[gen.Config.Source1]
 		if !isok {
@@ -124,7 +124,7 @@ func (gen *MergeSPGrid) getSource1(gameProp *GameProperty, plugin sgc7plugin.IPl
 	return os, nil
 }
 
-func (gen *MergeSPGrid) getSource2(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, prs []*sgc7game.PlayResult) (*sgc7game.GameScene, error) {
+func (gen *MergeSPGrid) getSource2(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) (*sgc7game.GameScene, error) {
 	if gen.Config.Source2 != "" {
 		stackSPGrid, isok := gameProp.MapSPGridStack[gen.Config.Source2]
 		if !isok {
@@ -152,7 +152,7 @@ func (gen *MergeSPGrid) getSource2(gameProp *GameProperty, plugin sgc7plugin.IPl
 	return os, nil
 }
 
-func (gen *MergeSPGrid) getOutput(gameProp *GameProperty, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult, gp *GameParams, prs []*sgc7game.PlayResult, bcd *BasicComponentData) (*sgc7game.GameScene, error) {
+func (gen *MergeSPGrid) getOutput(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, bcd *BasicComponentData) (*sgc7game.GameScene, error) {
 	if gen.Config.Output != "" {
 		stackSPGrid, isok := gameProp.MapSPGridStack[gen.Config.Output]
 		if !isok {
@@ -163,16 +163,18 @@ func (gen *MergeSPGrid) getOutput(gameProp *GameProperty, plugin sgc7plugin.IPlu
 			return nil, ErrInvalidComponentConfig
 		}
 
-		spgrid := stackSPGrid.Stack.GetTopSPGridEx(gen.Config.Output, curpr, prs)
-		if spgrid == nil {
-			goutils.Error("MergeSPGrid.getOutput:GetTopSPGridEx",
-				slog.String("SPGrid", gen.Config.Output),
+		gs := gameProp.PoolScene.New2(stackSPGrid.Width, stackSPGrid.Height, 0)
+		if gs == nil {
+			goutils.Error("InitTropiCoolSPGrid.OnPlayGame:New2",
+				slog.Int("Width", stackSPGrid.Width),
+				slog.Int("Height", stackSPGrid.Height),
+				slog.Int("EmptySymbolCode", 0),
 				goutils.Err(ErrInvalidComponentConfig))
 
 			return nil, ErrInvalidComponentConfig
 		}
 
-		newspgrid := spgrid.CloneEx(gameProp.PoolScene)
+		newspgrid := gs
 
 		gen.AddSPGrid(gen.Config.Output, gameProp, curpr, newspgrid, bcd)
 
@@ -193,7 +195,7 @@ func (gen *MergeSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	// placeholder implementation, does not change play result
 	bcd := icd.(*BasicComponentData)
-	source1, err := gen.getSource1(gameProp, plugin, curpr, gp, prs)
+	source1, err := gen.getSource1(gameProp, curpr, prs)
 	if err != nil {
 		goutils.Error("MergeSPGrid.OnPlayGame:getSource1",
 			goutils.Err(err))
@@ -201,7 +203,7 @@ func (gen *MergeSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		return "", err
 	}
 
-	source2, err := gen.getSource2(gameProp, plugin, curpr, gp, prs)
+	source2, err := gen.getSource2(gameProp, curpr, prs)
 	if err != nil {
 		goutils.Error("MergeSPGrid.OnPlayGame:getSource2",
 			goutils.Err(err))
@@ -209,7 +211,7 @@ func (gen *MergeSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 		return "", err
 	}
 
-	output, err := gen.getOutput(gameProp, plugin, curpr, gp, prs, bcd)
+	output, err := gen.getOutput(gameProp, curpr, prs, bcd)
 	if err != nil {
 		goutils.Error("MergeSPGrid.OnPlayGame:getOutput",
 			goutils.Err(err))

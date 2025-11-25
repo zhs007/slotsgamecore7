@@ -128,6 +128,7 @@ type GenSymbolVals2Config struct {
 	MapSymbolWeights     map[string]string               `yaml:"symbolWeights" json:"symbolWeights"`
 	MapSymbolWeightsVM   map[int]*sgc7game.ValWeights2   `yaml:"-" json:"-"`
 	Awards               []*Award                        `yaml:"awards" json:"awards"` // 新的奖励系统
+	SpGrid               string                          `yaml:"spGrid" json:"spGrid"`
 }
 
 // SetLinkComponent
@@ -722,6 +723,41 @@ func (genSymbolVals2 *GenSymbolVals2) procMask(gameProp *GameProperty, os *sgc7g
 	return nos, nil
 }
 
+func (genSymbolVals2 *GenSymbolVals2) getOutput(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, bcd *BasicComponentData) (*sgc7game.GameScene, error) {
+	if genSymbolVals2.Config.SpGrid != "" {
+		stackSPGrid, isok := gameProp.MapSPGridStack[genSymbolVals2.Config.SpGrid]
+		if !isok {
+			goutils.Error("GenSymbolVals2.getOutput:MapSPGridStack",
+				slog.String("SPGrid", genSymbolVals2.Config.SpGrid),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, ErrInvalidComponentConfig
+		}
+
+		spgrid := stackSPGrid.Stack.GetTopSPGridEx(genSymbolVals2.Config.SpGrid, curpr, prs)
+
+		return spgrid, nil
+	}
+
+	os, err := genSymbolVals2.getSrcOtherScene(gameProp, curpr, prs)
+	if err != nil {
+		goutils.Error("GenSymbolVals2.getOutput:getSrcOtherScene",
+			goutils.Err(err))
+
+		return nil, err
+	}
+
+	return os, nil
+}
+
+func (genSymbolVals2 *GenSymbolVals2) setOutput(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, bcd *BasicComponentData, os *sgc7game.GameScene) {
+	if genSymbolVals2.Config.SpGrid != "" {
+		genSymbolVals2.AddSPGrid(genSymbolVals2.Config.SpGrid, gameProp, curpr, os, bcd)
+	} else {
+		genSymbolVals2.AddOtherScene(gameProp, curpr, os, bcd)
+	}
+}
+
 // playgame
 func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -738,9 +774,9 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		return "", err
 	}
 
-	os, err := genSymbolVals2.getSrcOtherScene(gameProp, curpr, prs)
+	os, err := genSymbolVals2.getOutput(gameProp, curpr, prs, &cd.BasicComponentData)
 	if err != nil {
-		goutils.Error("GenSymbolVals2.OnPlayGame:getSrcOtherScene",
+		goutils.Error("GenSymbolVals2.OnPlayGame:getOutput",
 			goutils.Err(err))
 
 		return "", err
@@ -757,7 +793,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			genSymbolVals2.setOutput(gameProp, curpr, prs, &cd.BasicComponentData, nos)
 		} else {
 			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -773,7 +809,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			genSymbolVals2.setOutput(gameProp, curpr, prs, &cd.BasicComponentData, nos)
 		} else {
 			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -789,7 +825,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			genSymbolVals2.setOutput(gameProp, curpr, prs, &cd.BasicComponentData, nos)
 		} else {
 			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -805,7 +841,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			genSymbolVals2.setOutput(gameProp, curpr, prs, &cd.BasicComponentData, nos)
 		} else {
 			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -822,7 +858,7 @@ func (genSymbolVals2 *GenSymbolVals2) OnPlayGame(gameProp *GameProperty, curpr *
 		}
 
 		if nos != os {
-			genSymbolVals2.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+			genSymbolVals2.setOutput(gameProp, curpr, prs, &cd.BasicComponentData, nos)
 		} else {
 			nc := genSymbolVals2.onStepEnd(gameProp, curpr, gp, "")
 
@@ -877,6 +913,7 @@ func NewGenSymbolVals2(name string) IComponent {
 //	"rs-pos-wm"
 //
 // ]
+// "spGrid": "cg-spgrid-multi"
 type jsonGSV2SymbolWeight struct {
 	Symbol string `json:"symbol"`
 	Value  string `json:"value"`
@@ -893,6 +930,7 @@ type jsonGenSymbolVals2 struct {
 	MaxVal               int                    `json:"maxVal"`
 	IsAlwaysGen          bool                   `json:"isAlwaysGen"`
 	SymbolWeights        []jsonGSV2SymbolWeight `json:"symbolWeights"` // for srcSymbols
+	SpGrid               string                 `json:"spGrid"`
 }
 
 func (jcfg *jsonGenSymbolVals2) build() *GenSymbolVals2Config {
@@ -907,6 +945,7 @@ func (jcfg *jsonGenSymbolVals2) build() *GenSymbolVals2Config {
 		MaxVal:               jcfg.MaxVal,
 		IsAlwaysGen:          jcfg.IsAlwaysGen,
 		IsForceRefresh:       jcfg.IsForceRefresh,
+		SpGrid:               jcfg.SpGrid,
 	}
 
 	cfg.MapSymbolWeights = make(map[string]string, len(jcfg.SymbolWeights))
