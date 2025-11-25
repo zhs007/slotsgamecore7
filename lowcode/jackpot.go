@@ -184,6 +184,8 @@ func (jackpot *Jackpot) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayR
 
 	jackpot.AddResult(curpr, ret, &cd.BasicComponentData)
 
+	jackpot.ProcControllers(gameProp, plugin, curpr, gp, -1, "")
+
 	nc := jackpot.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
