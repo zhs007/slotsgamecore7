@@ -8,12 +8,24 @@ type PosData struct {
 	pos []int
 }
 
+func (pd *PosData) Len() int {
+	return len(pd.pos) / 2
+}
+
+func (pd *PosData) IsEmpty() bool {
+	return len(pd.pos) == 0
+}
+
 func (pd *PosData) Add(x, y int) {
 	pd.pos = append(pd.pos, x, y)
 }
 
 func (pd *PosData) Has(x, y int) bool {
 	return goutils.IndexOfInt2Slice(pd.pos, x, y, 0) >= 0
+}
+
+func (pd *PosData) Del(i int) {
+	pd.pos = append(pd.pos[:i*2], pd.pos[i*2+2:]...)
 }
 
 type PosPool struct {
