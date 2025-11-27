@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/bytedance/sonic"
@@ -72,9 +73,11 @@ type GenPositionCollectionConfig struct {
 	NumberWeight             string                          `yaml:"numberWeight" json:"numberWeight"`
 	NumberWeightVW2          *sgc7game.ValWeights2           `yaml:"-" json:"-"`
 	OutputPositionCollection string                          `yaml:"outputPositionCollection" json:"outputPositionCollection"`
-	RowMask                  string                          `json:"rowMask" json:"rowMask"`
-	Mask                     string                          `json:"mask" json:"mask"`
-	SrcPositionCollection    string                          `json:"srcPositionCollection" json:"srcPositionCollection"`
+	RowMask                  string                          `yaml:"rowMask" json:"rowMask"`
+	Mask                     string                          `yaml:"mask" json:"mask"`
+	SrcPositionCollection    string                          `yaml:"srcPositionCollection" json:"srcPositionCollection"`
+	SrcSymbols               []string                        `yaml:"srcSymbols" json:"srcSymbols"`
+	SrcSymbolCodes           []int                           `yaml:"-" json:"-"`
 	MapControllers           map[string][]*Award             `yaml:"controllers" json:"controllers"`
 	JumpToComponent          string                          `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
@@ -140,6 +143,21 @@ func (genPositionCollection *GenPositionCollection) InitEx(cfg any, pool *GamePr
 		genPositionCollection.Config.NumberWeightVW2 = vw2
 	}
 
+	if genPositionCollection.Config.SrcSymbols != nil {
+		for _, sym := range genPositionCollection.Config.SrcSymbols {
+			symcode, isok := pool.DefaultPaytables.MapSymbols[sym]
+			if isok {
+				genPositionCollection.Config.SrcSymbolCodes = append(genPositionCollection.Config.SrcSymbolCodes, symcode)
+			} else {
+				goutils.Error("GenPositionCollection.InitEx:SrcSymbols:Symbol",
+					slog.String("Symbol", sym),
+					goutils.Err(ErrInvalidComponentConfig))
+
+				return ErrInvalidComponentConfig
+			}
+		}
+	}
+
 	for _, arr := range genPositionCollection.Config.MapControllers {
 		for _, aw := range arr {
 			aw.Init()
@@ -159,8 +177,30 @@ func (genPositionCollection *GenPositionCollection) ProcControllers(gameProp *Ga
 	}
 }
 
+func (genPositionCollection *GenPositionCollection) getNumberWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
+	str := basicCD.GetConfigVal(CCVNumberWeight)
+	if str != "" {
+		if str == "<empty>" {
+			return genPositionCollection.Config.NumberWeightVW2
+		}
+
+		vw, err := gameProp.Pool.LoadIntWeights(str, true)
+		if err != nil {
+			goutils.Error("GenPositionCollection.getNumberWeight:LoadIntWeights",
+				slog.String("NumberWeight", str),
+				goutils.Err(err))
+
+			return nil
+		}
+
+		return vw
+	}
+
+	return genPositionCollection.Config.NumberWeightVW2
+}
+
 // getSrcPos
-func (genPositionCollection *GenPositionCollection) getSrcPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene) (*PosData, error) {
+func (genPositionCollection *GenPositionCollection) getSrcPos(gameProp *GameProperty, _ sgc7plugin.IPlugin, gs *sgc7game.GameScene) (*PosData, error) {
 
 	pos := gameProp.posPool.Get()
 
@@ -260,6 +300,27 @@ func (genPositionCollection *GenPositionCollection) getSrcPos(gameProp *GameProp
 		return nil, ErrInvalidComponentConfig
 	}
 
+	if pos.IsEmpty() {
+		return pos, nil
+	}
+
+	if len(genPositionCollection.Config.SrcSymbolCodes) > 0 {
+		newpos := gameProp.posPool.Get()
+
+		for i := 0; i < pos.Len(); i++ {
+			x := pos.pos[i*2]
+			y := pos.pos[i*2+1]
+
+			symcode := gs.Arr[x][y]
+
+			if slices.Contains(genPositionCollection.Config.SrcSymbolCodes, symcode) {
+				newpos.Add(x, y)
+			}
+		}
+
+		return newpos, nil
+	}
+
 	return pos, nil
 }
 
@@ -267,7 +328,7 @@ func (genPositionCollection *GenPositionCollection) getSrcPos(gameProp *GameProp
 func (genPositionCollection *GenPositionCollection) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	// bcd := icd.(*BasicComponentData)
+	bcd := icd.(*BasicComponentData)
 
 	gs := genPositionCollection.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -316,7 +377,7 @@ func (genPositionCollection *GenPositionCollection) OnPlayGame(gameProp *GamePro
 			isTrigger = true
 		}
 	case GPCCTypeNumberWeight:
-		vw := genPositionCollection.Config.NumberWeightVW2
+		vw := genPositionCollection.getNumberWeight(gameProp, bcd)
 		if vw == nil {
 			goutils.Error("GenPositionCollection.OnPlayGame:NumberWeightVW2==nil",
 				slog.String("NumberWeight", genPositionCollection.Config.NumberWeight),
@@ -393,15 +454,31 @@ func NewGenPositionCollection(name string) IComponent {
 // "number": 1,
 // "numberWeight": "cg-rollmunum",
 // "outputPositionCollection": "cg-pos-multi"
+// "srcSymbols": [
+//
+//	"WL",
+//	"H4",
+//	"H3",
+//	"H2",
+//	"H1",
+//	"L5",
+//	"L4",
+//	"L3",
+//	"L2",
+//	"L1",
+//	"CO"
+//
+// ]
 type jsonGenPositionCollection struct {
-	SrcType                  string `json:"srcType"`
-	CoreType                 string `json:"coreType"`
-	Number                   int    `json:"number"`
-	NumberWeight             string `json:"numberWeight"`
-	OutputPositionCollection string `json:"outputPositionCollection"`
-	RowMask                  string `json:"rowMask"`
-	Mask                     string `json:"mask"`
-	SrcPositionCollection    string `json:"srcPositionCollection"`
+	SrcType                  string   `json:"srcType"`
+	CoreType                 string   `json:"coreType"`
+	Number                   int      `json:"number"`
+	NumberWeight             string   `json:"numberWeight"`
+	OutputPositionCollection string   `json:"outputPositionCollection"`
+	RowMask                  string   `json:"rowMask"`
+	Mask                     string   `json:"mask"`
+	SrcPositionCollection    string   `json:"srcPositionCollection"`
+	SrcSymbols               []string `json:"srcSymbols"`
 }
 
 func (jcfg *jsonGenPositionCollection) build() *GenPositionCollectionConfig {
@@ -414,6 +491,7 @@ func (jcfg *jsonGenPositionCollection) build() *GenPositionCollectionConfig {
 		Mask:                     jcfg.Mask,
 		RowMask:                  jcfg.RowMask,
 		SrcPositionCollection:    jcfg.SrcPositionCollection,
+		SrcSymbols:               slices.Clone(jcfg.SrcSymbols),
 	}
 
 	return cfg
