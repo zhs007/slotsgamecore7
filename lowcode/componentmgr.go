@@ -91,6 +91,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(GenSymbolValsWithSymbolTypeName, NewGenSymbolValsWithSymbol)
 	mgr.Reg(RebuildReelIndexTypeName, NewRebuildReelIndex)
 	mgr.Reg(GenSymbolValsTypeName, NewGenSymbolVals)
+	mgr.Reg(GenSymbolValsInReelsTypeName, NewGenSymbolValsInReels)
 	mgr.Reg(RebuildSymbolsTypeName, NewRebuildSymbols)
 	mgr.Reg(RollNumberTypeName, NewRollNumber)
 	mgr.Reg(ControllerWorkerTypeName, NewControllerWorker)
