@@ -1,4 +1,4 @@
 package sgc7ver
 
 // Version -
-const Version = "v0.13.769"
+const Version = "v0.13.770"

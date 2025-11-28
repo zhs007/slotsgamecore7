@@ -102,9 +102,15 @@ func (collectorData *Collector2Data) ChgConfigIntVal(key string, off int) int {
 		}
 
 		if val > collectorData.cfg.MaxVal && collectorData.cfg.MaxVal > 0 {
-			val = collectorData.cfg.MaxVal
+			if collectorData.cfg.IsCycle {
+				val = val % collectorData.cfg.MaxVal
 
-			collectorData.NewCollector = collectorData.cfg.MaxVal - collectorData.Val
+				collectorData.NewCollector = 0
+			} else {
+				val = collectorData.cfg.MaxVal
+
+				collectorData.NewCollector = collectorData.cfg.MaxVal - collectorData.Val
+			}
 		} else {
 			collectorData.NewCollector = off
 		}
