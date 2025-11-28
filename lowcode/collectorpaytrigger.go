@@ -18,6 +18,51 @@ import (
 // CollectorPayTriggerTypeName is the component type name for the collector pay trigger.
 const CollectorPayTriggerTypeName = "collectorPayTrigger"
 
+type mainSymbolInfo struct {
+	symbolCode int
+	level      int
+	price      int
+}
+
+type CollectorPayTriggerData struct {
+	BasicComponentData
+	lstMainSymbols []mainSymbolInfo
+	cfg            *CollectorPayTriggerConfig
+}
+
+func (cpt *CollectorPayTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	cpt.BasicComponentData.OnNewGame(gameProp, component)
+
+	for _, ms := range cpt.lstMainSymbols {
+		ms.level = 0
+		sc := cpt.cfg.MapSymbolCode[ms.symbolCode][0]
+		ms.price = gameProp.Pool.DefaultPaytables.MapPay[sc][0]
+	}
+}
+
+func (cpt *CollectorPayTriggerData) onNewStep() {
+	cpt.UsedScenes = nil
+	cpt.UsedResults = nil
+	cpt.Pos = nil
+
+	sort.Slice(cpt.lstMainSymbols, func(i, j int) bool {
+		if cpt.lstMainSymbols[i].price == cpt.lstMainSymbols[j].price {
+			return i < j
+		}
+
+		return cpt.lstMainSymbols[i].price > cpt.lstMainSymbols[j].price
+	})
+}
+
+func (cpt *CollectorPayTriggerData) Clone() IComponentData {
+	target := &CollectorPayTriggerData{
+		BasicComponentData: cpt.CloneBasicComponentData(),
+		lstMainSymbols:     slices.Clone(cpt.lstMainSymbols),
+	}
+
+	return target
+}
+
 // CollectorPayTriggerConfig - configuration for CollectorPayTrigger
 // CollectorPayTriggerConfig is the configuration for the CollectorPayTrigger component.
 type CollectorPayTriggerConfig struct {
@@ -619,10 +664,12 @@ func (cpt *CollectorPayTrigger) rechgScene(gs *sgc7game.GameScene) {
 }
 
 // procSymbolsWithPos
-func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, bet int, bcd *BasicComponentData) error {
+func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, bet int, cd *CollectorPayTriggerData) error {
 	ngs := gs
 
-	for _, mainSymbol := range cpt.Config.lstMainSymbols {
+	for _, msi := range cd.lstMainSymbols {
+		mainSymbol := msi.symbolCode
+
 		arr := cpt.Config.MapSymbolCode[mainSymbol]
 
 		for x := 0; x < ngs.Width; x++ {
@@ -661,7 +708,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 
 								ngs.Arr[tx][ty] = -2
 
-								bcd.AddPos(tx, ty)
+								cd.AddPos(tx, ty)
 							}
 
 							if coreSymbol > 0 {
@@ -674,10 +721,10 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 
 							ngs.Arr[ex][ey] = mainSymbol
 
-							cpt.AddScene(gameProp, curpr, ngs, bcd)
-							cpt.AddResult(curpr, ret, bcd)
+							cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+							cpt.AddResult(curpr, ret, &cd.BasicComponentData)
 
-							bcd.AddPos(-1, -1)
+							cd.AddPos(-1, -1)
 
 							sx = ex
 							sy = ey
@@ -708,10 +755,8 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	bcd := icd.(*BasicComponentData)
-	bcd.UsedScenes = nil
-	bcd.UsedResults = nil
-	bcd.Pos = nil
+	cd := icd.(*CollectorPayTriggerData)
+	cd.onNewStep()
 
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
 
@@ -724,9 +769,9 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 	}
 
-	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), bcd)
+	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), cd)
 
-	if len(bcd.UsedResults) > 0 {
+	if len(cd.UsedResults) > 0 {
 		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 	}
 
@@ -739,6 +784,22 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 // OnAsciiGame outputs the component state to an asciigame representation (no-op for this component).
 func (cpt *CollectorPayTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
+}
+
+func (cpt *CollectorPayTrigger) NewComponentData() IComponentData {
+	cd := &CollectorPayTriggerData{
+		cfg: cpt.Config,
+	}
+
+	for _, ms := range cpt.Config.lstMainSymbols {
+		cd.lstMainSymbols = append(cd.lstMainSymbols, mainSymbolInfo{
+			symbolCode: ms,
+			level:      0,
+			price:      0,
+		})
+	}
+
+	return cd
 }
 
 // NewCollectorPayTrigger creates a new CollectorPayTrigger component instance.
