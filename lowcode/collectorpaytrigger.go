@@ -896,7 +896,7 @@ func (cpt *CollectorPayTrigger) findTarget(vs *sgc7game.GameScene, ds *sgc7game.
 				cd = ds.Arr[x][y]
 				cx = x
 				cy = y
-			} else if cv == 1 && vs.Arr[x][y] == cv {
+			} else if cv == 2 && vs.Arr[x][y] == cv {
 				if ds.Arr[x][y] > cd {
 					cd = ds.Arr[x][y]
 					cx = x
