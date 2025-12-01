@@ -919,6 +919,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		cd.AddPos(-1, -1)
 	}
 
+	ex := sx
+	ey := sy
+
 	for i := pos.Len() - 1; i >= 0; i-- {
 		x := pos.pos[i*2]
 		y := pos.pos[i*2+1]
@@ -928,6 +931,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		if slices.Contains(syms, ngs.Arr[x][y]) {
 			ngs.Arr[x][y] = -2
 			os.Arr[x][y] = -1
+
+			ex = x
+			ey = y
 		}
 
 		alluplevelIndex := slices.Index(cpt.Config.AllUpLevelSymbolCodes, ngs.Arr[x][y])
@@ -936,6 +942,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			ngs.Arr[x][y] = -2
 			os.Arr[x][y] = -1
+
+			ex = x
+			ey = y
 		}
 
 		uplevelIndex := slices.Index(cpt.Config.UpLevelSymbolCodes, ngs.Arr[x][y])
@@ -944,6 +953,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			ngs.Arr[x][y] = -2
 			os.Arr[x][y] = -1
+
+			ex = x
+			ey = y
 		}
 
 		if slices.Contains(cpt.Config.CoinSymbolCodes, ngs.Arr[x][y]) {
@@ -969,9 +981,14 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			os.Arr[x][y] = -1
 
+			ex = x
+			ey = y
+
 			cpt.AddResult(curpr, ret, &cd.BasicComponentData)
 		}
 	}
+
+	ngs.Arr[ex][ey] = ms
 
 	cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
