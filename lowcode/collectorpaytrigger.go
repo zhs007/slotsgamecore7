@@ -869,7 +869,36 @@ func (cpt *CollectorPayTrigger) findNearPath(ds *sgc7game.GameScene, mainSymbol 
 	return false
 }
 
-func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, sx, sy int, dx, dy int, vs *sgc7game.GameScene, ds *sgc7game.GameScene, gs *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult, cd *CollectorPayTriggerData) *sgc7game.GameScene {
+func (cpt *CollectorPayTrigger) procAllUpLevel(gs *sgc7game.GameScene, off int) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			for _, arr := range cpt.Config.MapSymbolCode {
+				ci := slices.Index(arr, gs.Arr[x][y])
+				if ci >= 0 && ci < len(arr)-off {
+					gs.Arr[x][y] += off
+				}
+			}
+		}
+	}
+}
+
+func (cpt *CollectorPayTrigger) procUpLevel(gs *sgc7game.GameScene, ms int, off int) {
+	arr := cpt.Config.MapSymbolCode[ms]
+
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+
+			ci := slices.Index(arr, gs.Arr[x][y])
+			if ci >= 0 && ci < len(arr)-off {
+				gs.Arr[x][y] += off
+			}
+		}
+	}
+}
+
+func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
+	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
+	cd *CollectorPayTriggerData) (*sgc7game.GameScene, error) {
 
 	pos := gameProp.posPool.Get()
 
@@ -881,7 +910,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, sx, sy int, dx,
 			slog.Int("dx", dx),
 			slog.Int("dy", dy))
 
-		return nil
+		return nil, ErrInvalidComponentData
 	}
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
@@ -898,16 +927,59 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, sx, sy int, dx,
 
 		if slices.Contains(syms, ngs.Arr[x][y]) {
 			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+		}
+
+		alluplevelIndex := slices.Index(cpt.Config.AllUpLevelSymbolCodes, ngs.Arr[x][y])
+		if alluplevelIndex >= 0 {
+			cpt.procAllUpLevel(ngs, alluplevelIndex+1)
+
+			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+		}
+
+		uplevelIndex := slices.Index(cpt.Config.UpLevelSymbolCodes, ngs.Arr[x][y])
+		if uplevelIndex >= 0 {
+			cpt.procUpLevel(ngs, ms, uplevelIndex+1)
+
+			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+		}
+
+		if slices.Contains(cpt.Config.CoinSymbolCodes, ngs.Arr[x][y]) {
+			ngs.Arr[x][y] = -2
+
+			if os.Arr[x][y] <= 0 {
+				goutils.Error("CollectorPayTrigger.procNear:InvalidCoinValue",
+					slog.Int("x", x),
+					slog.Int("y", y),
+					slog.Int("CoinSymbol", ngs.Arr[x][y]),
+					slog.Int("CoinValue", os.Arr[x][y]))
+
+				return nil, ErrInvalidComponentData
+			}
+
+			ret := &sgc7game.Result{
+				Symbol:    -1,
+				Type:      sgc7game.RTBonus,
+				LineIndex: -1,
+				CoinWin:   os.Arr[x][y],
+				CashWin:   os.Arr[x][y] * bet,
+			}
+
+			os.Arr[x][y] = -1
+
+			cpt.AddResult(curpr, ret, &cd.BasicComponentData)
 		}
 	}
 
 	cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-	return ngs
+	return ngs, nil
 }
 
 // procSymbolsWithPos
-func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, bet int, cd *CollectorPayTriggerData) error {
+func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) error {
 	ngs := gs
 
 	vs := gameProp.PoolScene.New2(gs.Width, gs.Height, -1)
@@ -940,7 +1012,21 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 						// cv := vs.Arr[tx][ty]
 
 						// if cpt.isNearVal(cv) {
-						ngs = cpt.procNear(gameProp, sx, sy, tx, ty, vs, ds, ngs, arr, curpr, cd)
+						cngs, err := cpt.procNear(gameProp, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
+						if err != nil {
+							goutils.Error("CollectorPayTrigger.procCollect:procNear",
+								slog.Int("sx", sx),
+								slog.Int("sy", sy),
+								slog.Int("tx", tx),
+								slog.Int("ty", ty),
+								goutils.Err(err))
+
+							return err
+						}
+
+						ngs = cngs
+						// } else {
+						// 	break
 						// }
 
 						sx = tx
@@ -964,7 +1050,10 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	cd := icd.(*CollectorPayTriggerData)
 	cd.onNewStep()
 
-	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
+	gs := cpt.GetTargetScene3(gameProp, curpr, prs, 0)
+	os := cpt.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+
+	nos := os.CloneEx(gameProp.PoolScene)
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
 	for x := 0; x < ngs.Width; x++ {
@@ -975,7 +1064,9 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 	}
 
-	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), cd)
+	bet := gameProp.GetBet3(stake, BTypeBet)
+
+	cpt.procCollect(gameProp, bet, curpr, ngs, nos, cd)
 
 	if len(cd.UsedResults) > 0 {
 		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
