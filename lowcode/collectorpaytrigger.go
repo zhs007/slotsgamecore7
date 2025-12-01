@@ -18,6 +18,51 @@ import (
 // CollectorPayTriggerTypeName is the component type name for the collector pay trigger.
 const CollectorPayTriggerTypeName = "collectorPayTrigger"
 
+type mainSymbolInfo struct {
+	symbolCode int
+	level      int
+	price      int
+}
+
+type CollectorPayTriggerData struct {
+	BasicComponentData
+	lstMainSymbols []mainSymbolInfo
+	cfg            *CollectorPayTriggerConfig
+}
+
+func (cpt *CollectorPayTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	cpt.BasicComponentData.OnNewGame(gameProp, component)
+
+	for _, ms := range cpt.lstMainSymbols {
+		ms.level = 0
+		sc := cpt.cfg.MapSymbolCode[ms.symbolCode][0]
+		ms.price = gameProp.Pool.DefaultPaytables.MapPay[sc][0]
+	}
+}
+
+func (cpt *CollectorPayTriggerData) onNewStep() {
+	cpt.UsedScenes = nil
+	cpt.UsedResults = nil
+	cpt.Pos = nil
+
+	sort.Slice(cpt.lstMainSymbols, func(i, j int) bool {
+		if cpt.lstMainSymbols[i].price == cpt.lstMainSymbols[j].price {
+			return i < j
+		}
+
+		return cpt.lstMainSymbols[i].price > cpt.lstMainSymbols[j].price
+	})
+}
+
+func (cpt *CollectorPayTriggerData) Clone() IComponentData {
+	target := &CollectorPayTriggerData{
+		BasicComponentData: cpt.CloneBasicComponentData(),
+		lstMainSymbols:     slices.Clone(cpt.lstMainSymbols),
+	}
+
+	return target
+}
+
 // CollectorPayTriggerConfig - configuration for CollectorPayTrigger
 // CollectorPayTriggerConfig is the configuration for the CollectorPayTrigger component.
 type CollectorPayTriggerConfig struct {
@@ -618,11 +663,331 @@ func (cpt *CollectorPayTrigger) rechgScene(gs *sgc7game.GameScene) {
 	}
 }
 
+func (cpt *CollectorPayTrigger) calcVal(gs *sgc7game.GameScene, x, y int, ms int, syms []int) int {
+	if gs.Arr[x][y] == -2 {
+		return 0
+	}
+
+	if gs.Arr[x][y] == cpt.Config.SwitcherSymbolCode {
+		return 8
+	}
+
+	if slices.Contains(cpt.Config.AllUpLevelSymbolCodes, gs.Arr[x][y]) {
+		return 7
+	}
+
+	if slices.Contains(cpt.Config.UpLevelSymbolCodes, gs.Arr[x][y]) {
+		return 6
+	}
+
+	if slices.Contains(cpt.Config.CoinSymbolCodes, gs.Arr[x][y]) {
+		return 5
+	}
+
+	if gs.Arr[x][y] == cpt.Config.PopcornSymbolCode {
+		return 4
+	}
+
+	if slices.Contains(syms, gs.Arr[x][y]) {
+		return 1
+	}
+
+	if gs.Arr[x][y] == ms {
+		return 1
+	}
+
+	if gs.Arr[x][y] == cpt.Config.EggSymbolCode {
+		return 2
+	}
+
+	if gs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+		return 3
+	}
+
+	return 0
+}
+
+func (cpt *CollectorPayTrigger) isNearVal(cv int) bool {
+	if cv >= 4 {
+		return true
+	}
+
+	return false
+}
+
+func (cpt *CollectorPayTrigger) checkDistente(vs *sgc7game.GameScene, ds *sgc7game.GameScene, x, y int, d int) {
+	if vs.Arr[x][y] != -1 {
+		if ds.Arr[x][y] > d {
+			ds.Arr[x][y] = d
+			// up
+			if y < vs.Height-1 {
+				cpt.checkDistente(vs, ds, x, y+1, d+1)
+			}
+
+			// down
+			if y > 0 {
+				cpt.checkDistente(vs, ds, x, y-1, d+1)
+			}
+
+			// left
+			if x > 0 {
+				cpt.checkDistente(vs, ds, x-1, y, d+1)
+			}
+
+			// right
+			if x < vs.Width-1 {
+				cpt.checkDistente(vs, ds, x+1, y, d+1)
+			}
+		}
+	}
+}
+
+func (cpt *CollectorPayTrigger) checkVal(gs *sgc7game.GameScene, vs *sgc7game.GameScene, ds *sgc7game.GameScene, ms int, x, y int, syms []int, d int) bool {
+	if vs.Arr[x][y] != -1 {
+		cpt.checkDistente(vs, ds, x, y, d)
+
+		return false
+	}
+
+	val := cpt.calcVal(gs, x, y, ms, syms)
+	if val == 0 {
+		return false
+	}
+
+	vs.Arr[x][y] = val
+	ds.Arr[x][y] = d
+
+	// up
+	if y < gs.Height-1 {
+		cpt.checkVal(gs, vs, ds, ms, x, y+1, syms, d+1)
+	}
+
+	// down
+	if y > 0 {
+		cpt.checkVal(gs, vs, ds, ms, x, y-1, syms, d+1)
+	}
+
+	// left
+	if x > 0 {
+		cpt.checkVal(gs, vs, ds, ms, x-1, y, syms, d+1)
+	}
+
+	// right
+	if x < gs.Width-1 {
+		cpt.checkVal(gs, vs, ds, ms, x+1, y, syms, d+1)
+	}
+
+	return true
+}
+
+func (cpt *CollectorPayTrigger) genValData(gs *sgc7game.GameScene, vs *sgc7game.GameScene, ds *sgc7game.GameScene, mx, my int, ms int, syms []int) (*sgc7game.GameScene, *sgc7game.GameScene) {
+	vs.Clear(-1)
+	ds.Clear(-1)
+
+	cpt.checkVal(gs, vs, ds, ms, mx, my, syms, 0)
+
+	return vs, ds
+}
+
+func (cpt *CollectorPayTrigger) findTarget(vs *sgc7game.GameScene, ds *sgc7game.GameScene) (int, int) {
+	cv := -1
+	cd := -1
+	cx := -1
+	cy := -1
+
+	for x := 0; x < vs.Width; x++ {
+		for y := 0; y < vs.Height; y++ {
+			if vs.Arr[x][y] > cv {
+				cv = vs.Arr[x][y]
+				cd = ds.Arr[x][y]
+				cx = x
+				cy = y
+			} else if cv == 1 && vs.Arr[x][y] == cv {
+				if ds.Arr[x][y] > cd {
+					cd = ds.Arr[x][y]
+					cx = x
+					cy = y
+				}
+			} else if vs.Arr[x][y] == cv && cv > 0 {
+				if ds.Arr[x][y] < cd {
+					cd = ds.Arr[x][y]
+					cx = x
+					cy = y
+				}
+			}
+		}
+	}
+
+	return cx, cy
+}
+
+func (cpt *CollectorPayTrigger) findNearPath(ds *sgc7game.GameScene, mainSymbol int, x, y int, pos *PosData) bool {
+	pos.Add(x, y)
+
+	d := ds.Arr[x][y]
+
+	if d == 0 {
+		return true
+	}
+
+	// up
+	if y < ds.Height-1 {
+		if ds.Arr[x][y+1] == d-1 {
+			if cpt.findNearPath(ds, mainSymbol, x, y+1, pos) {
+				return true
+			}
+		}
+	}
+
+	// down
+	if y > 0 {
+		if ds.Arr[x][y-1] == d-1 {
+			if cpt.findNearPath(ds, mainSymbol, x, y-1, pos) {
+				return true
+			}
+		}
+	}
+
+	// left
+	if x > 0 {
+		if ds.Arr[x-1][y] == d-1 {
+			if cpt.findNearPath(ds, mainSymbol, x-1, y, pos) {
+				return true
+			}
+		}
+	}
+
+	// right
+	if x < ds.Width-1 {
+		if ds.Arr[x+1][y] == d-1 {
+			if cpt.findNearPath(ds, mainSymbol, x+1, y, pos) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (cpt *CollectorPayTrigger) procAllUpLevel(gs *sgc7game.GameScene, off int) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			for _, arr := range cpt.Config.MapSymbolCode {
+				ci := slices.Index(arr, gs.Arr[x][y])
+				if ci >= 0 && ci < len(arr)-off {
+					gs.Arr[x][y] += off
+				}
+			}
+		}
+	}
+}
+
+func (cpt *CollectorPayTrigger) procUpLevel(gs *sgc7game.GameScene, ms int, off int) {
+	arr := cpt.Config.MapSymbolCode[ms]
+
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+
+			ci := slices.Index(arr, gs.Arr[x][y])
+			if ci >= 0 && ci < len(arr)-off {
+				gs.Arr[x][y] += off
+			}
+		}
+	}
+}
+
+func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
+	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
+	cd *CollectorPayTriggerData) (*sgc7game.GameScene, error) {
+
+	pos := gameProp.posPool.Get()
+
+	isok := cpt.findNearPath(ds, vs.Arr[sx][sy], dx, dy, pos)
+	if !isok {
+		goutils.Error("CollectorPayTrigger.procNear:findNearPath",
+			slog.Int("sx", sx),
+			slog.Int("sy", sy),
+			slog.Int("dx", dx),
+			slog.Int("dy", dy))
+
+		return nil, ErrInvalidComponentData
+	}
+
+	ngs := gs.CloneEx(gameProp.PoolScene)
+
+	if len(cd.Pos) != 0 {
+		cd.AddPos(-1, -1)
+	}
+
+	for i := pos.Len() - 1; i >= 0; i-- {
+		x := pos.pos[i*2]
+		y := pos.pos[i*2+1]
+
+		cd.AddPos(x, y)
+
+		if slices.Contains(syms, ngs.Arr[x][y]) {
+			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+		}
+
+		alluplevelIndex := slices.Index(cpt.Config.AllUpLevelSymbolCodes, ngs.Arr[x][y])
+		if alluplevelIndex >= 0 {
+			cpt.procAllUpLevel(ngs, alluplevelIndex+1)
+
+			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+		}
+
+		uplevelIndex := slices.Index(cpt.Config.UpLevelSymbolCodes, ngs.Arr[x][y])
+		if uplevelIndex >= 0 {
+			cpt.procUpLevel(ngs, ms, uplevelIndex+1)
+
+			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+		}
+
+		if slices.Contains(cpt.Config.CoinSymbolCodes, ngs.Arr[x][y]) {
+			ngs.Arr[x][y] = -2
+
+			if os.Arr[x][y] <= 0 {
+				goutils.Error("CollectorPayTrigger.procNear:InvalidCoinValue",
+					slog.Int("x", x),
+					slog.Int("y", y),
+					slog.Int("CoinSymbol", ngs.Arr[x][y]),
+					slog.Int("CoinValue", os.Arr[x][y]))
+
+				return nil, ErrInvalidComponentData
+			}
+
+			ret := &sgc7game.Result{
+				Symbol:    -1,
+				Type:      sgc7game.RTBonus,
+				LineIndex: -1,
+				CoinWin:   os.Arr[x][y],
+				CashWin:   os.Arr[x][y] * bet,
+			}
+
+			os.Arr[x][y] = -1
+
+			cpt.AddResult(curpr, ret, &cd.BasicComponentData)
+		}
+	}
+
+	cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+	return ngs, nil
+}
+
 // procSymbolsWithPos
-func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, bet int, bcd *BasicComponentData) error {
+func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) error {
 	ngs := gs
 
-	for _, mainSymbol := range cpt.Config.lstMainSymbols {
+	vs := gameProp.PoolScene.New2(gs.Width, gs.Height, -1)
+	ds := gameProp.PoolScene.New2(gs.Width, gs.Height, -1)
+
+	for _, msi := range cd.lstMainSymbols {
+		mainSymbol := msi.symbolCode
+
 		arr := cpt.Config.MapSymbolCode[mainSymbol]
 
 		for x := 0; x < ngs.Width; x++ {
@@ -630,68 +995,42 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 				if ngs.Arr[x][y] == mainSymbol {
 					sx := x
 					sy := y
+
 					for {
-						_, pd := cpt.findPath(gameProp, ngs, mainSymbol, sx, sy, false)
-						if pd != nil {
-							ret := &sgc7game.Result{
-								Type:      sgc7game.RTCollectorPay,
-								Symbol:    mainSymbol,
-								LineIndex: -1,
-							}
+						// 先计算价值和距离,然后按价值高低,一个个的获取,有走最短路径和最长路径2个方案,可能对局面造成影响的几个符号走最短路径,剩下的走最长路径
+						vs, ds := cpt.genValData(ngs, vs, ds, sx, sy, mainSymbol, arr)
 
-							ngs1 := ngs.CloneEx(gameProp.PoolScene)
-							cpt.rechgScene(ngs)
-							ngs = ngs1
-
-							ngs.Arr[sx][sy] = -2
-
-							coreSymbol := -1
-
-							for i := 0; i < len(pd.pos); i += 2 {
-								tx := pd.pos[i]
-								ty := pd.pos[i+1]
-
-								if slices.Contains(arr, ngs.Arr[tx][ty]) {
-									ret.Pos = append(ret.Pos, tx, ty)
-
-									coreSymbol = ngs.Arr[tx][ty]
-								} else if ngs.Arr[tx][ty] == cpt.Config.WildSymbolCode {
-									ret.Pos = append(ret.Pos, tx, ty)
-								}
-
-								ngs.Arr[tx][ty] = -2
-
-								bcd.AddPos(tx, ty)
-							}
-
-							if coreSymbol > 0 {
-								ret.CoinWin = len(ret.Pos) / 2 * gameProp.Pool.Config.GetDefaultPaytables().MapPay[coreSymbol][0]
-								ret.CashWin = ret.CoinWin * bet
-							}
-
-							ex := pd.pos[len(pd.pos)-2]
-							ey := pd.pos[len(pd.pos)-1]
-
-							ngs.Arr[ex][ey] = mainSymbol
-
-							cpt.AddScene(gameProp, curpr, ngs, bcd)
-							cpt.AddResult(curpr, ret, bcd)
-
-							bcd.AddPos(-1, -1)
-
-							sx = ex
-							sy = ey
-						} else {
-							for i := 0; i < ngs.Width; i++ {
-								for j := 0; j < ngs.Height; j++ {
-									if ngs.Arr[i][j] == -2 {
-										ngs.Arr[i][j] = -1
-									}
-								}
-							}
-
+						tx, ty := cpt.findTarget(vs, ds)
+						if tx == -1 && ty == -1 {
 							break
 						}
+
+						if sx == tx && sy == ty {
+							break
+						}
+
+						// cv := vs.Arr[tx][ty]
+
+						// if cpt.isNearVal(cv) {
+						cngs, err := cpt.procNear(gameProp, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
+						if err != nil {
+							goutils.Error("CollectorPayTrigger.procCollect:procNear",
+								slog.Int("sx", sx),
+								slog.Int("sy", sy),
+								slog.Int("tx", tx),
+								slog.Int("ty", ty),
+								goutils.Err(err))
+
+							return err
+						}
+
+						ngs = cngs
+						// } else {
+						// 	break
+						// }
+
+						sx = tx
+						sy = ty
 					}
 				}
 			}
@@ -708,12 +1047,13 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, curpr *sgc7g
 func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
-	bcd := icd.(*BasicComponentData)
-	bcd.UsedScenes = nil
-	bcd.UsedResults = nil
-	bcd.Pos = nil
+	cd := icd.(*CollectorPayTriggerData)
+	cd.onNewStep()
 
-	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
+	gs := cpt.GetTargetScene3(gameProp, curpr, prs, 0)
+	os := cpt.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+
+	nos := os.CloneEx(gameProp.PoolScene)
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
 	for x := 0; x < ngs.Width; x++ {
@@ -724,9 +1064,11 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 	}
 
-	cpt.procCollect(gameProp, curpr, ngs, int(stake.CashBet)/int(stake.CoinBet), bcd)
+	bet := gameProp.GetBet3(stake, BTypeBet)
 
-	if len(bcd.UsedResults) > 0 {
+	cpt.procCollect(gameProp, bet, curpr, ngs, nos, cd)
+
+	if len(cd.UsedResults) > 0 {
 		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 	}
 
@@ -739,6 +1081,22 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 // OnAsciiGame outputs the component state to an asciigame representation (no-op for this component).
 func (cpt *CollectorPayTrigger) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
+}
+
+func (cpt *CollectorPayTrigger) NewComponentData() IComponentData {
+	cd := &CollectorPayTriggerData{
+		cfg: cpt.Config,
+	}
+
+	for _, ms := range cpt.Config.lstMainSymbols {
+		cd.lstMainSymbols = append(cd.lstMainSymbols, mainSymbolInfo{
+			symbolCode: ms,
+			level:      0,
+			price:      0,
+		})
+	}
+
+	return cd
 }
 
 // NewCollectorPayTrigger creates a new CollectorPayTrigger component instance.
