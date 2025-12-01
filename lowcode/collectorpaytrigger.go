@@ -787,7 +787,7 @@ func (cpt *CollectorPayTrigger) calcVal(gs *sgc7game.GameScene, x, y int, ms int
 	}
 
 	if gs.Arr[x][y] == ms {
-		return 1
+		return 0
 	}
 
 	if gs.Arr[x][y] == cpt.Config.EggSymbolCode {
