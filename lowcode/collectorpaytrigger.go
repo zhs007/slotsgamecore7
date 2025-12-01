@@ -763,39 +763,39 @@ func (cpt *CollectorPayTrigger) calcVal(gs *sgc7game.GameScene, x, y int, ms int
 	}
 
 	if gs.Arr[x][y] == cpt.Config.SwitcherSymbolCode {
-		return 8
+		return 9
 	}
 
 	if slices.Contains(cpt.Config.AllUpLevelSymbolCodes, gs.Arr[x][y]) {
-		return 7
+		return 8
 	}
 
 	if slices.Contains(cpt.Config.UpLevelSymbolCodes, gs.Arr[x][y]) {
-		return 6
+		return 7
 	}
 
 	if slices.Contains(cpt.Config.CoinSymbolCodes, gs.Arr[x][y]) {
-		return 5
+		return 6
 	}
 
 	if gs.Arr[x][y] == cpt.Config.PopcornSymbolCode {
-		return 4
+		return 5
 	}
 
 	if slices.Contains(syms, gs.Arr[x][y]) {
-		return 1
-	}
-
-	if gs.Arr[x][y] == ms {
-		return 0
-	}
-
-	if gs.Arr[x][y] == cpt.Config.EggSymbolCode {
 		return 2
 	}
 
-	if gs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+	if gs.Arr[x][y] == ms {
+		return 1
+	}
+
+	if gs.Arr[x][y] == cpt.Config.EggSymbolCode {
 		return 3
+	}
+
+	if gs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+		return 4
 	}
 
 	return 0
@@ -998,7 +998,7 @@ func (cpt *CollectorPayTrigger) procUpLevel(gs *sgc7game.GameScene, ms int, off 
 
 func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
 	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
-	cd *CollectorPayTriggerData) (*sgc7game.GameScene, error) {
+	cd *CollectorPayTriggerData) (*sgc7game.GameScene, int, int, error) {
 
 	pos := gameProp.posPool.Get()
 
@@ -1010,7 +1010,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 			slog.Int("dx", dx),
 			slog.Int("dy", dy))
 
-		return nil, ErrInvalidComponentData
+		return nil, -1, -1, ErrInvalidComponentData
 	}
 
 	ngs := gs.CloneEx(gameProp.PoolScene)
@@ -1082,7 +1082,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 					slog.Int("CoinSymbol", ngs.Arr[x][y]),
 					slog.Int("CoinValue", os.Arr[x][y]))
 
-				return nil, ErrInvalidComponentData
+				return nil, -1, -1, ErrInvalidComponentData
 			}
 
 			ret := &sgc7game.Result{
@@ -1102,6 +1102,16 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			cpt.AddResult(curpr, ret, &cd.BasicComponentData)
 		}
+
+		if ngs.Arr[x][y] == cpt.Config.SwitcherSymbolCode || ngs.Arr[x][y] == cpt.Config.PopcornSymbolCode || ngs.Arr[x][y] == cpt.Config.EggSymbolCode || ngs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+			ngs.Arr[x][y] = -2
+			os.Arr[x][y] = -1
+
+			ex = x
+			ey = y
+
+			curRet.Pos = append(curRet.Pos, x, y)
+		}
 	}
 
 	if len(curRet.Pos) > 0 {
@@ -1113,7 +1123,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 	cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
-	return ngs, nil
+	return ngs, ex, ey, nil
 }
 
 // procSymbolsWithPos
@@ -1153,7 +1163,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 						// cv := vs.Arr[tx][ty]
 
 						// if cpt.isNearVal(cv) {
-						cngs, err := cpt.procNear(gameProp, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
+						cngs, ex, ey, err := cpt.procNear(gameProp, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
 						if err != nil {
 							goutils.Error("CollectorPayTrigger.procCollect:procNear",
 								slog.Int("sx", sx),
@@ -1166,12 +1176,15 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 						}
 
 						ngs = cngs
+
+						sx = ex
+						sy = ey
 						// } else {
 						// 	break
 						// }
 
-						sx = tx
-						sy = ty
+						// sx = tx
+						// sy = ty
 					}
 				}
 			}
