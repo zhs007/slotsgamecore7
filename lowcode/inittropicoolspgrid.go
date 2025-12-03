@@ -17,6 +17,31 @@ import (
 
 const InitTropiCoolSPGridTypeName = "initTropiCoolSPGrid"
 
+type InitTropiCoolSPGridData struct {
+	BasicComponentData
+	isSpBounsAdded bool
+	vw             *sgc7game.ValWeights2
+	vwNoSpBonus    *sgc7game.ValWeights2
+}
+
+func (itcdpg *InitTropiCoolSPGridData) OnNewGame(gameProp *GameProperty, component IComponent) {
+	itcdpg.BasicComponentData.OnNewGame(gameProp, component)
+
+	itcdpg.isSpBounsAdded = false
+}
+
+func (itcdpg *InitTropiCoolSPGridData) onNewStep() {
+}
+
+func (itcdpg *InitTropiCoolSPGridData) Clone() IComponentData {
+	target := &InitTropiCoolSPGridData{
+		BasicComponentData: itcdpg.CloneBasicComponentData(),
+		isSpBounsAdded:     itcdpg.isSpBounsAdded,
+	}
+
+	return target
+}
+
 // InitTropiCoolSPGridConfig - configuration for InitTropiCoolSPGrid
 type InitTropiCoolSPGridConfig struct {
 	BasicComponentConfig  `yaml:",inline" json:",inline"`
@@ -35,6 +60,9 @@ type InitTropiCoolSPGridConfig struct {
 	GigaWeightVM          *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	EmptySymbol           string                `yaml:"emptySymbol" json:"emptySymbol"`
 	EmptySymbolCode       int                   `yaml:"-" json:"-"`
+	SpBonusSymbol         string                `yaml:"spBonusSymbol" json:"spBonusSymbol"`
+	SpBonusSymbolCode     int                   `yaml:"-" json:"-"`
+	SpBonusSymbolCode2    int                   `yaml:"-" json:"-"`
 	MapControls           map[string][]*Award   `yaml:"-" json:"-"`
 }
 
@@ -137,6 +165,28 @@ func (gen *InitTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) error {
 		gen.Config.SPSymbolCodes = append(gen.Config.SPSymbolCodes, code)
 	}
 
+	code, isok := pool.Config.GetDefaultPaytables().MapSymbols[gen.Config.SpBonusSymbol]
+	if !isok {
+		goutils.Error("InitTropiCoolSPGrid.InitEx:SpBonusSymbol",
+			slog.String("SpBonusSymbol", gen.Config.SpBonusSymbol),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	gen.Config.SpBonusSymbolCode = code
+
+	code, isok = pool.Config.GetDefaultPaytables().MapSymbols[gen.Config.SpBonusSymbol+"_2"]
+	if !isok {
+		goutils.Error("InitTropiCoolSPGrid.InitEx:SpBonusSymbol",
+			slog.String("SpBonusSymbol2", gen.Config.SpBonusSymbol),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	gen.Config.SpBonusSymbolCode2 = code
+
 	// weights
 	if gen.Config.Weight != "" {
 		vw2, err := pool.LoadIntWeights(gen.Config.Weight, true)
@@ -191,21 +241,47 @@ func (gen *InitTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
-func (gen *InitTropiCoolSPGrid) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
-	str := basicCD.GetConfigVal(CCVWeight)
+func (gen *InitTropiCoolSPGrid) getWeight(gameProp *GameProperty, cd *InitTropiCoolSPGridData) (*sgc7game.ValWeights2, *sgc7game.ValWeights2) {
+	str := cd.GetConfigVal(CCVWeight)
 	if str != "" {
 		vw2, err := gameProp.Pool.LoadIntWeights(str, true)
 		if err != nil {
 			goutils.Error("InitTropiCoolSPGrid.getWeight:LoadIntWeights",
 				goutils.Err(err))
 
-			return nil
+			return nil, nil
 		}
 
-		return vw2
+		if cd.vw != vw2 {
+			nospbonusvw, err := vw2.CloneExcludeVal(sgc7game.NewIntValEx(gen.Config.SpBonusSymbolCode))
+			if err != nil {
+				goutils.Error("InitTropiCoolSPGrid.getWeight:CloneExcludeVal",
+					goutils.Err(err))
+
+				return nil, nil
+			}
+
+			cd.vw = vw2
+			cd.vwNoSpBonus = nospbonusvw
+		}
+
+		return vw2, cd.vwNoSpBonus
 	}
 
-	return gen.Config.WeightVM
+	if cd.vw != gen.Config.WeightVM {
+		nospbonusvw, err := gen.Config.WeightVM.CloneExcludeVal(sgc7game.NewIntValEx(gen.Config.SpBonusSymbolCode))
+		if err != nil {
+			goutils.Error("InitTropiCoolSPGrid.getWeight:CloneExcludeVal",
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		cd.vw = gen.Config.WeightVM
+		cd.vwNoSpBonus = nospbonusvw
+	}
+
+	return gen.Config.WeightVM, cd.vwNoSpBonus
 }
 
 func (gen *InitTropiCoolSPGrid) getGigaWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
@@ -251,7 +327,7 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	// Initialize an SPGrid for this component on the current play result
-	bcd := icd.(*BasicComponentData)
+	cd := icd.(*InitTropiCoolSPGridData)
 
 	stackSPGrid, isok := gameProp.MapSPGridStack[gen.Config.SPGrid]
 	if !isok {
@@ -273,7 +349,7 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		return "", ErrInvalidComponentConfig
 	}
 
-	vw := gen.getWeight(gameProp, bcd)
+	vw, vwsp := gen.getWeight(gameProp, cd)
 	if vw == nil {
 		goutils.Error("InitTropiCoolSPGrid.OnPlayGame:getWeight",
 			goutils.Err(ErrInvalidComponentConfig))
@@ -283,15 +359,37 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	for x, arr := range gs.Arr {
 		for y := range arr {
-			cv, err := vw.RandVal(plugin)
-			if err != nil {
-				goutils.Error("InitTropiCoolSPGrid.OnPlayGame:RandVal",
-					goutils.Err(err))
+			if cd.isSpBounsAdded {
+				cv, err := vwsp.RandVal(plugin)
+				if err != nil {
+					goutils.Error("InitTropiCoolSPGrid.OnPlayGame:RandVal",
+						goutils.Err(err))
 
-				return "", err
+					return "", err
+				}
+
+				gs.Arr[x][y] = cv.Int()
+			} else {
+				cv, err := vw.RandVal(plugin)
+				if err != nil {
+					goutils.Error("InitTropiCoolSPGrid.OnPlayGame:RandVal",
+						goutils.Err(err))
+
+					return "", err
+				}
+
+				if cv.Int() == gen.Config.SpBonusSymbolCode {
+					cd.isSpBounsAdded = true
+
+					gs.Arr[x][len(arr)-1] = gen.Config.SpBonusSymbolCode2
+					gs.Arr[x][len(arr)-2] = gen.Config.SpBonusSymbolCode2
+					gs.Arr[x][len(arr)-3] = gen.Config.EmptySymbolCode
+
+					break
+				}
+
+				gs.Arr[x][y] = cv.Int()
 			}
-
-			gs.Arr[x][y] = cv.Int()
 		}
 
 		if gs.Arr[x][gs.Height-1] == gen.Config.EmptySymbolCode {
@@ -299,13 +397,11 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 
 		if gs.Arr[x][gs.Height-2] == gen.Config.EmptySymbolCode {
-			if gs.Arr[x][0] == gen.Config.BlankSymbolCode {
-				gs.Arr[x][gs.Height-2] = gen.Config.BlankSymbolCode
-				gs.Arr[x][0] = -1
-			} else if gs.Arr[x][0] != gen.Config.EmptySymbolCode {
+			if gs.Arr[x][0] != gen.Config.EmptySymbolCode {
 				gs.Arr[x][gs.Height-2] = gs.Arr[x][0]
 				gs.Arr[x][0] = -1
 			} else {
+				gs.Arr[x][gs.Height-2] = -1
 				gs.Arr[x][0] = -1
 			}
 		}
@@ -316,7 +412,7 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 	}
 
 	if gen.Config.GigaWeightVM != nil {
-		gw := gen.getGigaWeight(gameProp, bcd)
+		gw := gen.getGigaWeight(gameProp, &cd.BasicComponentData)
 
 		for x, _ := range gs.Arr {
 			for y := gs.Height - 1; y > 0; y-- {
@@ -358,7 +454,7 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		}
 	}
 
-	gen.AddSPGrid(gen.Config.SPGrid, gameProp, curpr, gs, bcd)
+	gen.AddSPGrid(gen.Config.SPGrid, gameProp, curpr, gs, &cd.BasicComponentData)
 
 	nc := gen.onStepEnd(gameProp, curpr, gp, "")
 
@@ -368,6 +464,12 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 // OnAsciiGame - output to asciigame (no-op)
 func (gen *InitTropiCoolSPGrid) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, lst []*sgc7game.PlayResult, mapSymbolColor *asciigame.SymbolColorMap, icd IComponentData) error {
 	return nil
+}
+
+func (gen *InitTropiCoolSPGrid) NewComponentData() IComponentData {
+	cd := &InitTropiCoolSPGridData{}
+
+	return cd
 }
 
 func NewInitTropiCoolSPGrid(name string) IComponent {
@@ -395,27 +497,30 @@ func NewInitTropiCoolSPGrid(name string) IComponent {
 // "weight": "bgspgridsymsweight",
 // "gigaWeight": "bgspgridgigaweight",
 // "emptySymbol": "EM"
+// "spBonusSymbol": "EL"
 type jsonInitTropiCoolSPGrid struct {
-	MaxNumber   int      `json:"maxNumber"`
-	SPGrid      string   `json:"spGrid"`
-	BlankSymbol string   `json:"BlankSymbol"`
-	GigaSymbols []string `json:"gigsSymbols"`
-	SPSymbols   []string `json:"spSymbols"`
-	Weight      string   `json:"weight"`
-	GigaWeight  string   `json:"gigaWeight"`
-	EmptySymbol string   `json:"emptySymbol"`
+	MaxNumber     int      `json:"maxNumber"`
+	SPGrid        string   `json:"spGrid"`
+	BlankSymbol   string   `json:"BlankSymbol"`
+	GigaSymbols   []string `json:"gigsSymbols"`
+	SPSymbols     []string `json:"spSymbols"`
+	Weight        string   `json:"weight"`
+	GigaWeight    string   `json:"gigaWeight"`
+	EmptySymbol   string   `json:"emptySymbol"`
+	SpBonusSymbol string   `json:"spBonusSymbol"`
 }
 
 func (j *jsonInitTropiCoolSPGrid) build() *InitTropiCoolSPGridConfig {
 	return &InitTropiCoolSPGridConfig{
-		MaxNumber:   j.MaxNumber,
-		SPGrid:      j.SPGrid,
-		BlankSymbol: j.BlankSymbol,
-		GigaSymbols: slices.Clone(j.GigaSymbols),
-		SPSymbols:   slices.Clone(j.SPSymbols),
-		Weight:      j.Weight,
-		GigaWeight:  j.GigaWeight,
-		EmptySymbol: j.EmptySymbol,
+		MaxNumber:     j.MaxNumber,
+		SPGrid:        j.SPGrid,
+		BlankSymbol:   j.BlankSymbol,
+		GigaSymbols:   slices.Clone(j.GigaSymbols),
+		SPSymbols:     slices.Clone(j.SPSymbols),
+		Weight:        j.Weight,
+		GigaWeight:    j.GigaWeight,
+		EmptySymbol:   j.EmptySymbol,
+		SpBonusSymbol: j.SpBonusSymbol,
 	}
 }
 
