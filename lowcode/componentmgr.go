@@ -116,6 +116,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(TreasureChestTypeName, NewTreasureChest)
 	mgr.Reg(MoveSymbols2TypeName, NewMoveSymbols2)
 	mgr.Reg(GenSymbolVals2TypeName, NewGenSymbolVals2)
+	mgr.Reg(GenGigaSymbols2TypeName, NewGenGigaSymbols2)
 	mgr.Reg(MergePositionCollectionTypeName, NewMergePositionCollection)
 	mgr.Reg(FeatureBar2TypeName, NewFeatureBar2)
 	mgr.Reg(ChgSymbols2TypeName, NewChgSymbols2)
