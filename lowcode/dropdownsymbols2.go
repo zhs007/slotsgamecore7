@@ -47,6 +47,7 @@ type DropDownSymbols2Config struct {
 	leftSymbolCodes         []int                `yaml:"-" json:"-"`                                       // sp trigger
 	leftOrBottomSymbolCodes []int                `yaml:"-" json:"-"`                                       // sp trigger
 	OutputToComponent       string               `yaml:"outputToComponent" json:"outputToComponent"`       // outputToComponent
+	GenGigaSymbols2         string               `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`           // genGigaSymbols2
 	MapAwards               map[string][]*Award  `yaml:"controllers" json:"controllers"`
 }
 
@@ -144,7 +145,146 @@ func (dropDownSymbols *DropDownSymbols2) ProcControllers(gameProp *GameProperty,
 	}
 }
 
+func (dropDownSymbols *DropDownSymbols2) dropdownGigaWithOS(gameProp *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) bool {
+	isdown := false
+
+	for _, v := range gigacd.gigaData {
+		cy := gigacd.calcDropdown(ngs, v)
+		if cy != v.Y {
+			isdown = true
+
+			for tx := v.X; tx < v.X+v.Width-1; tx++ {
+				v.od = append(v.od, make([]int, v.Height))
+
+				for ty := v.Y; ty < v.Y+v.Height-1; ty++ {
+					ngs.Arr[tx][ty] = -1
+
+					v.od[tx-v.X][ty-v.Y] = nos.Arr[tx][ty]
+					nos.Arr[tx][ty] = dropDownSymbols.Config.EmptySymbolVal
+				}
+			}
+
+			v.Y = cy
+
+			for tx := v.X; tx < v.X+v.Width-1; tx++ {
+				for ty := v.Y; ty < v.Y+v.Height-1; ty++ {
+					ngs.Arr[tx][ty] = v.CurSymbolCode
+
+					nos.Arr[tx][ty] = v.od[tx-v.X][ty-v.Y]
+				}
+			}
+		}
+	}
+
+	return isdown
+}
+
+func (dropDownSymbols *DropDownSymbols2) refillGigaWithOS(gameProp *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) {
+
+	gigacd.sortGigaData()
+
+	for _, v := range gigacd.gigaData {
+		for ty := v.Y + v.Height; ty < ngs.Height; ty++ {
+			for tx := v.X; tx < v.X+v.Width-1; tx++ {
+				if ngs.Arr[tx][ty] == -1 {
+					ngs.Arr[tx][ty] = v.CurSymbolCode
+				}
+			}
+		}
+	}
+}
+
+func (dropDownSymbols *DropDownSymbols2) procGigaNormalWithOS(gameProp *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
+	gigaicd := gameProp.GetComponentDataWithName(dropDownSymbols.Config.GenGigaSymbols2)
+	if gigaicd == nil {
+		goutils.Error("DropDownSymbols2.procGigaNormalWithOS:GetComponentDataWithName",
+			slog.String("GenGigaSymbols2", dropDownSymbols.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	gigacd, isok := gigaicd.(*GenGigaSymbols2Data)
+	if !isok {
+		goutils.Error("DropDownSymbols2.procGigaNormalWithOS:GenGigaSymbols2Data",
+			slog.String("GenGigaSymbols2", dropDownSymbols.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	for {
+		for x := range ngs.Arr {
+			for y := len(ngs.Arr[x]) - 1; y >= 0; {
+				if ngs.Arr[x][y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						// if giga then break
+						if gigacd.getGigaData(x, y1) != nil {
+							break
+						}
+
+						if ngs.Arr[x][y1] != -1 {
+							ngs.Arr[x][y] = ngs.Arr[x][y1]
+							ngs.Arr[x][y1] = -1
+
+							nos.Arr[x][y] = nos.Arr[x][y1]
+							nos.Arr[x][y1] = dropDownSymbols.Config.EmptySymbolVal
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		isdrop := dropDownSymbols.dropdownGigaWithOS(gameProp, ngs, nos, gigacd)
+		if isdrop {
+			break
+		}
+	}
+
+	dropDownSymbols.refillGigaWithOS(gameProp, ngs, nos, gigacd)
+
+	if dropDownSymbols.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[dropDownSymbols.Config.OutputToComponent]
+		if isok {
+			pccd := gameProp.GetComponentData(pc)
+			pccd.ClearPos()
+
+			for x, arr := range ngs.Arr {
+				for y := len(arr) - 1; y >= 0; y-- {
+					if arr[y] == -1 {
+						pc.AddPos(pccd, x, y)
+					}
+				}
+			}
+
+			return nil
+		} else {
+			goutils.Error("DropDownSymbols2.procGigaNormal:OutputToComponent",
+				goutils.Err(ErrInvalidGameConfig))
+
+			return ErrInvalidGameConfig
+		}
+	}
+
+	return nil
+}
+
 func (dropDownSymbols *DropDownSymbols2) procNormalWithOS(gameProp *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
+	if dropDownSymbols.Config.GenGigaSymbols2 != "" {
+		return dropDownSymbols.procGigaNormalWithOS(gameProp, ngs, nos)
+	}
+
 	for x, arr := range ngs.Arr {
 		for y := len(arr) - 1; y >= 0; {
 			if arr[y] == -1 {
@@ -198,7 +338,156 @@ func (dropDownSymbols *DropDownSymbols2) procNormalWithOS(gameProp *GameProperty
 	return nil
 }
 
+func (dropDownSymbols *DropDownSymbols2) refillGiga(gameProp *GameProperty, gs *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) *sgc7game.GameScene {
+	ngs := gs
+
+	gigacd.sortGigaData()
+
+	for _, v := range gigacd.gigaData {
+		for ty := v.Y + v.Height; ty < gs.Height; ty++ {
+			for tx := v.X; tx < v.X+v.Width-1; tx++ {
+				if ngs.Arr[tx][ty] == -1 {
+					if ngs == gs {
+						ngs = gs.CloneEx(gameProp.PoolScene)
+					}
+
+					ngs.Arr[tx][ty] = v.CurSymbolCode
+				}
+			}
+		}
+	}
+
+	return ngs
+}
+
+func (dropDownSymbols *DropDownSymbols2) dropdownGiga(gameProp *GameProperty, gs *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) (bool, *sgc7game.GameScene) {
+	ngs := gs
+	isdown := false
+
+	for _, v := range gigacd.gigaData {
+		cy := gigacd.calcDropdown(ngs, v)
+		if cy != v.Y {
+			isdown = true
+
+			if ngs == gs {
+				ngs = gs.CloneEx(gameProp.PoolScene)
+			}
+
+			for tx := v.X; tx < v.X+v.Width-1; tx++ {
+				for ty := v.Y; ty < v.Y+v.Height-1; ty++ {
+					ngs.Arr[tx][ty] = -1
+				}
+			}
+
+			v.Y = cy
+
+			for tx := v.X; tx < v.X+v.Width-1; tx++ {
+				for ty := v.Y; ty < v.Y+v.Height-1; ty++ {
+					ngs.Arr[tx][ty] = v.CurSymbolCode
+				}
+			}
+		}
+	}
+
+	return isdown, ngs
+}
+
+func (dropDownSymbols *DropDownSymbols2) procGigaNormal(gameProp *GameProperty, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
+	gigaicd := gameProp.GetComponentDataWithName(dropDownSymbols.Config.GenGigaSymbols2)
+	if gigaicd == nil {
+		goutils.Error("DropDownSymbols2.procGigaNormal:GetComponentDataWithName",
+			slog.String("GenGigaSymbols2", dropDownSymbols.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	gigacd, isok := gigaicd.(*GenGigaSymbols2Data)
+	if !isok {
+		goutils.Error("DropDownSymbols2.procGigaNormal:GenGigaSymbols2Data",
+			slog.String("GenGigaSymbols2", dropDownSymbols.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	ngs := gs
+
+	for {
+		for x := range ngs.Arr {
+			for y := len(ngs.Arr[x]) - 1; y >= 0; {
+				if ngs.Arr[x][y] == -1 {
+					hass := false
+					for y1 := y - 1; y1 >= 0; y1-- {
+						// if giga then break
+						if gigacd.getGigaData(x, y1) != nil {
+							break
+						}
+
+						if ngs.Arr[x][y1] != -1 {
+							if ngs == gs {
+								ngs = gs.CloneEx(gameProp.PoolScene)
+							}
+
+							ngs.Arr[x][y] = ngs.Arr[x][y1]
+							ngs.Arr[x][y1] = -1
+
+							hass = true
+							y--
+							break
+						}
+					}
+
+					if !hass {
+						break
+					}
+				} else {
+					y--
+				}
+			}
+		}
+
+		isdrop, cngs := dropDownSymbols.dropdownGiga(gameProp, ngs, gigacd)
+		if isdrop {
+			break
+		}
+
+		ngs = cngs
+	}
+
+	cngs := dropDownSymbols.refillGiga(gameProp, ngs, gigacd)
+	ngs = cngs
+
+	if dropDownSymbols.Config.OutputToComponent != "" {
+		pc, isok := gameProp.Components.MapComponents[dropDownSymbols.Config.OutputToComponent]
+		if isok {
+			pccd := gameProp.GetComponentData(pc)
+			pccd.ClearPos()
+
+			for x, arr := range ngs.Arr {
+				for y := len(arr) - 1; y >= 0; y-- {
+					if arr[y] == -1 {
+						pc.AddPos(pccd, x, y)
+					}
+				}
+			}
+
+			return ngs, nil
+		} else {
+			goutils.Error("DropDownSymbols2.procGigaNormal:OutputToComponent",
+				goutils.Err(ErrInvalidGameConfig))
+
+			return nil, ErrInvalidGameConfig
+		}
+	}
+
+	return ngs, nil
+}
+
 func (dropDownSymbols *DropDownSymbols2) procNormal(gameProp *GameProperty, gs *sgc7game.GameScene) (*sgc7game.GameScene, error) {
+	if dropDownSymbols.Config.GenGigaSymbols2 != "" {
+		return dropDownSymbols.procGigaNormal(gameProp, gs)
+	}
 
 	ngs := gs
 
@@ -889,6 +1178,7 @@ func NewDropDownSymbols2(name string) IComponent {
 // "type": "hexGridStaggered"
 // "rowMask": "mask-height4"
 // "outputToComponent": "bg-pos-dropdown"
+// "genGigaSymbols2": "bg-gengiga"
 type jsonDropDownSymbols2 struct {
 	HoldSymbols          []string `json:"holdSymbols"`          // 不需要下落的symbol
 	IsNeedProcSymbolVals bool     `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
@@ -896,6 +1186,7 @@ type jsonDropDownSymbols2 struct {
 	Type                 string   `json:"type"`                 // 类型
 	RowMask              string   `json:"rowMask"`              // rowMask
 	OutputToComponent    string   `json:"outputToComponent"`    // outputToComponent
+	GenGigaSymbols2      string   `json:"genGigaSymbols2"`      // genGigaSymbols2
 }
 
 func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
@@ -906,6 +1197,7 @@ func (jcfg *jsonDropDownSymbols2) build() *DropDownSymbols2Config {
 		StrType:              strings.ToLower(jcfg.Type),
 		RowMask:              jcfg.RowMask,
 		OutputToComponent:    jcfg.OutputToComponent,
+		GenGigaSymbols2:      jcfg.GenGigaSymbols2,
 	}
 
 	return cfg

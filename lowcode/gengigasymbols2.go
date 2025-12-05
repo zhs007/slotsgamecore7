@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"sort"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -20,16 +21,54 @@ import (
 const GenGigaSymbols2TypeName = "genGigaSymbols2"
 
 type gigaData struct {
-	SymbolCode int
-	Width      int
-	Height     int
-	X          int
-	Y          int
+	SymbolCode    int
+	CurSymbolCode int
+	Width         int
+	Height        int
+	X             int
+	Y             int
+	od            [][]int
+}
+
+func (gd *gigaData) getBottom() int {
+	return gd.Y + gd.Height - 1
 }
 
 type GenGigaSymbols2Data struct {
 	BasicComponentData
 	gigaData []*gigaData
+	cfg      *GenGigaSymbols2Config
+}
+
+func (genGigaSymbols2Data *GenGigaSymbols2Data) calcDropdown(gs *sgc7game.GameScene, gd *gigaData) int {
+	cy := gd.Y
+	for gy := gd.Y + gd.Height; gy < gs.Height; gy++ {
+		for gx := gd.X; gx < gd.X+gd.Width-1; gx++ {
+			if slices.Contains(genGigaSymbols2Data.cfg.SpSymbolCodes, gs.Arr[gx][gy]) && genGigaSymbols2Data.getGigaData(gx, gy) != nil {
+				return cy
+			}
+		}
+
+		cy++
+	}
+
+	return cy
+}
+
+func (genGigaSymbols2Data *GenGigaSymbols2Data) getGigaData(x, y int) *gigaData {
+	for _, v := range genGigaSymbols2Data.gigaData {
+		if v.X >= x && v.Y >= y && v.X+v.Width-1 <= x && v.Y+v.Height-1 <= y {
+			return v
+		}
+	}
+
+	return nil
+}
+
+func (genGigaSymbols2Data *GenGigaSymbols2Data) sortGigaData() {
+	sort.Slice(genGigaSymbols2Data.gigaData, func(i, j int) bool {
+		return genGigaSymbols2Data.gigaData[i].getBottom() > genGigaSymbols2Data.gigaData[j].getBottom()
+	})
 }
 
 // OnNewGame -
@@ -51,11 +90,12 @@ func (genGigaSymbols2Data *GenGigaSymbols2Data) Clone() IComponentData {
 
 	for _, v := range genGigaSymbols2Data.gigaData {
 		target.gigaData = append(target.gigaData, &gigaData{
-			SymbolCode: v.SymbolCode,
-			Width:      v.Width,
-			Height:     v.Height,
-			X:          v.X,
-			Y:          v.Y,
+			SymbolCode:    v.SymbolCode,
+			CurSymbolCode: v.CurSymbolCode,
+			Width:         v.Width,
+			Height:        v.Height,
+			X:             v.X,
+			Y:             v.Y,
 		})
 	}
 
@@ -270,11 +310,12 @@ func (genGigaSymbols2 *GenGigaSymbols2) procGiga(gs *sgc7game.GameScene, vw *sgc
 						}
 
 						gd := &gigaData{
-							SymbolCode: symbolCode,
-							Width:      cr.Int(),
-							Height:     cr.Int(),
-							X:          x,
-							Y:          y,
+							SymbolCode:    symbolCode,
+							CurSymbolCode: genGigaSymbols2.Config.GigaSymbolCodes[symbolCode][gigasize-1],
+							Width:         cr.Int(),
+							Height:        cr.Int(),
+							X:             x,
+							Y:             y,
 						}
 
 						cd.gigaData = append(cd.gigaData, gd)
@@ -329,7 +370,9 @@ func (genGigaSymbols2 *GenGigaSymbols2) OnAsciiGame(gameProp *GameProperty, pr *
 
 // NewComponentData -
 func (genGigaSymbols2 *GenGigaSymbols2) NewComponentData() IComponentData {
-	return &GenGigaSymbols2Data{}
+	return &GenGigaSymbols2Data{
+		cfg: genGigaSymbols2.Config,
+	}
 }
 
 func NewGenGigaSymbols2(name string) IComponent {
