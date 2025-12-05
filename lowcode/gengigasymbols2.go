@@ -57,7 +57,7 @@ func (genGigaSymbols2Data *GenGigaSymbols2Data) calcDropdown(gs *sgc7game.GameSc
 
 func (genGigaSymbols2Data *GenGigaSymbols2Data) getGigaData(x, y int) *gigaData {
 	for _, v := range genGigaSymbols2Data.gigaData {
-		if v.X >= x && v.Y >= y && v.X+v.Width-1 <= x && v.Y+v.Height-1 <= y {
+		if v.X <= x && v.Y <= y && v.X+v.Width-1 >= x && v.Y+v.Height-1 >= y {
 			return v
 		}
 	}
@@ -212,7 +212,7 @@ func (genGigaSymbols2 *GenGigaSymbols2) InitEx(cfg any, pool *GamePropertyPool) 
 			return ErrInvalidSymbol
 		}
 
-		genGigaSymbols2.Config.GigaSymbolCodes[sc] = make([]int, pool.Config.Width)
+		genGigaSymbols2.Config.GigaSymbolCodes[sc] = make([]int, pool.Config.Width-1)
 		genGigaSymbols2.Config.GigaSymbolCodes[sc][0] = -1
 
 		for gi := 2; gi < pool.Config.Width; gi++ {
@@ -252,12 +252,12 @@ func (genGigaSymbols2 *GenGigaSymbols2) getMaxNumber(gameProp *GameProperty, bcd
 }
 
 func (genGigaSymbols2 *GenGigaSymbols2) isCanGiga(x, y int, giga int, gs *sgc7game.GameScene) bool {
-	for gx := 0; gx < giga-1; gx++ {
+	for gx := 0; gx <= giga-1; gx++ {
 		if x+gx >= gs.Width {
 			return false
 		}
 
-		for gy := 0; gy < giga-1; gy++ {
+		for gy := 0; gy <= giga-1; gy++ {
 			if gx == 0 && gy == 0 {
 				continue
 			}
@@ -303,8 +303,8 @@ func (genGigaSymbols2 *GenGigaSymbols2) procGiga(gs *sgc7game.GameScene, vw *sgc
 							ngs = gs.CloneEx(gameProp.PoolScene)
 						}
 
-						for gx := 0; gx < cr.Int()-1; gx++ {
-							for gy := 0; gy < cr.Int()-1; gy++ {
+						for gx := 0; gx < gigasize; gx++ {
+							for gy := 0; gy < gigasize; gy++ {
 								ngs.Arr[x+gx][y+gy] = genGigaSymbols2.Config.GigaSymbolCodes[symbolCode][gigasize-1]
 							}
 						}
@@ -332,7 +332,7 @@ func (genGigaSymbols2 *GenGigaSymbols2) procGiga(gs *sgc7game.GameScene, vw *sgc
 		}
 	}
 
-	return gs, nil
+	return ngs, nil
 }
 
 // playgame placeholder
@@ -354,7 +354,23 @@ func (genGigaSymbols2 *GenGigaSymbols2) OnPlayGame(gameProp *GameProperty, curpr
 	vw := genGigaSymbols2.getWeight(gameProp, &cd.BasicComponentData)
 	maxNumber := genGigaSymbols2.getMaxNumber(gameProp, &cd.BasicComponentData)
 
-	genGigaSymbols2.procGiga(gs, vw, gameProp, plugin, cd, maxNumber)
+	ngs, err := genGigaSymbols2.procGiga(gs, vw, gameProp, plugin, cd, maxNumber)
+	if err != nil {
+		goutils.Error("GenGigaSymbols2.OnPlayGame:procGiga",
+			goutils.Err(err))
+
+		return "", err
+	}
+
+	if ngs != gs {
+		genGigaSymbols2.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+
+		genGigaSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1, "<trigger>")
+
+		nc := genGigaSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+		return nc, nil
+	}
 
 	// Placeholder: Do nothing
 	nc := genGigaSymbols2.onStepEnd(gameProp, curpr, gp, "")

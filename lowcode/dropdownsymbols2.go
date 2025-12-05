@@ -448,7 +448,7 @@ func (dropDownSymbols *DropDownSymbols2) procGigaNormal(gameProp *GameProperty, 
 		}
 
 		isdrop, cngs := dropDownSymbols.dropdownGiga(gameProp, ngs, gigacd)
-		if isdrop {
+		if !isdrop {
 			break
 		}
 

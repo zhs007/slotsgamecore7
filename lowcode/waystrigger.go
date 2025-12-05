@@ -145,6 +145,7 @@ type WaysTriggerConfig struct {
 	RespinNumWeightWithScatterNum   map[int]string                `yaml:"respinNumWeightWithScatterNum" json:"respinNumWeightWithScatterNum"` // respin number weight with scatter number
 	RespinNumWeightWithScatterNumVW map[int]*sgc7game.ValWeights2 `yaml:"-" json:"-"`                                                         // respin number weight with scatter number
 	SetWinSymbols                   []string                      `yaml:"setWinSymbols" json:"setWinSymbols"`
+	GenGigaSymbols2                 string                        `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`
 	RowMask                         string                        `yaml:"rowMask" json:"rowMask"`
 }
 
@@ -348,6 +349,23 @@ func (waysTrigger *WaysTrigger) CanTriggerWithScene(gameProp *GameProperty, gs *
 	return waysTrigger.canTrigger(gameProp, gs, nil, curpr, stake, icd.(*WaysTriggerData))
 }
 
+func (waysTrigger *WaysTrigger) getGigaData(gameProp *GameProperty) (*GenGigaSymbols2Data, error) {
+	icd := gameProp.GetComponentDataWithName(waysTrigger.Config.GenGigaSymbols2)
+	if icd == nil {
+		return nil, nil
+	}
+
+	gigacd, isok := icd.(*GenGigaSymbols2Data)
+	if !isok {
+		goutils.Error("WaysTrigger.getGigaData:TypeAssert",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return gigacd, nil
+}
+
 // CanTrigger -
 func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, _ *sgc7game.PlayResult, stake *sgc7game.Stake, cd *WaysTriggerData) (bool, []*sgc7game.Result) {
 	isTrigger := false
@@ -362,6 +380,13 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 	}
 
 	rowMask := waysTrigger.getRowMask(&cd.BasicComponentData)
+	gigacd, err := waysTrigger.getGigaData(gameProp)
+	if err != nil {
+		goutils.Error("WaysTrigger.canTrigger:getGigaData",
+			goutils.Err(err))
+
+		return false, nil
+	}
 
 	if rowMask != "" {
 		maskCompData := gameProp.GetComponentDataWithName(rowMask)
@@ -377,47 +402,124 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		switch waysTrigger.Config.TriggerType {
 		case STTypeWays:
 			if os != nil {
-				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
-					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-						if !validMask[y] {
-							return false
-						}
+				if gigacd != nil {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						},
+						func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							if !validMask[y] {
+								return false
+							}
 
-						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
-					}, func(cursymbol int) bool {
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(cursymbol int, startsymbol int) bool {
-						if cursymbol == startsymbol {
-							return true
-						}
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							gigad := gigacd.getGigaData(x, y)
+							if gigad != nil {
+								return gigad.SymbolCode
+							}
 
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(x, y int) int {
-						return os.Arr[x][y]
-					})
+							return cursymbol
+						},
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
 
-				lst = append(lst, currets...)
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return os.Arr[x][y]
+						})
+
+					lst = append(lst, currets...)
+				} else {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						},
+						func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							if !validMask[y] {
+								return false
+							}
+
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							return cursymbol
+						},
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
+
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return os.Arr[x][y]
+						})
+
+					lst = append(lst, currets...)
+				}
 			} else {
-				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
-					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-						if !validMask[y] {
-							return false
-						}
+				if gigacd != nil {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							if !validMask[y] {
+								return false
+							}
 
-						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
-					}, func(cursymbol int) bool {
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(cursymbol int, startsymbol int) bool {
-						if cursymbol == startsymbol {
-							return true
-						}
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							gigad := gigacd.getGigaData(x, y)
+							if gigad != nil {
+								return gigad.SymbolCode
+							}
 
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(x, y int) int {
-						return 1
-					})
+							return cursymbol
+						}, func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
 
-				lst = append(lst, currets...)
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return 1
+						})
+
+					lst = append(lst, currets...)
+				} else {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						},
+						func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							if !validMask[y] {
+								return false
+							}
+
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							return cursymbol
+						}, func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
+
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return 1
+						})
+
+					lst = append(lst, currets...)
+				}
 			}
 
 			if len(lst) > 0 {
@@ -451,39 +553,108 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		switch waysTrigger.Config.TriggerType {
 		case STTypeWays:
 			if os != nil {
-				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
-					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
-					}, func(cursymbol int) bool {
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(cursymbol int, startsymbol int) bool {
-						if cursymbol == startsymbol {
-							return true
-						}
+				if gigacd != nil {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							gigad := gigacd.getGigaData(x, y)
+							if gigad != nil {
+								return gigad.SymbolCode
+							}
 
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(x, y int) int {
-						return os.Arr[x][y]
-					})
+							return cursymbol
+						}, func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
 
-				lst = append(lst, currets...)
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return os.Arr[x][y]
+						})
+
+					lst = append(lst, currets...)
+				} else {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							gigad := gigacd.getGigaData(x, y)
+							if gigad != nil {
+								return gigad.SymbolCode
+							}
+
+							return cursymbol
+						}, func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
+
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return os.Arr[x][y]
+						})
+
+					lst = append(lst, currets...)
+				}
 			} else {
-				currets := sgc7game.CheckWays3(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
-					func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
-						return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
-					}, func(cursymbol int) bool {
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(cursymbol int, startsymbol int) bool {
-						if cursymbol == startsymbol {
-							return true
-						}
+				if gigacd != nil {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							gigad := gigacd.getGigaData(x, y)
+							if gigad != nil {
+								return gigad.SymbolCode
+							}
 
-						return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
-					}, func(x, y int) int {
-						return 1
-					})
+							return cursymbol
+						}, func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
 
-				lst = append(lst, currets...)
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return 1
+						})
+
+					lst = append(lst, currets...)
+				} else {
+					currets := sgc7game.CheckWays5(gs, gameProp.CurPaytables, gameProp.GetBet3(stake, waysTrigger.Config.BetType),
+						func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
+							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
+						}, func(cursymbol int, x, y int) int {
+							return cursymbol
+						}, func(cursymbol int) bool {
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(cursymbol int, startsymbol int) bool {
+							if cursymbol == startsymbol {
+								return true
+							}
+
+							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
+						}, func(x, y int) int {
+							return 1
+						})
+
+					lst = append(lst, currets...)
+				}
 			}
 
 			if len(lst) > 0 {
@@ -826,31 +997,29 @@ func NewWaysTrigger(name string) IComponent {
 	}
 }
 
-//	"configuration": {
-//		"triggerType": "lines",
-//		"betType": "bet",
-//		"checkWinType": "left2right",
-//		"symbols": [
-//			"WL",
-//			"A",
-//			"B",
-//			"C",
-//			"D",
-//			"E",
-//			"F",
-//			"G",
-//			"H",
-//			"J",
-//			"K",
-//			"L"
-//		],
-//		"wildSymbols": [
-//			"WL"
-//		]
+//	"triggerType": "lines",
+//	"betType": "bet",
+//	"checkWinType": "left2right",
+//	"symbols": [
+//		"WL",
+//		"A",
+//		"B",
+//		"C",
+//		"D",
+//		"E",
+//		"F",
+//		"G",
+//		"H",
+//		"J",
+//		"K",
+//		"L"
+//	],
+//	"wildSymbols": [
+//		"WL"
+//	]
 //
 // "rowMask": "mask-height4"
-//
-//	},
+// "genGigaSymbols2": "bg-gengiga"
 type jsonWaysTrigger struct {
 	Symbols             []string `json:"symbols"`
 	TriggerType         string   `json:"triggerType"`
@@ -862,6 +1031,7 @@ type jsonWaysTrigger struct {
 	PutMoneyInPiggyBank string   `json:"putMoneyInPiggyBank"`
 	OutputToComponent   string   `json:"outputToComponent"`
 	RowMask             string   `json:"rowMask"`
+	GenGigaSymbols2     string   `json:"genGigaSymbols2"`
 }
 
 func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
@@ -876,6 +1046,7 @@ func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
 		OSMulTypeString:    jcfg.SymbolValsMulti,
 		OutputToComponent:  jcfg.OutputToComponent,
 		RowMask:            jcfg.RowMask,
+		GenGigaSymbols2:    jcfg.GenGigaSymbols2,
 	}
 
 	return cfg

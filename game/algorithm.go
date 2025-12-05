@@ -43,6 +43,9 @@ type FuncCalcMulti func(src int, target int) int
 // FuncGetSymbol - get symbol
 type FuncGetSymbol func(cursymbol int) int
 
+// FuncGetSymbolXY - get symbol
+type FuncGetSymbolXY func(cursymbol int, x, y int) int
+
 // CalcScatter - calc scatter
 func CalcScatter(scene *GameScene, pt *PayTables, scatter int, bet int, coins int,
 	isScatter FuncIsScatter) *Result {
