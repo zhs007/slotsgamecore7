@@ -40,15 +40,35 @@ type GenGigaSymbols2Data struct {
 	cfg      *GenGigaSymbols2Config
 }
 
+func (genGigaSymbols2Data *GenGigaSymbols2Data) removeSymbol(x, y int) {
+	for i, v := range genGigaSymbols2Data.gigaData {
+		if v.X <= x && v.Y <= y && v.X+v.Width-1 >= x && v.Y+v.Height-1 >= y {
+			genGigaSymbols2Data.gigaData = append(genGigaSymbols2Data.gigaData[:i], genGigaSymbols2Data.gigaData[i+1:]...)
+
+			return
+		}
+	}
+}
+
 func (genGigaSymbols2Data *GenGigaSymbols2Data) calcDropdown(gs *sgc7game.GameScene, gd *gigaData) int {
 	cy := gd.Y
 	for gy := gd.Y + gd.Height; gy < gs.Height; gy++ {
+		cn := 0
+		for gx := gd.X; gx <= gd.X+gd.Width-1; gx++ {
+			if gs.Arr[gx][gy] != -1 {
+				cn++
+			}
+		}
+
+		if cn == gd.Width {
+			return cy
+		}
+
 		for gx := gd.X; gx < gd.X+gd.Width-1; gx++ {
 			if slices.Contains(genGigaSymbols2Data.cfg.SpSymbolCodes, gs.Arr[gx][gy]) && genGigaSymbols2Data.getGigaData(gx, gy) != nil {
 				return cy
 			}
 		}
-
 		cy++
 	}
 

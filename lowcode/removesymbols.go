@@ -131,7 +131,8 @@ type RemoveSymbolsConfig struct {
 	IsNeedProcSymbolVals     bool              `yaml:"isNeedProcSymbolVals" json:"isNeedProcSymbolVals"`         // 是否需要同时处理symbolVals
 	EmptySymbolVal           int               `yaml:"emptySymbolVal" json:"emptySymbolVal"`                     // 空的symbolVal是什么
 	OutputToComponent        string            `yaml:"outputToComponent" json:"outputToComponent"`               // outputToComponent
-	Awards                   []*Award          `yaml:"awards" json:"awards"`                                     // 新的奖励系统
+	GenGigaSymbols2          string            `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`
+	Awards                   []*Award          `yaml:"awards" json:"awards"` // 新的奖励系统
 }
 
 // SetLinkComponent sets a named downstream component link. Supported link
@@ -241,7 +242,7 @@ func (removeSymbols *RemoveSymbols) canRemove(x, y int, gs *sgc7game.GameScene) 
 // position collections. If an "other scene" (os) is provided, it will be
 // updated accordingly (e.g. empty value mapping).
 func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, rscd *RemoveSymbolsData,
-	gs *sgc7game.GameScene, os *sgc7game.GameScene) error {
+	gs *sgc7game.GameScene, os *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) error {
 	ngs := gs
 	totalHeight := 0
 
@@ -281,6 +282,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 								ngs.Arr[x][y] = -1
 								nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
 
+								if gigacd != nil {
+									gigacd.removeSymbol(x, y)
+								}
+
 								rscd.X = x
 								rscd.Y = y
 
@@ -313,6 +318,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 						ngs.Arr[x][y] = -1
 						nos.Arr[x][y] = removeSymbols.Config.EmptySymbolVal
+
+						if gigacd != nil {
+							gigacd.removeSymbol(x, y)
+						}
 
 						rscd.X = x
 						rscd.Y = y
@@ -359,6 +368,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 
 								ngs.Arr[x][y] = -1
 
+								if gigacd != nil {
+									gigacd.removeSymbol(x, y)
+								}
+
 								rscd.X = x
 								rscd.Y = y
 
@@ -390,6 +403,10 @@ func (removeSymbols *RemoveSymbols) onBasic(gameProp *GameProperty, curpr *sgc7g
 						}
 
 						ngs.Arr[x][y] = -1
+
+						if gigacd != nil {
+							gigacd.removeSymbol(x, y)
+						}
 
 						rscd.X = x
 						rscd.Y = y
@@ -568,6 +585,23 @@ func (removeSymbols *RemoveSymbols) onAdjacentPay(gameProp *GameProperty, curpr 
 	return nil
 }
 
+func (removeSymbols *RemoveSymbols) getGigaData(gameProp *GameProperty) (*GenGigaSymbols2Data, error) {
+	icd := gameProp.GetComponentDataWithName(removeSymbols.Config.GenGigaSymbols2)
+	if icd == nil {
+		return nil, nil
+	}
+
+	gigacd, isok := icd.(*GenGigaSymbols2Data)
+	if !isok {
+		goutils.Error("RemoveSymbols.getGigaData:TypeAssert",
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return gigacd, nil
+}
+
 // OnPlayGame is the component entry point executed for a play step. It applies
 // the configured removal behavior (basic or adjacentPay) to the target
 // GameScene(s), processes controllers/awards and returns the next component
@@ -591,9 +625,17 @@ func (removeSymbols *RemoveSymbols) OnPlayGame(gameProp *GameProperty, curpr *sg
 		os = removeSymbols.GetTargetOtherScene3(gameProp, curpr, prs, 0)
 	}
 
+	gigacd, err := removeSymbols.getGigaData(gameProp)
+	if err != nil {
+		goutils.Error("RemoveSymbols.OnPlayGame:getGigaData",
+			goutils.Err(err))
+
+		return "", err
+	}
+
 	switch removeSymbols.Config.Type {
 	case RSTypeBasic:
-		err := removeSymbols.onBasic(gameProp, curpr, gp, rscd, gs, os)
+		err := removeSymbols.onBasic(gameProp, curpr, gp, rscd, gs, os, gigacd)
 		if err == ErrComponentDoNothing {
 			nc := removeSymbols.onStepEnd(gameProp, curpr, gp, "")
 
@@ -696,6 +738,7 @@ func NewRemoveSymbols(name string) IComponent {
 //	"bg-scatterzone"
 //
 // ]
+// "genGigaSymbols2": "bg-gengiga"
 // jsonRemoveSymbols is the lightweight JSON/YAML mapping used when parsing an
 // inline removeSymbols configuration from AST nodes. It is converted to the
 // full RemoveSymbolsConfig via build().
@@ -708,6 +751,7 @@ type jsonRemoveSymbols struct {
 	EmptySymbolVal           int      `json:"emptySymbolVal"`           // value to set in other scene for emptied slots
 	OutputToComponent        string   `json:"outputToComp"`             // optional component to output removed positions to
 	SourcePositionCollection []string `json:"sourcePositionCollection"` // alternative explicit list of positions to remove
+	GenGigaSymbols2          string   `json:"genGigaSymbols2"`
 }
 
 // build converts the jsonRemoveSymbols helper into a full
@@ -723,6 +767,7 @@ func (jcfg *jsonRemoveSymbols) build() *RemoveSymbolsConfig {
 		AddedSymbol:              jcfg.AddedSymbol,
 		OutputToComponent:        jcfg.OutputToComponent,
 		SourcePositionCollection: slices.Clone(jcfg.SourcePositionCollection),
+		GenGigaSymbols2:          jcfg.GenGigaSymbols2,
 	}
 
 	return cfg
