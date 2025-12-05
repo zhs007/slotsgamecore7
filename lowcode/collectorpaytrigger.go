@@ -118,6 +118,18 @@ func (cpt *CollectorPayTriggerData) moveEnd(ms int) {
 	}
 }
 
+func (cpt *CollectorPayTriggerData) procSymbolsWithLevel(gs *sgc7game.GameScene) {
+	for x, arr := range gs.Arr {
+		for y, sc := range arr {
+			for _, ms := range cpt.lstMainSymbols {
+				if slices.Contains(ms.syms, sc) {
+					gs.Arr[x][y] = ms.syms[ms.level]
+				}
+			}
+		}
+	}
+}
+
 func (cpt *CollectorPayTriggerData) onNewStep() {
 	cpt.UsedScenes = nil
 	cpt.UsedResults = nil

@@ -97,6 +97,7 @@ type RefillSymbols2Config struct {
 	Height               int    `yaml:"height" json:"height"`                             // 重新填充的symbolVal是什么
 	MaskX                string `yaml:"maskX" json:"maskX"`                               // maskX
 	MaskY                string `yaml:"maskY" json:"maskY"`                               // maskY
+	CollectorPay         string `yaml:"collectorPay" json:"collectorPay"`                 // collectorPay
 }
 
 // SetLinkComponent
@@ -523,6 +524,32 @@ func (refillSymbols2 *RefillSymbols2) refill(gameProp *GameProperty, gs *sgc7gam
 	return ngs, nil
 }
 
+func (refillSymbols2 *RefillSymbols2) procCollectorPay(gameProp *GameProperty, gs *sgc7game.GameScene) {
+	if refillSymbols2.Config.CollectorPay == "" {
+		return
+	}
+
+	icd := gameProp.GetComponentDataWithName(refillSymbols2.Config.CollectorPay)
+	if icd == nil {
+		goutils.Error("RefillSymbols2.procCollectorPay:CollectorPay",
+			slog.String("collectorPay", refillSymbols2.Config.CollectorPay),
+			goutils.Err(ErrInvalidComponent))
+
+		return
+	}
+
+	cptd, isok := icd.(*CollectorPayTriggerData)
+	if !isok {
+		goutils.Error("RefillSymbols2.procCollectorPay:CollectorPay",
+			slog.String("collectorPay", refillSymbols2.Config.CollectorPay),
+			goutils.Err(ErrInvalidComponentData))
+
+		return
+	}
+
+	cptd.procSymbolsWithLevel(gs)
+}
+
 // playgame
 func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
@@ -571,6 +598,8 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 				return nc, ErrComponentDoNothing
 			}
 
+			refillSymbols2.procCollectorPay(gameProp, ngs)
+
 			refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 			if nos != nil {
 				refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
@@ -599,6 +628,8 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
 		}
 
+		refillSymbols2.procCollectorPay(gameProp, ngs)
+
 		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 
 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
@@ -613,6 +644,8 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 
 			return nc, ErrComponentDoNothing
 		}
+
+		refillSymbols2.procCollectorPay(gameProp, ngs)
 
 		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 		if nos != nil {
@@ -634,6 +667,8 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 	if nos != nil {
 		refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
 	}
+
+	refillSymbols2.procCollectorPay(gameProp, ngs)
 
 	refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
 
@@ -675,6 +710,7 @@ func NewRefillSymbols2(name string) IComponent {
 // "defaultSymbolVal": 0,
 // "Height": 6,
 // "maskX": "mask-6"
+// "collectorPay": "bg-pay"
 type jsonRefillSymbols2 struct {
 	IsNeedProcSymbolVals bool   `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int    `json:"emptySymbolVal"`       // 空的symbolVal是什么
@@ -683,6 +719,7 @@ type jsonRefillSymbols2 struct {
 	Height               int    `json:"Height"`               // height, <=0 is ignore
 	MaskX                string `json:"maskX"`                // maskX
 	MaskY                string `json:"maskY"`                // maskY
+	CollectorPay         string `json:"collectorPay"`         // collectorPay
 }
 
 func (jcfg *jsonRefillSymbols2) build() *RefillSymbols2Config {
@@ -694,6 +731,7 @@ func (jcfg *jsonRefillSymbols2) build() *RefillSymbols2Config {
 		Height:               jcfg.Height,
 		MaskX:                jcfg.MaskX,
 		MaskY:                jcfg.MaskY,
+		CollectorPay:         jcfg.CollectorPay,
 	}
 
 	return cfg

@@ -35,6 +35,8 @@ type RefillTropiCoolSPGridConfig struct {
 	GigaWeightVM          *sgc7game.ValWeights2 `yaml:"-" json:"-"`
 	EmptySymbol           string                `yaml:"emptySymbol" json:"emptySymbol"`
 	EmptySymbolCode       int                   `yaml:"-" json:"-"`
+	SpBonusSymbol         string                `yaml:"spBonusSymbol" json:"spBonusSymbol"`
+	SpBonusSymbolCode     int                   `yaml:"-" json:"-"`
 	MapControls           map[string][]*Award   `yaml:"-" json:"-"`
 }
 
@@ -136,6 +138,17 @@ func (gen *RefillTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) error 
 
 		gen.Config.SPSymbolCodes = append(gen.Config.SPSymbolCodes, code)
 	}
+
+	code, isok := pool.Config.GetDefaultPaytables().MapSymbols[gen.Config.SpBonusSymbol]
+	if !isok {
+		goutils.Error("RefillTropiCoolSPGrid.InitEx:SpBonusSymbol",
+			slog.String("SpBonusSymbol", gen.Config.SpBonusSymbol),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return ErrInvalidComponentConfig
+	}
+
+	gen.Config.SpBonusSymbolCode = code
 
 	// weights
 	if gen.Config.Weight != "" {
@@ -398,26 +411,28 @@ func NewRefillTropiCoolSPGrid(name string) IComponent {
 
 // json representation used by editor
 type jsonRefillTropiCoolSPGrid struct {
-	MaxNumber   int      `json:"maxNumber"`
-	SPGrid      string   `json:"spGrid"`
-	BlankSymbol string   `json:"BlankSymbol"`
-	GigaSymbols []string `json:"gigsSymbols"`
-	SPSymbols   []string `json:"spSymbols"`
-	Weight      string   `json:"weight"`
-	GigaWeight  string   `json:"gigaWeight"`
-	EmptySymbol string   `json:"emptySymbol"`
+	MaxNumber     int      `json:"maxNumber"`
+	SPGrid        string   `json:"spGrid"`
+	BlankSymbol   string   `json:"BlankSymbol"`
+	GigaSymbols   []string `json:"gigsSymbols"`
+	SPSymbols     []string `json:"spSymbols"`
+	Weight        string   `json:"weight"`
+	GigaWeight    string   `json:"gigaWeight"`
+	EmptySymbol   string   `json:"emptySymbol"`
+	SpBonusSymbol string   `json:"spBonusSymbol"`
 }
 
 func (j *jsonRefillTropiCoolSPGrid) build() *RefillTropiCoolSPGridConfig {
 	return &RefillTropiCoolSPGridConfig{
-		MaxNumber:   j.MaxNumber,
-		SPGrid:      j.SPGrid,
-		BlankSymbol: j.BlankSymbol,
-		GigaSymbols: slices.Clone(j.GigaSymbols),
-		SPSymbols:   slices.Clone(j.SPSymbols),
-		Weight:      j.Weight,
-		GigaWeight:  j.GigaWeight,
-		EmptySymbol: j.EmptySymbol,
+		MaxNumber:     j.MaxNumber,
+		SPGrid:        j.SPGrid,
+		BlankSymbol:   j.BlankSymbol,
+		GigaSymbols:   slices.Clone(j.GigaSymbols),
+		SPSymbols:     slices.Clone(j.SPSymbols),
+		Weight:        j.Weight,
+		GigaWeight:    j.GigaWeight,
+		EmptySymbol:   j.EmptySymbol,
+		SpBonusSymbol: j.SpBonusSymbol,
 	}
 }
 
