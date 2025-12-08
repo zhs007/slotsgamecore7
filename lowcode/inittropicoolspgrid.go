@@ -23,6 +23,59 @@ type InitTropiCoolSPGridData struct {
 	vw             *sgc7game.ValWeights2
 	vwNoSpBonus    *sgc7game.ValWeights2
 	gigaData       []*gigaData
+	cfg            *InitTropiCoolSPGridConfig
+}
+
+func (itcdpg *InitTropiCoolSPGridData) alignStep(sx int) {
+	for _, v := range itcdpg.gigaData {
+		if v.X > sx {
+			v.X--
+		}
+	}
+}
+
+func (itcdpg *InitTropiCoolSPGridData) getGigaData(x, y int) *gigaData {
+	for _, v := range itcdpg.gigaData {
+		if v.X <= x && v.Y <= y && v.X+v.Width-1 >= x && v.Y+v.Height-1 >= y {
+			return v
+		}
+	}
+
+	return nil
+}
+
+func (itcdpg *InitTropiCoolSPGridData) rmGigaData(gd *gigaData) error {
+	i := slices.Index(itcdpg.gigaData, gd)
+	if i < 0 {
+		goutils.Error("InitTropiCoolSPGridData.rmGigaData:Index",
+			goutils.Err(ErrInvalidComponentData))
+
+		return ErrInvalidComponentData
+	}
+
+	itcdpg.gigaData = slices.Delete(itcdpg.gigaData, i, i+1)
+
+	return nil
+}
+
+func (itcdpg *InitTropiCoolSPGridData) splitGigaData(gs *sgc7game.GameScene, gd *gigaData) error {
+	i := slices.Index(itcdpg.gigaData, gd)
+	if i < 0 {
+		goutils.Error("InitTropiCoolSPGridData.rmGigaData:Index",
+			goutils.Err(ErrInvalidComponentData))
+
+		return ErrInvalidComponentData
+	}
+
+	for ix := gd.X; ix < gd.X+gd.Width; ix++ {
+		for iy := gd.Y; iy < gd.Y+gd.Height; iy++ {
+			gs.Arr[ix][iy] = gd.SymbolCode
+		}
+	}
+
+	itcdpg.gigaData = slices.Delete(itcdpg.gigaData, i, i+1)
+
+	return nil
 }
 
 func (itcdpg *InitTropiCoolSPGridData) OnNewGame(gameProp *GameProperty, component IComponent) {
@@ -484,7 +537,9 @@ func (gen *InitTropiCoolSPGrid) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 }
 
 func (gen *InitTropiCoolSPGrid) NewComponentData() IComponentData {
-	cd := &InitTropiCoolSPGridData{}
+	cd := &InitTropiCoolSPGridData{
+		cfg: gen.Config,
+	}
 
 	return cd
 }

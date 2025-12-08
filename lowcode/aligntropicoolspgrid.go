@@ -21,6 +21,7 @@ type AlignTropiCoolSPGridConfig struct {
 	SPGrid               string `yaml:"spGrid" json:"spGrid"`
 	BlankSymbol          string `yaml:"blankSymbol" json:"blankSymbol"`
 	BlankSymbolCode      int    `yaml:"-" json:"-"`
+	InitTropiCoolSPGrid  string `yaml:"initTropiCoolSPGrid" json:"initTropiCoolSPGrid"`
 }
 
 // SetLinkComponent
@@ -85,6 +86,28 @@ func (gen *AlignTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) error {
 	return nil
 }
 
+func (gen *AlignTropiCoolSPGrid) getInitTropiCoolSPGridData(gameProp *GameProperty) (*InitTropiCoolSPGridData, error) {
+	gigaicd := gameProp.GetComponentDataWithName(gen.Config.InitTropiCoolSPGrid)
+	if gigaicd == nil {
+		goutils.Error("AlignTropiCoolSPGrid.getInitTropiCoolSPGridData:GetComponentDataWithName",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	itccd, isok := gigaicd.(*InitTropiCoolSPGridData)
+	if !isok {
+		goutils.Error("AlignTropiCoolSPGrid.getInitTropiCoolSPGridData:InitTropiCoolSPGridData",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return itccd, nil
+}
+
 // OnPlayGame - minimal implementation: does nothing but advance
 func (gen *AlignTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -111,6 +134,15 @@ func (gen *AlignTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 			goutils.Err(ErrInvalidComponentConfig))
 
 		return "", ErrInvalidComponentConfig
+	}
+
+	iicd, err := gen.getInitTropiCoolSPGridData(gameProp)
+	if err != nil {
+		goutils.Error("AlignTropiCoolSPGrid.OnPlayGame:getInitTropiCoolSPGridData",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(err))
+
+		return "", err
 	}
 
 	newspgrid := spgrid
@@ -142,6 +174,8 @@ func (gen *AlignTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 				newspgrid.Arr[newspgrid.Width-1][y] = -1
 			}
 
+			iicd.alignStep(x)
+
 			ismoved = true
 
 			maxx--
@@ -172,15 +206,18 @@ func NewAlignTropiCoolSPGrid(name string) IComponent {
 
 // "spGrid": "bg-spgrid",
 // "BlankSymbol": "BN"
+// "initTropiCoolSPGrid": "bg-spgrid-init"
 type jsonAlignTropiCoolSPGrid struct {
-	SPGrid      string `json:"spGrid"`
-	BlankSymbol string `json:"BlankSymbol"`
+	SPGrid              string `json:"spGrid"`
+	BlankSymbol         string `json:"BlankSymbol"`
+	InitTropiCoolSPGrid string `json:"initTropiCoolSPGrid"`
 }
 
 func (j *jsonAlignTropiCoolSPGrid) build() *AlignTropiCoolSPGridConfig {
 	return &AlignTropiCoolSPGridConfig{
-		SPGrid:      j.SPGrid,
-		BlankSymbol: j.BlankSymbol,
+		SPGrid:              j.SPGrid,
+		BlankSymbol:         j.BlankSymbol,
+		InitTropiCoolSPGrid: j.InitTropiCoolSPGrid,
 	}
 }
 

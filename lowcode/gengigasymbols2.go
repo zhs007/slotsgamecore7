@@ -34,6 +34,65 @@ func (gd *gigaData) getBottom() int {
 	return gd.Y + gd.Height - 1
 }
 
+func (gd *gigaData) newOD() {
+	gd.od = make([][]int, gd.Width)
+	for x := 0; x < gd.Width; x++ {
+		gd.od[x] = make([]int, gd.Height)
+	}
+}
+
+func (gd *gigaData) checkWithBottomY(gs *sgc7game.GameScene, x, bottomY int) int {
+	ny := bottomY
+
+	for tx := 0; tx < gd.Width; tx++ {
+		if x+tx >= gs.Width {
+			return -1
+		}
+
+		for ty := 0; ty < gd.Height; ty++ {
+			if bottomY-ty < 0 {
+				return -1
+			}
+
+			if gs.Arr[x+tx][bottomY-ty] >= 0 {
+				return gd.checkWithBottomY(gs, x, bottomY-1)
+			}
+		}
+	}
+
+	return ny
+}
+
+func (gd *gigaData) putInWithBottomY(gs *sgc7game.GameScene, x, bottomY int) error {
+	for tx := 0; tx < gd.Width; tx++ {
+		if x+tx >= gs.Width {
+			goutils.Error("gigaData.putInWithBottomY:out of range x",
+				slog.Int("x", x),
+				slog.Int("tx", tx),
+				slog.Int("gsWidth", gs.Width),
+				goutils.Err(ErrInvalidComponentData))
+
+			return ErrInvalidComponentData
+		}
+
+		for ty := 0; ty < gd.Height; ty++ {
+			if bottomY-ty < 0 {
+				goutils.Error("gigaData.putInWithBottomY:out of range y",
+					slog.Int("bottomY", bottomY),
+					slog.Int("ty", ty),
+					slog.Int("gsHeight", gs.Height),
+					goutils.Err(ErrInvalidComponentData))
+
+				return ErrInvalidComponentData
+			}
+
+			gs.Arr[x+tx][bottomY-ty] = gd.CurSymbolCode
+		}
+	}
+
+	return nil
+}
+
 type GenGigaSymbols2Data struct {
 	BasicComponentData
 	gigaData []*gigaData
