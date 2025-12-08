@@ -37,6 +37,7 @@ type RefillTropiCoolSPGridConfig struct {
 	EmptySymbolCode       int                   `yaml:"-" json:"-"`
 	SpBonusSymbol         string                `yaml:"spBonusSymbol" json:"spBonusSymbol"`
 	SpBonusSymbolCode     int                   `yaml:"-" json:"-"`
+	InitTropiCoolSPGrid   string                `yaml:"initTropiCoolSPGrid" json:"initTropiCoolSPGrid"`
 	MapControls           map[string][]*Award   `yaml:"-" json:"-"`
 }
 
@@ -409,30 +410,32 @@ func NewRefillTropiCoolSPGrid(name string) IComponent {
 	}
 }
 
-// json representation used by editor
+// "initTropiCoolSPGrid": "bg-spgrid-init"
 type jsonRefillTropiCoolSPGrid struct {
-	MaxNumber     int      `json:"maxNumber"`
-	SPGrid        string   `json:"spGrid"`
-	BlankSymbol   string   `json:"BlankSymbol"`
-	GigaSymbols   []string `json:"gigsSymbols"`
-	SPSymbols     []string `json:"spSymbols"`
-	Weight        string   `json:"weight"`
-	GigaWeight    string   `json:"gigaWeight"`
-	EmptySymbol   string   `json:"emptySymbol"`
-	SpBonusSymbol string   `json:"spBonusSymbol"`
+	MaxNumber           int      `json:"maxNumber"`
+	SPGrid              string   `json:"spGrid"`
+	BlankSymbol         string   `json:"BlankSymbol"`
+	GigaSymbols         []string `json:"gigsSymbols"`
+	SPSymbols           []string `json:"spSymbols"`
+	Weight              string   `json:"weight"`
+	GigaWeight          string   `json:"gigaWeight"`
+	EmptySymbol         string   `json:"emptySymbol"`
+	SpBonusSymbol       string   `json:"spBonusSymbol"`
+	InitTropiCoolSPGrid string   `json:"initTropiCoolSPGrid"`
 }
 
 func (j *jsonRefillTropiCoolSPGrid) build() *RefillTropiCoolSPGridConfig {
 	return &RefillTropiCoolSPGridConfig{
-		MaxNumber:     j.MaxNumber,
-		SPGrid:        j.SPGrid,
-		BlankSymbol:   j.BlankSymbol,
-		GigaSymbols:   slices.Clone(j.GigaSymbols),
-		SPSymbols:     slices.Clone(j.SPSymbols),
-		Weight:        j.Weight,
-		GigaWeight:    j.GigaWeight,
-		EmptySymbol:   j.EmptySymbol,
-		SpBonusSymbol: j.SpBonusSymbol,
+		MaxNumber:           j.MaxNumber,
+		SPGrid:              j.SPGrid,
+		BlankSymbol:         j.BlankSymbol,
+		GigaSymbols:         slices.Clone(j.GigaSymbols),
+		SPSymbols:           slices.Clone(j.SPSymbols),
+		Weight:              j.Weight,
+		GigaWeight:          j.GigaWeight,
+		EmptySymbol:         j.EmptySymbol,
+		SpBonusSymbol:       j.SpBonusSymbol,
+		InitTropiCoolSPGrid: j.InitTropiCoolSPGrid,
 	}
 }
 

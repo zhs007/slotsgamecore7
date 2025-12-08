@@ -21,6 +21,7 @@ type AlignTropiCoolSPGridConfig struct {
 	SPGrid               string `yaml:"spGrid" json:"spGrid"`
 	BlankSymbol          string `yaml:"blankSymbol" json:"blankSymbol"`
 	BlankSymbolCode      int    `yaml:"-" json:"-"`
+	InitTropiCoolSPGrid  string `yaml:"initTropiCoolSPGrid" json:"initTropiCoolSPGrid"`
 }
 
 // SetLinkComponent
@@ -172,15 +173,18 @@ func NewAlignTropiCoolSPGrid(name string) IComponent {
 
 // "spGrid": "bg-spgrid",
 // "BlankSymbol": "BN"
+// "initTropiCoolSPGrid": "bg-spgrid-init"
 type jsonAlignTropiCoolSPGrid struct {
-	SPGrid      string `json:"spGrid"`
-	BlankSymbol string `json:"BlankSymbol"`
+	SPGrid              string `json:"spGrid"`
+	BlankSymbol         string `json:"BlankSymbol"`
+	InitTropiCoolSPGrid string `json:"initTropiCoolSPGrid"`
 }
 
 func (j *jsonAlignTropiCoolSPGrid) build() *AlignTropiCoolSPGridConfig {
 	return &AlignTropiCoolSPGridConfig{
-		SPGrid:      j.SPGrid,
-		BlankSymbol: j.BlankSymbol,
+		SPGrid:              j.SPGrid,
+		BlankSymbol:         j.BlankSymbol,
+		InitTropiCoolSPGrid: j.InitTropiCoolSPGrid,
 	}
 }
 

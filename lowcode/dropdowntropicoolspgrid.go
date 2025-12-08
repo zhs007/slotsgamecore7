@@ -3,6 +3,8 @@ package lowcode
 import (
 	"log/slog"
 	"os"
+	"slices"
+	"sort"
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/ast"
@@ -18,9 +20,17 @@ const DropDownTropiCoolSPGridTypeName = "dropDownTropiCoolSPGrid"
 // DropDownTropiCoolSPGridConfig - configuration for DropDownTropiCoolSPGrid
 type DropDownTropiCoolSPGridConfig struct {
 	BasicComponentConfig `yaml:",inline" json:",inline"`
-	SPGrid               string `yaml:"spGrid" json:"spGrid"`
-	BlankSymbol          string `yaml:"blankSymbol" json:"blankSymbol"`
-	BlankSymbolCode      int    `yaml:"-" json:"-"`
+	SPGrid               string   `yaml:"spGrid" json:"spGrid"`
+	BlankSymbol          string   `yaml:"blankSymbol" json:"blankSymbol"`
+	BlankSymbolCode      int      `yaml:"-" json:"-"`
+	InitTropiCoolSPGrid  string   `yaml:"initTropiCoolSPGrid" json:"initTropiCoolSPGrid"`
+	GenGigaSymbols2      string   `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`
+	BrokenSymbols        []string `yaml:"brokenSymbols" json:"brokenSymbols"`
+	BrokenSymbolCodes    []int    `yaml:"-" json:"-"`
+}
+
+func (cfg *DropDownTropiCoolSPGridConfig) isBroken(sc int) bool {
+	return slices.Contains(cfg.BrokenSymbolCodes, sc)
 }
 
 // SetLinkComponent
@@ -80,12 +90,73 @@ func (gen *DropDownTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) erro
 		gen.Config.BlankSymbolCode = -1
 	}
 
+	for _, bs := range gen.Config.BrokenSymbols {
+		sc, isok := pool.Config.GetDefaultPaytables().MapSymbols[bs]
+		if !isok {
+			goutils.Error("DropDownTropiCoolSPGrid.InitEx:BrokenSymbols",
+				slog.String("BrokenSymbol", bs),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return ErrInvalidComponentConfig
+		}
+
+		gen.Config.BrokenSymbolCodes = append(gen.Config.BrokenSymbolCodes, sc)
+	}
+
 	gen.onInit(&gen.Config.BasicComponentConfig)
 
 	return nil
 }
 
-func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, x int) int {
+func (gen *DropDownTropiCoolSPGrid) getInitTropiCoolSPGridData(gameProp *GameProperty) (*InitTropiCoolSPGridData, error) {
+	gigaicd := gameProp.GetComponentDataWithName(gen.Config.InitTropiCoolSPGrid)
+	if gigaicd == nil {
+		goutils.Error("DropDownTropiCoolSPGrid.getInitTropiCoolSPGridData:GetComponentDataWithName",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	itccd, isok := gigaicd.(*InitTropiCoolSPGridData)
+	if !isok {
+		goutils.Error("DropDownTropiCoolSPGrid.getInitTropiCoolSPGridData:InitTropiCoolSPGridData",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return itccd, nil
+}
+
+func (gen *DropDownTropiCoolSPGrid) getGenGigaSymbols2Data(gameProp *GameProperty) (*GenGigaSymbols2Data, error) {
+	gigaicd := gameProp.GetComponentDataWithName(gen.Config.GenGigaSymbols2)
+	if gigaicd == nil {
+		goutils.Error("DropDownTropiCoolSPGrid.getInitTropiCoolSPGridData:GetComponentDataWithName",
+			slog.String("GenGigaSymbols2", gen.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	ggcd, isok := gigaicd.(*GenGigaSymbols2Data)
+	if !isok {
+		goutils.Error("DropDownTropiCoolSPGrid.getInitTropiCoolSPGridData:GenGigaSymbols2Data",
+			slog.String("GenGigaSymbols2", gen.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return ggcd, nil
+}
+
+func (gen *DropDownTropiCoolSPGrid) getGiga(spgrid *sgc7game.GameScene, x int, iicd *InitTropiCoolSPGridData) *gigaData {
+	return iicd.getGigaData(x, spgrid.Height-1)
+}
+
+func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, x int, iicd *InitTropiCoolSPGridData) int {
 	if spgrid.Arr[x][spgrid.Height-1] == -1 {
 		return -1
 	}
@@ -98,11 +169,190 @@ func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, 
 
 	spgrid.Arr[x][0] = -1
 
-	// if sym == gen.Config.BlankSymbolCode {
-	// 	return gen.getSPGridSymbol(spgrid, x)
+	return sym
+}
+
+func (gen *DropDownTropiCoolSPGrid) brokenGigaSymbols(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
+	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+		return
+	}
+
+	for y := gigadata.Y + gigadata.Height; y < tgs.Height; y++ {
+		for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+			if gen.Config.isBroken(tgs.Arr[x][y]) {
+				tgs.Arr[x][y] = -2
+			} else {
+				newgigadata := ggcd.getGigaData(x, y)
+				if newgigadata != nil {
+					gen.brokenGigaSymbols(tgs, newgigadata, ggcd)
+				}
+			}
+		}
+	}
+}
+
+func (gen *DropDownTropiCoolSPGrid) dropdown(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
+	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+		return
+	}
+
+	for y := gigadata.Y + gigadata.Height; y < tgs.Height; y++ {
+		for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+			if gen.Config.isBroken(tgs.Arr[x][y]) {
+				tgs.Arr[x][y] = -1
+			} else {
+				newgigadata := ggcd.getGigaData(x, y)
+				if newgigadata != nil {
+					gen.brokenGigaSymbols(tgs, newgigadata, ggcd)
+				}
+			}
+		}
+	}
+}
+
+func (gen *DropDownTropiCoolSPGrid) canDownSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) bool {
+	if y+1 >= tgs.Height {
+		return false
+	}
+
+	ny := y + 1
+	if tgs.Arr[x][ny] != -1 && !gen.Config.isBroken(tgs.Arr[x][ny]) {
+		newgigadata := ggcd.getGigaData(x, ny)
+		if newgigadata != nil {
+			return gen.canDownGiga(tgs, newgigadata, ggcd)
+		}
+
+		return gen.canDownSymbol(tgs, x, ny, ggcd)
+	}
+
+	return true
+}
+
+func (gen *DropDownTropiCoolSPGrid) canDownGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) bool {
+	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+		return false
+	}
+
+	y := gigadata.Y + gigadata.Height
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		if tgs.Arr[x][y] != -1 && !gen.Config.isBroken(tgs.Arr[x][y]) {
+
+			newgigadata := ggcd.getGigaData(x, y)
+			if newgigadata != nil {
+				candrop := gen.canDownGiga(tgs, newgigadata, ggcd)
+				if !candrop {
+					return false
+				}
+			} else {
+				candrop := gen.canDownSymbol(tgs, x, y, ggcd)
+				if !candrop {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
+}
+
+func (gen *DropDownTropiCoolSPGrid) downSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) {
+	ny := y + 1
+	if tgs.Arr[x][ny] != -1 && !gen.Config.isBroken(tgs.Arr[x][ny]) {
+		newgigadata := ggcd.getGigaData(x, ny)
+		if newgigadata != nil {
+			gen.downGiga(tgs, newgigadata, ggcd)
+		} else {
+			gen.canDownSymbol(tgs, x, ny, ggcd)
+		}
+	} else {
+		tgs.Arr[x][ny] = tgs.Arr[x][y]
+		tgs.Arr[x][y] = -1
+	}
+}
+
+func (gen *DropDownTropiCoolSPGrid) downGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
+	y := gigadata.Y + gigadata.Height
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		if tgs.Arr[x][y] != -1 && !gen.Config.isBroken(tgs.Arr[x][y]) {
+			newgigadata := ggcd.getGigaData(x, y)
+			if newgigadata != nil {
+				gen.downGiga(tgs, newgigadata, ggcd)
+			} else {
+				gen.downSymbol(tgs, x, y, ggcd)
+			}
+		}
+	}
+
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		for y := gigadata.Y; y < gigadata.Y+gigadata.Height; y++ {
+			tgs.Arr[x][y] = -1
+		}
+	}
+
+	gigadata.Y++
+
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		for y := gigadata.Y; y < gigadata.Y+gigadata.Height; y++ {
+			tgs.Arr[x][y] = gigadata.CurSymbolCode
+		}
+	}
+}
+
+func (gen *DropDownTropiCoolSPGrid) dropdownSPGigaList(gameProp *GameProperty, gs *sgc7game.GameScene, lst []*gigaData, ggcd *GenGigaSymbols2Data) *sgc7game.GameScene {
+	ngs := gs.CloneEx(gameProp.PoolScene)
+
+	sort.Slice(lst, func(i, j int) bool {
+		return lst[i].getBottom() > lst[j].getBottom()
+	})
+
+	for _, gigadata := range lst {
+		for {
+			candrop := gen.canDownGiga(ngs, gigadata, ggcd)
+			if !candrop {
+				break
+			}
+
+			gen.downGiga(ngs, gigadata, ggcd)
+		}
+	}
+
+	// for {
+	// 	for x := range ngs.Arr {
+	// 		for y := len(ngs.Arr[x]) - 1; y >= 0; {
+	// 			if ngs.Arr[x][y] < 0 {
+	// 				hass := false
+	// 				for y1 := y - 1; y1 >= 0; y1-- {
+	// 					// if giga then break
+	// 					if ggcd.getGigaData(x, y1) != nil {
+	// 						break
+	// 					}
+
+	// 					if ngs.Arr[x][y1] >= 0 {
+	// 						ngs.Arr[x][y] = ngs.Arr[x][y1]
+	// 						ngs.Arr[x][y1] = -1
+
+	// 						hass = true
+	// 						y--
+	// 						break
+	// 					}
+	// 				}
+
+	// 				if !hass {
+	// 					break
+	// 				}
+	// 			} else {
+	// 				y--
+	// 			}
+	// 		}
+	// 	}
+
+	// 	isdrop := dropDownSymbols.dropdownGiga(gameProp, ngs, gigacd)
+	// 	if !isdrop {
+	// 		break
+	// 	}
 	// }
 
-	return sym
+	return ngs
 }
 
 // OnPlayGame - minimal implementation: does nothing but advance
@@ -132,15 +382,77 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return "", ErrInvalidComponentConfig
 	}
 
+	iicd, err := gen.getInitTropiCoolSPGridData(gameProp)
+	if err != nil {
+		goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:getInitTropiCoolSPGridData",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(err))
+
+		return "", err
+	}
+
+	ggcd, err := gen.getGenGigaSymbols2Data(gameProp)
+	if err != nil {
+		goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:getGenGigaSymbols2Data",
+			slog.String("GenGigaSymbols2", gen.Config.GenGigaSymbols2),
+			goutils.Err(err))
+
+		return "", err
+	}
+
 	newspgrid := spgrid.CloneEx(gameProp.PoolScene)
 
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
+	newgigadatalist := []*gigaData{}
+
 	for x := 0; x < gs.Width; x++ {
 		for y := gs.Height - 1; y >= 0; y-- {
 			if ngs.Arr[x][y] == -1 {
-				sym := gen.getSPGridSymbol(newspgrid, x)
+				gigadata := gen.getGiga(newspgrid, x, iicd)
+				if gigadata != nil {
+					ny := gigadata.checkWithBottomY(ngs, x, y)
+					if ny >= 0 {
+						err = gigadata.putInWithBottomY(ngs, x, ny)
+						if err != nil {
+							goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:putInWithBottomY",
+								slog.Int("x", x),
+								slog.Int("y", y),
+								goutils.Err(err))
+
+							return "", err
+						}
+
+						newgigadata := &gigaData{
+							X:             x,
+							Y:             ny - gigadata.Height + 1,
+							Width:         gigadata.Width,
+							Height:        gigadata.Height,
+							SymbolCode:    gigadata.SymbolCode,
+							CurSymbolCode: gigadata.CurSymbolCode,
+						}
+
+						newgigadatalist = append(newgigadatalist, newgigadata)
+
+						ggcd.gigaData = append(ggcd.gigaData, newgigadata)
+						iicd.rmGigaData(gigadata)
+
+						continue
+					}
+
+					err = iicd.splitGigaData(newspgrid, gigadata)
+					if err != nil {
+						goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:splitGigaData",
+							slog.Int("x", x),
+							slog.Int("y", y),
+							goutils.Err(err))
+
+						return "", err
+					}
+				}
+
+				sym := gen.getSPGridSymbol(newspgrid, x, iicd)
 				if sym == -1 {
 					break
 				}
@@ -151,6 +463,12 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 	}
 
 	gen.AddScene(gameProp, curpr, ngs, bcd)
+
+	if len(newgigadatalist) > 0 {
+		ngs3 := gen.dropdownSPGigaList(gameProp, ngs, newgigadatalist, ggcd)
+
+		gen.AddScene(gameProp, curpr, ngs3, bcd)
+	}
 
 	ngs2 := ngs
 	for x := 0; x < gs.Width; x++ {
@@ -213,15 +531,36 @@ func NewDropDownTropiCoolSPGrid(name string) IComponent {
 
 // "spGrid": "bg-spgrid",
 // "BlankSymbol": "BN"
+// "initTropiCoolSPGrid": "bg-spgrid-init"
+// "genGigaSymbols2": "bg-gengiga"
+// "brokenSymbols": [
+//
+//	"H1",
+//	"H2",
+//	"H3",
+//	"H4",
+//	"H5",
+//	"L1",
+//	"L2",
+//	"L3",
+//	"L4"
+//
+// ]
 type jsonDropDownTropiCoolSPGrid struct {
-	SPGrid      string `json:"spGrid"`
-	BlankSymbol string `json:"BlankSymbol"`
+	SPGrid              string   `json:"spGrid"`
+	BlankSymbol         string   `json:"BlankSymbol"`
+	InitTropiCoolSPGrid string   `json:"initTropiCoolSPGrid"`
+	GenGigaSymbols2     string   `json:"genGigaSymbols2"`
+	BrokenSymbols       []string `json:"brokenSymbols"`
 }
 
 func (j *jsonDropDownTropiCoolSPGrid) build() *DropDownTropiCoolSPGridConfig {
 	return &DropDownTropiCoolSPGridConfig{
-		SPGrid:      j.SPGrid,
-		BlankSymbol: j.BlankSymbol,
+		SPGrid:              j.SPGrid,
+		BlankSymbol:         j.BlankSymbol,
+		InitTropiCoolSPGrid: j.InitTropiCoolSPGrid,
+		GenGigaSymbols2:     j.GenGigaSymbols2,
+		BrokenSymbols:       slices.Clone(j.BrokenSymbols),
 	}
 }
 
