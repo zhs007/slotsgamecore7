@@ -156,7 +156,7 @@ func (gen *DropDownTropiCoolSPGrid) getGiga(spgrid *sgc7game.GameScene, x int, i
 	return iicd.getGigaData(x, spgrid.Height-1)
 }
 
-func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, x int, iicd *InitTropiCoolSPGridData) int {
+func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, x int, _ *InitTropiCoolSPGridData) int {
 	if spgrid.Arr[x][spgrid.Height-1] == -1 {
 		return -1
 	}
@@ -172,43 +172,43 @@ func (gen *DropDownTropiCoolSPGrid) getSPGridSymbol(spgrid *sgc7game.GameScene, 
 	return sym
 }
 
-func (gen *DropDownTropiCoolSPGrid) brokenGigaSymbols(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
-	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
-		return
-	}
+// func (gen *DropDownTropiCoolSPGrid) brokenGigaSymbols(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
+// 	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+// 		return
+// 	}
 
-	for y := gigadata.Y + gigadata.Height; y < tgs.Height; y++ {
-		for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
-			if gen.Config.isBroken(tgs.Arr[x][y]) {
-				tgs.Arr[x][y] = -2
-			} else {
-				newgigadata := ggcd.getGigaData(x, y)
-				if newgigadata != nil {
-					gen.brokenGigaSymbols(tgs, newgigadata, ggcd)
-				}
-			}
-		}
-	}
-}
+// 	for y := gigadata.Y + gigadata.Height; y < tgs.Height; y++ {
+// 		for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+// 			if gen.Config.isBroken(tgs.Arr[x][y]) {
+// 				tgs.Arr[x][y] = -2
+// 			} else {
+// 				newgigadata := ggcd.getGigaData(x, y)
+// 				if newgigadata != nil {
+// 					gen.brokenGigaSymbols(tgs, newgigadata, ggcd)
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
-func (gen *DropDownTropiCoolSPGrid) dropdown(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
-	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
-		return
-	}
+// func (gen *DropDownTropiCoolSPGrid) dropdown(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
+// 	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+// 		return
+// 	}
 
-	for y := gigadata.Y + gigadata.Height; y < tgs.Height; y++ {
-		for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
-			if gen.Config.isBroken(tgs.Arr[x][y]) {
-				tgs.Arr[x][y] = -1
-			} else {
-				newgigadata := ggcd.getGigaData(x, y)
-				if newgigadata != nil {
-					gen.brokenGigaSymbols(tgs, newgigadata, ggcd)
-				}
-			}
-		}
-	}
-}
+// 	for y := gigadata.Y + gigadata.Height; y < tgs.Height; y++ {
+// 		for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+// 			if gen.Config.isBroken(tgs.Arr[x][y]) {
+// 				tgs.Arr[x][y] = -1
+// 			} else {
+// 				newgigadata := ggcd.getGigaData(x, y)
+// 				if newgigadata != nil {
+// 					gen.brokenGigaSymbols(tgs, newgigadata, ggcd)
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
 func (gen *DropDownTropiCoolSPGrid) canDownSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) bool {
 	if y+1 >= tgs.Height {

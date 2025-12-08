@@ -25,6 +25,14 @@ type InitTropiCoolSPGridData struct {
 	gigaData       []*gigaData
 }
 
+func (itcdpg *InitTropiCoolSPGridData) alignStep(sx int) {
+	for _, v := range itcdpg.gigaData {
+		if v.X > sx {
+			v.X--
+		}
+	}
+}
+
 func (itcdpg *InitTropiCoolSPGridData) getGigaData(x, y int) *gigaData {
 	for _, v := range itcdpg.gigaData {
 		if v.X <= x && v.Y <= y && v.X+v.Width-1 >= x && v.Y+v.Height-1 >= y {
