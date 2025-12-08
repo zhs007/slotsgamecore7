@@ -22,12 +22,14 @@ type InitTropiCoolSPGridData struct {
 	isSpBounsAdded bool
 	vw             *sgc7game.ValWeights2
 	vwNoSpBonus    *sgc7game.ValWeights2
+	gigaData       []*gigaData
 }
 
 func (itcdpg *InitTropiCoolSPGridData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	itcdpg.BasicComponentData.OnNewGame(gameProp, component)
 
 	itcdpg.isSpBounsAdded = false
+	itcdpg.gigaData = nil
 }
 
 func (itcdpg *InitTropiCoolSPGridData) onNewStep() {
@@ -44,26 +46,26 @@ func (itcdpg *InitTropiCoolSPGridData) Clone() IComponentData {
 
 // InitTropiCoolSPGridConfig - configuration for InitTropiCoolSPGrid
 type InitTropiCoolSPGridConfig struct {
-	BasicComponentConfig  `yaml:",inline" json:",inline"`
-	MaxNumber             int                   `yaml:"maxNumber" json:"maxNumber"`
-	SPGrid                string                `yaml:"spGrid" json:"spGrid"`
-	BlankSymbol           string                `yaml:"blankSymbol" json:"blankSymbol"`
-	BlankSymbolCode       int                   `yaml:"-" json:"-"`
-	GigaSymbols           []string              `yaml:"gigSymbols" json:"gigSymbols"`
-	GigaSymbolCodes       []int                 `yaml:"-" json:"-"`
-	TargetGigaSymbolCodes map[int](map[int]int) `yaml:"-" json:"-"` // key: symbolCode, value: size->symbolCode
-	SPSymbols             []string              `yaml:"spSymbols" json:"spSymbols"`
-	SPSymbolCodes         []int                 `yaml:"-" json:"-"`
-	Weight                string                `yaml:"weight" json:"weight"`
-	WeightVM              *sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	GigaWeight            string                `yaml:"gigaWeight" json:"gigaWeight"`
-	GigaWeightVM          *sgc7game.ValWeights2 `yaml:"-" json:"-"`
-	EmptySymbol           string                `yaml:"emptySymbol" json:"emptySymbol"`
-	EmptySymbolCode       int                   `yaml:"-" json:"-"`
-	SpBonusSymbol         string                `yaml:"spBonusSymbol" json:"spBonusSymbol"`
-	SpBonusSymbolCode     int                   `yaml:"-" json:"-"`
-	SpBonusSymbolCode2    int                   `yaml:"-" json:"-"`
-	MapControls           map[string][]*Award   `yaml:"-" json:"-"`
+	BasicComponentConfig `yaml:",inline" json:",inline"`
+	MaxNumber            int                   `yaml:"maxNumber" json:"maxNumber"`
+	SPGrid               string                `yaml:"spGrid" json:"spGrid"`
+	BlankSymbol          string                `yaml:"blankSymbol" json:"blankSymbol"`
+	BlankSymbolCode      int                   `yaml:"-" json:"-"`
+	GigaSymbols          []string              `yaml:"gigSymbols" json:"gigSymbols"`
+	GigaSymbolCodes      []int                 `yaml:"-" json:"-"`
+	SPSymbols            []string              `yaml:"spSymbols" json:"spSymbols"`
+	SPSymbolCodes        []int                 `yaml:"-" json:"-"`
+	Weight               string                `yaml:"weight" json:"weight"`
+	WeightVM             *sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	GigaWeight           string                `yaml:"gigaWeight" json:"gigaWeight"`
+	GigaWeightVM         *sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	EmptySymbol          string                `yaml:"emptySymbol" json:"emptySymbol"`
+	EmptySymbolCode      int                   `yaml:"-" json:"-"`
+	SpBonusSymbol        string                `yaml:"spBonusSymbol" json:"spBonusSymbol"`
+	SpBonusSymbolCode    int                   `yaml:"-" json:"-"`
+	SpBonusSymbolCode2   int                   `yaml:"-" json:"-"`
+	MapGigaSymbolCodes   map[int][]int         `yaml:"-" json:"-"`
+	MapControls          map[string][]*Award   `yaml:"-" json:"-"`
 }
 
 // SetLinkComponent
@@ -213,27 +215,52 @@ func (gen *InitTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) error {
 
 		gen.Config.GigaWeightVM = vw2
 
-		gen.Config.TargetGigaSymbolCodes = make(map[int](map[int]int))
+		gen.Config.MapGigaSymbolCodes = make(map[int][]int)
+		for _, sym := range gen.Config.GigaSymbols {
+			sc, isok := pool.DefaultPaytables.MapSymbols[sym]
+			if !isok {
+				goutils.Error("GenGigaSymbols2.InitEx:Symbols2",
+					slog.String("symbol", sym),
+					goutils.Err(ErrInvalidSymbol))
 
-		for _, v := range vw2.Vals {
-			s := v.Int()
-
-			if s == 0 {
-				continue
+				return ErrInvalidSymbol
 			}
 
-			for i, sc := range gen.Config.GigaSymbolCodes {
-				if gen.Config.TargetGigaSymbolCodes[sc] == nil {
-					gen.Config.TargetGigaSymbolCodes[sc] = make(map[int]int)
-				}
+			gen.Config.MapGigaSymbolCodes[sc] = make([]int, pool.Config.Width-1)
+			gen.Config.MapGigaSymbolCodes[sc][0] = -1
 
-				cs := fmt.Sprintf("%v_%v", gen.Config.GigaSymbols[i], s)
-				csc, isok := pool.Config.GetDefaultPaytables().MapSymbols[cs]
+			for gi := 2; gi < pool.Config.Width; gi++ {
+				str := fmt.Sprintf("%v_%d", sym, gi)
+				gsc, isok := pool.DefaultPaytables.MapSymbols[str]
 				if isok {
-					gen.Config.TargetGigaSymbolCodes[sc][s] = csc
+					gen.Config.MapGigaSymbolCodes[sc][gi-1] = gsc
+				} else {
+					gen.Config.MapGigaSymbolCodes[sc][gi-1] = -1
 				}
 			}
 		}
+
+		// gen.Config.TargetGigaSymbolCodes = make(map[int](map[int]int))
+
+		// for _, v := range vw2.Vals {
+		// 	s := v.Int()
+
+		// 	if s == 0 {
+		// 		continue
+		// 	}
+
+		// 	for i, sc := range gen.Config.GigaSymbolCodes {
+		// 		if gen.Config.TargetGigaSymbolCodes[sc] == nil {
+		// 			gen.Config.TargetGigaSymbolCodes[sc] = make(map[int]int)
+		// 		}
+
+		// 		cs := fmt.Sprintf("%v_%v", gen.Config.GigaSymbols[i], s)
+		// 		csc, isok := pool.Config.GetDefaultPaytables().MapSymbols[cs]
+		// 		if isok {
+		// 			gen.Config.TargetGigaSymbolCodes[sc][s] = csc
+		// 		}
+		// 	}
+		// }
 	}
 
 	gen.onInit(&gen.Config.BasicComponentConfig)
@@ -301,13 +328,13 @@ func (gen *InitTropiCoolSPGrid) getGigaWeight(gameProp *GameProperty, basicCD *B
 	return gen.Config.GigaWeightVM
 }
 
-func (gen *InitTropiCoolSPGrid) setGiga(gs *sgc7game.GameScene, x int, y int, s int, c int) {
-	if x+s > gs.Width || y-s+1 < 0 {
+func (gen *InitTropiCoolSPGrid) setGiga(gs *sgc7game.GameScene, x int, y int, s int, srcsc int, c int, cd *InitTropiCoolSPGridData) {
+	if x+s-1 >= gs.Width || y+s-1 >= gs.Height {
 		return
 	}
 
 	for ix := x; ix < x+s; ix++ {
-		for iy := y; iy > y-s; iy-- {
+		for iy := y; iy < y+s; iy++ {
 			if goutils.IndexOfIntSlice(gen.Config.SPSymbolCodes, gs.Arr[ix][iy], 0) >= 0 {
 
 				return
@@ -316,10 +343,19 @@ func (gen *InitTropiCoolSPGrid) setGiga(gs *sgc7game.GameScene, x int, y int, s 
 	}
 
 	for ix := x; ix < x+s; ix++ {
-		for iy := y; iy > y-s; iy-- {
+		for iy := y; iy < y+s; iy++ {
 			gs.Arr[ix][iy] = c
 		}
 	}
+
+	cd.gigaData = append(cd.gigaData, &gigaData{
+		X:             x,
+		Y:             y,
+		Width:         s,
+		Height:        s,
+		SymbolCode:    srcsc,
+		CurSymbolCode: c,
+	})
 }
 
 // OnPlayGame - minimal implementation: does nothing but advance
@@ -415,7 +451,7 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		gw := gen.getGigaWeight(gameProp, &cd.BasicComponentData)
 
 		for x, _ := range gs.Arr {
-			for y := gs.Height - 1; y > 0; y-- {
+			for y := 0; y < gs.Height; y++ {
 				if goutils.IndexOfIntSlice(gen.Config.GigaSymbolCodes, gs.Arr[x][y], 0) >= 0 {
 					cv, err := gw.RandVal(plugin)
 					if err != nil {
@@ -427,28 +463,9 @@ func (gen *InitTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 					s := cv.Int()
 
-					gen.setGiga(gs, x, y, s, gen.Config.TargetGigaSymbolCodes[gs.Arr[x][y]][s])
-				}
-				cv, err := vw.RandVal(plugin)
-				if err != nil {
-					goutils.Error("InitTropiCoolSPGrid.OnPlayGame:RandVal",
-						goutils.Err(err))
-
-					return "", err
-				}
-
-				gs.Arr[x][y] = cv.Int()
-			}
-
-			if gs.Arr[x][gs.Height-1] == gen.Config.EmptySymbolCode {
-				gs.Arr[x][gs.Height-1] = gen.Config.BlankSymbolCode
-			} else if gs.Arr[x][gs.Height-2] == gen.Config.EmptySymbolCode {
-				if gs.Arr[x][0] == gen.Config.BlankSymbolCode {
-					gs.Arr[x][gs.Height-2] = gen.Config.BlankSymbolCode
-					gs.Arr[x][0] = gen.Config.EmptySymbolCode
-				} else if gs.Arr[x][1] != gen.Config.EmptySymbolCode {
-					gs.Arr[x][gs.Height-2] = gs.Arr[x][0]
-					gs.Arr[x][0] = gen.Config.EmptySymbolCode
+					if s > 1 {
+						gen.setGiga(gs, x, y, s, gs.Arr[x][y], gen.Config.MapGigaSymbolCodes[gs.Arr[x][y]][s-1], cd)
+					}
 				}
 			}
 		}
