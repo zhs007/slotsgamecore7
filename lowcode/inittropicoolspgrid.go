@@ -23,6 +23,7 @@ type InitTropiCoolSPGridData struct {
 	vw             *sgc7game.ValWeights2
 	vwNoSpBonus    *sgc7game.ValWeights2
 	gigaData       []*gigaData
+	cfg            *InitTropiCoolSPGridConfig
 }
 
 func (itcdpg *InitTropiCoolSPGridData) alignStep(sx int) {
@@ -536,7 +537,9 @@ func (gen *InitTropiCoolSPGrid) OnAsciiGame(gameProp *GameProperty, pr *sgc7game
 }
 
 func (gen *InitTropiCoolSPGrid) NewComponentData() IComponentData {
-	cd := &InitTropiCoolSPGridData{}
+	cd := &InitTropiCoolSPGridData{
+		cfg: gen.Config,
+	}
 
 	return cd
 }

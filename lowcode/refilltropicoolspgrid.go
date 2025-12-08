@@ -205,6 +205,28 @@ func (gen *RefillTropiCoolSPGrid) InitEx(cfg any, pool *GamePropertyPool) error 
 	return nil
 }
 
+func (gen *RefillTropiCoolSPGrid) getInitTropiCoolSPGridData(gameProp *GameProperty) (*InitTropiCoolSPGridData, error) {
+	gigaicd := gameProp.GetComponentDataWithName(gen.Config.InitTropiCoolSPGrid)
+	if gigaicd == nil {
+		goutils.Error("RefillTropiCoolSPGrid.getInitTropiCoolSPGridData:GetComponentDataWithName",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	itccd, isok := gigaicd.(*InitTropiCoolSPGridData)
+	if !isok {
+		goutils.Error("RefillTropiCoolSPGrid.getInitTropiCoolSPGridData:InitTropiCoolSPGridData",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return itccd, nil
+}
+
 func (gen *RefillTropiCoolSPGrid) getWeight(gameProp *GameProperty, basicCD *BasicComponentData) *sgc7game.ValWeights2 {
 	str := basicCD.GetConfigVal(CCVWeight)
 	if str != "" {
@@ -239,13 +261,13 @@ func (gen *RefillTropiCoolSPGrid) getGigaWeight(gameProp *GameProperty, basicCD 
 	return gen.Config.GigaWeightVM
 }
 
-func (gen *RefillTropiCoolSPGrid) setGiga(gs *sgc7game.GameScene, x int, y int, s int, c int) {
-	if x+s > gs.Width || y-s+1 < 0 {
+func (gen *RefillTropiCoolSPGrid) setGiga(gs *sgc7game.GameScene, x int, y int, s int, srcsc int, c int, cd *InitTropiCoolSPGridData) {
+	if x+s-1 >= gs.Width || y+s-1 >= gs.Height {
 		return
 	}
 
 	for ix := x; ix < x+s; ix++ {
-		for iy := y; iy > y-s; iy-- {
+		for iy := y; iy < y+s; iy++ {
 			if goutils.IndexOfIntSlice(gen.Config.SPSymbolCodes, gs.Arr[ix][iy], 0) >= 0 {
 
 				return
@@ -254,10 +276,19 @@ func (gen *RefillTropiCoolSPGrid) setGiga(gs *sgc7game.GameScene, x int, y int, 
 	}
 
 	for ix := x; ix < x+s; ix++ {
-		for iy := y; iy > y-s; iy-- {
+		for iy := y; iy < y+s; iy++ {
 			gs.Arr[ix][iy] = c
 		}
 	}
+
+	cd.gigaData = append(cd.gigaData, &gigaData{
+		X:             x,
+		Y:             y,
+		Width:         s,
+		Height:        s,
+		SymbolCode:    srcsc,
+		CurSymbolCode: c,
+	})
 }
 
 // OnPlayGame - generate SPGrid and optionally apply refill (gravity to bottom)
@@ -311,41 +342,76 @@ func (gen *RefillTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 	newspgrid := spgrid.CloneEx(gameProp.PoolScene)
 
-	vw := gen.getWeight(gameProp, bcd)
-	if vw == nil {
-		goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:getWeight",
-			goutils.Err(ErrInvalidComponentConfig))
+	iicd, err := gen.getInitTropiCoolSPGridData(gameProp)
+	if err != nil {
+		goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:getInitTropiCoolSPGridData",
+			slog.String("InitTropiCoolSPGrid", gen.Config.InitTropiCoolSPGrid),
+			goutils.Err(err))
 
-		return "", ErrInvalidComponentConfig
+		return "", err
 	}
+
+	// vw := gen.getWeight(gameProp, bcd)
+	// if vw == nil {
+	// 	goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:getWeight",
+	// 		goutils.Err(ErrInvalidComponentConfig))
+
+	// 	return "", ErrInvalidComponentConfig
+	// }
 
 	for x := startX; x < newspgrid.Width; x++ {
 		arr := newspgrid.Arr[x]
 
 		for y := range arr {
-			cv, err := vw.RandVal(plugin)
-			if err != nil {
-				goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:RandVal",
-					goutils.Err(err))
+			if iicd.isSpBounsAdded {
+				cv, err := iicd.vwNoSpBonus.RandVal(plugin)
+				if err != nil {
+					goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:RandVal",
+						goutils.Err(err))
 
-				return "", err
+					return "", err
+				}
+
+				newspgrid.Arr[x][y] = cv.Int()
+			} else {
+				cv, err := iicd.vw.RandVal(plugin)
+				if err != nil {
+					goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:RandVal",
+						goutils.Err(err))
+
+					return "", err
+				}
+
+				if cv.Int() == gen.Config.SpBonusSymbolCode {
+					iicd.isSpBounsAdded = true
+
+					newspgrid.Arr[x][len(arr)-1] = iicd.cfg.SpBonusSymbolCode2
+					newspgrid.Arr[x][len(arr)-2] = iicd.cfg.SpBonusSymbolCode2
+					newspgrid.Arr[x][len(arr)-3] = iicd.cfg.EmptySymbolCode
+
+					break
+				}
+
+				newspgrid.Arr[x][y] = cv.Int()
 			}
-
-			newspgrid.Arr[x][y] = cv.Int()
 		}
 
 		if newspgrid.Arr[x][newspgrid.Height-1] == gen.Config.EmptySymbolCode {
 			newspgrid.Arr[x][newspgrid.Height-1] = gen.Config.BlankSymbolCode
-		} else if newspgrid.Arr[x][newspgrid.Height-2] == gen.Config.EmptySymbolCode {
-			if newspgrid.Arr[x][0] == gen.Config.BlankSymbolCode {
-				newspgrid.Arr[x][newspgrid.Height-2] = gen.Config.BlankSymbolCode
-				newspgrid.Arr[x][0] = -1
-			} else if newspgrid.Arr[x][0] != gen.Config.EmptySymbolCode {
+		}
+
+		if newspgrid.Arr[x][newspgrid.Height-2] == gen.Config.EmptySymbolCode {
+			if newspgrid.Arr[x][0] != gen.Config.EmptySymbolCode {
 				newspgrid.Arr[x][newspgrid.Height-2] = newspgrid.Arr[x][0]
 				newspgrid.Arr[x][0] = -1
 			} else {
+				newspgrid.Arr[x][newspgrid.Height-2] = -1
 				newspgrid.Arr[x][0] = -1
 			}
+		}
+
+		if newspgrid.Arr[x][newspgrid.Height-3] == gen.Config.EmptySymbolCode {
+			newspgrid.Arr[x][0] = -1
 		}
 	}
 
@@ -353,7 +419,7 @@ func (gen *RefillTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 		gw := gen.getGigaWeight(gameProp, bcd)
 
 		for x := startX; x < newspgrid.Width; x++ {
-			for y := newspgrid.Height - 1; y > 0; y-- {
+			for y := 0; y < newspgrid.Height; y++ {
 				if goutils.IndexOfIntSlice(gen.Config.GigaSymbolCodes, newspgrid.Arr[x][y], 0) >= 0 {
 					cv, err := gw.RandVal(plugin)
 					if err != nil {
@@ -365,32 +431,56 @@ func (gen *RefillTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7
 
 					s := cv.Int()
 
-					gen.setGiga(newspgrid, x, y, s, gen.Config.TargetGigaSymbolCodes[newspgrid.Arr[x][y]][s])
-				}
-				cv, err := vw.RandVal(plugin)
-				if err != nil {
-					goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:RandVal",
-						goutils.Err(err))
-
-					return "", err
-				}
-
-				newspgrid.Arr[x][y] = cv.Int()
-			}
-
-			if newspgrid.Arr[x][newspgrid.Height-1] == gen.Config.EmptySymbolCode {
-				newspgrid.Arr[x][newspgrid.Height-1] = gen.Config.BlankSymbolCode
-			} else if newspgrid.Arr[x][newspgrid.Height-2] == gen.Config.EmptySymbolCode {
-				if newspgrid.Arr[x][0] == gen.Config.BlankSymbolCode {
-					newspgrid.Arr[x][newspgrid.Height-2] = gen.Config.BlankSymbolCode
-					newspgrid.Arr[x][0] = gen.Config.EmptySymbolCode
-				} else if newspgrid.Arr[x][1] != gen.Config.EmptySymbolCode {
-					newspgrid.Arr[x][newspgrid.Height-2] = newspgrid.Arr[x][0]
-					newspgrid.Arr[x][0] = gen.Config.EmptySymbolCode
+					if s > 1 {
+						gen.setGiga(newspgrid, x, y, s, newspgrid.Arr[x][y], iicd.cfg.MapGigaSymbolCodes[newspgrid.Arr[x][y]][s-1], iicd)
+					}
 				}
 			}
 		}
 	}
+
+	// if gen.Config.GigaWeightVM != nil {
+	// 	gw := gen.getGigaWeight(gameProp, bcd)
+
+	// 	for x := startX; x < newspgrid.Width; x++ {
+	// 		for y := newspgrid.Height - 1; y > 0; y-- {
+	// 			if goutils.IndexOfIntSlice(gen.Config.GigaSymbolCodes, newspgrid.Arr[x][y], 0) >= 0 {
+	// 				cv, err := gw.RandVal(plugin)
+	// 				if err != nil {
+	// 					goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:RandVal",
+	// 						goutils.Err(err))
+
+	// 					return "", err
+	// 				}
+
+	// 				s := cv.Int()
+
+	// 				gen.setGiga(newspgrid, x, y, s, gen.Config.TargetGigaSymbolCodes[newspgrid.Arr[x][y]][s])
+	// 			}
+	// 			cv, err := vw.RandVal(plugin)
+	// 			if err != nil {
+	// 				goutils.Error("RefillTropiCoolSPGrid.OnPlayGame:RandVal",
+	// 					goutils.Err(err))
+
+	// 				return "", err
+	// 			}
+
+	// 			newspgrid.Arr[x][y] = cv.Int()
+	// 		}
+
+	// 		if newspgrid.Arr[x][newspgrid.Height-1] == gen.Config.EmptySymbolCode {
+	// 			newspgrid.Arr[x][newspgrid.Height-1] = gen.Config.BlankSymbolCode
+	// 		} else if newspgrid.Arr[x][newspgrid.Height-2] == gen.Config.EmptySymbolCode {
+	// 			if newspgrid.Arr[x][0] == gen.Config.BlankSymbolCode {
+	// 				newspgrid.Arr[x][newspgrid.Height-2] = gen.Config.BlankSymbolCode
+	// 				newspgrid.Arr[x][0] = gen.Config.EmptySymbolCode
+	// 			} else if newspgrid.Arr[x][1] != gen.Config.EmptySymbolCode {
+	// 				newspgrid.Arr[x][newspgrid.Height-2] = newspgrid.Arr[x][0]
+	// 				newspgrid.Arr[x][0] = gen.Config.EmptySymbolCode
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	gen.AddSPGrid(gen.Config.SPGrid, gameProp, curpr, newspgrid, bcd)
 
