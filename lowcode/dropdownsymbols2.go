@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/bytedance/sonic"
@@ -372,7 +373,7 @@ func (dropDownSymbols *DropDownSymbols2) canDownSymbol(tgs *sgc7game.GameScene, 
 }
 
 func (dropDownSymbols *DropDownSymbols2) canDownGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) bool {
-	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+	if gigadata.Y+gigadata.Height-1 >= tgs.Height-1 {
 		return false
 	}
 
@@ -441,12 +442,14 @@ func (dropDownSymbols *DropDownSymbols2) downGiga(tgs *sgc7game.GameScene, gigad
 	}
 }
 
-func (dropDownSymbols *DropDownSymbols2) dropdownGiga(gameProp *GameProperty, ngs *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) bool {
+func (dropDownSymbols *DropDownSymbols2) dropdownGiga(_ *GameProperty, ngs *sgc7game.GameScene, gigacd *GenGigaSymbols2Data, lst []*gigaData) bool {
 	isdown := false
 
-	gigacd.sortGigaData()
+	sort.Slice(lst, func(i, j int) bool {
+		return lst[i].getBottom() > lst[j].getBottom()
+	})
 
-	for _, v := range gigacd.gigaData {
+	for _, v := range lst {
 		for {
 			candrop := dropDownSymbols.canDownGiga(ngs, v, gigacd)
 			if !candrop {
@@ -503,6 +506,28 @@ func (dropDownSymbols *DropDownSymbols2) procGigaNormal(gameProp *GameProperty, 
 	}
 
 	for {
+		lst := []*gigaData{}
+
+		for _, v := range gigacd.gigaData {
+			isget := false
+
+			for tx := v.X; tx < v.X+v.Width; tx++ {
+				for ty := ngs.Height - 1; ty >= v.Y+v.Height; ty-- {
+					if ngs.Arr[tx][ty] == -1 {
+						lst = append(lst, v)
+
+						isget = true
+
+						break
+					}
+				}
+
+				if isget {
+					break
+				}
+			}
+		}
+
 		for x := range ngs.Arr {
 			for y := len(ngs.Arr[x]) - 1; y >= 0; {
 				if ngs.Arr[x][y] == -1 {
@@ -532,7 +557,7 @@ func (dropDownSymbols *DropDownSymbols2) procGigaNormal(gameProp *GameProperty, 
 			}
 		}
 
-		isdrop := dropDownSymbols.dropdownGiga(gameProp, ngs, gigacd)
+		isdrop := dropDownSymbols.dropdownGiga(gameProp, ngs, gigacd, lst)
 		if !isdrop {
 			break
 		}

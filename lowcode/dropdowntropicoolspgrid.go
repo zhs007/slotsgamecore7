@@ -229,7 +229,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownSymbol(tgs *sgc7game.GameScene, x, y 
 }
 
 func (gen *DropDownTropiCoolSPGrid) canDownGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) bool {
-	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+	if gigadata.Y+gigadata.Height-1 >= tgs.Height-1 {
 		return false
 	}
 
