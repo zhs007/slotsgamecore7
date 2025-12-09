@@ -29,9 +29,9 @@ type DropDownTropiCoolSPGridConfig struct {
 	BrokenSymbolCodes    []int    `yaml:"-" json:"-"`
 }
 
-func (cfg *DropDownTropiCoolSPGridConfig) isBroken(sc int) bool {
-	return slices.Contains(cfg.BrokenSymbolCodes, sc)
-}
+// func (cfg *DropDownTropiCoolSPGridConfig) isBroken(sc int) bool {
+// 	return slices.Contains(cfg.BrokenSymbolCodes, sc)
+// }
 
 // SetLinkComponent
 func (cfg *DropDownTropiCoolSPGridConfig) SetLinkComponent(link string, componentName string) {
@@ -216,7 +216,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownSymbol(tgs *sgc7game.GameScene, x, y 
 	}
 
 	ny := y + 1
-	if tgs.Arr[x][ny] != -1 && !gen.Config.isBroken(tgs.Arr[x][ny]) {
+	if tgs.Arr[x][ny] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][ny]) {
 		newgigadata := ggcd.getGigaData(x, ny)
 		if newgigadata != nil {
 			return gen.canDownGiga(tgs, newgigadata, ggcd)
@@ -235,7 +235,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownGiga(tgs *sgc7game.GameScene, gigadat
 
 	y := gigadata.Y + gigadata.Height
 	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
-		if tgs.Arr[x][y] != -1 && !gen.Config.isBroken(tgs.Arr[x][y]) {
+		if tgs.Arr[x][y] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][y]) {
 
 			newgigadata := ggcd.getGigaData(x, y)
 			if newgigadata != nil {
@@ -257,7 +257,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownGiga(tgs *sgc7game.GameScene, gigadat
 
 func (gen *DropDownTropiCoolSPGrid) downSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) {
 	ny := y + 1
-	if tgs.Arr[x][ny] != -1 && !gen.Config.isBroken(tgs.Arr[x][ny]) {
+	if tgs.Arr[x][ny] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][ny]) {
 		newgigadata := ggcd.getGigaData(x, ny)
 		if newgigadata != nil {
 			gen.downGiga(tgs, newgigadata, ggcd)
@@ -273,7 +273,7 @@ func (gen *DropDownTropiCoolSPGrid) downSymbol(tgs *sgc7game.GameScene, x, y int
 func (gen *DropDownTropiCoolSPGrid) downGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
 	y := gigadata.Y + gigadata.Height
 	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
-		if tgs.Arr[x][y] != -1 && !gen.Config.isBroken(tgs.Arr[x][y]) {
+		if tgs.Arr[x][y] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][y]) {
 			newgigadata := ggcd.getGigaData(x, y)
 			if newgigadata != nil {
 				gen.downGiga(tgs, newgigadata, ggcd)
@@ -355,6 +355,34 @@ func (gen *DropDownTropiCoolSPGrid) dropdownSPGigaList(gameProp *GameProperty, g
 	return ngs
 }
 
+func (gen *DropDownTropiCoolSPGrid) dropdownSPGiga(gs *sgc7game.GameScene, gd *gigaData) {
+	for x := gd.X; x < gd.X+gd.Width; x++ {
+
+		for y := gs.Height - 1; y >= 0; {
+			if gs.Arr[x][y] == -1 {
+				hass := false
+				for y1 := y - 1; y1 >= 0; y1-- {
+					if gs.Arr[x][y1] != -1 {
+						gs.Arr[x][y] = gs.Arr[x][y1]
+						gs.Arr[x][y1] = -1
+
+						hass = true
+						y--
+						break
+					}
+				}
+
+				if !hass {
+					break
+				}
+			} else {
+				y--
+			}
+		}
+
+	}
+}
+
 // OnPlayGame - minimal implementation: does nothing but advance
 func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -363,6 +391,11 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// It simply ends this step and returns to the next component. It can be
 	// extended later to implement drop-down / TropiCool-specific behaviour.
 	bcd := icd.(*BasicComponentData)
+
+	bcd.UsedScenes = nil
+	if bcd.MapUsedSPGric != nil && bcd.MapUsedSPGric[gen.Config.SPGrid] != nil {
+		bcd.MapUsedSPGric[gen.Config.SPGrid] = nil
+	}
 
 	stackSPGrid, isok := gameProp.MapSPGridStack[gen.Config.SPGrid]
 	if !isok {
@@ -436,7 +469,9 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 						newgigadatalist = append(newgigadatalist, newgigadata)
 
 						ggcd.gigaData = append(ggcd.gigaData, newgigadata)
-						iicd.rmGigaData(gigadata)
+						iicd.rmGigaData(newspgrid, gigadata)
+
+						gen.dropdownSPGiga(newspgrid, gigadata)
 
 						continue
 					}

@@ -235,10 +235,11 @@ type ChgSymbols2Config struct {
 	SymbolCollection      string                      `json:"symbolCollection"`
 	MaxNumber             int                         `yaml:"maxNumber" json:"maxNumber"`
 	RowMask               string                      `yaml:"rowMask" json:"rowMask"`
-	MapControllers        map[string][]*Award         `yaml:"controllers" json:"controllers"`
 	JumpToComponent       string                      `yaml:"jumpToComponent" json:"jumpToComponent"`
 	OutputToComponent     string                      `yaml:"outputToComponent" json:"outputToComponent"`
 	IsClearOutput         bool                        `yaml:"isClearOutput" json:"isClearOutput"`
+	GenGigaSymbols2       string                      `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`
+	MapControllers        map[string][]*Award         `yaml:"controllers" json:"controllers"`
 }
 
 // SetLinkComponent
@@ -389,8 +390,7 @@ func (chgSymbols2 *ChgSymbols2) ProcControllers(gameProp *GameProperty, plugin s
 }
 
 // getSrcPos
-func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
-	gs *sgc7game.GameScene) ([]int, error) {
+func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, ggcd *GenGigaSymbols2Data) ([]int, error) {
 
 	pos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
 
@@ -643,6 +643,19 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 	case CS2SSTypeSymbols:
 		npos := make([]int, 0, gameProp.GetVal(GamePropWidth)*gameProp.GetVal(GamePropHeight)*2)
 
+		if ggcd != nil {
+			for i := range len(pos) / 2 {
+				x := pos[i*2]
+				y := pos[i*2+1]
+
+				if slices.Contains(chgSymbols2.Config.SrcSymbolCodes, gs.Arr[x][y]) || ggcd.getGigaData(x, y) != nil {
+					npos = append(npos, x, y)
+				}
+			}
+
+			return npos, nil
+		}
+
 		for i := range len(pos) / 2 {
 			x := pos[i*2]
 			y := pos[i*2+1]
@@ -681,11 +694,11 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 
 // procPos
 func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	_ sgc7game.IPlayerState, _ *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbols2Data) (string, error) {
+	_ sgc7game.IPlayerState, _ *sgc7game.Stake, prs []*sgc7game.PlayResult, cd *ChgSymbols2Data, ggcd *GenGigaSymbols2Data) (string, error) {
 
 	gs := chgSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
 
-	pos, err := chgSymbols2.getSrcPos(gameProp, plugin, gs)
+	pos, err := chgSymbols2.getSrcPos(gameProp, plugin, gs, ggcd)
 	if err != nil {
 		goutils.Error("ChgSymbols2.procPos:getSrcPos",
 			goutils.Err(err))
@@ -710,7 +723,7 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 	switch chgSymbols2.Config.Type {
 	case CS2TypeSymbol:
 		symbolCode := chgSymbols2.Config.SymbolCode
-		ngs, err := chgSymbols2.procSymbolWithPos(gameProp, gs, pos, symbolCode, cd)
+		ngs, err := chgSymbols2.procSymbolWithPos(gameProp, gs, pos, symbolCode, cd, ggcd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWithPos",
 				goutils.Err(err))
@@ -729,7 +742,7 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 			return nc, ErrComponentDoNothing
 		}
 	case CS2TypeSymbolWeight:
-		ngs, err := chgSymbols2.procSymbolWeightWithPos(gameProp, curpr, gp, plugin, gs, pos, cd)
+		ngs, err := chgSymbols2.procSymbolWeightWithPos(gameProp, curpr, gp, plugin, gs, pos, cd, ggcd)
 		if err != nil {
 			goutils.Error("ChgSymbols2.procPos:procSymbolWeightWithPos",
 				goutils.Err(err))
@@ -803,8 +816,37 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 	return nc, nil
 }
 
+func (chgSymbols2 *ChgSymbols2) getGenGigaSymbols2Data(gameProp *GameProperty) (*GenGigaSymbols2Data, error) {
+	if chgSymbols2.Config.GenGigaSymbols2 == "" {
+		return nil, nil
+	}
+
+	gigaicd := gameProp.GetComponentDataWithName(chgSymbols2.Config.GenGigaSymbols2)
+	if gigaicd == nil {
+		goutils.Error("ChgSymbols2.getGenGigaSymbols2Data:GetComponentDataWithName",
+			slog.String("GenGigaSymbols2", chgSymbols2.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	ggcd, isok := gigaicd.(*GenGigaSymbols2Data)
+	if !isok {
+		goutils.Error("ChgSymbols2.getGenGigaSymbols2Data:GenGigaSymbols2Data",
+			slog.String("GenGigaSymbols2", chgSymbols2.Config.GenGigaSymbols2),
+			goutils.Err(ErrInvalidComponentConfig))
+
+		return nil, ErrInvalidComponentConfig
+	}
+
+	return ggcd, nil
+}
+
 // procSymbolWithPos
-func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sgc7game.GameScene, pos []int, symbolCode int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sgc7game.GameScene, pos []int, symbolCode int, cd *ChgSymbols2Data,
+	ggcd *GenGigaSymbols2Data) (*sgc7game.GameScene, error) {
+	lstggd := []*gigaData{}
+
 	ngs := gs.CloneEx(gameProp.PoolScene)
 
 	var outputCD IComponentData
@@ -826,12 +868,35 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 			x := pos[i*2]
 			y := pos[i*2+1]
 
-			ngs.Arr[x][y] = symbolCode
+			if ggcd != nil {
+				cggd := ggcd.getGigaData(x, y)
+				if cggd != nil {
+					if slices.Contains(lstggd, cggd) {
+						continue
+					}
 
-			cd.AddPos(x, y)
+					lstggd = append(lstggd, cggd)
 
-			if outputCD != nil {
-				outputCD.AddPos(x, y)
+					cggd.chgSymbol(ngs, symbolCode, ggcd.cfg)
+
+					for gx := cggd.X; gx < cggd.X+cggd.Width; gx++ {
+						for gy := cggd.Y; gy < cggd.Y+cggd.Height; gy++ {
+							cd.AddPos(gx, gy)
+
+							if outputCD != nil {
+								outputCD.AddPos(gx, gy)
+							}
+						}
+					}
+				}
+			} else {
+				ngs.Arr[x][y] = symbolCode
+
+				cd.AddPos(x, y)
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
 			}
 
 			curnum++
@@ -844,12 +909,35 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 			x := pos[i*2]
 			y := pos[i*2+1]
 
-			ngs.Arr[x][y] = symbolCode
+			if ggcd != nil {
+				cggd := ggcd.getGigaData(x, y)
+				if cggd != nil {
+					if slices.Contains(lstggd, cggd) {
+						continue
+					}
 
-			cd.AddPos(x, y)
+					lstggd = append(lstggd, cggd)
 
-			if outputCD != nil {
-				outputCD.AddPos(x, y)
+					cggd.chgSymbol(ngs, symbolCode, ggcd.cfg)
+
+					for gx := cggd.X; gx < cggd.X+cggd.Width; gx++ {
+						for gy := cggd.Y; gy < cggd.Y+cggd.Height; gy++ {
+							cd.AddPos(gx, gy)
+
+							if outputCD != nil {
+								outputCD.AddPos(gx, gy)
+							}
+						}
+					}
+				}
+			} else {
+				ngs.Arr[x][y] = symbolCode
+
+				cd.AddPos(x, y)
+
+				if outputCD != nil {
+					outputCD.AddPos(x, y)
+				}
 			}
 		}
 	}
@@ -906,7 +994,7 @@ func (chgSymbols2 *ChgSymbols2) procSymbolsWithPos(gameProp *GameProperty, plugi
 
 // procSymbolWeightWithPos
 func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
-	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data) (*sgc7game.GameScene, error) {
+	plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, pos []int, cd *ChgSymbols2Data, ggcd *GenGigaSymbols2Data) (*sgc7game.GameScene, error) {
 
 	vw2 := chgSymbols2.getWeight(gameProp, &cd.BasicComponentData)
 	curs, err := vw2.RandVal(plugin)
@@ -923,7 +1011,7 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWeightWithPos(gameProp *GameProperty, 
 		chgSymbols2.ProcControllers(gameProp, plugin, curpr, gp, -1,
 			gameProp.Pool.DefaultPaytables.GetStringFromInt(sc))
 
-		return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, sc, cd)
+		return chgSymbols2.procSymbolWithPos(gameProp, gs, pos, sc, cd, ggcd)
 	}
 
 	return gs, nil
@@ -1034,7 +1122,15 @@ func (chgSymbols2 *ChgSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	cd.OnNewStep()
 
-	return chgSymbols2.procPos(gameProp, curpr, gp, plugin, ps, stake, prs, cd)
+	ggcd, err := chgSymbols2.getGenGigaSymbols2Data(gameProp)
+	if err != nil {
+		goutils.Info("ChgSymbols2.OnPlayGame:getGenGigaSymbols2Data",
+			goutils.Err(err))
+
+		return "", err
+	}
+
+	return chgSymbols2.procPos(gameProp, curpr, gp, plugin, ps, stake, prs, cd, ggcd)
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -1090,6 +1186,7 @@ func NewChgSymbols2(name string) IComponent {
 // "symbolCollection": "bg-allms"
 // "outputToComponent": "bg-sc-bottom",
 // "isClearOutput": true,
+// "genGigaSymbols2": "bg-gengiga"
 type jsonChgSymbols2 struct {
 	StrSrcType            string   `json:"srcType"`
 	StrSrcSymbolType      string   `json:"srcSymbolType"`
@@ -1110,6 +1207,7 @@ type jsonChgSymbols2 struct {
 	RowMask               string   `json:"rowMask"`
 	OutputToComponent     string   `json:"outputToComponent"`
 	IsClearOutput         bool     `json:"isClearOutput"`
+	GenGigaSymbols2       string   `json:"genGigaSymbols2"`
 }
 
 func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
@@ -1133,6 +1231,7 @@ func (jcfg *jsonChgSymbols2) build() *ChgSymbols2Config {
 		SymbolCollection:      jcfg.SymbolCollection,
 		OutputToComponent:     jcfg.OutputToComponent,
 		IsClearOutput:         jcfg.IsClearOutput,
+		GenGigaSymbols2:       jcfg.GenGigaSymbols2,
 	}
 
 	return cfg
