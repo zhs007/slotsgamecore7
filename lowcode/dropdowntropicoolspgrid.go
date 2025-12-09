@@ -392,6 +392,11 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 	// extended later to implement drop-down / TropiCool-specific behaviour.
 	bcd := icd.(*BasicComponentData)
 
+	bcd.UsedScenes = nil
+	if bcd.MapUsedSPGric != nil && bcd.MapUsedSPGric[gen.Config.SPGrid] != nil {
+		bcd.MapUsedSPGric[gen.Config.SPGrid] = nil
+	}
+
 	stackSPGrid, isok := gameProp.MapSPGridStack[gen.Config.SPGrid]
 	if !isok {
 		goutils.Error("DropDownTropiCoolSPGrid.OnPlayGame:MapSPGridStack",

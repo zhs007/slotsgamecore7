@@ -142,6 +142,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(MergeSPGridTypeName, NewMergeSPGrid)
 	mgr.Reg(CollectorPayTriggerTypeName, NewCollectorPayTrigger)
 	mgr.Reg(CalculatorTypeName, NewCalculator)
+	mgr.Reg(TropiCoolExchangeTypeName, NewTropiCoolExchange)
 
 	return mgr
 }
