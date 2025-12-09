@@ -586,11 +586,6 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 						}, func(cursymbol int, scene *sgc7game.GameScene, x, y int) bool {
 							return goutils.IndexOfIntSlice(symbols, cursymbol, 0) >= 0
 						}, func(cursymbol int, x, y int) int {
-							gigad := gigacd.getGigaData(x, y)
-							if gigad != nil {
-								return gigad.SymbolCode
-							}
-
 							return cursymbol
 						}, func(cursymbol int) bool {
 							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0

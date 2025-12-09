@@ -152,6 +152,7 @@ func (genGigaSymbols2Data *GenGigaSymbols2Data) calcDropdown(gs *sgc7game.GameSc
 				return cy
 			}
 		}
+
 		cy++
 	}
 

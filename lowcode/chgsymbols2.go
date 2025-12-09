@@ -817,6 +817,10 @@ func (chgSymbols2 *ChgSymbols2) procPos(gameProp *GameProperty, curpr *sgc7game.
 }
 
 func (chgSymbols2 *ChgSymbols2) getGenGigaSymbols2Data(gameProp *GameProperty) (*GenGigaSymbols2Data, error) {
+	if chgSymbols2.Config.GenGigaSymbols2 == "" {
+		return nil, nil
+	}
+
 	gigaicd := gameProp.GetComponentDataWithName(chgSymbols2.Config.GenGigaSymbols2)
 	if gigaicd == nil {
 		goutils.Error("ChgSymbols2.getGenGigaSymbols2Data:GetComponentDataWithName",
