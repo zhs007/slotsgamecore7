@@ -224,6 +224,12 @@ type GenGigaSymbols2Config struct {
 	Weight               string                `yaml:"weight" json:"weight"`
 	GigaSymbolCodes      map[int][]int         `yaml:"-" json:"-"`
 	WeightVW             *sgc7game.ValWeights2 `yaml:"-" json:"-"`
+	BrokenSymbols        []string              `yaml:"brokenSymbols" json:"brokenSymbols"`
+	BrokenSymbolCodes    []int                 `yaml:"-" json:"-"`
+}
+
+func (cfg *GenGigaSymbols2Config) isBroken(sc int) bool {
+	return slices.Contains(cfg.BrokenSymbolCodes, sc)
 }
 
 // SetLinkComponent
@@ -328,6 +334,19 @@ func (genGigaSymbols2 *GenGigaSymbols2) InitEx(cfg any, pool *GamePropertyPool) 
 				genGigaSymbols2.Config.GigaSymbolCodes[sc][gi-1] = -1
 			}
 		}
+	}
+
+	for _, bs := range genGigaSymbols2.Config.BrokenSymbols {
+		sc, isok := pool.Config.GetDefaultPaytables().MapSymbols[bs]
+		if !isok {
+			goutils.Error("DropDownTropiCoolSPGrid.InitEx:BrokenSymbols",
+				slog.String("BrokenSymbol", bs),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return ErrInvalidComponentConfig
+		}
+
+		genGigaSymbols2.Config.BrokenSymbolCodes = append(genGigaSymbols2.Config.BrokenSymbolCodes, sc)
 	}
 
 	genGigaSymbols2.onInit(&genGigaSymbols2.Config.BasicComponentConfig)
@@ -543,19 +562,34 @@ func NewGenGigaSymbols2(name string) IComponent {
 //
 // ],
 // "weight": "bgspgridgigaweight"
+// "brokenSymbols": [
+//
+//	"H1",
+//	"H2",
+//	"H3",
+//	"H4",
+//	"H5",
+//	"L1",
+//	"L2",
+//	"L3",
+//	"L4"
+//
+// ]
 type jsonGenGigaSymbols2 struct {
-	MaxNumber int      `json:"maxNumber"`
-	Symbols   []string `json:"symbols"`
-	SpSymbols []string `json:"spSymbols"`
-	Weight    string   `json:"weight"`
+	MaxNumber     int      `json:"maxNumber"`
+	Symbols       []string `json:"symbols"`
+	SpSymbols     []string `json:"spSymbols"`
+	Weight        string   `json:"weight"`
+	BrokenSymbols []string `json:"brokenSymbols"`
 }
 
 func (jcfg *jsonGenGigaSymbols2) build() *GenGigaSymbols2Config {
 	cfg := &GenGigaSymbols2Config{
-		MaxNumber: jcfg.MaxNumber,
-		Symbols:   jcfg.Symbols,
-		SpSymbols: jcfg.SpSymbols,
-		Weight:    jcfg.Weight,
+		MaxNumber:     jcfg.MaxNumber,
+		Symbols:       jcfg.Symbols,
+		SpSymbols:     jcfg.SpSymbols,
+		Weight:        jcfg.Weight,
+		BrokenSymbols: slices.Clone(jcfg.BrokenSymbols),
 	}
 
 	return cfg

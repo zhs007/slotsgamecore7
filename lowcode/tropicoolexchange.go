@@ -187,6 +187,10 @@ func (gen *TropiCoolExchange) procRowGiga(plugin sgc7plugin.IPlugin, ngs *sgc7ga
 	}
 
 	nvw := vw.CloneWithIntArray(syms)
+	if nvw == nil {
+		nvw = vw
+	}
+
 	cr, err := nvw.RandVal(plugin)
 	if err != nil {
 		goutils.Error("TropiCoolExchange.procRowGiga:RandVal",
@@ -270,6 +274,10 @@ func (gen *TropiCoolExchange) procColGiga(plugin sgc7plugin.IPlugin, ngs *sgc7ga
 	}
 
 	nvw := vw.CloneWithIntArray(syms)
+	if nvw == nil {
+		nvw = vw
+	}
+
 	cr, err := nvw.RandVal(plugin)
 	if err != nil {
 		goutils.Error("TropiCoolExchange.procColGiga:RandVal",
@@ -335,6 +343,10 @@ func (gen *TropiCoolExchange) procRowSymbol(plugin sgc7plugin.IPlugin, ngs *sgc7
 	}
 
 	nvw := vw.CloneWithIntArray(syms)
+	if nvw == nil {
+		nvw = vw
+	}
+
 	cr, err := nvw.RandVal(plugin)
 	if err != nil {
 		goutils.Error("TropiCoolExchange.procRowSymbol:RandVal",
@@ -399,6 +411,10 @@ func (gen *TropiCoolExchange) procColSymbol(plugin sgc7plugin.IPlugin, ngs *sgc7
 	}
 
 	nvw := vw.CloneWithIntArray(syms)
+	if nvw == nil {
+		nvw = vw
+	}
+
 	cr, err := nvw.RandVal(plugin)
 	if err != nil {
 		goutils.Error("TropiCoolExchange.procRowSymbol:RandVal",

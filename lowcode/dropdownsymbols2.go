@@ -353,29 +353,132 @@ func (dropDownSymbols *DropDownSymbols2) refillGiga(gameProp *GameProperty, ngs 
 	}
 }
 
-func (dropDownSymbols *DropDownSymbols2) dropdownGiga(gameProp *GameProperty, ngs *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) bool {
-	isdown := false
+func (dropDownSymbols *DropDownSymbols2) canDownSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) bool {
+	if y+1 >= tgs.Height {
+		return false
+	}
 
-	for _, v := range gigacd.gigaData {
-		cy := gigacd.calcDropdown(ngs, v)
-		if cy != v.Y {
-			isdown = true
+	ny := y + 1
+	if tgs.Arr[x][ny] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][ny]) {
+		newgigadata := ggcd.getGigaData(x, ny)
+		if newgigadata != nil {
+			return dropDownSymbols.canDownGiga(tgs, newgigadata, ggcd)
+		}
 
-			for tx := v.X; tx <= v.X+v.Width-1; tx++ {
-				for ty := v.Y; ty <= v.Y+v.Height-1; ty++ {
-					ngs.Arr[tx][ty] = -1
+		return dropDownSymbols.canDownSymbol(tgs, x, ny, ggcd)
+	}
+
+	return true
+}
+
+func (dropDownSymbols *DropDownSymbols2) canDownGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) bool {
+	if gigadata.Y+gigadata.Height >= tgs.Height-1 {
+		return false
+	}
+
+	y := gigadata.Y + gigadata.Height
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		if tgs.Arr[x][y] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][y]) {
+
+			newgigadata := ggcd.getGigaData(x, y)
+			if newgigadata != nil {
+				candrop := dropDownSymbols.canDownGiga(tgs, newgigadata, ggcd)
+				if !candrop {
+					return false
 				}
-			}
-
-			v.Y = cy
-
-			for tx := v.X; tx <= v.X+v.Width-1; tx++ {
-				for ty := v.Y; ty <= v.Y+v.Height-1; ty++ {
-					ngs.Arr[tx][ty] = v.CurSymbolCode
+			} else {
+				candrop := dropDownSymbols.canDownSymbol(tgs, x, y, ggcd)
+				if !candrop {
+					return false
 				}
 			}
 		}
 	}
+
+	return true
+}
+
+func (dropDownSymbols *DropDownSymbols2) downSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) {
+	ny := y + 1
+	if tgs.Arr[x][ny] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][ny]) {
+		newgigadata := ggcd.getGigaData(x, ny)
+		if newgigadata != nil {
+			dropDownSymbols.downGiga(tgs, newgigadata, ggcd)
+		} else {
+			dropDownSymbols.canDownSymbol(tgs, x, ny, ggcd)
+		}
+	} else {
+		tgs.Arr[x][ny] = tgs.Arr[x][y]
+		tgs.Arr[x][y] = -1
+	}
+}
+
+func (dropDownSymbols *DropDownSymbols2) downGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
+	y := gigadata.Y + gigadata.Height
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		if tgs.Arr[x][y] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][y]) {
+			newgigadata := ggcd.getGigaData(x, y)
+			if newgigadata != nil {
+				dropDownSymbols.downGiga(tgs, newgigadata, ggcd)
+			} else {
+				dropDownSymbols.downSymbol(tgs, x, y, ggcd)
+			}
+		}
+	}
+
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		for y := gigadata.Y; y < gigadata.Y+gigadata.Height; y++ {
+			tgs.Arr[x][y] = -1
+		}
+	}
+
+	gigadata.Y++
+
+	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
+		for y := gigadata.Y; y < gigadata.Y+gigadata.Height; y++ {
+			tgs.Arr[x][y] = gigadata.CurSymbolCode
+		}
+	}
+}
+
+func (dropDownSymbols *DropDownSymbols2) dropdownGiga(gameProp *GameProperty, ngs *sgc7game.GameScene, gigacd *GenGigaSymbols2Data) bool {
+	isdown := false
+
+	gigacd.sortGigaData()
+
+	for _, v := range gigacd.gigaData {
+		for {
+			candrop := dropDownSymbols.canDownGiga(ngs, v, gigacd)
+			if !candrop {
+				break
+			}
+
+			dropDownSymbols.downGiga(ngs, v, gigacd)
+
+			isdown = true
+		}
+	}
+
+	// for _, v := range gigacd.gigaData {
+	// 	cy := gigacd.calcDropdown(ngs, v)
+	// 	if cy != v.Y {
+	// 		isdown = true
+
+	// 		for tx := v.X; tx <= v.X+v.Width-1; tx++ {
+	// 			for ty := v.Y; ty <= v.Y+v.Height-1; ty++ {
+	// 				ngs.Arr[tx][ty] = -1
+	// 			}
+	// 		}
+
+	// 		v.Y = cy
+
+	// 		for tx := v.X; tx <= v.X+v.Width-1; tx++ {
+	// 			for ty := v.Y; ty <= v.Y+v.Height-1; ty++ {
+	// 				ngs.Arr[tx][ty] = v.CurSymbolCode
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return isdown
 }

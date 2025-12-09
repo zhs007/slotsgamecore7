@@ -29,9 +29,9 @@ type DropDownTropiCoolSPGridConfig struct {
 	BrokenSymbolCodes    []int    `yaml:"-" json:"-"`
 }
 
-func (cfg *DropDownTropiCoolSPGridConfig) isBroken(sc int) bool {
-	return slices.Contains(cfg.BrokenSymbolCodes, sc)
-}
+// func (cfg *DropDownTropiCoolSPGridConfig) isBroken(sc int) bool {
+// 	return slices.Contains(cfg.BrokenSymbolCodes, sc)
+// }
 
 // SetLinkComponent
 func (cfg *DropDownTropiCoolSPGridConfig) SetLinkComponent(link string, componentName string) {
@@ -216,7 +216,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownSymbol(tgs *sgc7game.GameScene, x, y 
 	}
 
 	ny := y + 1
-	if tgs.Arr[x][ny] != -1 && !gen.Config.isBroken(tgs.Arr[x][ny]) {
+	if tgs.Arr[x][ny] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][ny]) {
 		newgigadata := ggcd.getGigaData(x, ny)
 		if newgigadata != nil {
 			return gen.canDownGiga(tgs, newgigadata, ggcd)
@@ -235,7 +235,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownGiga(tgs *sgc7game.GameScene, gigadat
 
 	y := gigadata.Y + gigadata.Height
 	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
-		if tgs.Arr[x][y] != -1 && !gen.Config.isBroken(tgs.Arr[x][y]) {
+		if tgs.Arr[x][y] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][y]) {
 
 			newgigadata := ggcd.getGigaData(x, y)
 			if newgigadata != nil {
@@ -257,7 +257,7 @@ func (gen *DropDownTropiCoolSPGrid) canDownGiga(tgs *sgc7game.GameScene, gigadat
 
 func (gen *DropDownTropiCoolSPGrid) downSymbol(tgs *sgc7game.GameScene, x, y int, ggcd *GenGigaSymbols2Data) {
 	ny := y + 1
-	if tgs.Arr[x][ny] != -1 && !gen.Config.isBroken(tgs.Arr[x][ny]) {
+	if tgs.Arr[x][ny] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][ny]) {
 		newgigadata := ggcd.getGigaData(x, ny)
 		if newgigadata != nil {
 			gen.downGiga(tgs, newgigadata, ggcd)
@@ -273,7 +273,7 @@ func (gen *DropDownTropiCoolSPGrid) downSymbol(tgs *sgc7game.GameScene, x, y int
 func (gen *DropDownTropiCoolSPGrid) downGiga(tgs *sgc7game.GameScene, gigadata *gigaData, ggcd *GenGigaSymbols2Data) {
 	y := gigadata.Y + gigadata.Height
 	for x := gigadata.X; x < gigadata.X+gigadata.Width; x++ {
-		if tgs.Arr[x][y] != -1 && !gen.Config.isBroken(tgs.Arr[x][y]) {
+		if tgs.Arr[x][y] != -1 && !ggcd.cfg.isBroken(tgs.Arr[x][y]) {
 			newgigadata := ggcd.getGigaData(x, y)
 			if newgigadata != nil {
 				gen.downGiga(tgs, newgigadata, ggcd)
