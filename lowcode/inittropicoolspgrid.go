@@ -44,7 +44,7 @@ func (itcdpg *InitTropiCoolSPGridData) getGigaData(x, y int) *gigaData {
 	return nil
 }
 
-func (itcdpg *InitTropiCoolSPGridData) rmGigaData(gd *gigaData) error {
+func (itcdpg *InitTropiCoolSPGridData) rmGigaData(gs *sgc7game.GameScene, gd *gigaData) error {
 	i := slices.Index(itcdpg.gigaData, gd)
 	if i < 0 {
 		goutils.Error("InitTropiCoolSPGridData.rmGigaData:Index",
@@ -54,6 +54,12 @@ func (itcdpg *InitTropiCoolSPGridData) rmGigaData(gd *gigaData) error {
 	}
 
 	itcdpg.gigaData = slices.Delete(itcdpg.gigaData, i, i+1)
+
+	for x := gd.X; x < gd.X+gd.Width; x++ {
+		for y := gd.Y; y < gd.Y+gd.Height; y++ {
+			gs.Arr[x][y] = -1
+		}
+	}
 
 	return nil
 }

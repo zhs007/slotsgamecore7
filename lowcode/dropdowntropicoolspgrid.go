@@ -355,6 +355,34 @@ func (gen *DropDownTropiCoolSPGrid) dropdownSPGigaList(gameProp *GameProperty, g
 	return ngs
 }
 
+func (gen *DropDownTropiCoolSPGrid) dropdownSPGiga(gs *sgc7game.GameScene, gd *gigaData) {
+	for x := gd.X; x < gd.X+gd.Width; x++ {
+
+		for y := gs.Height - 1; y >= 0; {
+			if gs.Arr[x][y] == -1 {
+				hass := false
+				for y1 := y - 1; y1 >= 0; y1-- {
+					if gs.Arr[x][y1] != -1 {
+						gs.Arr[x][y] = gs.Arr[x][y1]
+						gs.Arr[x][y1] = -1
+
+						hass = true
+						y--
+						break
+					}
+				}
+
+				if !hass {
+					break
+				}
+			} else {
+				y--
+			}
+		}
+
+	}
+}
+
 // OnPlayGame - minimal implementation: does nothing but advance
 func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -436,7 +464,9 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 						newgigadatalist = append(newgigadatalist, newgigadata)
 
 						ggcd.gigaData = append(ggcd.gigaData, newgigadata)
-						iicd.rmGigaData(gigadata)
+						iicd.rmGigaData(newspgrid, gigadata)
+
+						gen.dropdownSPGiga(newspgrid, gigadata)
 
 						continue
 					}
