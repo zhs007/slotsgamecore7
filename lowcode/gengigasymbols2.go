@@ -30,6 +30,30 @@ type gigaData struct {
 	od            [][]int
 }
 
+func (gd *gigaData) chgSymbol(gs *sgc7game.GameScene, newSymbolCode int, cfg *GenGigaSymbols2Config) {
+	gd.CurSymbolCode = cfg.GigaSymbolCodes[newSymbolCode][gd.Width-1]
+	gd.SymbolCode = newSymbolCode
+
+	for tx := gd.X; tx < gd.X+gd.Width; tx++ {
+		for ty := gd.Y; ty < gd.Y+gd.Height; ty++ {
+			gs.Arr[tx][ty] = gd.CurSymbolCode
+		}
+	}
+}
+
+func (gd *gigaData) inPos(posData *PosData) bool {
+	for i := 0; i < posData.Len(); i++ {
+		x := posData.pos[i*2]
+		y := posData.pos[i*2+1]
+
+		if gd.X <= x && gd.Y <= y && gd.X+gd.Width-1 >= x && gd.Y+gd.Height-1 >= y {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (gd *gigaData) getBottom() int {
 	return gd.Y + gd.Height - 1
 }
