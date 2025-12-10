@@ -143,6 +143,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(CollectorPayTriggerTypeName, NewCollectorPayTrigger)
 	mgr.Reg(CalculatorTypeName, NewCalculator)
 	mgr.Reg(TropiCoolExchangeTypeName, NewTropiCoolExchange)
+	mgr.Reg(GenTropiCoolSPSymbolsTypeName, NewGenTropiCoolSPSymbols)
 
 	return mgr
 }
