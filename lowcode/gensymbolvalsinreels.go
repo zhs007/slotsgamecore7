@@ -64,6 +64,7 @@ type GenSymbolValsInReelsConfig struct {
 	MapNumber            map[int]int                           `yaml:"mapNumber" json:"mapNumber"`
 	MapNumberWeight      map[int]string                        `yaml:"mapNumberWeight" json:"mapNumberWeight"`
 	MapNumberWeightVW    map[int]*sgc7game.ValWeights2         `yaml:"-" json:"-"`
+	SpGrid               string                                `yaml:"spGrid" json:"spGrid"`
 	MapControllers       map[string][]*Award                   `yaml:"mapControllers" json:"mapControllers"`
 	JumpToComponent      string                                `yaml:"jumpToComponent" json:"jumpToComponent"`
 }
@@ -176,12 +177,11 @@ func (gsv *GenSymbolValsInReels) getSrcOtherScene(gameProp *GameProperty, curpr 
 }
 
 // procNumber
-func (gsv *GenSymbolValsInReels) procNumber(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
-	gp *GameParams, bcd *BasicComponentData) (*sgc7game.GameScene, error) {
+func (gsv *GenSymbolValsInReels) procNumber(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin,
+	curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, gp *GameParams, bcd *BasicComponentData, stackSPGrid *SPGridStack) (*sgc7game.GameScene, error) {
 
 	if os == nil {
-		os = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight),
-			gsv.Config.DefaultVal)
+		os = gsv.newOutput(gameProp, curpr, prs, bcd, stackSPGrid)
 	} else {
 		os = os.CloneEx(gameProp.PoolScene)
 	}
@@ -214,7 +214,7 @@ func (gsv *GenSymbolValsInReels) procNumber(gameProp *GameProperty, gs *sgc7game
 	if isTrigger {
 		gsv.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 
-		gsv.AddOtherScene(gameProp, curpr, os, bcd)
+		gsv.setOutput(gameProp, curpr, prs, bcd, os)
 
 		return os, nil
 	}
@@ -223,12 +223,12 @@ func (gsv *GenSymbolValsInReels) procNumber(gameProp *GameProperty, gs *sgc7game
 }
 
 // procWeight
-func (gsv *GenSymbolValsInReels) procWeight(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin, curpr *sgc7game.PlayResult,
-	gp *GameParams, bcd *BasicComponentData) (*sgc7game.GameScene, error) {
+func (gsv *GenSymbolValsInReels) procWeight(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, plugin sgc7plugin.IPlugin,
+	curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult,
+	gp *GameParams, bcd *BasicComponentData, stackSPGrid *SPGridStack) (*sgc7game.GameScene, error) {
 
 	if os == nil {
-		os = gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight),
-			gsv.Config.DefaultVal)
+		os = gsv.newOutput(gameProp, curpr, prs, bcd, stackSPGrid)
 	} else {
 		os = os.CloneEx(gameProp.PoolScene)
 	}
@@ -285,7 +285,7 @@ func (gsv *GenSymbolValsInReels) procWeight(gameProp *GameProperty, gs *sgc7game
 	if isTrigger {
 		gsv.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 
-		gsv.AddOtherScene(gameProp, curpr, os, bcd)
+		gsv.setOutput(gameProp, curpr, prs, bcd, os)
 
 		return os, nil
 	}
@@ -293,17 +293,71 @@ func (gsv *GenSymbolValsInReels) procWeight(gameProp *GameProperty, gs *sgc7game
 	return nil, nil
 }
 
+func (gsv *GenSymbolValsInReels) getOutput(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult,
+	_ *BasicComponentData) (*sgc7game.GameScene, *SPGridStack, error) {
+	if gsv.Config.SpGrid != "" {
+		stackSPGrid, isok := gameProp.MapSPGridStack[gsv.Config.SpGrid]
+		if !isok {
+			goutils.Error("GenSymbolValsInReels.getOutput:MapSPGridStack",
+				slog.String("SPGrid", gsv.Config.SpGrid),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, nil, ErrInvalidComponentConfig
+		}
+
+		spgrid := stackSPGrid.Stack.GetTopSPGridEx(gsv.Config.SpGrid, curpr, prs)
+
+		return spgrid, stackSPGrid, nil
+	}
+
+	os, err := gsv.getSrcOtherScene(gameProp, curpr, prs)
+	if err != nil {
+		goutils.Error("GenSymbolValsInReels.getOutput:getSrcOtherScene",
+			goutils.Err(err))
+
+		return nil, nil, err
+	}
+
+	return os, nil, nil
+}
+
+func (gsv *GenSymbolValsInReels) newOutput(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult, bcd *BasicComponentData,
+	stackSPGrid *SPGridStack) *sgc7game.GameScene {
+
+	if stackSPGrid != nil {
+		spgrid := gameProp.PoolScene.New2(stackSPGrid.Width, stackSPGrid.Height, gsv.Config.DefaultVal)
+
+		return spgrid
+	}
+
+	os := gameProp.PoolScene.New2(gameProp.GetVal(GamePropWidth), gameProp.GetVal(GamePropHeight),
+		gsv.Config.DefaultVal)
+
+	return os
+}
+
+func (gsv *GenSymbolValsInReels) setOutput(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult,
+	bcd *BasicComponentData, os *sgc7game.GameScene) {
+
+	if gsv.Config.SpGrid != "" {
+		gsv.AddSPGrid(gsv.Config.SpGrid, gameProp, curpr, os, bcd)
+	} else {
+		gsv.AddOtherScene(gameProp, curpr, os, bcd)
+	}
+}
+
 // OnPlayGame - placeholder implementation; do nothing
 func (gsv *GenSymbolValsInReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams,
-	plugin sgc7plugin.IPlugin, cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
+	plugin sgc7plugin.IPlugin, cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult,
+	icd IComponentData) (string, error) {
 
 	// placeholder: nothing implemented yet
 	bcd := icd.(*BasicComponentData)
 	bcd.UsedOtherScenes = nil
 
-	os, err := gsv.getSrcOtherScene(gameProp, curpr, prs)
+	os, stackSPGrid, err := gsv.getOutput(gameProp, curpr, prs, bcd)
 	if err != nil {
-		goutils.Error("GenSymbolValsInReels.OnPlayGame:getSrcOtherScene",
+		goutils.Error("GenSymbolValsInReels.OnPlayGame:getOutput",
 			goutils.Err(err))
 
 		return "", err
@@ -313,7 +367,7 @@ func (gsv *GenSymbolValsInReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 
 	switch gsv.Config.GenType {
 	case GSVIRCTypeNumber:
-		nos, err := gsv.procNumber(gameProp, gs, os, plugin, curpr, gp, bcd)
+		nos, err := gsv.procNumber(gameProp, gs, os, plugin, curpr, prs, gp, bcd, stackSPGrid)
 		if err != nil {
 			goutils.Error("GenSymbolValsInReels.OnPlayGame:procNumber",
 				goutils.Err(err))
@@ -327,7 +381,7 @@ func (gsv *GenSymbolValsInReels) OnPlayGame(gameProp *GameProperty, curpr *sgc7g
 			return nc, ErrComponentDoNothing
 		}
 	case GSVIRCTypeWeight:
-		nos, err := gsv.procWeight(gameProp, gs, os, plugin, curpr, gp, bcd)
+		nos, err := gsv.procWeight(gameProp, gs, os, plugin, curpr, prs, gp, bcd, stackSPGrid)
 		if err != nil {
 			goutils.Error("GenSymbolValsInReels.OnPlayGame:procWeight",
 				goutils.Err(err))
@@ -428,6 +482,7 @@ func NewGenSymbolValsInReels(name string) IComponent {
 //	]
 //
 // ]
+// "spGrid": "fg-wl-spgrid"
 type jsonGenSymbolValsInReels struct {
 	SrcSymbolValsType string          `json:"srcSymbolValsType"`
 	DefaultVal        int             `json:"defaultVal"`
@@ -437,6 +492,7 @@ type jsonGenSymbolValsInReels struct {
 	MapSrcSymbols     [][]interface{} `json:"mapSrcSymbols"`
 	MapNumber         [][]interface{} `json:"mapNumber"`
 	MapNumberWeight   [][]interface{} `json:"mapNumberWeight"`
+	SpGrid            string          `json:"spGrid"`
 }
 
 func (jcfg *jsonGenSymbolValsInReels) build() *GenSymbolValsInReelsConfig {
@@ -446,6 +502,7 @@ func (jcfg *jsonGenSymbolValsInReels) build() *GenSymbolValsInReelsConfig {
 		IsForceRefresh:       jcfg.IsForceRefresh,
 		StrGenType:           jcfg.GenType,
 		IsAlwaysGen:          jcfg.IsAlwaysGen,
+		SpGrid:               jcfg.SpGrid,
 	}
 
 	if len(jcfg.MapNumber) > 0 {
