@@ -147,6 +147,7 @@ type WaysTriggerConfig struct {
 	SetWinSymbols                   []string                      `yaml:"setWinSymbols" json:"setWinSymbols"`
 	GenGigaSymbols2                 string                        `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`
 	RowMask                         string                        `yaml:"rowMask" json:"rowMask"`
+	SpGrid                          string                        `yaml:"spGrid" json:"spGrid"`
 }
 
 // SetLinkComponent
@@ -827,6 +828,29 @@ func (waysTrigger *WaysTrigger) ProcControllers(gameProp *GameProperty, plugin s
 	}
 }
 
+func (waysTrigger *WaysTrigger) getOtherScene(gameProp *GameProperty, curpr *sgc7game.PlayResult, prs []*sgc7game.PlayResult) (
+	*sgc7game.GameScene, error) {
+
+	if waysTrigger.Config.SpGrid != "" {
+		stackSPGrid, isok := gameProp.MapSPGridStack[waysTrigger.Config.SpGrid]
+		if !isok {
+			goutils.Error("WaysTrigger.getOtherScene:MapSPGridStack",
+				slog.String("SPGrid", waysTrigger.Config.SpGrid),
+				goutils.Err(ErrInvalidComponentConfig))
+
+			return nil, ErrInvalidComponentConfig
+		}
+
+		spgrid := stackSPGrid.Stack.GetTopSPGridEx(waysTrigger.Config.SpGrid, curpr, prs)
+
+		return spgrid, nil
+	}
+
+	os := waysTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+
+	return os, nil
+}
+
 // playgame
 func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
@@ -838,7 +862,15 @@ func (waysTrigger *WaysTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	var os *sgc7game.GameScene
 	if waysTrigger.Config.OSMulType != OSMTNone {
-		os = waysTrigger.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+		tos, err := waysTrigger.getOtherScene(gameProp, curpr, prs)
+		if err != nil {
+			goutils.Error("WaysTrigger.OnPlayGame:getOtherScene",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		os = tos
 	}
 
 	isTrigger, lst := waysTrigger.canTrigger(gameProp, gs, os, curpr, stake, std)
@@ -1015,6 +1047,7 @@ func NewWaysTrigger(name string) IComponent {
 //
 // "rowMask": "mask-height4"
 // "genGigaSymbols2": "bg-gengiga"
+// "spGrid": "fg-wl-spgrid"
 type jsonWaysTrigger struct {
 	Symbols             []string `json:"symbols"`
 	TriggerType         string   `json:"triggerType"`
@@ -1027,6 +1060,7 @@ type jsonWaysTrigger struct {
 	OutputToComponent   string   `json:"outputToComponent"`
 	RowMask             string   `json:"rowMask"`
 	GenGigaSymbols2     string   `json:"genGigaSymbols2"`
+	SpGrid              string   `json:"spGrid"`
 }
 
 func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
@@ -1042,6 +1076,7 @@ func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
 		OutputToComponent:  jcfg.OutputToComponent,
 		RowMask:            jcfg.RowMask,
 		GenGigaSymbols2:    jcfg.GenGigaSymbols2,
+		SpGrid:             jcfg.SpGrid,
 	}
 
 	return cfg
