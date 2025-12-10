@@ -406,7 +406,7 @@ func (dropDownSymbols *DropDownSymbols2) downSymbol(tgs *sgc7game.GameScene, x, 
 		if newgigadata != nil {
 			dropDownSymbols.downGiga(tgs, newgigadata, ggcd)
 		} else {
-			dropDownSymbols.canDownSymbol(tgs, x, ny, ggcd)
+			dropDownSymbols.downSymbol(tgs, x, ny, ggcd)
 		}
 	} else {
 		tgs.Arr[x][ny] = tgs.Arr[x][y]

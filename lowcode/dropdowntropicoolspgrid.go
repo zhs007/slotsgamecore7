@@ -262,7 +262,7 @@ func (gen *DropDownTropiCoolSPGrid) downSymbol(tgs *sgc7game.GameScene, x, y int
 		if newgigadata != nil {
 			gen.downGiga(tgs, newgigadata, ggcd)
 		} else {
-			gen.canDownSymbol(tgs, x, ny, ggcd)
+			gen.downSymbol(tgs, x, ny, ggcd)
 		}
 	} else {
 		tgs.Arr[x][ny] = tgs.Arr[x][y]

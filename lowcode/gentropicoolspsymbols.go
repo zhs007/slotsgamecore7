@@ -202,13 +202,14 @@ func (gen *GenTropiCoolSPSymbols) InitEx(cfg any, pool *GamePropertyPool) error 
 	gen.Config.SymbolWeightVW = vw
 
 	gen.Config.MapSpSymbolCodes = make(map[int][]int)
-	for _, sc := range gen.Config.SpSymbolCodes {
+	for i, s := range gen.Config.SpSymbols {
+		sc = gen.Config.SpSymbolCodes[i]
 		gen.Config.MapSpSymbolCodes[sc] = make([]int, pool.Config.Height)
 
 		for i := 2; i <= pool.Config.Height; i++ {
 			gen.Config.MapSpSymbolCodes[sc][0] = sc
 
-			nsc, isok := pool.DefaultPaytables.MapSymbols[fmt.Sprintf("%v_%v", sc, i)]
+			nsc, isok := pool.DefaultPaytables.MapSymbols[fmt.Sprintf("%v_%v", s, i)]
 			if isok {
 				gen.Config.MapSpSymbolCodes[sc][i-1] = nsc
 			} else {
@@ -272,6 +273,10 @@ func (gen *GenTropiCoolSPSymbols) procSpSymbol(gs *sgc7game.GameScene, vw *sgc7g
 				}
 
 				spsc := cr.Int()
+
+				if spsc == gen.Config.BlankSymbolCode {
+					continue
+				}
 
 				msc, h := gen.Config.getSpSymbolInfo(spsc)
 				if msc < 0 {

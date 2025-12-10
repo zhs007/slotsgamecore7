@@ -355,16 +355,22 @@ func (gen *InitTropiCoolSPGrid) getWeight(gameProp *GameProperty, cd *InitTropiC
 	}
 
 	if cd.vw != gen.Config.WeightVM {
-		nospbonusvw, err := gen.Config.WeightVM.CloneExcludeVal(sgc7game.NewIntValEx(gen.Config.SpBonusSymbolCode))
-		if err != nil {
-			goutils.Error("InitTropiCoolSPGrid.getWeight:CloneExcludeVal",
-				goutils.Err(err))
+		arr := gen.Config.WeightVM.GetIntVals()
+		if slices.Contains(arr, gen.Config.SpBonusSymbolCode) {
+			nospbonusvw, err := gen.Config.WeightVM.CloneExcludeVal(sgc7game.NewIntValEx(gen.Config.SpBonusSymbolCode))
+			if err != nil {
+				goutils.Error("InitTropiCoolSPGrid.getWeight:CloneExcludeVal",
+					goutils.Err(err))
 
-			return nil, nil
+				return nil, nil
+			}
+
+			cd.vw = gen.Config.WeightVM
+			cd.vwNoSpBonus = nospbonusvw
+		} else {
+			cd.vw = gen.Config.WeightVM
+			cd.vwNoSpBonus = gen.Config.WeightVM
 		}
-
-		cd.vw = gen.Config.WeightVM
-		cd.vwNoSpBonus = nospbonusvw
 	}
 
 	return gen.Config.WeightVM, cd.vwNoSpBonus

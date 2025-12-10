@@ -138,4 +138,5 @@ func init() {
 	gJsonMgr.RegLoadComponent(strings.ToLower(CollectorPayTriggerTypeName), parseCollectorPayTrigger)
 	gJsonMgr.RegLoadComponent(strings.ToLower(TropiCoolExchangeTypeName), parseTropiCoolExchange)
 	gJsonMgr.RegLoadComponent(strings.ToLower(GenTropiCoolSPSymbolsTypeName), parseGenTropiCoolSPSymbols)
+	gJsonMgr.RegLoadComponent(strings.ToLower(TropiCoolSPBonusTypeName), parseTropiCoolSPBonus)
 }

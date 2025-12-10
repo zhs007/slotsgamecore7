@@ -144,6 +144,7 @@ func NewComponentMgr() *ComponentMgr {
 	mgr.Reg(CalculatorTypeName, NewCalculator)
 	mgr.Reg(TropiCoolExchangeTypeName, NewTropiCoolExchange)
 	mgr.Reg(GenTropiCoolSPSymbolsTypeName, NewGenTropiCoolSPSymbols)
+	mgr.Reg(TropiCoolSPBonusTypeName, NewTropiCoolSPBonus)
 
 	return mgr
 }
