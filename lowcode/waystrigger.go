@@ -431,6 +431,10 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 
 							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 						}, func(x, y int) int {
+							if os.Arr[x][y] <= 0 {
+								return 1
+							}
+
 							return os.Arr[x][y]
 						})
 
@@ -458,6 +462,10 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 
 							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 						}, func(x, y int) int {
+							if os.Arr[x][y] <= 0 {
+								return 1
+							}
+
 							return os.Arr[x][y]
 						})
 
@@ -576,6 +584,10 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 
 							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 						}, func(x, y int) int {
+							if os.Arr[x][y] <= 0 {
+								return 1
+							}
+
 							return os.Arr[x][y]
 						})
 
@@ -597,6 +609,10 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 
 							return goutils.IndexOfIntSlice(waysTrigger.Config.WildSymbolCodes, cursymbol, 0) >= 0
 						}, func(x, y int) int {
+							if os.Arr[x][y] <= 0 {
+								return 1
+							}
+
 							return os.Arr[x][y]
 						})
 
