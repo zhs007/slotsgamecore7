@@ -18,116 +18,113 @@ import (
 // CollectorPayTriggerTypeName is the component type name for the collector pay trigger.
 const CollectorPayTriggerTypeName = "collectorPayTrigger"
 
-type mainSymbolInfo struct {
-	symbolCode int
-	level      int
-	price      int
-	moved      bool
-	syms       []int
-}
-
 type CollectorPayTriggerData struct {
 	BasicComponentData
-	lstMainSymbols []*mainSymbolInfo
-	cfg            *CollectorPayTriggerConfig
+	corecd *CPCoreData
+	cfg    *CollectorPayTriggerConfig
 }
 
 func (cpt *CollectorPayTriggerData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	cpt.BasicComponentData.OnNewGame(gameProp, component)
 
-	for _, ms := range cpt.lstMainSymbols {
-		ms.level = 0
-		sc := ms.syms[0]
-		ms.price = gameProp.Pool.DefaultPaytables.MapPay[sc][0]
-	}
+	// for _, ms := range cpt.lstMainSymbols {
+	// 	ms.level = 0
+	// 	sc := ms.syms[0]
+	// 	ms.price = gameProp.Pool.DefaultPaytables.MapPay[sc][0]
+	// }
 }
 
 func (cpt *CollectorPayTriggerData) onLevelUp(mainSymbol int, off int) {
-	for _, ms := range cpt.lstMainSymbols {
-		if ms.symbolCode == mainSymbol {
-			ms.level += off
+	cpt.corecd.onLevelUp(mainSymbol, off)
+	// for _, ms := range cpt.lstMainSymbols {
+	// 	if ms.symbolCode == mainSymbol {
+	// 		ms.level += off
 
-			if ms.level >= len(cpt.cfg.MapSymbolCode[ms.symbolCode]) {
-				ms.level = len(cpt.cfg.MapSymbolCode[ms.symbolCode]) - 1
-			}
+	// 		if ms.level >= len(cpt.cfg.MapSymbolCode[ms.symbolCode]) {
+	// 			ms.level = len(cpt.cfg.MapSymbolCode[ms.symbolCode]) - 1
+	// 		}
 
-			ms.price = cpt.cfg.MapSymbolCode[ms.symbolCode][ms.level]
-		}
-	}
+	// 		ms.price = cpt.cfg.MapSymbolCode[ms.symbolCode][ms.level]
+	// 	}
+	// }
 }
 
 func (cpt *CollectorPayTriggerData) onAllLevelUp(off int) {
-	for _, ms := range cpt.lstMainSymbols {
-		ms.level += off
+	cpt.corecd.onAllLevelUp(off)
+	// for _, ms := range cpt.lstMainSymbols {
+	// 	ms.level += off
 
-		if ms.level >= len(cpt.cfg.MapSymbolCode[ms.symbolCode]) {
-			ms.level = len(cpt.cfg.MapSymbolCode[ms.symbolCode]) - 1
-		}
+	// 	if ms.level >= len(cpt.cfg.MapSymbolCode[ms.symbolCode]) {
+	// 		ms.level = len(cpt.cfg.MapSymbolCode[ms.symbolCode]) - 1
+	// 	}
 
-		ms.price = cpt.cfg.MapSymbolCode[ms.symbolCode][ms.level]
-	}
+	// 	ms.price = cpt.cfg.MapSymbolCode[ms.symbolCode][ms.level]
+	// }
 }
 
 func (cpt *CollectorPayTriggerData) getSymbolCode(ms int) int {
+	return cpt.corecd.getSymbolCode(ms)
+	// for _, msi := range cpt.lstMainSymbols {
+	// 	if msi.symbolCode == ms {
+	// 		return cpt.cfg.MapSymbolCode[ms][msi.level]
+	// 	}
+	// }
 
-	for _, msi := range cpt.lstMainSymbols {
-		if msi.symbolCode == ms {
-			return cpt.cfg.MapSymbolCode[ms][msi.level]
-		}
-	}
-
-	return -1
+	// return -1
 }
 
 func (cpt *CollectorPayTriggerData) getMainSymbolInfo(ms int) *mainSymbolInfo {
+	return cpt.corecd.getMainSymbolInfo(ms)
+	// for _, msi := range cpt.lstMainSymbols {
+	// 	if msi.symbolCode == ms {
+	// 		return msi
+	// 	}
+	// }
 
-	for _, msi := range cpt.lstMainSymbols {
-		if msi.symbolCode == ms {
-			return msi
-		}
-	}
-
-	return nil
+	// return nil
 }
 
 func (cpt *CollectorPayTriggerData) getNext() int {
-	msc := -1
-	msp := -1
+	return cpt.corecd.getNext()
+	// msc := -1
+	// msp := -1
 
-	for _, ms := range cpt.lstMainSymbols {
-		if ms.moved {
-			continue
-		}
+	// for _, ms := range cpt.lstMainSymbols {
+	// 	if ms.moved {
+	// 		continue
+	// 	}
 
-		if ms.price > msp {
-			msp = ms.price
-			msc = ms.symbolCode
-		}
-	}
+	// 	if ms.price > msp {
+	// 		msp = ms.price
+	// 		msc = ms.symbolCode
+	// 	}
+	// }
 
-	return msc
+	// return msc
 }
 
 func (cpt *CollectorPayTriggerData) moveEnd(ms int) {
-	for _, msi := range cpt.lstMainSymbols {
-		if msi.symbolCode == ms {
-			msi.moved = true
+	cpt.corecd.moveEnd(ms)
+	// for _, msi := range cpt.lstMainSymbols {
+	// 	if msi.symbolCode == ms {
+	// 		msi.moved = true
 
-			return
-		}
-	}
+	// 		return
+	// 	}
+	// }
 }
 
 func (cpt *CollectorPayTriggerData) procSymbolsWithLevel(gs *sgc7game.GameScene) {
-	for x, arr := range gs.Arr {
-		for y, sc := range arr {
-			for _, ms := range cpt.lstMainSymbols {
-				if slices.Contains(ms.syms, sc) {
-					gs.Arr[x][y] = ms.syms[ms.level]
-				}
-			}
-		}
-	}
+	cpt.corecd.procSymbolsWithLevel(gs)
+	// for x, arr := range gs.Arr {
+	// 	for y, sc := range arr {
+	// 		for _, ms := range cpt.lstMainSymbols {
+	// 			if slices.Contains(ms.syms, sc) {
+	// 				gs.Arr[x][y] = ms.syms[ms.level]
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 func (cpt *CollectorPayTriggerData) onNewStep() {
@@ -135,15 +132,17 @@ func (cpt *CollectorPayTriggerData) onNewStep() {
 	cpt.UsedResults = nil
 	cpt.Pos = nil
 
-	for _, ms := range cpt.lstMainSymbols {
-		ms.moved = false
-	}
+	cpt.corecd.clearMove()
+
+	// for _, ms := range cpt.lstMainSymbols {
+	// 	ms.moved = false
+	// }
 }
 
 func (cpt *CollectorPayTriggerData) Clone() IComponentData {
 	target := &CollectorPayTriggerData{
 		BasicComponentData: cpt.CloneBasicComponentData(),
-		lstMainSymbols:     slices.Clone(cpt.lstMainSymbols),
+		// lstMainSymbols:     slices.Clone(cpt.lstMainSymbols),
 	}
 
 	return target
@@ -185,6 +184,7 @@ type CollectorPayTriggerConfig struct {
 	JumpToComponent        string              `yaml:"jump" json:"jump"`
 	mapSymbolValues        map[int]int         `yaml:"-" json:"-"`
 	lstMainSymbols         []int               `yaml:"-" json:"-"`
+	CPCore                 string              `yaml:"cpCore" json:"cpCore"`
 	MapControllers         map[string][]*Award `yaml:"mapControllers" json:"mapControllers"` // 新的奖励系统
 }
 
@@ -758,7 +758,7 @@ func (cpt *CollectorPayTrigger) reinitScene(gs *sgc7game.GameScene, cd *Collecto
 				continue
 			}
 
-			for _, msi := range cd.lstMainSymbols {
+			for _, msi := range cd.corecd.lstMainSymbols {
 				if slices.Contains(msi.syms, gs.Arr[x][y]) {
 					gs.Arr[x][y] = msi.syms[msi.level]
 
@@ -981,7 +981,7 @@ func (cpt *CollectorPayTrigger) procAllUpLevel(gs *sgc7game.GameScene, off int, 
 
 	for x := 0; x < gs.Width; x++ {
 		for y := 0; y < gs.Height; y++ {
-			for _, msi := range cd.lstMainSymbols {
+			for _, msi := range cd.corecd.lstMainSymbols {
 				cursym := msi.syms[msi.level]
 
 				if slices.Contains(msi.syms, gs.Arr[x][y]) {
@@ -1210,12 +1210,45 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 	return nil
 }
 
+func (cpt *CollectorPayTrigger) getCPCoreData(gameProp *GameProperty) (*CPCoreData, error) {
+	icd := gameProp.GetComponentDataWithName(cpt.Config.CPCore)
+	if icd == nil {
+		goutils.Error("CollectorPayTrigger.getCPCoreData:GetComponentDataWithName",
+			slog.String("CPCore", cpt.Config.CPCore),
+			goutils.Err(ErrInvalidComponentData))
+
+		return nil, ErrInvalidComponentData
+	}
+
+	cd, isok := icd.(*CPCoreData)
+	if !isok {
+		goutils.Error("CollectorPayTrigger.getCPCoreData:ComponentDataType",
+			slog.String("CPCore", cpt.Config.CPCore),
+			goutils.Err(ErrInvalidComponentData))
+
+		return nil, ErrInvalidComponentData
+	}
+
+	return cd, nil
+}
+
 // OnPlayGame - check collector value and proc awards when reach threshold
 // OnPlayGame processes a play event for the component and returns the next component name (if any).
 func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
 	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, icd IComponentData) (string, error) {
 
 	cd := icd.(*CollectorPayTriggerData)
+
+	corecd, err := cpt.getCPCoreData(gameProp)
+	if err != nil {
+		goutils.Error("CollectorPayTrigger.OnPlayGame:getCPCoreData",
+			goutils.Err(err))
+
+		return "", err
+	}
+
+	cd.corecd = corecd
+
 	cd.onNewStep()
 
 	gs := cpt.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -1252,14 +1285,14 @@ func (cpt *CollectorPayTrigger) NewComponentData() IComponentData {
 		cfg: cpt.Config,
 	}
 
-	for _, ms := range cpt.Config.lstMainSymbols {
-		cd.lstMainSymbols = append(cd.lstMainSymbols, &mainSymbolInfo{
-			symbolCode: ms,
-			level:      0,
-			price:      0,
-			syms:       cpt.Config.MapSymbolCode[ms],
-		})
-	}
+	// for _, ms := range cpt.Config.lstMainSymbols {
+	// 	cd.lstMainSymbols = append(cd.lstMainSymbols, &mainSymbolInfo{
+	// 		symbolCode: ms,
+	// 		level:      0,
+	// 		price:      0,
+	// 		syms:       cpt.Config.MapSymbolCode[ms],
+	// 	})
+	// }
 
 	return cd
 }
@@ -1367,6 +1400,7 @@ func NewCollectorPayTrigger(name string) IComponent {
 //	"EG"
 //
 // ]
+// "cpCore": "bg-core"
 
 type jsonCPTSymbolData struct {
 	MainSymbol       string   `json:"mainSymbol"`
@@ -1390,6 +1424,7 @@ type jsonCollectorPayTrigger struct {
 	HighLevelSPSymbol      []string            `json:"highLevelSPSymbol"`
 	LowLevelSPSymbolCount  int                 `json:"lowLevelSPSymbolCount"`
 	LowLevelSPSymbol       []string            `json:"lowLevelSPSymbol"`
+	CPCore                 string              `json:"cpCore"`
 }
 
 func (j *jsonCollectorPayTrigger) build() *CollectorPayTriggerConfig {
@@ -1409,6 +1444,7 @@ func (j *jsonCollectorPayTrigger) build() *CollectorPayTriggerConfig {
 		HighLevelSPSymbols:     j.HighLevelSPSymbol,
 		LowLevelSPSymbolCount:  j.LowLevelSPSymbolCount,
 		LowLevelSPSymbols:      j.LowLevelSPSymbol,
+		CPCore:                 j.CPCore,
 	}
 
 	for _, ms := range j.MapSymbol {

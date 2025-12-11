@@ -21,8 +21,17 @@ import (
 
 const CPCoreTypeName = "CPCore"
 
+type mainSymbolInfo struct {
+	symbolCode int
+	level      int
+	price      int
+	moved      bool
+	syms       []int
+}
+
 type CPCoreData struct {
 	BasicComponentData
+	lstMainSymbols       []*mainSymbolInfo
 	isPopcornTriggered   bool
 	gridSize             int
 	isDontPressTriggered bool
@@ -33,6 +42,100 @@ type CPCoreData struct {
 	isSpSymPopcorn       bool
 	isSpSymDontPress     bool
 	spSymBonusNum        int
+}
+
+func (gcd *CPCoreData) clearMove() {
+	for _, ms := range gcd.lstMainSymbols {
+		ms.moved = false
+	}
+}
+
+func (gcd *CPCoreData) onLevelUp(mainSymbol int, off int) {
+	for _, ms := range gcd.lstMainSymbols {
+		if ms.symbolCode == mainSymbol {
+			ms.level += off
+
+			if ms.level >= len(gcd.cfg.MapSymbolCode[ms.symbolCode]) {
+				ms.level = len(gcd.cfg.MapSymbolCode[ms.symbolCode]) - 1
+			}
+
+			ms.price = gcd.cfg.MapSymbolCode[ms.symbolCode][ms.level]
+		}
+	}
+}
+
+func (gcd *CPCoreData) onAllLevelUp(off int) {
+	for _, ms := range gcd.lstMainSymbols {
+		ms.level += off
+
+		if ms.level >= len(gcd.cfg.MapSymbolCode[ms.symbolCode]) {
+			ms.level = len(gcd.cfg.MapSymbolCode[ms.symbolCode]) - 1
+		}
+
+		ms.price = gcd.cfg.MapSymbolCode[ms.symbolCode][ms.level]
+	}
+}
+
+func (gcd *CPCoreData) getSymbolCode(ms int) int {
+
+	for _, msi := range gcd.lstMainSymbols {
+		if msi.symbolCode == ms {
+			return gcd.cfg.MapSymbolCode[ms][msi.level]
+		}
+	}
+
+	return -1
+}
+
+func (gcd *CPCoreData) getMainSymbolInfo(ms int) *mainSymbolInfo {
+
+	for _, msi := range gcd.lstMainSymbols {
+		if msi.symbolCode == ms {
+			return msi
+		}
+	}
+
+	return nil
+}
+
+func (gcd *CPCoreData) getNext() int {
+	msc := -1
+	msp := -1
+
+	for _, ms := range gcd.lstMainSymbols {
+		if ms.moved {
+			continue
+		}
+
+		if ms.price > msp {
+			msp = ms.price
+			msc = ms.symbolCode
+		}
+	}
+
+	return msc
+}
+
+func (gcd *CPCoreData) moveEnd(ms int) {
+	for _, msi := range gcd.lstMainSymbols {
+		if msi.symbolCode == ms {
+			msi.moved = true
+
+			return
+		}
+	}
+}
+
+func (gcd *CPCoreData) procSymbolsWithLevel(gs *sgc7game.GameScene) {
+	for x, arr := range gs.Arr {
+		for y, sc := range arr {
+			for _, ms := range gcd.lstMainSymbols {
+				if slices.Contains(ms.syms, sc) {
+					gs.Arr[x][y] = ms.syms[ms.level]
+				}
+			}
+		}
+	}
 }
 
 func (gcd *CPCoreData) isCoin(sym int) bool {
@@ -114,6 +217,12 @@ func (gcd *CPCoreData) OnNewGame(gameProp *GameProperty, component IComponent) {
 	gcd.spSymBonusNum = 0
 
 	gcd.spSymVW = gcd.cfg.SpSymbolWeightVW
+
+	for _, ms := range gcd.lstMainSymbols {
+		ms.level = 0
+		sc := ms.syms[0]
+		ms.price = gameProp.Pool.DefaultPaytables.MapPay[sc][0]
+	}
 }
 
 // OnNewStep -
@@ -130,6 +239,12 @@ func (gcd *CPCoreData) Clone() IComponentData {
 		isEggTriggered:       gcd.isEggTriggered,
 		isDontPressTriggered: gcd.isDontPressTriggered,
 		cfg:                  gcd.cfg,
+		spSymVW:              gcd.spSymVW,
+		isSpSymEgg:           gcd.isSpSymEgg,
+		isSpSymPopcorn:       gcd.isSpSymPopcorn,
+		isSpSymDontPress:     gcd.isSpSymDontPress,
+		spSymBonusNum:        gcd.spSymBonusNum,
+		lstMainSymbols:       slices.Clone(gcd.lstMainSymbols),
 	}
 
 	return target
@@ -707,9 +822,20 @@ func (cpc *CPCore) OnAsciiGame(gameProp *GameProperty, pr *sgc7game.PlayResult, 
 
 // NewComponentData -
 func (cpc *CPCore) NewComponentData() IComponentData {
-	return &CPCoreData{
+	cd := &CPCoreData{
 		cfg: cpc.Config,
 	}
+
+	for _, ms := range cpc.Config.lstMainSymbols {
+		cd.lstMainSymbols = append(cd.lstMainSymbols, &mainSymbolInfo{
+			symbolCode: ms,
+			level:      0,
+			price:      0,
+			syms:       cpc.Config.MapSymbolCode[ms],
+		})
+	}
+
+	return cd
 }
 
 func NewCPCore(name string) IComponent {
