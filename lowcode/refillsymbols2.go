@@ -98,6 +98,7 @@ type RefillSymbols2Config struct {
 	MaskX                string `yaml:"maskX" json:"maskX"`                               // maskX
 	MaskY                string `yaml:"maskY" json:"maskY"`                               // maskY
 	CollectorPay         string `yaml:"collectorPay" json:"collectorPay"`                 // collectorPay
+	CPCore               string `yaml:"cpCore" json:"cpCore"`                             // cpCore
 }
 
 // SetLinkComponent
@@ -550,13 +551,31 @@ func (refillSymbols2 *RefillSymbols2) procCollectorPay(gameProp *GameProperty, g
 	cptd.procSymbolsWithLevel(gs)
 }
 
-// playgame
-func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+func (refillSymbols2 *RefillSymbols2) getCPCoreData(gameProp *GameProperty) (*CPCoreData, error) {
+	icd := gameProp.GetComponentDataWithName(refillSymbols2.Config.CPCore)
+	if icd == nil {
+		goutils.Error("RefillSymbols2.getCPCoreData:GetComponentDataWithName",
+			slog.String("CPCore", refillSymbols2.Config.CPCore),
+			goutils.Err(ErrInvalidComponentData))
 
-	rs2d := cd.(*RefillSymbols2Data)
+		return nil, ErrInvalidComponentData
+	}
 
-	rs2d.onNewStep()
+	cd, isok := icd.(*CPCoreData)
+	if !isok {
+		goutils.Error("RefillSymbols2.getCPCoreData:ComponentDataType",
+			slog.String("CPCore", refillSymbols2.Config.CPCore),
+			goutils.Err(ErrInvalidComponentData))
+
+		return nil, ErrInvalidComponentData
+	}
+
+	return cd, nil
+}
+
+func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, rcd *RefillSymbols2Data) (
+	*sgc7game.GameScene, *sgc7game.GameScene, bool, error) {
 
 	gs := refillSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
 
@@ -573,14 +592,14 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 				slog.String("outputToComponent", refillSymbols2.Config.OutputToComponent),
 				goutils.Err(ErrInvalidComponent))
 
-			return "", ErrInvalidComponent
+			return nil, nil, false, ErrInvalidComponent
 		}
 
 		outputCD.ClearPos()
 	}
 
-	height := refillSymbols2.getHeight(&rs2d.BasicComponentData)
-	maskX := refillSymbols2.getMaskX(gameProp, &rs2d.BasicComponentData)
+	height := refillSymbols2.getHeight(&rcd.BasicComponentData)
+	maskX := refillSymbols2.getMaskX(gameProp, &rcd.BasicComponentData)
 
 	if maskX != "" {
 		if height > 0 && height < gs.Height {
@@ -589,25 +608,21 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 				goutils.Error("RefillSymbols2.OnPlayGame:refillHeightAndMaskX",
 					goutils.Err(err))
 
-				return "", err
+				return nil, nil, false, err
 			}
 
 			if ngs == gs {
-				nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-				return nc, ErrComponentDoNothing
+				return nil, nil, false, nil
 			}
 
 			refillSymbols2.procCollectorPay(gameProp, ngs)
 
-			refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+			refillSymbols2.AddScene(gameProp, curpr, ngs, &rcd.BasicComponentData)
 			if nos != nil {
-				refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+				refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rcd.BasicComponentData)
 			}
 
-			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, nil
+			return ngs, nos, true, nil
 		}
 
 		ngs, nos, err := refillSymbols2.refillMaskX(gameProp, plugin, gs, os, maskX, outputCD)
@@ -615,66 +630,235 @@ func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *
 			goutils.Error("RefillSymbols2.OnPlayGame:refillMaskX",
 				goutils.Err(err))
 
-			return "", err
+			return nil, nil, false, err
 		}
 
 		if ngs == gs {
-			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
+			return nil, nil, false, nil
 		}
 
 		if nos != nil {
-			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rcd.BasicComponentData)
 		}
 
 		refillSymbols2.procCollectorPay(gameProp, ngs)
 
-		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+		refillSymbols2.AddScene(gameProp, curpr, ngs, &rcd.BasicComponentData)
 
-		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-		return nc, nil
+		return ngs, nos, true, nil
 	}
 
 	if height > 0 && height < gs.Height {
 		ngs, nos := refillSymbols2.refillOnlyHeight(gameProp, gs, os, height, outputCD)
 		if ngs == gs {
-			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-			return nc, ErrComponentDoNothing
+			return nil, nil, false, nil
 		}
 
 		refillSymbols2.procCollectorPay(gameProp, ngs)
 
-		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+		refillSymbols2.AddScene(gameProp, curpr, ngs, &rcd.BasicComponentData)
 		if nos != nil {
-			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rcd.BasicComponentData)
 		}
 
-		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
-
-		return nc, nil
+		return ngs, nos, true, nil
 	}
 
 	ngs, nos := refillSymbols2.refill(gameProp, gs, os, outputCD)
 	if ngs == gs {
+		return nil, nil, false, nil
+	}
+
+	if nos != nil {
+		refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rcd.BasicComponentData)
+	}
+
+	refillSymbols2.procCollectorPay(gameProp, ngs)
+
+	refillSymbols2.AddScene(gameProp, curpr, ngs, &rcd.BasicComponentData)
+
+	return ngs, nos, true, nil
+}
+
+// playgame
+func (refillSymbols2 *RefillSymbols2) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, cd IComponentData) (string, error) {
+
+	rs2d := cd.(*RefillSymbols2Data)
+
+	rs2d.onNewStep()
+
+	if refillSymbols2.Config.CPCore != "" {
+		ngs, nos, isTriggered, err := refillSymbols2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, rs2d)
+		if err != nil {
+			goutils.Error("RefillSymbols2.OnPlayGame:onPlayGame",
+				goutils.Err(err))
+
+			return "", err
+		}
+
+		if isTriggered {
+			cpcorecd, err := refillSymbols2.getCPCoreData(gameProp)
+			if err != nil {
+				goutils.Error("RefillSymbols2.OnPlayGame:getCPCoreData",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			err = cpcorecd.onRefillSymbols2(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, rs2d, refillSymbols2, ngs, nos)
+			if err != nil {
+				goutils.Error("RefillSymbols2.OnPlayGame:onRefillSymbols2",
+					goutils.Err(err))
+
+				return "", err
+			}
+
+			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
+		}
+
 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
 		return nc, ErrComponentDoNothing
 	}
 
-	if nos != nil {
-		refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+	_, _, isTriggered, err := refillSymbols2.onPlayGame(gameProp, curpr, gp, plugin, cmd, param, ps, stake, prs, rs2d)
+	if err != nil {
+		goutils.Error("RefillSymbols2.OnPlayGame:onPlayGame",
+			goutils.Err(err))
+
+		return "", err
 	}
 
-	refillSymbols2.procCollectorPay(gameProp, ngs)
+	if !isTriggered {
+		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
-	refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+		return nc, ErrComponentDoNothing
+	}
 
 	nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
 
 	return nc, nil
+
+	// gs := refillSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
+
+	// var os *sgc7game.GameScene
+	// if refillSymbols2.Config.IsNeedProcSymbolVals {
+	// 	os = refillSymbols2.GetTargetOtherScene3(gameProp, curpr, prs, 0)
+	// }
+
+	// var outputCD IComponentData
+	// if refillSymbols2.Config.OutputToComponent != "" {
+	// 	outputCD = gameProp.GetComponentDataWithName(refillSymbols2.Config.OutputToComponent)
+	// 	if outputCD == nil {
+	// 		goutils.Error("RefillSymbols2.OnPlayGame:OutputToComponent",
+	// 			slog.String("outputToComponent", refillSymbols2.Config.OutputToComponent),
+	// 			goutils.Err(ErrInvalidComponent))
+
+	// 		return "", ErrInvalidComponent
+	// 	}
+
+	// 	outputCD.ClearPos()
+	// }
+
+	// height := refillSymbols2.getHeight(&rs2d.BasicComponentData)
+	// maskX := refillSymbols2.getMaskX(gameProp, &rs2d.BasicComponentData)
+
+	// if maskX != "" {
+	// 	if height > 0 && height < gs.Height {
+	// 		ngs, nos, err := refillSymbols2.refillHeightAndMaskX(gameProp, plugin, gs, os, height, maskX, outputCD)
+	// 		if err != nil {
+	// 			goutils.Error("RefillSymbols2.OnPlayGame:refillHeightAndMaskX",
+	// 				goutils.Err(err))
+
+	// 			return "", err
+	// 		}
+
+	// 		if ngs == gs {
+	// 			nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 			return nc, ErrComponentDoNothing
+	// 		}
+
+	// 		refillSymbols2.procCollectorPay(gameProp, ngs)
+
+	// 		refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+	// 		if nos != nil {
+	// 			refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+	// 		}
+
+	// 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 		return nc, nil
+	// 	}
+
+	// 	ngs, nos, err := refillSymbols2.refillMaskX(gameProp, plugin, gs, os, maskX, outputCD)
+	// 	if err != nil {
+	// 		goutils.Error("RefillSymbols2.OnPlayGame:refillMaskX",
+	// 			goutils.Err(err))
+
+	// 		return "", err
+	// 	}
+
+	// 	if ngs == gs {
+	// 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 		return nc, ErrComponentDoNothing
+	// 	}
+
+	// 	if nos != nil {
+	// 		refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+	// 	}
+
+	// 	refillSymbols2.procCollectorPay(gameProp, ngs)
+
+	// 	refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+
+	// 	nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 	return nc, nil
+	// }
+
+	// if height > 0 && height < gs.Height {
+	// 	ngs, nos := refillSymbols2.refillOnlyHeight(gameProp, gs, os, height, outputCD)
+	// 	if ngs == gs {
+	// 		nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 		return nc, ErrComponentDoNothing
+	// 	}
+
+	// 	refillSymbols2.procCollectorPay(gameProp, ngs)
+
+	// 	refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+	// 	if nos != nil {
+	// 		refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+	// 	}
+
+	// 	nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 	return nc, nil
+	// }
+
+	// ngs, nos := refillSymbols2.refill(gameProp, gs, os, outputCD)
+	// if ngs == gs {
+	// 	nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// 	return nc, ErrComponentDoNothing
+	// }
+
+	// if nos != nil {
+	// 	refillSymbols2.AddOtherScene(gameProp, curpr, nos, &rs2d.BasicComponentData)
+	// }
+
+	// refillSymbols2.procCollectorPay(gameProp, ngs)
+
+	// refillSymbols2.AddScene(gameProp, curpr, ngs, &rs2d.BasicComponentData)
+
+	// nc := refillSymbols2.onStepEnd(gameProp, curpr, gp, "")
+
+	// return nc, nil
 }
 
 // OnAsciiGame - outpur to asciigame
@@ -711,6 +895,7 @@ func NewRefillSymbols2(name string) IComponent {
 // "Height": 6,
 // "maskX": "mask-6"
 // "collectorPay": "bg-pay"
+// "cpCore": "bg-core"
 type jsonRefillSymbols2 struct {
 	IsNeedProcSymbolVals bool   `json:"isNeedProcSymbolVals"` // 是否需要同时处理symbolVals
 	EmptySymbolVal       int    `json:"emptySymbolVal"`       // 空的symbolVal是什么
@@ -720,6 +905,7 @@ type jsonRefillSymbols2 struct {
 	MaskX                string `json:"maskX"`                // maskX
 	MaskY                string `json:"maskY"`                // maskY
 	CollectorPay         string `json:"collectorPay"`         // collectorPay
+	CPCore               string `json:"cpCore"`               // cpCore
 }
 
 func (jcfg *jsonRefillSymbols2) build() *RefillSymbols2Config {

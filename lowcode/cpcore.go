@@ -46,6 +46,19 @@ type CPCoreData struct {
 	spSymBonusNum        int
 }
 
+func (gcd *CPCoreData) onRefillSymbols2(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
+	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, rcd *RefillSymbols2Data,
+	rf *RefillSymbols2, ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
+
+	if nos == nil {
+		nos = gameProp.PoolScene.New(ngs.Width, ngs.Height)
+
+		rf.AddOtherScene(gameProp, curpr, nos, &rcd.BasicComponentData)
+	}
+
+	return nil
+}
+
 func (gcd *CPCoreData) setMainSymbolPos(ms int, x, y int) {
 	for _, msi := range gcd.lstMainSymbols {
 		if msi.symbolCode == ms {
