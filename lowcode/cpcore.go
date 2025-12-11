@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math/rand"
 	"os"
 	"slices"
 	"sort"
@@ -27,6 +28,7 @@ type mainSymbolInfo struct {
 	price      int
 	moved      bool
 	syms       []int
+	x, y       int
 }
 
 type CPCoreData struct {
@@ -42,6 +44,53 @@ type CPCoreData struct {
 	isSpSymPopcorn       bool
 	isSpSymDontPress     bool
 	spSymBonusNum        int
+}
+
+func (gcd *CPCoreData) setMainSymbolPos(ms int, x, y int) {
+	for _, msi := range gcd.lstMainSymbols {
+		if msi.symbolCode == ms {
+			msi.x = x
+			msi.y = y
+
+			return
+		}
+	}
+}
+
+func (gcd *CPCoreData) resortMainSymbol(gs *sgc7game.GameScene) {
+	arr := []int{0, 1, 2, 3}
+
+	pos := []int{}
+	for _, msi := range gcd.lstMainSymbols {
+		pos = append(pos, msi.x, msi.y)
+	}
+
+	rand.Shuffle(4, func(i, j int) {
+		t := arr[i]
+		arr[i] = arr[j]
+		arr[j] = t
+	})
+
+	for i, msi := range gcd.lstMainSymbols {
+		msi.x = pos[arr[i]*2]
+		msi.y = pos[arr[i]*2+1]
+
+		gs.Arr[msi.x][msi.y] = msi.symbolCode
+	}
+}
+
+func (gcd *CPCoreData) isWild(sym int) bool {
+	return sym == gcd.cfg.WildUsedSymbolCode ||
+		sym == gcd.cfg.WildSymbolCode
+}
+
+func (gcd *CPCoreData) isNeedBack(sym int) bool {
+	return sym == gcd.cfg.EggUsedSymbolCode ||
+		sym == gcd.cfg.DontPressUsedSymbolCode ||
+		sym == gcd.cfg.WildUsedSymbolCode ||
+		sym == gcd.cfg.EggSymbolCode ||
+		sym == gcd.cfg.DontPressSymbolCode ||
+		sym == gcd.cfg.WildSymbolCode
 }
 
 func (gcd *CPCoreData) clearMove() {
@@ -755,6 +804,8 @@ func (cpc *CPCore) OnPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult
 		x, y := posd.Get(ci)
 		ngs.Arr[x][y] = k
 		posd.Del(ci)
+
+		cd.setMainSymbolPos(k, x, y)
 	}
 
 	spnum, err := cd.randSpNum(plugin)

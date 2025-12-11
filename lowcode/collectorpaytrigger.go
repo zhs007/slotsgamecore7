@@ -1008,6 +1008,26 @@ func (cpt *CollectorPayTrigger) procUpLevel(gs *sgc7game.GameScene, ms int, off 
 	}
 }
 
+func (cpt *CollectorPayTrigger) procEgg(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			if gs.Arr[x][y] == cd.corecd.cfg.EggUsedSymbolCode {
+				ngs := gs.CloneEx(gameProp.PoolScene)
+				nos := os.CloneEx(gameProp.PoolScene)
+
+				ngs.Arr[x][y] = -1
+				nos.Arr[x][y] = -1
+
+				cd.corecd.resortMainSymbol(ngs)
+
+				return ngs, nos
+			}
+		}
+	}
+
+	return nil, nil
+}
+
 func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
 	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
 	cd *CollectorPayTriggerData) (*sgc7game.GameScene, int, int, error) {
@@ -1034,6 +1054,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 	ex := sx
 	ey := sy
 
+	prex := sx
+	prey := sy
+
 	curRet := &sgc7game.Result{
 		Symbol:    ms,
 		Type:      sgc7game.RTCollectorPay,
@@ -1053,9 +1076,18 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 			ex = x
 			ey = y
 
+			prex = x
+			prey = y
+
 			curRet.Pos = append(curRet.Pos, x, y)
-		} else if ngs.Arr[x][y] == cpt.Config.WildSymbolCode {
+		} else if cd.corecd.isWild(ngs.Arr[x][y]) {
 			curRet.Pos = append(curRet.Pos, x, y)
+
+			ngs.Arr[x][y] = cd.corecd.cfg.WildUsedSymbolCode
+			os.Arr[x][y] = 0
+
+			ex = x
+			ey = y
 		}
 
 		alluplevelIndex := slices.Index(cpt.Config.AllUpLevelSymbolCodes, ngs.Arr[x][y])
@@ -1067,6 +1099,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			ex = x
 			ey = y
+
+			prex = x
+			prey = y
 
 			curRet.Pos = append(curRet.Pos, x, y)
 		}
@@ -1080,6 +1115,9 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			ex = x
 			ey = y
+
+			prex = x
+			prey = y
 
 			curRet.Pos = append(curRet.Pos, x, y)
 		}
@@ -1110,17 +1148,43 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 			ex = x
 			ey = y
 
+			prex = x
+			prey = y
+
 			curRet.Pos = append(curRet.Pos, x, y)
 
 			cpt.AddResult(curpr, ret, &cd.BasicComponentData)
 		}
 
-		if ngs.Arr[x][y] == cpt.Config.SwitcherSymbolCode || ngs.Arr[x][y] == cpt.Config.PopcornSymbolCode || ngs.Arr[x][y] == cpt.Config.EggSymbolCode || ngs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+		if ngs.Arr[x][y] == cpt.Config.EggSymbolCode {
+			ngs.Arr[x][y] = cd.corecd.cfg.EggUsedSymbolCode
+			os.Arr[x][y] = 0
+
+			ex = x
+			ey = y
+
+			curRet.Pos = append(curRet.Pos, x, y)
+		}
+
+		if ngs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+			ngs.Arr[x][y] = cd.corecd.cfg.DontPressUsedSymbolCode
+			os.Arr[x][y] = 0
+
+			ex = x
+			ey = y
+
+			curRet.Pos = append(curRet.Pos, x, y)
+		}
+
+		if ngs.Arr[x][y] == cpt.Config.SwitcherSymbolCode || ngs.Arr[x][y] == cpt.Config.PopcornSymbolCode {
 			ngs.Arr[x][y] = -2
 			os.Arr[x][y] = -1
 
 			ex = x
 			ey = y
+
+			prex = x
+			prey = y
 
 			curRet.Pos = append(curRet.Pos, x, y)
 		}
@@ -1131,7 +1195,17 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		cpt.AddResult(curpr, curRet, &cd.BasicComponentData)
 	}
 
-	ngs.Arr[ex][ey] = ms
+	if cd.corecd.isNeedBack(ngs.Arr[ex][ey]) {
+		ngs.Arr[prex][prey] = ms
+
+		cd.corecd.setMainSymbolPos(ms, prex, prey)
+
+		curRet.Pos = append(curRet.Pos, prex, prey)
+	} else {
+		ngs.Arr[ex][ey] = ms
+
+		cd.corecd.setMainSymbolPos(ms, ex, ey)
+	}
 
 	cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 
@@ -1265,9 +1339,15 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	if len(cd.UsedResults) > 0 {
 		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
-	}
 
-	cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+	} else {
+		ngs, nos := cpt.procEgg(gameProp, ngs, nos, cd)
+		if ngs != nil {
+			cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+			cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		}
+	}
 
 	nc := cpt.onStepEnd(gameProp, curpr, gp, "")
 
