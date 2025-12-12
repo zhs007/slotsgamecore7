@@ -232,6 +232,15 @@ func (cfg *GenGigaSymbols2Config) isBroken(sc int) bool {
 	return slices.Contains(cfg.BrokenSymbolCodes, sc)
 }
 
+// func (cfg *GenGigaSymbols2Config) mergeGigaData(mapGiga map[int][]int) {
+// 	for k, v := range mapGiga {
+// 		_, isok := cfg.GigaSymbolCodes[k]
+// 		if !isok {
+// 			cfg.GigaSymbolCodes[k] = v
+// 		}
+// 	}
+// }
+
 // SetLinkComponent
 func (cfg *GenGigaSymbols2Config) SetLinkComponent(link string, componentName string) {
 	if link == "next" {

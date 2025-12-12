@@ -433,6 +433,12 @@ func (gen *DropDownTropiCoolSPGrid) OnPlayGame(gameProp *GameProperty, curpr *sg
 		return "", err
 	}
 
+	// if !iicd.isInited {
+	// 	ggcd.cfg.mergeGigaData(iicd.cfg.MapGigaSymbolCodes)
+
+	// 	iicd.isInited = true
+	// }
+
 	newspgrid := spgrid.CloneEx(gameProp.PoolScene)
 
 	gs := gameProp.SceneStack.GetTopSceneEx(curpr, prs)

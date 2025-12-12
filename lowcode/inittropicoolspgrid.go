@@ -24,6 +24,7 @@ type InitTropiCoolSPGridData struct {
 	vwNoSpBonus    *sgc7game.ValWeights2
 	gigaData       []*gigaData
 	cfg            *InitTropiCoolSPGridConfig
+	// isInited       bool
 }
 
 func (itcdpg *InitTropiCoolSPGridData) alignStep(sx int) {
@@ -89,6 +90,7 @@ func (itcdpg *InitTropiCoolSPGridData) OnNewGame(gameProp *GameProperty, compone
 
 	itcdpg.isSpBounsAdded = false
 	itcdpg.gigaData = nil
+	// itcdpg.isInited = false
 }
 
 func (itcdpg *InitTropiCoolSPGridData) onNewStep() {
