@@ -148,6 +148,7 @@ type WaysTriggerConfig struct {
 	GenGigaSymbols2                 string                        `yaml:"genGigaSymbols2" json:"genGigaSymbols2"`
 	RowMask                         string                        `yaml:"rowMask" json:"rowMask"`
 	SpGrid                          string                        `yaml:"spGrid" json:"spGrid"`
+	IsWildColMultiAdd               bool                          `yaml:"isWildColMultiAdd" json:"isWildColMultiAdd"`
 }
 
 // SetLinkComponent
@@ -698,6 +699,37 @@ func (waysTrigger *WaysTrigger) canTrigger(gameProp *GameProperty, gs *sgc7game.
 		isTrigger = !isTrigger
 	}
 
+	if waysTrigger.Config.IsWildColMultiAdd {
+
+		for _, v := range lst {
+			v.OtherMul = 0
+			wmarr := make([]bool, gs.Width)
+
+			for i := 0; i < len(v.Pos)/2; i++ {
+				x := v.Pos[i*2]
+
+				if x == 0 {
+					continue
+				}
+
+				y := v.Pos[i*2+1]
+
+				if slices.Contains(waysTrigger.Config.WildSymbolCodes, gs.Arr[x][y]) {
+					wmarr[x] = true
+				}
+			}
+
+			for x, iswildcol := range wmarr {
+				if iswildcol {
+					v.OtherMul += x + 1
+				}
+			}
+
+			v.CashWin *= v.OtherMul
+			v.CoinWin *= v.OtherMul
+		}
+	}
+
 	return isTrigger, lst
 }
 
@@ -1064,6 +1096,7 @@ func NewWaysTrigger(name string) IComponent {
 // "rowMask": "mask-height4"
 // "genGigaSymbols2": "bg-gengiga"
 // "spGrid": "fg-wl-spgrid"
+// "isWildColMultiAdd": true
 type jsonWaysTrigger struct {
 	Symbols             []string `json:"symbols"`
 	TriggerType         string   `json:"triggerType"`
@@ -1077,6 +1110,7 @@ type jsonWaysTrigger struct {
 	RowMask             string   `json:"rowMask"`
 	GenGigaSymbols2     string   `json:"genGigaSymbols2"`
 	SpGrid              string   `json:"spGrid"`
+	IsWildColMultiAdd   bool     `json:"isWildColMultiAdd"`
 }
 
 func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
@@ -1093,6 +1127,7 @@ func (jcfg *jsonWaysTrigger) build() *WaysTriggerConfig {
 		RowMask:            jcfg.RowMask,
 		GenGigaSymbols2:    jcfg.GenGigaSymbols2,
 		SpGrid:             jcfg.SpGrid,
+		IsWildColMultiAdd:  jcfg.IsWildColMultiAdd,
 	}
 
 	return cfg

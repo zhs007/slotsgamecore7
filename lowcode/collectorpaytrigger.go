@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"slices"
@@ -515,235 +516,245 @@ func (cpt *CollectorPayTrigger) ProcControllers(gameProp *GameProperty, plugin s
 	}
 }
 
-func (cpt *CollectorPayTrigger) calcSymbolCodeValue(symbol int, mainSymbol int) int {
-	v, isok := cpt.Config.mapSymbolValues[symbol]
-	if isok {
-		if v == 4 && !slices.Contains(cpt.Config.MapSymbolCode[mainSymbol], symbol) {
-			return -1
-		}
+// func (cpt *CollectorPayTrigger) calcSymbolCodeValue(symbol int, mainSymbol int) int {
+// 	v, isok := cpt.Config.mapSymbolValues[symbol]
+// 	if isok {
+// 		if v == 4 && !slices.Contains(cpt.Config.MapSymbolCode[mainSymbol], symbol) {
+// 			return -1
+// 		}
 
-		if v == 1 && symbol != mainSymbol {
-			return -1
-		}
+// 		if v == 1 && symbol != mainSymbol {
+// 			return -1
+// 		}
 
-		return v
-	}
+// 		return v
+// 	}
 
-	return -1
-}
+// 	return -1
+// }
 
-// 计算这个位置的价值,如果已经走过了,返回-1,如果是空位置,且isIgnoreEmpty为true,也返回-1,如果isIgnoreEmpty为false,返回0
-func (cpt *CollectorPayTrigger) calcTileValue(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) int {
-	if pd.Has(x, y) {
-		return -1
-	}
+// // 计算这个位置的价值,如果已经走过了,返回-1,如果是空位置,且isIgnoreEmpty为true,也返回-1,如果isIgnoreEmpty为false,返回0
+// func (cpt *CollectorPayTrigger) calcTileValue(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) int {
+// 	if pd.Has(x, y) {
+// 		return -1
+// 	}
 
-	if gs.Arr[x][y] == -3 {
-		return -1
-	}
+// 	if gs.Arr[x][y] == -3 {
+// 		return -1
+// 	}
 
-	if gs.Arr[x][y] == -2 {
-		return 0
-	}
+// 	if gs.Arr[x][y] == -2 {
+// 		return 0
+// 	}
 
-	if gs.Arr[x][y] == -1 {
-		if isIgnoreEmpty {
-			return 0
-		}
+// 	if gs.Arr[x][y] == -1 {
+// 		if isIgnoreEmpty {
+// 			return 0
+// 		}
 
-		return -1
-	}
+// 		return -1
+// 	}
 
-	return cpt.calcSymbolCodeValue(gs.Arr[x][y], mainSymbol)
-}
+// 	return cpt.calcSymbolCodeValue(gs.Arr[x][y], mainSymbol)
+// }
 
-func (cpt *CollectorPayTrigger) isCanEnding(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) bool {
-	if y < gs.Height-1 {
-		cv := cpt.calcTileValue(gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
-		if cv >= 0 {
-			return false
-		}
-	}
+// func (cpt *CollectorPayTrigger) isCanEnding(gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) bool {
+// 	if y < gs.Height-1 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
+// 		if cv >= 0 {
+// 			return false
+// 		}
+// 	}
 
-	if y > 0 {
-		cv := cpt.calcTileValue(gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
-		if cv >= 0 {
-			return false
-		}
-	}
+// 	if y > 0 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
+// 		if cv >= 0 {
+// 			return false
+// 		}
+// 	}
 
-	if x > 0 {
-		cv := cpt.calcTileValue(gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
-		if cv >= 0 {
-			return false
-		}
-	}
+// 	if x > 0 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
+// 		if cv >= 0 {
+// 			return false
+// 		}
+// 	}
 
-	if x < gs.Width-1 {
-		cv := cpt.calcTileValue(gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
-		if cv >= 0 {
-			return false
-		}
-	}
+// 	if x < gs.Width-1 {
+// 		cv := cpt.calcTileValue(gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
+// 		if cv >= 0 {
+// 			return false
+// 		}
+// 	}
 
-	return true
-}
+// 	return true
+// }
 
-// 找到一条路径,返回该路径上的最大价值以及路径数组,找到第一个大于普通符号的位置就返回
-func (cpt *CollectorPayTrigger) findPathDeep(gameProp *GameProperty, gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) (int, *PosData) {
-	csv := cpt.calcTileValue(gs, mainSymbol, x, y, pd, isIgnoreEmpty)
-	if csv < 0 {
-		return -1, nil
-	}
+// // 找到一条路径,返回该路径上的最大价值以及路径数组,找到第一个大于普通符号的位置就返回
+// func (cpt *CollectorPayTrigger) findPathDeep(gameProp *GameProperty, gs *sgc7game.GameScene, mainSymbol int, x, y int, pd *PosData, isIgnoreEmpty bool) (int, *PosData) {
+// 	csv := cpt.calcTileValue(gs, mainSymbol, x, y, pd, isIgnoreEmpty)
+// 	if csv < 0 {
+// 		return -1, nil
+// 	}
 
-	if csv > 4 {
-		npd := gameProp.posPool.Clone(pd)
-		npd.Add(x, y)
+// 	if csv > 4 {
+// 		npd := gameProp.posPool.Clone(pd)
+// 		npd.Add(x, y)
 
-		return csv, npd
-	}
+// 		return csv, npd
+// 	}
 
-	if csv != 4 && csv != 0 {
-		npd := gameProp.posPool.Clone(pd)
-		npd.Add(x, y)
+// 	if csv != 4 && csv != 0 {
+// 		npd := gameProp.posPool.Clone(pd)
+// 		npd.Add(x, y)
 
-		return csv, npd
-	}
+// 		return csv, npd
+// 	}
 
-	tmppd := gameProp.posPool.Clone(pd)
-	tmppd.Add(x, y)
+// 	tmppd := gameProp.posPool.Clone(pd)
+// 	tmppd.Add(x, y)
 
-	if cpt.isCanEnding(gs, mainSymbol, x, y, tmppd, isIgnoreEmpty) {
-		return csv, tmppd
-	}
+// 	if cpt.isCanEnding(gs, mainSymbol, x, y, tmppd, isIgnoreEmpty) {
+// 		return csv, tmppd
+// 	}
 
-	maxv := -1
-	var maxvpd *PosData
+// 	maxv := -1
+// 	var maxvpd *PosData
 
-	if y < gs.Height-1 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, tmppd, isIgnoreEmpty)
-		if cdv >= 0 {
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
+// 	if y < gs.Height-1 {
+// 		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, tmppd, isIgnoreEmpty)
+// 		if cdv >= 0 {
+// 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 				maxv = cdv
 
-				maxvpd = cdpd
-			}
-		}
-	}
+// 				maxvpd = cdpd
+// 			}
+// 		}
+// 	}
 
-	if y > 0 {
-		if maxvpd == nil || !maxvpd.Has(x, y-1) {
-			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, tmppd, isIgnoreEmpty)
-			if cdv >= 0 {
-				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-					maxv = cdv
+// 	if y > 0 {
+// 		if maxvpd == nil || !maxvpd.Has(x, y-1) {
+// 			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, tmppd, isIgnoreEmpty)
+// 			if cdv >= 0 {
+// 				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 					maxv = cdv
 
-					maxvpd = cdpd
-				}
-			}
-		}
-	}
+// 					maxvpd = cdpd
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if x > 0 {
-		if maxvpd == nil || !maxvpd.Has(x-1, y) {
-			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, tmppd, isIgnoreEmpty)
-			if cdv >= 0 {
-				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-					maxv = cdv
+// 	if x > 0 {
+// 		if maxvpd == nil || !maxvpd.Has(x-1, y) {
+// 			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, tmppd, isIgnoreEmpty)
+// 			if cdv >= 0 {
+// 				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 					maxv = cdv
 
-					maxvpd = cdpd
-				}
-			}
-		}
-	}
+// 					maxvpd = cdpd
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if x < gs.Width-1 {
-		if maxvpd == nil || !maxvpd.Has(x+1, y) {
-			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, tmppd, isIgnoreEmpty)
-			if cdv >= 0 {
-				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-					maxv = cdv
+// 	if x < gs.Width-1 {
+// 		if maxvpd == nil || !maxvpd.Has(x+1, y) {
+// 			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, tmppd, isIgnoreEmpty)
+// 			if cdv >= 0 {
+// 				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 					maxv = cdv
 
-					maxvpd = cdpd
-				}
-			}
-		}
-	}
+// 					maxvpd = cdpd
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if maxv >= 0 {
-		return maxv, maxvpd
-	}
+// 	if maxv >= 0 {
+// 		return maxv, maxvpd
+// 	}
 
-	return -1, nil
-}
+// 	return -1, nil
+// }
 
-// 找到一条路径,返回该路径上的最大价值以及路径数组,找到第一个大于普通符号的位置就返回
-func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.GameScene, mainSymbol int, x, y int, isIgnoreEmpty bool) (int, *PosData) {
-	pd := gameProp.posPool.Get()
+// // 找到一条路径,返回该路径上的最大价值以及路径数组,找到第一个大于普通符号的位置就返回
+// func (cpt *CollectorPayTrigger) findPath(gameProp *GameProperty, gs *sgc7game.GameScene, mainSymbol int, x, y int, isIgnoreEmpty bool) (int, *PosData) {
+// 	pd := gameProp.posPool.Get()
 
-	pd.Add(x, y)
+// 	pd.Add(x, y)
 
-	maxv := -1
-	var maxvpd *PosData
+// 	maxv := -1
+// 	var maxvpd *PosData
 
-	if y < gs.Height-1 {
-		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
-		if cdv > 0 {
-			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-				maxv = cdv
+// 	if y < gs.Height-1 {
+// 		cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y+1, pd, isIgnoreEmpty)
+// 		if cdv > 0 {
+// 			if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 				maxv = cdv
 
-				maxvpd = cdpd
-			}
-		}
-	}
+// 				maxvpd = cdpd
+// 			}
+// 		}
+// 	}
 
-	if y > 0 {
-		if maxvpd == nil || !maxvpd.Has(x, y-1) {
-			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
-			if cdv > 0 {
-				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-					maxv = cdv
+// 	if y > 0 {
+// 		if maxvpd == nil || !maxvpd.Has(x, y-1) {
+// 			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x, y-1, pd, isIgnoreEmpty)
+// 			if cdv > 0 {
+// 				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 					maxv = cdv
 
-					maxvpd = cdpd
-				}
-			}
-		}
-	}
+// 					maxvpd = cdpd
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if x < gs.Width-1 {
-		if maxvpd == nil || !maxvpd.Has(x+1, y) {
-			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
-			if cdv > 0 {
-				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-					maxv = cdv
+// 	if x < gs.Width-1 {
+// 		if maxvpd == nil || !maxvpd.Has(x+1, y) {
+// 			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x+1, y, pd, isIgnoreEmpty)
+// 			if cdv > 0 {
+// 				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 					maxv = cdv
 
-					maxvpd = cdpd
-				}
-			}
-		}
-	}
+// 					maxvpd = cdpd
+// 				}
+// 			}
+// 		}
+// 	}
 
-	if x > 0 {
-		if maxvpd == nil || !maxvpd.Has(x-1, y) {
-			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
-			if cdv > 0 {
-				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
-					maxv = cdv
+// 	if x > 0 {
+// 		if maxvpd == nil || !maxvpd.Has(x-1, y) {
+// 			cdv, cdpd := cpt.findPathDeep(gameProp, gs, mainSymbol, x-1, y, pd, isIgnoreEmpty)
+// 			if cdv > 0 {
+// 				if cdv > maxv || (maxv == cdv && len(maxvpd.pos) > len(cdpd.pos)) {
+// 					maxv = cdv
 
-					maxvpd = cdpd
-				}
-			}
-		}
-	}
+// 					maxvpd = cdpd
+// 				}
+// 			}
+// 		}
+// 	}
 
-	return maxv, maxvpd
-}
+// 	return maxv, maxvpd
+// }
 
 func (cpt *CollectorPayTrigger) rechgScene(gs *sgc7game.GameScene) {
 	for x := 0; x < gs.Width; x++ {
 		for y := 0; y < gs.Height; y++ {
 			if gs.Arr[x][y] < 0 {
 				gs.Arr[x][y] = -1
+			}
+		}
+	}
+}
+
+func (cpt *CollectorPayTrigger) resetOtherPath(gs *sgc7game.GameScene) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			if gs.Arr[x][y] == -1 {
+				gs.Arr[x][y] = -2
 			}
 		}
 	}
@@ -769,9 +780,17 @@ func (cpt *CollectorPayTrigger) reinitScene(gs *sgc7game.GameScene, cd *Collecto
 	}
 }
 
-func (cpt *CollectorPayTrigger) calcVal(gs *sgc7game.GameScene, x, y int, ms int, syms []int) int {
-	if gs.Arr[x][y] == -2 {
+func (cpt *CollectorPayTrigger) calcVal(gs *sgc7game.GameScene, x, y int, ms int, syms []int, cd *CollectorPayTriggerData) int {
+	if gs.Arr[x][y] == -1 {
 		return 0
+	}
+
+	if gs.Arr[x][y] == -2 {
+		if cd.corecd.isPopcornTriggered {
+			return 0
+		}
+
+		return -1
 	}
 
 	if gs.Arr[x][y] == cpt.Config.SwitcherSymbolCode {
@@ -810,16 +829,16 @@ func (cpt *CollectorPayTrigger) calcVal(gs *sgc7game.GameScene, x, y int, ms int
 		return 4
 	}
 
-	return 0
+	return -1
 }
 
-func (cpt *CollectorPayTrigger) isNearVal(cv int) bool {
-	if cv >= 4 {
-		return true
-	}
+// func (cpt *CollectorPayTrigger) isNearVal(cv int) bool {
+// 	if cv >= 4 {
+// 		return true
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
 func (cpt *CollectorPayTrigger) checkDistente(vs *sgc7game.GameScene, ds *sgc7game.GameScene, x, y int, d int) {
 	if vs.Arr[x][y] != -1 {
@@ -848,15 +867,17 @@ func (cpt *CollectorPayTrigger) checkDistente(vs *sgc7game.GameScene, ds *sgc7ga
 	}
 }
 
-func (cpt *CollectorPayTrigger) checkVal(gs *sgc7game.GameScene, vs *sgc7game.GameScene, ds *sgc7game.GameScene, ms int, x, y int, syms []int, d int) bool {
+func (cpt *CollectorPayTrigger) checkVal(gs *sgc7game.GameScene, vs *sgc7game.GameScene, ds *sgc7game.GameScene, ms int, x, y int,
+	syms []int, d int, cd *CollectorPayTriggerData) bool {
+
 	if vs.Arr[x][y] != -1 {
 		cpt.checkDistente(vs, ds, x, y, d)
 
 		return false
 	}
 
-	val := cpt.calcVal(gs, x, y, ms, syms)
-	if val == 0 {
+	val := cpt.calcVal(gs, x, y, ms, syms, cd)
+	if val == -1 {
 		return false
 	}
 
@@ -865,32 +886,34 @@ func (cpt *CollectorPayTrigger) checkVal(gs *sgc7game.GameScene, vs *sgc7game.Ga
 
 	// up
 	if y < gs.Height-1 {
-		cpt.checkVal(gs, vs, ds, ms, x, y+1, syms, d+1)
+		cpt.checkVal(gs, vs, ds, ms, x, y+1, syms, d+1, cd)
 	}
 
 	// down
 	if y > 0 {
-		cpt.checkVal(gs, vs, ds, ms, x, y-1, syms, d+1)
+		cpt.checkVal(gs, vs, ds, ms, x, y-1, syms, d+1, cd)
 	}
 
 	// left
 	if x > 0 {
-		cpt.checkVal(gs, vs, ds, ms, x-1, y, syms, d+1)
+		cpt.checkVal(gs, vs, ds, ms, x-1, y, syms, d+1, cd)
 	}
 
 	// right
 	if x < gs.Width-1 {
-		cpt.checkVal(gs, vs, ds, ms, x+1, y, syms, d+1)
+		cpt.checkVal(gs, vs, ds, ms, x+1, y, syms, d+1, cd)
 	}
 
 	return true
 }
 
-func (cpt *CollectorPayTrigger) genValData(gs *sgc7game.GameScene, vs *sgc7game.GameScene, ds *sgc7game.GameScene, mx, my int, ms int, syms []int) (*sgc7game.GameScene, *sgc7game.GameScene) {
+func (cpt *CollectorPayTrigger) genValData(gs *sgc7game.GameScene, vs *sgc7game.GameScene, ds *sgc7game.GameScene,
+	mx, my int, ms int, syms []int, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
 	vs.Clear(-1)
 	ds.Clear(-1)
 
-	cpt.checkVal(gs, vs, ds, ms, mx, my, syms, 0)
+	cpt.checkVal(gs, vs, ds, ms, mx, my, syms, 0, cd)
 
 	return vs, ds
 }
@@ -1008,6 +1031,10 @@ func (cpt *CollectorPayTrigger) procUpLevel(gs *sgc7game.GameScene, ms int, off 
 	}
 }
 
+func (cpt *CollectorPayTrigger) procPopcorn(_ *sgc7game.GameScene, cd *CollectorPayTriggerData) {
+	cd.corecd.isPopcornTriggered = true
+}
+
 func (cpt *CollectorPayTrigger) procEgg(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
 	for x := 0; x < gs.Width; x++ {
 		for y := 0; y < gs.Height; y++ {
@@ -1028,7 +1055,149 @@ func (cpt *CollectorPayTrigger) procEgg(gameProp *GameProperty, gs *sgc7game.Gam
 	return nil, nil
 }
 
-func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
+func (cpt *CollectorPayTrigger) procSwitcher(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	ngs *sgc7game.GameScene, nos *sgc7game.GameScene,
+	ms int, x, y int, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
+	posd := gameProp.posPool.Get()
+
+	if cd.corecd.isValidPos(x-1, y) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x-1][y]) {
+		posd.Add(x-1, y)
+	}
+
+	if cd.corecd.isValidPos(x+1, y) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x+1][y]) {
+		posd.Add(x+1, y)
+	}
+
+	if cd.corecd.isValidPos(x, y-1) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x][y-1]) {
+		posd.Add(x, y-1)
+	}
+
+	if cd.corecd.isValidPos(x, y+1) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x][y+1]) {
+		posd.Add(x, y+1)
+	}
+
+	if posd.Len() > 0 {
+		ci, err := plugin.Random(context.Background(), posd.Len())
+		if err != nil {
+			goutils.Error("CollectorPayTrigger.procSwitcher:Random",
+				slog.Int("posdLen", posd.Len()),
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		tx, ty := posd.Get(ci)
+
+		posd2 := gameProp.posPool.Get()
+		cd.corecd.genClusterPosData(ngs, ngs.Arr[tx][ty], tx, ty, posd2)
+
+		msi := cd.corecd.getMainSymbolInfo(ms)
+		cd.corecd.refillSymbol(ngs, msi.syms[msi.level], posd2)
+
+		return ngs, nos
+	}
+
+	posd.Clear()
+
+	if cd.corecd.isValidPos(x-1, y) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x-1][y]) {
+		posd.Add(x-1, y)
+	}
+
+	if cd.corecd.isValidPos(x+1, y) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x+1][y]) {
+		posd.Add(x+1, y)
+	}
+
+	if cd.corecd.isValidPos(x, y-1) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x][y-1]) {
+		posd.Add(x, y-1)
+	}
+
+	if cd.corecd.isValidPos(x, y+1) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x][y+1]) {
+		posd.Add(x, y+1)
+	}
+
+	if posd.Len() > 0 {
+		ci, err := plugin.Random(context.Background(), posd.Len())
+		if err != nil {
+			goutils.Error("CollectorPayTrigger.procSwitcher:Random",
+				slog.Int("posdLen", posd.Len()),
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		tx, ty := posd.Get(ci)
+
+		sps, err := cd.corecd.randSpSym(plugin)
+		if err != nil {
+			goutils.Error("CollectorPayTrigger.procSwitcher:randSpSym",
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		ngs.Arr[tx][ty] = sps
+		if cd.corecd.isCoin(sps) {
+			cn, err := cd.corecd.randCoin(plugin)
+			if err != nil {
+				goutils.Error("CollectorPayTrigger.procSwitcher:randCoin",
+					goutils.Err(err))
+
+				return nil, nil
+			}
+
+			nos.Arr[tx][ty] = cn
+		}
+
+		return ngs, nos
+	}
+
+	goutils.Error("CollectorPayTrigger.procSwitcher:no")
+
+	return nil, nil
+}
+
+func (cpt *CollectorPayTrigger) procBomb(_ *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene, cd *CollectorPayTriggerData,
+	x, y int) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
+	for tx := -2; tx <= 2; tx++ {
+		for ty := -2; ty <= 2; ty++ {
+			if (tx == -2 || tx == 2) && (ty == 2 || ty == -2) {
+				continue
+			}
+
+			if cd.corecd.isValidPos(tx+x, ty+y) {
+				msi := cd.corecd.getMainSymbolInfo(ngs.Arr[tx+x][ty+y])
+				if msi != nil {
+					msi.x = -1
+					msi.y = -1
+				}
+
+				ngs.Arr[x][y] = -1
+				nos.Arr[x][y] = -1
+			}
+		}
+	}
+
+	return ngs, nos
+}
+
+func (cpt *CollectorPayTrigger) procDontPress(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			if gs.Arr[x][y] == cd.corecd.cfg.DontPressUsedSymbolCode {
+				ngs := gs.CloneEx(gameProp.PoolScene)
+				nos := os.CloneEx(gameProp.PoolScene)
+
+				return cpt.procBomb(gameProp, ngs, nos, cd, x, y)
+			}
+		}
+	}
+
+	return nil, nil
+}
+
+func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
 	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
 	cd *CollectorPayTriggerData) (*sgc7game.GameScene, int, int, error) {
 
@@ -1070,7 +1239,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		cd.AddPos(x, y)
 
 		if slices.Contains(syms, ngs.Arr[x][y]) || ngs.Arr[x][y] == ms {
-			ngs.Arr[x][y] = -2
+			ngs.Arr[x][y] = -1
 			os.Arr[x][y] = -1
 
 			ex = x
@@ -1094,7 +1263,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		if alluplevelIndex >= 0 {
 			cpt.procAllUpLevel(ngs, alluplevelIndex+1, cd)
 
-			ngs.Arr[x][y] = -2
+			ngs.Arr[x][y] = -1
 			os.Arr[x][y] = -1
 
 			ex = x
@@ -1110,7 +1279,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		if uplevelIndex >= 0 {
 			cpt.procUpLevel(ngs, ms, uplevelIndex+1, cd)
 
-			ngs.Arr[x][y] = -2
+			ngs.Arr[x][y] = -1
 			os.Arr[x][y] = -1
 
 			ex = x
@@ -1123,7 +1292,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 		}
 
 		if slices.Contains(cpt.Config.CoinSymbolCodes, ngs.Arr[x][y]) {
-			ngs.Arr[x][y] = -2
+			ngs.Arr[x][y] = -1
 
 			if os.Arr[x][y] <= 0 {
 				goutils.Error("CollectorPayTrigger.procNear:InvalidCoinValue",
@@ -1154,9 +1323,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 			curRet.Pos = append(curRet.Pos, x, y)
 
 			cpt.AddResult(curpr, ret, &cd.BasicComponentData)
-		}
-
-		if ngs.Arr[x][y] == cpt.Config.EggSymbolCode {
+		} else if ngs.Arr[x][y] == cpt.Config.EggSymbolCode {
 			ngs.Arr[x][y] = cd.corecd.cfg.EggUsedSymbolCode
 			os.Arr[x][y] = 0
 
@@ -1164,9 +1331,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 			ey = y
 
 			curRet.Pos = append(curRet.Pos, x, y)
-		}
-
-		if ngs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
+		} else if ngs.Arr[x][y] == cpt.Config.DontPressSymbolCode {
 			ngs.Arr[x][y] = cd.corecd.cfg.DontPressUsedSymbolCode
 			os.Arr[x][y] = 0
 
@@ -1174,10 +1339,29 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 			ey = y
 
 			curRet.Pos = append(curRet.Pos, x, y)
-		}
+		} else if ngs.Arr[x][y] == cpt.Config.SwitcherSymbolCode {
+			cpt.procSwitcher(gameProp, plugin, ngs, os, ms, x, y, cd)
+			// if tgs == nil {
+			// 	goutils.Error("CollectorPayTrigger.procNear:procSwitcher",
+			// 		goutils.Err(ErrInvalidComponentData))
 
-		if ngs.Arr[x][y] == cpt.Config.SwitcherSymbolCode || ngs.Arr[x][y] == cpt.Config.PopcornSymbolCode {
-			ngs.Arr[x][y] = -2
+			// 	return nil, -1, -1, ErrInvalidComponentData
+			// }
+
+			ngs.Arr[x][y] = -1
+			os.Arr[x][y] = -1
+
+			ex = x
+			ey = y
+
+			prex = x
+			prey = y
+
+			curRet.Pos = append(curRet.Pos, x, y)
+		} else if ngs.Arr[x][y] == cpt.Config.PopcornSymbolCode {
+			cpt.procPopcorn(ngs, cd)
+
+			ngs.Arr[x][y] = -1
 			os.Arr[x][y] = -1
 
 			ex = x
@@ -1213,7 +1397,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 }
 
 // procSymbolsWithPos
-func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) error {
+func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bet int, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) error {
 	ngs := gs
 
 	vs := gameProp.PoolScene.New2(gs.Width, gs.Height, -1)
@@ -1235,7 +1419,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 
 					for {
 						// 先计算价值和距离,然后按价值高低,一个个的获取,有走最短路径和最长路径2个方案,可能对局面造成影响的几个符号走最短路径,剩下的走最长路径
-						vs, ds := cpt.genValData(ngs, vs, ds, sx, sy, mainSymbol, arr)
+						vs, ds := cpt.genValData(ngs, vs, ds, sx, sy, mainSymbol, arr, cd)
 
 						tx, ty := cpt.findTarget(vs, ds)
 						if tx == -1 && ty == -1 {
@@ -1249,7 +1433,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 						// cv := vs.Arr[tx][ty]
 
 						// if cpt.isNearVal(cv) {
-						cngs, ex, ey, err := cpt.procNear(gameProp, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
+						cngs, ex, ey, err := cpt.procNear(gameProp, plugin, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
 						if err != nil {
 							goutils.Error("CollectorPayTrigger.procCollect:procNear",
 								slog.Int("sx", sx),
@@ -1277,6 +1461,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 		}
 
 		cd.moveEnd(mainSymbol)
+		cpt.resetOtherPath(ngs)
 	}
 
 	cpt.rechgScene(ngs)
@@ -1335,17 +1520,31 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	bet := gameProp.GetBet3(stake, BTypeBet)
 
-	cpt.procCollect(gameProp, bet, curpr, ngs, nos, cd)
+	cpt.procCollect(gameProp, plugin, bet, curpr, ngs, nos, cd)
 
 	if len(cd.UsedResults) > 0 {
 		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
 
 		cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
 	} else {
-		ngs, nos := cpt.procEgg(gameProp, ngs, nos, cd)
-		if ngs != nil {
-			cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
-			cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+		tngs, tnos := cpt.procEgg(gameProp, ngs, nos, cd)
+		if tngs != nil {
+			cpt.AddScene(gameProp, curpr, tngs, &cd.BasicComponentData)
+			cpt.AddOtherScene(gameProp, curpr, tnos, &cd.BasicComponentData)
+
+			nc := cpt.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
+		}
+
+		tngs, tnos = cpt.procDontPress(gameProp, ngs, nos, cd)
+		if tngs != nil {
+			cpt.AddScene(gameProp, curpr, tngs, &cd.BasicComponentData)
+			cpt.AddOtherScene(gameProp, curpr, tnos, &cd.BasicComponentData)
+
+			nc := cpt.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
 		}
 	}
 

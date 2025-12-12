@@ -46,6 +46,202 @@ type CPCoreData struct {
 	spSymBonusNum        int
 }
 
+func (gcd *CPCoreData) refillSymbol(ngs *sgc7game.GameScene, cs int, posd *PosData) {
+	for i := 0; i < posd.Len(); i++ {
+		x, y := posd.Get(i)
+		ngs.Arr[x][y] = cs
+	}
+}
+
+func (gcd *CPCoreData) genClusterPosData(ngs *sgc7game.GameScene, cs int, x, y int, posd *PosData) {
+	posd.Add(x, y)
+
+	if gcd.isValidPos(x-1, y) && ngs.Arr[x-1][y] == cs && posd.Has(x-1, y) {
+		gcd.genClusterPosData(ngs, cs, x-1, y, posd)
+	}
+
+	if gcd.isValidPos(x+1, y) && ngs.Arr[x+1][y] == cs && posd.Has(x+1, y) {
+		gcd.genClusterPosData(ngs, cs, x+1, y, posd)
+	}
+
+	if gcd.isValidPos(x, y-1) && ngs.Arr[x][y-1] == cs && posd.Has(x, y-1) {
+		gcd.genClusterPosData(ngs, cs, x, y-1, posd)
+	}
+
+	if gcd.isValidPos(x, y+1) && ngs.Arr[x][y+1] == cs && posd.Has(x, y+1) {
+		gcd.genClusterPosData(ngs, cs, x, y+1, posd)
+	}
+}
+
+func (gcd *CPCoreData) isValidSymbol4Switcher(ms int, cs int) bool {
+	if gcd.isSpSymbols(cs) {
+		return false
+	}
+
+	if cs < 0 {
+		return false
+	}
+
+	if gcd.getMainSymbolInfo(cs) != nil {
+		return false
+	}
+
+	msi := gcd.getMainSymbolInfo(ms)
+	if msi == nil {
+		return false
+	}
+
+	if slices.Contains(msi.syms, cs) {
+		return false
+	}
+
+	return true
+}
+
+func (gcd *CPCoreData) isValidSpSymbol4Switcher(ms int, cs int) bool {
+	msi := gcd.getMainSymbolInfo(ms)
+	if msi == nil {
+		return false
+	}
+
+	if slices.Contains(msi.syms, cs) {
+		return true
+	}
+
+	return false
+}
+
+func (gcd *CPCoreData) isSpSymbols(sc int) bool {
+	return gcd.cfg.isSpSymbols(sc)
+}
+
+func (gcd *CPCoreData) getMainSymbolInfo(ms int) *mainSymbolInfo {
+	for _, v := range gcd.lstMainSymbols {
+		if v.symbolCode == ms {
+			return v
+		}
+	}
+
+	return nil
+}
+
+func (gcd *CPCoreData) isValidPos(x, y int) bool {
+	switch gcd.gridSize {
+	case 6:
+		return x >= 1 && y >= 2 && x < 7 && y < 8
+	case 7:
+		return x >= 0 && y >= 1 && x < 7 && y < 8
+	}
+
+	return x >= 0 && y >= 0 && x < 8 && y < 8
+}
+
+func (gcd *CPCoreData) onRefillSymbols2(gameProp *GameProperty, curpr *sgc7game.PlayResult, _ *GameParams, plugin sgc7plugin.IPlugin,
+	_ string, _ string, _ sgc7game.IPlayerState, _ *sgc7game.Stake, _ []*sgc7game.PlayResult, rcd *RefillSymbols2Data,
+	rf *RefillSymbols2, ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
+
+	gcd.isDontPressTriggered = false
+
+	if nos == nil {
+		nos = gameProp.PoolScene.New(ngs.Width, ngs.Height)
+
+		rf.AddOtherScene(gameProp, curpr, nos, &rcd.BasicComponentData)
+	}
+
+	posd := gameProp.posPool.Get()
+	posd.SetPos(rcd.Pos)
+
+	for _, msi := range gcd.lstMainSymbols {
+		if msi.x < 0 {
+			if posd.IsEmpty() {
+				goutils.Error("CPCoreData.onRefillSymbols2:Random",
+					goutils.Err(ErrInvalidComponentData))
+
+				return ErrInvalidComponentData
+			}
+
+			ci, err := plugin.Random(context.Background(), posd.Len())
+			if err != nil {
+				goutils.Error("CPCoreData.onRefillSymbols2:Random",
+					goutils.Err(err))
+
+				return err
+			}
+
+			x, y := posd.Get(ci)
+			posd.Del(ci)
+
+			ngs.Arr[x][y] = msi.symbolCode
+			msi.x = x
+			msi.y = y
+		}
+	}
+
+	spn := 0
+	for _, arr := range ngs.Arr {
+		for _, sc := range arr {
+			if gcd.isSpSymbols(sc) {
+				spn++
+			}
+		}
+	}
+
+	nspn, err := gcd.randSpNum(plugin)
+	if err != nil {
+		goutils.Error("CPCoreData.onRefillSymbols2:randSpNum",
+			goutils.Err(err))
+
+		return err
+	}
+
+	if nspn <= spn {
+		return nil
+	}
+
+	for i := 0; i < nspn-spn; i++ {
+		if posd.IsEmpty() {
+			goutils.Error("CPCoreData.onRefillSymbols2:nspn",
+				goutils.Err(ErrInvalidComponentData))
+
+			return ErrInvalidComponentData
+		}
+
+		ci, err := plugin.Random(context.Background(), posd.Len())
+		if err != nil {
+			goutils.Error("CPCoreData.onRefillSymbols2:Random",
+				goutils.Err(err))
+
+			return err
+		}
+
+		x, y := posd.Get(ci)
+		posd.Del(ci)
+
+		sp, err := gcd.randSpSym(plugin)
+		if err != nil {
+			goutils.Error("CPCoreData.onRefillSymbols2:randSpSym",
+				goutils.Err(err))
+
+			return err
+		}
+
+		ngs.Arr[x][y] = sp
+		if gcd.isCoin(sp) {
+			cn, err := gcd.randCoin(plugin)
+			if err != nil {
+				goutils.Error("CPCoreData.onRefillSymbols2:randCoin",
+					goutils.Err(err))
+
+				return err
+			}
+
+			nos.Arr[x][y] = cn
+		}
+	}
+
+	return nil
+}
+
 func (gcd *CPCoreData) setMainSymbolPos(ms int, x, y int) {
 	for _, msi := range gcd.lstMainSymbols {
 		if msi.symbolCode == ms {
@@ -136,16 +332,16 @@ func (gcd *CPCoreData) getSymbolCode(ms int) int {
 	return -1
 }
 
-func (gcd *CPCoreData) getMainSymbolInfo(ms int) *mainSymbolInfo {
+// func (gcd *CPCoreData) getMainSymbolInfo(ms int) *mainSymbolInfo {
 
-	for _, msi := range gcd.lstMainSymbols {
-		if msi.symbolCode == ms {
-			return msi
-		}
-	}
+// 	for _, msi := range gcd.lstMainSymbols {
+// 		if msi.symbolCode == ms {
+// 			return msi
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func (gcd *CPCoreData) getNext() int {
 	msc := -1
@@ -355,6 +551,13 @@ func (cfg *CPCoreConfig) SetLinkComponent(link string, componentName string) {
 	if link == "next" {
 		cfg.DefaultNextComponent = componentName
 	}
+}
+
+func (cfg *CPCoreConfig) isSpSymbols(sc int) bool {
+	return sc == cfg.BonusSymbolCode || sc == cfg.DontPressSymbolCode || sc == cfg.DontPressUsedSymbolCode || sc == cfg.EggSymbolCode ||
+		sc == cfg.EggUsedSymbolCode || sc == cfg.PopcornSymbolCode || sc == cfg.SwitcherSymbolCode || sc == cfg.WildSymbolCode ||
+		sc == cfg.WildUsedSymbolCode || slices.Contains(cfg.UpLevelSymbolCodes, sc) || slices.Contains(cfg.AllUpLevelSymbolCodes, sc) ||
+		slices.Contains(cfg.CoinSymbolCodes, sc)
 }
 
 type CPCore struct {
