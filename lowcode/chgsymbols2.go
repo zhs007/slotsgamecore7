@@ -648,7 +648,14 @@ func (chgSymbols2 *ChgSymbols2) getSrcPos(gameProp *GameProperty, plugin sgc7plu
 				x := pos[i*2]
 				y := pos[i*2+1]
 
-				if slices.Contains(chgSymbols2.Config.SrcSymbolCodes, gs.Arr[x][y]) || ggcd.getGigaData(x, y) != nil {
+				cgd := ggcd.getGigaData(x, y)
+				if cgd != nil && slices.Contains(chgSymbols2.Config.SrcSymbolCodes, cgd.SymbolCode) {
+					npos = append(npos, x, y)
+
+					continue
+				}
+
+				if slices.Contains(chgSymbols2.Config.SrcSymbolCodes, gs.Arr[x][y]) {
 					npos = append(npos, x, y)
 				}
 			}
@@ -929,15 +936,17 @@ func (chgSymbols2 *ChgSymbols2) procSymbolWithPos(gameProp *GameProperty, gs *sg
 							}
 						}
 					}
-				}
-			} else {
-				ngs.Arr[x][y] = symbolCode
 
-				cd.AddPos(x, y)
-
-				if outputCD != nil {
-					outputCD.AddPos(x, y)
+					continue
 				}
+			}
+
+			ngs.Arr[x][y] = symbolCode
+
+			cd.AddPos(x, y)
+
+			if outputCD != nil {
+				outputCD.AddPos(x, y)
 			}
 		}
 	}

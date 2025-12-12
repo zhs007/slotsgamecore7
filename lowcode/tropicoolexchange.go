@@ -493,7 +493,7 @@ func (gen *TropiCoolExchange) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 	for x := 0; x < gs.Width; x++ {
 		for y := 0; y < gs.Height; y++ {
-			sym := gs.Arr[x][y]
+			sym := ngs.Arr[x][y]
 
 			ggd := ggcd.getGigaData(x, y)
 			if ggd != nil {
@@ -525,7 +525,7 @@ func (gen *TropiCoolExchange) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 			switch sym {
 			case gen.Config.RowSymbolCode:
-				err = gen.procRowSymbol(plugin, ts, ngs, x, y, ggcd, vw)
+				err = gen.procRowSymbol(plugin, ngs, ts, x, y, ggcd, vw)
 				if err != nil {
 					goutils.Error("TropiCoolExchange.OnPlayGame:procRowSymbol",
 						goutils.Err(err))
@@ -535,7 +535,7 @@ func (gen *TropiCoolExchange) OnPlayGame(gameProp *GameProperty, curpr *sgc7game
 
 				isTrigger = true
 			case gen.Config.ColSymbolCode:
-				err = gen.procColSymbol(plugin, ts, ngs, x, y, ggcd, vw)
+				err = gen.procColSymbol(plugin, ngs, ts, x, y, ggcd, vw)
 				if err != nil {
 					goutils.Error("TropiCoolExchange.OnPlayGame:procColSymbol",
 						goutils.Err(err))
