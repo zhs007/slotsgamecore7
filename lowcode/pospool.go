@@ -10,6 +10,12 @@ type PosData struct {
 	pos []int
 }
 
+func (pd *PosData) SetPos(pos []int) {
+	pd.pos = pd.pos[:0]
+
+	pd.pos = append(pd.pos, pos...)
+}
+
 func (pd *PosData) Len() int {
 	return len(pd.pos) / 2
 }

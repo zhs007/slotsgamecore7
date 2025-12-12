@@ -1028,6 +1028,46 @@ func (cpt *CollectorPayTrigger) procEgg(gameProp *GameProperty, gs *sgc7game.Gam
 	return nil, nil
 }
 
+func (cpt *CollectorPayTrigger) procBomb(gameProp *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene, cd *CollectorPayTriggerData,
+	x, y int) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
+	for tx := -2; tx <= 2; tx++ {
+		for ty := -2; ty <= 2; ty++ {
+			if (tx == -2 || tx == 2) && (ty == 2 || ty == -2) {
+				continue
+			}
+
+			if cd.corecd.isValidPos(tx+x, ty+y) {
+				msi := cd.corecd.getMainSymbolInfo(ngs.Arr[tx+x][ty+y])
+				if msi != nil {
+					msi.x = -1
+					msi.y = -1
+				}
+
+				ngs.Arr[x][y] = -1
+				nos.Arr[x][y] = -1
+			}
+		}
+	}
+
+	return ngs, nos
+}
+
+func (cpt *CollectorPayTrigger) procDontPress(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+	for x := 0; x < gs.Width; x++ {
+		for y := 0; y < gs.Height; y++ {
+			if gs.Arr[x][y] == cd.corecd.cfg.DontPressUsedSymbolCode {
+				ngs := gs.CloneEx(gameProp.PoolScene)
+				nos := os.CloneEx(gameProp.PoolScene)
+
+				return cpt.procBomb(gameProp, ngs, nos, cd, x, y)
+			}
+		}
+	}
+
+	return nil, nil
+}
+
 func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
 	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
 	cd *CollectorPayTriggerData) (*sgc7game.GameScene, int, int, error) {
@@ -1346,6 +1386,20 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 		if ngs != nil {
 			cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
 			cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+
+			nc := cpt.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
+		}
+
+		ngs, nos = cpt.procDontPress(gameProp, ngs, nos, cd)
+		if ngs != nil {
+			cpt.AddScene(gameProp, curpr, ngs, &cd.BasicComponentData)
+			cpt.AddOtherScene(gameProp, curpr, nos, &cd.BasicComponentData)
+
+			nc := cpt.onStepEnd(gameProp, curpr, gp, "")
+
+			return nc, nil
 		}
 	}
 

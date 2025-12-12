@@ -33,6 +33,7 @@ func (rs2d *RefillSymbols2Data) OnNewGame(gameProp *GameProperty, component ICom
 func (rs2d *RefillSymbols2Data) onNewStep() {
 	rs2d.UsedScenes = nil
 	rs2d.UsedOtherScenes = nil
+	rs2d.Pos = nil
 }
 
 // Clone
@@ -176,7 +177,7 @@ func (refillSymbols2 *RefillSymbols2) getMaskX(_ *GameProperty, basicCD *BasicCo
 }
 
 func (refillSymbols2 *RefillSymbols2) refillHeightAndMaskX(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, os *sgc7game.GameScene,
-	height int, maskX string, outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
+	height int, maskX string, outputCD IComponentData, rcd *RefillSymbols2Data) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
 
 	var maskArr []bool
 	if maskX == "<empty>" {
@@ -247,6 +248,8 @@ func (refillSymbols2 *RefillSymbols2) refillHeightAndMaskX(gameProp *GamePropert
 					if outputCD != nil {
 						outputCD.AddPos(x, y)
 					}
+
+					rcd.AddPos(x, y)
 				}
 			}
 		}
@@ -288,6 +291,8 @@ func (refillSymbols2 *RefillSymbols2) refillHeightAndMaskX(gameProp *GamePropert
 				if outputCD != nil {
 					outputCD.AddPos(x, y)
 				}
+
+				rcd.AddPos(x, y)
 			}
 		}
 	}
@@ -296,7 +301,7 @@ func (refillSymbols2 *RefillSymbols2) refillHeightAndMaskX(gameProp *GamePropert
 }
 
 func (refillSymbols2 *RefillSymbols2) refillMaskX(gameProp *GameProperty, plugin sgc7plugin.IPlugin, gs *sgc7game.GameScene, os *sgc7game.GameScene,
-	maskX string, outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
+	maskX string, outputCD IComponentData, rcd *RefillSymbols2Data) (*sgc7game.GameScene, *sgc7game.GameScene, error) {
 
 	var maskArr []bool
 	if maskX == "<empty>" {
@@ -363,6 +368,8 @@ func (refillSymbols2 *RefillSymbols2) refillMaskX(gameProp *GameProperty, plugin
 					if outputCD != nil {
 						outputCD.AddPos(x, y)
 					}
+
+					rcd.AddPos(x, y)
 				}
 			}
 		}
@@ -400,6 +407,8 @@ func (refillSymbols2 *RefillSymbols2) refillMaskX(gameProp *GameProperty, plugin
 				if outputCD != nil {
 					outputCD.AddPos(x, y)
 				}
+
+				rcd.AddPos(x, y)
 			}
 		}
 	}
@@ -408,7 +417,7 @@ func (refillSymbols2 *RefillSymbols2) refillMaskX(gameProp *GameProperty, plugin
 }
 
 func (refillSymbols2 *RefillSymbols2) refillOnlyHeight(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene,
-	height int, outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+	height int, outputCD IComponentData, rcd *RefillSymbols2Data) (*sgc7game.GameScene, *sgc7game.GameScene) {
 
 	ngs := gs
 
@@ -437,6 +446,8 @@ func (refillSymbols2 *RefillSymbols2) refillOnlyHeight(gameProp *GameProperty, g
 					if outputCD != nil {
 						outputCD.AddPos(x, y)
 					}
+
+					rcd.AddPos(x, y)
 				}
 			}
 		}
@@ -463,6 +474,8 @@ func (refillSymbols2 *RefillSymbols2) refillOnlyHeight(gameProp *GameProperty, g
 				if outputCD != nil {
 					outputCD.AddPos(x, y)
 				}
+
+				rcd.AddPos(x, y)
 			}
 		}
 	}
@@ -471,7 +484,7 @@ func (refillSymbols2 *RefillSymbols2) refillOnlyHeight(gameProp *GameProperty, g
 }
 
 func (refillSymbols2 *RefillSymbols2) refill(gameProp *GameProperty, gs *sgc7game.GameScene, os *sgc7game.GameScene,
-	outputCD IComponentData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+	outputCD IComponentData, rcd *RefillSymbols2Data) (*sgc7game.GameScene, *sgc7game.GameScene) {
 
 	ngs := gs
 
@@ -496,6 +509,8 @@ func (refillSymbols2 *RefillSymbols2) refill(gameProp *GameProperty, gs *sgc7gam
 					if outputCD != nil {
 						outputCD.AddPos(x, y)
 					}
+
+					rcd.AddPos(x, y)
 				}
 			}
 		}
@@ -573,8 +588,8 @@ func (refillSymbols2 *RefillSymbols2) getCPCoreData(gameProp *GameProperty) (*CP
 	return cd, nil
 }
 
-func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, gp *GameParams, plugin sgc7plugin.IPlugin,
-	cmd string, param string, ps sgc7game.IPlayerState, stake *sgc7game.Stake, prs []*sgc7game.PlayResult, rcd *RefillSymbols2Data) (
+func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *sgc7game.PlayResult, _ *GameParams, plugin sgc7plugin.IPlugin,
+	_ string, _ string, _ sgc7game.IPlayerState, _ *sgc7game.Stake, prs []*sgc7game.PlayResult, rcd *RefillSymbols2Data) (
 	*sgc7game.GameScene, *sgc7game.GameScene, bool, error) {
 
 	gs := refillSymbols2.GetTargetScene3(gameProp, curpr, prs, 0)
@@ -603,7 +618,7 @@ func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *
 
 	if maskX != "" {
 		if height > 0 && height < gs.Height {
-			ngs, nos, err := refillSymbols2.refillHeightAndMaskX(gameProp, plugin, gs, os, height, maskX, outputCD)
+			ngs, nos, err := refillSymbols2.refillHeightAndMaskX(gameProp, plugin, gs, os, height, maskX, outputCD, rcd)
 			if err != nil {
 				goutils.Error("RefillSymbols2.OnPlayGame:refillHeightAndMaskX",
 					goutils.Err(err))
@@ -625,7 +640,7 @@ func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *
 			return ngs, nos, true, nil
 		}
 
-		ngs, nos, err := refillSymbols2.refillMaskX(gameProp, plugin, gs, os, maskX, outputCD)
+		ngs, nos, err := refillSymbols2.refillMaskX(gameProp, plugin, gs, os, maskX, outputCD, rcd)
 		if err != nil {
 			goutils.Error("RefillSymbols2.OnPlayGame:refillMaskX",
 				goutils.Err(err))
@@ -649,7 +664,7 @@ func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *
 	}
 
 	if height > 0 && height < gs.Height {
-		ngs, nos := refillSymbols2.refillOnlyHeight(gameProp, gs, os, height, outputCD)
+		ngs, nos := refillSymbols2.refillOnlyHeight(gameProp, gs, os, height, outputCD, rcd)
 		if ngs == gs {
 			return nil, nil, false, nil
 		}
@@ -664,7 +679,7 @@ func (refillSymbols2 *RefillSymbols2) onPlayGame(gameProp *GameProperty, curpr *
 		return ngs, nos, true, nil
 	}
 
-	ngs, nos := refillSymbols2.refill(gameProp, gs, os, outputCD)
+	ngs, nos := refillSymbols2.refill(gameProp, gs, os, outputCD, rcd)
 	if ngs == gs {
 		return nil, nil, false, nil
 	}
