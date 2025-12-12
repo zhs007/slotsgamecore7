@@ -10,6 +10,10 @@ type PosData struct {
 	pos []int
 }
 
+func (pd *PosData) Clear() {
+	pd.pos = pd.pos[:0]
+}
+
 func (pd *PosData) SetPos(pos []int) {
 	pd.pos = pd.pos[:0]
 
@@ -37,7 +41,7 @@ func (pd *PosData) Index(x, y int) int {
 }
 
 func (pd *PosData) Del(i int) {
-	slices.Delete(pd.pos, i*2, i*2+2)
+	pd.pos = slices.Delete(pd.pos, i*2, i*2+2)
 }
 
 func (pd *PosData) Get(i int) (int, int) {

@@ -46,6 +46,71 @@ type CPCoreData struct {
 	spSymBonusNum        int
 }
 
+func (gcd *CPCoreData) refillSymbol(ngs *sgc7game.GameScene, cs int, posd *PosData) {
+	for i := 0; i < posd.Len(); i++ {
+		x, y := posd.Get(i)
+		ngs.Arr[x][y] = cs
+	}
+}
+
+func (gcd *CPCoreData) genClusterPosData(ngs *sgc7game.GameScene, cs int, x, y int, posd *PosData) {
+	posd.Add(x, y)
+
+	if gcd.isValidPos(x-1, y) && ngs.Arr[x-1][y] == cs && posd.Has(x-1, y) {
+		gcd.genClusterPosData(ngs, cs, x-1, y, posd)
+	}
+
+	if gcd.isValidPos(x+1, y) && ngs.Arr[x+1][y] == cs && posd.Has(x+1, y) {
+		gcd.genClusterPosData(ngs, cs, x+1, y, posd)
+	}
+
+	if gcd.isValidPos(x, y-1) && ngs.Arr[x][y-1] == cs && posd.Has(x, y-1) {
+		gcd.genClusterPosData(ngs, cs, x, y-1, posd)
+	}
+
+	if gcd.isValidPos(x, y+1) && ngs.Arr[x][y+1] == cs && posd.Has(x, y+1) {
+		gcd.genClusterPosData(ngs, cs, x, y+1, posd)
+	}
+}
+
+func (gcd *CPCoreData) isValidSymbol4Switcher(ms int, cs int) bool {
+	if gcd.isSpSymbols(cs) {
+		return false
+	}
+
+	if cs < 0 {
+		return false
+	}
+
+	if gcd.getMainSymbolInfo(cs) != nil {
+		return false
+	}
+
+	msi := gcd.getMainSymbolInfo(ms)
+	if msi == nil {
+		return false
+	}
+
+	if slices.Contains(msi.syms, cs) {
+		return false
+	}
+
+	return true
+}
+
+func (gcd *CPCoreData) isValidSpSymbol4Switcher(ms int, cs int) bool {
+	msi := gcd.getMainSymbolInfo(ms)
+	if msi == nil {
+		return false
+	}
+
+	if slices.Contains(msi.syms, cs) {
+		return true
+	}
+
+	return false
+}
+
 func (gcd *CPCoreData) isSpSymbols(sc int) bool {
 	return gcd.cfg.isSpSymbols(sc)
 }

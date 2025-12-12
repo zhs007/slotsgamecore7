@@ -1,6 +1,7 @@
 package lowcode
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"slices"
@@ -1054,6 +1055,108 @@ func (cpt *CollectorPayTrigger) procEgg(gameProp *GameProperty, gs *sgc7game.Gam
 	return nil, nil
 }
 
+func (cpt *CollectorPayTrigger) procSwitcher(gameProp *GameProperty, plugin sgc7plugin.IPlugin,
+	ngs *sgc7game.GameScene, nos *sgc7game.GameScene,
+	ms int, x, y int, cd *CollectorPayTriggerData) (*sgc7game.GameScene, *sgc7game.GameScene) {
+
+	posd := gameProp.posPool.Get()
+
+	if cd.corecd.isValidPos(x-1, y) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x-1][y]) {
+		posd.Add(x-1, y)
+	}
+
+	if cd.corecd.isValidPos(x+1, y) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x+1][y]) {
+		posd.Add(x+1, y)
+	}
+
+	if cd.corecd.isValidPos(x, y-1) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x][y-1]) {
+		posd.Add(x, y-1)
+	}
+
+	if cd.corecd.isValidPos(x, y+1) && cd.corecd.isValidSymbol4Switcher(ms, ngs.Arr[x][y+1]) {
+		posd.Add(x, y+1)
+	}
+
+	if posd.Len() > 0 {
+		ci, err := plugin.Random(context.Background(), posd.Len())
+		if err != nil {
+			goutils.Error("CollectorPayTrigger.procSwitcher:Random",
+				slog.Int("posdLen", posd.Len()),
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		tx, ty := posd.Get(ci)
+
+		posd2 := gameProp.posPool.Get()
+		cd.corecd.genClusterPosData(ngs, ngs.Arr[tx][ty], tx, ty, posd2)
+
+		msi := cd.corecd.getMainSymbolInfo(ms)
+		cd.corecd.refillSymbol(ngs, msi.syms[msi.level], posd2)
+
+		return ngs, nos
+	}
+
+	posd.Clear()
+
+	if cd.corecd.isValidPos(x-1, y) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x-1][y]) {
+		posd.Add(x-1, y)
+	}
+
+	if cd.corecd.isValidPos(x+1, y) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x+1][y]) {
+		posd.Add(x+1, y)
+	}
+
+	if cd.corecd.isValidPos(x, y-1) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x][y-1]) {
+		posd.Add(x, y-1)
+	}
+
+	if cd.corecd.isValidPos(x, y+1) && cd.corecd.isValidSpSymbol4Switcher(ms, ngs.Arr[x][y+1]) {
+		posd.Add(x, y+1)
+	}
+
+	if posd.Len() > 0 {
+		ci, err := plugin.Random(context.Background(), posd.Len())
+		if err != nil {
+			goutils.Error("CollectorPayTrigger.procSwitcher:Random",
+				slog.Int("posdLen", posd.Len()),
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		tx, ty := posd.Get(ci)
+
+		sps, err := cd.corecd.randSpSym(plugin)
+		if err != nil {
+			goutils.Error("CollectorPayTrigger.procSwitcher:randSpSym",
+				goutils.Err(err))
+
+			return nil, nil
+		}
+
+		ngs.Arr[tx][ty] = sps
+		if cd.corecd.isCoin(sps) {
+			cn, err := cd.corecd.randCoin(plugin)
+			if err != nil {
+				goutils.Error("CollectorPayTrigger.procSwitcher:randCoin",
+					goutils.Err(err))
+
+				return nil, nil
+			}
+
+			nos.Arr[tx][ty] = cn
+		}
+
+		return ngs, nos
+	}
+
+	goutils.Error("CollectorPayTrigger.procSwitcher:no")
+
+	return nil, nil
+}
+
 func (cpt *CollectorPayTrigger) procBomb(_ *GameProperty, ngs *sgc7game.GameScene, nos *sgc7game.GameScene, cd *CollectorPayTriggerData,
 	x, y int) (*sgc7game.GameScene, *sgc7game.GameScene) {
 
@@ -1094,7 +1197,7 @@ func (cpt *CollectorPayTrigger) procDontPress(gameProp *GameProperty, gs *sgc7ga
 	return nil, nil
 }
 
-func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
+func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bet int, ms int, sx, sy int, dx, dy int, vs *sgc7game.GameScene,
 	ds *sgc7game.GameScene, gs *sgc7game.GameScene, os *sgc7game.GameScene, syms []int, curpr *sgc7game.PlayResult,
 	cd *CollectorPayTriggerData) (*sgc7game.GameScene, int, int, error) {
 
@@ -1237,6 +1340,14 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 
 			curRet.Pos = append(curRet.Pos, x, y)
 		} else if ngs.Arr[x][y] == cpt.Config.SwitcherSymbolCode {
+			cpt.procSwitcher(gameProp, plugin, ngs, os, ms, x, y, cd)
+			// if tgs == nil {
+			// 	goutils.Error("CollectorPayTrigger.procNear:procSwitcher",
+			// 		goutils.Err(ErrInvalidComponentData))
+
+			// 	return nil, -1, -1, ErrInvalidComponentData
+			// }
+
 			ngs.Arr[x][y] = -1
 			os.Arr[x][y] = -1
 
@@ -1286,7 +1397,7 @@ func (cpt *CollectorPayTrigger) procNear(gameProp *GameProperty, bet int, ms int
 }
 
 // procSymbolsWithPos
-func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) error {
+func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, plugin sgc7plugin.IPlugin, bet int, curpr *sgc7game.PlayResult, gs *sgc7game.GameScene, os *sgc7game.GameScene, cd *CollectorPayTriggerData) error {
 	ngs := gs
 
 	vs := gameProp.PoolScene.New2(gs.Width, gs.Height, -1)
@@ -1322,7 +1433,7 @@ func (cpt *CollectorPayTrigger) procCollect(gameProp *GameProperty, bet int, cur
 						// cv := vs.Arr[tx][ty]
 
 						// if cpt.isNearVal(cv) {
-						cngs, ex, ey, err := cpt.procNear(gameProp, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
+						cngs, ex, ey, err := cpt.procNear(gameProp, plugin, bet, mainSymbol, sx, sy, tx, ty, vs, ds, ngs, os, arr, curpr, cd)
 						if err != nil {
 							goutils.Error("CollectorPayTrigger.procCollect:procNear",
 								slog.Int("sx", sx),
@@ -1409,7 +1520,7 @@ func (cpt *CollectorPayTrigger) OnPlayGame(gameProp *GameProperty, curpr *sgc7ga
 
 	bet := gameProp.GetBet3(stake, BTypeBet)
 
-	cpt.procCollect(gameProp, bet, curpr, ngs, nos, cd)
+	cpt.procCollect(gameProp, plugin, bet, curpr, ngs, nos, cd)
 
 	if len(cd.UsedResults) > 0 {
 		cpt.ProcControllers(gameProp, plugin, curpr, gp, 0, "<trigger>")
