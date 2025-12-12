@@ -75,6 +75,8 @@ func (gcd *CPCoreData) onRefillSymbols2(gameProp *GameProperty, curpr *sgc7game.
 	_ string, _ string, _ sgc7game.IPlayerState, _ *sgc7game.Stake, _ []*sgc7game.PlayResult, rcd *RefillSymbols2Data,
 	rf *RefillSymbols2, ngs *sgc7game.GameScene, nos *sgc7game.GameScene) error {
 
+	gcd.isDontPressTriggered = false
+
 	if nos == nil {
 		nos = gameProp.PoolScene.New(ngs.Width, ngs.Height)
 
