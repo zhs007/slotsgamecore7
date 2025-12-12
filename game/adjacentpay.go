@@ -163,33 +163,33 @@ func calcAdjacentPayWithX(scene *GameScene, x, y int, symbol int, pt *PayTables,
 		}
 
 		if pt.MapPay[curs][nums-1] > 0 && pt.MapPay[symbol][wnums-1] > 0 {
-			if pt.MapPay[curs][nums-1] > pt.MapPay[symbol][wnums-1] {
-				r := &Result{
-					Symbol:     curs,
-					Type:       RTAdjacentPay,
-					LineIndex:  -1,
-					Pos:        pos,
-					SymbolNums: nums,
-					Mul:        pt.MapPay[curs][nums-1],
-					CoinWin:    pt.MapPay[curs][nums-1],
-					CashWin:    pt.MapPay[curs][nums-1] * bet,
-				}
-
-				return r
-			}
-
+			// if pt.MapPay[curs][nums-1] > pt.MapPay[symbol][wnums-1] {
 			r := &Result{
-				Symbol:     symbol,
+				Symbol:     curs,
 				Type:       RTAdjacentPay,
 				LineIndex:  -1,
-				Pos:        wpos,
-				SymbolNums: wnums,
-				Mul:        pt.MapPay[symbol][wnums-1],
-				CoinWin:    pt.MapPay[symbol][wnums-1],
-				CashWin:    pt.MapPay[symbol][wnums-1] * bet,
+				Pos:        pos,
+				SymbolNums: nums,
+				Mul:        pt.MapPay[curs][nums-1],
+				CoinWin:    pt.MapPay[curs][nums-1],
+				CashWin:    pt.MapPay[curs][nums-1] * bet,
 			}
 
 			return r
+			// }
+
+			// r := &Result{
+			// 	Symbol:     symbol,
+			// 	Type:       RTAdjacentPay,
+			// 	LineIndex:  -1,
+			// 	Pos:        wpos,
+			// 	SymbolNums: wnums,
+			// 	Mul:        pt.MapPay[symbol][wnums-1],
+			// 	CoinWin:    pt.MapPay[symbol][wnums-1],
+			// 	CashWin:    pt.MapPay[symbol][wnums-1] * bet,
+			// }
+
+			// return r
 		}
 
 		if pt.MapPay[symbol][wnums-1] > 0 {
@@ -321,33 +321,33 @@ func calcAdjacentPayWithY(scene *GameScene, x, y int, symbol int, pt *PayTables,
 		}
 
 		if pt.MapPay[curs][nums-1] > 0 && pt.MapPay[symbol][wnums-1] > 0 {
-			if pt.MapPay[curs][nums-1] > pt.MapPay[symbol][wnums-1] {
-				r := &Result{
-					Symbol:     curs,
-					Type:       RTAdjacentPay,
-					LineIndex:  -1,
-					Pos:        pos,
-					SymbolNums: nums,
-					Mul:        pt.MapPay[curs][nums-1],
-					CoinWin:    pt.MapPay[curs][nums-1],
-					CashWin:    pt.MapPay[curs][nums-1] * bet,
-				}
-
-				return r
-			}
-
+			// if pt.MapPay[curs][nums-1] > pt.MapPay[symbol][wnums-1] {
 			r := &Result{
-				Symbol:     symbol,
+				Symbol:     curs,
 				Type:       RTAdjacentPay,
 				LineIndex:  -1,
-				Pos:        wpos,
-				SymbolNums: wnums,
-				Mul:        pt.MapPay[symbol][wnums-1],
-				CoinWin:    pt.MapPay[symbol][wnums-1],
-				CashWin:    pt.MapPay[symbol][wnums-1] * bet,
+				Pos:        pos,
+				SymbolNums: nums,
+				Mul:        pt.MapPay[curs][nums-1],
+				CoinWin:    pt.MapPay[curs][nums-1],
+				CashWin:    pt.MapPay[curs][nums-1] * bet,
 			}
 
 			return r
+			// }
+
+			// r := &Result{
+			// 	Symbol:     symbol,
+			// 	Type:       RTAdjacentPay,
+			// 	LineIndex:  -1,
+			// 	Pos:        wpos,
+			// 	SymbolNums: wnums,
+			// 	Mul:        pt.MapPay[symbol][wnums-1],
+			// 	CoinWin:    pt.MapPay[symbol][wnums-1],
+			// 	CashWin:    pt.MapPay[symbol][wnums-1] * bet,
+			// }
+
+			// return r
 		}
 
 		if pt.MapPay[symbol][wnums-1] > 0 {
