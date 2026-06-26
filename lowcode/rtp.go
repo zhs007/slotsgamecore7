@@ -321,6 +321,8 @@ func StartRTP(gamecfg string, icore int, ispinnums int64, outputPath string, bet
 
 	rtp.Save2CSV(path.Join(outputPath, fmt.Sprintf("%v-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
 
+	rtp.SaveReturns2CSV(path.Join(outputPath, fmt.Sprintf("%v-retuans-%v.csv", game.Pool.Config.Name, curtime.Format("2006-01-02_15_04_05"))))
+
 	if game.Pool.Stats != nil {
 		game.Pool.Stats.Wait()
 
